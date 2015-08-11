@@ -51,15 +51,15 @@ ConfigNodePersistent {
 	protected ArrayDrawer arrayDrawer;
 	private ColorExtractor colorExtractor;
 	
-	private TVModel tvModel;
+	private DataModel model;
 	protected Preferences configNode;
 	
 	public MatrixViewController(final InteractiveMatrixView imView,
-			final GlobalMatrixView gmView, final TVModel tvModel) {
+			final GlobalMatrixView gmView, final DataModel model) {
 		
 		this.imView = imView;
 		this.gmView = gmView;
-		this.tvModel = tvModel;
+		this.model = model;
 		
 	}
 	
@@ -69,7 +69,7 @@ ConfigNodePersistent {
 	 */
 	public void setup() {
 		
-		if(configNode != null) {
+		if(configNode == null) {
 			LogBuffer.println("Could not set up IMVController. No configNode"
 					+ "was set!");
 			return;
@@ -123,7 +123,7 @@ ConfigNodePersistent {
 
 	@Override // Observer code
 	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 	
@@ -144,7 +144,7 @@ ConfigNodePersistent {
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		colorPresets.setConfigNode(configNode);
 		colorExtractor = new ColorExtractor(
-				tvModel.getDataMatrix().getMinVal(), tvModel.getDataMatrix()
+				model.getDataMatrix().getMinVal(), model.getDataMatrix()
 						.getMaxVal());
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NAN, DataModel.EMPTY);
@@ -152,7 +152,14 @@ ConfigNodePersistent {
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
 		dArrayDrawer.setColorExtractor(colorExtractor);
 		arrayDrawer = dArrayDrawer;
-		tvModel.addObserver(arrayDrawer);
+		((TVModel) model).addObserver(arrayDrawer);
+		
+		dArrayDrawer.setDataMatrix(model.getDataMatrix());
+		dArrayDrawer.recalculateContrast();
+		dArrayDrawer.setConfigNode("ArrayDrawer1");
+		
+		imView.setArrayDrawer(arrayDrawer);
+		gmView.setArrayDrawer(arrayDrawer);
 	}
 	
 	private void addKeyBindings() {
@@ -249,7 +256,7 @@ ConfigNodePersistent {
 
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier),
 				"zoomSelection");
-		action_map.put("zoomSelection", new ZoomAction());
+		action_map.put("zoomSelection", new ZoomSelectionAction());
 
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier),
 				"resetZoom");
@@ -401,7 +408,7 @@ ConfigNodePersistent {
 	/**
 	 * Zooms into the selected area
 	 */
-	private class ZoomAction extends AbstractAction {
+	private class ZoomSelectionAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -457,6 +464,7 @@ ConfigNodePersistent {
 		}
 	}
 
+	
 	/** Resets the GlobalView to all zoomed-out state */
 	private class HomeAction extends AbstractAction {
 
@@ -564,6 +572,16 @@ ConfigNodePersistent {
 	}
 	
 	/**
+	 * Notifies both MatrixViews that the data has updated, so it can
+	 * recalculate pixel color values during the next update.
+	 */
+	public void updateMatrixPixels() {
+		
+		imView.setDataChanged();
+		gmView.setDataChanged();
+	}
+	
+	/**
 	 * Assigns references of MapContainer instances to be used for 
 	 * interactivity and information display in InteractiveMatrixView. 
 	 * @param xmap
@@ -616,6 +634,9 @@ ConfigNodePersistent {
 
 		this.rowSelection = rowSelection;
 		this.rowSelection.addObserver(this);
+		
+		imView.setRowSelection(rowSelection);
+		gmView.setRowSelection(rowSelection);
 	}
 
 	/**
@@ -633,6 +654,9 @@ ConfigNodePersistent {
 
 		this.colSelection = colSelection;
 		this.colSelection.addObserver(this);
+		
+		imView.setColSelection(colSelection);
+		gmView.setColSelection(colSelection);
 	}
 	
 	/**
@@ -657,5 +681,63 @@ ConfigNodePersistent {
 
 		interactiveXmap.notifyObservers();
 		interactiveYmap.notifyObservers();
+	}
+	
+	/**
+	 * Access a reference of the color extractor which determines how
+	 * colors are displayed in relation to values.
+	 * @return The MatrixView's color extractor.
+	 */
+	public ColorExtractor getColorExtractor() {
+		
+		return colorExtractor;
+	}
+	
+	/**
+	 * Evaluates current zoom status and returns an array of booleans, which
+	 * can be used to test certain zoom conditions. This is for example relevant
+	 * for the DendroView buttons. They will be enabled or disabled based 
+	 * on the zoom status.
+	 * @return Ordered boolean array of zoom statuses: [isXMin, isYMin, 
+	 * atRight, atLeft, atTop, atBottom, isSelectionZoomed]
+	 */
+	public boolean[] getZoomStatusForButtons() {
+		
+		boolean[] zoomStatus;
+		
+		/* Determine if either MapContainer is at minimum scale */
+		boolean isXMin = interactiveXmap.showsAllTiles();
+		boolean isYMin = interactiveYmap.showsAllTiles();
+		
+		boolean atRight = (interactiveXmap.getFirstVisible() + interactiveXmap
+				.getNumVisible()) == (interactiveXmap.getMaxIndex() + 1);
+		boolean atLeft = interactiveXmap.getFirstVisible() == 0;
+		boolean atTop = interactiveYmap.getFirstVisible() == 0;
+		boolean atBottom = (interactiveYmap.getFirstVisible() + interactiveYmap
+				.getNumVisible()) == (interactiveYmap.getMaxIndex() + 1);
+
+		int xTilesVisible = interactiveXmap.getNumVisible();
+		int yTilesVisible = interactiveYmap.getNumVisible();
+
+		final boolean genesSelected = rowSelection.getNSelectedIndexes() > 0;
+		final boolean arraysSelected = colSelection.getNSelectedIndexes() > 0;
+
+		// Note: A selection is "fully zoomed" if there is no selection - this
+		// will disable the zoom selection button
+		boolean isSelectionZoomed = (!genesSelected && !arraysSelected)
+				|| (genesSelected
+						&& rowSelection.getMinIndex() == interactiveYmap
+								.getFirstVisible()
+						&& (rowSelection.getMaxIndex()
+								- rowSelection.getMinIndex() + 1) == yTilesVisible
+						&& arraysSelected
+						&& colSelection.getMinIndex() == interactiveXmap
+								.getFirstVisible() && (colSelection
+						.getMaxIndex() - colSelection.getMinIndex() + 1) == xTilesVisible);
+		
+		zoomStatus = new boolean[]{isXMin, isYMin, atRight, atLeft, atTop, 
+				atBottom, isSelectionZoomed};
+		
+		return zoomStatus;
 	}
 }

@@ -116,9 +116,9 @@ public abstract class MatrixView extends ModelViewProduced {
 			revalidateScreen();
 			setSubImage();
 			
-			if(pixelsChanged) {
+			if(dataChanged) {
 				updatePixels();
-				pixelsChanged = false;
+				dataChanged = false;
 			}
 		}
 			
@@ -383,9 +383,13 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 	}
 	
-	public void setPixelsChanged() {
+	/**
+	 * Tells the MatrixView that underlying data has changed and it needs to
+	 * recalculate its pixel color values. 
+	 */
+	public void setDataChanged() {
 		
-		this.pixelsChanged = true;
+		this.dataChanged = true;
 	}
 
 }

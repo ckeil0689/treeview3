@@ -151,7 +151,7 @@ public class GUIFactory {
 			break;
 			
 		case NO_GAPS_NO_INS_FILL:
-			comp.setLayout(new MigLayout("gap 0!, ins 0, debug", "grow"));
+			comp.setLayout(new MigLayout("gap 0!, ins 0", "grow"));
 			break;
 			
 		case TINY_GAPS_INS:

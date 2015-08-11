@@ -205,6 +205,15 @@ public class MapContainer extends Observable implements Observer,
 		final double divider = getMaxIndex() - getMinIndex() + 1;
 		return(pixels / divider);
 	}
+	
+	/**
+	 * Tests whether all data tiles for this MapContainer are visible.
+	 * @return True if all tiles are visible, false otherwise.
+	 */
+	public boolean showsAllTiles() {
+		
+		return getMaxIndex() + 1 == getNumVisible();
+	}
 
 	/**
 	 * This method allows for a more intuitive call from other classes so

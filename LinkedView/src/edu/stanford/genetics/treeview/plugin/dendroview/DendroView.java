@@ -227,20 +227,20 @@ public class DendroView implements Observer, DendroPanel {
 		setupScaleButtons();
 	}
 
-	public void setMatrixHome() {
-
-		interactiveMatrixView.resetView();
-		interactiveMatrixView.repaint();
-
-		globalMatrixView.resetView();
-		globalMatrixView.repaint();
-	}
-	
-	public void updateMatrixPixels() {
-		
-		interactiveMatrixView.setPixelsChanged();
-		globalMatrixView.setPixelsChanged();
-	}
+//	public void setMatrixHome() {
+//
+//		interactiveMatrixView.resetView();
+//		interactiveMatrixView.repaint();
+//
+//		globalMatrixView.resetView();
+//		globalMatrixView.repaint();
+//	}
+//	
+//	public void updateMatrixPixels() {
+//		
+//		interactiveMatrixView.setPixelsChanged();
+//		globalMatrixView.setPixelsChanged();
+//	}
 
 	/**
 	 * Returns the dendroPane so it can be displayed in TVFrame.
@@ -544,7 +544,7 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel globalOverviewPanel;
 		
 		globalOverviewPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS_NO_INS_FILL);
+				GUIFactory.NO_PADDING);
 		globalOverviewPanel.add(globalMatrixView, "grow, push");
 		
 		return globalOverviewPanel;
