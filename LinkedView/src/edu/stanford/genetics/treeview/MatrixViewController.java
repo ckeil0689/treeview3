@@ -6,11 +6,13 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -26,11 +28,12 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
 /**
  * This controller explicitly handles direct user interaction with the
- * InteractiveMatrixView.  
+ * InteractiveMatrixView. 
+ * This can probably also be split into Parent + Interactive + Global 
  * @author chris0689
  *
  */
-public class InteractiveMatrixViewController implements Observer, 
+public class MatrixViewController implements Observer, 
 ConfigNodePersistent {
 
 	private InteractiveMatrixView imView;
@@ -51,7 +54,7 @@ ConfigNodePersistent {
 	private TVModel tvModel;
 	protected Preferences configNode;
 	
-	public InteractiveMatrixViewController(final InteractiveMatrixView imView,
+	public MatrixViewController(final InteractiveMatrixView imView,
 			final GlobalMatrixView gmView, final TVModel tvModel) {
 		
 		this.imView = imView;
@@ -91,6 +94,31 @@ ConfigNodePersistent {
 					+ "node because parentNode was null.");
 			return;
 		}
+	}
+	
+	/**
+	 * Update the state of color extractor to reflect settings from an imported
+	 * node.
+	 * 
+	 * @param node
+	 * @throws BackingStoreException
+	 */
+	public void importColorPreferences(Preferences oldNode)
+			throws BackingStoreException {
+
+		LogBuffer.println("Importing color settings...");
+
+		colorExtractor.importPreferences(oldNode);
+
+		/* Update GradientChooser node */
+		String lastActive = oldNode.node("GradientChooser").get("activeColors",
+				"RedGreen");
+		configNode.node("GradientChooser").put("activeColors", lastActive);
+
+		/* Store copied node in new ColorPresets node */
+		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+		colorPresets.setConfigNode(configNode);
+		colorPresets.addColorSet(colorExtractor.getActiveColorSet());
 	}
 
 	@Override // Observer code
@@ -514,6 +542,28 @@ ConfigNodePersistent {
 	}
 	
 	/**
+	 * Scrolls to index i in the Y-MapContainer
+	 *
+	 * @param i
+	 */
+	public void scrollToGene(final int i) {
+
+		interactiveYmap.scrollToIndex(i);
+		interactiveYmap.notifyObservers();
+	}
+
+	/**
+	 * Scrolls to index i in the X-MapContainer.
+	 *
+	 * @param i
+	 */
+	public void scrollToArray(final int i) {
+
+		interactiveXmap.scrollToIndex(i);
+		interactiveXmap.notifyObservers();
+	}
+	
+	/**
 	 * Assigns references of MapContainer instances to be used for 
 	 * interactivity and information display in InteractiveMatrixView. 
 	 * @param xmap
@@ -527,6 +577,9 @@ ConfigNodePersistent {
 		
 		interactiveXmap.addObserver(this);
 		interactiveYmap.addObserver(this);
+		
+		imView.setXMap(xmap);
+		imView.setYMap(ymap);
 	}
 	
 	/**
@@ -543,6 +596,55 @@ ConfigNodePersistent {
 		
 		globalXmap.addObserver(this);
 		globalYmap.addObserver(this);
+		
+		gmView.setXMap(xmap);
+		gmView.setYMap(ymap);
+	}
+	
+	/**
+	 * Set rowSelection
+	 *
+	 * @param rowSelection
+	 *            The TreeSelection which is set by selecting genes in the
+	 *            GlobalView
+	 */
+	public void setRowSelection(final TreeSelectionI rowSelection) {
+
+		if (this.rowSelection != null) {
+			this.rowSelection.deleteObserver(this);
+		}
+
+		this.rowSelection = rowSelection;
+		this.rowSelection.addObserver(this);
+	}
+
+	/**
+	 * Set colSelection
+	 *
+	 * @param colSelection
+	 *            The TreeSelection which is set by selecting arrays in the
+	 *            GlobalView
+	 */
+	public void setColSelection(final TreeSelectionI colSelection) {
+
+		if (this.colSelection != null) {
+			this.colSelection.deleteObserver(this);
+		}
+
+		this.colSelection = colSelection;
+		this.colSelection.addObserver(this);
+	}
+	
+	/**
+	 * Assigns scrollbars to MapContainers.
+	 * @param rowScroll Scrollbar for scrolling through matrix rows.
+	 * @param colScroll Scrollbar for scrolling through matrix columns.
+	 */
+	public void setScrollBars(final JScrollBar rowScroll, 
+			final JScrollBar colScroll) {
+
+		interactiveXmap.setScrollbar(colScroll);
+		interactiveYmap.setScrollbar(rowScroll);
 	}
 	
 	/**

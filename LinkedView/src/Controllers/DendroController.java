@@ -1321,6 +1321,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		// the scrollbars "scroll" by communicating with the maps.
 		setupMapContainers();
 
+		// TODO replace with IMVController method
 		interactiveXmap.setScrollbar(dendroView.getMatrixXScroll());
 		interactiveYmap.setScrollbar(dendroView.getMatrixYScroll());
 
@@ -1389,9 +1390,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.getRowTreeView().setMap(interactiveYmap);
 		dendroView.getRowLabelView().setMap(interactiveYmap);
 
+		// TODO replace with IMVcontroller method
 		dendroView.getInteractiveMatrixView().setXMap(interactiveXmap);
 		dendroView.getInteractiveMatrixView().setYMap(interactiveYmap);
 
+		// TODO replace with IMVcontroller method
 		dendroView.getGlobalMatrixView().setXMap(globalXmap);
 		dendroView.getGlobalMatrixView().setYMap(globalYmap);
 
@@ -1872,6 +1875,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	}
 
 	/**
+	 * TODO move to IMVController
 	 * Update the state of color extractor to reflect settings from an imported
 	 * node.
 	 * 
@@ -1911,6 +1915,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 				node.node("ColLabelView"));
 	}
 
+	// TODO move to IMVController
 	/**
 	 * Scrolls to index i in the Y-MapContainer
 	 *
@@ -1922,6 +1927,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		getInteractiveYMap().notifyObservers();
 	}
 
+	// TODO move to IMVController
 	/**
 	 * Scrolls to index i in the X-MapContainer.
 	 *
@@ -1957,6 +1963,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		this.colSelection = colSelection;
 		colSelection.addObserver(dendroView);
 
+		// TODO add IMVController method rather than direct IMV
 		dendroView.getInteractiveMatrixView().setColSelection(colSelection);
 		dendroView.getColumnTreeView().setTreeSelection(colSelection);
 		dendroView.getRowLabelView().setColSelection(colSelection);
@@ -1978,6 +1985,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		this.rowSelection = rowSelection;
 		rowSelection.addObserver(dendroView);
 
+		// TODO add IMVController method rather than direct IMV
 		dendroView.getInteractiveMatrixView().setRowSelection(rowSelection);
 		dendroView.getRowTreeView().setTreeSelection(rowSelection);
 		dendroView.getRowLabelView().setRowSelection(rowSelection);
