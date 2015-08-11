@@ -33,7 +33,7 @@ This README would normally document whatever steps are necessary to get your app
 
 ### Developer Change Procedure ###
 
-When you tackle an issue:
+Generally tackling an issue:
 
 1. Claim the issue
 2. Check to make sure no one's working on a similar issue (possibly involving same code)
@@ -51,7 +51,7 @@ The XML-protocol is available for download in the download section of this repos
 12. Merge in your branch (on master: git merge branchname)
 13. Resolve possible merge conflicts. ONLY if you are 100% sure no other work of others (fixes, additions, changes) will be overwritten by your code go ahead and decide which version to use. Otherwise bring up the single merge conflicts to other developers! This is to avoid accidental change/ deletion of important code.
 13. Push the merged master branch to remote once all conflicts have been resolved.
-14. Resolve the issue.
+14. Resolve the issue..
 
 ### Code criteria to be eligible for merging into master ###
 In general, clean & concise & functional code. The goal is minimum effort required by other devs to understand code and what it is supposed to do.
@@ -66,6 +66,35 @@ In general, clean & concise & functional code. The goal is minimum effort requir
 
 ### General Git flow ### 
 
+[Reference 1](http://nvie.com/posts/a-successful-git-branching-model/)
+
+[Reference 2 (pics)](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
+
+Specific branches have specific roles.
+
+1. Two branches are used to record the history of the project:
+     * master: holds history of project releases. Incremented by release versions. Commits tagged with version number.
+     * develop: integration history for features. Incremented by feature additions.
+     ![Selection_020.png](https://bitbucket.org/repo/AXqk7r/images/3307300262-Selection_020.png)
+     * develop used to be master (as of Aug 2015).
+
+2. Feature branches are branched off and merged into develop.
+     * No direct interaction with master!
+    ![Selection_021.png](https://bitbucket.org/repo/AXqk7r/images/863398893-Selection_021.png)
+
+3. Release branch
+     * Branched off from develop.
+     * Branch once release is feature ready.
+     * naming: release-***
+     * Does **only** include: documentation, bug fixes, release-oriented stuff
+     * No feature work here!
+     * When ready to ship: merge into master -> tag branch & commit with version number!
+     * Also, after release and potential bug fixes etc., merge back into develop to retain important changes.
+
+4. Maintenance
+     * For hotfixes.
+     * Only branch that may directly branch of master (since fixed master should be released right away).
+     * Immediately merge back into master once the hotfix is done.
 
 ### Developer Testing Procedure ###
 
