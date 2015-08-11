@@ -27,7 +27,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
@@ -450,7 +449,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		dendroView.setTreeVisibility(atr_loc, gtr_loc);
 	}
 
-	/* Action to deselect everything */
+	/**
+	 * Puts the row search box into focus when called.
+	 */
 	private class SearchLabelAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -462,12 +463,16 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		}
 	}
 
+	/**
+	 * When this PropertyChangeListener is triggered, the JMenuItem for
+	 * showing/ hiding trees will be updated accordingly.
+	 */
 	private class DividerListener implements PropertyChangeListener {
 
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
 
-			dendroView.updateTreeMenuBtn((JSplitPane) evt.getSource());
+			dendroView.updateTreeMenuBtn();
 		}
 	}
 
@@ -616,7 +621,9 @@ public class DendroController implements ConfigNodePersistent, Observer {
 //		}
 //	}
 
-	/** Action to deselect everything */
+	/** 
+	 * Causes all selections on both axes to be set to zero when called. 
+	 */
 	private class DeselectAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;

@@ -539,6 +539,10 @@ public class DendroView implements Observer, DendroPanel {
 		}
 	}
 	
+	/**
+	 * Creates container for the GlobalOverViewMatrix.
+	 * @return JPanel holding the GlobalOverviewMatrix instance.
+	 */
 	private JPanel createGlobalOverviewPanel() {
 		
 		JPanel globalOverviewPanel;
@@ -550,6 +554,11 @@ public class DendroView implements Observer, DendroPanel {
 		return globalOverviewPanel;
 	}
 	
+	/**
+	 * Creates the InteractiveMatrixView column navigation panel. This includes
+	 * the column scrollbar and 4 scaling buttons (2 on each side).
+	 * @return JPanel holding column navigation components.
+	 */
 	private JPanel createColNavPanel() {
 		
 		JPanel colNavPanel;
@@ -566,6 +575,11 @@ public class DendroView implements Observer, DendroPanel {
 		return colNavPanel;
 	}
 	
+	/**
+	 * Creates the InteractiveMatrixView row navigation panel. This includes
+	 * the row scrollbar and 4 scaling buttons (2 on each side).
+	 * @return JPanel holding row navigation components.
+	 */
 	private JPanel createRowNavPanel() {
 		
 		JPanel rowNavPanel;
@@ -583,6 +597,12 @@ public class DendroView implements Observer, DendroPanel {
 		return rowNavPanel;
 	}
 	
+	/**
+	 * Panel that holds the main components for the interactive matrix.
+	 * This includes InteractiveMatrixView itself as well as row and column
+	 * navigation panels.
+	 * @return A JPanel with the interactive matrix view setup.
+	 */
 	private JPanel createInteractiveMatrixPanel() {
 		
 		JPanel interactiveMatrixPanel;
@@ -601,6 +621,12 @@ public class DendroView implements Observer, DendroPanel {
 		return interactiveMatrixPanel;
 	}
 	
+	/**
+	 * Creates the full main matrix panel which includes all components
+	 * making up a full DendroView with the exception of the toolbar related
+	 * elements such as buttons or search.
+	 * @return A JPanel with all main views arranged in it.
+	 */
 	private JPanel createMatrixPanel() {
 		
 		JPanel matrixPanel;
@@ -622,6 +648,11 @@ public class DendroView implements Observer, DendroPanel {
 		return matrixPanel;
 	}
 	
+	/**
+	 * Looks up the stored location values for the JSplitPane dividers.
+	 * This is needed for "Show-Hide" trees. It determines how much of
+	 * labels vs. tree panel is shown.
+	 */
 	private void setDataPaneDividers() {
 		
 		final double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc",
@@ -642,7 +673,7 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/**
-	 * Sets up the buttons which control scaling and zooming
+	 * Sets up the JButtons which control scaling and zooming.
 	 */
 	private void setupScaleButtons() {
 
@@ -690,6 +721,7 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/**
+	 * TODO move this out of DendroView....nothing like that should be in here.
 	 * Initiates a search of of labels for both axes.
 	 */
 	public void searchLabels() {
@@ -698,7 +730,11 @@ public class DendroView implements Observer, DendroPanel {
 		colFinderBox.seekAll();
 	}
 
-	public void updateTreeMenuBtn(final JSplitPane srcPane) {
+	/**
+	 * Used to update the JMenuItem field "Show trees/ Hide trees" depending
+	 * on the current status of the divider.
+	 */
+	public void updateTreeMenuBtn() {
 
 		/* Should always be "Show trees" if any tree panel is invisible */
 		if (rowDataPane.getDividerLocation() == 0
