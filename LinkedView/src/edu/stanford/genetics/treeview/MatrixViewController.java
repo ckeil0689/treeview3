@@ -87,7 +87,7 @@ ConfigNodePersistent {
 	public void setConfigNode(final Preferences parentNode) {
 
 		if (parentNode != null) {
-			configNode = parentNode.node("IMViewController");
+			configNode = parentNode;
 
 		} else {
 			LogBuffer.println("Could not find or create IMViewController "

@@ -1524,6 +1524,11 @@ public class MapContainer extends Observable implements Observer,
 
 	public void scrollToFirstIndex(final int i) {
 
+		if(i < getMinIndex() || i > getMaxIndex()) {
+			LogBuffer.println("Cannot set first index to " + i);
+			return;
+		}
+		
 		final int j = scrollbar.getValue();
 
 		scrollbar.setValue(i);
@@ -1538,8 +1543,20 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
-	public void scrollBy(final int i,boolean pullLabels) {
+	public void scrollBy(int i, boolean pullLabels) {
 
+		if(showsAllTiles()) {
+			return;
+		}
+		
+		/* 
+		 * What if only 2 tiles are not shown? Cannot scroll by 3 in this case
+		 * and MapContainer would get the false firstIndex.
+		 */
+		if(i > (getMaxIndex() + 1 - getNumVisible())) {
+			i = getMaxIndex() + 1 - getNumVisible();
+		}
+		
 		final int j = scrollbar.getValue();
 
 		scrollbar.setValue(j + i);

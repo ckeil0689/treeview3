@@ -45,8 +45,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
@@ -155,6 +153,7 @@ public class InteractiveMatrixView extends MatrixView implements
 			ymap.unsetHoverChanged();
 			return;
 		}
+		
 		Graphics2D g2d = (Graphics2D) g;
 
 		revalidateScreen();
@@ -187,6 +186,7 @@ public class InteractiveMatrixView extends MatrixView implements
 			ymap.unsetHoverChanged();
 			return;
 		}
+		
 		Graphics2D g2 = (Graphics2D) g;
 
 		if (selectionRectList != null) {
@@ -678,7 +678,7 @@ public class InteractiveMatrixView extends MatrixView implements
 				//This ensures we only zoom toward the cursor when the cursor is
 				//over the map
 				if (hasMouse) {
-					smoothZoomTowardPixel(e.getX(),e.getY());
+					smoothZoomTowardPixel(e.getX(), e.getY());
 				}
 				//This should happen when the mouse is not over the heatmap
 				else {
@@ -687,18 +687,18 @@ public class InteractiveMatrixView extends MatrixView implements
 				}
 			} else {
 				if (hasMouse) {
-					smoothZoomFromPixel(e.getX(),e.getY());
+					smoothZoomFromPixel(e.getX(), e.getY());
 				} else {
 					xmap.zoomOutBegin();
 					ymap.zoomOutBegin();
 				}
 			}
 		} else if (e.isShiftDown()) {
-			xmap.scrollBy(shift,false);
+			xmap.scrollBy(shift, false);
 			//Now we are hovered over a new index
 			xmap.setHoverIndex(xmap.getIndex(e.getX()));
 		} else {
-			ymap.scrollBy(shift,false);
+			ymap.scrollBy(shift, false);
 			//Now we are hovered over a new index
 			ymap.setHoverIndex(ymap.getIndex(e.getY()));
 		}
