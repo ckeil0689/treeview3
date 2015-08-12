@@ -50,9 +50,9 @@ Specific branches have specific roles.
      * Immediately merge back into master once the hotfix is done.
 
 ### Code Style & Conventions
-    1. Oracle Code Conventions: http://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html
-    2. Google Java Style: https://google-styleguide.googlecode.com/svn/trunk/javaguide.html
-    3. More extensive style guide: http://www.scribd.com/doc/15884743/Java-Coding-Style-by-Achut-Reddy
+1. [Oracle Code Conventions](http://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html)
+2. [Google Java Style](https://google-styleguide.googlecode.com/svn/trunk/javaguide.html)
+3. [More extensive style guide](http://www.scribd.com/doc/15884743/Java-Coding-Style-by-Achut-Reddy)
 
 ### Developer Change Procedure
 
