@@ -31,13 +31,11 @@ Specific branches have specific roles.
 1. Two branches are used to record the history of the project:
      * master: holds history of project releases. Incremented by release versions. Commits tagged with version number.
      * develop: integration history for features. Incremented by feature additions.
-     ![Selection_020.png](https://bitbucket.org/repo/AXqk7r/images/3307300262-Selection_020.png)
      * develop used to be master (as of Aug 2015).
-
+     * ![Selection_020.png](https://bitbucket.org/repo/AXqk7r/images/3307300262-Selection_020.png)
 2. Feature branches are branched off and merged into develop.
      * No direct interaction with master!
-    ![Selection_021.png](https://bitbucket.org/repo/AXqk7r/images/863398893-Selection_021.png)
-
+     * ![Selection_021.png](https://bitbucket.org/repo/AXqk7r/images/863398893-Selection_021.png)
 3. Release branch
      * Branched off from develop.
      * Branch once release is feature ready.
@@ -46,13 +44,12 @@ Specific branches have specific roles.
      * No feature work here!
      * When ready to ship: merge into master -> tag branch & commit with version number!
      * Also, after release and potential bug fixes etc., merge back into develop to retain important changes.
-
 4. Maintenance
      * For hotfixes.
      * Only branch that may directly branch of master (since fixed master should be released right away).
      * Immediately merge back into master once the hotfix is done.
 
-* Other guidelines
+### Code Style & Conventions
     1. Oracle Code Conventions: http://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html
     2. Google Java Style: https://google-styleguide.googlecode.com/svn/trunk/javaguide.html
     3. More extensive style guide: http://www.scribd.com/doc/15884743/Java-Coding-Style-by-Achut-Reddy
