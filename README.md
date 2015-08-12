@@ -21,6 +21,10 @@ This README would normally document whatever steps are necessary to get your app
 ### Contribution guidelines ###
 
 * Writing tests
+    1. master and develop branches may never include "debugging code" (debug log statements etc., see code criteria below).
+    2. If a method needs to be debugged, it should be done via JUnit tests + debugger with breakpoints. You may write or expand test cases for methods.
+    3. Small intro to JUnit in Eclipse -> https://courses.cs.washington.edu/courses/cse143/11wi/eclipse-tutorial/junit.shtml
+
 * Code review (**BEFORE** Merge)
     1. Have at least 1 other permanent contributor look at the code and point out criticism.
     2. Upload a test JAR/ Executable for at least 1 other contributor to thoroughly test for issues.
