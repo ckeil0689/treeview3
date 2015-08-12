@@ -321,7 +321,7 @@ ConfigNodePersistent {
 		public void actionPerformed(final ActionEvent e) {
 
 			final int scrollBy = interactiveYmap.getNumVisible();
-			interactiveYmap.scrollBy(-scrollBy,false);
+			interactiveYmap.scrollBy(-scrollBy);
 		}
 	}
 
@@ -333,7 +333,7 @@ ConfigNodePersistent {
 		public void actionPerformed(final ActionEvent e) {
 
 			final int scrollBy = interactiveYmap.getNumVisible();
-			interactiveYmap.scrollBy(scrollBy,false);
+			interactiveYmap.scrollBy(scrollBy);
 		}
 	}
 
@@ -345,7 +345,7 @@ ConfigNodePersistent {
 		public void actionPerformed(final ActionEvent e) {
 
 			final int scrollBy = interactiveXmap.getNumVisible();
-			interactiveXmap.scrollBy(-scrollBy,false);
+			interactiveXmap.scrollBy(-scrollBy);
 		}
 	}
 
@@ -357,7 +357,7 @@ ConfigNodePersistent {
 		public void actionPerformed(final ActionEvent e) {
 
 			final int scrollBy = interactiveXmap.getNumVisible();
-			interactiveXmap.scrollBy(scrollBy,false);
+			interactiveXmap.scrollBy(scrollBy);
 		}
 	}
 
@@ -368,7 +368,7 @@ ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			interactiveXmap.scrollBy(-1,false);
+			interactiveXmap.scrollBy(-1);
 		}
 	}
 
@@ -379,7 +379,7 @@ ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			interactiveXmap.scrollBy(1,false);
+			interactiveXmap.scrollBy(1);
 		}
 	}
 
@@ -390,7 +390,7 @@ ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			interactiveYmap.scrollBy(-1,false);
+			interactiveYmap.scrollBy(-1);
 		}
 	}
 
@@ -401,7 +401,7 @@ ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			interactiveYmap.scrollBy(1,false);
+			interactiveYmap.scrollBy(1);
 		}
 	}
 

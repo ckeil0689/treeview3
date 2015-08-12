@@ -52,6 +52,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
+import edu.stanford.genetics.treeview.plugin.dendroview.IntegerMap;
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenu;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenuController;
@@ -112,11 +113,11 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		this.tvFrame = tvFrame;
 		this.tvController = tvController;
 
-		interactiveXmap = new MapContainer("Fixed", "GlobalXMap");
-		interactiveYmap = new MapContainer("Fixed", "GlobalYMap");
+		interactiveXmap = new MapContainer(IntegerMap.FIXED, "GlobalXMap");
+		interactiveYmap = new MapContainer(IntegerMap.FIXED, "GlobalYMap");
 
-		globalXmap = new MapContainer("Fixed", "OverviewXMap");
-		globalYmap = new MapContainer("Fixed", "OverviewYMap");
+		globalXmap = new MapContainer(IntegerMap.FIXED, "OverviewXMap");
+		globalYmap = new MapContainer(IntegerMap.FIXED, "OverviewYMap");
 	}
 	
 	/**

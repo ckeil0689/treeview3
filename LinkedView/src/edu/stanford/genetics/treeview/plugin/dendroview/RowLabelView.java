@@ -176,25 +176,30 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 		repaint();
 	}
 
+	@Override
 	public void setSecondaryScrollBarPolicyAlways() {
 		scrollPane.setVerticalScrollBarPolicy(
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 	}
 
+	@Override
 	public void setSecondaryScrollBarPolicyNever() {
 		scrollPane.setVerticalScrollBarPolicy(
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 	}
 
+	@Override
 	public void setSecondaryScrollBarPolicyAsNeeded() {
 		scrollPane.setVerticalScrollBarPolicy(
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 	}
 
+	@Override
 	public boolean isJustifiedToMatrixEdge() {
 		return(isRightJustified);
 	}
 
+	@Override
 	public int getPrimaryHoverPosition(final MouseEvent e) {
 		return(e.getY());
 	}
@@ -466,6 +471,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 		return scrollPane.getHorizontalScrollBar();
 	}
 
+	@Override
 	public void setHoverPosition(final MouseEvent e) {
 		hoverPixel = e.getY();
 	}
@@ -518,7 +524,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 			paintImmediately(0, 0, getWidth(), getHeight());
 		} else {
 			//Value of label length scrollbar
-			map.scrollBy(shift, false);
+			map.scrollBy(shift);
 			updatePrimaryHoverIndexDuringScrollWheel();
 		}
 
@@ -531,7 +537,9 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 		//paintImmediately(0, 0, getWidth(), getHeight());
 	}
 
+	@Override
 	public void explicitSecondaryScrollTo(int pos,int endPos,int endGap) {
+		
 		debug("Explicitly scrolling to [" + pos + "]",12);
 		if(pos < 0) pos = 0;
 		if(pos > (getSecondaryScrollBar().getMaximum() -
@@ -553,7 +561,9 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 		lastScrollRowEndGap = endGap;
 	}
 
+	@Override
 	public void adjustmentValueChanged(AdjustmentEvent evt) {
+		
 		Adjustable source = evt.getAdjustable();
 		int orient = source.getOrientation();
 		if(orient == Adjustable.HORIZONTAL) {
@@ -594,6 +604,8 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 						      "call from code or a mouse wheel event)",1);
 						updateScroll = false;
 						break;
+				default:
+					break;
 				}
 				debug("Scrolling from: [" + source.getValue() + " or (" +
 				      oldvalue + ")" + "] to: [" + newvalue + "] via [" +
@@ -624,10 +636,12 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 			}
 		});
 
+	@Override
 	public boolean areLabelsBeingScrolled() {
 		return(map.areRowLabelsBeingScrolled());
 	}
 
+	@Override
 	public void updatePrimaryHoverIndexDuringScrollDrag() {
 		//If the labels are being scrolled, you must manually retrieve the
 		//cursor position
@@ -636,6 +650,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 		}
 	}
 
+	@Override
 	public void forceUpdatePrimaryHoverIndex() {
 		Point p = MouseInfo.getPointerInfo().getLocation();
 		SwingUtilities.convertPointFromScreen(p,getComponent());
@@ -649,10 +664,12 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 		hoverIndex = hDI;
 	}
 
+	@Override
 	protected int getPrimaryViewportSize() {
 		return(scrollPane.getViewport().getSize().height);
 	}
 
+	@Override
 	protected int getSecondaryViewportSize() {
 		return(rowLabelViewportSize);
 	}

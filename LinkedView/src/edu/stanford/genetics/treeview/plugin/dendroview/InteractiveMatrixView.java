@@ -694,11 +694,12 @@ public class InteractiveMatrixView extends MatrixView implements
 				}
 			}
 		} else if (e.isShiftDown()) {
-			xmap.scrollBy(shift, false);
+			xmap.scrollBy(shift);
 			//Now we are hovered over a new index
 			xmap.setHoverIndex(xmap.getIndex(e.getX()));
+			
 		} else {
-			ymap.scrollBy(shift, false);
+			ymap.scrollBy(shift);
 			//Now we are hovered over a new index
 			ymap.setHoverIndex(ymap.getIndex(e.getY()));
 		}

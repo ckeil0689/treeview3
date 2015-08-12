@@ -429,11 +429,11 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 		final HeaderInfo aH = new DummyHeaderInfo();
 		final HeaderInfo gH = new DummyHeaderInfo();
-		final MapContainer aMap = new MapContainer("Fixed", "FixedMap");
+		final MapContainer aMap = new MapContainer(IntegerMap.FIXED, "FixedMap");
 		// aMap.setMap("Fixed");
 		aMap.setScale(10);
 		aMap.setIndexRange(0, aH.getNumHeaders());
-		final MapContainer gMap = new MapContainer("Fixed", "FixedMap");
+		final MapContainer gMap = new MapContainer(IntegerMap.FIXED, "FixedMap");
 		// gMap.setMap("Fixed");
 		gMap.setScale(12);
 		gMap.setIndexRange(0, gH.getNumHeaders());

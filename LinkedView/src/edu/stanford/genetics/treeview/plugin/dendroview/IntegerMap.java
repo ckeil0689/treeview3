@@ -34,32 +34,37 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public abstract class IntegerMap implements ConfigNodePersistent {
 
+	public static final int NULL = 0;
+	public static final int FIXED = 1;
+	public static final int FILL = 2;
+	
 	protected int availablepixels;
 	protected int maxindex;
 	protected int minindex;
 	protected Preferences configNode;
-	protected String type;
+	protected int type;
+	protected String typeName = "NullMap";
 
 	public IntegerMap() {
 
 		availablepixels = 0;
 		maxindex = -1;
 		minindex = -1;
-		configNode = Preferences.userRoot().node(type());
+		configNode = Preferences.userRoot().node(typeName);
 	}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
 		if (parentNode != null) {
-			this.configNode = parentNode.node(type);
+			this.configNode = parentNode.node(typeName);
 
 		} else {
 			LogBuffer.println("Could not find or create IntegerMap "
 					+ "node because parentNode was null.");
 		}
 
-		configNode.put("type", type());
+		configNode.putInt("type", type);
 	}
 
 	/**
@@ -68,19 +73,47 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 	 *
 	 * @param type
 	 */
-	public void setTypeString(final String type) {
+	public void setType(final int type) {
 
+		this.type = type;
+		
+		switch(type) {
+		
+		case IntegerMap.NULL:
+			this.typeName = "NullMap";
+			break;
+			
+		case IntegerMap.FIXED:
+			this.typeName = "FixedMap";
+			break;
+			
+		case IntegerMap.FILL:
+			this.typeName = "FillMap";
+			break;
+			
+		default:
+			LogBuffer.println("Type cannot be set for IntegerMap: " + type);
+			return;
+		}
+		
 		this.type = type;
 	}
 
-	public IntegerMap createMap(final String string) {
+	public IntegerMap createMap(final int type) {
 
-		if (string.equals("Fixed"))
+		switch(type) {
+		
+		case IntegerMap.NULL:
+			return new NullMap();
+			
+		case IntegerMap.FIXED:
 			return new FixedMap();
-		else if (string.equals("Fill"))
+			
+		case IntegerMap.FILL:
 			return new FillMap();
-		else {
-			System.out.println(string + " not found");
+			
+		default:
+			LogBuffer.println(type + " type not found for IntegerMap.");
 			return null;
 		}
 	}
@@ -213,6 +246,12 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 		minindex = i;
 		maxindex = j;
 	}
+	
+	public boolean equalsType(final int otherType) {
+		
+		return type == otherType;
+	}
 
-	public abstract String type();
+	public abstract String typeName();
+	public abstract int type();
 }

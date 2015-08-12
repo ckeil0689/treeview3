@@ -1,8 +1,6 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Adjustable;
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -512,8 +510,9 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 		// On macs' magic mouse, horizontal scroll comes in as if the shift was
 		// down
 		if(e.isShiftDown()) {
-			map.scrollBy(shift, false);
+			map.scrollBy(shift);
 			updatePrimaryHoverIndexDuringScrollWheel();
+			
 		} else {
 			shift = (notches < 0) ? -6 : 6;
 			final int j = getSecondaryScrollBar().getValue();

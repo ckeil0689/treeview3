@@ -140,17 +140,20 @@ public class FixedMap extends IntegerMap {
 	@Override
 	public int getUsedPixels() {
 
-		if (minindex == -1)
+		if (minindex == -1) {
 			return 0;
+		}
 
 		final int i = (int) Math.round((maxindex - minindex + 1) * scale);
 		// Rob 10/14/2014 - Changed the redundant calculation into a call to
 		// getViewableIndexes
 		final int j = (int) Math.round((scale * getViewableIndexes()));
-		if (i > j)
+		
+		if (i > j) {
 			return j;
-		else
-			return i;
+		}
+		
+		return i;
 	}
 
 	/**
@@ -192,8 +195,14 @@ public class FixedMap extends IntegerMap {
 	 * @return A short word desribing this type of map
 	 */
 	@Override
-	public String type() {
+	public String typeName() {
 
-		return "Fixed";
+		return "FixedMap";
+	}
+
+	@Override
+	public int type() {
+		
+		return IntegerMap.FIXED;
 	}
 }
