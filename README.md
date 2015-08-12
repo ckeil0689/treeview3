@@ -20,7 +20,7 @@ This README would normally document whatever steps are necessary to get your app
 
 ## Contribution guidelines
 
-### General Git flow ### 
+### General Git Flow
 
 [Reference 1](http://nvie.com/posts/a-successful-git-branching-model/)
 
