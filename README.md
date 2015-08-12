@@ -83,12 +83,16 @@ Merging branch of resolved issue with _develop_ branch:
 6. Resolve the issue in Bitbucket issue log (can be done automatically via "resolved _issue_num_; [...]" in commit message). 
 
 ### JUnit - Writing tests
-1. **No debug code** in _master_ and _develop_ branches (debug log statements etc., see code criteria below).
-2. JUnit supports all sorts of unit testing (correctness, timing, etc.).
-3. Write a test for **every** class and **all** its methods. Tests ideally need to cover all possible cases. 
-4. If a method needs debugging, it should **fail its JUnit test**.
-5. [Small intro to JUnit in Eclipse](https://courses.cs.washington.edu/courses/cse143/11wi/eclipse-tutorial/junit.shtml)
-6. [Another good intro](http://www.vogella.com/tutorials/JUnit/article.html) 
+1. [Small intro to JUnit in Eclipse](https://courses.cs.washington.edu/courses/cse143/11wi/eclipse-tutorial/junit.shtml)
+2. [Another good intro](http://www.vogella.com/tutorials/JUnit/article.html) 
+3. **No debug code** in _master_ and _develop_ branches (debug log statements etc., see code criteria below).
+4. JUnit supports all sorts of unit testing (correctness, timing, etc.).
+5. Write a test for **every** class and **all** its methods. Tests ideally need to cover all possible cases. 
+6. If a method needs debugging, it should **fail its JUnit test**.
+7. GUI/ Swing code: [**Do not test the framework code!**](https://stackoverflow.com/questions/1480843/unit-testing-a-swing-component) Test the logic you implement to update/ change GUI components. E.g.:
+    * Do not test whether JScrollBar.setValue(int val) works, but whether your custom scroll code will produce the expected value used as parameter in setValue().
+    * Do not test ActionListeners, but **do** test the methods they execute in actionPerformed().
+    * If code is to be tested, it is logic. Therefore it belongs in the Controller class, not the View class. -> [MVC pattern](https://programmers.stackexchange.com/questions/127624/what-is-mvc-really)
 
 ### Debugging
 If it does not fail while being buggy, extend the test case for this method (boundary conditions etc.).
