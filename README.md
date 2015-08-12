@@ -24,7 +24,7 @@ This README would normally document whatever steps are necessary to get your app
 
 [Reference 1](http://nvie.com/posts/a-successful-git-branching-model/)
 
-[Reference 2 (pics)](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
+[Reference 2 (pic src)](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 
 Specific branches have specific roles.
 
@@ -52,13 +52,6 @@ Specific branches have specific roles.
      * Only branch that may directly branch of master (since fixed master should be released right away).
      * Immediately merge back into master once the hotfix is done.
 
-
-
-* Code review (**BEFORE** Merge)
-    1. Have at least 1 other permanent contributor look at the code and point out criticism.
-    2. Upload a test JAR/ Executable for at least 1 other contributor to thoroughly test for issues.
-    3. Only merge into production branch if code / version have been reviewed and tested.
-
 * Other guidelines
     1. Oracle Code Conventions: http://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html
     2. Google Java Style: https://google-styleguide.googlecode.com/svn/trunk/javaguide.html
@@ -66,7 +59,7 @@ Specific branches have specific roles.
 
 ### Developer Change Procedure
 
-Generally tackling an issue:
+Tackling an issue:
 
 1. Claim the issue
 2. Check to make sure no one's working on a similar issue (possibly involving same code)
@@ -78,15 +71,19 @@ Generally tackling an issue:
 8. Run a code clean up if using Eclipse (Project Explorer > Right-click > Source > Clean-up)
 The XML-protocol is available for download in the download section of this repository (cleanup_prefs_alpha01.xml). Import this to Eclipse for use.
 9. Commit. Push to/ create _remote feature branch_ only for work that should be looked at by others or be backed up (git is not a backup tool though).
-10. Ask at least 1 other contributor to user test
+10. Code review
+    * Have at least 1 other permanent contributor look at the code and point out criticism.
 11. **Do not proceed** beyond here if tests fail. -> Fix until all tests are green. Exception: user test issues after team discussion.
 ---------------------- 
-12. Switch to master branch (git checkout master -> no errors if all changes have been committed).
-13. Sync with remote master again **before merge**!
-14. Merge in your branch (on master: git merge branchname)
-15. Resolve possible merge conflicts. ONLY if you are 100% sure no other work of others (fixes, additions, changes) will be overwritten by your code go ahead and decide which version to use. Otherwise bring up the single merge conflicts to other developers! This is to avoid accidental change/ deletion of important code.
-16. Push the merged master branch to remote once all conflicts have been resolved.
-17. Resolve the issue in Bitbucket issue log.
+
+Merging branch of resolved issue with _develop_ branch:
+
+1. Switch to _develop_ branch (git checkout _develop_ -> no errors if all changes have been committed).
+2. Sync with remote _develop_ again **before merge**!
+3. Merge in your branch (on _develop_: git merge branchname)
+4. Resolve possible merge conflicts. ONLY if you are 100% sure no other work of others (fixes, additions, changes) will be overwritten by your code go ahead and decide which version to use. Otherwise bring up the single merge conflicts to other developers! This is to avoid accidental change/ deletion of important code.
+5. Push your locally merged _develop_ branch to remote _develop_ once all conflicts have been resolved.
+6. Resolve the issue in Bitbucket issue log (can be done automatically via "resolved _issue_num_; [...]" in commit message). 
 
 ### JUnit - Writing tests
 1. **No debug code** in _master_ and _develop_ branches (debug log statements etc., see code criteria below).
