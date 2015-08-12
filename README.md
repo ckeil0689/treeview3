@@ -74,17 +74,19 @@ Generally tackling an issue:
 4. Sync repository (git pull)
 5. Branch (git checkout -b branchname)
 6. Implement code
-7. Test on your own
+7. JUnit test + user test on your own
 8. Run a code clean up if using Eclipse (Project Explorer > Right-click > Source > Clean-up)
 The XML-protocol is available for download in the download section of this repository (cleanup_prefs_alpha01.xml). Import this to Eclipse for use.
-9. Commit. Push to/ create remote branch only for work that should be looked at by others or be backed up (git is not a backup tool though).
-10. Ask at least 1 other contributor to test
-11. Switch to master branch (git checkout master -> no errors if all changes have been committed).
-12. Sync with remote master again **before merge**!
-12. Merge in your branch (on master: git merge branchname)
-13. Resolve possible merge conflicts. ONLY if you are 100% sure no other work of others (fixes, additions, changes) will be overwritten by your code go ahead and decide which version to use. Otherwise bring up the single merge conflicts to other developers! This is to avoid accidental change/ deletion of important code.
-13. Push the merged master branch to remote once all conflicts have been resolved.
-14. Resolve the issue..
+9. Commit. Push to/ create _remote feature branch_ only for work that should be looked at by others or be backed up (git is not a backup tool though).
+10. Ask at least 1 other contributor to user test
+11. **Do not proceed** beyond here if tests fail. -> Fix until all tests are green. Exception: user test issues after team discussion.
+---------------------- 
+12. Switch to master branch (git checkout master -> no errors if all changes have been committed).
+13. Sync with remote master again **before merge**!
+14. Merge in your branch (on master: git merge branchname)
+15. Resolve possible merge conflicts. ONLY if you are 100% sure no other work of others (fixes, additions, changes) will be overwritten by your code go ahead and decide which version to use. Otherwise bring up the single merge conflicts to other developers! This is to avoid accidental change/ deletion of important code.
+16. Push the merged master branch to remote once all conflicts have been resolved.
+17. Resolve the issue in Bitbucket issue log.
 
 ### JUnit - Writing tests
 1. **No debug code** in _master_ and _develop_ branches (debug log statements etc., see code criteria below).
