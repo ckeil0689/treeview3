@@ -176,7 +176,7 @@ public class MapContainer extends Observable implements Observer,
 		// Added 1 because tileNumVisible is treated as number of indexes
 		// visible, not max index
 		this.tileNumVisible = getTotalTileNum();
-		minScale = getCalculatedMinScale();
+		this.minScale = getCalculatedMinScale();
 	}
 
 	/**

@@ -26,7 +26,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
@@ -57,11 +56,6 @@ public class InteractiveMatrixView extends MatrixView {
 
 	private double aspectRatio = -1;
 
-//	/**
-//	 * This rectangle keeps track of where the drag rect was drawn
-//	 */
-//	private final Rectangle dragRect = new Rectangle();
-
 	/**
 	 * Rectangle to track yellow selected rectangle (pixels)
 	 */
@@ -83,11 +77,6 @@ public class InteractiveMatrixView extends MatrixView {
 
 		setLabelPortMode(true);
 		debug = 0;
-
-		/* Listeners for interactivity */
-//		addMouseListener(new MatrixMouseListener());
-//		addMouseMotionListener(new MatrixMouseListener());
-//		addMouseWheelListener(this);
 	}
 
 	/**
@@ -107,21 +96,6 @@ public class InteractiveMatrixView extends MatrixView {
 
 		return scrollPane.getVerticalScrollBar();
 	}
-	
-//	/**
-//	 * Adjusts the dimension of the dragging rectangle.
-//	 * @param w New width of the dragging rectangle.
-//	 * @param h New height of the dragging rectangle.
-//	 */
-//	public void setDragRectSize(final int w, final int h) {
-//		
-//		dragRect.setSize(w, h);
-//	}
-
-//	public void setGlobalMatrixView(GlobalMatrixView gmv) {
-//		
-//		globalMatrixView = gmv;
-//	}
 
 	/**
 	 * Get ArrayDrawer
@@ -200,7 +174,6 @@ public class InteractiveMatrixView extends MatrixView {
 				g2.drawRect(rect.x, rect.y, rect.width, rect.height);
 			}
 
-			//debug("Preparing to draw ellipses.");
 			/*
 			 * draw white selection circle if only 1 tile is selected and small
 			 * enough.
@@ -211,7 +184,6 @@ public class InteractiveMatrixView extends MatrixView {
 				g2.setColor(Color.yellow);
 				g2.setStroke(new BasicStroke(3));
 				for(Ellipse2D.Double indicatorCircle : indicatorCircleList) {
-					//debug("Drawing ellipse.");
 					g2.draw(indicatorCircle);
 				}
 			}
@@ -239,15 +211,7 @@ public class InteractiveMatrixView extends MatrixView {
 			final int[] selectedGeneIndexes =
 				geneSelection.getSelectedIndexes();
 	
-//			globalMatrixView.setIMVselectedIndexes(selectedArrayIndexes,
-//												   selectedGeneIndexes);
-	
 			if (selectedArrayIndexes.length > 0) {
-	
-				// debug("Selected min array index: [" +
-				// selectedArrayIndexes[0] + "] Selected min gene index: [" +
-				// selectedGeneIndexes[0] + "].");
-	
 				List<List<Integer>> arrayBoundaryList;
 				List<List<Integer>> geneBoundaryList;
 	
@@ -369,8 +333,9 @@ public class InteractiveMatrixView extends MatrixView {
 			offscreenValid = false;
 			repaint();
 
-		} else// if(!xmap.hoverChanged() && !ymap.hoverChanged()) {
+		} else {// if(!xmap.hoverChanged() && !ymap.hoverChanged()) {
 			super.update(o, arg);
+		}
 //		} else {
 //			if(xmap.hoverChanged()) {
 //				xmap.unsetHoverChanged();
@@ -410,301 +375,6 @@ public class InteractiveMatrixView extends MatrixView {
 			adjusting.notifyObservers();
 		}
 	}
-
-//	/* TODO move to a specified controller class */
-//	private class MatrixMouseListener extends MouseAdapter {
-//
-//		boolean isMousePressed;
-//		
-//		@Override
-//		public void mouseMoved(final MouseEvent e) {
-//			
-//			debug("mouseMoved inside IMV",9);
-//			
-//			xmap.setHoverIndex(xmap.getIndex(e.getX()));
-//			ymap.setHoverIndex(ymap.getIndex(e.getY()));
-//		}
-//
-//		@Override
-//		public void mouseDragged(final MouseEvent e) {
-//
-//			// TODO dont draw when out of focus... doesnt recognize isMousePressed...
-//			if (!enclosingWindow().isActive()) {
-//				return;
-//			}
-//			
-//			// When left button is used
-//			if (SwingUtilities.isLeftMouseButton(e)) {
-//				debug("Mouse dragged. Updating hover indexes to [" +
-//				      xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) +
-//				      "]",4);
-//				xmap.setHoverIndex(xmap.getIndex(e.getX()));
-//				ymap.setHoverIndex(ymap.getIndex(e.getY()));
-//
-//				// rubber band?
-//				drawBand(dragRect);
-//				endPoint.setLocation(xmap.getIndex(e.getX()),
-//						ymap.getIndex(e.getY()));
-//
-//				/* Full gene selection */
-//				if (e.isShiftDown()) {
-//					dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
-//					dragRect.setSize(0, 0);
-//					dragRect.add(xmap.getMaxIndex(), endPoint.y);
-//
-//					/* Full array selection */
-//				} else if (e.isControlDown()) {
-//					dragRect.setLocation(startPoint.x, ymap.getMinIndex());
-//					dragRect.setSize(0, 0);
-//					dragRect.add(endPoint.x, ymap.getMaxIndex());
-//
-//					/* Normal selection */
-//				} else {
-//					dragRect.setLocation(startPoint.x, startPoint.y);
-//					dragRect.setSize(0, 0);
-//					dragRect.add(endPoint.x, endPoint.y);
-//				}
-//
-//				drawBand(dragRect);
-//			}
-//		}
-//
-//		@Override
-//		public void mouseReleased(final MouseEvent e) {
-//
-//			if (!enclosingWindow().isActive() || !isMousePressed) {
-//				return;
-//			}
-//
-//			// When left button is used
-//			if (SwingUtilities.isLeftMouseButton(e)) {
-//				debug("Mouse released. No longer selecting",4);
-//				xmap.setSelecting(false);
-//				ymap.setSelecting(false);
-//				xmap.setSelectingStart(-1);
-//				ymap.setSelectingStart(-1);
-//				mouseDragged(e);
-//				drawBand(dragRect);
-//
-//				/* Full gene selection */
-//				if (e.isShiftDown()) {
-//					final Point start = new Point(xmap.getMinIndex(),
-//							startPoint.y);
-//					final Point end = new Point(xmap.getMaxIndex(), endPoint.y);
-//					selectRectangle(start, end);
-//
-//					/* Full array selection */
-//				} else if (e.isControlDown()) {
-//					final Point start = new Point(startPoint.x,
-//							ymap.getMinIndex());
-//					final Point end = new Point(endPoint.x, ymap.getMaxIndex());
-//					selectRectangle(start, end);
-//
-//					/* Normal selection */
-//				} else {
-//					selectRectangle(startPoint, endPoint);
-//				}
-//
-//			} else {
-//				// do something else?
-//			}
-//			
-//			isMousePressed = false;
-//			repaint();
-//		}
-//
-//		// Mouse Listener
-//		@Override
-//		public void mousePressed(final MouseEvent e) {
-//
-//			if (!enclosingWindow().isActive()) {
-//				return;
-//			}
-//
-//			isMousePressed = true;
-//			
-//			// if left button is used
-//			if (SwingUtilities.isLeftMouseButton(e)) {
-//				debug("Starting selecting, setting selection start to [" +
-//				      xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) +
-//				      "]",4);
-//				xmap.setSelecting(true);
-//				ymap.setSelecting(true);
-//				xmap.setSelectingStart(xmap.getIndex(e.getX()));
-//				ymap.setSelectingStart(ymap.getIndex(e.getY()));
-//
-//				startPoint.setLocation(xmap.getIndex(e.getX()),
-//						ymap.getIndex(e.getY()));
-//				endPoint.setLocation(startPoint.x, startPoint.y);
-//				dragRect.setLocation(startPoint.x, startPoint.y);
-//				dragRect.setSize(endPoint.x - dragRect.x, endPoint.y
-//						- dragRect.y);
-//
-//				drawBand(dragRect);
-//
-//			} else if (SwingUtilities.isRightMouseButton(e)) {
-//				geneSelection.setSelectedNode(null);
-//				geneSelection.deselectAllIndexes();
-//
-//				arraySelection.setSelectedNode(null);
-//				arraySelection.deselectAllIndexes();
-//
-//				//debug("Deselecting.");
-//
-//				geneSelection.notifyObservers();
-//				arraySelection.notifyObservers();
-//			}
-//
-//			globalMatrixView.setIMVselectedIndexes(
-//					arraySelection.getSelectedIndexes(),
-//					geneSelection.getSelectedIndexes());
-//		}
-//
-//		//Timer to let the label pane linger a bit (prevents flashing when
-//		//passing between panes which do not change the visibility of the label
-//		//panes)
-//		final private int delay = 250;
-//		private javax.swing.Timer turnOffLabelPortTimer;
-//		ActionListener turnOffLabelPort = new ActionListener() {
-//			
-//			@Override
-//			public void actionPerformed(ActionEvent evt) {
-//				if (evt.getSource() == turnOffLabelPortTimer) {
-//					/* Stop timer */
-//					turnOffLabelPortTimer.stop();
-//					turnOffLabelPortTimer = null;
-//				
-//					debug("mouseEvent in IMV - ACTED ON",1);
-//					xmap.setOverInteractiveMatrix(false);
-//					ymap.setOverInteractiveMatrix(false);
-//					xmap.notifyObservers();
-//					ymap.notifyObservers();
-//					revalidate();
-//					repaint();
-//				}
-//			}
-//		};
-//
-//		@Override
-//		public void mouseEntered(final MouseEvent e) {
-//			debug("mouseEntered IMV",9);
-//			if(this.turnOffLabelPortTimer != null) {
-//				/* Event came too soon, swallow it by resetting the timer.. */
-//				this.turnOffLabelPortTimer.stop();
-//				this.turnOffLabelPortTimer = null;
-//			}
-//			xmap.setOverInteractiveMatrix(true);
-//			ymap.setOverInteractiveMatrix(true);
-//			if (!enclosingWindow().isActive()) {
-//				return;
-//			}
-//			
-//			hasMouse = true;
-//			requestFocus();
-//		}
-//
-//		@Override
-//		public void mouseExited(final MouseEvent e) {
-//
-//			debug("mouseExited IMV",1);
-//			//Turn off the "over a label port view" boolean after a bit
-//			if(this.turnOffLabelPortTimer == null) {
-//				debug("mouseExited IMV - starting timer",1);
-//				/* Start waiting for delay millis to elapse and then
-//				 * call actionPerformed of the ActionListener
-//				 * "turnOffLabelPort". */
-//				if(delay == 0) {
-//					debug("mouseEvent in IMV - ACTED ON",1);
-//					xmap.setOverInteractiveMatrix(false);
-//					ymap.setOverInteractiveMatrix(false);
-//					xmap.notifyObservers();
-//					ymap.notifyObservers();
-//					revalidate();
-//					repaint();
-//				} else {
-//					this.turnOffLabelPortTimer = new Timer(this.delay,
-//							turnOffLabelPort);
-//					this.turnOffLabelPortTimer.start();
-//				}
-//			}
-//
-//			//setOverInteractiveMatrix(false);
-//			hasMouse = false;
-//
-//			xmap.setHoverIndex(-1);
-//			ymap.setHoverIndex(-1);
-//		}
-//	}
-
-//	public void startDragRect(int xIndex, int yIndex) {
-//		
-//		startPoint.setLocation(xIndex, yIndex);
-//		endPoint.setLocation(startPoint.x,startPoint.y);
-//		dragRect.setLocation(startPoint.x,startPoint.y);
-//		dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
-//		drawBand(dragRect);
-//	}
-//
-//	public void updateDragRect(int xIndex, int yIndex) {
-//		
-//		drawBand(dragRect);
-//		endPoint.setLocation(xIndex, yIndex);
-//		dragRect.setLocation(startPoint.x, startPoint.y);
-//		dragRect.setSize(0, 0);
-//		dragRect.add(endPoint.x, endPoint.y);
-//	}
-//
-//	public void endDragRect(int xIndex, int yIndex) {
-//		
-//		updateDragRect(xIndex, yIndex);
-//		drawBand(dragRect);
-//	}
-
-//	/**
-//	 * Zooming when the mouse wheel is used in conjunction with the alt/option
-//	 * key.  Vertical scrolling if the shift key is not pressed.
-//	 */
-//	@Override
-//	public void mouseWheelMoved(final MouseWheelEvent e) {
-//
-//		final int notches = e.getWheelRotation();
-//		final int shift = (notches < 0) ? -3 : 3;
-//
-//		//On macs' magic mouse, horizontal scroll comes in as if the shift was
-//		//down
-//		if (e.isAltDown()) {
-//			if (notches < 0) {
-//				//This ensures we only zoom toward the cursor when the cursor is
-//				//over the map
-//				if (hasMouse) {
-//					smoothZoomTowardPixel(e.getX(), e.getY());
-//				}
-//				//This should happen when the mouse is not over the heatmap
-//				else {
-//					xmap.zoomInBegin();
-//					ymap.zoomInBegin();
-//				}
-//			} else {
-//				if (hasMouse) {
-//					smoothZoomFromPixel(e.getX(), e.getY());
-//				} else {
-//					xmap.zoomOutBegin();
-//					ymap.zoomOutBegin();
-//				}
-//			}
-//		} else if (e.isShiftDown()) {
-//			xmap.scrollBy(shift);
-//			//Now we are hovered over a new index
-//			xmap.setHoverIndex(xmap.getIndex(e.getX()));
-//			
-//		} else {
-//			ymap.scrollBy(shift);
-//			//Now we are hovered over a new index
-//			ymap.setHoverIndex(ymap.getIndex(e.getY()));
-//		}
-//
-//		repaint();
-//	}
 
 	/**
 	 * This function, given a pixel location (e.g. where the cursor is), will
@@ -963,8 +633,8 @@ public class InteractiveMatrixView extends MatrixView {
 	 * in the dimensions of the matrix
 	 */
 	public void smoothAnimatedZoomOut() {
-		smoothAnimatedZoomTowardSelection(0,(xmap.getMaxIndex() + 1),
-											0,(ymap.getMaxIndex() + 1));
+		smoothAnimatedZoomTowardSelection(0, (xmap.getTotalTileNum()),
+											0, (ymap.getTotalTileNum()));
 	}
 
 	/**

@@ -672,10 +672,6 @@ ConfigNodePersistent, Controller {
 				rowSelection.notifyObservers();
 				colSelection.notifyObservers();
 			}
-
-//			gmView.setIMVselectedIndexes(
-//					colSelection.getSelectedIndexes(),
-//					rowSelection.getSelectedIndexes());
 		}
 
 		//Timer to let the label pane linger a bit (prevents flashing when
