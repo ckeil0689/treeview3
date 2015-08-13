@@ -198,10 +198,6 @@ public class DendroView implements Observer, DendroPanel {
 		globalMatrixView = new GlobalMatrixView();
 		interactiveMatrixView = new InteractiveMatrixView();
 
-		//Register the global matrix view with the interactive matrix view so
-		//that it can notify it when a selection changes
-//		interactiveMatrixView.setGlobalMatrixView(globalMatrixView);
-
 		/* scrollbars, mostly used by maps */
 		matrixXscrollbar = interactiveMatrixView.getXMapScroll();
 		matrixYscrollbar = interactiveMatrixView.getYMapScroll();
@@ -473,7 +469,7 @@ public class DendroView implements Observer, DendroPanel {
 		
 		JPanel colTreePanel;
 		
-		colTreePanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_NO_INS);
+		colTreePanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS);
 		colTreePanel.add(colTreeView, "push, growx, h 100%");
 		
 		return colTreePanel;
@@ -489,7 +485,7 @@ public class DendroView implements Observer, DendroPanel {
 		
 		colLabelPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_GAPS_NO_INS);
-		colLabelPanel.add(colLabelView.getComponent(), "pushx, growx");
+		colLabelPanel.add(colLabelView.getComponent(), "h 100%, pushx, growx");
 		
 		return colLabelPanel;
 	}
