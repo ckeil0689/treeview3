@@ -1,6 +1,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -522,9 +523,24 @@ ConfigNodePersistent, Controller {
 		});
 	}
 	
-	/* TODO move to a specified controller class */
+	/**
+	 * Defines all mouse interactions (except wheel) with the 
+	 * interactive matrix.
+	 */
 	private class MatrixMouseListener extends MouseAdapter {
 
+		/**
+		 * This rectangle keeps track of where the drag rect was drawn
+		 */
+		private final Rectangle dragRect = new Rectangle();
+		
+		/**
+		 * Points to track candidate selected rows/cols should reflect where the
+		 * mouse has actually been
+		 */
+		private final Point startPoint = new Point();
+		private final Point endPoint = new Point();
+		
 		boolean isMousePressed;
 		
 		@Override
@@ -537,7 +553,6 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void mouseDragged(final MouseEvent e) {
 
-			// TODO dont draw when out of focus... doesnt recognize isMousePressed...
 			if (!imView.enclosingWindow().isActive()) {
 				return;
 			}
@@ -550,7 +565,7 @@ ConfigNodePersistent, Controller {
 				interactiveYmap.setHoverIndex(cursorYIdx);
 
 				// rubber band?
-				imView.drawBand(dragRect);
+				imView.drawBand(getRectFromMaps(dragRect));
 				endPoint.setLocation(interactiveXmap.getIndex(e.getX()),
 						interactiveYmap.getIndex(e.getY()));
 
@@ -573,7 +588,7 @@ ConfigNodePersistent, Controller {
 					dragRect.add(endPoint.x, endPoint.y);
 				}
 
-				drawBand(dragRect);
+				imView.drawBand(getRectFromMaps(dragRect));
 			}
 		}
 
@@ -591,7 +606,7 @@ ConfigNodePersistent, Controller {
 				interactiveXmap.setSelectingStart(-1);
 				interactiveYmap.setSelectingStart(-1);
 				mouseDragged(e);
-				drawBand(dragRect);
+				imView.drawBand(getRectFromMaps(dragRect));
 
 				/* Full gene selection */
 				if (e.isShiftDown()) {
@@ -645,7 +660,7 @@ ConfigNodePersistent, Controller {
 				dragRect.setSize(endPoint.x - dragRect.x, endPoint.y
 						- dragRect.y);
 
-				drawBand(dragRect);
+				imView.drawBand(getRectFromMaps(dragRect));
 
 			} else if (SwingUtilities.isRightMouseButton(e)) {
 				rowSelection.setSelectedNode(null);
@@ -654,15 +669,13 @@ ConfigNodePersistent, Controller {
 				colSelection.setSelectedNode(null);
 				colSelection.deselectAllIndexes();
 
-				//debug("Deselecting.");
-
 				rowSelection.notifyObservers();
 				colSelection.notifyObservers();
 			}
 
-			gmView.setIMVselectedIndexes(
-					colSelection.getSelectedIndexes(),
-					rowSelection.getSelectedIndexes());
+//			gmView.setIMVselectedIndexes(
+//					colSelection.getSelectedIndexes(),
+//					rowSelection.getSelectedIndexes());
 		}
 
 		//Timer to let the label pane linger a bit (prevents flashing when
@@ -674,25 +687,26 @@ ConfigNodePersistent, Controller {
 			
 			@Override
 			public void actionPerformed(ActionEvent evt) {
+				
 				if (evt.getSource() == turnOffLabelPortTimer) {
 					/* Stop timer */
 					turnOffLabelPortTimer.stop();
 					turnOffLabelPortTimer = null;
 				
-					debug("mouseEvent in IMV - ACTED ON",1);
 					interactiveXmap.setOverInteractiveMatrix(false);
 					interactiveYmap.setOverInteractiveMatrix(false);
+					
 					interactiveXmap.notifyObservers();
 					interactiveYmap.notifyObservers();
-					revalidate();
-					repaint();
+					
+					imView.repaint();
 				}
 			}
 		};
 
 		@Override
 		public void mouseEntered(final MouseEvent e) {
-			debug("mouseEntered IMV",9);
+			
 			if(this.turnOffLabelPortTimer != null) {
 				/* Event came too soon, swallow it by resetting the timer.. */
 				this.turnOffLabelPortTimer.stop();
@@ -700,12 +714,13 @@ ConfigNodePersistent, Controller {
 			}
 			interactiveXmap.setOverInteractiveMatrix(true);
 			interactiveYmap.setOverInteractiveMatrix(true);
-			if (!enclosingWindow().isActive()) {
+			
+			if (!imView.enclosingWindow().isActive()) {
 				return;
 			}
 			
-			hasMouse = true;
-			requestFocus();
+			imView.setHasMouse(true);;
+			imView.requestFocus();
 		}
 
 		@Override
@@ -721,8 +736,7 @@ ConfigNodePersistent, Controller {
 					interactiveYmap.setOverInteractiveMatrix(false);
 					interactiveXmap.notifyObservers();
 					interactiveYmap.notifyObservers();
-					revalidate();
-					repaint();
+					imView.repaint();
 				} else {
 					this.turnOffLabelPortTimer = new Timer(this.delay,
 							turnOffLabelPort);
@@ -731,10 +745,44 @@ ConfigNodePersistent, Controller {
 			}
 
 			//setOverInteractiveMatrix(false);
-			hasMouse = false;
+			imView.setHasMouse(false);
 
 			interactiveXmap.setHoverIndex(-1);
 			interactiveYmap.setHoverIndex(-1);
+		}
+		
+		public void startDragRect(int xIndex, int yIndex) {
+			
+			startPoint.setLocation(xIndex, yIndex);
+			endPoint.setLocation(startPoint.x,startPoint.y);
+			dragRect.setLocation(startPoint.x,startPoint.y);
+			dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
+			imView.drawBand(getRectFromMaps(dragRect));
+		}
+
+		public void updateDragRect(int xIndex, int yIndex) {
+			
+			imView.drawBand(getRectFromMaps(dragRect));
+			endPoint.setLocation(xIndex, yIndex);
+			dragRect.setLocation(startPoint.x, startPoint.y);
+			dragRect.setSize(0, 0);
+			dragRect.add(endPoint.x, endPoint.y);
+		}
+
+		public void endDragRect(int xIndex, int yIndex) {
+			
+			updateDragRect(xIndex, yIndex);
+			imView.drawBand(getRectFromMaps(dragRect));
+		}
+		
+		private Rectangle getRectFromMaps(Rectangle l) {
+			
+			final int x = interactiveXmap.getPixel(l.x);
+			final int y = interactiveYmap.getPixel(l.y);
+			final int w = interactiveXmap.getPixel(l.x + l.width + 1) - x;
+			final int h = interactiveYmap.getPixel(l.y + l.height + 1) - y;
+			
+			return new Rectangle(x, y, w, h);
 		}
 	}
 	
@@ -756,34 +804,34 @@ ConfigNodePersistent, Controller {
 				if (notches < 0) {
 					//This ensures we only zoom toward the cursor when the cursor is
 					//over the map
-					if (hasMouse) {
-						smoothZoomTowardPixel(e.getX(), e.getY());
+					if (imView.hasMouse()) {
+						imView.smoothZoomTowardPixel(e.getX(), e.getY());
 					}
 					//This should happen when the mouse is not over the heatmap
 					else {
-						xmap.zoomInBegin();
-						ymap.zoomInBegin();
+						interactiveXmap.zoomInBegin();
+						interactiveYmap.zoomInBegin();
 					}
 				} else {
-					if (hasMouse) {
-						smoothZoomFromPixel(e.getX(), e.getY());
+					if (imView.hasMouse()) {
+						imView.smoothZoomFromPixel(e.getX(), e.getY());
 					} else {
-						xmap.zoomOutBegin();
-						ymap.zoomOutBegin();
+						interactiveXmap.zoomOutBegin();
+						interactiveYmap.zoomOutBegin();
 					}
 				}
 			} else if (e.isShiftDown()) {
-				xmap.scrollBy(shift);
+				interactiveXmap.scrollBy(shift);
 				//Now we are hovered over a new index
-				xmap.setHoverIndex(xmap.getIndex(e.getX()));
+				interactiveXmap.setHoverIndex(interactiveXmap.getIndex(e.getX()));
 				
 			} else {
-				ymap.scrollBy(shift);
+				interactiveYmap.scrollBy(shift);
 				//Now we are hovered over a new index
-				ymap.setHoverIndex(ymap.getIndex(e.getY()));
+				interactiveYmap.setHoverIndex(interactiveYmap.getIndex(e.getY()));
 			}
 
-			repaint();
+			imView.repaint();
 		}
 	}
 	

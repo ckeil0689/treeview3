@@ -57,17 +57,10 @@ public class InteractiveMatrixView extends MatrixView {
 
 	private double aspectRatio = -1;
 
-	/**
-	 * Points to track candidate selected rows/cols should reflect where the
-	 * mouse has actually been
-	 */
-	private final Point startPoint = new Point();
-	private final Point endPoint = new Point();
-
-	/**
-	 * This rectangle keeps track of where the drag rect was drawn
-	 */
-	private final Rectangle dragRect = new Rectangle();
+//	/**
+//	 * This rectangle keeps track of where the drag rect was drawn
+//	 */
+//	private final Rectangle dragRect = new Rectangle();
 
 	/**
 	 * Rectangle to track yellow selected rectangle (pixels)
@@ -115,15 +108,15 @@ public class InteractiveMatrixView extends MatrixView {
 		return scrollPane.getVerticalScrollBar();
 	}
 	
-	/**
-	 * Adjusts the dimension of the dragging rectangle.
-	 * @param w New width of the dragging rectangle.
-	 * @param h New height of the dragging rectangle.
-	 */
-	public void setDragRectSize(final int w, final int h) {
-		
-		dragRect.setSize(w, h);
-	}
+//	/**
+//	 * Adjusts the dimension of the dragging rectangle.
+//	 * @param w New width of the dragging rectangle.
+//	 * @param h New height of the dragging rectangle.
+//	 */
+//	public void setDragRectSize(final int w, final int h) {
+//		
+//		dragRect.setSize(w, h);
+//	}
 
 //	public void setGlobalMatrixView(GlobalMatrixView gmv) {
 //		
@@ -643,29 +636,29 @@ public class InteractiveMatrixView extends MatrixView {
 //		}
 //	}
 
-	public void startDragRect(int xIndex, int yIndex) {
-		
-		startPoint.setLocation(xIndex, yIndex);
-		endPoint.setLocation(startPoint.x,startPoint.y);
-		dragRect.setLocation(startPoint.x,startPoint.y);
-		dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
-		drawBand(dragRect);
-	}
-
-	public void updateDragRect(int xIndex, int yIndex) {
-		
-		drawBand(dragRect);
-		endPoint.setLocation(xIndex, yIndex);
-		dragRect.setLocation(startPoint.x, startPoint.y);
-		dragRect.setSize(0, 0);
-		dragRect.add(endPoint.x, endPoint.y);
-	}
-
-	public void endDragRect(int xIndex, int yIndex) {
-		
-		updateDragRect(xIndex, yIndex);
-		drawBand(dragRect);
-	}
+//	public void startDragRect(int xIndex, int yIndex) {
+//		
+//		startPoint.setLocation(xIndex, yIndex);
+//		endPoint.setLocation(startPoint.x,startPoint.y);
+//		dragRect.setLocation(startPoint.x,startPoint.y);
+//		dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
+//		drawBand(dragRect);
+//	}
+//
+//	public void updateDragRect(int xIndex, int yIndex) {
+//		
+//		drawBand(dragRect);
+//		endPoint.setLocation(xIndex, yIndex);
+//		dragRect.setLocation(startPoint.x, startPoint.y);
+//		dragRect.setSize(0, 0);
+//		dragRect.add(endPoint.x, endPoint.y);
+//	}
+//
+//	public void endDragRect(int xIndex, int yIndex) {
+//		
+//		updateDragRect(xIndex, yIndex);
+//		drawBand(dragRect);
+//	}
 
 //	/**
 //	 * Zooming when the mouse wheel is used in conjunction with the alt/option
@@ -1829,18 +1822,13 @@ public class InteractiveMatrixView extends MatrixView {
 		aspectRatio = getAspectRatio(numXDots,numYDots);
 	}
 
-	private void drawBand(final Rectangle l) {
+	public void drawBand(final Rectangle l) {
 
 		Graphics2D g2d = (Graphics2D) getGraphics();
 		g2d.setXORMode(getBackground());
 		g2d.setColor(GUIFactory.MAIN);
 
-		final int x = xmap.getPixel(l.x);
-		final int y = ymap.getPixel(l.y);
-		final int w = xmap.getPixel(l.x + l.width + 1) - x;
-		final int h = ymap.getPixel(l.y + l.height + 1) - y;
-
-		g2d.drawRect(x, y, w, h);
+		g2d.drawRect(l.x, l.y, l.width, l.height);
 		g2d.setPaintMode();
 	}
 

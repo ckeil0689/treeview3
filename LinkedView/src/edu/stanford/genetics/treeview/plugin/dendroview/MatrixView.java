@@ -383,6 +383,16 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 	}
 	
+	public void setHasMouse(boolean hasMouse) {
+		
+		this.hasMouse = hasMouse;
+	}
+	
+	public boolean hasMouse() {
+		
+		return hasMouse;
+	}
+	
 	/**
 	 * Tells the MatrixView that underlying data has changed and it needs to
 	 * recalculate its pixel color values. 
