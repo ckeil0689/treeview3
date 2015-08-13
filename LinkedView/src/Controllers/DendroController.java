@@ -75,7 +75,8 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
  * TreeView interface (DendroView).
  *
  */
-public class DendroController implements ConfigNodePersistent, Observer {
+public class DendroController implements ConfigNodePersistent, Observer, 
+Controller {
 
 	private DendroView dendroView;
 	private final TreeViewFrame tvFrame;
@@ -184,7 +185,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		mvController.resetMatrixViews();
 
 		addKeyBindings();
-		addDendroViewListeners();
+		addListeners();
 	}
 	
 	/**
@@ -200,8 +201,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 		mvController.setup();
 	}
 
-	/** Adds all keyboard shortcuts that can be used with DendroView open. */
-	private void addKeyBindings() {
+	@Override
+	public void addKeyBindings() {
 
 		final InputMap input_map = dendroView.getInputMap();
 		final ActionMap action_map = dendroView.getActionMap();
@@ -361,7 +362,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	/**
 	 * Adds listeners to DendroView's UI components.
 	 */
-	private void addDendroViewListeners() {
+	@Override
+	public void addListeners() {
 
 		dendroView.addScaleListeners(new ScaleListener());
 		dendroView.addZoomListener(new ZoomSelectionListener());
@@ -981,7 +983,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 			break;
 		}
 
-		addDendroViewListeners();
+		addListeners();
 		refocusViewPort();
 	}
 

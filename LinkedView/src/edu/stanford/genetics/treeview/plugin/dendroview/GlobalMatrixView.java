@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
+import edu.stanford.genetics.treeview.TreeSelection;
+
 public class GlobalMatrixView extends MatrixView {
 
 	/**
@@ -101,9 +103,14 @@ public class GlobalMatrixView extends MatrixView {
 	@Override
 	public void update(Observable o, Object arg) {
 
-		if (o == interactiveXmap || o == interactiveYmap) {
+		if (o instanceof MapContainer) {
 			recalculateOverlay();
 			offscreenValid = false;
+			repaint();
+			
+		} else if(o instanceof TreeSelection) {
+			recalculateOverlay();
+			offscreenValid = false;	
 			repaint();
 
 		} else {
@@ -398,93 +405,89 @@ public class GlobalMatrixView extends MatrixView {
 		double w = 0;
 		double h = 0;
 
-		//if (geneSelection == null || arraySelection == null)
-		if (selectedIMVGeneIndexes == null || selectedIMVArrayIndexes == null ||
-				selectedIMVGeneIndexes.length == 0 ||
-				selectedIMVArrayIndexes.length == 0) {
+		if (geneSelection == null || arraySelection == null) {
 			indicatorSelectionCircleList = null;
 			return;
-		} else {// if ((selectedIMVGeneIndexes.length * ymap.getScale()) < 5 &&
-				// (selectedIMVArrayIndexes.length * xmap.getScale()) < 5) {
+		}
+		
+		//Empty the list of
+		indicatorSelectionCircleList = new ArrayList<Ellipse2D.Double>();
 
-			//Empty the list of
-			indicatorSelectionCircleList = new ArrayList<Ellipse2D.Double>();
+		List<List<Integer>> arrayBoundaryList;
+		List<List<Integer>> geneBoundaryList;
 
-			List<List<Integer>> arrayBoundaryList;
-			List<List<Integer>> geneBoundaryList;
+		arrayBoundaryList = findRectangleBoundaries(
+				arraySelection.getSelectedIndexes(), xmap);
+		geneBoundaryList = findRectangleBoundaries(
+				geneSelection.getSelectedIndexes(), ymap);
 
-			arrayBoundaryList =
-					findRectangleBoundaries(selectedIMVArrayIndexes,xmap);
-			geneBoundaryList =
-					findRectangleBoundaries(selectedIMVGeneIndexes,ymap);
+		/*
+		 * TODO: Instead of just checking the last(/next) selection
+		 * position, should group all small selections together too see if
+		 * the cluster is smaller than our limits.
+		 */
+		double lastxb = -1;
+
+		// Make the rectangles
+		for (final List<Integer> xBoundaries : arrayBoundaryList) {
 
 			/*
 			 * TODO: Instead of just checking the last(/next) selection
-			 * position, should group all small selections together too see if
-			 * the cluster is smaller than our limits.
+			 * position, should group all small selections together too see
+			 * if the cluster is smaller than our limits.
 			 */
-			double lastxb = -1;
+			double lastyb = -1;
+			w = (xBoundaries.get(1) - xBoundaries.get(0));
 
-			// Make the rectangles
-			for (final List<Integer> xBoundaries : arrayBoundaryList) {
+			for (final List<Integer> yBoundaries : geneBoundaryList) {
 
-				/*
-				 * TODO: Instead of just checking the last(/next) selection
-				 * position, should group all small selections together too see
-				 * if the cluster is smaller than our limits.
-				 */
-				double lastyb = -1;
-				w = (xBoundaries.get(1) - xBoundaries.get(0));
+				//LogBuffer.println("Preparing to create ellipse.");
 
-				for (final List<Integer> yBoundaries : geneBoundaryList) {
+				// Width and height of rectangle which spans the Ellipse2D
+				// object
+				h = (yBoundaries.get(1) - yBoundaries.get(0));
 
-					//LogBuffer.println("Preparing to create ellipse.");
+				if(w < 5 && h < 5 &&
+				   //This is not the first selection and the last selection
+				   //is far away OR this is the first selection and the next
+				   //selection either doesn't exists or is far away
+				   ((lastxb >= 0 &&
+				     Math.abs(xBoundaries.get(0) - lastxb) > 5) ||
+				    (lastxb < 0 &&
+				     (arrayBoundaryList.size() == 1 ||
+				      Math.abs(arrayBoundaryList.get(1).get(0) -
+				               xBoundaries.get(1)) > 5))) &&
+				   ((lastyb >= 0 &&
+				     Math.abs(yBoundaries.get(0) - lastyb) > 5) ||
+				    (lastyb < 0 &&
+				     (geneBoundaryList.size() == 1 ||
+				      Math.abs(geneBoundaryList.get(1).get(0) -
+				               yBoundaries.get(1)) > 5)))) {
+					// coords for top left of circle
+					x = xBoundaries.get(0) + (w / 2.0) - 5;
+					y = yBoundaries.get(0) + (h / 2.0) - 5;
 
-					// Width and height of rectangle which spans the Ellipse2D
-					// object
-					h = (yBoundaries.get(1) - yBoundaries.get(0));
+					//LogBuffer.println("Ellipse created at [" + x + "x" + y +
+					//		"] and is dimensions [" + w + "x" + h + "].");
 
-					if(w < 5 && h < 5 &&
-					   //This is not the first selection and the last selection
-					   //is far away OR this is the first selection and the next
-					   //selection either doesn't exists or is far away
-					   ((lastxb >= 0 &&
-					     Math.abs(xBoundaries.get(0) - lastxb) > 5) ||
-					    (lastxb < 0 &&
-					     (arrayBoundaryList.size() == 1 ||
-					      Math.abs(arrayBoundaryList.get(1).get(0) -
-					               xBoundaries.get(1)) > 5))) &&
-					   ((lastyb >= 0 &&
-					     Math.abs(yBoundaries.get(0) - lastyb) > 5) ||
-					    (lastyb < 0 &&
-					     (geneBoundaryList.size() == 1 ||
-					      Math.abs(geneBoundaryList.get(1).get(0) -
-					               yBoundaries.get(1)) > 5)))) {
-						// coords for top left of circle
-						x = xBoundaries.get(0) + (w / 2.0) - 5;
-						y = yBoundaries.get(0) + (h / 2.0) - 5;
-
-						//LogBuffer.println("Ellipse created at [" + x + "x" + y +
-						//		"] and is dimensions [" + w + "x" + h + "].");
-
-						indicatorSelectionCircleList.add(
-								new Ellipse2D.Double(x, y, 10, 10));
-					//} else {
-					//	LogBuffer.println("Selection was too big [" + w + "x" +
-					//			h + "] or [(" + xBoundaries.get(1) + " - " +
-					//			xBoundaries.get(0) + ") x (" +
-					//			yBoundaries.get(1) + " - " +
-					//			yBoundaries.get(0) + ")].");
-					}
-					lastyb = yBoundaries.get(1);
+					indicatorSelectionCircleList.add(
+							new Ellipse2D.Double(x, y, 10, 10));
+				//} else {
+				//	LogBuffer.println("Selection was too big [" + w + "x" +
+				//			h + "] or [(" + xBoundaries.get(1) + " - " +
+				//			xBoundaries.get(0) + ") x (" +
+				//			yBoundaries.get(1) + " - " +
+				//			yBoundaries.get(0) + ")].");
 				}
-				lastxb = xBoundaries.get(1);
+				lastyb = yBoundaries.get(1);
 			}
+			lastxb = xBoundaries.get(1);
 		}
 	}
 
 	public void setIMVselectedIndexes(int[] selectedArrayIndexes,
 									  int[] selectedGeneIndexes) {
+		
 		selectedIMVArrayIndexes = selectedArrayIndexes;
 		selectedIMVGeneIndexes  = selectedGeneIndexes;
 

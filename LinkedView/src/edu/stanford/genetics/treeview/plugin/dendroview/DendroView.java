@@ -200,7 +200,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		//Register the global matrix view with the interactive matrix view so
 		//that it can notify it when a selection changes
-		interactiveMatrixView.setGlobalMatrixView(globalMatrixView);
+//		interactiveMatrixView.setGlobalMatrixView(globalMatrixView);
 
 		/* scrollbars, mostly used by maps */
 		matrixXscrollbar = interactiveMatrixView.getXMapScroll();

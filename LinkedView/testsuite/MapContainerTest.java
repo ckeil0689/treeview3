@@ -17,6 +17,7 @@ public class MapContainerTest {
 	private final static int MAX_IDX = 99;
 	
 	private MapContainer mpContainer;
+	private JScrollBar scrollbar;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -30,6 +31,10 @@ public class MapContainerTest {
 	public void setUp() throws Exception {
 		
 		mpContainer = new MapContainer(IntegerMap.FIXED, "TestMap");
+		
+		scrollbar = new JScrollBar();
+		mpContainer.setScrollbar(scrollbar);
+		
 		mpContainer.setIndexRange(MIN_IDX, MAX_IDX);
 	}
 
@@ -44,7 +49,17 @@ public class MapContainerTest {
 
 	@Test
 	public void testShowsAllTiles() {
-		fail("Not yet implemented");
+		
+		// Case 1: Fully zoomed out.
+		assertTrue("All tiles visible.", mpContainer.showsAllTiles());
+		
+		// Case 2: Zoomed in once.
+		mpContainer.zoomInEnd();
+		assertFalse("Not all tiles visible.", mpContainer.showsAllTiles());
+		
+		// Case 3: Zoomed out again
+		mpContainer.setToMinScale();
+		assertTrue("All tiles visible.", mpContainer.showsAllTiles());
 	}
 
 	@Test
@@ -74,9 +89,6 @@ public class MapContainerTest {
 
 	@Test
 	public void testScrollBy() {
-		
-		JScrollBar scrollbar = new JScrollBar();
-		mpContainer.setScrollbar(scrollbar);
 		
 		assertEquals("Scrollbar Object Equality", scrollbar, 
 				mpContainer.getScroll());

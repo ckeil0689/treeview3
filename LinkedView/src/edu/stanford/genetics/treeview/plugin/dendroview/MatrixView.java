@@ -334,8 +334,8 @@ public abstract class MatrixView extends ModelViewProduced {
 	protected void adjustPixelsToMaps() {
 		
 		// correct for zero indexing
-		int x_tiles = xmap.getMaxIndex() + 1;
-		int y_tiles = ymap.getMaxIndex() + 1;
+		int x_tiles = xmap.getTotalTileNum();
+		int y_tiles = ymap.getTotalTileNum();
 		
 		int tileCount = x_tiles * y_tiles;
 		

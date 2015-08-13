@@ -1,9 +1,15 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.BackingStoreException;
@@ -15,7 +21,9 @@ import javax.swing.InputMap;
 import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
+import Controllers.Controller;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
@@ -34,7 +42,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
  *
  */
 public class MatrixViewController implements Observer, 
-ConfigNodePersistent {
+ConfigNodePersistent, Controller {
 
 	private InteractiveMatrixView imView;
 	private GlobalMatrixView gmView;
@@ -60,7 +68,6 @@ ConfigNodePersistent {
 		this.imView = imView;
 		this.gmView = gmView;
 		this.model = model;
-		
 	}
 	
 	/**
@@ -76,7 +83,19 @@ ConfigNodePersistent {
 		}
 		
 		setupDrawingComponents();
+		addListeners();
 		addKeyBindings();
+	}
+	
+
+	@Override
+	public void addListeners() {
+		
+		MatrixMouseListener mmListener = new MatrixMouseListener();
+		imView.addMouseListener(mmListener);
+		imView.addMouseMotionListener(mmListener);
+		
+		imView.addMouseWheelListener(new MatrixMouseWheelListener());
 	}
 	
 	/**
@@ -162,7 +181,8 @@ ConfigNodePersistent {
 		gmView.setArrayDrawer(arrayDrawer);
 	}
 	
-	private void addKeyBindings() {
+	@Override
+	public void addKeyBindings() {
 		
 		final InputMap input_map = imView.getInputMap();
 		final ActionMap action_map = imView.getActionMap();
@@ -502,6 +522,320 @@ ConfigNodePersistent {
 		});
 	}
 	
+	/* TODO move to a specified controller class */
+	private class MatrixMouseListener extends MouseAdapter {
+
+		boolean isMousePressed;
+		
+		@Override
+		public void mouseMoved(final MouseEvent e) {
+						
+			interactiveXmap.setHoverIndex(interactiveXmap.getIndex(e.getX()));
+			interactiveYmap.setHoverIndex(interactiveYmap.getIndex(e.getY()));
+		}
+
+		@Override
+		public void mouseDragged(final MouseEvent e) {
+
+			// TODO dont draw when out of focus... doesnt recognize isMousePressed...
+			if (!imView.enclosingWindow().isActive()) {
+				return;
+			}
+			
+			// When left button is used
+			if (SwingUtilities.isLeftMouseButton(e)) {
+				final int cursorXIdx = interactiveXmap.getIndex(e.getX());
+				final int cursorYIdx = interactiveYmap.getIndex(e.getY());
+				interactiveXmap.setHoverIndex(cursorXIdx);
+				interactiveYmap.setHoverIndex(cursorYIdx);
+
+				// rubber band?
+				imView.drawBand(dragRect);
+				endPoint.setLocation(interactiveXmap.getIndex(e.getX()),
+						interactiveYmap.getIndex(e.getY()));
+
+				/* Full gene selection */
+				if (e.isShiftDown()) {
+					dragRect.setLocation(interactiveXmap.getMinIndex(), startPoint.y);
+					dragRect.setSize(0, 0);
+					dragRect.add(interactiveXmap.getMaxIndex(), endPoint.y);
+
+					/* Full array selection */
+				} else if (e.isControlDown()) {
+					dragRect.setLocation(startPoint.x, interactiveYmap.getMinIndex());
+					dragRect.setSize(0, 0);
+					dragRect.add(endPoint.x, interactiveYmap.getMaxIndex());
+
+					/* Normal selection */
+				} else {
+					dragRect.setLocation(startPoint.x, startPoint.y);
+					dragRect.setSize(0, 0);
+					dragRect.add(endPoint.x, endPoint.y);
+				}
+
+				drawBand(dragRect);
+			}
+		}
+
+		@Override
+		public void mouseReleased(final MouseEvent e) {
+
+			if (!imView.enclosingWindow().isActive() || !isMousePressed) {
+				return;
+			}
+
+			// When left button is used
+			if (SwingUtilities.isLeftMouseButton(e)) {
+				interactiveXmap.setSelecting(false);
+				interactiveYmap.setSelecting(false);
+				interactiveXmap.setSelectingStart(-1);
+				interactiveYmap.setSelectingStart(-1);
+				mouseDragged(e);
+				drawBand(dragRect);
+
+				/* Full gene selection */
+				if (e.isShiftDown()) {
+					final Point start = new Point(interactiveXmap.getMinIndex(),
+							startPoint.y);
+					final Point end = new Point(interactiveXmap.getMaxIndex(), endPoint.y);
+					selectRectangle(start, end);
+
+					/* Full array selection */
+				} else if (e.isControlDown()) {
+					final Point start = new Point(startPoint.x,
+							interactiveYmap.getMinIndex());
+					final Point end = new Point(endPoint.x, interactiveYmap.getMaxIndex());
+					selectRectangle(start, end);
+
+					/* Normal selection */
+				} else {
+					selectRectangle(startPoint, endPoint);
+				}
+
+			} else {
+				// do something else?
+			}
+			
+			isMousePressed = false;
+			
+			imView.repaint();
+		}
+
+		// Mouse Listener
+		@Override
+		public void mousePressed(final MouseEvent e) {
+
+			if (!imView.enclosingWindow().isActive()) {
+				return;
+			}
+
+			isMousePressed = true;
+			
+			// if left button is used
+			if (SwingUtilities.isLeftMouseButton(e)) {
+				interactiveXmap.setSelecting(true);
+				interactiveYmap.setSelecting(true);
+				interactiveXmap.setSelectingStart(interactiveXmap.getIndex(e.getX()));
+				interactiveYmap.setSelectingStart(interactiveYmap.getIndex(e.getY()));
+
+				startPoint.setLocation(interactiveXmap.getIndex(e.getX()),
+						interactiveYmap.getIndex(e.getY()));
+				endPoint.setLocation(startPoint.x, startPoint.y);
+				dragRect.setLocation(startPoint.x, startPoint.y);
+				dragRect.setSize(endPoint.x - dragRect.x, endPoint.y
+						- dragRect.y);
+
+				drawBand(dragRect);
+
+			} else if (SwingUtilities.isRightMouseButton(e)) {
+				rowSelection.setSelectedNode(null);
+				rowSelection.deselectAllIndexes();
+
+				colSelection.setSelectedNode(null);
+				colSelection.deselectAllIndexes();
+
+				//debug("Deselecting.");
+
+				rowSelection.notifyObservers();
+				colSelection.notifyObservers();
+			}
+
+			gmView.setIMVselectedIndexes(
+					colSelection.getSelectedIndexes(),
+					rowSelection.getSelectedIndexes());
+		}
+
+		//Timer to let the label pane linger a bit (prevents flashing when
+		//passing between panes which do not change the visibility of the label
+		//panes)
+		final private int delay = 250;
+		private javax.swing.Timer turnOffLabelPortTimer;
+		ActionListener turnOffLabelPort = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				if (evt.getSource() == turnOffLabelPortTimer) {
+					/* Stop timer */
+					turnOffLabelPortTimer.stop();
+					turnOffLabelPortTimer = null;
+				
+					debug("mouseEvent in IMV - ACTED ON",1);
+					interactiveXmap.setOverInteractiveMatrix(false);
+					interactiveYmap.setOverInteractiveMatrix(false);
+					interactiveXmap.notifyObservers();
+					interactiveYmap.notifyObservers();
+					revalidate();
+					repaint();
+				}
+			}
+		};
+
+		@Override
+		public void mouseEntered(final MouseEvent e) {
+			debug("mouseEntered IMV",9);
+			if(this.turnOffLabelPortTimer != null) {
+				/* Event came too soon, swallow it by resetting the timer.. */
+				this.turnOffLabelPortTimer.stop();
+				this.turnOffLabelPortTimer = null;
+			}
+			interactiveXmap.setOverInteractiveMatrix(true);
+			interactiveYmap.setOverInteractiveMatrix(true);
+			if (!enclosingWindow().isActive()) {
+				return;
+			}
+			
+			hasMouse = true;
+			requestFocus();
+		}
+
+		@Override
+		public void mouseExited(final MouseEvent e) {
+
+			//Turn off the "over a label port view" boolean after a bit
+			if(this.turnOffLabelPortTimer == null) {
+				/* Start waiting for delay millis to elapse and then
+				 * call actionPerformed of the ActionListener
+				 * "turnOffLabelPort". */
+				if(delay == 0) {
+					interactiveXmap.setOverInteractiveMatrix(false);
+					interactiveYmap.setOverInteractiveMatrix(false);
+					interactiveXmap.notifyObservers();
+					interactiveYmap.notifyObservers();
+					revalidate();
+					repaint();
+				} else {
+					this.turnOffLabelPortTimer = new Timer(this.delay,
+							turnOffLabelPort);
+					this.turnOffLabelPortTimer.start();
+				}
+			}
+
+			//setOverInteractiveMatrix(false);
+			hasMouse = false;
+
+			interactiveXmap.setHoverIndex(-1);
+			interactiveYmap.setHoverIndex(-1);
+		}
+	}
+	
+	private class MatrixMouseWheelListener implements MouseWheelListener {
+		
+		/**
+		 * Zooming when the mouse wheel is used in conjunction with the alt/option
+		 * key.  Vertical scrolling if the shift key is not pressed.
+		 */
+		@Override
+		public void mouseWheelMoved(final MouseWheelEvent e) {
+
+			final int notches = e.getWheelRotation();
+			final int shift = (notches < 0) ? -3 : 3;
+
+			//On macs' magic mouse, horizontal scroll comes in as if the shift was
+			//down
+			if (e.isAltDown()) {
+				if (notches < 0) {
+					//This ensures we only zoom toward the cursor when the cursor is
+					//over the map
+					if (hasMouse) {
+						smoothZoomTowardPixel(e.getX(), e.getY());
+					}
+					//This should happen when the mouse is not over the heatmap
+					else {
+						xmap.zoomInBegin();
+						ymap.zoomInBegin();
+					}
+				} else {
+					if (hasMouse) {
+						smoothZoomFromPixel(e.getX(), e.getY());
+					} else {
+						xmap.zoomOutBegin();
+						ymap.zoomOutBegin();
+					}
+				}
+			} else if (e.isShiftDown()) {
+				xmap.scrollBy(shift);
+				//Now we are hovered over a new index
+				xmap.setHoverIndex(xmap.getIndex(e.getX()));
+				
+			} else {
+				ymap.scrollBy(shift);
+				//Now we are hovered over a new index
+				ymap.setHoverIndex(ymap.getIndex(e.getY()));
+			}
+
+			repaint();
+		}
+	}
+	
+	/**
+	 * Selecting a rectangular area in GlobalView
+	 *
+	 * @param start
+	 * @param end
+	 */
+	private void selectRectangle(final Point start, final Point end) {
+
+		// sort so that ep is upper left corner
+		if (end.x < start.x) {
+			final int x = end.x;
+			end.x = start.x;
+			start.x = x;
+		}
+
+		if (end.y < start.y) {
+			final int y = end.y;
+			end.y = start.y;
+			start.y = y;
+		}
+
+		// nodes
+		rowSelection.setSelectedNode(null);
+
+		// genes...
+		rowSelection.deselectAllIndexes();
+
+		for (int i = start.y; i <= end.y; i++) {
+
+			rowSelection.setIndexSelection(i, true);
+		}
+
+		// arrays...
+		colSelection.setSelectedNode(null);
+		colSelection.deselectAllIndexes();
+
+		for (int i = start.x; i <= end.x; i++) {
+
+			colSelection.setIndexSelection(i, true);
+		}
+
+		gmView.setIMVselectedIndexes(
+				colSelection.getSelectedIndexes(),
+				rowSelection.getSelectedIndexes());
+
+		rowSelection.notifyObservers();
+		colSelection.notifyObservers();
+	}
+	
 	/**
 	 * Zooms on a selection. The type of zooming is dependent on input 
 	 * modifiers used when executing the zoom.
@@ -584,20 +918,20 @@ ConfigNodePersistent {
 	/**
 	 * Assigns references of MapContainer instances to be used for 
 	 * interactivity and information display in InteractiveMatrixView. 
-	 * @param xmap
-	 * @param ymap
+	 * @param interactiveXmap
+	 * @param interactiveYmap
 	 */
-	public void setInteractiveMapContainers(final MapContainer xmap, 
-			final MapContainer ymap) {
+	public void setInteractiveMapContainers(final MapContainer interactiveXmap, 
+			final MapContainer interactiveYmap) {
 		
-		this.interactiveXmap = xmap;
-		this.interactiveYmap = ymap;
+		this.interactiveXmap = interactiveXmap;
+		this.interactiveYmap = interactiveYmap;
 		
 		interactiveXmap.addObserver(this);
 		interactiveYmap.addObserver(this);
 		
-		imView.setXMap(xmap);
-		imView.setYMap(ymap);
+		imView.setXMap(interactiveXmap);
+		imView.setYMap(interactiveYmap);
 	}
 	
 	/**
