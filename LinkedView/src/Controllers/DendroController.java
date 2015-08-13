@@ -1428,9 +1428,9 @@ Controller {
 //		dendroView.getGlobalMatrixView().setXMap(globalXmap);
 //		dendroView.getGlobalMatrixView().setYMap(globalYmap);
 
-		// what...?
-		dendroView.getGlobalMatrixView().setInteractiveXMap(interactiveXmap);
-		dendroView.getGlobalMatrixView().setInteractiveYMap(interactiveYmap);
+//		// what...?
+//		dendroView.getGlobalMatrixView().setInteractiveXMap(interactiveXmap);
+//		dendroView.getGlobalMatrixView().setInteractiveYMap(interactiveYmap);
 	}
 
 	/**

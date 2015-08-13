@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelection;
 
 public class GlobalMatrixView extends MatrixView {
@@ -23,14 +22,15 @@ public class GlobalMatrixView extends MatrixView {
 
 	private final int MAP_SIZE_LIMIT = 300;
 	private final int MIN_VIEWPORT_SIZE = 1;
-
-	/*
-	 * Also needs reference to interactive MapContainers to get knowledge
-	 * about which specific tiles are currently visible and update the 
-	 * viewport rectangle through the observer pattern.
+	
+	/**
+	 * Keep track of IMV viewport. TODO change to direct rectangle
+	 * pixel calcs should not be in this class.
 	 */
-	private MapContainer interactiveXmap;
-	private MapContainer interactiveYmap;
+	private int imv_firstXVisible;
+	private int imv_firstYVisible;
+	private int imv_numXVisible;
+	private int imv_numYVisible;
 
 	private int xViewMin;
 	private int yViewMin;
@@ -109,7 +109,6 @@ public class GlobalMatrixView extends MatrixView {
 			repaint();
 			
 		} else if(o instanceof TreeSelection) {
-			LogBuffer.println("Selection for GMV changed");
 			recalculateOverlay();
 			offscreenValid = false;	
 			repaint();
@@ -123,37 +122,6 @@ public class GlobalMatrixView extends MatrixView {
 	public String viewName() {
 
 		return "GlobalMatrixView";
-	}
-
-	/**
-	 * Sets a reference to the interactive x-MapContainer to keep track of
-	 * currently visible tiles. 
-	 * @param m
-	 */
-	public void setInteractiveXMap(final MapContainer m) {
-
-		if (interactiveXmap != null) {
-			interactiveXmap.deleteObserver(this);
-		}
-
-		interactiveXmap = m;
-		interactiveXmap.addObserver(this);
-	}
-
-	/**
-	 * Sets a reference to the interactive y-MapContainer to keep track of
-	 * currently visible tiles.
-	 * 
-	 * @param m
-	 */
-	public void setInteractiveYMap(final MapContainer m) {
-
-		if (interactiveYmap != null) {
-			interactiveYmap.deleteObserver(this);
-		}
-
-		interactiveYmap = m;
-		interactiveYmap.addObserver(this);
 	}
 
 	/**
@@ -203,23 +171,23 @@ public class GlobalMatrixView extends MatrixView {
 
 		/* Assure minimum draw size for viewport rectangle */
 		int xRange;
-		if(interactiveXmap.getNumVisible() > xViewMin) {
-			xRange = interactiveXmap.getNumVisible();
+		if(imv_numXVisible > xViewMin) {
+			xRange = imv_numXVisible;
 		} else {
 			xRange = xViewMin;
 		}
 
 		int yRange;
-		if(interactiveYmap.getNumVisible() > yViewMin) {
-			yRange = interactiveYmap.getNumVisible();
+		if(imv_numYVisible > yViewMin) {
+			yRange = imv_numYVisible;
 		} else {
 			yRange = yViewMin;
 		}
 
-		int xFirst = interactiveXmap.getFirstVisible();
+		int xFirst = imv_firstXVisible;
 		int xLast = xFirst + (xRange - 1);
 
-		int yFirst = interactiveYmap.getFirstVisible();
+		int yFirst = imv_firstYVisible;
 		int yLast = yFirst + (yRange - 1);
 
 		int spx = xmap.getPixel(xFirst);
@@ -358,17 +326,14 @@ public class GlobalMatrixView extends MatrixView {
 		double h = 0;
 
 		// Width and height of rectangle which spans the Ellipse2D object
-		w = interactiveXmap.getNumVisible() * xmap.getScale();
-		h = interactiveYmap.getNumVisible() * ymap.getScale();
+		w = imv_numXVisible * xmap.getScale();
+		h = imv_numYVisible * ymap.getScale();
 
 		if (w < 5 && h < 5) {
 
 			// coords for top left of circle
-			x = xmap.getPixel(interactiveXmap.getFirstVisible()) + w / 2.0 - 5;
-			y = ymap.getPixel(interactiveYmap.getFirstVisible()) + h / 2.0 - 5;
-
-			// LogBuffer.println("Circle coords: x y w h: " +
-			// x+" "+y+" "+w+" "+h);
+			x = xmap.getPixel(imv_firstXVisible) + w / 2.0 - 5;
+			y = ymap.getPixel(imv_firstYVisible) + h / 2.0 - 5;
 
 			if (indicatorVisibleCircle == null) {
 				indicatorVisibleCircle = new Ellipse2D.Double(x, y, 10, 10);
@@ -428,8 +393,6 @@ public class GlobalMatrixView extends MatrixView {
 
 			for (final List<Integer> yBoundaries : geneBoundaryList) {
 
-				//LogBuffer.println("Preparing to create ellipse.");
-
 				// Width and height of rectangle which spans the Ellipse2D
 				// object
 				h = (yBoundaries.get(1) - yBoundaries.get(0));
@@ -454,21 +417,32 @@ public class GlobalMatrixView extends MatrixView {
 					x = xBoundaries.get(0) + (w / 2.0) - 5;
 					y = yBoundaries.get(0) + (h / 2.0) - 5;
 
-					//LogBuffer.println("Ellipse created at [" + x + "x" + y +
-					//		"] and is dimensions [" + w + "x" + h + "].");
-
 					indicatorSelectionCircleList.add(
 							new Ellipse2D.Double(x, y, 10, 10));
-				//} else {
-				//	LogBuffer.println("Selection was too big [" + w + "x" +
-				//			h + "] or [(" + xBoundaries.get(1) + " - " +
-				//			xBoundaries.get(0) + ") x (" +
-				//			yBoundaries.get(1) + " - " +
-				//			yBoundaries.get(0) + ")].");
 				}
 				lastyb = yBoundaries.get(1);
 			}
 			lastxb = xBoundaries.get(1);
 		}
+	}
+	
+	/**
+	 * Let GlobalMatrixView know the viewport boundaries of 
+	 * InteractiveMatrixView without the need for full MapContainer dependence.
+	 * @param firstXVisible Index of first visible tile in IMV xmap. 
+	 * @param firstYVisible Index of first visible tile in IMV ymap.
+	 * @param numXVisible Number of visible tiles in IMV xmap.
+	 * @param numYVisible Number of visible tiles in IMV ymap.
+	 */
+	public void setIMVViewportRange(final int firstXVisible, 
+			final int firstYVisible, final int numXVisible, 
+			final int numYVisible) {
+		
+		this.imv_firstXVisible = firstXVisible;
+		this.imv_firstYVisible = firstYVisible;
+		this.imv_numXVisible = numXVisible;
+		this.imv_numYVisible = numYVisible;
+		
+		recalculateOverlay();
 	}
 }

@@ -1815,15 +1815,13 @@ public class MapContainer extends Observable implements Observer,
 	 * spots they are looking at.
 	 */
 	public void setNumVisible(final int i) {
-		// LogBuffer.println("setNumVisible: numVisible has been set to [" + i +
-		// "].");
+
 		if(i > getTotalTileNum()) {
 			numVisible = getTotalTileNum();
 			
 		} else {
 			numVisible = i;
 		}
-
 //		//If the number of visible squares has dipped below the number of
 //		//visible labels
 //		if(i < getNumVisibleLabels()) {

@@ -38,9 +38,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 /**
  * This controller explicitly handles direct user interaction with the
  * InteractiveMatrixView. 
- * This can probably also be split into Parent + Interactive + Global 
- * @author chris0689
- *
+ * This can probably also be split into Parent + Interactive + Global
  */
 public class MatrixViewController implements Observer, 
 ConfigNodePersistent, Controller {
@@ -144,7 +142,25 @@ ConfigNodePersistent, Controller {
 	@Override // Observer code
 	public void update(Observable o, Object arg) {
 		
+		if(o instanceof MapContainer) {
+			LogBuffer.println("MVController gets MapContainer update");
+			updateGMVViewPortRect();
+		}
+	}
+	
+	/**
+	 * Let's the GlobalMatrixView know about the current InteractiveMatrixView
+	 * viewport.
+	 * TODO claculate pixels from maps here and send a rectangle instead.
+	 */
+	private void updateGMVViewPortRect() {
 		
+		int firstXVisible = interactiveXmap.getFirstVisible();
+		int firstYVisible = interactiveYmap.getFirstVisible();
+		int numXVisible = interactiveXmap.getNumVisible();
+		int numYVisible = interactiveYmap.getNumVisible();
+		gmView.setIMVViewportRange(firstXVisible, firstYVisible, 
+				numXVisible, numYVisible);
 	}
 	
 	/**
