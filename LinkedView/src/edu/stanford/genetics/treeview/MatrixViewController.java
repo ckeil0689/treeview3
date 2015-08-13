@@ -606,7 +606,7 @@ ConfigNodePersistent, Controller {
 				interactiveXmap.setSelectingStart(-1);
 				interactiveYmap.setSelectingStart(-1);
 				mouseDragged(e);
-				imView.drawBand(getRectFromMaps(dragRect));
+				imView.drawBand(getRectFromMaps(dragRect)); // ?????
 
 				/* Full gene selection */
 				if (e.isShiftDown()) {
@@ -724,51 +724,15 @@ ConfigNodePersistent, Controller {
 
 			//Turn off the "over a label port view" boolean after a bit
 			if(this.turnOffLabelPortTimer == null) {
-				/* Start waiting for delay millis to elapse and then
-				 * call actionPerformed of the ActionListener
-				 * "turnOffLabelPort". */
-				if(delay == 0) {
-					interactiveXmap.setOverInteractiveMatrix(false);
-					interactiveYmap.setOverInteractiveMatrix(false);
-					interactiveXmap.notifyObservers();
-					interactiveYmap.notifyObservers();
-					imView.repaint();
-				} else {
-					this.turnOffLabelPortTimer = new Timer(this.delay,
-							turnOffLabelPort);
-					this.turnOffLabelPortTimer.start();
-				}
+				this.turnOffLabelPortTimer = new Timer(this.delay,
+						turnOffLabelPort);
+				this.turnOffLabelPortTimer.start();
 			}
 
-			//setOverInteractiveMatrix(false);
 			imView.setHasMouse(false);
 
 			interactiveXmap.setHoverIndex(-1);
 			interactiveYmap.setHoverIndex(-1);
-		}
-		
-		public void startDragRect(int xIndex, int yIndex) {
-			
-			startPoint.setLocation(xIndex, yIndex);
-			endPoint.setLocation(startPoint.x,startPoint.y);
-			dragRect.setLocation(startPoint.x,startPoint.y);
-			dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
-			imView.drawBand(getRectFromMaps(dragRect));
-		}
-
-		public void updateDragRect(int xIndex, int yIndex) {
-			
-			imView.drawBand(getRectFromMaps(dragRect));
-			endPoint.setLocation(xIndex, yIndex);
-			dragRect.setLocation(startPoint.x, startPoint.y);
-			dragRect.setSize(0, 0);
-			dragRect.add(endPoint.x, endPoint.y);
-		}
-
-		public void endDragRect(int xIndex, int yIndex) {
-			
-			updateDragRect(xIndex, yIndex);
-			imView.drawBand(getRectFromMaps(dragRect));
 		}
 		
 		private Rectangle getRectFromMaps(Rectangle l) {
@@ -871,10 +835,6 @@ ConfigNodePersistent, Controller {
 
 			colSelection.setIndexSelection(i, true);
 		}
-
-		gmView.setIMVselectedIndexes(
-				colSelection.getSelectedIndexes(),
-				rowSelection.getSelectedIndexes());
 
 		rowSelection.notifyObservers();
 		colSelection.notifyObservers();

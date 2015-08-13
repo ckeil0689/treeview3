@@ -2039,9 +2039,9 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setOverRowLabels(boolean overRowLabels) {
 		this.overRowLabels = overRowLabels;
-		setChanged();
+		setChanged(); // mapcontainer didnt change as a result of hovering over labels...
 		setHoverChanged();
-		notifyObservers();
+		notifyObservers(); // calls recalculateOverlay for IMV and GMV... shoudlnt
 	}
 
 	/**
@@ -2049,9 +2049,9 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setOverRowLabelsScrollbar(boolean overRowLabels) {
 		this.overRowLabelsScrollbar = overRowLabels;
-		setChanged();
+		setChanged(); // NO
 		setHoverChanged();
-		notifyObservers();
+		notifyObservers(); // recalculates overlay in IMV & GMV. why?
 	}
 
 	/**

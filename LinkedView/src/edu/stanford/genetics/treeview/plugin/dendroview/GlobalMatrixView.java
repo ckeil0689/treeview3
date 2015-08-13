@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelection;
 
 public class GlobalMatrixView extends MatrixView {
@@ -51,9 +52,6 @@ public class GlobalMatrixView extends MatrixView {
 	 */
 	private List<Ellipse2D.Double> indicatorSelectionCircleList = null;
 
-	private int[] selectedIMVArrayIndexes = null;
-	private int[] selectedIMVGeneIndexes  = null;
-
 	public GlobalMatrixView() {
 
 		super();
@@ -85,16 +83,18 @@ public class GlobalMatrixView extends MatrixView {
 								RenderingHints.VALUE_ANTIALIAS_ON);
 			g2.setStroke(new BasicStroke(2));
 		}
+		
 		if (viewPortRect != null) {
 			g2.setColor(Color.white);
+			
 			if (indicatorVisibleCircle != null) {
 				g2.draw(indicatorVisibleCircle);
 			}
 		}
 		if (indicatorSelectionCircleList != null) {
 			g2.setColor(Color.yellow);
+			
 			for(Ellipse2D.Double indicatorCircle : indicatorSelectionCircleList) {
-				//LogBuffer.println("Drawing ellipse.");
 				g2.draw(indicatorCircle);
 			}
 		}
@@ -109,6 +109,7 @@ public class GlobalMatrixView extends MatrixView {
 			repaint();
 			
 		} else if(o instanceof TreeSelection) {
+			LogBuffer.println("Selection for GMV changed");
 			recalculateOverlay();
 			offscreenValid = false;	
 			repaint();
@@ -238,36 +239,22 @@ public class GlobalMatrixView extends MatrixView {
 
 		setIndicatorVisibleCircleBounds();
 
-		//if ((geneSelection == null) || (arraySelection == null)) {
-		if ((selectedIMVGeneIndexes == null) ||
-			(selectedIMVArrayIndexes == null)) {
+		if ((geneSelection == null) || (arraySelection == null)) {
 			selectionRectList = null;
 			indicatorSelectionCircleList = null;
-			//LogBuffer.println("Nothing appears to be selected.");
 			return;
 		}
 
 		selectionRectList = new ArrayList<Rectangle>();
-
-		//final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
-		//final int[] selectedGeneIndexes = geneSelection.getSelectedIndexes();
-
-		//LogBuffer.println("Num selected array indexes: [" +
-		//		selectedIMVArrayIndexes.length + "].");
-		//Could check either genes or arrays here - it's assumed if one's
-		//populated, the other must be as well
-		if (selectedIMVArrayIndexes.length > 0) {
-
-			// LogBuffer.println("Selected min array index: [" +
-			// selectedArrayIndexes[0] + "] Selected min gene index: [" +
-			// selectedGeneIndexes[0] + "].");
+		
+		if (arraySelection.getSelectedIndexes().length > 0) {
 
 			List<List<Integer>> arrayBoundaryList;
 			List<List<Integer>> geneBoundaryList;
 
 			arrayBoundaryList = findRectangleBoundaries(
-					selectedIMVArrayIndexes,xmap);
-			geneBoundaryList = findRectangleBoundaries(selectedIMVGeneIndexes,
+					arraySelection.getSelectedIndexes(),xmap);
+			geneBoundaryList = findRectangleBoundaries(geneSelection.getSelectedIndexes(),
 					ymap);
 
 			// Make the rectangles
@@ -482,20 +469,6 @@ public class GlobalMatrixView extends MatrixView {
 				lastyb = yBoundaries.get(1);
 			}
 			lastxb = xBoundaries.get(1);
-		}
-	}
-
-	public void setIMVselectedIndexes(int[] selectedArrayIndexes,
-									  int[] selectedGeneIndexes) {
-		
-		selectedIMVArrayIndexes = selectedArrayIndexes;
-		selectedIMVGeneIndexes  = selectedGeneIndexes;
-
-		recalculateOverlay();
-
-		//If the selected index arrays have been defined, repaint the screen
-		if(selectedIMVArrayIndexes != null && selectedIMVGeneIndexes != null) {
-			repaint();
 		}
 	}
 }
