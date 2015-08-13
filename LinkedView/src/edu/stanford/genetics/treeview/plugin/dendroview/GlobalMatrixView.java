@@ -429,6 +429,8 @@ public class GlobalMatrixView extends MatrixView {
 	/**
 	 * Let GlobalMatrixView know the viewport boundaries of 
 	 * InteractiveMatrixView without the need for full MapContainer dependence.
+	 * Called via MatrixViewController update().
+	 * 
 	 * @param firstXVisible Index of first visible tile in IMV xmap. 
 	 * @param firstYVisible Index of first visible tile in IMV ymap.
 	 * @param numXVisible Number of visible tiles in IMV xmap.
@@ -444,5 +446,7 @@ public class GlobalMatrixView extends MatrixView {
 		this.imv_numYVisible = numYVisible;
 		
 		recalculateOverlay();
+		offscreenValid = false;	
+		repaint();
 	}
 }

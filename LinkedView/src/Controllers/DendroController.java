@@ -61,9 +61,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 
-/* TODO separate some parts into dedicated GlobalView controller 
- * TODO separate out interactivity of labels to a controller class.
- * 
+/* 
  * NOTES: 
  * DendroController needs to listen to selection objects in order to
  * update button statuses (focus, enabled, etc.)
@@ -104,9 +102,6 @@ Controller {
 	// Selections
 	private TreeSelectionI rowSelection = null;
 	private TreeSelectionI colSelection = null;
-
-	// Color Extractor
-//	private ColorExtractor colorExtractor;
 
 	public DendroController(final TreeViewFrame tvFrame,
 			final TVController tvController) {
@@ -210,7 +205,6 @@ Controller {
 		/* Gets the system's modifier key (Ctrl or Cmd) */
 		final int modifier = Toolkit.getDefaultToolkit()
 				.getMenuShortcutKeyMask();
-//		final int shift_mask = InputEvent.SHIFT_MASK;
 
 		/* Toggle the trees */
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, modifier),
@@ -226,97 +220,6 @@ Controller {
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, modifier),
 				"searchLabels");
 		action_map.put("searchLabels", new SearchLabelAction());
-
-		// for InteractiveMatrixVontroller ... 
-		/* Scroll through GlobalView with HOME, END, PgUP, PgDOWN */
-//		input_map.put(KeyStroke.getKeyStroke("HOME"), "pageYToStart");
-//		action_map.put("pageYToStart", new HomeKeyYAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke("END"), "pageYToEnd");
-//		action_map.put("pageYToEnd", new EndKeyYAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, modifier),
-//				"pageXToStart");
-//		action_map.put("pageXToStart", new HomeKeyXAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier),
-//				"pageXToEnd");
-//		action_map.put("pageXToEnd", new EndKeyXAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke("PAGE_UP"), "pageYUp");
-//		action_map.put("pageYUp", new PageUpYAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke("PAGE_DOWN"), "pageYDown");
-//		action_map.put("pageYDown", new PageDownYAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, modifier),
-//				"pageXUp");
-//		action_map.put("pageXUp", new PageUpXAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, modifier),
-//				"pageXDown");
-//		action_map.put("pageXDown", new PageDownXAction());
-//
-//		/* Scroll through GlobalView with arrow keys */
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier),
-//				"arrowYToStart");
-//		action_map.put("arrowYToStart", new HomeKeyYAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier),
-//				"arrowYToEnd");
-//		action_map.put("arrowYToEnd", new EndKeyYAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, modifier),
-//				"arrowXToStart");
-//		action_map.put("arrowXToStart", new HomeKeyXAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, modifier),
-//				"arrowXToEnd");
-//		action_map.put("arrowXToEnd", new EndKeyXAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, shift_mask),
-//				"arrowYUp");
-//		action_map.put("arrowYUp", new PageUpYAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, shift_mask),
-//				"arrowYDown");
-//		action_map.put("arrowYDown", new PageDownYAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, shift_mask),
-//				"arrowXUp");
-//		action_map.put("arrowXUp", new PageUpXAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, shift_mask),
-//				"arrowXDown");
-//		action_map.put("arrowXDown", new PageDownXAction());
-//
-//		/* arrow 1-step */
-//		input_map.put(KeyStroke.getKeyStroke("UP"), "arrowUp");
-//		action_map.put("arrowUp", new ArrowUpAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke("DOWN"), "arrowDown");
-//		action_map.put("arrowDown", new ArrowDownAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke("LEFT"), "arrowLeft");
-//		action_map.put("arrowLeft", new ArrowLeftAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke("RIGHT"), "arrowRight");
-//		action_map.put("arrowRight", new ArrowRightAction());
-//
-//		/* zoom actions */
-//		input_map.put(KeyStroke.getKeyStroke("MINUS"), "zoomOut");
-//		action_map.put("zoomOut", new ZoomOutAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke("EQUALS"), "zoomIn");
-//		action_map.put("zoomIn", new ZoomInAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier),
-//				"zoomSelection");
-//		action_map.put("zoomSelection", new ZoomAction());
-//
-//		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier),
-//				"resetZoom");
-//		action_map.put("resetZoom", new HomeAction());
 	}
 
 	/**
@@ -341,24 +244,6 @@ Controller {
 		colSelection.addObserver(this);
 	}
 
-//	/**
-//	 * Recalculates proportions for the MapContainers, when the layout was
-//	 * changed by removing or adding components, or resizing the TVFrame. Only
-//	 * works if GlobalView is already resized (has availablePixels set to new
-//	 * value!).
-//	 */
-//	public void resetMatrixViews() {
-//
-//		SwingUtilities.invokeLater(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//
-//				dendroView.setMatrixHome();
-//			}
-//		});
-//	}
-
 	/**
 	 * Adds listeners to DendroView's UI components.
 	 */
@@ -377,8 +262,6 @@ Controller {
 	/**
 	 * When mouse click happens on dendroPane in DendroView, everything will be
 	 * deselected.
-	 * 
-	 * @author chris0689
 	 *
 	 */
 	private class PanelClickDeselector extends MouseAdapter {
@@ -479,151 +362,6 @@ Controller {
 		}
 	}
 
-	// TODO move listeners below this point to InteractiveMatrixViewController
-	/* >>>>>>> Mapped Key Actions <<<<<<<<< */
-	/* TODO make all this key-scroll code more compact... */
-	/** Action to scroll the y-axis to top. */
-//	private class HomeKeyYAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			getInteractiveYMap().scrollToIndex(0);
-//		}
-//	}
-//
-//	/** Action to scroll the y-axis to bottom. */
-//	private class EndKeyYAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			final int max = getInteractiveYMap().getMaxIndex();
-//			getInteractiveYMap().scrollToIndex(max);
-//		}
-//	}
-//
-//	/** Action to scroll the y-axis to top. */
-//	private class HomeKeyXAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			getInteractiveXMap().scrollToIndex(0);
-//		}
-//	}
-//
-//	/** Action to scroll the y-axis to bottom. */
-//	private class EndKeyXAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			final int max = getInteractiveXMap().getMaxIndex();
-//			getInteractiveXMap().scrollToIndex(max);
-//		}
-//	}
-//
-//	private class PageUpYAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			final int scrollBy = getInteractiveYMap().getNumVisible();
-//			getInteractiveYMap().scrollBy(-scrollBy,false);
-//		}
-//	}
-//
-//	private class PageDownYAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			final int scrollBy = getInteractiveYMap().getNumVisible();
-//			getInteractiveYMap().scrollBy(scrollBy,false);
-//		}
-//	}
-//
-//	private class PageUpXAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			final int scrollBy = getInteractiveXMap().getNumVisible();
-//			getInteractiveXMap().scrollBy(-scrollBy,false);
-//		}
-//	}
-//
-//	private class PageDownXAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			final int scrollBy = getInteractiveXMap().getNumVisible();
-//			getInteractiveXMap().scrollBy(scrollBy,false);
-//		}
-//	}
-//
-//	private class ArrowLeftAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			getInteractiveXMap().scrollBy(-1,false);
-//		}
-//	}
-//
-//	private class ArrowRightAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			getInteractiveXMap().scrollBy(1,false);
-//		}
-//	}
-//
-//	private class ArrowUpAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			getInteractiveYMap().scrollBy(-1,false);
-//		}
-//	}
-//
-//	private class ArrowDownAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent e) {
-//
-//			getInteractiveYMap().scrollBy(1,false);
-//		}
-//	}
-
 	/** 
 	 * Causes all selections on both axes to be set to zero when called. 
 	 */
@@ -638,82 +376,6 @@ Controller {
 		}
 	}
 
-	
-//	/**
-//	 * TODO move to IMVController
-//	 * Zooms into the selected area
-//	 */
-//	private class ZoomAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent arg0) {
-//
-//			final boolean genesSelected = rowSelection.getNSelectedIndexes() > 0;
-//			final boolean arraysSelected = colSelection.getNSelectedIndexes() > 0;
-//
-//			if (genesSelected || arraysSelected) {
-//				// Zoom in (or out)
-//				getInteractiveXMap().zoomToSelected(colSelection.getMinIndex(),
-//						colSelection.getMaxIndex());
-//				getInteractiveYMap().zoomToSelected(rowSelection.getMinIndex(),
-//						rowSelection.getMaxIndex());
-//
-//				// Then scroll
-//				getInteractiveXMap().scrollToFirstIndex(
-//						colSelection.getMinIndex()/*,true*/);
-//				getInteractiveYMap().scrollToFirstIndex(
-//						rowSelection.getMinIndex()/*,true*/);
-//			}
-//		}
-//	}
-//
-//	/** Zooms into IMView by 1 scale step (depends on previous scale). */
-//	private class ZoomInAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent arg0) {
-//
-//			getInteractiveXMap().zoomInBegin();
-//			getInteractiveYMap().zoomInBegin();
-//
-//			notifyAllMapObservers();
-//		}
-//	}
-//
-//	/** Zooms out of IMView by 1 scale step (depends on previous scale). */
-//	private class ZoomOutAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent arg0) {
-//
-//			getInteractiveXMap().zoomOutBegin();
-//			getInteractiveYMap().zoomOutBegin();
-//
-//			notifyAllMapObservers();
-//		}
-//	}
-//
-//	/** Resets the IMView to all zoomed-out state */
-//	private class HomeAction extends AbstractAction {
-//
-//		private static final long serialVersionUID = 1L;
-//
-//		@Override
-//		public void actionPerformed(final ActionEvent arg0) {
-//
-//			resetMatrixViews();
-//			dendroView.getInteractiveMatrixView().setAspectRatio(
-//					interactiveXmap.getMaxIndex() + 1,
-//					interactiveYmap.getMaxIndex() + 1);
-//		}
-//	}
-
 	/* >>>>>>> Component Listeners <<<<<<<<< */
 	/**
 	 * Listener for the setScale-buttons in DendroView. Changes the scale in
@@ -723,7 +385,8 @@ Controller {
 	 * buttons are being used.
 	 * 
 	 * TODO Keep in this controller. 
-	 * Split to single button listeners (one per button).
+	 * Split to single button listeners (one per button). Create methods
+	 * in MCController to be called by the single button listeners.
 	 */
 	class ScaleListener implements ActionListener {
 
@@ -845,8 +508,6 @@ Controller {
 	/**
 	 * Defines what happens when component properties of the two JSplitPanes
 	 * which contain labels and trees are changed by the system or the user.
-	 * 
-	 * @author chris0689
 	 *
 	 */
 	private class SplitPaneListener extends ComponentAdapter {
@@ -854,7 +515,6 @@ Controller {
 		@Override
 		public void componentResized(final ComponentEvent e) {
 
-			/* TODO define JSplitPane behavior */
 		}
 
 		@Override
@@ -892,14 +552,6 @@ Controller {
 
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
-			// LogBuffer.println("componentResized: globalYmap.getTileNumVisible: ["
-			// + globalYmap.getTileNumVisible() +
-			// "] globalXmap.getTileNumVisible: [" +
-			// globalXmap.getTileNumVisible() +
-			// "] dendroView.getXScroll().getValue(): [" +
-			// dendroView.getXScroll().getValue() +
-			// "] dendroView.getYScroll().getValue(): [" +
-			// dendroView.getYScroll().getValue() + "].");
 
 			// Previously, resetMapContainers was called here, but that caused
 			// the zoom level to change when the user resized the window, so I
@@ -1084,16 +736,9 @@ Controller {
 	private static double calcAxisDimension(final double big,
 			final double small, final double max) {
 
-		final double percentDiff = small / big;
+		double newAxis = (small / big) * max;
 
-		double newAxis = percentDiff * max;
-
-		// rounding
-		newAxis *= 1000;
-		newAxis = Math.round(newAxis);
-		newAxis /= 1000;
-
-		return newAxis;
+		return Helper.roundDouble(newAxis, 3);
 	}
 
 	/**
@@ -1122,62 +767,18 @@ Controller {
 	}
 
 	/**
-	 * TODO Keep here - AL for ZoomSelection button. -> implement methods
-	 * in IMVController and call them from here.
 	 * The Zoom listener which allows the user to zoom into a selection.
-	 *
 	 */
 	private class ZoomSelectionListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			// TODO replace with controller method
 			mvController.zoomOnSelection(arg0.getModifiers());
-//			final boolean rowsSelected = rowSelection.getNSelectedIndexes() > 0;
-//			final boolean colssSelected = colSelection.getNSelectedIndexes() > 0;
-//
-//			if (rowsSelected || colssSelected) {
-//				if ((arg0.getModifiers() & InputEvent.SHIFT_MASK) != 0
-//						|| (arg0.getModifiers() & InputEvent.META_MASK) != 0) {
-//
-//					// Zoom in (or out)
-//					getInteractiveXMap().zoomToSelected(
-//							colSelection.getMinIndex(),
-//							colSelection.getMaxIndex());
-//					getInteractiveYMap().zoomToSelected(
-//							rowSelection.getMinIndex(),
-//							rowSelection.getMaxIndex());
-//
-//					// Then scroll
-//					getInteractiveXMap().scrollToFirstIndex(
-//							colSelection.getMinIndex());
-//					getInteractiveYMap().scrollToFirstIndex(
-//							rowSelection.getMinIndex());
-//
-//				} else if ((arg0.getModifiers() & InputEvent.ALT_MASK) != 0) {
-//					dendroView.getInteractiveMatrixView()
-//							.smoothZoomTowardSelection(
-//									colSelection.getMinIndex(),
-//									(colSelection.getMaxIndex()
-//											- colSelection.getMinIndex() + 1),
-//									rowSelection.getMinIndex(),
-//									(rowSelection.getMaxIndex()
-//											- rowSelection.getMinIndex() + 1));
-//				} else {
-//					dendroView.getInteractiveMatrixView()
-//							.smoothAnimatedZoomTowardSelection(
-//									colSelection.getMinIndex(),
-//									(colSelection.getMaxIndex()
-//											- colSelection.getMinIndex() + 1),
-//									rowSelection.getMinIndex(),
-//									(rowSelection.getMaxIndex()
-//											- rowSelection.getMinIndex() + 1));
-//				}
-//			}
 		}
 	}
 
+	// TODO move to MVController
 	private void refocusViewPort() {
 
 		interactiveXmap.adjustToScreenChange();
@@ -1321,39 +922,12 @@ Controller {
 		} else {
 			setColumnSelection(tvFrame.getColumnSelection());
 		}
-
-		// TODO moved to IMVController
-//		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
-//		colorPresets.setConfigNode(configNode);
-//		colorExtractor = new ColorExtractor(
-//				tvModel.getDataMatrix().getMinVal(), tvModel.getDataMatrix()
-//						.getMaxVal());
-//		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
-//		colorExtractor.setMissing(DataModel.NAN, DataModel.EMPTY);
-//
-//		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
-//		dArrayDrawer.setColorExtractor(colorExtractor);
-//		arrayDrawer = dArrayDrawer;
-//		((TVModel) tvModel).addObserver(arrayDrawer);
-
-		// set data first to avoid adding auto-generated
-		// contrast to documentConfig.
-//		dArrayDrawer.setDataMatrix(tvModel.getDataMatrix());
-//		dArrayDrawer.recalculateContrast();
-//		dArrayDrawer.setConfigNode("ArrayDrawer1");
-
-		// globalmaps tell globalview, atrview, and gtrview
-		// where to draw each data point.
-		// the scrollbars "scroll" by communicating with the maps.
+		
 		setupMapContainers();
 
 		// TODO replace with IMVController method
 		interactiveXmap.setScrollbar(dendroView.getMatrixXScroll());
 		interactiveYmap.setScrollbar(dendroView.getMatrixYScroll());
-
-		// Drawers
-//		dendroView.getInteractiveMatrixView().setArrayDrawer(arrayDrawer);
-//		dendroView.getGlobalMatrixView().setArrayDrawer(arrayDrawer);
 
 		leftTreeDrawer = new TreePainter();
 		dendroView.getRowTreeView().setTreeDrawer(leftTreeDrawer);
@@ -1416,21 +990,9 @@ Controller {
 		dendroView.getRowTreeView().setMap(interactiveYmap);
 		dendroView.getRowLabelView().setMap(interactiveYmap);
 
-		// TODO replace with IMVcontroller method
 		mvController.setInteractiveMapContainers(interactiveXmap, 
 				interactiveYmap);
-//		// TODO remove after full code migration from IMV -> Controller
-//		dendroView.getInteractiveMatrixView().setXMap(interactiveXmap);
-//		dendroView.getInteractiveMatrixView().setYMap(interactiveYmap);
-
-		// TODO replace with IMVcontroller method
 		mvController.setGlobalMapContainers(globalXmap, globalYmap);
-//		dendroView.getGlobalMatrixView().setXMap(globalXmap);
-//		dendroView.getGlobalMatrixView().setYMap(globalYmap);
-
-//		// what...?
-//		dendroView.getGlobalMatrixView().setInteractiveXMap(interactiveXmap);
-//		dendroView.getGlobalMatrixView().setInteractiveYMap(interactiveYmap);
 	}
 
 	/**

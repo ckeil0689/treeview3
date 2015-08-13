@@ -19,6 +19,7 @@ import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -143,7 +144,6 @@ ConfigNodePersistent, Controller {
 	public void update(Observable o, Object arg) {
 		
 		if(o instanceof MapContainer) {
-			LogBuffer.println("MVController gets MapContainer update");
 			updateGMVViewPortRect();
 		}
 	}
@@ -201,7 +201,8 @@ ConfigNodePersistent, Controller {
 	@Override
 	public void addKeyBindings() {
 		
-		final InputMap input_map = imView.getInputMap();
+		final InputMap input_map = imView.getInputMap(
+				JComponent.WHEN_IN_FOCUSED_WINDOW);
 		final ActionMap action_map = imView.getActionMap();
 
 		/* Gets the system's modifier key (Ctrl or Cmd) */
