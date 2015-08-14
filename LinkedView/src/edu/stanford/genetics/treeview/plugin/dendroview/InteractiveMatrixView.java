@@ -216,14 +216,13 @@ public class InteractiveMatrixView extends MatrixView {
 				List<List<Integer>> geneBoundaryList;
 	
 				arrayBoundaryList =
-					findRectangleBoundaries(selectedArrayIndexes,xmap);
+					findRectBoundaries(selectedArrayIndexes, xmap);
 				geneBoundaryList =
-					findRectangleBoundaries(selectedGeneIndexes,ymap);
+					findRectBoundaries(selectedGeneIndexes, ymap);
 	
 				// Make the rectangles
 				if (selectionRectList != null) {
 					for(final List<Integer> xBoundaries : arrayBoundaryList) {
-	
 						for(final List<Integer> yBoundaries : geneBoundaryList){
 	
 							selectionRectList
@@ -247,7 +246,7 @@ public class InteractiveMatrixView extends MatrixView {
 	 * @param map
 	 * @return
 	 */
-	protected List<List<Integer>> findRectangleBoundaries(
+	protected List<List<Integer>> findRectBoundaries(
 			final int[] selectedIndexes, final MapContainer map) {
 
 		int sp = 0;
@@ -318,6 +317,7 @@ public class InteractiveMatrixView extends MatrixView {
 			ymap.unsetHoverChanged();
 			return;
 		}
+		
 		if (o == geneSelection) {
 			updateSelection(geneSelection, arraySelection);
 			recalculateOverlay();
@@ -1529,9 +1529,9 @@ public class InteractiveMatrixView extends MatrixView {
 		List<List<Integer>> arrayBoundaryList;
 		List<List<Integer>> geneBoundaryList;
 
-		arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes,
+		arrayBoundaryList = findRectBoundaries(selectedArrayIndexes,
 				xmap);
-		geneBoundaryList  = findRectangleBoundaries(selectedGeneIndexes,
+		geneBoundaryList  = findRectBoundaries(selectedGeneIndexes,
 				ymap);
 
 		/*

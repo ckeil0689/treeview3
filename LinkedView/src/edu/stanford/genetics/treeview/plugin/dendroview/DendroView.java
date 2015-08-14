@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -92,8 +91,6 @@ public class DendroView implements Observer, DendroPanel {
 	private final JPanel dendroPane;
 	private final JPanel searchPanel;
 
-	protected ScrollPane panes[];
-
 	// Matrix views
 	private final GlobalMatrixView globalMatrixView;
 	private final InteractiveMatrixView interactiveMatrixView;
@@ -142,15 +139,6 @@ public class DendroView implements Observer, DendroPanel {
 
 	private HeaderFinderBox rowFinderBox;
 	private HeaderFinderBox colFinderBox;
-
-	/* GlobalView default sizes */
-	/* TODO needed? ... */
-	private double gvWidth;
-	private double gvHeight;
-
-	/* Maximum GlobalView dimensions in percent */
-	public static final double MAX_GV_WIDTH = 75;
-	public static final double MAX_GV_HEIGHT = 80;
 
 	/*
 	 * MapContainers map tile size (scale) to selection rectangles in
@@ -377,14 +365,9 @@ public class DendroView implements Observer, DendroPanel {
 		JPanel searchBarPanel;
 		JPanel colorValIndicatorPanel;
 		JPanel toolbarPanel;
-		
-		// Comp 1
+	
 		colorValIndicatorPanel = createColorValIndicatorPanel();
-		
-		// Comp 2
 		navBtnPanel = createNavBtnPanel();
-		
-		// Comp 3
 		searchBarPanel = createSearchBarPanel();
 		
 		// Toolbar
@@ -454,6 +437,7 @@ public class DendroView implements Observer, DendroPanel {
 				0.5d);
 		if (rowTreeView.isEnabled()) {
 			rowDataPane.setDividerLocation(oldRowDiv);
+			
 		} else {
 			rowDataPane.setDividerLocation(0.0);
 		}
@@ -515,6 +499,7 @@ public class DendroView implements Observer, DendroPanel {
 				0.5d);
 		if (colTreeView.isEnabled()) {
 			colDataPane.setDividerLocation(oldColDiv);
+			
 		} else {
 			colDataPane.setDividerLocation(0.0);
 		}
@@ -721,6 +706,7 @@ public class DendroView implements Observer, DendroPanel {
 		if (rowDataPane.getDividerLocation() == 0
 				|| colDataPane.getDividerLocation() == 0) {
 			showTreesMenuItem.setText(StringRes.menu_showTrees);
+			
 		} else {
 			showTreesMenuItem.setText(StringRes.menu_hideTrees);
 		}
@@ -1176,7 +1162,7 @@ public class DendroView implements Observer, DendroPanel {
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		tvFrame.addToStackMenuList(showTreesMenuItem);
 
-		//
+		// TODO readd once copy-from-selection is available
 		// isolateMenu = new JMenuItem("Isolate Selected");
 		// menu.add(isolateMenu);
 		// tvFrame.addToStackMenuList(isolateMenu);
@@ -1192,6 +1178,7 @@ public class DendroView implements Observer, DendroPanel {
 		menu.add(hierMenuItem);
 		tvFrame.addToStackMenuList(hierMenuItem);
 
+		// TODO re-add K-means once available
 		// final JMenuItem kMeansMenuItem = new JMenuItem(
 		// StringRes.menu_KMeans);
 		// menu.add(kMeansMenuItem);
@@ -1319,28 +1306,6 @@ public class DendroView implements Observer, DendroPanel {
 	// exporter.save();
 	// }
 	// }
-
-	// Set GlobalView sizes
-	public void setGVWidth(final double newWidth) {
-
-		this.gvWidth = newWidth;
-	}
-
-	public void setGVHeight(final double newHeight) {
-
-		this.gvHeight = newHeight;
-	}
-
-	// Get GlobalView sizes
-	public double getGVWidth() {
-
-		return gvWidth;
-	}
-
-	public double getGVHeight() {
-
-		return gvHeight;
-	}
 
 	/**
 	 * Setter for viewFrame
@@ -1537,13 +1502,14 @@ public class DendroView implements Observer, DendroPanel {
 		final JSplitPane treePane = (dendrogram == colTreeView) ? colDataPane
 				: rowDataPane;
 
-		/* returns imprecise position? -- no bug reports found */
 		final double abs_div_loc = treePane.getDividerLocation();
 		final double max_div_loc = treePane.getMaximumDividerLocation();
 
-		/* Round the value */
-		final int tmp = (int) ((abs_div_loc / max_div_loc) * 100);
-		final double rel_div_loc = tmp / 100.0;
+		double rel_div_loc = abs_div_loc / max_div_loc;
+		rel_div_loc = Helper.roundDouble(rel_div_loc, 2);
+		
+//		final int tmp = (int) ((abs_div_loc / max_div_loc) * 100);
+//		final double rel_div_loc = tmp / 100.0;
 
 		return (rel_div_loc > 1.0) ? 1.0 : rel_div_loc;
 	}

@@ -641,80 +641,40 @@ Controller {
 
 	/**
 	 * Sets axis dimensions of heat map to their maximum values.
+	 * @deprecated
 	 */
 	private void setMatrixFill() {
 
-		dendroView.setGVWidth(DendroView.MAX_GV_WIDTH);
-		dendroView.setGVHeight(DendroView.MAX_GV_HEIGHT);
+		// TODO insert new code when issue is tackled
 	}
 
 	/**
 	 * Sets the size of each GlobalView axes to the smallest of both to form a
 	 * square.
+	 * @deprecated
 	 */
 	private void setMatrixAxesEqual() {
 
-		/* Get GlobalView dimensions */
-		final double absGVWidth = dendroView.getInteractiveMatrixView()
-				.getWidth();
-		final double absGVHeight = dendroView.getInteractiveMatrixView()
-				.getHeight();
-
-		if (!Helper.nearlyEqual(absGVWidth, absGVHeight)) {
-
-			/*
-			 * Depends on app frame size (what if app used on a screen with
-			 * larger height than width etc...)
-			 */
-			final int screen_width = tvFrame.getAppFrame().getWidth();
-			final int screen_height = tvFrame.getAppFrame().getHeight();
-
-			/* Make sure the axis with the smallest screen side is maximized */
-			if (screen_height < screen_width) {
-				final double newWidth = calcAxisDimension(absGVWidth,
-						absGVHeight, DendroView.MAX_GV_WIDTH);
-
-				dendroView.setGVWidth(newWidth);
-
-			} else {
-				final double newHeight = calcAxisDimension(absGVHeight,
-						absGVWidth, DendroView.MAX_GV_HEIGHT);
-
-				dendroView.setGVHeight(newHeight);
-			}
-		}
+		// TODO insert new code when issue is tackled
 	}
 
 	/**
 	 * Resizes the matrix such that it fits all pixels as squares. If gvWidth or
 	 * gvHeight would go below a certain size, the matrix is adjusted such that
 	 * the content remains viewable in a meaningful manner.
+	 * @deprecated
 	 */
 	private void setMatrixPropotional() {
 
-		// Condition: All pixels must be shown, but must have same scale.
-
-		final double xScale = interactiveXmap.getScale();
-		final double yScale = interactiveYmap.getScale();
-
-		if (xScale >= yScale) {
-			interactiveXmap.setScale(yScale);
-
-			double newWidth = calcAxisDimensionFromMap(interactiveXmap,
-					DendroView.MAX_GV_WIDTH);
-
-			dendroView.setGVWidth(newWidth);
-
-		} else {
-			interactiveYmap.setScale(xScale);
-
-			double newHeight = calcAxisDimensionFromMap(interactiveYmap,
-					DendroView.MAX_GV_HEIGHT);
-
-			dendroView.setGVHeight(newHeight);
-		}
+		// TODO insert new code when issue is tackled
 	}
 
+	/**
+	 * 
+	 * @param map
+	 * @param max
+	 * @return
+	 */
 	private static double calcAxisDimensionFromMap(final MapContainer map,
 			final double max) {
 

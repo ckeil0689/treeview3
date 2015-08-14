@@ -772,6 +772,10 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void mouseWheelMoved(final MouseWheelEvent e) {
 
+			if(!imView.hasMouse()) {
+				return;
+			}
+			
 			final int notches = e.getWheelRotation();
 			final int shift = (notches < 0) ? -3 : 3;
 

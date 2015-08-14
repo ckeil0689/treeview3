@@ -156,27 +156,23 @@ public class MapContainer extends Observable implements Observer,
 	 * screen space.
 	 */
 	public void setToMinScale() {
-		// LogBuffer.println("setHome() called.");
-		calculateNewMinScale();
-
-		// Keep track of explicit changes, by the user, to the amount of
-		// visible data
-		firstVisible = 0;
-		numVisible = getTotalTileNum();
-		// LogBuffer.println("setHome: numVisible has been set to [" +
-		// numVisible + "].");
+		
+		setMinScale();
 
 		setScale(minScale);
 
 		notifyObservers();
 	}
 
-	public void calculateNewMinScale() {
+	public void setMinScale() {
 
-		// Added 1 because tileNumVisible is treated as number of indexes
-		// visible, not max index
 		this.tileNumVisible = getTotalTileNum();
 		this.minScale = getCalculatedMinScale();
+		this.firstVisible = 0;
+		this.numVisible = getTotalTileNum();
+		
+		setScale(minScale);
+		notifyObservers();
 	}
 
 	/**
@@ -196,14 +192,18 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
-	 * Sets the minimum scale for the available screen space so that no white
-	 * space occurs in GlobalView.
+	 * Calculates how many pixels this side of a tile is long so that all tiles
+	 * can be fir onto the screen (minimum scale). It is based on the
+	 * available screen space. 
+	 * @return The length of a tile's side such that all tiles fit 
+	 * on the screen.
 	 */
 	public double getCalculatedMinScale() {
 
 		final double pixels  = getAvailablePixels();
 		final double divider = getMaxIndex() - getMinIndex() + 1;
-		return(pixels / divider);
+		
+		return (pixels/ divider);
 	}
 	
 	/**
@@ -221,7 +221,8 @@ public class MapContainer extends Observable implements Observer,
 	 * and set first.
 	 */
 	public void zoomOutBegin() {
-		incrementalZoom(false,true,true);
+		
+		incrementalZoom(false, true, true);
 	}
 
 	/**
@@ -230,7 +231,8 @@ public class MapContainer extends Observable implements Observer,
 	 * and set first.
 	 */
 	public void zoomInBegin() {
-		incrementalZoom(true,true,true);
+		
+		incrementalZoom(true, true, true);
 	}
 
 	/**
@@ -239,7 +241,8 @@ public class MapContainer extends Observable implements Observer,
 	 * and set first.
 	 */
 	public void zoomOutEnd() {
-		incrementalZoom(false,false,true);
+		
+		incrementalZoom(false, false, true);
 	}
 
 	/**
@@ -248,21 +251,19 @@ public class MapContainer extends Observable implements Observer,
 	 * and set first.
 	 */
 	public void zoomInEnd() {
-		incrementalZoom(true,false,true);
+		
+		incrementalZoom(true, false, true);
 	}
 
 	//This is for gradually zooming away from the center of the currently
 	//displayed dots
 	public void zoomOutCenter(String speed) {
 
-		//LogBuffer.println("zoomOutCenter...");
 		int zoomVal;
 		int initialFirstVisible = firstVisible;
 		double newScale = getScale();
 
 		tileNumVisible = Math.round(getAvailablePixels() / getScale());
-		// LogBuffer.println("zoomOut: tileNumVisible has been set to [" +
-		// tileNumVisible + "].");
 
 		if(speed == "slow") {
 			zoomVal = 2;
@@ -283,8 +284,6 @@ public class MapContainer extends Observable implements Observer,
 		if (tileNumVisible > (getTotalTileNum())) {
 			tileNumVisible = getTotalTileNum();
 		}
-		// LogBuffer.println("zoomOut: tileNumVisible has been set to [" +
-		// tileNumVisible + "].");
 
 		// Keep track of explicit changes, by the user, to the amount of
 		// visible data
@@ -756,10 +755,9 @@ public class MapContainer extends Observable implements Observer,
 			//closest pixel
 			if(numPixelsOfSelec > numTotalPixels) {
 				return(numTotalPixels - 1);
-			} else {
-				//LogBuffer.println("Returning Target pixel: [0].");
-				return(0);
 			}
+			//LogBuffer.println("Returning Target pixel: [0].");
+			return(0);
 		}
 		//If any of the selected area is below/after the visible area, return the first pixel so that
 		else if((pixelIndexOfSelec + numPixelsOfSelec) > numTotalPixels && pixelIndexOfSelec > 0) {
@@ -768,9 +766,8 @@ public class MapContainer extends Observable implements Observer,
 			if(numPixelsOfSelec > numTotalPixels) {
 				//LogBuffer.println("Returning Target pixel: [0].");
 				return(0);
-			} else {
-				return(numTotalPixels - 1);
 			}
+			return(numTotalPixels - 1);
 		}
 
 		//The following equation is based on the merging of 2 equations and then
@@ -1096,6 +1093,7 @@ public class MapContainer extends Observable implements Observer,
 	//relative pixel position of the cursor to calculate the zoom position that
 	//is targeted for smoothing
 	public int getBestZoomOutVal(int pixel,double targetZoomFrac) {
+		
 		int cells = getNumVisible();
 		//If the targetZoomFrac is 1.0, return the remainder of this dimension
 		if((targetZoomFrac % 1) == 0 &&
@@ -1427,6 +1425,7 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	public void adjustToScreenChange() {
+		
 		adjustScaleToScreen();
 		adjustScrollToScreen();
 	}
@@ -1434,8 +1433,9 @@ public class MapContainer extends Observable implements Observer,
 	public void recalculateScale() {
 
 		if (nodeHasAttribute("FixedMap", "scale")) {
-			if (getScale() < getAvailablePixels())
+			if (getScale() < getAvailablePixels()) {
 				return;
+			}
 		}
 
 		// The divisor here was previously calculated by:
@@ -1593,9 +1593,6 @@ public class MapContainer extends Observable implements Observer,
 	@Override
 	public void adjustmentValueChanged(final AdjustmentEvent adjustmentEvent) {
 
-		// LogBuffer.println("Adjusting scrollbar position?: [" +
-		// adjustmentEvent.getValue() + "].");
-		// Keep track of explicit view changes made by the user
 		setFirstVisible(adjustmentEvent.getValue());
 		setChanged();
 		notifyObservers(scrollbar);
@@ -1630,11 +1627,6 @@ public class MapContainer extends Observable implements Observer,
 
 			scrollbar.setValues(value, extent, 0, max);
 			scrollbar.setBlockIncrement(current.getViewableIndexes());
-
-//			//Initialize the label scrollbar values if undefined
-//			if(!(firstVisibleLabel > -1)) {
-//				firstVisibleLabel = firstVisible;
-//			}
 		}
 	}
 
@@ -1686,6 +1678,7 @@ public class MapContainer extends Observable implements Observer,
 		return current.getPixel(d - offset);
 	}
 
+	
 	public int getPixel(final int i) {
 
 		int offset = 0;
@@ -1696,9 +1689,15 @@ public class MapContainer extends Observable implements Observer,
 		return current.getPixel(i - offset);
 	}
 
+	/**
+	 * Uses the MapContainers assigned IntegerMap object to figure out what
+	 * index a certain pixel belongs to.
+	 * @param pix
+	 * @return
+	 */
 	public int getIndex(final int pix) {
 
-		int index = 0;
+		int index = -1;
 		if (current != null) {
 			index = current.getIndex(pix);
 		}
@@ -1710,20 +1709,22 @@ public class MapContainer extends Observable implements Observer,
 		return index;
 	}
 
+	/**
+	 * This checks if an index is currently in the range of visible pixels.
+	 * @param i The index to be checked.
+	 * @return Whether an index is within range of visible screen pixels.
+	 */
 	public boolean isVisible(final int i) {
 
 		final int min = getIndex(0);
 		final int max = getIndex(getAvailablePixels());
-		if (i < min)
+		
+		if (i < min || i > max) {
 			return false;
-
-		if (i > max)
-			return false;
+		}
 
 		return true;
 	}
-
-	// {return current.getPixel(intval);}
 
 	public int getRequiredPixels() {
 
@@ -1735,6 +1736,11 @@ public class MapContainer extends Observable implements Observer,
 		return current.getUsedPixels();
 	}
 
+	/**
+	 * Tells its MapContainer instance how many pixels are available on the
+	 * screen. 
+	 * @param i The number of pixels available for this MapContainer (axis).
+	 */
 	public void setAvailablePixels(final int i) {
 
 		final int j = current.getUsedPixels();
@@ -1762,44 +1768,25 @@ public class MapContainer extends Observable implements Observer,
 			 * Setting default numVisible here for now '
 			 */
 			setNumVisible(j + 1);
-
-			// Added this, but took it out because it was to fix something that
-			// previously wasn't broken, so instead of try to patch it, I'm
-			// going to
-			// check out the old code to see what went wrong
-			// if(current.getMinIndex() != i) {
-			// //Keep track of explicitly changed position of visible data
-			// indexes
-			// setFirstVisible(i);
-			// }
+			
 			setChanged();
 		}
 	}
 
+	/**
+	 * Setting the axis size per tile in pixels for this MapContainer.
+	 * @param d The new axis size per tile in pixels.
+	 */
 	public void setScale(final double d) {
-
-		// LogBuffer.println("Scale sent in (d) = [" + d +
-		// "], d*int(AvailablePix/d) = ["
-		// + ((d * (int) (getAvailablePixels() / d)))
-		// + "] UsedPix = [" + getUsedPixels() + "] =? AvailPix = ["
-		// + getAvailablePixels() + "] Scale = [" + getScale()
-		// + "] ScrollBar#: " + scrollbar.getVisibleAmount());
 
 		if (!Helper.nearlyEqual(fixedMap.getScale(), d)) {
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();
 
-			// LogBuffer.println("Scale set.");
-
 			configNode.putDouble("scale", d);
 			configNode.putDouble("minScale", minScale);
 		}
-		// else {
-		// LogBuffer.println("Scale not set.  Scale sent in (d) = [" + d +
-		// "].  Apparently the scale is nearly equal to: [" +
-		// fixedMap.getScale() + "].");
-		// }
 	}
 
 	/**
@@ -2013,7 +2000,7 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setRowLabelsBeingScrolled(boolean overRowLabels) {
 		this.rowLabelsBeingScrolled = overRowLabels;
-		setChanged();
+		setChanged(); // why does the mapcontainer need to update here??
 		setHoverChanged();
 		notifyObservers();
 	}
@@ -2047,9 +2034,9 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setOverRowLabelsScrollbar(boolean overRowLabels) {
 		this.overRowLabelsScrollbar = overRowLabels;
-		setChanged(); // NO
+		setChanged(); // see above
 		setHoverChanged();
-		notifyObservers(); // recalculates overlay in IMV & GMV. why?
+		notifyObservers(); // see above
 	}
 
 	/**
@@ -2057,9 +2044,9 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setOverInteractiveMatrix(boolean overInteractiveMatrix) {
 		this.overInteractiveMatrix = overInteractiveMatrix;
-		setChanged();
+		setChanged(); // see above
 		setHoverChanged();
-		notifyObservers();
+		notifyObservers(); // see above...
 	}
 
 	public boolean isOverIMV() {
@@ -2137,6 +2124,7 @@ public class MapContainer extends Observable implements Observer,
 	 * This is used to decide to not actually repaint because all that changed
 	 * is the hover position of the mouse - however, that DOES trigger a change
 	 * in the LabelView classes
+	 * TODO maybe setChanged & notify shouldn't be triggered on simple hovering...
 	 * @return hoverChanged
 	 */
 	public boolean hoverChanged() {
