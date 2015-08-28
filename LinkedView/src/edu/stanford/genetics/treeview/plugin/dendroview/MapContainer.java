@@ -1885,6 +1885,19 @@ public class MapContainer extends Observable implements Observer,
 		return firstVisible;
 	}
 
+	public int getLastVisible() {
+		int lastVisible = getFirstVisible() + getNumVisible() - 1;
+		/** TODO: For some undetermined reason, the above sometimes yields an
+		 * out of bounds number. I suspect that it has something to do with
+		 * multiple cells under a single pixel, but I'm not sure. For now, this
+		 * work-around will prevent exceptions. Figure this out & fix it
+		 * eventually. */
+		if(lastVisible > getMaxIndex()) {
+			lastVisible = getMaxIndex();
+		}
+		return(lastVisible);
+	}
+
 	private void switchMap(final IntegerMap integerMap) {
 
 		if (current != integerMap) {
@@ -1988,6 +2001,13 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public boolean areColLabelsBeingScrolled() {
 		return colLabelsBeingScrolled;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public boolean areLabelsBeingScrolled() {
+		return rowLabelsBeingScrolled || colLabelsBeingScrolled;
 	}
 
 	/**

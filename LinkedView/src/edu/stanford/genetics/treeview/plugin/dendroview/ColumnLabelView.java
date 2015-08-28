@@ -3,6 +3,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Adjustable;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -33,7 +34,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 
 	public ColumnLabelView() {
 
-		super(LabelView.COL);
+		super();
 		d_justified = false;
 		zoomHint = StringRes.lbl_ZoomColLabels;
 		addMouseWheelListener(this);
@@ -43,7 +44,6 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 			public void mouseEntered(MouseEvent e) {
 				setPrimaryHoverIndex(map.getMaxIndex());
 				map.setOverColLabelsScrollbar(true);
-				paintImmediately(0,0,getWidth(),colLabelPaneSize);
 				debug("The mouse has entered a column label pane scrollbar",2);
 				if(overScrollLabelPortOffTimer != null) {
 					/* Event came too soon, swallow by resetting the timer.. */
@@ -78,7 +78,6 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 			public void mousePressed(MouseEvent e) {
 				map.setColLabelsBeingScrolled(true);
 				updateDragScrollTimer.start();
-				paintImmediately(0,0,getWidth(),colLabelPaneSize);
 				debug("The mouse has clicked a column label scrollbar",6);
 				if(activeScrollLabelPortOffTimer != null) {
 					/* Event came too soon, swallow by resetting the timer.. */
@@ -127,6 +126,21 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 	@Override
 	protected void adjustScrollBar() {}
 
+	protected boolean labelAndScrollCoordsAreOpposite() {
+		return(true);
+	}
+
+	/**
+	 * This is only here for use by fudge factors that I suspect have to do with
+	 * the rotation of the graphics.
+	 * @author rleach
+	 * @param 
+	 * @return boolean
+	 */
+	protected boolean isAColumnPane() {
+		return(true);
+	}
+
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
@@ -145,7 +159,7 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 
 		if (o == map) {
 			selectionChanged(); // gene locations changed
-		} else if (o == geneSelection || o == arraySelection) {
+		} else if (o == otherSelection || o == drawSelection) {
 			selectionChanged(); // which genes are selected changed
 
 		} else if (o == headerSummary) { // annotation selection changed
@@ -175,10 +189,35 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 		int hDI = map.getIndex(p.x); //Hover Data Index
 		if(hDI > map.getMaxIndex()) {
 			hDI = map.getMaxIndex();
-		} else if (hDI < 0) {
+		} else if(hDI < 0) {
 			hDI = 0;
 		}
 		hoverIndex = hDI;
+	}
+
+	public void orientLabelPane(Graphics2D g2d) {
+		g2d.rotate(Math.PI * 3 / 2);
+		g2d.translate(-offscreenSize.height,0);
+	}
+
+	public void orientHintPane(Graphics2D g2d) {}
+
+	protected void setLabelPaneSize(int offscreenPrimarySize,int offscreenSecondarySize) {
+		//Set the size of the scrollpane to match the longest string
+		debug("Setting col pane height to [" + offscreenSecondarySize + "]",
+		      6);
+		setPreferredSize(new Dimension(offscreenPrimarySize,
+		                               offscreenSecondarySize));
+		debug("Resizing col labels panel to [" + offscreenPrimarySize + "x" +
+			offscreenSecondarySize + "].",1);
+	}
+
+	protected String getSummary() {
+		return("ColumnSummary");
+	}
+
+	protected String getPaneType() {
+		return("Column");
 	}
 
 	/**
@@ -319,33 +358,50 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 		final int index = getPrimaryHoverIndex(e);
 
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			if (geneSelection.getNSelectedIndexes() > 0) {
+			if (otherSelection.getNSelectedIndexes() > 0) {
 				if(e.isMetaDown() && e.isAltDown()) {
-					geneSelection.deselectAllIndexes();
-					arraySelection.deselectAllIndexes();
+					otherSelection.deselectAllIndexes();
+					drawSelection.deselectAllIndexes();
 				} else if(e.isShiftDown()) {
-					toggleSelectFromClosestToIndex(arraySelection,index);
+					toggleSelectFromClosestToIndex(drawSelection,index);
 				} else if(e.isMetaDown()) {
-					toggleSelect(arraySelection,index);
+					toggleSelect(drawSelection,index);
 				} else if(e.isAltDown()) {
-					arraySelection.setIndexSelection(index, false);
+					drawSelection.setIndexSelection(index, false);
 				} else {
-					selectAnew(arraySelection,index);
+					selectAnew(drawSelection,index);
 				}
 			} else {
 				//Assumes there is no selection at all
-				arraySelection.setIndexSelection(index, true);
-				geneSelection.selectAllIndexes();
+				drawSelection.setIndexSelection(index, true);
+				otherSelection.selectAllIndexes();
 			}
 		}
 		//A right-click now brings up a contextual menu coded elsewhere
 		// else {
-		//	geneSelection.deselectAllIndexes();
-		//	arraySelection.deselectAllIndexes();
+		//	otherSelection.deselectAllIndexes();
+		//	drawSelection.deselectAllIndexes();
 		//}
 
-		geneSelection.notifyObservers();
-		arraySelection.notifyObservers();
+		otherSelection.notifyObservers();
+		drawSelection.notifyObservers();
+	}
+
+	/**
+	 * This method is necessary to determine whether an indent offset is
+	 * necessary for the start coordinate of the label.  It is dependent on the
+	 * isRightJustified data member of the parent class and whether the pane's
+	 * position is on the left or top of the matrix
+	 * @param none
+	 * @author rleach
+	 * @return boolean
+	 */
+	protected boolean isMatrixJustified() {
+		return(!isRightJustified);
+	}
+
+	protected boolean isLabelStartNearMatrix() {
+		return(true);
 	}
 
 	/**
@@ -469,10 +525,6 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	}
 
-	public boolean isJustifiedToMatrixEdge() {
-		return(!isRightJustified);
-	}
-
 	public int getPrimaryHoverPosition(final MouseEvent e) {
 		hoverPixel = e.getX();
 		return(hoverPixel);
@@ -494,9 +546,12 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 			endGap = getSecondaryScrollBar().getMaximum() - endPos;
 		}
 		getSecondaryScrollBar().setValue(pos);
-		lastScrollColPos    = pos;
-		lastScrollColEndPos = endPos;
-		lastScrollColEndGap = endGap;
+//		lastScrollColPos    = pos;
+//		lastScrollColEndPos = endPos;
+//		lastScrollColEndGap = endGap;
+		lastScrollPos    = pos;
+		lastScrollEndPos = endPos;
+		lastScrollEndGap = endGap;
 	}
 
 	/* TODO: Eliminate this and use adjustmentValueChanged instead because it is
@@ -526,25 +581,43 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 			}
 			if(shift == 0) return;
 			debug("Scrolling vertically from [" + j + "] by [" + shift + "]",1);
-			lastScrollColPos = j + shift;
-			lastScrollColEndPos = lastScrollColPos +
+//			lastScrollColPos = j + shift;
+//			lastScrollColEndPos = lastScrollColPos +
+//			                      getSecondaryScrollBar().getModel()
+//			                      .getExtent();
+//			lastScrollColEndGap = getSecondaryScrollBar().getMaximum() -
+//			                      lastScrollColEndPos;
+//			if(lastScrollColEndGap < 0) {
+//				lastScrollColPos -= lastScrollColEndGap;
+//				lastScrollColEndPos -= lastScrollColEndGap;
+//				lastScrollColEndGap = 0;
+//			} else if(lastScrollColPos < 0) {
+//				lastScrollColEndPos += lastScrollColPos;
+//				lastScrollColEndGap += lastScrollColPos;
+//				lastScrollColPos = 0;
+//			}
+			lastScrollPos = j + shift;
+			lastScrollEndPos = lastScrollPos +
 			                      getSecondaryScrollBar().getModel()
 			                      .getExtent();
-			lastScrollColEndGap = getSecondaryScrollBar().getMaximum() -
-			                      lastScrollColEndPos;
-			if(lastScrollColEndGap < 0) {
-				lastScrollColPos -= lastScrollColEndGap;
-				lastScrollColEndPos -= lastScrollColEndGap;
-				lastScrollColEndGap = 0;
-			} else if(lastScrollColPos < 0) {
-				lastScrollColEndPos += lastScrollColPos;
-				lastScrollColEndGap += lastScrollColPos;
-				lastScrollColPos = 0;
+			lastScrollEndGap = getSecondaryScrollBar().getMaximum() -
+			                      lastScrollEndPos;
+			if(lastScrollEndGap < 0) {
+				lastScrollPos -= lastScrollEndGap;
+				lastScrollEndPos -= lastScrollEndGap;
+				lastScrollEndGap = 0;
+			} else if(lastScrollPos < 0) {
+				lastScrollEndPos += lastScrollPos;
+				lastScrollEndGap += lastScrollPos;
+				lastScrollPos = 0;
 			}
 			getSecondaryScrollBar().setValue(j + shift);
-			debug("New secondary col scroll position [" + lastScrollColPos +
-			      "] end pos: [" + lastScrollColEndPos + "] end gap: [" +
-			      lastScrollColEndGap + "] out of [" +
+//			debug("New secondary col scroll position [" + lastScrollColPos +
+//			      "] end pos: [" + lastScrollColEndPos + "] end gap: [" +
+//			      lastScrollColEndGap + "] out of [" +
+			debug("New secondary " + getPaneType() + " scroll position [" + lastScrollPos +
+			      "] end pos: [" + lastScrollEndPos + "] end gap: [" +
+			      lastScrollEndGap + "] out of [" +
 			      getSecondaryScrollBar().getMaximum() + "]",1);
 			//paintImmediately(0, 0, getWidth(), getHeight());
 		}
@@ -631,6 +704,19 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 	}
 
 	protected int getSecondaryViewportSize() {
-		return(colLabelViewportSize);
+		return(scrollPane.getViewport().getSize().height);
+	}
+
+	protected int getSecondaryPaneSize(final Dimension dims) {
+		return(dims.height);
+	}
+
+	protected int getPrimaryPaneSize(final Dimension dims) {
+		return(dims.width);
+	}
+
+	protected void setSecondaryPaneSize(final Dimension dims,int Size) {
+		secondaryPaneSize = Size;
+		dims.height = Size;
 	}
 }

@@ -6,6 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.Adjustable;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -31,7 +33,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 
 	public RowLabelView() {
 
-		super(LabelView.ROW);
+		super();
 		d_justified = true;
 		zoomHint = StringRes.lbl_ZoomRowLabels;
 		addMouseWheelListener(this);
@@ -139,6 +141,21 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 	@Override
 	protected void adjustScrollBar() {}
 
+	protected boolean labelAndScrollCoordsAreOpposite() {
+		return(false);
+	}
+
+	/**
+	 * This is only here for use by fudge factors that I suspect have to do with
+	 * the rotation of the graphics.
+	 * @author rleach
+	 * @param 
+	 * @return boolean
+	 */
+	protected boolean isAColumnPane() {
+		return(false);
+	}
+
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
@@ -158,7 +175,7 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 		if (o == map) {
 			selectionChanged(); // gene locations changed
 
-		} else if (o == geneSelection || o == arraySelection) {
+		} else if (o == drawSelection || o == otherSelection) {
 			selectionChanged(); // which genes are selected changed
 
 		} else if (o == headerSummary) { // annotation selection changed
@@ -190,8 +207,8 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 	}
 
-	public boolean isJustifiedToMatrixEdge() {
-		return(isRightJustified);
+	protected boolean isLabelStartNearMatrix() {
+		return(false);
 	}
 
 	public int getPrimaryHoverPosition(final MouseEvent e) {
@@ -332,31 +349,44 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 		final int index = getPrimaryHoverIndex(e);
 
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			if (arraySelection.getNSelectedIndexes() > 0) {
+			if (otherSelection.getNSelectedIndexes() > 0) {
 				if(e.isMetaDown() && e.isAltDown()) {
-					geneSelection.deselectAllIndexes();
-					arraySelection.deselectAllIndexes();
+					drawSelection.deselectAllIndexes();
+					otherSelection.deselectAllIndexes();
 				} else if(e.isShiftDown()) {
-					toggleSelectFromClosestToIndex(geneSelection,index);
+					toggleSelectFromClosestToIndex(drawSelection,index);
 				} else if(e.isMetaDown()) {
-					toggleSelect(geneSelection,index);
+					toggleSelect(drawSelection,index);
 				} else if(e.isAltDown()) {
-					geneSelection.setIndexSelection(index, false);
+					drawSelection.setIndexSelection(index, false);
 				} else {
-					selectAnew(geneSelection,index);
+					selectAnew(drawSelection,index);
 				}
 			} else {
 				//Assumes there is no selection at all
-				geneSelection.setIndexSelection(index, true);
-				arraySelection.selectAllIndexes();
+				drawSelection.setIndexSelection(index, true);
+				otherSelection.selectAllIndexes();
 			}
 		} else {
-			arraySelection.deselectAllIndexes();
-			geneSelection.deselectAllIndexes();
+			otherSelection.deselectAllIndexes();
+			drawSelection.deselectAllIndexes();
 		}
 
-		geneSelection.notifyObservers();
-		arraySelection.notifyObservers();
+		drawSelection.notifyObservers();
+		otherSelection.notifyObservers();
+	}
+
+	/**
+	 * This method is necessary to determine whether an indent offset is
+	 * necessary for the start coordinate of the label.  It is dependent on the
+	 * isRightJustified data member of the parent class and whether the pane's
+	 * position is on the left or top of the matrix
+	 * @param none
+	 * @author rleach
+	 * @return boolean
+	 */
+	protected boolean isMatrixJustified() {
+		return(isRightJustified);
 	}
 
 	/**
@@ -495,24 +525,43 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 			if(shift == 0) return;
 			debug("Scrolling horizontally from [" + j + "] by [" + shift + "]",
 			      2);
-			lastScrollRowPos = j + shift;
+//			lastScrollRowPos = j + shift;
+//			getSecondaryScrollBar().setValue(j + shift);
+//			lastScrollRowEndPos = lastScrollRowPos +
+//			                      getSecondaryScrollBar().getModel()
+//			                      .getExtent();
+//			lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() -
+//			                      lastScrollRowEndPos;
+//			if(lastScrollRowEndGap < 0) {
+//				lastScrollRowPos    -= lastScrollRowEndGap;
+//				lastScrollRowEndPos -= lastScrollRowEndGap;
+//				lastScrollRowEndGap  = 0;
+//			} else if(lastScrollRowPos < 0) {
+//				lastScrollRowEndPos += lastScrollRowPos;
+//				lastScrollRowEndGap += lastScrollRowPos;
+//				lastScrollRowPos     = 0;
+//			}
+//			debug("New scroll position [" + lastScrollRowPos + "] end pos: [" +
+//			      lastScrollRowEndPos + "] end gap: [" + lastScrollRowEndGap +
+//			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",12);
+			lastScrollPos = j + shift;
 			getSecondaryScrollBar().setValue(j + shift);
-			lastScrollRowEndPos = lastScrollRowPos +
+			lastScrollEndPos = lastScrollPos +
 			                      getSecondaryScrollBar().getModel()
 			                      .getExtent();
-			lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() -
-			                      lastScrollRowEndPos;
-			if(lastScrollRowEndGap < 0) {
-				lastScrollRowPos    -= lastScrollRowEndGap;
-				lastScrollRowEndPos -= lastScrollRowEndGap;
-				lastScrollRowEndGap  = 0;
-			} else if(lastScrollRowPos < 0) {
-				lastScrollRowEndPos += lastScrollRowPos;
-				lastScrollRowEndGap += lastScrollRowPos;
-				lastScrollRowPos     = 0;
+			lastScrollEndGap = getSecondaryScrollBar().getMaximum() -
+			                      lastScrollEndPos;
+			if(lastScrollEndGap < 0) {
+				lastScrollPos    -= lastScrollEndGap;
+				lastScrollEndPos -= lastScrollEndGap;
+				lastScrollEndGap  = 0;
+			} else if(lastScrollPos < 0) {
+				lastScrollEndPos += lastScrollPos;
+				lastScrollEndGap += lastScrollPos;
+				lastScrollPos     = 0;
 			}
-			debug("New scroll position [" + lastScrollRowPos + "] end pos: [" +
-			      lastScrollRowEndPos + "] end gap: [" + lastScrollRowEndGap +
+			debug("New scroll position [" + lastScrollPos + "] end pos: [" +
+			      lastScrollEndPos + "] end gap: [" + lastScrollEndGap +
 			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",12);
 			paintImmediately(0, 0, getWidth(), getHeight());
 		} else {
@@ -547,9 +596,12 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 			endGap = getSecondaryScrollBar().getMaximum() - endPos;
 		}
 		getSecondaryScrollBar().setValue(pos);
-		lastScrollRowPos    = pos;
-		lastScrollRowEndPos = endPos;
-		lastScrollRowEndGap = endGap;
+//		lastScrollRowPos    = pos;
+//		lastScrollRowEndPos = endPos;
+//		lastScrollRowEndGap = endGap;
+		lastScrollPos    = pos;
+		lastScrollEndPos = endPos;
+		lastScrollEndGap = endGap;
 	}
 
 	public void adjustmentValueChanged(AdjustmentEvent evt) {
@@ -642,17 +694,53 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 		int hDI = map.getIndex(p.y); //Hover Data Index
 		if(hDI > map.getMaxIndex()) {
 			hDI = map.getMaxIndex();
-		} else if (hDI < 0) {
+		} else if(hDI < 0) {
 			hDI = 0;
 		}
 		hoverIndex = hDI;
+	}
+
+	public void orientLabelPane(Graphics2D g2d) {}
+
+	public void orientHintPane(Graphics2D g2d) {
+		g2d.rotate(Math.PI * 3 / 2);
+		g2d.translate(-getPrimaryViewportSize(),0);
 	}
 
 	protected int getPrimaryViewportSize() {
 		return(scrollPane.getViewport().getSize().height);
 	}
 
+	protected String getPaneType() {
+		return("Row");
+	}
+
+	protected String getSummary() {
+		return("RowSummary");
+	}
+
+	protected void setLabelPaneSize(int offscreenPrimarySize,int offscreenSecondarySize) {
+		//Set the size of the scrollpane to match the longest string
+		setPreferredSize(new Dimension(offscreenSecondarySize,
+		                               offscreenPrimarySize));
+		debug("Resizing row labels panel to [" + offscreenSecondarySize + "x" +
+			offscreenPrimarySize + "].",2);
+	}
+
 	protected int getSecondaryViewportSize() {
-		return(rowLabelViewportSize);
+		return(scrollPane.getViewport().getSize().width);
+	}
+
+	protected int getSecondaryPaneSize(final Dimension dims) {
+		return(dims.width);
+	}
+
+	protected int getPrimaryPaneSize(final Dimension dims) {
+		return(dims.height);
+	}
+
+	protected void setSecondaryPaneSize(final Dimension dims,int Size) {
+		secondaryPaneSize = Size;
+		dims.width = Size;
 	}
 }

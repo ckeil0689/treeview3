@@ -1938,8 +1938,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		dendroView.getInteractiveMatrixView().setColSelection(colSelection);
 		dendroView.getColumnTreeView().setTreeSelection(colSelection);
-		dendroView.getRowLabelView().setColSelection(colSelection);
-		dendroView.getColumnLabelView().setColSelection(colSelection);
+		dendroView.getRowLabelView().setOtherSelection(colSelection);
+		dendroView.getColumnLabelView().setDrawSelection(colSelection);
 	}
 
 	/**
@@ -1959,8 +1959,8 @@ public class DendroController implements ConfigNodePersistent, Observer {
 
 		dendroView.getInteractiveMatrixView().setRowSelection(rowSelection);
 		dendroView.getRowTreeView().setTreeSelection(rowSelection);
-		dendroView.getRowLabelView().setRowSelection(rowSelection);
-		dendroView.getColumnLabelView().setRowSelection(rowSelection);
+		dendroView.getRowLabelView().setDrawSelection(rowSelection);
+		dendroView.getColumnLabelView().setOtherSelection(rowSelection);
 	}
 
 	public void setNewIncluded(final int[] gIncluded, final int[] aIncluded) {
