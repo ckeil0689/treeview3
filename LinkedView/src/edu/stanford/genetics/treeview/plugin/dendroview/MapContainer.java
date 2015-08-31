@@ -81,19 +81,16 @@ public class MapContainer extends Observable implements Observer,
 
 	//Track the explicitly manipulated visible labels. These can change as a
 	//result of a scroll in the label pane
-	private boolean overColLabels          = false;
-	private boolean overColLabelsScrollbar = false;
-	private boolean overRowLabels          = false;
-	private boolean overRowLabelsScrollbar = false;
-	private boolean overInteractiveMatrix  = false;
-	private boolean colLabelsBeingScrolled = false;
-	private boolean rowLabelsBeingScrolled = false;
-	private int     hoverIndex             = -1;
-	private boolean hoverChanged           = false;
-	private boolean selecting              = false;
-	private boolean toggling               = false;
-	private boolean deselecting            = false;
-	private int     selectingStart         = -1;
+	private boolean overLabels            = false;
+	private boolean overLabelsScrollbar   = false;
+	private boolean overInteractiveMatrix = false;
+	private boolean labelsBeingScrolled   = false;
+	private int     hoverIndex            = -1;
+	private boolean hoverChanged          = false;
+	private boolean selecting             = false;
+	private boolean toggling              = false;
+	private boolean deselecting           = false;
+	private int     selectingStart        = -1;
 
 	boolean debug = false;
 
@@ -1950,84 +1947,40 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
-	 * @param overColLabels the overColLabels to set
+	 * @param overLabels the overLabels to set
 	 */
-	public void setOverColLabels(boolean overColLabels) {
-		this.overColLabels = overColLabels;
+	public void setOverLabels(boolean overLabels) {
+		this.overLabels = overLabels;
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
 	}
 
 	/**
-	 * @param overColLabels the overColLabels to set
+	 * @param overLabels the overLabels to set
 	 */
-	public void setOverColLabelsScrollbar(boolean overColLabels) {
-		this.overColLabelsScrollbar = overColLabels;
+	public void setOverLabelsScrollbar(boolean overLabels) {
+		this.overLabelsScrollbar = overLabels;
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
 	}
 
 	/**
-	 * @param overColLabels the overColLabels to set
+	 * @param overLabels the overLabels to set
 	 */
-	public void setColLabelsBeingScrolled(boolean overColLabels) {
-		this.colLabelsBeingScrolled = overColLabels;
+	public void setLabelsBeingScrolled(boolean overLabels) {
+		this.labelsBeingScrolled = overLabels;
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
-	}
-
-	/**
-	 * @param overColLabels the overColLabels to set
-	 */
-	public void setRowLabelsBeingScrolled(boolean overRowLabels) {
-		this.rowLabelsBeingScrolled = overRowLabels;
-		setChanged();
-		setHoverChanged();
-		notifyObservers();
-	}
-
-	/**
-	 * @return the rowLabelsBeingScrolled
-	 */
-	public boolean areRowLabelsBeingScrolled() {
-		return rowLabelsBeingScrolled;
-	}
-
-	/**
-	 * @return the rowLabelsBeingScrolled
-	 */
-	public boolean areColLabelsBeingScrolled() {
-		return colLabelsBeingScrolled;
 	}
 
 	/**
 	 * @return boolean
 	 */
 	public boolean areLabelsBeingScrolled() {
-		return rowLabelsBeingScrolled || colLabelsBeingScrolled;
-	}
-
-	/**
-	 * @param overRowLabels the overRowLabels to set
-	 */
-	public void setOverRowLabels(boolean overRowLabels) {
-		this.overRowLabels = overRowLabels;
-		setChanged();
-		setHoverChanged();
-		notifyObservers();
-	}
-
-	/**
-	 * @param overRowLabels the overRowLabels to set
-	 */
-	public void setOverRowLabelsScrollbar(boolean overRowLabels) {
-		this.overRowLabelsScrollbar = overRowLabels;
-		setChanged();
-		setHoverChanged();
-		notifyObservers();
+		return(labelsBeingScrolled);
 	}
 
 	/**
@@ -2052,23 +2005,15 @@ public class MapContainer extends Observable implements Observer,
 	//reference for all the classes in the view and is their only way to
 	//communicate with one another.
 	public boolean overALabelPortLinkedView() {
-		return(overColLabels || overRowLabels || overInteractiveMatrix ||
-		       overColLabelsScrollbar || overRowLabelsScrollbar ||
-		       colLabelsBeingScrolled || rowLabelsBeingScrolled || selecting);
+		return(overLabels || overInteractiveMatrix || overLabelsScrollbar ||
+		       labelsBeingScrolled || selecting);
 	}
 
 	/**
 	 * @return the overRowLabels
 	 */
-	public boolean isOverRowLabels() {
-		return overRowLabels;
-	}
-
-	/**
-	 * @return the overRowLabels
-	 */
-	public boolean isOverColLabels() {
-		return overColLabels;
+	public boolean isOverLabels() {
+		return overLabels;
 	}
 
 	/**
