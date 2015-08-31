@@ -90,13 +90,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected int     last_size;
 	protected boolean isFixed;
 
-	/* Keeps track of where the mouse cursor is */
-	/** TODO: Eliminate hoverIndex and hoverPixel and use MapContainer's hover
-	 * info instead so that the different panes can update on hovers over
-	 * corresponding places */
-	protected int hoverIndex = -1;
-	protected int hoverPixel = -1;
-
 	/* Alignment status */
 	protected boolean isRightJustified;
 
@@ -470,20 +463,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected abstract int        getPrimaryViewportSize();
 	protected abstract int        getSecondaryViewportSize();
 
-	/** TODO: Eliminate hoverIndex and hoverPixel and use MapContainer's hover
-	 * info instead so that the different panes can update on hovers over
-	 * corresponding places */
-	public int getHoverPixel() {
-		return(hoverPixel);
-	}
-
-	/** TODO: Eliminate hoverIndex and hoverPixel and use MapContainer's hover
-	 * info instead so that the different panes can update on hovers over
-	 * corresponding places */
-	public void setHoverPixel(int pixelIndex) {
-		hoverPixel = pixelIndex;
-	}
-
 	abstract public int determineCursorPixelIndex(Point p);
 
 	/**
@@ -495,27 +474,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//cursor position
 		if(map.areLabelsBeingScrolled()) {
 			forceUpdatePrimaryHoverIndex();
-		}
-	}
-
-	public void forceUpdatePrimaryHoverIndex() {
-		Point p = MouseInfo.getPointerInfo().getLocation();
-		SwingUtilities.convertPointFromScreen(p,getComponent());
-		int hPI = determineCursorPixelIndex(p); //Hover Pixel Index
-		int hDI = map.getIndex(hPI);            //Hover Data Index
-		if(hDI > map.getMaxIndex()) {
-			hDI = map.getMaxIndex();
-		} else if(hDI < 0) {
-			hDI = 0;
-		}
-		hoverIndex = hDI;
-	}
-
-	public void updatePrimaryHoverIndexDuringScrollWheel() {
-		if(hoverPixel == -1) {
-			hoverIndex = -1;
-		} else {
-			hoverIndex = map.getIndex(hoverPixel);
 		}
 	}
 
@@ -711,7 +669,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			debug("Hovering across matrix - starting up animation",9);
 			repaintTimer.start();
 			map.setLabelAnimeRunning(true);
-			lastHoverIndex = hoverIndex;
+			lastHoverIndex = getPrimaryHoverIndex();
 			//Disable any slowDownRepaintTimer that might have been left over
 			if(slowDownRepaintTimer != null) {
 				slowDownRepaintTimer.stop();
@@ -721,7 +679,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Else if the mouse hasn't moved, start the second timer to slow down
 		//the first after 1 second (this mitigates delays upon mouse motion
 		//after a brief period of no motion)
-		else if(hoverIndex == lastHoverIndex) {
+		else if(getPrimaryHoverIndex() == lastHoverIndex) {
 			debug("Hovering on one spot [" + lastHoverIndex +
 			      "] - stopping animation",9);
 			if(slowDownRepaintTimer == null) {
@@ -747,7 +705,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				slowDownRepaintTimer.stop();
 				slowDownRepaintTimer = null;
 			}
-			lastHoverIndex = hoverIndex;
+			lastHoverIndex = getPrimaryHoverIndex();
 			map.setLabelAnimeRunning(true);
 		}
 	}
@@ -767,14 +725,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 * here on out
 		 */
 
-		/** TODO: Clean out usage of hoverIndex in deference to this method */
 		//There used to be a custom case for hover index updates during
 		//scrollbar drag, but it has been replaced by this more universal
 		//method.  Note, this method returns 0 or the max index if the cursor is
 		//hovered off that nearest edge.
 		forceUpdatePrimaryHoverIndex();
 
-		debug(getPaneType() + " forced hover index: [" + hoverIndex +
+		debug(getPaneType() + " forced hover index: [" + getPrimaryHoverIndex() +
 			"] isOverIMV? [" + (map.isOverIMV() ? "yes" : "no") + "]",9);
 
 		if(getSecondaryViewportSize() != getSavedSecondaryViewportSize()) {
@@ -790,8 +747,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		updateLabelRepaintTimers();
 
 		debug("Updating the label pane graphics",1);
-		debug("Hover indexes are (local) [" + hoverIndex + "] and (matrix) [" +
-		      map.getHoverIndex() + "]",9);
+		debug("Hover index is [" + getPrimaryHoverIndex() + "]",9);
 
 		/* Shouldn't draw if there's no TreeSelection defined */
 		if(drawSelection == null) {
@@ -899,22 +855,22 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		int offscreenMatrixSize    = map.getPixel(map.getMaxIndex() + 1) - 1 -
 			map.getPixel(0);
 		Color bgColor;
-		int minPortLabel           = hoverIndex;
-		int maxPortLabel           = hoverIndex;
+		int minPortLabel           = getPrimaryHoverIndex();
+		int maxPortLabel           = getPrimaryHoverIndex();
 		int hoverStyle             = Font.BOLD | style;
 
 		//See if the labels are going to be offset because they are near
 		//an edge
-		int hoverYPos  = map.getMiddlePixel(hoverIndex) +
+		int hoverYPos  = map.getMiddlePixel(getPrimaryHoverIndex()) +
 		                 ascent / 2;
 		int edgeOffset = 0;
-		if((map.getMiddlePixel(hoverIndex) + ascent) >
+		if((map.getMiddlePixel(getPrimaryHoverIndex()) + ascent) >
 		   offscreenMatrixSize) {
-			edgeOffset = map.getMiddlePixel(hoverIndex) +
+			edgeOffset = map.getMiddlePixel(getPrimaryHoverIndex()) +
 			             ascent - offscreenMatrixSize;
-		} else if(map.getMiddlePixel(hoverIndex) -
+		} else if(map.getMiddlePixel(getPrimaryHoverIndex()) -
 		          (int) Math.ceil(ascent / 2) < 0) {
-			edgeOffset = map.getMiddlePixel(hoverIndex) -
+			edgeOffset = map.getMiddlePixel(getPrimaryHoverIndex()) -
 			             (int) Math.ceil(ascent / 2);
 		}
 
@@ -922,7 +878,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Draw labels from the hovered index backward to the start index
 		//so that we show as many as there is room for, centered on
 		//where the mouse is
-		for(int j = hoverIndex;j >= start;j--) {
+		for(int j = getPrimaryHoverIndex();j >= start;j--) {
 			try {
 				String out = headerSummary.getSummary(headerInfo,j);
 				final String[] headers = headerInfo.getHeader(j);
@@ -932,7 +888,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				}
 
 				/* Set label color */
-				if(j == hoverIndex) {
+				if(j == getPrimaryHoverIndex()) {
 					labelColor = hoverTextFGColor;
 				} else {
 					if(drawSelection.isIndexSelected(j)) {
@@ -957,7 +913,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				      getLabelStartOffset(metrics.stringWidth(out)) +
 				      "]",11);
 
-				int indexDiff = j - hoverIndex;
+				int indexDiff = j - getPrimaryHoverIndex();
 				int yPos = hoverYPos + indexDiff *
 				           (size + SQUEEZE);
 				//Account for offsets from being near an edge
@@ -967,12 +923,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					bgColor = drawLabelBackground(g,j,yPos - ascent);
 					if(yPos >= ascent){
 						minPortLabel = j;
-						if(j != hoverIndex) {
+						if(j != getPrimaryHoverIndex()) {
 							labelColor = labelPortColor;
 						}
 					}
 					g2d.setColor(labelColor);
-					if(j == hoverIndex) {
+					if(j == getPrimaryHoverIndex()) {
 						debug("Drawing " + getPaneType() +
 							" hover font BOLD [" + hoverStyle + "].",
 							5);
@@ -1015,7 +971,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 		//For hovering over the left-most index, we must do this:
 		g2d.setFont(new Font(face,style,size));
-		for(int j = hoverIndex + 1;j <= end;j++) {
+		for(int j = getPrimaryHoverIndex() + 1;j <= end;j++) {
 			try {
 				String out = headerSummary.getSummary(headerInfo,j);
 				final String[] headers = headerInfo.getHeader(j);
@@ -1048,7 +1004,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				      getLabelStartOffset(metrics.stringWidth(out)) +
 				      "]",11);
 
-				int indexDiff = j - hoverIndex;
+				int indexDiff = j - getPrimaryHoverIndex();
 				int yPos = hoverYPos + indexDiff *
 				           (size + SQUEEZE);
 				debug("edgeOffset: [" + edgeOffset + "]",3);
@@ -1129,11 +1085,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							map.getPixel(minPortLabel));
 				}
 
-				if(hoverIndex > -1) {
+				if(getPrimaryHoverIndex() > -1) {
 					//Change to the hover color
 					g2d.setColor(hoverTextFGColor);
 					//Draw the hover matrix position indicator
-					int matrixPixel = map.getPixel(hoverIndex);
+					int matrixPixel = map.getPixel(getPrimaryHoverIndex());
 
 					int indwidth = map.getPixel(matrixPixel + 1) -
 							map.getPixel(matrixPixel);
@@ -1192,13 +1148,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				/* Set label color */
 				if((drawSelection.isIndexSelected(j) &&
 					doDrawLabelPort()) ||
-				   j == hoverIndex) {
+				   j == getPrimaryHoverIndex()) {
 					if(colorIndex > 0) {
 						g.setColor(TreeColorer
 						           .getColor(headers[colorIndex]));
 					}
 
-					if(j == hoverIndex) {
+					if(j == getPrimaryHoverIndex()) {
 						g2d.setColor(hoverTextFGColor);
 						g2d.setFont(new Font(face,hoverStyle,size));
 					} else {
@@ -1317,8 +1273,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		Color bgColor = textBGColor;
 		boolean isSelecting =
 			(map.isSelecting() &&
-		     ((j >= map.getSelectingStart() && j <= map.getHoverIndex()) ||
-		      (j <= map.getSelectingStart() && j >= map.getHoverIndex())));
+		     ((j >= map.getSelectingStart() && j <= getPrimaryHoverIndex()) ||
+		      (j <= map.getSelectingStart() && j >= getPrimaryHoverIndex())));
 		boolean drawingSelectColor = false;
 		try {
 			if((drawSelection.isIndexSelected(j) && !isSelecting) ||
@@ -1726,9 +1682,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	@Override
 	public void mouseDragged(final MouseEvent e) {
-		setHoverPosition(e);
-		hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
-		map.setHoverIndex(hoverIndex);
+		//Note that the hover index is updated by forceUpdatePrimaryHoverIndex
+		//which is called from updateBuffer
 
 		debug("Selecting from " + map.getSelectingStart() + " to " +
 		      map.getIndex(getPrimaryHoverPosition(e)),8);
@@ -1764,7 +1719,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			      map.getIndex(getPrimaryHoverPosition(e)),8);
 
 			map.setSelectingStart(map.getIndex(getPrimaryHoverPosition(e)));
-			map.setHoverIndex(map.getIndex(getPrimaryHoverPosition(e)));
+			//Note that the hover index is updated by
+			//forceUpdatePrimaryHoverIndex which is called from updateBuffer
 
 			if(e.isMetaDown()) {
 				map.setToggling(true);
@@ -1846,7 +1802,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		map.setSelecting(false);
 		map.setDeSelecting(false);
 		map.setToggling(false);
-		map.setHoverIndex(-1);
+		unsetPrimaryHoverIndex();
 		map.setSelectingStart(-1);
 
 		drawSelection.notifyObservers();
@@ -1912,12 +1868,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 	}
 
-	/* TODO: Deprecated. Remove these functions if they won't be used in the
-	 * future. */
-	protected abstract void setSecondaryScrollBarPolicyAsNeeded();
-	protected abstract void setSecondaryScrollBarPolicyAlways();
-	protected abstract void setSecondaryScrollBarPolicyNever();
-
 	/**
 	 * Returns the pixel index of the cursor and updates the pixelIndex data
 	 * member for use during scroll wheel events (to update the data index
@@ -1936,8 +1886,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public void mouseMoved(final MouseEvent e) {
 		setHoverPosition(e);
-		hoverIndex = map.getIndex(getPrimaryHoverPosition(e));
-		debug("mouseMoved - updating hoverIndex to [" + hoverIndex + "]",9);
+		//Note that the hover index is updated by forceUpdatePrimaryHoverIndex
+		//which is called from updateBuffer
 
 		//This is not necessary, but makes things a tad more responsive
 		if(repaintTimer != null &&
@@ -1959,6 +1909,31 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		return(map.getIndex(getPrimaryHoverPosition(e)));
 	}
 
+	public int getPrimaryHoverIndex() {
+		return(map.getHoverIndex());
+	}
+
+	public void updatePrimaryHoverIndexDuringScrollWheel() {
+		if(map.getHoverPixel() == -1) {
+			unsetPrimaryHoverIndex();
+		} else {
+			setPrimaryHoverIndex(map.getIndex(map.getHoverPixel()));
+		}
+	}
+
+	public void forceUpdatePrimaryHoverIndex() {
+		Point p = MouseInfo.getPointerInfo().getLocation();
+		SwingUtilities.convertPointFromScreen(p,getComponent());
+		int hPI = determineCursorPixelIndex(p); //Hover Pixel Index
+		int hDI = map.getIndex(hPI);            //Hover Data Index
+		if(hDI > map.getLastVisible()) {
+			hDI = map.getLastVisible();
+		} else if(hDI < map.getFirstVisible()) {
+			hDI = map.getFirstVisible();
+		}
+		setPrimaryHoverIndex(hDI);
+	}
+
 	/**
 	 * This setter allows a hover index to be manually set in cases where the
 	 * cursor is for example, over the secondary scroll bar, drag-selecting off
@@ -1967,19 +1942,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @param i
 	 */
 	public void setPrimaryHoverIndex(final int i) {
-		hoverIndex = i;
+		map.setHoverIndex(i);
 	}
 
-	/**
-	 * This method computes the hover index based on the last saved pixel index
-	 * maintained by getPrimaryHoverPosition.
-	 * @return
-	 */
-	public int getUpdatedPrimaryHoverIndex() {
-		if(hoverPixel == -1) {
-			return(-1);
-		}
-		return(map.getIndex(hoverPixel));
+	public void unsetPrimaryHoverIndex() {
+		map.unsetHoverIndex();
 	}
 
 	/**
@@ -2597,8 +2564,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			}
 		}
 
-		setHoverPixel(-1);
-		hoverIndex = -1;
+		map.unsetHoverPixel();
+		unsetPrimaryHoverIndex();
 		repaint();
 	}
 
@@ -2801,8 +2768,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		if(isASecondaryScroll(e)) {
 			shift = (notches < 0) ? -6 : 6;
 			final int j = getSecondaryScrollBar().getValue();
-			/* TODO: If the following works, I need to copy it to
-			 * ColumnLabelView's corresponding method */
 			if(j + shift < 0) {
 				shift = -j;
 			} else if(j + shift + getSecondaryScrollBar().getModel().getExtent()

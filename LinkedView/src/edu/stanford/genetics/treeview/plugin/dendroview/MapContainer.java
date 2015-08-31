@@ -22,8 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.util.Observable;
@@ -32,7 +30,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
-import javax.swing.Timer;
 
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
@@ -85,6 +82,7 @@ public class MapContainer extends Observable implements Observer,
 	private boolean overLabelsScrollbar   = false;
 	private boolean overInteractiveMatrix = false;
 	private boolean labelsBeingScrolled   = false;
+	private int     hoverPixel            = -1;
 	private int     hoverIndex            = -1;
 	private boolean hoverChanged          = false;
 	private boolean selecting             = false;
@@ -2016,13 +2014,6 @@ public class MapContainer extends Observable implements Observer,
 		return overLabels;
 	}
 
-	/**
-	 * @return the hoverIndex
-	 */
-	public int getHoverIndex() {
-		return hoverIndex;
-	}
-
 	/* This variable is used and managed from LabelView because running the
 	 * repaints on a timer is much smoother and snappier than via
 	 * notifyObservers */
@@ -2032,6 +2023,13 @@ public class MapContainer extends Observable implements Observer,
 	}
 	public boolean isLabelAnimeRunning() {
 		return(labelAnimeRunning);
+	}
+
+	/**
+	 * @return the hoverIndex
+	 */
+	public int getHoverIndex() {
+		return hoverIndex;
 	}
 
 	/**
@@ -2054,6 +2052,29 @@ public class MapContainer extends Observable implements Observer,
 		if(!labelAnimeRunning) {
 			notifyObservers();
 		}
+	}
+
+	/**
+	 * This sets the hoverIndex to a value indicating that the cursor is not
+	 * hovered over a position corresponding to a visible data index
+	 * @author rleach
+	 * @param none
+	 * @return nothing
+	 */
+	public void unsetHoverIndex() {
+		this.hoverIndex = -1;
+	}
+
+	public int getHoverPixel() {
+		return(hoverPixel);
+	}
+
+	public void setHoverPixel(int pixelIndex) {
+		hoverPixel = pixelIndex;
+	}
+
+	public void unsetHoverPixel() {
+		hoverPixel = -1;
 	}
 
 	/**

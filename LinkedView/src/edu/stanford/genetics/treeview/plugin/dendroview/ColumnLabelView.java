@@ -9,7 +9,6 @@ import java.awt.event.MouseWheelEvent;
 import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
-import javax.swing.ScrollPaneConstants;
 
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -82,7 +81,7 @@ public class ColumnLabelView extends LabelView {
 	}
 
 	public void setHoverPosition(final MouseEvent e) {
-		hoverPixel = e.getX();
+		map.setHoverPixel(e.getX());
 	}
 
 	/**
@@ -120,24 +119,8 @@ public class ColumnLabelView extends LabelView {
 		return scrollPane.getVerticalScrollBar();
 	}
 
-	public void setSecondaryScrollBarPolicyAlways() {
-		scrollPane.setHorizontalScrollBarPolicy(
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-	}
-
-	public void setSecondaryScrollBarPolicyNever() {
-		scrollPane.setHorizontalScrollBarPolicy(
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-	}
-
-	public void setSecondaryScrollBarPolicyAsNeeded() {
-		scrollPane.setHorizontalScrollBarPolicy(
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	}
-
 	public int getPrimaryHoverPosition(final MouseEvent e) {
-		hoverPixel = e.getX();
-		return(hoverPixel);
+		return(e.getX());
 	}
 
 	protected int getPrimaryViewportSize() {
