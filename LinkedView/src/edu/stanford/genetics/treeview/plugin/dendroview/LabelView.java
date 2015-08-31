@@ -7,6 +7,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -389,13 +391,32 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		hoverPixel = pixelIndex;
 	}
 
+	abstract public int     determineCursorPixelIndex(Point p);
+
 	/**
 	 * This is for updating the hover index when the mouse has not moved but the
 	 * data under it has (like when using the scroll wheel)
 	 */
-	abstract public void    updatePrimaryHoverIndexDuringScrollDrag();
-	abstract public void    forceUpdatePrimaryHoverIndex();
-	abstract public boolean areLabelsBeingScrolled();
+	public void updatePrimaryHoverIndexDuringScrollDrag() {
+		//If the labels are being scrolled, you must manually retrieve the
+		//cursor position
+		if(map.areLabelsBeingScrolled()) {
+			forceUpdatePrimaryHoverIndex();
+		}
+	}
+
+	public void forceUpdatePrimaryHoverIndex() {
+		Point p = MouseInfo.getPointerInfo().getLocation();
+		SwingUtilities.convertPointFromScreen(p,getComponent());
+		int hPI = determineCursorPixelIndex(p); //Hover Pixel Index
+		int hDI = map.getIndex(hPI);            //Hover Data Index
+		if(hDI > map.getMaxIndex()) {
+			hDI = map.getMaxIndex();
+		} else if(hDI < 0) {
+			hDI = 0;
+		}
+		hoverIndex = hDI;
+	}
 
 	public void updatePrimaryHoverIndexDuringScrollWheel() {
 		if(hoverPixel == -1) {
@@ -675,9 +696,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//method.  Note, this method returns 0 or the max index if the cursor is
 		//hovered off that nearest edge.
 		forceUpdatePrimaryHoverIndex();
-		int activeHoverDataIndex = hoverIndex;
 
-		debug(getPaneType() + " forced hover index: [" + activeHoverDataIndex +
+		debug(getPaneType() + " forced hover index: [" + hoverIndex +
 			"] isOverIMV? [" + (map.isOverIMV() ? "yes" : "no") + "]",9);
 
 		if(getSecondaryViewportSize() != getSavedSecondaryViewportSize()) {

@@ -157,42 +157,18 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 	@Override
 	public void update(final Observable o, final Object arg) {
 
-		if (o == map) {
-			selectionChanged(); // gene locations changed
-		} else if (o == otherSelection || o == drawSelection) {
-			selectionChanged(); // which genes are selected changed
-
-		} else if (o == headerSummary) { // annotation selection changed
+		if (o == map ||                                  //gene locations change
+			o == otherSelection || o == drawSelection || //gene selection change
+			o == headerSummary) {                        //annotation selection
 			selectionChanged();
-
 		} else {
 			LogBuffer.println("Warning: LabelView got funny update!");
 		}
 	}
 
-	public boolean areLabelsBeingScrolled() {
-		return(map.areColLabelsBeingScrolled());
-	}
-
-	public void updatePrimaryHoverIndexDuringScrollDrag() {
-		//If the labels are being scrolled, you must manually retrieve the
-		//cursor position
-		if(areLabelsBeingScrolled()) {
-			forceUpdatePrimaryHoverIndex();
-		}
-	}
-
-	public void forceUpdatePrimaryHoverIndex() {
-		Point p = MouseInfo.getPointerInfo().getLocation();
-		SwingUtilities.convertPointFromScreen(p,getComponent());
+	public int determineCursorPixelIndex(Point p) {
 		debug("Cursor x coordinate relative to column labels: [" + p.x + "]",8);
-		int hDI = map.getIndex(p.x); //Hover Data Index
-		if(hDI > map.getMaxIndex()) {
-			hDI = map.getMaxIndex();
-		} else if(hDI < 0) {
-			hDI = 0;
-		}
-		hoverIndex = hDI;
+		return(p.x);
 	}
 
 	public void orientLabelPane(Graphics2D g2d) {
@@ -202,7 +178,8 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 
 	public void orientHintPane(Graphics2D g2d) {}
 
-	protected void setLabelPaneSize(int offscreenPrimarySize,int offscreenSecondarySize) {
+	protected void setLabelPaneSize(int offscreenPrimarySize,
+	                                int offscreenSecondarySize) {
 		//Set the size of the scrollpane to match the longest string
 		debug("Setting col pane height to [" + offscreenSecondarySize + "]",
 		      6);
@@ -400,6 +377,14 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 		return(!isRightJustified);
 	}
 
+	/**
+	 * This method should return true if the start of the label string is closer
+	 * to the data matrix than the end of the label string. It is assumed that
+	 * the pre-rotated x position of the start of the string is lesser than the
+	 * pre-rotated x position of the end of the string. The value returned is
+	 * used to infer that the scroll 0 position either corresponds to the string
+	 * 0 position (true) or is oriented in the opposite direction (false).
+	 */
 	protected boolean isLabelStartNearMatrix() {
 		return(true);
 	}
@@ -581,21 +566,6 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 			}
 			if(shift == 0) return;
 			debug("Scrolling vertically from [" + j + "] by [" + shift + "]",1);
-//			lastScrollColPos = j + shift;
-//			lastScrollColEndPos = lastScrollColPos +
-//			                      getSecondaryScrollBar().getModel()
-//			                      .getExtent();
-//			lastScrollColEndGap = getSecondaryScrollBar().getMaximum() -
-//			                      lastScrollColEndPos;
-//			if(lastScrollColEndGap < 0) {
-//				lastScrollColPos -= lastScrollColEndGap;
-//				lastScrollColEndPos -= lastScrollColEndGap;
-//				lastScrollColEndGap = 0;
-//			} else if(lastScrollColPos < 0) {
-//				lastScrollColEndPos += lastScrollColPos;
-//				lastScrollColEndGap += lastScrollColPos;
-//				lastScrollColPos = 0;
-//			}
 			lastScrollPos = j + shift;
 			lastScrollEndPos = lastScrollPos +
 			                      getSecondaryScrollBar().getModel()
@@ -612,19 +582,11 @@ public class ColumnLabelView extends LabelView implements MouseWheelListener,
 				lastScrollPos = 0;
 			}
 			getSecondaryScrollBar().setValue(j + shift);
-//			debug("New secondary col scroll position [" + lastScrollColPos +
-//			      "] end pos: [" + lastScrollColEndPos + "] end gap: [" +
-//			      lastScrollColEndGap + "] out of [" +
 			debug("New secondary " + getPaneType() + " scroll position [" + lastScrollPos +
 			      "] end pos: [" + lastScrollEndPos + "] end gap: [" +
 			      lastScrollEndGap + "] out of [" +
 			      getSecondaryScrollBar().getMaximum() + "]",1);
-			//paintImmediately(0, 0, getWidth(), getHeight());
 		}
-
-		//revalidate();
-		//repaint();
-		//paintImmediately(0, 0, getWidth(), getHeight());
 	}
 
 	public void adjustmentValueChanged(AdjustmentEvent evt) {

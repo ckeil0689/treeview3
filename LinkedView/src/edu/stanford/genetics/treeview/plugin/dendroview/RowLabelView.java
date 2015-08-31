@@ -207,6 +207,14 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 	}
 
+	/**
+	 * This method should return true if the start of the label string is closer
+	 * to the data matrix than the end of the label string. It is assumed that
+	 * the pre-rotated x position of the start of the string is lesser than the
+	 * pre-rotated x position of the end of the string. The value returned is
+	 * used to infer that the scroll 0 position either corresponds to the string
+	 * 0 position (true) or is oriented in the opposite direction (false).
+	 */
 	protected boolean isLabelStartNearMatrix() {
 		return(false);
 	}
@@ -525,25 +533,6 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 			if(shift == 0) return;
 			debug("Scrolling horizontally from [" + j + "] by [" + shift + "]",
 			      2);
-//			lastScrollRowPos = j + shift;
-//			getSecondaryScrollBar().setValue(j + shift);
-//			lastScrollRowEndPos = lastScrollRowPos +
-//			                      getSecondaryScrollBar().getModel()
-//			                      .getExtent();
-//			lastScrollRowEndGap = getSecondaryScrollBar().getMaximum() -
-//			                      lastScrollRowEndPos;
-//			if(lastScrollRowEndGap < 0) {
-//				lastScrollRowPos    -= lastScrollRowEndGap;
-//				lastScrollRowEndPos -= lastScrollRowEndGap;
-//				lastScrollRowEndGap  = 0;
-//			} else if(lastScrollRowPos < 0) {
-//				lastScrollRowEndPos += lastScrollRowPos;
-//				lastScrollRowEndGap += lastScrollRowPos;
-//				lastScrollRowPos     = 0;
-//			}
-//			debug("New scroll position [" + lastScrollRowPos + "] end pos: [" +
-//			      lastScrollRowEndPos + "] end gap: [" + lastScrollRowEndGap +
-//			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",12);
 			lastScrollPos = j + shift;
 			getSecondaryScrollBar().setValue(j + shift);
 			lastScrollEndPos = lastScrollPos +
@@ -569,14 +558,6 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 			map.scrollBy(shift, false);
 			updatePrimaryHoverIndexDuringScrollWheel();
 		}
-
-		//revalidate();
-		//repaint();
-		//repaint wasn't always updating the last paint step, but
-		//paintImmediately (and an invokdeLater also) seems to work
-		//I think it's because the updateBuffer finds out if it needs to change
-		//anything from the map object
-		//paintImmediately(0, 0, getWidth(), getHeight());
 	}
 
 	public void explicitSecondaryScrollTo(int pos,int endPos,int endGap) {
@@ -675,29 +656,9 @@ public class RowLabelView extends LabelView implements MouseWheelListener,
 			}
 		});
 
-	public boolean areLabelsBeingScrolled() {
-		return(map.areRowLabelsBeingScrolled());
-	}
-
-	public void updatePrimaryHoverIndexDuringScrollDrag() {
-		//If the labels are being scrolled, you must manually retrieve the
-		//cursor position
-		if(areLabelsBeingScrolled()) {
-			forceUpdatePrimaryHoverIndex();
-		}
-	}
-
-	public void forceUpdatePrimaryHoverIndex() {
-		Point p = MouseInfo.getPointerInfo().getLocation();
-		SwingUtilities.convertPointFromScreen(p,getComponent());
+	public int determineCursorPixelIndex(Point p) {
 		debug("Cursor y coordinate relative to column labels: [" + p.y + "]",8);
-		int hDI = map.getIndex(p.y); //Hover Data Index
-		if(hDI > map.getMaxIndex()) {
-			hDI = map.getMaxIndex();
-		} else if(hDI < 0) {
-			hDI = 0;
-		}
-		hoverIndex = hDI;
+		return(p.y);
 	}
 
 	public void orientLabelPane(Graphics2D g2d) {}
