@@ -700,11 +700,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//after a brief period of no motion)
 		else if(map.overALabelPortLinkedView() &&
 			getPrimaryHoverIndex() == lastHoverIndex) {
-			debug("Hovering on one spot [" + lastHoverIndex +
-			      "] - slowing animation",9);
-			if(slowDownRepaintTimer == null) {
-				slowDownRepaintTimer = new Timer(delay,slowDownRepaintListener);
-				slowDownRepaintTimer.start();
+			if(repaintTimer.getDelay() == repaintInterval) {
+				debug("Hovering on one spot [" + lastHoverIndex +
+				      "] - slowing animation",9);
+				if(slowDownRepaintTimer == null) {
+					slowDownRepaintTimer = new Timer(delay,slowDownRepaintListener);
+					slowDownRepaintTimer.start();
+				}
+			} else {
+				debug("Animation already slowed down to [" + repaintTimer.getDelay() + "ms].",9);
 			}
 		}
 		//Else, disable the slowDownRepaintTimer, update the hover index, and

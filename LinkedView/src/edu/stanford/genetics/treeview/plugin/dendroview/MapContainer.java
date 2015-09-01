@@ -2037,7 +2037,6 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setHoverIndex(int hoverIndex) {
 		this.hoverIndex = hoverIndex;
-		setChanged();
 		//setHoverChanged prevents the IMV (and other views) from repainting
 		//when no visual change has occurred (i.e. it's just a change in hover
 		//position of the mouse.  setChanged is called above though so that
@@ -2050,6 +2049,7 @@ public class MapContainer extends Observable implements Observer,
 		//If LabelView is not controlling its own repaints anymore, start it
 		//back up with a call to notifyObservers
 		if(!labelAnimeRunning && overALabelPortLinkedView()) {
+			setChanged();
 			notifyObservers();
 		}
 	}
