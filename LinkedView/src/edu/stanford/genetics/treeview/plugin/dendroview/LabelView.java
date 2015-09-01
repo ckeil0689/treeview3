@@ -176,7 +176,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBorder(null);
 
-		debug = 20;
+		debug = 0;
 		//Debug modes:
 		//9  = debug repaint timer intervals and updates to label panels
 		//10 = Debug label drawing issues when split pane divider adjusted
@@ -195,6 +195,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//18 = Debug the lastScrollRowEndPos value
 		//19 = Debug the blanking out of scrolled labels
 		//20 = Debug whether the label offset calculations yield negatives
+		//21 = Test whether the pixel index determined by 2 different methods is
+		//     the same
 
 		panel = scrollPane;
 
@@ -1924,7 +1926,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void forceUpdatePrimaryHoverIndex() {
 		Point p = MouseInfo.getPointerInfo().getLocation();
 		SwingUtilities.convertPointFromScreen(p,getComponent());
+		p.y += 1; //+1 is a fudge factor because the conversion seems to
+		//be off by 1 in the y direction for whatever reason
 		int hPI = determineCursorPixelIndex(p); //Hover Pixel Index
+		if(debug > 0) {
+			debug("Hover Pixel as determined by: MouseInfo.getPointerInfo()." +
+				"getLocation(): [" + hPI + "] map.getHoverPixel(): [" +
+				map.getHoverPixel() + "]",21);
+		}
 		int hDI = map.getIndex(hPI);            //Hover Data Index
 		if(hDI > map.getLastVisible()) {
 			hDI = map.getLastVisible();
