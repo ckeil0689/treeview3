@@ -25,9 +25,9 @@ This README would normally document whatever steps are necessary to get your app
 Our Git workflow follows the [Github Workflow](https://guides.github.com/introduction/flow/).
 
 ### Code Style & Conventions
-1. [Oracle Code Conventions](http://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html)
-2. [Google Java Style](https://google-styleguide.googlecode.com/svn/trunk/javaguide.html)
-3. [More extensive style guide](http://www.scribd.com/doc/15884743/Java-Coding-Style-by-Achut-Reddy)
+[Google Java Style](https://google-styleguide.googlecode.com/svn/trunk/javaguide.html)
+
+An Eclipse configuration XML file can be found in LinkedView/ 
 
 ### Developer Change Procedure
 
