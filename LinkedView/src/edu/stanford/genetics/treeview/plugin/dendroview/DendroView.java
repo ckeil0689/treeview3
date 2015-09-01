@@ -1495,7 +1495,7 @@ public class DendroView implements Observer, DendroPanel {
 	 *
 	 * @param dendrogram
 	 * @return Location of divider (max = 1.0)
-	 */
+	 */V
 	public double getDivLoc(final TRView dendrogram) {
 
 		/* Get value for correct dendrogram JSplitPane */
