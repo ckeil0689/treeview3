@@ -22,37 +22,12 @@ This README would normally document whatever steps are necessary to get your app
 
 ### General Git Flow
 
-[Reference 1](http://nvie.com/posts/a-successful-git-branching-model/)
-
-[Reference 2 (pic src)](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
-
-Specific branches have specific roles.
-
-1. Two branches are used to record the history of the project:
-     * master: holds history of project releases. Incremented by release versions. Commits tagged with version number.
-     * develop: integration history for features. Incremented by feature additions.
-     * develop used to be master (as of Aug 2015).
-     * ![Selection_020.png](https://bitbucket.org/repo/AXqk7r/images/3307300262-Selection_020.png)
-2. Feature branches are branched off and merged into develop.
-     * No direct interaction with master!
-     * ![Selection_021.png](https://bitbucket.org/repo/AXqk7r/images/863398893-Selection_021.png)
-3. Release branch
-     * Branched off from develop.
-     * Branch once release is feature ready.
-     * naming: release-***
-     * Does **only** include: documentation, bug fixes, release-oriented stuff
-     * No feature work here!
-     * When ready to ship: merge into master -> tag branch & commit with version number!
-     * Also, after release and potential bug fixes etc., merge back into develop to retain important changes.
-4. Maintenance
-     * For hotfixes.
-     * Only branch that may directly branch of master (since fixed master should be released right away).
-     * Immediately merge back into master once the hotfix is done.
+Our Git workflow follows the [Github Workflow](https://guides.github.com/introduction/flow/).
 
 ### Code Style & Conventions
-1. [Oracle Code Conventions](http://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html)
-2. [Google Java Style](https://google-styleguide.googlecode.com/svn/trunk/javaguide.html)
-3. [More extensive style guide](http://www.scribd.com/doc/15884743/Java-Coding-Style-by-Achut-Reddy)
+[Google Java Style](https://google-styleguide.googlecode.com/svn/trunk/javaguide.html)
+
+An Eclipse configuration XML file can be found in LinkedView/ 
 
 ### Developer Change Procedure
 
