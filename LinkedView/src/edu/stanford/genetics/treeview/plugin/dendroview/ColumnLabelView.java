@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.util.Observable;
 import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
@@ -121,6 +122,17 @@ public class ColumnLabelView extends LabelView {
 
 	public int getPrimaryHoverPosition(final MouseEvent e) {
 		return(e.getX());
+	}
+
+	@Override
+	public void update(final Observable o, final Object arg) {
+		if(o == map ||                                   //location changed
+			o == drawSelection || o == otherSelection || //selection change
+			o == headerSummary) {                        //annotation change
+			selectionChanged();
+		} else {
+			LogBuffer.println("Warning: LabelView got funny update!");
+		}
 	}
 
 	protected int getPrimaryViewportSize() {

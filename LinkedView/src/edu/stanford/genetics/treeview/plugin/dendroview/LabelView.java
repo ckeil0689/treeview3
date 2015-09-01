@@ -364,15 +364,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		this.otherSelection.addObserver(this);
 	}
 
-	public void update(final Observable o, final Object arg) {
-		if(o == map ||                                   //location changed
-			o == drawSelection || o == otherSelection || //selection change
-			o == headerSummary) {                        //annotation change
-			selectionChanged();
-		} else {
-			LogBuffer.println("Warning: LabelView got funny update!");
-		}
-	}
+	@Override
+	public void update(final Observable o,final Object arg) {}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
@@ -666,24 +659,49 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	public void updateLabelRepaintTimers() {
-		//If the animation is not running, start it up
-		if(!map.isLabelAnimeRunning()) {
-			debug("Hovering across matrix - starting up animation",9);
-			repaintTimer.start();
-			map.setLabelAnimeRunning(true);
-			lastHoverIndex = getPrimaryHoverIndex();
-			//Disable any slowDownRepaintTimer that might have been left over
-			if(slowDownRepaintTimer != null) {
-				slowDownRepaintTimer.stop();
-				slowDownRepaintTimer = null;
+		//If the mouse is not hovering over the IMV, stop both timers, set the
+		//last hover index, and tell mapcontainer that the animation has stopped
+		if(!map.overALabelPortLinkedView()) {
+			if(repaintTimer != null && repaintTimer.isRunning()) {
+				debug("Not hovering over a label port linked view - stopping animation",9);
+				repaintTimer.stop();
+				lastHoverIndex = -1;
+				map.setLabelAnimeRunning(false);
+				//Disable the turnOffRepaintTimer if it is running, because we've
+				//already stopped repaints
+				if(slowDownRepaintTimer != null) {
+					slowDownRepaintTimer.stop();
+					slowDownRepaintTimer = null;
+				}
+			} else {
+				debug("The repaint timer is not running. This updateBuffer " +
+					"call was initiated by something else.",9);
+			}
+		}
+		//Else, assume the mouse is hovering, and if the animation is not
+		//running, start it up
+		else if(!map.isLabelAnimeRunning()) {
+			if(repaintTimer == null || !repaintTimer.isRunning()) {
+				debug("Hovering across matrix - starting up animation",9);
+				repaintTimer.start();
+				map.setLabelAnimeRunning(true);
+				lastHoverIndex = getPrimaryHoverIndex();
+				//Disable any slowDownRepaintTimer that might have been left over
+				if(slowDownRepaintTimer != null) {
+					slowDownRepaintTimer.stop();
+					slowDownRepaintTimer = null;
+				}
+			} else {
+				debug("The repaint timer was in fact running even though map.isLabelAnimeRunning() said it wasn't.",9);
 			}
 		}
 		//Else if the mouse hasn't moved, start the second timer to slow down
 		//the first after 1 second (this mitigates delays upon mouse motion
 		//after a brief period of no motion)
-		else if(getPrimaryHoverIndex() == lastHoverIndex) {
+		else if(map.overALabelPortLinkedView() &&
+			getPrimaryHoverIndex() == lastHoverIndex) {
 			debug("Hovering on one spot [" + lastHoverIndex +
-			      "] - stopping animation",9);
+			      "] - slowing animation",9);
 			if(slowDownRepaintTimer == null) {
 				slowDownRepaintTimer = new Timer(delay,slowDownRepaintListener);
 				slowDownRepaintTimer.start();
@@ -693,6 +711,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//set the repaint interval to normal speed
 		else {
 			debug("Hovering across matrix - keeping animation going",9);
+			debug("Last hover Index: [" + lastHoverIndex +
+				"] current hover index [" + getPrimaryHoverIndex() + "]",9);
 			if(repaintTimer != null && !repaintTimer.isRunning()) {
 				repaintTimer.start();
 			} else if(repaintTimer.getDelay() == slowRepaintInterval) {

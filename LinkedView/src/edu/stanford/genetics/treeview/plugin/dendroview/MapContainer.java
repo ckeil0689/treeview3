@@ -2049,7 +2049,7 @@ public class MapContainer extends Observable implements Observer,
 
 		//If LabelView is not controlling its own repaints anymore, start it
 		//back up with a call to notifyObservers
-		if(!labelAnimeRunning) {
+		if(!labelAnimeRunning && overALabelPortLinkedView()) {
 			notifyObservers();
 		}
 	}
