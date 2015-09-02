@@ -24,6 +24,8 @@ import java.awt.geom.AffineTransform;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
+import javafx.beans.value.ObservableValue;
+
 import javax.swing.BoundedRangeModel;
 import javax.swing.DebugGraphics;
 import javax.swing.DefaultBoundedRangeModel;
@@ -32,6 +34,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
@@ -200,6 +204,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//20 = Debug whether the label offset calculations yield negatives
 		//21 = Test whether the pixel index determined by 2 different methods is
 		//     the same
+		//22 = Debug the ChangeListener attached to the secondary scrollbar
 
 		panel = scrollPane;
 
@@ -243,7 +248,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			@Override
 			public void mousePressed(MouseEvent e) {
 				map.setLabelsBeingScrolled(true);
-				updateDragScrollTimer.start();
 				debug("The mouse has clicked a row label scrollbar",2);
 				if(activeScrollLabelPortOffTimer != null) {
 					/* Event came too soon, swallow by resetting the timer.. */
@@ -254,7 +258,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				updateDragScrollTimer.stop();
 				debug("The mouse has released a row label scrollbar",2);
 				//Turn off the "over a label port view" boolean after a bit
 				if(activeScrollLabelPortOffTimer == null) {
@@ -277,6 +280,26 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		//Listen for value changes in the scroll pane's scrollbars
 		getSecondaryScrollBar().addAdjustmentListener(this);
+
+		//The following live-updates the labels during a scroll handle drag
+		class ScrollChangeListener implements ChangeListener {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				Object source = e.getSource();
+				if(source instanceof BoundedRangeModel) {
+					BoundedRangeModel aModel = (BoundedRangeModel) source;
+					if(aModel.getValueIsAdjusting()) {
+						debug("Scroll position changed.",22);
+						explicitSecondaryScrollTo(aModel.getValue(),
+						                          -1,
+						                          -1);
+						repaint();
+					}
+				}
+			}
+		}
+		getSecondaryScrollBar().getModel().addChangeListener(new
+			ScrollChangeListener());
 	}
 
 	public void generateView(final UrlExtractor uExtractor) {
@@ -2541,7 +2564,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		@Override
 		public void actionPerformed(ActionEvent evt) {
 			if (evt.getSource() == activeScrollLabelPortOffTimer) {
-				debug("You released the secondary row scrollbar 1s ago, so " +
+				debug("You released the secondary scrollbar 1s ago, so " +
 				      "the label port might turn off unless you're over " +
 				      "another pane that activates it",2);
 				/* Stop timer */
@@ -2554,22 +2577,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			}
 		}
 	};
-
-	//This is an attempt to get the dragging of the scroll handle to correctly
-	//redraw the labels in the correct positions
-	private int updateDragScrollInterval = 10;  // update every X milliseconds
-	private Timer updateDragScrollTimer =
-		new Timer(updateDragScrollInterval,
-		          new ActionListener() {
-			@Override
-			public void
-			actionPerformed(ActionEvent e) {
-				explicitSecondaryScrollTo(getSecondaryScrollBar().getValue(),
-				                          -1,
-				                          -1);
-				repaint();
-			}
-		});
 
 	@Override
 	public void mouseEntered(final MouseEvent e) {
@@ -2745,7 +2752,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		boolean updateScroll = false;
 		//This if conditional catches drags
 		if(!evt.getValueIsAdjusting() && map.areLabelsBeingScrolled()) {
-			System.out.println("The knob on the scrollbar is being dragged");
+			debug("The knob on the scrollbar is being dragged",7);
 			updateScroll = true;
 			explicitSecondaryScrollTo(oldvalue,-1,-1);
 		}
@@ -2874,10 +2881,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		if(endGap == -1) {
 			endGap = getSecondaryScrollBar().getMaximum() - endPos;
 		}
-		getSecondaryScrollBar().setValue(pos);
 		lastScrollPos    = pos;
 		lastScrollEndPos = endPos;
 		lastScrollEndGap = endGap;
+		getSecondaryScrollBar().setValue(pos);
 	}
 
 	protected void selectionChanged() {
