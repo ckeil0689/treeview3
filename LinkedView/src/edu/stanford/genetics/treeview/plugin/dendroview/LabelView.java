@@ -24,6 +24,9 @@ import java.awt.geom.AffineTransform;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
+import javax.swing.BoundedRangeModel;
+import javax.swing.DebugGraphics;
+import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
@@ -2736,7 +2739,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		Adjustable source = evt.getAdjustable();
 		int orient = source.getOrientation();
 		if(orient == getLabelOrientation()) {
-			debug("scrollbar adjustment detected from horizontal scrollbar",2); 
+			debug("scrollbar adjustment detected from secondary scrollbar",2); 
 		}
 		int oldvalue = getSecondaryScrollBar().getValue();
 		boolean updateScroll = false;
@@ -2793,13 +2796,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void mouseWheelMoved(final MouseWheelEvent e) {
 
 		final int notches = e.getWheelRotation();
-		int shift = (notches < 0) ? -3 : 3;
+		int shift = (notches < 0) ? -6 : 6;
 		debug("Scroll wheel event detected",1);
 
 		// On macs' magic mouse, horizontal scroll comes in as if the shift was
 		// down
 		if(isASecondaryScroll(e)) {
-			shift = (notches < 0) ? -6 : 6;
 			final int j = getSecondaryScrollBar().getValue();
 			if(j + shift < 0) {
 				shift = -j;
@@ -2812,7 +2814,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			debug("Scrolling horizontally from [" + j + "] by [" + shift + "]",
 			      2);
 			lastScrollPos = j + shift;
-			getSecondaryScrollBar().setValue(j + shift);
 			lastScrollEndPos = lastScrollPos +
 			                      getSecondaryScrollBar().getModel()
 			                      .getExtent();
@@ -2830,7 +2831,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			debug("New scroll position [" + lastScrollPos + "] end pos: [" +
 			      lastScrollEndPos + "] end gap: [" + lastScrollEndGap +
 			      "] out of [" + getSecondaryScrollBar().getMaximum() + "]",12);
-			paintImmediately(0, 0, getWidth(), getHeight());
+			repaint();
+			//Moved the setValue call here, after the repaint, because putting
+			//it before caused the scroll to look really bouncy and choppy
+			getSecondaryScrollBar().setValue(j + shift);
 		} else {
 			//Value of label length scrollbar
 			map.scrollBy(shift, false);
