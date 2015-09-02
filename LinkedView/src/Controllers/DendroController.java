@@ -409,32 +409,38 @@ Controller {
 				if ((e.getModifiers() & InputEvent.META_MASK) != 0) {
 					mvController.resetMatrixViews();
 					dendroView.getInteractiveMatrixView().setAspectRatio(
-							interactiveXmap.getMaxIndex() + 1,
-							interactiveYmap.getMaxIndex() + 1);
+							interactiveXmap.getTotalTileNum(),
+							interactiveYmap.getTotalTileNum());
+					
 				} else if ((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
-					interactiveXmap.zoomOutCenter("fast");
-					interactiveYmap.zoomOutCenter("fast");
+					interactiveXmap.zoomOutCenter(MapContainer.ZOOM_FAST);
+					interactiveYmap.zoomOutCenter(MapContainer.ZOOM_FAST);
+					
 				} else if ((e.getModifiers() & InputEvent.ALT_MASK) != 0) {
-					interactiveXmap.zoomOutCenter("slow");
-					interactiveYmap.zoomOutCenter("slow");
+					interactiveXmap.zoomOutCenter(MapContainer.ZOOM_SLOW);
+					interactiveYmap.zoomOutCenter(MapContainer.ZOOM_SLOW);
+					
 				} else {
-					interactiveXmap.zoomOutCenter("medium");
-					interactiveYmap.zoomOutCenter("medium");
+					interactiveXmap.zoomOutCenter(MapContainer.ZOOM_DEFAULT);
+					interactiveYmap.zoomOutCenter(MapContainer.ZOOM_DEFAULT);
 				}
 
 			} else if (e.getSource() == dendroView.getXYPlusButton()) {
 				if ((e.getModifiers() & InputEvent.META_MASK) != 0) {
-					interactiveXmap.zoomInCenter("slam");
-					interactiveYmap.zoomInCenter("slam");
+					interactiveXmap.zoomInCenter(MapContainer.ZOOM_SLAM);
+					interactiveYmap.zoomInCenter(MapContainer.ZOOM_SLAM);
+					
 				} else if ((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
-					interactiveXmap.zoomInCenter("fast");
-					interactiveYmap.zoomInCenter("fast");
+					interactiveXmap.zoomInCenter(MapContainer.ZOOM_FAST);
+					interactiveYmap.zoomInCenter(MapContainer.ZOOM_FAST);
+					
 				} else if ((e.getModifiers() & InputEvent.ALT_MASK) != 0) {
-					interactiveXmap.zoomInCenter("slow");
-					interactiveYmap.zoomInCenter("slow");
+					interactiveXmap.zoomInCenter(MapContainer.ZOOM_SLOW);
+					interactiveYmap.zoomInCenter(MapContainer.ZOOM_SLOW);
+					
 				} else {
-					interactiveXmap.zoomInCenter("medium");
-					interactiveYmap.zoomInCenter("medium");
+					interactiveXmap.zoomInCenter(MapContainer.ZOOM_DEFAULT);
+					interactiveYmap.zoomInCenter(MapContainer.ZOOM_DEFAULT);
 				}
 
 			} else if (e.getSource() == dendroView.getXLeftPlusButton()) {
@@ -600,105 +606,6 @@ Controller {
 		rowSelection.notifyObservers();
 
 		setAdaptiveButtonStatus();
-	}
-
-	/**
-	 * TODO keep here - this should change the canvas (JPanel) 
-	 * in DendroView to which the IMView should automatically adapt.
-	 * 
-	 * Sets the dimensions of the GlobalView axes. There are three options,
-	 * passed from the MenuBar when the user selects it. Fill: This fills all of
-	 * the available space on the screen with the matrix. Equal: Both axes are
-	 * equally sized, forming a square matrix. Proportional: Axes are sized in
-	 * proportion to how many elements they show.
-	 *
-	 * @param mode
-	 */
-	public void setMatrixSize(final int mode) {
-
-		switch (mode) {
-
-		case InteractiveMatrixView.FILL:
-			setMatrixFill();
-			break;
-
-		case InteractiveMatrixView.EQUAL:
-			setMatrixAxesEqual();
-			break;
-
-		case InteractiveMatrixView.PROPORT:
-			setMatrixPropotional();
-			break;
-
-		default:
-			setMatrixFill();
-			break;
-		}
-
-		addListeners();
-		refocusViewPort();
-	}
-
-	/**
-	 * Sets axis dimensions of heat map to their maximum values.
-	 * @deprecated
-	 */
-	private void setMatrixFill() {
-
-		// TODO insert new code when issue is tackled
-	}
-
-	/**
-	 * Sets the size of each GlobalView axes to the smallest of both to form a
-	 * square.
-	 * @deprecated
-	 */
-	private void setMatrixAxesEqual() {
-
-		// TODO insert new code when issue is tackled
-	}
-
-	/**
-	 * Resizes the matrix such that it fits all pixels as squares. If gvWidth or
-	 * gvHeight would go below a certain size, the matrix is adjusted such that
-	 * the content remains viewable in a meaningful manner.
-	 * @deprecated
-	 */
-	private void setMatrixPropotional() {
-
-		// TODO insert new code when issue is tackled
-	}
-
-	/**
-	 * 
-	 * @param map
-	 * @param max
-	 * @return
-	 */
-	private static double calcAxisDimensionFromMap(final MapContainer map,
-			final double max) {
-
-		final double used = map.getUsedPixels();
-		final double avail = map.getAvailablePixels();
-
-		return calcAxisDimension(avail, used, max);
-	}
-
-	/**
-	 * TODO just deprecate this method when this feature will be implemented...
-	 * You can just take the smaller of WIDTH or HEIGHT of a maximized matrix.
-	 * 
-	 * @param big
-	 * @param small
-	 * @param max
-	 * @return
-	 */
-	private static double calcAxisDimension(final double big,
-			final double small, final double max) {
-
-		double newAxis = (small / big) * max;
-
-		return Helper.roundDouble(newAxis, 3);
 	}
 
 	/**
@@ -1427,31 +1334,17 @@ Controller {
 		leftTreeDrawer.notifyObservers();
 	}
 
-//	/**
-//	 * TODO move to IMVController
-//	 * Update the state of color extractor to reflect settings from an imported
-//	 * node.
-//	 * 
-//	 * @param node
-//	 * @throws BackingStoreException
-//	 */
+	/**
+	 * Update the state of color extractor to reflect settings from an imported
+	 * node.
+	 * 
+	 * @param node
+	 * @throws BackingStoreException
+	 */
 	public void importColorPreferences(Preferences oldNode)
 			throws BackingStoreException {
-//
+		
 		mvController.importColorPreferences(oldNode);
-//		LogBuffer.println("Importing color settings...");
-//
-//		colorExtractor.importPreferences(oldNode);
-//
-//		/* Update GradientChooser node */
-//		String lastActive = oldNode.node("GradientChooser").get("activeColors",
-//				"RedGreen");
-//		configNode.node("GradientChooser").put("activeColors", lastActive);
-//
-//		/* Store copied node in new ColorPresets node */
-//		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
-//		colorPresets.setConfigNode(configNode);
-//		colorPresets.addColorSet(colorExtractor.getActiveColorSet());
 	}
 
 	/**
@@ -1463,35 +1356,12 @@ Controller {
 	public void importLabelPreferences(Preferences node) {
 
 		LogBuffer.println("Importing labels...");
+		
 		dendroView.getRowLabelView().importSettingsFromNode(
 				node.node("RowLabelView"));
 		dendroView.getColumnLabelView().importSettingsFromNode(
 				node.node("ColLabelView"));
 	}
-
-//	// TODO move to IMVController
-//	/**
-//	 * Scrolls to index i in the Y-MapContainer
-//	 *
-//	 * @param i
-//	 */
-//	public void scrollToGene(final int i) {
-//
-//		getInteractiveYMap().scrollToIndex(i);
-//		getInteractiveYMap().notifyObservers();
-//	}
-//
-//	// TODO move to IMVController
-//	/**
-//	 * Scrolls to index i in the X-MapContainer.
-//	 *
-//	 * @param i
-//	 */
-//	public void scrollToArray(final int i) {
-//
-//		getInteractiveXMap().scrollToIndex(i);
-//		getInteractiveXMap().notifyObservers();
-//	}
 
 	// /**
 	// * show summary of the specified indexes
@@ -1516,9 +1386,7 @@ Controller {
 
 		this.colSelection = colSelection;
 		colSelection.addObserver(dendroView);
-
-		// TODO add IMVController method rather than direct IMV
-//		dendroView.getInteractiveMatrixView().setColSelection(colSelection);
+		
 		mvController.setColSelection(colSelection);
 		
 		dendroView.getColumnTreeView().setTreeSelection(colSelection);
@@ -1541,8 +1409,6 @@ Controller {
 		this.rowSelection = rowSelection;
 		rowSelection.addObserver(dendroView);
 
-		// TODO add IMVController method rather than direct IMV
-//		dendroView.getInteractiveMatrixView().setRowSelection(rowSelection);
 		mvController.setRowSelection(rowSelection);
 		
 		dendroView.getRowTreeView().setTreeSelection(rowSelection);
@@ -1571,12 +1437,6 @@ Controller {
 
 		return dendroView != null;
 	}
-
-	// Getters for fields
-//	public ArrayDrawer getArrayDrawer() {
-//
-//		return arrayDrawer;
-//	}
 	
 	/**
 	 * Returns a reference to the ColorExtractor instance assigned to the 
@@ -1647,7 +1507,6 @@ Controller {
 	}
 
 	/**
-	 * TODO clean & simplify this
 	 * Enables or disables button based on the current zoom status of the two
 	 * different axis maps. If they are set to minimum scale, then the relevant
 	 * buttons should be disabled as they become useless. This provides
@@ -1666,38 +1525,8 @@ Controller {
 		boolean atBottom = zoomStatusList[5];
 		boolean isSelectionZoomed = zoomStatusList[6];
 		
-//		/* Determine if either MapContainer is at minimum scale */
-//		boolean isXMin = Helper.nearlyEqual(interactiveXmap.getMinScale(),
-//				interactiveXmap.getScale());
-//		boolean isYMin = Helper.nearlyEqual(interactiveYmap.getMinScale(),
-//				interactiveYmap.getScale());
-//		boolean atRight = (interactiveXmap.getFirstVisible() + interactiveXmap
-//				.getNumVisible()) == (interactiveXmap.getMaxIndex() + 1);
-//		boolean atLeft = interactiveXmap.getFirstVisible() == 0;
-//		boolean atTop = interactiveYmap.getFirstVisible() == 0;
-//		boolean atBottom = (interactiveYmap.getFirstVisible() + interactiveYmap
-//				.getNumVisible()) == (interactiveYmap.getMaxIndex() + 1);
-//
 		int xTilesVisible = interactiveXmap.getNumVisible();
 		int yTilesVisible = interactiveYmap.getNumVisible();
-//
-//		final boolean genesSelected = this.rowSelection != null
-//				&& rowSelection.getNSelectedIndexes() > 0;
-//		final boolean arraysSelected = this.colSelection != null
-//				&& colSelection.getNSelectedIndexes() > 0;
-//
-//		// Note: A selection is "fully zoomed" if there is no selection - this
-//		// will disable the zoom selection button
-//		boolean isSelectionZoomed = (!genesSelected && !arraysSelected)
-//				|| (genesSelected
-//						&& rowSelection.getMinIndex() == interactiveYmap
-//								.getFirstVisible()
-//						&& (rowSelection.getMaxIndex()
-//								- rowSelection.getMinIndex() + 1) == yTilesVisible
-//						&& arraysSelected
-//						&& colSelection.getMinIndex() == interactiveXmap
-//								.getFirstVisible() && (colSelection
-//						.getMaxIndex() - colSelection.getMinIndex() + 1) == xTilesVisible);
 
 		/* Zoom-out buttons disabled if min scale for axis is reached. */
 		dendroView.getHomeButton().setEnabled(!(isXMin && isYMin));

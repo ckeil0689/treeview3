@@ -47,10 +47,10 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 
 	public IntegerMap() {
 
-		availablepixels = 0;
-		maxindex = -1;
-		minindex = -1;
-		configNode = Preferences.userRoot().node(typeName);
+		this.availablepixels = 0;
+		this.maxindex = -1;
+		this.minindex = -1;
+		this.configNode = Preferences.userRoot().node(typeName);
 	}
 
 	@Override
@@ -99,6 +99,11 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 		this.type = type;
 	}
 
+	/**
+	 * Creates an IntegerMap object based on the type int that was supplied.
+	 * @param type Indicates the type of IntegerMap to create.
+	 * @return A specific type IntegerMap. Null if type cannot be identified.
+	 */
 	public IntegerMap createMap(final int type) {
 
 		switch(type) {
@@ -119,7 +124,7 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 	}
 
 	/**
-	 * @return number of pixels available for display
+	 * @return Number of pixels available for display.
 	 */
 	public int getAvailablePixels() {
 
@@ -127,49 +132,50 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 	}
 
 	/**
-	 * @param i
-	 *            pixel for which to find index
-	 * @return index into array for that pixel
+	 * @param i Pixel for which to find the corresponding tile index.
+	 * @return Tile index for the given pixel.
 	 */
 	public abstract int getIndex(int i);
 
 	/**
-	 * @return maximum index mapped
+	 * @return Maximum index mapped.
 	 */
 	public int getMaxIndex() {
 
 		return maxindex;
 	}
 
-	// simple accessors
 	/**
-	 * @return minimum index mapped
+	 * @return Minimum index mapped.
 	 */
 	public int getMinIndex() {
 
 		return minindex;
 	}
 
+	/**
+	 * Checks if a given index is part of this IntegerMap's index range.
+	 * @param i An index to check.
+	 * @return Whether the indicator is inside the IntegerMap's index 
+	 * range.
+	 */
 	public boolean contains(final int i) {
 
-		if (i < getMinIndex())
+		if (i < getMinIndex() || i > getMaxIndex()) {
 			return false;
-		else if (i > getMaxIndex())
-			return false;
-		else
-			return true;
+		}
+		
+		return true;
 	}
 
-	// subclasses implement actual mapping functions
 	/**
-	 * note: if i == maxindex + 1, return the first pixel beyond end of max
+	 * Note: if i == maxindex + 1, return the first pixel beyond end of max.
 	 *
-	 * @param i
-	 *            the index for which we want the first pixel of
+	 * @param i The index for which we want the first pixel of.
 	 *
-	 * @return first pixel corresponding to index
+	 * @return First pixel corresponding to index.
 	 */
-	public abstract int getPixel(int i);
+	public abstract int getPixel(final int i);
 
 	/**
 	 * @param indval
@@ -195,58 +201,65 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 		final int ibase = (int) base;
 		final int map = (int) (getPixel(ibase) * (1.0 - residual) + residual
 				* getPixel(ibase + 1));
-		// System.out.println("scale " + getScale() + "got base " + base +
-		// " residual " + residual + " maps to " + map);
 
 		return map;
 	}
 
+	/**
+	 * Calculates how many pixels are required for the full range of elements
+	 * at the currently set tile scale.
+	 * 
+	 * @return Number of required pixels for the amount of elements at the 
+	 * current scale.
+	 */
 	public int getRequiredPixels() {
 
 		return (int) ((maxindex - minindex + 1) * getScale());
 	}
 
-	// how many pixels per integer, on average?
 	/**
-	 * @return average number of pixels per index. Could be meaningless if
+	 * @return Average number of pixels per index. Could be meaningless if
 	 *         non-constant spacing.
 	 */
 	public abstract double getScale();
 
 	/**
-	 * @return how many of the avaiable pixels are actually used...
+	 * @return How many of the available pixels are actually used/ filled by
+	 * tiles.
 	 */
 	public abstract int getUsedPixels();
 
 	/**
-	 * @return number of indexes viewable at once
+	 * @return Number of indexes viewable at once.
 	 */
 	public abstract int getViewableIndexes();
 
 	/**
-	 * @param i
-	 *            number of pixels which we can map to. The map will map the
-	 *            index range to pixels 1 to n-1.
+	 * @param i Number of pixels which we can map to. 
+	 * The map will map the index range to pixels 1 to (n - 1).
 	 */
 	public void setAvailablePixels(final int i) {
 
-		availablepixels = i;
+		this.availablepixels = i;
 	}
 
 	/**
-	 * Set the range of pixels to map to
+	 * Set the range of pixels to map to.
 	 *
-	 * @param i
-	 *            lower bound
-	 * @param j
-	 *            upper bound
+	 * @param i lower bound (minimum index)
+	 * @param j upper bound (maximum index)
 	 */
 	public void setIndexRange(final int i, final int j) {
 
-		minindex = i;
-		maxindex = j;
+		this.minindex = i;
+		this.maxindex = j;
 	}
 	
+	/**
+	 * Check if the type of this IntegerMap is the same as the supplied type.
+	 * @param otherType The type to be checked for equality.
+	 * @return Whether the IntegerMap has the type of the given parameter.
+	 */
 	public boolean equalsType(final int otherType) {
 		
 		return type == otherType;

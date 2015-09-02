@@ -35,20 +35,25 @@ public class GlobalMatrixView extends MatrixView {
 	private int xViewMin;
 	private int yViewMin;
 
+	/**
+	 * White rectangle to display IMV viewport.
+	 */
 	private final Rectangle viewPortRect = new Rectangle();
 
 	/**
-	 * Rectangle to track yellow selected rectangle (pixels)
+	 * List of all yellow selection rectangles.
 	 */
 	private List<Rectangle> selectionRectList = new ArrayList<Rectangle>();
 
 	/**
-	 * Circle to be used as indicator for Visible area in interactive matrix
+	 * Circle to be used as indicator for small visible area 
+	 * in interactive matrix.
 	 */
 	private Ellipse2D.Double indicatorVisibleCircle = null;
 
 	/**
-	 * Circle to be used as indicator for selection area in interactive matrix
+	 * List of circles to be used as indicator for small selection area 
+	 * in interactive matrix.
 	 */
 	private List<Ellipse2D.Double> indicatorSelectionCircleList = null;
 
@@ -60,30 +65,32 @@ public class GlobalMatrixView extends MatrixView {
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
 		
+		final Graphics2D g2 = (Graphics2D) g;
+		
+		/* White viewport rectangle */
 		if (viewPortRect != null) {
-			/* draw visible rectangle in white */
-			g.setColor(Color.white);
+			g2.setColor(Color.white);
 
-			g.drawRect(viewPortRect.x, viewPortRect.y, viewPortRect.width,
+			g2.drawRect(viewPortRect.x, viewPortRect.y, viewPortRect.width,
 					viewPortRect.height);
 		}
+		
+		/* yellow selection rectangles */
 		if (selectionRectList != null) {
 
-			/* draw all selection rectangles in yellow */
-			g.setColor(Color.yellow);
+			g2.setColor(Color.yellow);
 
 			for (final Rectangle rect : selectionRectList) {
-				g.drawRect(rect.x, rect.y, rect.width, rect.height);
+				g2.drawRect(rect.x, rect.y, rect.width, rect.height);
 			}
 		}
 		
-		final Graphics2D g2 = (Graphics2D) g;
-		if (viewPortRect != null || indicatorSelectionCircleList != null) {
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-								RenderingHints.VALUE_ANTIALIAS_ON);
-			g2.setStroke(new BasicStroke(2));
-		}
+		/* indicator circles */
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+				RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setStroke(new BasicStroke(2));
 		
+		/* viewport circle */
 		if (viewPortRect != null) {
 			g2.setColor(Color.white);
 			
@@ -91,6 +98,8 @@ public class GlobalMatrixView extends MatrixView {
 				g2.draw(indicatorVisibleCircle);
 			}
 		}
+		
+		/* selection circles */
 		if (indicatorSelectionCircleList != null) {
 			g2.setColor(Color.yellow);
 			
@@ -168,7 +177,58 @@ public class GlobalMatrixView extends MatrixView {
 	 */
 	@Override
 	protected void recalculateOverlay() {
+		
+		setViewportRectBounds();
+		setIndicatorVisibleCircleBounds();
 
+		if ((geneSelection == null) || (arraySelection == null)) {
+			selectionRectList = null;
+			indicatorSelectionCircleList = null;
+			return;
+		}
+		
+		setSelectionRectangles();
+		setIndicatorSelectionCircleBounds();
+	}
+	
+	/**
+	 * Sets up all rectangles graphically indicating row/ column index 
+	 * selection.
+	 */
+	private void setSelectionRectangles() {
+		
+		this.selectionRectList = new ArrayList<Rectangle>();
+		
+		if (arraySelection.getSelectedIndexes().length > 0) {
+
+			List<List<Integer>> arrayBoundaryList;
+			List<List<Integer>> geneBoundaryList;
+
+			arrayBoundaryList = findRectangleBoundaries(
+					arraySelection.getSelectedIndexes(), xmap);
+			geneBoundaryList = findRectangleBoundaries(
+					geneSelection.getSelectedIndexes(), ymap);
+
+			// Make the rectangles
+			for (final List<Integer> xBoundaries : arrayBoundaryList) {
+				for (final List<Integer> yBoundaries : geneBoundaryList) {
+
+					selectionRectList.add(new Rectangle(xBoundaries.get(0),
+							yBoundaries.get(0), xBoundaries.get(1)
+									- xBoundaries.get(0), yBoundaries
+									.get(1) - yBoundaries.get(0)));
+				}
+			}
+			
+		}
+	}
+	
+	/**
+	 * Determine boundaries of the viewport indicator rectangle based on
+	 * the visible tiles in the InteractiveMatrixView.
+	 */
+	private void setViewportRectBounds() {
+		
 		/* Assure minimum draw size for viewport rectangle */
 		int xRange;
 		if(imv_numXVisible > xViewMin) {
@@ -204,43 +264,6 @@ public class GlobalMatrixView extends MatrixView {
 		}
 
 		viewPortRect.setBounds(spx, spy, epx - spx, epy - spy);
-
-		setIndicatorVisibleCircleBounds();
-
-		if ((geneSelection == null) || (arraySelection == null)) {
-			selectionRectList = null;
-			indicatorSelectionCircleList = null;
-			return;
-		}
-
-		selectionRectList = new ArrayList<Rectangle>();
-		
-		if (arraySelection.getSelectedIndexes().length > 0) {
-
-			List<List<Integer>> arrayBoundaryList;
-			List<List<Integer>> geneBoundaryList;
-
-			arrayBoundaryList = findRectangleBoundaries(
-					arraySelection.getSelectedIndexes(),xmap);
-			geneBoundaryList = findRectangleBoundaries(geneSelection.getSelectedIndexes(),
-					ymap);
-
-			// Make the rectangles
-			if (selectionRectList != null) {
-				for (final List<Integer> xBoundaries : arrayBoundaryList) {
-
-					for (final List<Integer> yBoundaries : geneBoundaryList) {
-
-						selectionRectList.add(new Rectangle(xBoundaries.get(0),
-								yBoundaries.get(0), xBoundaries.get(1)
-										- xBoundaries.get(0), yBoundaries
-										.get(1) - yBoundaries.get(0)));
-					}
-				}
-			}
-		}
-
-		setIndicatorSelectionCircleBounds();
 	}
 
 	/**

@@ -138,6 +138,7 @@ public class InteractiveMatrixView extends MatrixView {
 			g2d.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g2d.setColor(Color.black);
 
+			// TODO rectangles not needed anymore, adapt ArrayDrawer methods.
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
 
@@ -333,17 +334,9 @@ public class InteractiveMatrixView extends MatrixView {
 			offscreenValid = false;
 			repaint();
 
-		} else {// if(!xmap.hoverChanged() && !ymap.hoverChanged()) {
+		} else {
 			super.update(o, arg);
 		}
-//		} else {
-//			if(xmap.hoverChanged()) {
-//				xmap.unsetHoverChanged();
-//			}
-//			if(ymap.hoverChanged()) {
-//				ymap.unsetHoverChanged();
-//			}
-//		}
 	}
 
 	/**
@@ -361,7 +354,6 @@ public class InteractiveMatrixView extends MatrixView {
 			if (origin.getNSelectedIndexes() != 0) {
 				// select all genes if some arrays selected...
 				adjusting.selectAllIndexes();
-				// notifies self...
 				adjusting.notifyObservers();
 				return;
 			}
@@ -617,8 +609,8 @@ public class InteractiveMatrixView extends MatrixView {
 			//debug("smoothZoomTowardSelection bug still exists." +
 			//					"  Working around it.");
 
-			xmap.zoomOutCenter("fast");
-			ymap.zoomOutCenter("fast");
+			xmap.zoomOutCenter(MapContainer.ZOOM_FAST);
+			ymap.zoomOutCenter(MapContainer.ZOOM_FAST);
 		}
 
 		//If we've reached full zoom-out, reset the aspect ratio

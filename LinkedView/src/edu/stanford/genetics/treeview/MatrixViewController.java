@@ -144,7 +144,7 @@ ConfigNodePersistent, Controller {
 	public void update(Observable o, Object arg) {
 		
 		if(o instanceof MapContainer) {
-			updateGMVViewPortRect();
+			updateGMVViewportRect();
 		}
 	}
 	
@@ -153,12 +153,13 @@ ConfigNodePersistent, Controller {
 	 * viewport.
 	 * TODO claculate pixels from maps here and send a rectangle instead.
 	 */
-	private void updateGMVViewPortRect() {
+	private void updateGMVViewportRect() {
 		
 		int firstXVisible = interactiveXmap.getFirstVisible();
 		int firstYVisible = interactiveYmap.getFirstVisible();
 		int numXVisible = interactiveXmap.getNumVisible();
 		int numYVisible = interactiveYmap.getNumVisible();
+		
 		gmView.setIMVViewportRange(firstXVisible, firstYVisible, 
 				numXVisible, numYVisible);
 	}
@@ -513,8 +514,8 @@ ConfigNodePersistent, Controller {
 
 			resetMatrixViews();
 			imView.setAspectRatio(
-					interactiveXmap.getMaxIndex() + 1,
-					interactiveYmap.getMaxIndex() + 1);
+					interactiveXmap.getTotalTileNum(),
+					interactiveYmap.getTotalTileNum());
 		}
 	}
 	
@@ -869,24 +870,19 @@ ConfigNodePersistent, Controller {
 	public void zoomOnSelection(final int modifiers) {
 		
 		final boolean rowsSelected = rowSelection.getNSelectedIndexes() > 0;
-		final boolean colssSelected = colSelection.getNSelectedIndexes() > 0;
 
-		if (rowsSelected || colssSelected) {
+		if (rowsSelected) {
 			if ((modifiers & InputEvent.SHIFT_MASK) != 0
 					|| (modifiers & InputEvent.META_MASK) != 0) {
 				// Zoom in (or out)
-				interactiveXmap.zoomToSelected(
-						colSelection.getMinIndex(),
+				interactiveXmap.zoomToSelected(colSelection.getMinIndex(),
 						colSelection.getMaxIndex());
-				interactiveYmap.zoomToSelected(
-						rowSelection.getMinIndex(),
+				interactiveYmap.zoomToSelected(rowSelection.getMinIndex(),
 						rowSelection.getMaxIndex());
 
 				// Then scroll
-				interactiveXmap.scrollToFirstIndex(
-						colSelection.getMinIndex());
-				interactiveYmap.scrollToFirstIndex(
-						rowSelection.getMinIndex());
+				interactiveXmap.scrollToFirstIndex(colSelection.getMinIndex());
+				interactiveYmap.scrollToFirstIndex(rowSelection.getMinIndex());
 
 			} else if ((modifiers & InputEvent.ALT_MASK) != 0) {
 				imView.smoothZoomTowardSelection(
@@ -909,7 +905,7 @@ ConfigNodePersistent, Controller {
 	}
 	
 	/**
-	 * Scrolls to index i in the Y-MapContainer
+	 * Scrolls to index i in the y-MapContainer
 	 *
 	 * @param i
 	 */
@@ -920,7 +916,7 @@ ConfigNodePersistent, Controller {
 	}
 
 	/**
-	 * Scrolls to index i in the X-MapContainer.
+	 * Scrolls to index i in the x-MapContainer.
 	 *
 	 * @param i
 	 */

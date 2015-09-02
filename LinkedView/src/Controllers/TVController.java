@@ -245,16 +245,6 @@ public class TVController implements Observer {
 	}
 
 	/**
-	 * Passes the resize call for the matrix to the DendroController.
-	 *
-	 * @param mode
-	 */
-	protected void setMatrixSize(final int mode) {
-
-		dendroController.setMatrixSize(mode);
-	}
-
-	/**
 	 * Load data into the model.
 	 * 
 	 * @param fileSet

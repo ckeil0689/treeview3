@@ -36,45 +36,30 @@ public class FixedMap extends IntegerMap {
 	private double scale;
 
 	/**
-	 * constructs new FixedMap
+	 * Constructs new FixedMap.
 	 */
 	public FixedMap() {
 
-		default_scale = 10.0;
+		this.default_scale = 10.0;
 	}
 
-	// /**
-	// * For persistance of scale, bind to a ConfigNode
-	// *
-	// * @param configNode
-	// * ConfigNode to bind to
-	// */
-	// @Override
-	// public void bindConfig(final Preferences configNode) {
-	//
-	// super.bindConfig(configNode);
-	// scale = root.getDouble("scale", default_scale);
-	// }
-
 	/**
-	 * For persistance of scale, bind to a ConfigNode
+	 * For persistence of scale, bind to a configNode.
 	 *
-	 * @param configNode
-	 *            ConfigNode to bind to
+	 * @param configNode Preferences node to bind to.
 	 */
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
 		super.setConfigNode(parentNode);
-		scale = configNode.getDouble("scale", default_scale);
+		this.scale = configNode.getDouble("scale", default_scale);
 	}
 
 	/**
-	 * Gets the index for a particular pixel.
+	 * Gets the tile index for a particular pixel.
 	 *
-	 * @param i
-	 *            the pixel value
-	 * @return The index value
+	 * @param i The pixel value.
+	 * @return The tile index which the pixel represents.
 	 */
 	@Override
 	public int getIndex(final int i) {
@@ -95,33 +80,26 @@ public class FixedMap extends IntegerMap {
 		// wrong.
 		// If this is Math.floor, the visible grid is wrong, and the highlight
 		// is correct.
-		// LogBuffer.println("Min index = [" + minindex + "].  Pixel index = ["
-		// + i + "].  Scale = [" + scale + "].  Data index = [floor(" + ((i /
-		// scale) + minindex) + ") = " + ((int) Math.floor((i / scale) +
-		// minindex)) + "].");
 
-		if ((Math.round(i / scale) + minindex) > 0
-				&& ((i / scale) + minindex)
-						/ (Math.round(i / scale) + minindex) > (1 - 0.000001))
-			// LogBuffer.println("Returning round [" + ((int) Math.round(i /
-			// scale) + minindex) + "]");
-			return (int) Math.round(i / scale) + minindex;
-		// LogBuffer.println("Returning floor [" + ((int) Math.floor(i / scale)
-		// + minindex) + "]");
-		return (int) Math.floor(i / scale) + minindex;
+		double idx = (i / scale) + minindex;
+		double rounded_idx = Math.round(i / scale) + minindex;
+		
+		if (rounded_idx > 0 && (idx / rounded_idx) > (1 - 0.000001)) {
+			return (int) rounded_idx;
+		}
+		
+		return (int) Math.floor(idx);
 	}
 
 	/**
-	 * Gets the pixel for a particular index
+	 * Gets the pixel for a particular tile index.
 	 *
-	 * @param i
-	 *            The index value
+	 * @param i The index value
 	 * @return The pixel value
 	 */
 	@Override
 	public int getPixel(final int i) {
 
-		// Rob 10/14/2014 - Added Math.floor to be explicit
 		return (int) Math.floor((i - minindex) * scale);
 	}
 
@@ -135,7 +113,7 @@ public class FixedMap extends IntegerMap {
 	}
 
 	/**
-	 * @return The number of pixels currently being used
+	 * @return The number of pixels currently being used for tile display.
 	 */
 	@Override
 	public int getUsedPixels() {
@@ -145,8 +123,6 @@ public class FixedMap extends IntegerMap {
 		}
 
 		final int i = (int) Math.round((maxindex - minindex + 1) * scale);
-		// Rob 10/14/2014 - Changed the redundant calculation into a call to
-		// getViewableIndexes
 		final int j = (int) Math.round((scale * getViewableIndexes()));
 		
 		if (i > j) {
@@ -157,42 +133,40 @@ public class FixedMap extends IntegerMap {
 	}
 
 	/**
-	 * @return The number of indexes currently visible
+	 * Calculates the viewable indices. Based on available screen pixels 
+	 * and currently set scale of the IntegerMap. 
+	 * @return The number of indexes that should be visible on screen. 
 	 */
 	@Override
 	public int getViewableIndexes() {
 
-		// Rob 10/14/2014 - Added Math.round because due to precision issues,
-		// sometimes the value ended in .99999999...
 		final int i = (int) Math.round(availablepixels / scale);
 		return i;
 	}
 
 	/**
-	 * Sets the defaultScale attribute of the FixedMap object
+	 * Sets the defaultScale attribute of the FixedMap object.
 	 *
-	 * @param d
-	 *            The new defaultScale value
+	 * @param d The new defaultScale value
 	 */
 	public void setDefaultScale(final double d) {
 
-		default_scale = d;
+		this.default_scale = d;
 	}
 
 	/**
-	 * set scaling value
+	 * Set a new scaling value for this IntegerMap. Store it for persistence.
 	 *
-	 * @param d
-	 *            The new scale value
+	 * @param d The new scale value.
 	 */
 	public void setScale(final double d) {
 
-		scale = d;
-		configNode.putDouble("scale", scale);
+		this.scale = d;
+		this.configNode.putDouble("scale", scale);
 	}
 
 	/**
-	 * @return A short word desribing this type of map
+	 * @return A short word describing this type of map.
 	 */
 	@Override
 	public String typeName() {
@@ -200,6 +174,9 @@ public class FixedMap extends IntegerMap {
 		return "FixedMap";
 	}
 
+	/**
+	 * @return The type identifier for this map type.
+	 */
 	@Override
 	public int type() {
 		

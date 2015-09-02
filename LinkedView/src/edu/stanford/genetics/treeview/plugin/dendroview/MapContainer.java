@@ -54,6 +54,11 @@ public class MapContainer extends Observable implements Observer,
 	private static final double MIN_TILE_NUM        = 1.0;
 	private static final double ZOOM_INCREMENT      = 0.05;
 	private static final double ZOOM_INCREMENT_FAST = 0.15;
+	
+	public static final int ZOOM_DEFAULT = 0;
+	public static final int ZOOM_FAST = 1;
+	public static final int ZOOM_SLOW = 2;
+	public static final int ZOOM_SLAM = 3;
 
 	private final int default_map = IntegerMap.FIXED;
 	private double default_scale = 1.0;
@@ -124,6 +129,7 @@ public class MapContainer extends Observable implements Observer,
 		} else {
 			LogBuffer.println("Could not find or create MapContainer "
 					+ "node because parentNode was null.");
+			return;
 		}
 
 		// first bind subordinate maps...
@@ -147,7 +153,7 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setDefaultScale(final double d) {
 
-		default_scale = d;
+		this.default_scale = d;
 		fixedMap.setDefaultScale(d);
 	}
 
@@ -158,9 +164,7 @@ public class MapContainer extends Observable implements Observer,
 	public void setToMinScale() {
 		
 		setMinScale();
-
 		setScale(minScale);
-
 		notifyObservers();
 	}
 
@@ -257,22 +261,28 @@ public class MapContainer extends Observable implements Observer,
 
 	//This is for gradually zooming away from the center of the currently
 	//displayed dots
-	public void zoomOutCenter(String speed) {
+	public void zoomOutCenter(final int speed) {
 
 		int zoomVal;
 		int initialFirstVisible = firstVisible;
 		double newScale = getScale();
 
-		tileNumVisible = Math.round(getAvailablePixels() / getScale());
+		this.tileNumVisible = Math.round(getAvailablePixels() / getScale());
 
-		if(speed == "slow") {
+		switch(speed) {
+		
+		case ZOOM_SLOW: 
 			zoomVal = 2;
-		} else if(speed == "fast") {
+			break;
+		case ZOOM_FAST:
 			zoomVal = (int) Math.round(ZOOM_INCREMENT_FAST * tileNumVisible);
-		} else if(speed == "slam") {
+			break;
+		case ZOOM_SLAM:
 			zoomVal = getTotalTileNum() - (int) Math.round(tileNumVisible);
-		} else {
+			break;
+		default:
 			zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
+		
 		}
 
 		// Ensure that at least one tile will be zoomed out.
@@ -418,7 +428,7 @@ public class MapContainer extends Observable implements Observer,
 
 	//This is for gradually zooming toward the center of the currently displayed
 	//dots
-	public void zoomInCenter(String speed) {
+	public void zoomInCenter(final int speed) {
 
 		// final double maxScale = getAvailablePixels();
 		double newScale = getScale();
@@ -430,15 +440,21 @@ public class MapContainer extends Observable implements Observer,
 		if(tileNumVisible > (getTotalTileNum())) {
 			tileNumVisible = getTotalTileNum();
 		}
-
-		if(speed == "slow") {
+		
+		switch(speed) {
+		
+		case ZOOM_SLOW: 
 			zoomVal = 2;
-		} else if(speed == "fast") {
+			break;
+		case ZOOM_FAST:
 			zoomVal = (int) Math.round(ZOOM_INCREMENT_FAST * tileNumVisible);
-		} else if(speed == "slam") {
+			break;
+		case ZOOM_SLAM:
 			zoomVal = (int) Math.round(tileNumVisible) - 1;
-		} else {
+			break;
+		default:
 			zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
+	
 		}
 
 		//Ensure that at least 2 tiles will be zoomed in (1 on each side of the
@@ -451,8 +467,6 @@ public class MapContainer extends Observable implements Observer,
 		if (tileNumVisible < 1) {
 			tileNumVisible = 1;
 		}
-		// LogBuffer.println("zoomIn: tileNumVisible has been set to [" +
-		// tileNumVisible + "].");
 
 		// Keep track of explicit changes, by the user, to the amount of
 		// visible data
@@ -1279,8 +1293,8 @@ public class MapContainer extends Observable implements Observer,
 		//step, not this one
 		if((zoomingOut &&
 				targetZoomFrac * largerXSize >
-				Math.abs(largerXSize + (zoomingOut ? 1 : -1) *
-						 (int) Math.round(targetZoomFrac * largerXSize) -
+				Math.abs(largerXSize + 1 * 
+							(int) Math.round(targetZoomFrac * largerXSize) -
 				targetNumIndexes))) {
 			//The above seems only necessary for zoom out (for speed)
 			// ||
@@ -1678,7 +1692,12 @@ public class MapContainer extends Observable implements Observer,
 		return current.getPixel(d - offset);
 	}
 
-	
+	/**
+	 * Get the first pixels belonging to the tile which represents the given
+	 * index.
+	 * @param i The index for which to retrieve the pixel.
+	 * @return A pixel index.
+	 */
 	public int getPixel(final int i) {
 
 		int offset = 0;
@@ -1692,14 +1711,14 @@ public class MapContainer extends Observable implements Observer,
 	/**
 	 * Uses the MapContainers assigned IntegerMap object to figure out what
 	 * index a certain pixel belongs to.
-	 * @param pix
-	 * @return
+	 * @param pixel The pixel to be checked.
+	 * @return The index of the tile to which the given pixel belongs.
 	 */
-	public int getIndex(final int pix) {
+	public int getIndex(final int pixel) {
 
 		int index = -1;
 		if (current != null) {
-			index = current.getIndex(pix);
+			index = current.getIndex(pixel);
 		}
 
 		if (scrollbar != null) {
@@ -1726,20 +1745,29 @@ public class MapContainer extends Observable implements Observer,
 		return true;
 	}
 
+	/**
+	 * @return The number of required pixels to fill out the index range of the
+	 * MapContainer's IntegerMap at the currently set tile scale.
+	 */
 	public int getRequiredPixels() {
 
 		return current.getRequiredPixels();
 	}
 
+	/**
+	 * @return How many pixels of the MapContainer's IntegerMap are actually 
+	 * used/ filled out by tiles.
+	 */
 	public int getUsedPixels() {
 
 		return current.getUsedPixels();
 	}
 
 	/**
-	 * Tells its MapContainer instance how many pixels are available on the
+	 * Tells MapContainer's IntegerMap how many pixels are available on the
 	 * screen. 
-	 * @param i The number of pixels available for this MapContainer (axis).
+	 * @param i The number of pixels available for 
+	 * the MapContainer's IntegerMap (axis).
 	 */
 	public void setAvailablePixels(final int i) {
 
@@ -1752,6 +1780,11 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
+	/**
+	 * Set a new index range for the MapContainer's IntegerMap.
+	 * @param i The new minimum index.
+	 * @param j The new maximum index.
+	 */
 	public void setIndexRange(int i, int j) {
 		
 		if (i > j) {
@@ -1763,12 +1796,7 @@ public class MapContainer extends Observable implements Observer,
 		if (current.getMinIndex() != i || current.getMaxIndex() != j) {
 			current.setIndexRange(i, j);
 			setupScrollbar();
-			/*
-			 * TODO improve numVisible implementation
-			 * Setting default numVisible here for now '
-			 */
 			setNumVisible(j + 1);
-			
 			setChanged();
 		}
 	}
