@@ -9,9 +9,9 @@ import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
 import Utilities.Helper;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 public class ThumbBox {
 

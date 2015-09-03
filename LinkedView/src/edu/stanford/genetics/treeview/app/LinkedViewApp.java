@@ -39,7 +39,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MainProgramArgs;
 import edu.stanford.genetics.treeview.TreeViewApp;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.model.DataLoadInfo;
 //import edu.stanford.genetics.treeview.Util;
 //import edu.stanford.genetics.treeview.core.PluginManager;
 import edu.stanford.genetics.treeview.model.TVModel;

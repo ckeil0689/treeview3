@@ -24,11 +24,7 @@ import java.awt.geom.AffineTransform;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
-import javafx.beans.value.ObservableValue;
-
 import javax.swing.BoundedRangeModel;
-import javax.swing.DebugGraphics;
-import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;

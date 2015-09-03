@@ -40,7 +40,6 @@ import javax.swing.SwingUtilities;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LinearTransformation;
-import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * Draws an array tree to show the relations between arrays. This object

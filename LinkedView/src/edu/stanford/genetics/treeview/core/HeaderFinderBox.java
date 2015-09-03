@@ -80,9 +80,6 @@ public abstract class HeaderFinderBox {
 	protected TreeSelectionI otherSelection;
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
-	private HeaderInfo otherHeaderInfo;
-	private List<String> otherDataList;
-	private String[] otherDataHeaders = { "" };
 
 	// "Search for Substring"
 	public HeaderFinderBox(final String type) {
@@ -113,11 +110,9 @@ public abstract class HeaderFinderBox {
 		this.headerSummary = headerSummary;
 	}
 
-	public void setHeaderInfo(final HeaderInfo searchHI,
-			final HeaderInfo otherHI) {
+	public void setHeaderInfo(final HeaderInfo searchHI) {
 
 		this.headerInfo = searchHI;
-		this.otherHeaderInfo = otherHI;
 	}
 
 	public void setMapContainers(final MapContainer searchMap,
@@ -129,8 +124,7 @@ public abstract class HeaderFinderBox {
 
 	public void setNewSearchTermBox() {
 
-		if (headerSummary == null
-				|| (headerInfo == null || otherHeaderInfo == null)) {
+		if (headerSummary == null || headerInfo == null) {
 			setEmptySearchTermBox();
 			return;
 		}
@@ -181,18 +175,6 @@ public abstract class HeaderFinderBox {
 
 		Arrays.sort(searchDataHeaders);
 
-		// Going to keep track of the other dimension's headers so that we can
-		// determine if the search results are currently visible (at current
-		// zoom level)
-		final String[][] ohA = otherHeaderInfo.getHeaderArray();
-		otherDataList = new ArrayList<String>();
-		otherDataHeaders = getHeaders(ohA); // TODO BUG this breaks if rows +
-											// col header number isnt equal!!
-		for (final String item : otherDataHeaders) {
-
-			otherDataList.add(item);
-		}
-
 		System.arraycopy(searchDataHeaders, 0, labeledHeaders, 1,
 				searchDataHeaders.length);
 
@@ -219,7 +201,17 @@ public abstract class HeaderFinderBox {
 	public String[] getHeaders(final String[][] hA) {
 
 		final String[] headerArray = new String[hA.length];
-		final int idIndex = headerSummary.getIncluded()[0];
+		int idIndex = headerSummary.getIncluded()[0];
+
+		//If the saved label index to use (e.g. GID, UID, NAME, etc.) does
+		//not exist among the headers in the file (which can be the case if
+		//you had a file open with a bunch of header labels and the last one
+		//was selected, and then you open a new file with fewer header
+		//labels), revert the saved index to 0
+		if(hA.length > 0 && idIndex >= hA[0].length) {
+			idIndex = 0;
+			headerSummary.setIncluded(new int[] { 0 });
+		}
 
 		for (int i = 0; i < hA.length; i++) {
 
@@ -263,22 +255,8 @@ public abstract class HeaderFinderBox {
 
 		// Determine pre-selected min/max from the other dimension to see if
 		// they are visible
-		final List<Integer> otherIndexList = getOtherSelected();
-		int otherMinIndex = 0;
-		int otherMaxIndex = 0;
-		if (indexList.size() > 0) {
-			otherMinIndex = otherIndexList.get(0);
-			otherMaxIndex = otherIndexList.get(0);
-		}
-		for (int i = 0; i < otherIndexList.size(); i++) {
-
-			if (otherIndexList.get(i) < otherMinIndex) {
-				otherMinIndex = otherIndexList.get(i);
-			}
-			if (otherIndexList.get(i) > otherMaxIndex) {
-				otherMaxIndex = otherIndexList.get(i);
-			}
-		}
+		int otherMinIndex = otherSelection.getMinIndex();
+		int otherMaxIndex = otherSelection.getMaxIndex();
 
 		if ((indexList.size() > 0) &&
 		// At least part of the found min/max selected area is not visible
@@ -287,27 +265,14 @@ public abstract class HeaderFinderBox {
 				(minIndex < globalSmap.getFirstVisible() || maxIndex > (globalSmap
 						.getFirstVisible() + globalSmap.getNumVisible() - 1))) {
 
-			// LogBuffer.println("The search result is outside the visible area.");
-			// LogBuffer.println("The search result is outside the visible area: ["
-			// + minIndex + " < " + globalSmap.getFirstVisible() + "] || [" +
-			// maxIndex + " > (" + globalSmap.getFirstVisible() + " + " +
-			// globalSmap.getNumVisible() + " - 1)].");
 			globalSmap.setToMinScale();
 		}
 
-		if ((otherIndexList.size() == 0
-				|| otherMinIndex < globalOmap.getFirstVisible() || otherMaxIndex > (globalOmap
-				.getFirstVisible() + globalOmap.getNumVisible() - 1))) {
+		if ((otherSelection.getNSelectedIndexes() == 0 ||
+			otherMinIndex < globalOmap.getFirstVisible() ||
+			otherMaxIndex > (globalOmap.getFirstVisible() +
+				globalOmap.getNumVisible() - 1))) {
 
-			// LogBuffer.println("Search result: [" + minIndex + " < " +
-			// globalSmap.getFirstVisible() + "] || [" + maxIndex + " > (" +
-			// globalSmap.getFirstVisible() + " + " + globalSmap.getNumVisible()
-			// + " - 1)].");
-			// LogBuffer.println("A whole row is being returned or the already-selected data is outside of the visible area: ["
-			// + otherIndexList.size() + " == 0] || [" + otherMinIndex + " < " +
-			// globalOmap.getFirstVisible() + "] || [" + otherMaxIndex + " > ("
-			// + globalOmap.getFirstVisible() + " + " +
-			// globalOmap.getNumVisible() + " - 1)].");
 			globalOmap.setToMinScale();
 		}
 	}
@@ -343,20 +308,6 @@ public abstract class HeaderFinderBox {
 		return (substrList);
 	}
 
-	private List<Integer> getOtherSelected() {
-
-		final List<Integer> indexList = new ArrayList<Integer>();
-
-		for (final String item : otherDataList) {
-
-			if (otherSelection.isIndexSelected(otherDataList.indexOf(item))) {
-				indexList.add(otherDataList.indexOf(item));
-			}
-		}
-
-		return indexList;
-	}
-
 	/**
 	 * Performs a wildcard matching for the text and pattern provided. Matching
 	 * is done based on regex patterns.
@@ -380,7 +331,6 @@ public abstract class HeaderFinderBox {
 		// Convert our wildcards to regular expression syntax
 		pattern = pattern.replaceAll("\\?", ".");
 		pattern = pattern.replaceAll("\\*", ".*");
-		// LogBuffer.println("Searching for [" + pattern + "]");
 
 		// Check if generated regex matches, store result in boolean.
 		boolean isMatch = false;

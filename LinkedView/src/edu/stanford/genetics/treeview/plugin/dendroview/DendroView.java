@@ -47,6 +47,8 @@ import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
+//import com.sun.glass.events.MouseEvent;
+import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -59,8 +61,6 @@ import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.HeaderFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
-//import com.sun.glass.events.MouseEvent;
-import net.miginfocom.swing.MigLayout;
 
 /**
  * TODO Refactor this JavaDoc. It's not applicable to the current program
@@ -1275,14 +1275,14 @@ public class DendroView implements Observer, DendroPanel {
 			final HeaderInfo columnHI, final MapContainer xmap,
 			final MapContainer ymap) {
 
-		rowFinderBox.setHeaderInfo(rowHI, columnHI);
+		rowFinderBox.setHeaderInfo(rowHI);
 		rowFinderBox.setHeaderSummary(getRowLabelView().getHeaderSummary());
 		rowFinderBox.setMapContainers(ymap, xmap);
 		rowFinderBox.setSelection(tvFrame.getRowSelection(),
 				tvFrame.getColumnSelection());
 		rowFinderBox.setNewSearchTermBox();
 
-		colFinderBox.setHeaderInfo(columnHI, rowHI);
+		colFinderBox.setHeaderInfo(columnHI);
 		colFinderBox.setHeaderSummary(getColumnLabelView().getHeaderSummary());
 		colFinderBox.setMapContainers(xmap, ymap);
 		colFinderBox.setSelection(tvFrame.getColumnSelection(),

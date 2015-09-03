@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import edu.stanford.genetics.treeview.LogBuffer;
 import Controllers.ClusterController;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * Performs the calculations of the k-means algorithm.
