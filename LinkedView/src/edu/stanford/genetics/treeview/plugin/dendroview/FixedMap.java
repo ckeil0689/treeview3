@@ -24,6 +24,8 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.util.prefs.Preferences;
 
+import edu.stanford.genetics.treeview.LogBuffer;
+
 /**
  * Maps integers (gene index) to pixels using a fixed scale
  *
@@ -33,7 +35,8 @@ import java.util.prefs.Preferences;
 public class FixedMap extends IntegerMap {
 
 	private double default_scale;
-	private double scale;
+	private double scale; //Pixels per data index
+	private int debug = 0;
 
 	/**
 	 * constructs new FixedMap
@@ -41,6 +44,8 @@ public class FixedMap extends IntegerMap {
 	public FixedMap() {
 
 		default_scale = 10.0;
+		debug = 0;
+		//1 = Debug getIndex to see if it's returning the correct value
 	}
 
 	// /**
@@ -70,7 +75,12 @@ public class FixedMap extends IntegerMap {
 	}
 
 	/**
-	 * Gets the index for a particular pixel.
+	 * Gets the index for a particular pixel. If there are multiple data indexes
+	 * per pixel, arbitrarily returns the one from the subset that corresponds
+	 * to their overall matrix position. This is so that you can obtain the last
+	 * data index via this method - which wasn't possible when there were
+	 * multiple rows of data represented by a single row of pixels in dense/
+	 * large data.
 	 *
 	 * @param i
 	 *            the pixel value
@@ -78,6 +88,68 @@ public class FixedMap extends IntegerMap {
 	 */
 	@Override
 	public int getIndex(final int i) {
+		if(scale >= 1.0) {
+			debug("Returning usual getIndex response because scale > 1.",1);
+			return(getIndexHelper(i));
+		} else {
+			//When there is more than 1 data row or col per pixel, we will
+			//arbitrarily return the index among the numerous indexes
+			//represented by that pixel which is in the same relative position
+			//as the pixel is (relative to the entire offscreen map). To get the
+			//data index among the multiple represented by a single pixel which
+			//is relative to what is visible/zoomed, you will have to roll your
+			//own.
+
+			//Assuming that you get the first data index represented by a pixel
+			//from getIndexHelper (the previous version of this method), we will
+			//grab the data index represented by the next pixel and subtract 1
+			//to find the last data index represented by the current pixel.
+			int firstindex = getIndexHelper(i);
+			int lastindex  = getIndexHelper(i+1) - 1;
+			if(firstindex == lastindex) {
+				debug("Returning usual getIndex response because there " +
+					"appears to be only 1 index mapped to this pixel.",1);
+				return(firstindex);
+			} else {
+				//Number of data indexes under the pixel
+				int numindexes = lastindex - firstindex + 1;
+				//The middle index will be used to get relative matrix position
+				int middleindex =
+					firstindex + (int) Math.round(numindexes/2) - 1;
+				//Total number of matrix indexes
+				int totalindexes = maxindex - minindex + 1;
+				//Relative position of the middle index
+				double ratioposition =
+					(double) middleindex / (double) totalindexes;
+				//Select the index under the pixel that corresponds to their
+				//overall matrix position
+				int selectindex = firstindex +
+					(int) Math.round(numindexes * ratioposition);
+				//Just in case...
+				if(selectindex > lastindex) {
+					selectindex = lastindex;
+				} else if(selectindex < firstindex) {
+					selectindex = firstindex;
+				}
+				debug("Given the data index range of [" + firstindex +
+					"] to [" + lastindex + "], including [" + numindexes +
+					"] indexes returning index [" + selectindex +
+					"] because of ratioposition [" + ratioposition +
+					"]. Pixel index sent in: [" + i + "] out of [" +
+					getAvailablePixels() + "] available pixels.",1);
+				return(selectindex);
+			}
+		}
+	}
+
+	/**
+	 * Gets the index for a particular pixel.
+	 *
+	 * @param i
+	 *            the pixel value
+	 * @return The index value
+	 */
+	public int getIndexHelper(final int i) {
 
 		// Rob 10/14/2014
 		// Explanation: When scale has a trailing long decimal value that is cut
@@ -100,9 +172,9 @@ public class FixedMap extends IntegerMap {
 		// scale) + minindex) + ") = " + ((int) Math.floor((i / scale) +
 		// minindex)) + "].");
 
-		if ((Math.round(i / scale) + minindex) > 0
-				&& ((i / scale) + minindex)
-						/ (Math.round(i / scale) + minindex) > (1 - 0.000001))
+		if ((Math.round(i / scale) + minindex) > 0 &&
+			((i / scale) + minindex) /
+				(Math.round(i / scale) + minindex) > (1 - 0.000001))
 			// LogBuffer.println("Returning round [" + ((int) Math.round(i /
 			// scale) + minindex) + "]");
 			return (int) Math.round(i / scale) + minindex;
@@ -195,5 +267,11 @@ public class FixedMap extends IntegerMap {
 	public String type() {
 
 		return "Fixed";
+	}
+
+	public void debug(String msg,int level) {
+		if(level == debug) {
+			LogBuffer.println(msg);
+		}
 	}
 }
