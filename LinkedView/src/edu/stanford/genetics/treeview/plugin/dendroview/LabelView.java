@@ -913,9 +913,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		                 ascent / 2;
 		int edgeOffset = 0;
 		if((map.getMiddlePixel(getPrimaryHoverIndex()) + ascent) >
-		   offscreenMatrixSize) {
+		   getPrimaryViewportSize()) {
 			edgeOffset = map.getMiddlePixel(getPrimaryHoverIndex()) +
-			             ascent - offscreenMatrixSize;
+			             ascent - getPrimaryViewportSize();
 		} else if(map.getMiddlePixel(getPrimaryHoverIndex()) -
 		          (int) Math.ceil(ascent / 2) < 0) {
 			edgeOffset = map.getMiddlePixel(getPrimaryHoverIndex()) -
