@@ -2146,4 +2146,28 @@ public class MapContainer extends Observable implements Observer,
 	public void setDeSelecting(boolean deselecting) {
 		this.deselecting = deselecting;
 	}
+
+	/**
+	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
+	 * zooming that is aware of aspect ratio
+	 * @author rleach
+	 * @param 
+	 * @return 
+	 * @return
+	 */
+	public double getZoomIncrement() {
+		return(ZOOM_INCREMENT);
+	}
+
+	/**
+	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
+	 * zooming that is aware of aspect ratio
+	 * @author rleach
+	 * @param 
+	 * @return 
+	 * @return
+	 */
+	public double getZoomIncrementFast() {
+		return(ZOOM_INCREMENT_FAST);
+	}
 }

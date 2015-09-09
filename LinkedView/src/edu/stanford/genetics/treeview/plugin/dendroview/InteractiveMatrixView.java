@@ -29,6 +29,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -107,6 +108,7 @@ public class InteractiveMatrixView extends MatrixView implements
 
 		setLabelPortMode(true);
 		debug = 0;
+		//1 = Debug double-click detection
 
 		/* Listeners for interactivity */
 		addMouseListener(new MatrixMouseListener());
@@ -519,136 +521,230 @@ public class InteractiveMatrixView extends MatrixView implements
 		@Override
 		public void mouseDragged(final MouseEvent e) {
 
-			// TODO dont draw when out of focus... doesnt recognize isMousePressed...
+			//TODO don't draw when out of focus... doesn't recognize
+			//isMousePressed...
 			if (!enclosingWindow().isActive()) {
 				return;
 			}
 			
-			// When left button is used
+			//When left button is used
 			if (SwingUtilities.isLeftMouseButton(e)) {
-				debug("Mouse dragged. Updating hover indexes to [" +
-				      xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) +
-				      "]",4);
-				xmap.setHoverIndex(xmap.getIndex(e.getX()));
-				ymap.setHoverIndex(ymap.getIndex(e.getY()));
-
-				// rubber band?
-				drawBand(dragRect);
-				endPoint.setLocation(xmap.getIndex(e.getX()),
-						ymap.getIndex(e.getY()));
+//				debug("Mouse dragged. Updating hover indexes to [" +
+//				      xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) +
+//				      "]",4);
+//				xmap.setHoverIndex(xmap.getIndex(e.getX()));
+//				ymap.setHoverIndex(ymap.getIndex(e.getY()));
+//
+//				//rubber band?
+//				drawBand(dragRect);
+//				endPoint.setLocation(xmap.getIndex(e.getX()),
+//						ymap.getIndex(e.getY()));
 
 				/* Full gene selection */
 				if (e.isShiftDown()) {
-					dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
-					dragRect.setSize(0, 0);
-					dragRect.add(xmap.getMaxIndex(), endPoint.y);
+//					dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
+//					dragRect.setSize(0, 0);
+//					dragRect.add(xmap.getMaxIndex(), endPoint.y);
+					processLeftShiftDragDuring(e.getX(),e.getY());
 
 					/* Full array selection */
 				} else if (e.isControlDown()) {
-					dragRect.setLocation(startPoint.x, ymap.getMinIndex());
-					dragRect.setSize(0, 0);
-					dragRect.add(endPoint.x, ymap.getMaxIndex());
+//					dragRect.setLocation(startPoint.x, ymap.getMinIndex());
+//					dragRect.setSize(0, 0);
+//					dragRect.add(endPoint.x, ymap.getMaxIndex());
+					processLeftControlDragDuring(e.getX(),e.getY());
 
 					/* Normal selection */
 				} else {
-					dragRect.setLocation(startPoint.x, startPoint.y);
-					dragRect.setSize(0, 0);
-					dragRect.add(endPoint.x, endPoint.y);
+//					dragRect.setLocation(startPoint.x, startPoint.y);
+//					dragRect.setSize(0, 0);
+//					dragRect.add(endPoint.x, endPoint.y);
+					processLeftDragDuring(e.getX(),e.getY());
 				}
 
-				drawBand(dragRect);
+//				drawBand(dragRect);
 			}
 		}
 
 		@Override
 		public void mouseReleased(final MouseEvent e) {
 
-			if (!enclosingWindow().isActive() || !isMousePressed) {
+			if(!enclosingWindow().isActive() || !isMousePressed) {
 				return;
 			}
 
-			// When left button is used
-			if (SwingUtilities.isLeftMouseButton(e)) {
-				debug("Mouse released. No longer selecting",4);
-				xmap.setSelecting(false);
-				ymap.setSelecting(false);
-				xmap.setSelectingStart(-1);
-				ymap.setSelectingStart(-1);
-				mouseDragged(e);
-				drawBand(dragRect);
-
-				/* Full gene selection */
-				if (e.isShiftDown()) {
-					final Point start = new Point(xmap.getMinIndex(),
-							startPoint.y);
-					final Point end = new Point(xmap.getMaxIndex(), endPoint.y);
-					selectRectangle(start, end);
-
+			//When left button is used
+			if(SwingUtilities.isLeftMouseButton(e)) {
+//				if(doubleClick) {
+//					//option/alt = Zooming out
+//					if(e.isAltDown()) {
+//						//shift = zoom faster (0.15)
+//						if(e.isShiftDown()) {
+//							smoothZoomFromPixelFast(e.getX(),e.getY());
+//						}
+//						//command/windows = slam zoom to target
+//						else if(e.isMetaDown()) {
+//							//If click was inside a selection and the selection
+//							//is larger than the current zoom level or if the
+//							//selection is the same size but isn't equal to what
+//							//is visible
+//							if(//A selection exists
+//								geneSelection != null &&
+//								arraySelection != null &&
+//								//Click is amidst a selected area
+//								geneSelection.getMinIndex() <=
+//									xmap.getIndex(e.getX()) &&
+//								geneSelection.getMaxIndex() >=
+//									xmap.getIndex(e.getX()) &&
+//								arraySelection.getMinIndex() <=
+//									ymap.getIndex(e.getY()) &&
+//								arraySelection.getMaxIndex() >=
+//									ymap.getIndex(e.getY()) &&
+//								//A Selected dimension is larger than the
+//								//visible area
+//								(((geneSelection.getMaxIndex() -
+//										geneSelection.getMinIndex() + 1) >
+//										xmap.getNumVisible() ||
+//									(arraySelection.getMaxIndex() -
+//										arraySelection.getMinIndex() + 1) >
+//										ymap.getNumVisible()) ||
+//									//Selected area = visible area
+//									((geneSelection.getMaxIndex() -
+//										geneSelection.getMinIndex() + 1) ==
+//										xmap.getNumVisible() &&
+//										(arraySelection.getMaxIndex() -
+//											arraySelection.getMinIndex() + 1) ==
+//											ymap.getNumVisible() &&
+//										//Selected area is not scrolled to
+//										//visible area
+//										(geneSelection.getMinIndex() !=
+//											xmap.getFirstVisible() ||
+//											arraySelection.getMinIndex() !=
+//											ymap.getFirstVisible())))) {
+//								//Zoom to selection
+//								smoothAnimatedZoomTowardSelection(
+//									geneSelection.getMinIndex(),
+//									(geneSelection.getMaxIndex() -
+//										geneSelection.getMinIndex() + 1),
+//									arraySelection.getMinIndex(),
+//									(arraySelection.getMaxIndex() -
+//										arraySelection.getMinIndex() + 1));
+//							}
+//							//Else full zoom out
+//							else {
+//								smoothAnimatedZoomOut();
+//							}
+//						}
+//						//regular double-click = zoom medium (0.05)
+//						else {
+//							smoothZoomFromPixel(e.getX(),e.getY());
+//						}
+//					}
+//					//No option/alt = Zooming in
+//					else {
+//						//shift = zoom faster
+//						if(e.isShiftDown()) {
+//							smoothZoomTowardPixelFast(e.getX(),e.getY());
+//						}
+//						//command/windows = slam zoom to target
+//						else if(e.isMetaDown()) {
+//							//If click was inside a selection and the selection
+//							//is smaller than the current zoom level or if the
+//							//selection is the same size but isn't equal to what
+//							//is visible
+//							if(//A selection exists
+//								geneSelection != null &&
+//								arraySelection != null &&
+//								//Click is amidst a selected area
+//								geneSelection.getMinIndex() <=
+//									xmap.getIndex(e.getX()) &&
+//								geneSelection.getMaxIndex() >=
+//									xmap.getIndex(e.getX()) &&
+//								arraySelection.getMinIndex() <=
+//									ymap.getIndex(e.getY()) &&
+//								arraySelection.getMaxIndex() >=
+//									ymap.getIndex(e.getY()) &&
+//								//A Selected dimension is smaller than the
+//								//visible area
+//								(((geneSelection.getMaxIndex() -
+//										geneSelection.getMinIndex() + 1) <
+//										xmap.getNumVisible() ||
+//									(arraySelection.getMaxIndex() -
+//										arraySelection.getMinIndex() + 1) <
+//										ymap.getNumVisible()) ||
+//									//Selected area = visible area
+//									((geneSelection.getMaxIndex() -
+//										geneSelection.getMinIndex() + 1) ==
+//										xmap.getNumVisible() &&
+//										(arraySelection.getMaxIndex() -
+//											arraySelection.getMinIndex() + 1) ==
+//											ymap.getNumVisible() &&
+//										//Selected area is not scrolled to
+//										//visible area
+//										(geneSelection.getMinIndex() !=
+//											xmap.getFirstVisible() ||
+//											arraySelection.getMinIndex() !=
+//											ymap.getFirstVisible())))) {
+//								//Zoom to selection
+//								smoothAnimatedZoomTowardSelection(
+//									geneSelection.getMinIndex(),
+//									(geneSelection.getMaxIndex() -
+//										geneSelection.getMinIndex() + 1),
+//									arraySelection.getMinIndex(),
+//									(arraySelection.getMaxIndex() -
+//										arraySelection.getMinIndex() + 1));
+//							}
+//							//Else full zoom in
+//							else {
+//								smoothAnimatedZoomTowardSelection(
+//									xmap.getIndex(e.getX()),
+//									1,
+//									ymap.getIndex(e.getY()),
+//									1);
+//							}
+//						}
+//						//Regular double-click = zoom medium
+//						else {
+//							smoothZoomTowardPixel(e.getX(),e.getY());
+//						}
+//					}
+//				} else {
+					debug("Mouse released. No longer selecting",4);
+	
+					/* Full gene selection */
+					if(e.isShiftDown()) {
+						processLeftShiftDragEnd(e.getX(),e.getY());
+					}
 					/* Full array selection */
-				} else if (e.isControlDown()) {
-					final Point start = new Point(startPoint.x,
-							ymap.getMinIndex());
-					final Point end = new Point(endPoint.x, ymap.getMaxIndex());
-					selectRectangle(start, end);
-
+					else if(e.isControlDown()) {
+						processLeftControlDragEnd(e.getX(),e.getY());
+					}
 					/* Normal selection */
-				} else {
-					selectRectangle(startPoint, endPoint);
-				}
-
-			} else {
-				// do something else?
+					else {
+						processLeftDragEnd(e.getX(),e.getY());
+					}
+//				}
+			} else if(SwingUtilities.isRightMouseButton(e)) {
+				processRightSingleClick(e.getX(),e.getY());
 			}
 			
 			isMousePressed = false;
-			repaint();
 		}
 
-		// Mouse Listener
+		//Mouse Listener
 		@Override
 		public void mousePressed(final MouseEvent e) {
 
-			if (!enclosingWindow().isActive()) {
+			if(!enclosingWindow().isActive()) {
 				return;
 			}
 
 			isMousePressed = true;
 			
-			// if left button is used
-			if (SwingUtilities.isLeftMouseButton(e)) {
-				debug("Starting selecting, setting selection start to [" +
-				      xmap.getIndex(e.getX()) + "x" + ymap.getIndex(e.getY()) +
-				      "]",4);
-				xmap.setSelecting(true);
-				ymap.setSelecting(true);
-				xmap.setSelectingStart(xmap.getIndex(e.getX()));
-				ymap.setSelectingStart(ymap.getIndex(e.getY()));
-
-				startPoint.setLocation(xmap.getIndex(e.getX()),
-						ymap.getIndex(e.getY()));
-				endPoint.setLocation(startPoint.x, startPoint.y);
-				dragRect.setLocation(startPoint.x, startPoint.y);
-				dragRect.setSize(endPoint.x - dragRect.x, endPoint.y
-						- dragRect.y);
-
-				drawBand(dragRect);
-
-			} else if (SwingUtilities.isRightMouseButton(e)) {
-				geneSelection.setSelectedNode(null);
-				geneSelection.deselectAllIndexes();
-
-				arraySelection.setSelectedNode(null);
-				arraySelection.deselectAllIndexes();
-
-				//debug("Deselecting.");
-
-				geneSelection.notifyObservers();
-				arraySelection.notifyObservers();
+			//if left button is used
+			if(SwingUtilities.isLeftMouseButton(e)) {
+				processLeftDragStart(e.getX(),e.getY());
 			}
-
-			globalMatrixView.setIMVselectedIndexes(
-					arraySelection.getSelectedIndexes(),
-					geneSelection.getSelectedIndexes());
 		}
 
 		//Timer to let the label pane linger a bit (prevents flashing when
@@ -731,6 +827,268 @@ public class InteractiveMatrixView extends MatrixView implements
 
 			status.setMessages(statustext);
 		}
+
+//		//The following catches double-clicks for use by mouseReleased
+//		boolean doubleClick = false;
+//		Timer   doubleClickTimer;
+//		int     clickCount = 0;
+//		public void mouseClicked(MouseEvent evt) {
+//			if(evt.getButton() == MouseEvent.BUTTON1) {
+//				clickCount = 0;
+//				if(evt.getClickCount() == 2)
+//					doubleClick = true;
+//				Integer timerinterval =
+//					(Integer) Toolkit.getDefaultToolkit().
+//					getDesktopProperty("awt.multiClickInterval");
+//				if(timerinterval == null) {
+//					timerinterval = 200;
+//				}
+//			
+//				doubleClickTimer = new Timer(timerinterval,
+//					new ActionListener() {
+//					public void actionPerformed(ActionEvent evt) {  
+//						if (evt.getSource() == doubleClickTimer) {
+//							if(doubleClick) {
+//								debug("double click.",1);
+//								clickCount++;
+//								if(clickCount == 2) {
+//									clickCount=0;
+//									doubleClick = false;
+//								}
+//							} else {
+//								debug("single click.",1);
+//							}
+//						}
+//					}
+//				});
+//				doubleClickTimer.setRepeats(false);
+//				doubleClickTimer.start();
+//				if(evt.getID() == MouseEvent.MOUSE_RELEASED)
+//					doubleClickTimer.stop();
+//			}
+//		}
+	}
+
+	public void processLeftSingleClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftSingleShiftClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftSingleCommandClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftSingleOptionClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftSingleOptionShiftClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftSingleOptionCommandClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftDoubleClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftDoubleShiftClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftDoubleCommandClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftDoubleOptionClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftDoubleOptionShiftClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftDoubleOptionCommandClick(int xPixel,int yPixel) {
+		
+	}
+
+	public void processLeftDragStart(int xPixel,int yPixel) {
+		xmap.setSelecting(true);
+		ymap.setSelecting(true);
+		xmap.setSelectingStart(xmap.getIndex(xPixel));
+		ymap.setSelectingStart(ymap.getIndex(yPixel));
+
+		startPoint.setLocation(xmap.getIndex(xPixel),ymap.getIndex(yPixel));
+		endPoint.setLocation(startPoint.x, startPoint.y);
+		dragRect.setLocation(startPoint.x, startPoint.y);
+		dragRect.setSize(endPoint.x - dragRect.x, endPoint.y - dragRect.y);
+
+		drawBand(dragRect);
+	}
+
+	public void processLeftDragEnd(int xPixel,int yPixel) {
+		xmap.setSelecting(false);
+		ymap.setSelecting(false);
+		xmap.setSelectingStart(-1);
+		ymap.setSelectingStart(-1);
+		debug("Mouse dragged. Updating hover indexes to [" +
+		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
+		      "]",4);
+		xmap.setHoverIndex(xmap.getIndex(xPixel));
+		ymap.setHoverIndex(ymap.getIndex(yPixel));
+
+		drawBand(dragRect);
+
+		endPoint.setLocation(xmap.getIndex(xPixel),
+				ymap.getIndex(yPixel));
+
+		dragRect.setLocation(startPoint.x, startPoint.y);
+		dragRect.setSize(0, 0);
+		dragRect.add(endPoint.x, endPoint.y);
+
+		drawBand(dragRect);
+
+		selectRectangle(startPoint, endPoint);
+
+		repaint();
+	}
+
+	public void processLeftShiftDragEnd(int xPixel,int yPixel) {
+		xmap.setSelecting(false);
+		ymap.setSelecting(false);
+		xmap.setSelectingStart(-1);
+		ymap.setSelectingStart(-1);
+		debug("Mouse dragged. Updating hover indexes to [" +
+		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
+		      "]",4);
+		xmap.setHoverIndex(xmap.getIndex(xPixel));
+		ymap.setHoverIndex(ymap.getIndex(yPixel));
+
+		drawBand(dragRect);
+
+		endPoint.setLocation(xmap.getIndex(xPixel),
+				ymap.getIndex(yPixel));
+
+		dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
+		dragRect.setSize(0, 0);
+		dragRect.add(xmap.getMaxIndex(), endPoint.y);
+
+		drawBand(dragRect);
+
+		final Point start = new Point(xmap.getMinIndex(),startPoint.y);
+		final Point end   = new Point(xmap.getMaxIndex(),endPoint.y);
+
+		selectRectangle(start, end);
+
+		repaint();
+	}
+
+	public void processLeftControlDragEnd(int xPixel,int yPixel) {
+		xmap.setSelecting(false);
+		ymap.setSelecting(false);
+		xmap.setSelectingStart(-1);
+		ymap.setSelectingStart(-1);
+		debug("Mouse dragged. Updating hover indexes to [" +
+		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
+		      "]",4);
+		xmap.setHoverIndex(xmap.getIndex(xPixel));
+		ymap.setHoverIndex(ymap.getIndex(yPixel));
+
+		drawBand(dragRect);
+
+		endPoint.setLocation(xmap.getIndex(xPixel),
+				ymap.getIndex(yPixel));
+
+		dragRect.setLocation(startPoint.x, ymap.getMinIndex());
+		dragRect.setSize(0, 0);
+		dragRect.add(endPoint.x, ymap.getMaxIndex());
+
+		drawBand(dragRect);
+
+		final Point start = new Point(startPoint.x,ymap.getMinIndex());
+		final Point end   = new Point(endPoint.x, ymap.getMaxIndex());
+
+		selectRectangle(start, end);
+
+		repaint();
+	}
+
+	public void processLeftDragDuring(int xPixel,int yPixel) {
+		debug("Mouse dragged. Updating hover indexes to [" +
+		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
+		      "]",4);
+		xmap.setHoverIndex(xmap.getIndex(xPixel));
+		ymap.setHoverIndex(ymap.getIndex(yPixel));
+
+		drawBand(dragRect);
+
+		endPoint.setLocation(xmap.getIndex(xPixel),
+				ymap.getIndex(yPixel));
+
+		/* Normal selection */
+		dragRect.setLocation(startPoint.x, startPoint.y);
+		dragRect.setSize(0, 0);
+		dragRect.add(endPoint.x, endPoint.y);
+
+		drawBand(dragRect);
+	}
+
+	public void processLeftShiftDragDuring(int xPixel,int yPixel) {
+		debug("Mouse dragged. Updating hover indexes to [" +
+		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
+		      "]",4);
+		xmap.setHoverIndex(xmap.getIndex(xPixel));
+		ymap.setHoverIndex(ymap.getIndex(yPixel));
+
+		drawBand(dragRect);
+
+		endPoint.setLocation(xmap.getIndex(xPixel),
+				ymap.getIndex(yPixel));
+
+		/* Full gene selection */
+		dragRect.setLocation(xmap.getMinIndex(), startPoint.y);
+		dragRect.setSize(0, 0);
+		dragRect.add(xmap.getMaxIndex(), endPoint.y);
+
+		drawBand(dragRect);
+	}
+
+	public void processLeftControlDragDuring(int xPixel,int yPixel) {
+		debug("Mouse dragged. Updating hover indexes to [" +
+		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
+		      "]",4);
+		xmap.setHoverIndex(xmap.getIndex(xPixel));
+		ymap.setHoverIndex(ymap.getIndex(yPixel));
+
+		drawBand(dragRect);
+
+		endPoint.setLocation(xmap.getIndex(xPixel),
+				ymap.getIndex(yPixel));
+
+		/* Full array selection */
+		dragRect.setLocation(startPoint.x, ymap.getMinIndex());
+		dragRect.setSize(0, 0);
+		dragRect.add(endPoint.x, ymap.getMaxIndex());
+
+		drawBand(dragRect);
+	}
+
+	public void processRightSingleClick(int xPixel,int yPixel) {
+		geneSelection.setSelectedNode(null);
+		geneSelection.deselectAllIndexes();
+
+		arraySelection.setSelectedNode(null);
+		arraySelection.deselectAllIndexes();
+
+		debug("Deselecting.",1);
+
+		geneSelection.notifyObservers();
+		arraySelection.notifyObservers();
 	}
 
 	public void startDragRect(int xIndex,int yIndex) {
@@ -766,7 +1124,7 @@ public class InteractiveMatrixView extends MatrixView implements
 
 		//On macs' magic mouse, horizontal scroll comes in as if the shift was
 		//down
-		if (e.isAltDown()) {
+		if(e.isAltDown()) {
 			if (notches < 0) {
 				//This ensures we only zoom toward the cursor when the cursor is
 				//over the map
@@ -786,7 +1144,7 @@ public class InteractiveMatrixView extends MatrixView implements
 					ymap.zoomOutBegin();
 				}
 			}
-		} else if (e.isShiftDown()) {
+		} else if(e.isShiftDown()) {
 			xmap.scrollBy(shift,false);
 			//Now we are hovered over a new index
 			xmap.setHoverIndex(xmap.getIndex(e.getX()));
@@ -808,6 +1166,31 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @param yPxPos
 	 */
 	public void smoothZoomTowardPixel(int xPxPos,int yPxPos) {
+		smoothZoomTowardPixel(xPxPos,yPxPos,xmap.getZoomIncrement());
+	}
+
+	/**
+	 * This function, given a pixel location (e.g. where the cursor is), will
+	 * intelligently choose a zoom amount to given the appearance of a smooth
+	 * zoom that expands from the given pixel
+	 * 
+	 * @param xPxPos
+	 * @param yPxPos
+	 */
+	public void smoothZoomTowardPixelFast(int xPxPos,int yPxPos) {
+		smoothZoomTowardPixel(xPxPos,yPxPos,xmap.getZoomIncrementFast());
+	}
+
+	/**
+	 * This function, given a pixel location (e.g. where the cursor is) and a
+	 * fraction to zoom by, will intelligently choose a zoom amount to given the
+	 * appearance of a smooth zoom that expands from the given pixel
+	 * 
+	 * @param xPxPos
+	 * @param yPxPos
+	 * @param zoomInc
+	 */
+	public void smoothZoomTowardPixel(int xPxPos,int yPxPos,double zoomInc) {
 		int zoomXVal = 0;
 		int zoomYVal = 0;
 		int numXCells = xmap.getNumVisible();
@@ -821,7 +1204,7 @@ public class InteractiveMatrixView extends MatrixView implements
 		//This is the amount by which we incrementally zoom in.  It is hard-
 		//coded here in addition to inside MapContainer because we need to
 		//adjust the value based on aspect ratio
-		double targetZoomFrac = 0.05;
+		double targetZoomFrac = zoomInc;
 
 		//This will tell us how out of sync the aspect ratio has gotten from the
 		//smooth-zooming trick and how many cells on the x axis we must add or
@@ -908,7 +1291,31 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @param yPxPos
 	 */
 	public void smoothZoomFromPixel(int xPxPos,int yPxPos) {
+		smoothZoomFromPixel(xPxPos,yPxPos,xmap.getZoomIncrement());
+	}
 
+	/**
+	 * This function, given a pixel location (e.g. where the cursor is), will
+	 * intelligently choose a zoom amount to given the appearance of a smooth
+	 * zoom that contracts on the given pixel
+	 * 
+	 * @param xPxPos
+	 * @param yPxPos
+	 */
+	public void smoothZoomFromPixelFast(int xPxPos,int yPxPos) {
+		smoothZoomFromPixel(xPxPos,yPxPos,xmap.getZoomIncrementFast());
+	}
+
+	/**
+	 * This function, given a pixel location (e.g. where the cursor is) and zoom
+	 * increment, will intelligently choose a zoom amount to given the
+	 * appearance of a smooth zoom that contracts on the given pixel
+	 * 
+	 * @param xPxPos
+	 * @param yPxPos
+	 * @param zoomInc
+	 */
+	public void smoothZoomFromPixel(int xPxPos,int yPxPos,double zoomInc) {
 		int zoomXVal = 0;
 		int zoomYVal = 0;
 		int numXCells = xmap.getNumVisible();
@@ -922,7 +1329,7 @@ public class InteractiveMatrixView extends MatrixView implements
 		//This is the amount by which we incrementally zoom out.  It is hard-
 		//coded here in addition to inside MapContainer because we need to
 		//adjust the value based on aspect ratio
-		double targetZoomFrac = 0.05;
+		double targetZoomFrac = zoomInc;
 
 		//This will tell us how out of sync the aspect ratio has gotten from the
 		//smooth-zooming trick and how many cells on the x axis we must add or
