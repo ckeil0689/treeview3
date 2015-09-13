@@ -24,6 +24,9 @@ This README would normally document whatever steps are necessary to get your app
 
 Our Git workflow follows the [Github Workflow](https://guides.github.com/introduction/flow/).
 
+### Commit Messages
+50 character one liner as header - 1 blank line + body to explain details. Reference: http://chris.beams.io/posts/git-commit/
+
 ### Code Style & Conventions
 [Google Java Style](https://google-styleguide.googlecode.com/svn/trunk/javaguide.html)
 
