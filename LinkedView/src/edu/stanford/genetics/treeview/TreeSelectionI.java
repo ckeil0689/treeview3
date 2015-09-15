@@ -53,10 +53,26 @@ public interface TreeSelectionI {
 	public abstract int[] getSelectedIndexes();
 
 	/**
+	 * The maximum selected index contiguous with given index or intervening
+	 * @author rleach
+	 * @param i
+	 * @return
+	 */
+	public abstract int getMinContiguousIndex(final int i);
+
+	/**
 	 *
 	 * @return The maximum selected index.
 	 */
 	public abstract int getMaxIndex();
+
+	/**
+	 * The maximum selected index contiguous with given index or intervening
+	 * @author rleach
+	 * @param i
+	 * @return
+	 */
+	public abstract int getMaxContiguousIndex(final int i);
 
 	/**
 	 * Nice for find boxes which are curious.

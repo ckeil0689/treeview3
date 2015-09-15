@@ -104,6 +104,48 @@ public class ReorderedTreeSelection extends Observable implements
 		return -1;
 	}
 
+	/**
+	 * Given a selected index, return the minimum selected index that is
+	 * separated from the initial index be a contiguous series of 0 or more
+	 * selected indexes
+	 * @author rleach
+	 * @param i
+	 * @return int
+	 */
+	public int getMinContiguousIndex(final int i) {
+
+		final int stop = parent.getMinContiguousIndex(i);
+		if(stop == -1)
+			return -1;
+
+		for(int j = reorderedIndex.length - 1;j >= 0;j--) {
+			if(reorderedIndex[j] == stop)
+				return j;
+		}
+		return(-1);
+	}
+
+	/**
+	 * Given a selected index, return the minimum selected index that is
+	 * separated from the initial index be a contiguous series of 0 or more
+	 * selected indexes
+	 * @author rleach
+	 * @param i
+	 * @return int
+	 */
+	public int getMaxContiguousIndex(final int i) {
+
+		final int stop = parent.getMinContiguousIndex(i);
+		if(stop == -1)
+			return -1;
+
+		for(int j = reorderedIndex.length - 1;j >= 0;j--) {
+			if(reorderedIndex[j] == stop)
+				return j;
+		}
+		return(-1);
+	}
+
 	@Override
 	public int getNumIndexes() {
 

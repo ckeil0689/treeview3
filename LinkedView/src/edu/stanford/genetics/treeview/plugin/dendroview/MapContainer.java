@@ -1210,7 +1210,7 @@ public class MapContainer extends Observable implements Observer,
 	 * This function calculates the fraction by which the zoom increment should
 	 * be if you want to draw increments in an animation (e.g. an animated
 	 * zoom).  Drawing large matrices takes a lot of time, thus animations
-	 * should zoom more when there are large abounts of squares to zoom
+	 * should zoom more when there are large amounts of squares to zoom
 	 * through
 	 */
 	public double getOptimalZoomIncrement(int targetNumIndexes,
