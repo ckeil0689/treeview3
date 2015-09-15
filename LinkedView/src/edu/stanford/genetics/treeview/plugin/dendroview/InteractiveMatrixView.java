@@ -680,15 +680,23 @@ public class InteractiveMatrixView extends MatrixView implements
 		};
 
 		/**
-		 * This timer doesn't do anything. The mere fact that the timer is
-		 * running is used to determine what should be done in mouseReleased
+		 * This timer initiates single-click, multi-click, & drag events only.
+		 * It is interrupted by mouseDragged. Also, even-numbered double-click
+		 * events during a 3+ click event (including a double-click) are
+		 * initiated in mouseReleased. The fact that this timer is running is
+		 * used to determine whether or not mouseReleased should do anything.
 		 */
 		private int multiClickActionDelay = 250;
 		private javax.swing.Timer multiClickActionTimer;
 		ActionListener multiClickActionListener = new ActionListener() {
-			
+
+			/**
+			 * When a multi-click or a click & hold timer expires, this is
+			 * called
+			 */
 			@Override
 			public void actionPerformed(ActionEvent evt) {
+
 				if(evt.getSource() == multiClickActionTimer) {
 					/* Stop timer so it doesn't repeat */
 					multiClickActionTimer.stop();
@@ -724,9 +732,11 @@ public class InteractiveMatrixView extends MatrixView implements
 						int dragX,dragY;
 						if(dragEvent == null) {
 							debug("dragEvent is null",10);
-							Point p = MouseInfo.getPointerInfo().getLocation();
-							SwingUtilities.convertPointFromScreen(p,getComponent());
-							p.y += 1; //+1 is a fudge factor because the conversion seems to
+							Point p =
+								MouseInfo.getPointerInfo().getLocation();
+							SwingUtilities.convertPointFromScreen(p,
+								getComponent());
+							p.y += 1; //fudge factor bec conversion is off by 1
 							dragX = p.x;
 							dragY = p.y;
 						} else {
@@ -757,6 +767,7 @@ public class InteractiveMatrixView extends MatrixView implements
 
 		@Override
 		public void mouseEntered(final MouseEvent e) {
+
 			debug("mouseEntered IMV",9);
 			if(this.turnOffLabelPortTimer != null) {
 				/* Event came too soon, swallow it by resetting the timer.. */
@@ -911,7 +922,14 @@ public class InteractiveMatrixView extends MatrixView implements
 		}
 	}
 
+	/**
+	 * Processed a completed left single click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftSingleClick(int xPixel,int yPixel) {
+
 		final Point start = new Point(xmap.getIndex(xPixel),
 			ymap.getIndex(yPixel));
 		final Point end   = new Point(xmap.getIndex(xPixel),
@@ -922,7 +940,14 @@ public class InteractiveMatrixView extends MatrixView implements
 		repaint();
 	}
 
+	/**
+	 * Processed a completed left single shift click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftSingleShiftClick(int xPixel,int yPixel) {
+
 		final Point start = new Point(xmap.getMinIndex(),ymap.getIndex(yPixel));
 		final Point end   = new Point(xmap.getMaxIndex(),ymap.getIndex(yPixel));
 	
@@ -931,7 +956,14 @@ public class InteractiveMatrixView extends MatrixView implements
 		repaint();
 	}
 
+	/**
+	 * Processed a completed left control click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftSingleControlClick(int xPixel,int yPixel) {
+
 		final Point start = new Point(xmap.getIndex(xPixel),ymap.getMinIndex());
 		final Point end   = new Point(xmap.getIndex(xPixel),ymap.getMaxIndex());
 	
@@ -940,6 +972,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		repaint();
 	}
 
+	/**
+	 * Processed a completed left double click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDoubleClick(int xPixel,int yPixel) {
 
 		//If click was inside a contiguous selection and the selection
@@ -1010,6 +1048,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		}
 	}
 
+	/**
+	 * Processed a completed left double control click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDoubleControlClick(int xPixel,int yPixel) {
 
 		//If click was inside a contiguous selection and the selection
@@ -1080,6 +1124,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		}
 	}
 
+	/**
+	 * Processed a completed left double shift click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDoubleShiftClick(int xPixel,int yPixel) {
 
 		//If click was inside a contiguous selection and the selection
@@ -1144,6 +1194,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		}
 	}
 
+	/**
+	 * Processed a completed left double command click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDoubleCommandClick(int xPixel,int yPixel) {
 
 		//If click was inside a contiguous selection and the selection
@@ -1212,18 +1268,14 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @return boolean
 	 */
 	public boolean pixelIsAmidstSelection(int xPixel,int yPixel) {
+
 		return(//A selection exists
-			geneSelection != null &&
-			arraySelection != null &&
+			geneSelection != null && arraySelection != null &&
 			//Click is amidst a selected area
-			geneSelection.getMinIndex() <=
-				ymap.getIndex(yPixel) &&
-			geneSelection.getMaxIndex() >=
-				ymap.getIndex(yPixel) &&
-			arraySelection.getMinIndex() <=
-				xmap.getIndex(xPixel) &&
-			arraySelection.getMaxIndex() >=
-				xmap.getIndex(xPixel));
+			geneSelection.getMinIndex()  <= ymap.getIndex(yPixel) &&
+			geneSelection.getMaxIndex()  >= ymap.getIndex(yPixel) &&
+			arraySelection.getMinIndex() <= xmap.getIndex(xPixel) &&
+			arraySelection.getMaxIndex() >= xmap.getIndex(xPixel));
 	}
 
 	/**
@@ -1235,9 +1287,9 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @return boolean
 	 */
 	public boolean pixelIsInsideSelection(int xPixel,int yPixel) {
+
 		return(//A selection exists
-			geneSelection != null &&
-			arraySelection != null &&
+			geneSelection != null && arraySelection != null &&
 			//Click is amidst a selected area
 			geneSelection.isIndexSelected(ymap.getIndex(yPixel)) &&
 			arraySelection.isIndexSelected(xmap.getIndex(xPixel)));
@@ -1251,14 +1303,12 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @return boolean
 	 */
 	public boolean selectionIsSmallerThanVisible() {
+
 		return(//A selection exists
-			geneSelection != null &&
-			arraySelection != null &&
-			(geneSelection.getMaxIndex() -
-			geneSelection.getMinIndex() + 1) <
+			geneSelection != null && arraySelection != null &&
+			(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1) <
 			ymap.getNumVisible() ||
-			(arraySelection.getMaxIndex() -
-			arraySelection.getMinIndex() + 1) <
+			(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1) <
 			xmap.getNumVisible());
 	}
 
@@ -1274,8 +1324,7 @@ public class InteractiveMatrixView extends MatrixView implements
 		final int yIndex) {
 
 		return(//A selection exists
-			geneSelection != null &&
-			arraySelection != null &&
+			geneSelection != null && arraySelection != null &&
 			(geneSelection.getMaxContiguousIndex(yIndex) -
 			geneSelection.getMinContiguousIndex(yIndex) + 1) <
 			ymap.getNumVisible() ||
@@ -1292,9 +1341,9 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @return boolean
 	 */
 	public boolean selectionIsLargerThanVisible() {
+
 		return(//A selection exists
-			geneSelection != null &&
-			arraySelection != null &&
+			geneSelection != null && arraySelection != null &&
 			(geneSelection.getMaxIndex() -
 			geneSelection.getMinIndex() + 1) >
 			ymap.getNumVisible() ||
@@ -1315,8 +1364,7 @@ public class InteractiveMatrixView extends MatrixView implements
 		final int yIndex) {
 
 		return(//A selection exists
-			geneSelection != null &&
-			arraySelection != null &&
+			geneSelection != null && arraySelection != null &&
 			(geneSelection.getMaxContiguousIndex(yIndex) -
 			geneSelection.getMinContiguousIndex(yIndex) + 1) >
 			ymap.getNumVisible() ||
@@ -1335,22 +1383,28 @@ public class InteractiveMatrixView extends MatrixView implements
 	public boolean selectionIsEqualToVisible() {
 
 		return(//A selection exists
-			geneSelection != null &&
-			arraySelection != null &&
-			(geneSelection.getMaxIndex() -
-			geneSelection.getMinIndex() + 1) ==
+			geneSelection != null && arraySelection != null &&
+			(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1) ==
 			ymap.getNumVisible() &&
-			(arraySelection.getMaxIndex() -
-			arraySelection.getMinIndex() + 1) ==
+			(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1) ==
 			xmap.getNumVisible());
 	}
 
+	/**
+	 * Returns true if a selection exists and the contiguously selected
+	 * boundaries surrounding the supplied selected index of either
+	 * dimension of the selection is larger than the amount visible in the
+	 * respective dimension, false otherwise
+	 * @author rleach
+	 * @param xIndex
+	 * @param yIndex
+	 * @return boolean
+	 */
 	public boolean subSelectionIsEqualToVisible(final int xIndex,
 		final int yIndex) {
 
 		return(//A selection exists
-			geneSelection != null &&
-			arraySelection != null &&
+			geneSelection != null && arraySelection != null &&
 			(geneSelection.getMaxContiguousIndex(yIndex) -
 			geneSelection.getMinContiguousIndex(yIndex) + 1) ==
 			ymap.getNumVisible() &&
@@ -1424,20 +1478,46 @@ public class InteractiveMatrixView extends MatrixView implements
 		}
 	}
 
+	/**
+	 * Processes a completed left double option control click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDoubleOptionControlClick(int xPixel,int yPixel) {
+
 		smoothAnimatedZoomFromPixel(xPixel,yPixel,0.05);
 	}
 
+	/**
+	 * Processes a completed left double option click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDoubleOptionClick(int xPixel,int yPixel) {
+
 		smoothAnimatedZoomFromPixel(xPixel,yPixel,0.3);
 	}
 
+	/**
+	 * Processes a completed left double option shift click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDoubleOptionShiftClick(int xPixel,int yPixel) {
-		//Zooming out
-		//shift = zoom faster
+
+		//Zooming out.  shift = zoom faster
 		smoothAnimatedZoomFromPixel(xPixel,yPixel,0.6);
 	}
 
+	/**
+	 * Processes a completed left double option command click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDoubleOptionCommandClick(int xPixel,int yPixel) {
 
 		//If click was inside a contiguous selection and the selection
@@ -1477,6 +1557,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		}
 	}
 
+	/**
+	 * Processes a completed left double option shift command click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDoubleOptionShiftCommandClick(int xPixel,
 		int yPixel) {
 
@@ -1518,7 +1604,14 @@ public class InteractiveMatrixView extends MatrixView implements
 		}
 	}
 
+	/**
+	 * Processes left click drag start event
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDragStart(int xPixel,int yPixel) {
+
 		//If this is a correction of the starting point, clear out the previous
 		//dragRect
 		if(xmap.isSelecting()) {
@@ -1540,7 +1633,14 @@ public class InteractiveMatrixView extends MatrixView implements
 		drawBand(dragRect);
 	}
 
+	/**
+	 * Processes left click drag end event
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDragEnd(int xPixel,int yPixel) {
+
 		xmap.setSelecting(false);
 		ymap.setSelecting(false);
 		xmap.setSelectingStart(-1);
@@ -1568,7 +1668,14 @@ public class InteractiveMatrixView extends MatrixView implements
 		repaint();
 	}
 
+	/**
+	 * Processes left shift click drag end event
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftShiftDragEnd(int xPixel,int yPixel) {
+
 		xmap.setSelecting(false);
 		ymap.setSelecting(false);
 		xmap.setSelectingStart(-1);
@@ -1598,6 +1705,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		repaint();
 	}
 
+	/**
+	 * Processes left control click drag end event
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftControlDragEnd(int xPixel,int yPixel) {
 		xmap.setSelecting(false);
 		ymap.setSelecting(false);
@@ -1628,6 +1741,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		repaint();
 	}
 
+	/**
+	 * Processes left click drag movement event
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftDragDuring(int xPixelStart,int yPixelStart,
 		int xPixel,int yPixel) {
 
@@ -1656,6 +1775,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		drawBand(dragRect);
 	}
 
+	/**
+	 * Processes left shift click drag movement event
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftShiftDragDuring(int xPixelStart,int yPixelStart,
 		int xPixel,int yPixel) {
 
@@ -1684,6 +1809,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		drawBand(dragRect);
 	}
 
+	/**
+	 * Processes left control click drag movement event
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processLeftControlDragDuring(int xPixelStart,int yPixelStart,
 		int xPixel,int yPixel) {
 
@@ -1712,6 +1843,12 @@ public class InteractiveMatrixView extends MatrixView implements
 		drawBand(dragRect);
 	}
 
+	/**
+	 * Processes a completed right single click
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
 	public void processRightSingleClick(int xPixel,int yPixel) {
 		geneSelection.setSelectedNode(null);
 		geneSelection.deselectAllIndexes();
@@ -1977,6 +2114,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @param zoomInc
 	 */
 	public void smoothZoomTowardPixel(int xPxPos,int yPxPos,double zoomInc) {
+
 		int zoomXVal = 0;
 		int zoomYVal = 0;
 		int numXCells = xmap.getNumVisible();
@@ -2077,6 +2215,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @param yPxPos
 	 */
 	public void smoothZoomFromPixel(int xPxPos,int yPxPos) {
+
 		smoothZoomFromPixel(xPxPos,yPxPos,xmap.getZoomIncrement());
 	}
 
@@ -2089,6 +2228,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @param yPxPos
 	 */
 	public void smoothZoomFromPixelFast(int xPxPos,int yPxPos) {
+
 		smoothZoomFromPixel(xPxPos,yPxPos,xmap.getZoomIncrementFast());
 	}
 
@@ -2102,6 +2242,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @param zoomInc
 	 */
 	public void smoothZoomFromPixel(int xPxPos,int yPxPos,double zoomInc) {
+
 		int zoomXVal = 0;
 		int zoomYVal = 0;
 		int numXCells = xmap.getNumVisible();
@@ -2209,6 +2350,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * in the target zoom level info.
 	 */
 	public void smoothIncrementalZoomOut() {
+
 		//The function below has a bug that prevents full zoom out
 		// - this works around that - though it may have already been fixed
 		int prevXNumVisible = xmap.getNumVisible();
@@ -2248,6 +2390,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * in the dimensions of the matrix
 	 */
 	public void smoothAnimatedZoomOut() {
+
 		smoothAnimatedZoomToTarget(0,(xmap.getMaxIndex() + 1),
 			0,(ymap.getMaxIndex() + 1));
 	}
@@ -2263,6 +2406,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	public void smoothAnimatedZoomToTarget(int selecXStartIndex,
 		int numXSelectedIndexes,int selecYStartIndex,int numYSelectedIndexes) {
+
 		long startTime = System.currentTimeMillis();
 
 		//Zooming out is slower on large matrices because it just takes longer
@@ -2431,6 +2575,15 @@ public class InteractiveMatrixView extends MatrixView implements
 		updateAspectRatio();
 	}
 
+	/**
+	 * This method simply groups the xmap and ymap calls necessary for a single
+	 * zoom event
+	 * @author rleach
+	 * @param selecXStartIndex
+	 * @param numXSelectedIndexes
+	 * @param selecYStartIndex
+	 * @param numYSelectedIndexes
+	 */
 	public void hardZoomToTarget(int selecXStartIndex,
 		int numXSelectedIndexes,int selecYStartIndex,int numYSelectedIndexes) {
 
@@ -3410,10 +3563,12 @@ public class InteractiveMatrixView extends MatrixView implements
 	}
 
 	public TreeSelectionI getGeneSelection() {
+
 		return(geneSelection);
 	}
 
 	public TreeSelectionI getArraySelection() {
+
 		return(arraySelection);
 	}
 }
