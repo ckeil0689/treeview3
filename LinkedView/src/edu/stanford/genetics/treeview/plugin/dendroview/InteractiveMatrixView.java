@@ -835,7 +835,7 @@ public class InteractiveMatrixView extends MatrixView implements
 							processLeftDoubleOptionShiftCommandClick(
 								pressedX,pressedY);
 						}
-						//shift = zoom faster (0.15)
+						//shift = zoom faster
 						else if(pressedEvent.isShiftDown()) {
 							processLeftDoubleOptionShiftClick(
 								pressedX,pressedY);
@@ -845,7 +845,12 @@ public class InteractiveMatrixView extends MatrixView implements
 							processLeftDoubleOptionCommandClick(
 								pressedX,pressedY);
 						}
-						//regular double-click = zoom medium (0.05)
+						//control = zoom slower
+						else if(pressedEvent.isControlDown()) {
+							processLeftDoubleOptionControlClick(
+								pressedX,pressedY);
+						}
+						//regular double-click = zoom medium
 						else {
 							processLeftDoubleOptionClick(
 								pressedX,pressedY);
@@ -868,6 +873,11 @@ public class InteractiveMatrixView extends MatrixView implements
 						else if(pressedEvent.isMetaDown()) {
 							processLeftDoubleCommandClick(pressedX,
 								pressedY);
+						}
+						//control = zoom slower
+						else if(pressedEvent.isControlDown()) {
+							processLeftDoubleControlClick(
+								pressedX,pressedY);
 						}
 						//Regular double-click = zoom medium
 						else {
@@ -997,6 +1007,76 @@ public class InteractiveMatrixView extends MatrixView implements
 			debug("Medium-zooming toward pixel",11);
 
 			smoothAnimatedZoomTowardPixel(xPixel,yPixel,0.3);
+		}
+	}
+
+	public void processLeftDoubleControlClick(int xPixel,int yPixel) {
+
+		//If click was inside a contiguous selection and the selection
+		//is smaller than the current zoom level or if the
+		//selection is the same size but isn't equal to what
+		//is visible
+		if(pixelIsInsideSelection(xPixel,yPixel) &&
+			(subSelectionIsSmallerThanVisible(xmap.getIndex(xPixel),
+				ymap.getIndex(yPixel)) ||
+				(subSelectionIsEqualToVisible(xmap.getIndex(xPixel),
+					ymap.getIndex(yPixel)) &&
+				//Selected area is not scrolled to
+				//visible area
+				(geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) !=
+				ymap.getFirstVisible() ||
+				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) !=
+				xmap.getFirstVisible())))) {
+
+			debug("Slow-zooming toward sub-selection",11);
+
+			//Zoom to sub-selection
+			smoothAnimatedZoomTowardTarget(
+				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
+
+				(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
+				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+				1),
+
+				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
+
+				(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
+				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
+				1),
+
+				0.05);
+		}
+		//If click was inside a selection or between selections and the
+		//selection area is smaller than the current zoom level or if the
+		//selection area is the same size but isn't equal to what
+		//is visible
+		else if(pixelIsAmidstSelection(xPixel,yPixel) &&
+			(selectionIsSmallerThanVisible() ||
+				(selectionIsEqualToVisible() &&
+					//Selected area is not scrolled to
+					//visible area
+					(geneSelection.getMinIndex() !=
+						ymap.getFirstVisible() ||
+						arraySelection.getMinIndex() !=
+						xmap.getFirstVisible())))) {
+
+			debug("Slow-zooming toward selection",11);
+
+			//Zoom to selection
+			smoothAnimatedZoomTowardTarget(
+				arraySelection.getMinIndex(),
+				(arraySelection.getMaxIndex() -
+					arraySelection.getMinIndex() + 1),
+				geneSelection.getMinIndex(),
+				(geneSelection.getMaxIndex() -
+					geneSelection.getMinIndex() + 1),
+				0.05);
+		}
+		//Else full zoom in
+		else {
+			debug("Slow-zooming toward pixel",11);
+
+			smoothAnimatedZoomTowardPixel(xPixel,yPixel,0.05);
 		}
 	}
 
@@ -1342,6 +1422,10 @@ public class InteractiveMatrixView extends MatrixView implements
 		else {
 			hardZoomToTarget(xmap.getIndex(xPixel),1,ymap.getIndex(yPixel),1);
 		}
+	}
+
+	public void processLeftDoubleOptionControlClick(int xPixel,int yPixel) {
+		smoothAnimatedZoomFromPixel(xPixel,yPixel,0.05);
 	}
 
 	public void processLeftDoubleOptionClick(int xPixel,int yPixel) {
@@ -2250,18 +2334,20 @@ public class InteractiveMatrixView extends MatrixView implements
 		double targetZoomInc) {
 
 		double zoomInc = xmap.getZoomIncrement();
+		int startVisX = xmap.getNumVisible();
+		int startVisY = ymap.getNumVisible();
+		int targetDiffX =
+			(int) Math.round((double) xmap.getNumVisible() * targetZoomInc -
+				(double) xmap.getNumVisible() * zoomInc);
+		int targetDiffY =
+			(int) Math.round((double) ymap.getNumVisible() * targetZoomInc -
+				(double) ymap.getNumVisible() * zoomInc);
 
-		if(targetZoomInc >= zoomInc) {
+		if(targetZoomInc >= zoomInc &&
+			targetDiffX > Math.abs(xmap.getNumVisible() - startVisX) &&
+			targetDiffY > Math.abs(ymap.getNumVisible() - startVisY)) {
 
 			long startTime = System.currentTimeMillis();
-			int startVisX = xmap.getNumVisible();
-			int startVisY = ymap.getNumVisible();
-			int targetDiffX =
-				(int) Math.round((double) xmap.getNumVisible() * targetZoomInc -
-					(double) xmap.getNumVisible() * zoomInc);
-			int targetDiffY =
-				(int) Math.round((double) ymap.getNumVisible() * targetZoomInc -
-					(double) ymap.getNumVisible() * zoomInc);
 		
 			//Zooming out is slower on large matrices because it just takes longer
 			//to draw large amounts of cells, so our cutoff wait time should be
@@ -2284,7 +2370,7 @@ public class InteractiveMatrixView extends MatrixView implements
 				//We will assume a relatively small amount of zoom and forego
 				//logMode
 				smoothZoomTowardSelection(selecXStartIndex,numXSelectedIndexes,
-					selecYStartIndex,numYSelectedIndexes,false);
+					selecYStartIndex,numYSelectedIndexes,false,-1.0);
 
 				debug("Zoomed by [" + targetDiffX + "," + targetDiffY + "] thus far",11);
 		
@@ -2303,6 +2389,9 @@ public class InteractiveMatrixView extends MatrixView implements
 					e.printStackTrace();
 				}
 			}
+		} else if(targetZoomInc > 0.0) {
+			smoothZoomTowardSelection(selecXStartIndex,numXSelectedIndexes,
+				selecYStartIndex,numYSelectedIndexes,false,targetZoomInc);
 		}
 
 		//If the target is less than zoomInc away in both dimensions, hard-zoom
@@ -2336,7 +2425,7 @@ public class InteractiveMatrixView extends MatrixView implements
 			hardZoomToTarget(selecXStartIndex,numXSelectedIndexes,selecYStartIndex,
 				numYSelectedIndexes);
 		}
-	
+
 		//We will update the aspect ratio just in case it didn't happen
 		//automatically
 		updateAspectRatio();
@@ -2378,7 +2467,7 @@ public class InteractiveMatrixView extends MatrixView implements
 										   int numYSelectedIndexes) {
 
 		return(smoothZoomTowardSelection(selecXStartIndex,numXSelectedIndexes,
-			selecYStartIndex,numYSelectedIndexes,true));
+			selecYStartIndex,numYSelectedIndexes,true,-1.0));
 	}
 
 	/*
@@ -2396,13 +2485,18 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * to determine the pixel in the selection to zoom toward (so that the
 	 * selection ends up filling the view) and then uses that pixel to call
 	 * zoomTowardPixel.
+	 * @author rleach
+	 * @param selecXStartIndex
+	 * @param numXSelectedIndexes
+	 * @param selecYStartIndex
+	 * @param numYSelectedIndexes
+	 * @param logMode
+	 * @param optionalTargetZoomFrac (only used if > 0.0)
 	 */
 	public int[] smoothZoomTowardSelection(int selecXStartIndex,
-										   int numXSelectedIndexes,
-										   int selecYStartIndex,
-										   int numYSelectedIndexes,
-										   boolean logMode) {
-		
+		int numXSelectedIndexes,int selecYStartIndex,int numYSelectedIndexes,
+		boolean logMode,double optionalTargetZoomFrac) {
+
 		//Find the pixel inside the selected area to "zoom toward" such that the
 		//selected area essentially expands to fill the screen
 		int startXPixel = xmap.getPixel(selecXStartIndex);
@@ -2456,14 +2550,16 @@ public class InteractiveMatrixView extends MatrixView implements
 		//Since it takes a lot of time to draw large matrices, select a zoom
 		//fraction based on the size of the matrix we are going to draw at each
 		//increment so that we skip increments that take too much time to draw
-		double targetZoomFracX =
-				(logMode ? xmap.getOptimalZoomIncrement(numXSelectedIndexes,
-						(prevXNumVisible < numXSelectedIndexes)) :
-							xmap.getZoomIncrement());
-		double targetZoomFracY =
+		double targetZoomFracX = (optionalTargetZoomFrac > 0.0 ?
+			optionalTargetZoomFrac :
+			(logMode ? xmap.getOptimalZoomIncrement(numXSelectedIndexes,
+				(prevXNumVisible < numXSelectedIndexes)) :
+					xmap.getZoomIncrement()));
+		double targetZoomFracY = (optionalTargetZoomFrac > 0.0 ?
+			optionalTargetZoomFrac :
 			(logMode ? ymap.getOptimalZoomIncrement(numYSelectedIndexes,
-						(prevYNumVisible < numYSelectedIndexes)) :
-							ymap.getZoomIncrement());
+				(prevYNumVisible < numYSelectedIndexes)) :
+					ymap.getZoomIncrement()));
 		//Select the larger zoom increment from the 2 dimensions
 		double targetZoomFrac = targetZoomFracX;
 		if(targetZoomFrac < targetZoomFracY)
