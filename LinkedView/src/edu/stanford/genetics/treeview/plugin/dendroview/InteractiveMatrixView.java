@@ -973,6 +973,231 @@ public class InteractiveMatrixView extends MatrixView implements
 	}
 
 	/**
+	 * This method encapsulates the logic of zooming when a double-click with
+	 * any modifier happens, however it is abstracted from clicks and keyboard
+	 * keys.  It takes the click pixel coordinates, whether we're zooming in or
+	 * out, the speed of the zoom (slow/med/fast), and whether we are doing a
+	 * stepwise zoom or not, all the way to the clicked target.
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 * @param zoomIn
+	 * @param stepwiseZoom
+	 * @param zoomSpeed
+	 */
+	public void processLeftDoubleClickZoomEvent(int xPixel,int yPixel,
+		boolean zoomIn,boolean stepwiseZoom,
+		int zoomSpeed /* 0=slow,1=med,2=fast */) {
+
+		//zoomDegree is only used when stepwiseZoom is false
+		double zoomDegree = 0.3; //Medium
+
+		if(zoomSpeed == 0) {
+
+			zoomDegree = 0.05;   //Slow
+		} else if(zoomSpeed == 2) {
+
+			zoomDegree = 0.6;    //Fast
+		}
+
+		if(zoomIn) {
+
+			//If click was inside a contiguous selection and the selection
+			//is smaller than the current zoom level or if the
+			//selection is the same size but isn't equal to what
+			//is visible
+			if(pixelIsInsideSelection(xPixel,yPixel) &&
+				(subSelectionIsSmallerThanVisible(xmap.getIndex(xPixel),
+					ymap.getIndex(yPixel)) ||
+					(subSelectionIsEqualToVisible(xmap.getIndex(xPixel),
+						ymap.getIndex(yPixel)) &&
+					//Selected area is not scrolled to
+					//visible area
+					(geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) !=
+					ymap.getFirstVisible() ||
+					arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) !=
+					xmap.getFirstVisible())))) {
+
+				if(stepwiseZoom) {
+					if(zoomSpeed == 2) {
+
+						hardZoomToTarget(
+							arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
+							(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
+								arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+								1),
+							geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
+							(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
+								geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
+								1));
+					} else {
+
+						//Zoom to sub-selection
+						smoothAnimatedZoomToTarget(
+							arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
+							(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
+								arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+								1),
+							geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
+							(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
+								geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
+								1));
+					}
+				} else {
+
+					//Zoom to sub-selection
+					smoothAnimatedZoomTowardTarget(
+						arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
+	
+						(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
+						arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+						1),
+	
+						geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
+	
+						(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
+						geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
+						1),
+	
+						zoomDegree);
+				}
+			}
+			//If click was inside a selection or between selections and the
+			//selection area is smaller than the current zoom level or if the
+			//selection area is the same size but isn't equal to what
+			//is visible
+			else if(pixelIsAmidstSelection(xPixel,yPixel) &&
+				(selectionIsSmallerThanVisible() ||
+					(selectionIsEqualToVisible() &&
+						//Selected area is not scrolled to
+						//visible area
+						(geneSelection.getMinIndex() !=
+							ymap.getFirstVisible() ||
+							arraySelection.getMinIndex() !=
+							xmap.getFirstVisible())))) {
+
+				if(stepwiseZoom) {
+
+					//Zoom to selection
+					smoothAnimatedZoomToTarget(
+						arraySelection.getMinIndex(),
+						(arraySelection.getMaxIndex() -
+							arraySelection.getMinIndex() + 1),
+						geneSelection.getMinIndex(),
+						(geneSelection.getMaxIndex() -
+							geneSelection.getMinIndex() + 1));
+				} else {
+
+					//Zoom toward selection
+					smoothAnimatedZoomTowardTarget(
+						arraySelection.getMinIndex(),
+						(arraySelection.getMaxIndex() -
+							arraySelection.getMinIndex() + 1),
+						geneSelection.getMinIndex(),
+						(geneSelection.getMaxIndex() -
+							geneSelection.getMinIndex() + 1),
+						zoomDegree);
+				}
+			}
+			//Else full zoom in
+			else {
+
+				if(stepwiseZoom) {
+
+					smoothAnimatedZoomToTarget(xmap.getIndex(xPixel),1,
+						ymap.getIndex(yPixel),1);
+				} else {
+
+					smoothAnimatedZoomTowardPixel(xPixel,yPixel,zoomDegree);
+				}
+			}
+		} else {
+
+			if(stepwiseZoom) {
+
+				//If click was inside a contiguous selection and the selection
+				//is larger than the current zoom level
+				if(pixelIsInsideSelection(xPixel,yPixel) &&
+					(subSelectionIsLargerThanVisible(xmap.getIndex(xPixel),
+						ymap.getIndex(yPixel)))) {
+
+					if(zoomSpeed == 2) {
+
+						//Zoom to sub-selection
+						hardZoomToTarget(
+							arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
+							(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
+								arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+								1),
+							geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
+							(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
+								geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
+								1));
+					} else {
+
+						//Zoom to sub-selection
+						smoothAnimatedZoomToTarget(
+							arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
+							(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
+								arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+								1),
+							geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
+							(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
+								geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
+								1));
+					}
+				}
+				//If click was inside a selection or between selections and the
+				//selection area is larger than the current zoom level
+				else if(pixelIsAmidstSelection(xPixel,yPixel) &&
+					(selectionIsLargerThanVisible())) {
+
+					if(zoomSpeed == 2) {
+
+						//Zoom to selection
+						hardZoomToTarget(
+							arraySelection.getMinIndex(),
+							(arraySelection.getMaxIndex() -
+								arraySelection.getMinIndex() + 1),
+							geneSelection.getMinIndex(),
+							(geneSelection.getMaxIndex() -
+								geneSelection.getMinIndex() + 1));
+					} else {
+
+						//Zoom to selection
+						smoothAnimatedZoomToTarget(
+							arraySelection.getMinIndex(),
+							(arraySelection.getMaxIndex() -
+								arraySelection.getMinIndex() + 1),
+							geneSelection.getMinIndex(),
+							(geneSelection.getMaxIndex() -
+								geneSelection.getMinIndex() + 1));
+					}
+				}
+				//Else full zoom out
+				else {
+
+					if(zoomSpeed == 2) {
+
+						hardZoomToTarget(xmap.getMinIndex(),xmap.getMaxIndex() + 1,
+							ymap.getMinIndex(),ymap.getMaxIndex() + 1);
+					} else {
+
+						smoothAnimatedZoomOut();
+					}
+				}
+			} else {
+
+				//All incomplete zoom-outs will perform a precise zoom-out from
+				//the pixel clicked, partly because I haven't implemented a
+				//zoom-away method which takes selection boundaries, but also to
+				//provide more discrete control of where precisely to be zoomed
+				smoothAnimatedZoomFromPixel(xPixel,yPixel,zoomDegree);
+			}
+		}
+	}
+
+	/**
 	 * Processed a completed left double click
 	 * @author rleach
 	 * @param xPixel
@@ -980,72 +1205,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	public void processLeftDoubleClick(int xPixel,int yPixel) {
 
-		//If click was inside a contiguous selection and the selection
-		//is smaller than the current zoom level or if the
-		//selection is the same size but isn't equal to what
-		//is visible
-		if(pixelIsInsideSelection(xPixel,yPixel) &&
-			(subSelectionIsSmallerThanVisible(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel)) ||
-				(subSelectionIsEqualToVisible(xmap.getIndex(xPixel),
-					ymap.getIndex(yPixel)) &&
-				//Selected area is not scrolled to
-				//visible area
-				(geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) !=
-				ymap.getFirstVisible() ||
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) !=
-				xmap.getFirstVisible())))) {
-
-			debug("Medium-zooming toward sub-selection",11);
-
-			//Zoom to sub-selection
-			smoothAnimatedZoomTowardTarget(
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-
-				(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-				1),
-
-				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-
-				(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-				1),
-
-				0.3);
-		}
-		//If click was inside a selection or between selections and the
-		//selection area is smaller than the current zoom level or if the
-		//selection area is the same size but isn't equal to what
-		//is visible
-		else if(pixelIsAmidstSelection(xPixel,yPixel) &&
-			(selectionIsSmallerThanVisible() ||
-				(selectionIsEqualToVisible() &&
-					//Selected area is not scrolled to
-					//visible area
-					(geneSelection.getMinIndex() !=
-						ymap.getFirstVisible() ||
-						arraySelection.getMinIndex() !=
-						xmap.getFirstVisible())))) {
-
-			debug("Medium-zooming toward selection",11);
-
-			//Zoom to selection
-			smoothAnimatedZoomTowardTarget(
-				arraySelection.getMinIndex(),
-				(arraySelection.getMaxIndex() -
-					arraySelection.getMinIndex() + 1),
-				geneSelection.getMinIndex(),
-				(geneSelection.getMaxIndex() -
-					geneSelection.getMinIndex() + 1),
-				0.3);
-		}
-		//Else full zoom in
-		else {
-			debug("Medium-zooming toward pixel",11);
-
-			smoothAnimatedZoomTowardPixel(xPixel,yPixel,0.3);
-		}
+		processLeftDoubleClickZoomEvent(xPixel,yPixel,true,false,1);
 	}
 
 	/**
@@ -1056,72 +1216,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	public void processLeftDoubleControlClick(int xPixel,int yPixel) {
 
-		//If click was inside a contiguous selection and the selection
-		//is smaller than the current zoom level or if the
-		//selection is the same size but isn't equal to what
-		//is visible
-		if(pixelIsInsideSelection(xPixel,yPixel) &&
-			(subSelectionIsSmallerThanVisible(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel)) ||
-				(subSelectionIsEqualToVisible(xmap.getIndex(xPixel),
-					ymap.getIndex(yPixel)) &&
-				//Selected area is not scrolled to
-				//visible area
-				(geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) !=
-				ymap.getFirstVisible() ||
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) !=
-				xmap.getFirstVisible())))) {
-
-			debug("Slow-zooming toward sub-selection",11);
-
-			//Zoom to sub-selection
-			smoothAnimatedZoomTowardTarget(
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-
-				(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-				1),
-
-				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-
-				(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-				1),
-
-				0.05);
-		}
-		//If click was inside a selection or between selections and the
-		//selection area is smaller than the current zoom level or if the
-		//selection area is the same size but isn't equal to what
-		//is visible
-		else if(pixelIsAmidstSelection(xPixel,yPixel) &&
-			(selectionIsSmallerThanVisible() ||
-				(selectionIsEqualToVisible() &&
-					//Selected area is not scrolled to
-					//visible area
-					(geneSelection.getMinIndex() !=
-						ymap.getFirstVisible() ||
-						arraySelection.getMinIndex() !=
-						xmap.getFirstVisible())))) {
-
-			debug("Slow-zooming toward selection",11);
-
-			//Zoom to selection
-			smoothAnimatedZoomTowardTarget(
-				arraySelection.getMinIndex(),
-				(arraySelection.getMaxIndex() -
-					arraySelection.getMinIndex() + 1),
-				geneSelection.getMinIndex(),
-				(geneSelection.getMaxIndex() -
-					geneSelection.getMinIndex() + 1),
-				0.05);
-		}
-		//Else full zoom in
-		else {
-			debug("Slow-zooming toward pixel",11);
-
-			smoothAnimatedZoomTowardPixel(xPixel,yPixel,0.05);
-		}
+		processLeftDoubleClickZoomEvent(xPixel,yPixel,true,false,0);
 	}
 
 	/**
@@ -1132,66 +1227,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	public void processLeftDoubleShiftClick(int xPixel,int yPixel) {
 
-		//If click was inside a contiguous selection and the selection
-		//is smaller than the current zoom level or if the
-		//selection is the same size but isn't equal to what
-		//is visible
-		if(pixelIsInsideSelection(xPixel,yPixel) &&
-			(subSelectionIsSmallerThanVisible(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel)) ||
-				(subSelectionIsEqualToVisible(xmap.getIndex(xPixel),
-					ymap.getIndex(yPixel)) &&
-				//Selected area is not scrolled to
-				//visible area
-				(geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) !=
-				ymap.getFirstVisible() ||
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) !=
-				xmap.getFirstVisible())))) {
-			
-			//Zoom to sub-selection
-			smoothAnimatedZoomTowardTarget(
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-
-				(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-				1),
-
-				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-
-				(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-				1),
-
-				0.6);
-		}
-		//If click was inside a selection or between selections and the
-		//selection area is smaller than the current zoom level or if the
-		//selection area is the same size but isn't equal to what
-		//is visible
-		else if(pixelIsAmidstSelection(xPixel,yPixel) &&
-			(selectionIsSmallerThanVisible() ||
-				(selectionIsEqualToVisible() &&
-					//Selected area is not scrolled to
-					//visible area
-					(geneSelection.getMinIndex() !=
-						ymap.getFirstVisible() ||
-						arraySelection.getMinIndex() !=
-						xmap.getFirstVisible())))) {
-
-			//Zoom to selection
-			smoothAnimatedZoomTowardTarget(
-				arraySelection.getMinIndex(),
-				(arraySelection.getMaxIndex() -
-					arraySelection.getMinIndex() + 1),
-				geneSelection.getMinIndex(),
-				(geneSelection.getMaxIndex() -
-					geneSelection.getMinIndex() + 1),
-				0.6);
-		}
-		//Else full zoom in
-		else {
-			smoothAnimatedZoomTowardPixel(xPixel,yPixel,0.6);
-		}
+		processLeftDoubleClickZoomEvent(xPixel,yPixel,true,false,2);
 	}
 
 	/**
@@ -1202,61 +1238,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	public void processLeftDoubleCommandClick(int xPixel,int yPixel) {
 
-		//If click was inside a contiguous selection and the selection
-		//is smaller than the current zoom level or if the
-		//selection is the same size but isn't equal to what
-		//is visible
-		if(pixelIsInsideSelection(xPixel,yPixel) &&
-			(subSelectionIsSmallerThanVisible(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel)) ||
-				(subSelectionIsEqualToVisible(xmap.getIndex(xPixel),
-					ymap.getIndex(yPixel)) &&
-				//Selected area is not scrolled to
-				//visible area
-				(geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) !=
-				ymap.getFirstVisible() ||
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) !=
-				xmap.getFirstVisible())))) {
-			
-			//Zoom to sub-selection
-			smoothAnimatedZoomToTarget(
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-				(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-					arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-					1),
-				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-				(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-					geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-					1));
-		}
-		//If click was inside a selection or between selections and the
-		//selection area is smaller than the current zoom level or if the
-		//selection area is the same size but isn't equal to what
-		//is visible
-		else if(pixelIsAmidstSelection(xPixel,yPixel) &&
-			(selectionIsSmallerThanVisible() ||
-				(selectionIsEqualToVisible() &&
-					//Selected area is not scrolled to
-					//visible area
-					(geneSelection.getMinIndex() !=
-						ymap.getFirstVisible() ||
-						arraySelection.getMinIndex() !=
-						xmap.getFirstVisible())))) {
-
-			//Zoom to selection
-			smoothAnimatedZoomToTarget(
-				arraySelection.getMinIndex(),
-				(arraySelection.getMaxIndex() -
-					arraySelection.getMinIndex() + 1),
-				geneSelection.getMinIndex(),
-				(geneSelection.getMaxIndex() -
-					geneSelection.getMinIndex() + 1));
-		}
-		//Else full zoom in
-		else {
-			smoothAnimatedZoomToTarget(xmap.getIndex(xPixel),1,
-				ymap.getIndex(yPixel),1);
-		}
+		processLeftDoubleClickZoomEvent(xPixel,yPixel,true,true,1);
 	}
 
 	/**
@@ -1422,60 +1404,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	public void processLeftDoubleShiftCommandClick(int xPixel,int yPixel) {
 
-		//If click was inside a contiguous selection and the selection
-		//is smaller than the current zoom level or if the
-		//selection is the same size but isn't equal to what
-		//is visible
-		if(pixelIsInsideSelection(xPixel,yPixel) &&
-			(subSelectionIsSmallerThanVisible(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel)) ||
-				(subSelectionIsEqualToVisible(xmap.getIndex(xPixel),
-					ymap.getIndex(yPixel)) &&
-				//Selected area is not scrolled to
-				//visible area
-				(geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) !=
-				ymap.getFirstVisible() ||
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) !=
-				xmap.getFirstVisible())))) {
-			
-			//Zoom to sub-selection
-			hardZoomToTarget(
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-				(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-					arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-					1),
-				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-				(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-					geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-					1));
-		}
-		//If click was inside a selection or between selections and the
-		//selection area is smaller than the current zoom level or if the
-		//selection area is the same size but isn't equal to what
-		//is visible
-		else if(pixelIsAmidstSelection(xPixel,yPixel) &&
-			(selectionIsSmallerThanVisible() ||
-				(selectionIsEqualToVisible() &&
-					//Selected area is not scrolled to
-					//visible area
-					(geneSelection.getMinIndex() !=
-						ymap.getFirstVisible() ||
-						arraySelection.getMinIndex() !=
-						xmap.getFirstVisible())))) {
-
-			//Zoom to selection
-			hardZoomToTarget(
-				arraySelection.getMinIndex(),
-				(arraySelection.getMaxIndex() -
-					arraySelection.getMinIndex() + 1),
-				geneSelection.getMinIndex(),
-				(geneSelection.getMaxIndex() -
-					geneSelection.getMinIndex() + 1));
-		}
-		//Else full zoom in
-		else {
-			hardZoomToTarget(xmap.getIndex(xPixel),1,ymap.getIndex(yPixel),1);
-		}
+		processLeftDoubleClickZoomEvent(xPixel,yPixel,true,true,2);
 	}
 
 	/**
@@ -1486,7 +1415,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	public void processLeftDoubleOptionControlClick(int xPixel,int yPixel) {
 
-		smoothAnimatedZoomFromPixel(xPixel,yPixel,0.05);
+		processLeftDoubleClickZoomEvent(xPixel,yPixel,false,false,0);
 	}
 
 	/**
@@ -1497,7 +1426,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	public void processLeftDoubleOptionClick(int xPixel,int yPixel) {
 
-		smoothAnimatedZoomFromPixel(xPixel,yPixel,0.3);
+		processLeftDoubleClickZoomEvent(xPixel,yPixel,false,false,1);
 	}
 
 	/**
@@ -1508,8 +1437,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	public void processLeftDoubleOptionShiftClick(int xPixel,int yPixel) {
 
-		//Zooming out.  shift = zoom faster
-		smoothAnimatedZoomFromPixel(xPixel,yPixel,0.6);
+		processLeftDoubleClickZoomEvent(xPixel,yPixel,false,false,2);
 	}
 
 	/**
@@ -1520,41 +1448,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	public void processLeftDoubleOptionCommandClick(int xPixel,int yPixel) {
 
-		//If click was inside a contiguous selection and the selection
-		//is larger than the current zoom level
-		if(pixelIsInsideSelection(xPixel,yPixel) &&
-			(subSelectionIsLargerThanVisible(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel)))) {
-			
-			//Zoom to sub-selection
-			smoothAnimatedZoomToTarget(
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-				(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-					arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-					1),
-				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-				(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-					geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-					1));
-		}
-		//If click was inside a selection or between selections and the
-		//selection area is larger than the current zoom level
-		else if(pixelIsAmidstSelection(xPixel,yPixel) &&
-			(selectionIsLargerThanVisible())) {
-
-			//Zoom to selection
-			smoothAnimatedZoomToTarget(
-				arraySelection.getMinIndex(),
-				(arraySelection.getMaxIndex() -
-					arraySelection.getMinIndex() + 1),
-				geneSelection.getMinIndex(),
-				(geneSelection.getMaxIndex() -
-					geneSelection.getMinIndex() + 1));
-		}
-		//Else full zoom out
-		else {
-			smoothAnimatedZoomOut();
-		}
+		processLeftDoubleClickZoomEvent(xPixel,yPixel,false,true,1);
 	}
 
 	/**
@@ -1566,42 +1460,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	public void processLeftDoubleOptionShiftCommandClick(int xPixel,
 		int yPixel) {
 
-		//If click was inside a contiguous selection and the selection
-		//is larger than the current zoom level
-		if(pixelIsInsideSelection(xPixel,yPixel) &&
-			(subSelectionIsLargerThanVisible(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel)))) {
-			
-			//Zoom to sub-selection
-			hardZoomToTarget(
-				arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-				(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-					arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-					1),
-				geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-				(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-					geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-					1));
-		}
-		//If click was inside a selection or between selections and the
-		//selection area is larger than the current zoom level
-		else if(pixelIsAmidstSelection(xPixel,yPixel) &&
-			(selectionIsLargerThanVisible())) {
-
-			//Zoom to selection
-			hardZoomToTarget(
-				arraySelection.getMinIndex(),
-				(arraySelection.getMaxIndex() -
-					arraySelection.getMinIndex() + 1),
-				geneSelection.getMinIndex(),
-				(geneSelection.getMaxIndex() -
-					geneSelection.getMinIndex() + 1));
-		}
-		//Else full zoom out
-		else {
-			hardZoomToTarget(xmap.getMinIndex(),xmap.getMaxIndex() + 1,
-				ymap.getMinIndex(),ymap.getMaxIndex() + 1);
-		}
+		processLeftDoubleClickZoomEvent(xPixel,yPixel,false,true,2);
 	}
 
 	/**
