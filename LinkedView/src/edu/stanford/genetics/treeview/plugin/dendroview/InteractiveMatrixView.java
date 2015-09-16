@@ -409,8 +409,9 @@ public class InteractiveMatrixView extends MatrixView implements
 			final List<Integer> boundaries = new ArrayList<Integer>(2);
 
 			sp = map.getPixel(selectionRange.get(0));
-			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1);
-			// removed + 1 here due to new image drawing (otherwise selection was not accurate by 1 pixel)
+			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) +1);
+			// removed + 1 here due to new image drawing (otherwise selection
+			//was not accurate by 1 pixel)
 
 			if (ep < sp) {
 				ep = sp;
@@ -497,13 +498,13 @@ public class InteractiveMatrixView extends MatrixView implements
 	int pressedX;
 	int pressedY;
 	MouseEvent dragEvent;
+	MouseEvent pressedEvent;   //To process clicks initiated via timer
 
 	/* TODO move to a specified controller class */
 	private class MatrixMouseListener extends MouseAdapter {
 
 		boolean    isMousePressed;
 		int        clickCount;     //Need to determine single/double/etc clicks
-		MouseEvent pressedEvent;   //To process clicks initiated via timer
 
 		@Override
 		public void mouseMoved(final MouseEvent e) {
@@ -547,7 +548,8 @@ public class InteractiveMatrixView extends MatrixView implements
 				//point in case the timer has not yet started the drag
 				debug("mouseDragged: pressedEvent is [" +
 					((pressedEvent == null) ? "null" : "defined") + "].",10);
-				debug("mouseDragged: pressedX [" + pressedX + "] pressedY [" + pressedY + "].",10);
+				debug("mouseDragged: pressedX [" + pressedX + "] pressedY [" +
+					pressedY + "].",10);
 				if(e.isShiftDown()) {
 					processLeftShiftDragDuring(pressedX,pressedY,e.getX(),
 						e.getY());
@@ -572,21 +574,44 @@ public class InteractiveMatrixView extends MatrixView implements
 			//If the timer is still running and the user has not dragged the
 			//mouse
 			if(multiClickActionTimer != null &&
-				multiClickActionTimer.isRunning() && !xmap.isSelecting()) {
-				if(clickCount > 0 && clickCount % 2 == 0) {
-					multiClickActionTimer.restart();
+				multiClickActionTimer.isRunning() && !mouseWasDragged()) {
+
+				//Restart the timer to listen for the second click
+				multiClickActionTimer.setDelay(multiClickActionDelay);
+				multiClickActionTimer.restart();
+
+				//Immediately process multiclicks in intervals of the maximum
+				//number of supported clicks (in this case, a double-click).
+				//We will allow multi-clicks to continue and restart the timer
+				//so that they can continue to be detected as a single multi-
+				//click event.
+				if(clickCount > 2 && clickCount % 2 == 0) {
+
 					processClickEvents();
 				}
+
 				//Do nothing & let the timer trigger the click action
 				return;
-			} else if(multiClickActionTimer != null &&
+			}
+			//Else the mouse was dragged, so process the drag start (if
+			//necessary) and stop the timer
+			else if(multiClickActionTimer != null &&
 				multiClickActionTimer.isRunning()) {
+
+				//If we're not already in selecting mode, process the drag start
+				if(!xmap.isSelecting()) {
+					processLeftDragStart(pressedX,pressedY);
+				}
+
 				multiClickActionTimer.stop();
 			}
 
 			//This is a drag-selection event
-			debug("Mouse released. No longer selecting",4);
+			debug("Mouse released.",4);
 
+			//At this point, we are assured the timer has stopped, so we need to
+			//know if this is a release from a drag or a click event (possibly
+			//multi). xmap.isSelecting will be true if it is a drag.
 			//If this is a drag-select
 			if(xmap.isSelecting()) {
 				debug("Ending a drag-selection",10);
@@ -614,40 +639,56 @@ public class InteractiveMatrixView extends MatrixView implements
 
 		@Override
 		public void mousePressed(final MouseEvent e) {
-			Integer tmp =
-				(Integer) Toolkit.getDefaultToolkit().
-				getDesktopProperty("awt.multiClickInterval");
-			if(tmp != null) {
-				multiClickActionDelay = tmp;
-			}
 
 			if(!enclosingWindow().isActive()) {
 				return;
 			}
 
 			isMousePressed = true;
-			//Always record where the first click happened
-			pressedEvent = e;
-			pressedX = e.getX();
-			pressedY = e.getY();
-			debug("mousePressed: Setting pressedX [" + pressedX + "] and pressedY [" + pressedY + "].",10);
+
+			debug("mousePressed: Setting pressedX [" + pressedX +
+				"] and pressedY [" + pressedY + "].",10);
 
 			//If a previous 200ms timer is still running, restart the timer and
 			//increment the clickCount
 			if(multiClickActionTimer != null &&
 				multiClickActionTimer.isRunning()) {
+
+				multiClickActionTimer.setDelay(multiClickActionDelay);
 				multiClickActionTimer.restart();
 				clickCount++;
 			}
 			//Else this is a first click event - set clickCount to 1 and start
 			//the timer to listen for more clicks
 			else {
+
+				Integer tmp =
+					(Integer) Toolkit.getDefaultToolkit().
+					getDesktopProperty("awt.multiClickInterval");
+				if(tmp != null) {
+					multiClickActionInitialDelay = tmp;
+					multiClickActionDelay        = tmp;
+				}
+
 				clickCount = 1;
+
+				//Always record where the first click happened
+				pressedEvent = e;
+				pressedX = e.getX();
+				pressedY = e.getY();
+
+				//Start the drag event over so that we don't base the
+				//mouseWasDragged() calculation on a previous drag event
+				dragEvent = null;
+
 				if(multiClickActionTimer != null) {
+
+					multiClickActionTimer.
+						setDelay(multiClickActionInitialDelay);
 					multiClickActionTimer.start();
 				} else {
 					multiClickActionTimer =
-						new Timer(multiClickActionDelay,
+						new Timer(multiClickActionInitialDelay,
 							multiClickActionListener);
 					multiClickActionTimer.start();
 				}
@@ -686,6 +727,7 @@ public class InteractiveMatrixView extends MatrixView implements
 		 * initiated in mouseReleased. The fact that this timer is running is
 		 * used to determine whether or not mouseReleased should do anything.
 		 */
+		private int multiClickActionInitialDelay = 350;
 		private int multiClickActionDelay = 250;
 		private javax.swing.Timer multiClickActionTimer;
 		ActionListener multiClickActionListener = new ActionListener() {
@@ -698,35 +740,39 @@ public class InteractiveMatrixView extends MatrixView implements
 			public void actionPerformed(ActionEvent evt) {
 
 				if(evt.getSource() == multiClickActionTimer) {
+
 					/* Stop timer so it doesn't repeat */
 					multiClickActionTimer.stop();
 					multiClickActionTimer = null;
-					//If the left mouse button is pressed, we are in selecting
-					//mode (triggered by mouseDragged), and there's
-					//still only been a single click, start the drag selection
-					//Note that the mouseDragged function may have already
-					//called processLeftDragStart, but if the mouse moved very
-					//fast, it may not have captured the correct starting
-					//location, so that is corrected here.
-					if(isMousePressed &&
-						SwingUtilities.isLeftMouseButton(pressedEvent) &&
-						xmap.isSelecting() && clickCount == 1) {
+
+					//THIS FIRST IF CONDITIONAL MIGHT BE UNNECESSARY
+					//If the left mouse button is pressed, we're not already in
+					//drag-selecting mode, and it's a left-click, process the
+					//drag start.
+					if(isMousePressed && !xmap.isSelecting() &&
+						SwingUtilities.isLeftMouseButton(pressedEvent)) {
+
 						debug("Correcting drag start",10);
-						processLeftDragStart(pressedX,
-							pressedY);
+						processLeftDragStart(pressedX,pressedY);
 					}
-					//Else if the mouse button is not pressed, the click count
-					//is 1 and the mouse has not moved during the click
-					else if(!isMousePressed && clickCount == 1 &&
-						!xmap.isSelecting()) {
+					//Else if the mouse button is not pressed and the mouse has
+					//not moved during the click event (possibly multi)
+					else if(!isMousePressed && !mouseWasDragged()) {
+
 						processClickEvents();
 					}
-					//Else if the mouse button is not pressed, the click count
-					//is 1 and the mouse finished moving before this timer
-					//action was triggered, then the drag end never got called
-					//to make the selection, so call it
-					else if(!isMousePressed && clickCount == 1 &&
-						xmap.isSelecting()) {
+					//Else if the mouse button is not pressed and the mouse
+					//finished moving before this timer action was triggered,
+					//then the drag end never got called to make the selection,
+					//so call it
+					else if(!isMousePressed && mouseWasDragged()) {
+
+						if(!xmap.isSelecting()) {
+
+							debug("Correcting drag start",10);
+							processLeftDragStart(pressedX,
+								pressedY);
+						}
 
 						//Figure out the end of the drag event
 						int dragX,dragY;
@@ -920,6 +966,28 @@ public class InteractiveMatrixView extends MatrixView implements
 					pressedY);
 			}
 		}
+
+		/**
+		 * Only to be called by the multiClickDetectionTimer. This method
+		 * returns true if the cursor position changed significantly between the
+		 * first click and the last drag position by the time the timer goes off
+		 * @author rleach
+		 * @param 
+		 * @return 
+		 * @return
+		 */
+		public boolean mouseWasDragged() {
+
+			double maxPixelDistance = 4.0;
+			if(pressedEvent == null || dragEvent == null) {
+				return(false);
+			} else {
+				double xdist = dragEvent.getX() - pressedEvent.getX();
+				double ydist = dragEvent.getY() - pressedEvent.getY();
+				double distance = Math.sqrt(xdist*xdist + ydist*ydist);
+				return(distance > maxPixelDistance);
+			}
+		}
 	}
 
 	/**
@@ -1013,45 +1081,55 @@ public class InteractiveMatrixView extends MatrixView implements
 						ymap.getIndex(yPixel)) &&
 					//Selected area is not scrolled to
 					//visible area
-					(geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) !=
-					ymap.getFirstVisible() ||
-					arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) !=
-					xmap.getFirstVisible())))) {
+					(geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel))
+						!= ymap.getFirstVisible() ||
+					arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel))
+					!= xmap.getFirstVisible())))) {
 
 				if(stepwiseZoom) {
 					if(zoomSpeed == 2) {
 
 						hardZoomToTarget(
-							arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-							(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-								arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-								1),
-							geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-							(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-								geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-								1));
+							arraySelection.getMinContiguousIndex(
+								xmap.getIndex(xPixel)),
+							(arraySelection.getMaxContiguousIndex(
+								xmap.getIndex(xPixel)) -
+								arraySelection.getMinContiguousIndex(
+									xmap.getIndex(xPixel)) + 1),
+							geneSelection.getMinContiguousIndex(
+								ymap.getIndex(yPixel)),
+							(geneSelection.getMaxContiguousIndex(
+								ymap.getIndex(yPixel)) -
+								geneSelection.getMinContiguousIndex(
+									ymap.getIndex(yPixel)) + 1));
 					} else {
 
 						//Zoom to sub-selection
 						smoothAnimatedZoomToTarget(
-							arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-							(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-								arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-								1),
-							geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-							(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-								geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-								1));
+							arraySelection.getMinContiguousIndex(
+								xmap.getIndex(xPixel)),
+							(arraySelection.getMaxContiguousIndex(
+								xmap.getIndex(xPixel)) -
+								arraySelection.getMinContiguousIndex(
+									xmap.getIndex(xPixel)) + 1),
+							geneSelection.getMinContiguousIndex(
+								ymap.getIndex(yPixel)),
+							(geneSelection.getMaxContiguousIndex(
+								ymap.getIndex(yPixel)) -
+								geneSelection.getMinContiguousIndex(
+									ymap.getIndex(yPixel)) + 1));
 					}
 				} else {
 
 					//Zoom to sub-selection
 					smoothAnimatedZoomTowardTarget(
-						arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
+						arraySelection.getMinContiguousIndex(
+							xmap.getIndex(xPixel)),
 	
-						(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-						arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-						1),
+						(arraySelection.getMaxContiguousIndex(
+							xmap.getIndex(xPixel)) -
+							arraySelection.getMinContiguousIndex(
+								xmap.getIndex(xPixel)) + 1),
 	
 						geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
 	
@@ -1078,14 +1156,26 @@ public class InteractiveMatrixView extends MatrixView implements
 
 				if(stepwiseZoom) {
 
-					//Zoom to selection
-					smoothAnimatedZoomToTarget(
-						arraySelection.getMinIndex(),
-						(arraySelection.getMaxIndex() -
-							arraySelection.getMinIndex() + 1),
-						geneSelection.getMinIndex(),
-						(geneSelection.getMaxIndex() -
-							geneSelection.getMinIndex() + 1));
+					if(zoomSpeed == 2) {
+
+						hardZoomToTarget(
+							arraySelection.getMinIndex(),
+							(arraySelection.getMaxIndex() -
+								arraySelection.getMinIndex() + 1),
+							geneSelection.getMinIndex(),
+							(geneSelection.getMaxIndex() -
+								geneSelection.getMinIndex() + 1));
+					} else {
+
+						//Zoom to selection
+						smoothAnimatedZoomToTarget(
+							arraySelection.getMinIndex(),
+							(arraySelection.getMaxIndex() -
+								arraySelection.getMinIndex() + 1),
+							geneSelection.getMinIndex(),
+							(geneSelection.getMaxIndex() -
+								geneSelection.getMinIndex() + 1));
+					}
 				} else {
 
 					//Zoom toward selection
@@ -1104,8 +1194,15 @@ public class InteractiveMatrixView extends MatrixView implements
 
 				if(stepwiseZoom) {
 
-					smoothAnimatedZoomToTarget(xmap.getIndex(xPixel),1,
-						ymap.getIndex(yPixel),1);
+					if(zoomSpeed == 2) {
+
+						hardZoomToTarget(xmap.getIndex(xPixel),1,
+							ymap.getIndex(yPixel),1);
+					} else {
+
+						smoothAnimatedZoomToTarget(xmap.getIndex(xPixel),1,
+							ymap.getIndex(yPixel),1);
+					}
 				} else {
 
 					smoothAnimatedZoomTowardPixel(xPixel,yPixel,zoomDegree);
@@ -1125,26 +1222,34 @@ public class InteractiveMatrixView extends MatrixView implements
 
 						//Zoom to sub-selection
 						hardZoomToTarget(
-							arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-							(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-								arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-								1),
-							geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-							(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-								geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-								1));
+							arraySelection.getMinContiguousIndex(
+								xmap.getIndex(xPixel)),
+							(arraySelection.getMaxContiguousIndex(
+								xmap.getIndex(xPixel)) -
+								arraySelection.getMinContiguousIndex(
+									xmap.getIndex(xPixel)) + 1),
+							geneSelection.getMinContiguousIndex(
+								ymap.getIndex(yPixel)),
+							(geneSelection.getMaxContiguousIndex(
+								ymap.getIndex(yPixel)) -
+								geneSelection.getMinContiguousIndex(
+									ymap.getIndex(yPixel)) + 1));
 					} else {
 
 						//Zoom to sub-selection
 						smoothAnimatedZoomToTarget(
-							arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)),
-							(arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) -
-								arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
-								1),
-							geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-							(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-								geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-								1));
+							arraySelection.getMinContiguousIndex(
+								xmap.getIndex(xPixel)),
+							(arraySelection.getMaxContiguousIndex(
+								xmap.getIndex(xPixel)) -
+								arraySelection.getMinContiguousIndex(
+									xmap.getIndex(xPixel)) + 1),
+							geneSelection.getMinContiguousIndex(
+								ymap.getIndex(yPixel)),
+							(geneSelection.getMaxContiguousIndex(
+								ymap.getIndex(yPixel)) -
+								geneSelection.getMinContiguousIndex(
+									ymap.getIndex(yPixel)) + 1));
 					}
 				}
 				//If click was inside a selection or between selections and the
@@ -1179,8 +1284,8 @@ public class InteractiveMatrixView extends MatrixView implements
 
 					if(zoomSpeed == 2) {
 
-						hardZoomToTarget(xmap.getMinIndex(),xmap.getMaxIndex() + 1,
-							ymap.getMinIndex(),ymap.getMaxIndex() + 1);
+						hardZoomToTarget(xmap.getMinIndex(),xmap.getMaxIndex() +
+							1,ymap.getMinIndex(),ymap.getMaxIndex() + 1);
 					} else {
 
 						smoothAnimatedZoomOut();
@@ -1493,6 +1598,31 @@ public class InteractiveMatrixView extends MatrixView implements
 	}
 
 	/**
+	 * Processes left click temporary drag start event (called by
+	 * mouseDragged and not the timer which detects multi-clicks so that double-
+	 * clicks where the mouse is accidentally slightly dragged can perform a
+	 * double-click instead of a drag event and potentially mess up a user's
+	 * existing selection)
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
+	public void processTemporaryLeftDragStart(int xPixelStart,int yPixelStart,
+		int xPixel,int yPixel) {
+
+		startPoint.setLocation(xmap.getIndex(xPixelStart),
+			ymap.getIndex(yPixelStart));
+		endPoint.setLocation(xmap.getIndex(xPixel),
+			ymap.getIndex(yPixel));
+
+		dragRect.setLocation(startPoint.x,startPoint.y);
+		dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
+
+		drawBand(dragRect);
+		repaint();
+	}
+
+	/**
 	 * Processes left click drag end event
 	 * @author rleach
 	 * @param xPixel
@@ -1521,7 +1651,8 @@ public class InteractiveMatrixView extends MatrixView implements
 
 		drawBand(dragRect);
 
-		debug("Selecting startpoint: [" + startPoint.x + "," + startPoint.y + "] to endPoint: [" + endPoint.x + "," + endPoint.y + "].",10);
+		debug("Selecting startpoint: [" + startPoint.x + "," + startPoint.y +
+			"] to endPoint: [" + endPoint.x + "," + endPoint.y + "].",10);
 		selectRectangle(startPoint,endPoint);
 
 		repaint();
@@ -1612,7 +1743,8 @@ public class InteractiveMatrixView extends MatrixView implements
 		//If the timer hasn't done this yet, we now have confirmation this is a
 		//left-click drag event
 		if(!xmap.isSelecting()) {
-			processLeftDragStart(xPixelStart,yPixelStart);
+			processTemporaryLeftDragStart(xPixelStart,yPixelStart,xPixel,
+				yPixel);
 		}
 
 		debug("Mouse dragged. Updating hover indexes to [" +
@@ -1646,7 +1778,8 @@ public class InteractiveMatrixView extends MatrixView implements
 		//If the timer hasn't done this yet, we now have confirmation this is a
 		//left-click drag event
 		if(!xmap.isSelecting()) {
-			processLeftDragStart(xPixelStart,yPixelStart);
+			processTemporaryLeftDragStart(xPixelStart,yPixelStart,xPixel,
+				yPixel);
 		}
 
 		debug("Mouse dragged. Updating hover indexes to [" +
@@ -1662,7 +1795,7 @@ public class InteractiveMatrixView extends MatrixView implements
 
 		/* Full gene selection */
 		dragRect.setLocation(xmap.getMinIndex(),startPoint.y);
-		dragRect.setSize(0, 0);
+		dragRect.setSize(0,0);
 		dragRect.add(xmap.getMaxIndex(),endPoint.y);
 
 		drawBand(dragRect);
@@ -1680,7 +1813,8 @@ public class InteractiveMatrixView extends MatrixView implements
 		//If the timer hasn't done this yet, we now have confirmation this is a
 		//left-click drag event
 		if(!xmap.isSelecting()) {
-			processLeftDragStart(xPixelStart,yPixelStart);
+			processTemporaryLeftDragStart(xPixelStart,yPixelStart,xPixel,
+				yPixel);
 		}
 
 		debug("Mouse dragged. Updating hover indexes to [" +
@@ -2352,20 +2486,20 @@ public class InteractiveMatrixView extends MatrixView implements
 
 			long startTime = System.currentTimeMillis();
 		
-			//Zooming out is slower on large matrices because it just takes longer
-			//to draw large amounts of cells, so our cutoff wait time should be
-			//smaller if we are zooming out
+			//Zooming out is slower on large matrices because it just takes
+			//longer to draw large amounts of cells, so our cutoff wait time
+			//should be smaller if we are zooming out
 			int doneWaitingMillis = 500;
 		
-			//Let's calculate the relative position of the center of the selection
-			//and gradually zoom toward that spot in a loop
+			//Let's calculate the relative position of the center of the
+			//selection and gradually zoom toward that spot in a loop
 			while((xmap.getNumVisible() != numXSelectedIndexes ||
 				ymap.getNumVisible() != numYSelectedIndexes) &&
 				targetDiffX > Math.abs(xmap.getNumVisible() - startVisX) &&
 				targetDiffY > Math.abs(ymap.getNumVisible() - startVisY)) {
 		
-				//If drawing the zoom increment levels is taking too long, snap out
-				//of it.
+				//If drawing the zoom increment levels is taking too long, snap
+				//out of it.
 				if((System.currentTimeMillis() - startTime) > doneWaitingMillis)
 					break;
 
@@ -2375,7 +2509,8 @@ public class InteractiveMatrixView extends MatrixView implements
 				smoothZoomTowardSelection(selecXStartIndex,numXSelectedIndexes,
 					selecYStartIndex,numYSelectedIndexes,false,-1.0);
 
-				debug("Zoomed by [" + targetDiffX + "," + targetDiffY + "] thus far",11);
+				debug("Zoomed by [" + targetDiffX + "," + targetDiffY +
+					"] thus far",11);
 		
 				//Force an immediate repaint.  Found this in a thread here:
 				//https://community.oracle.com/thread/1663771
@@ -2425,8 +2560,8 @@ public class InteractiveMatrixView extends MatrixView implements
 
 			debug("Hard zooming to target to finish off the zoom step.",11);
 
-			hardZoomToTarget(selecXStartIndex,numXSelectedIndexes,selecYStartIndex,
-				numYSelectedIndexes);
+			hardZoomToTarget(selecXStartIndex,numXSelectedIndexes,
+				selecYStartIndex,numYSelectedIndexes);
 		}
 
 		//We will update the aspect ratio just in case it didn't happen
