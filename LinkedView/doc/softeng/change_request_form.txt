@@ -1,0 +1,35 @@
+Change Request/BitBucket Issue Template
+Version 1.1
+
+References:
+1. TreeView's BitBucket Issue #277
+2. change_request_template.txt from the LANL genome annotation toolkit project
+
+THE FOLLOWING IS TO BE PRE-PASTED INTO ALL NEW BITBUCKET ISSUES
+===============================================================
+Please use the form below to submit issues.
+Reference: docs/softeng/change_request_form.txt
+
+USE CASE: WHAT DO YOU WANT TO DO?
+e.g. Adjust image colors
+
+STEPS TO REPRODUCE AN ISSUE (OR TRIGGER A NEW FEATURE)
+e.g. Click an "adjust colors" button
+
+CURRENT BEHAVIOR
+e.g. There's no color selection window
+
+EXPECTED BEHAVIOR
+e.g. A color selection window opens
+
+****DEVELOPERS ONLY****
+SUGGESTED CHANGE (Pseudocode optional)
+e.g. Add a color selection class
+
+FILES AFFECTED (where the changes will be implemented) - developers only
+e.g. selectColor.java & settingsPanel.java
+
+LEVEL OF EFFORT - developers only
+trivial/minor/medium/major/overhaul (choose one)
+
+COMMENTS

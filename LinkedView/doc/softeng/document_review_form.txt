@@ -1,0 +1,44 @@
+DOCUMENT REVIEW FORM
+Version 1.2
+
+PURPOSE: This template is for use when conducting a document review.
+
+USAGE:
+1. A merge request form is submitted for review to the CCB Librarian including a
+   branch or a diff.[2]
+2. When the level of effort of the change is Medium+, the Librarian schedules a
+   document review meeting with the CM Leader.
+3. The CCB Librarian (adds line numbers and) distributes the document (with
+   "_inspection" appended to the file name before the file extension), along
+   with a suggested meeting time, to a minimum of 2 reviewers of his/her choice,
+   including the CM Leader.
+4. Each reviewer inspects the changes, notes issues using the below review
+   template (including the header), and makes a recommendation as to whether a
+   meeting is necessary.  The reviewer appends their first name to the file name
+   before the file extension.
+5. Completed forms are submitted to the CM Leader 24 hours before the meeting.
+
+REFERENCES:
+1. inspection_template.txt from the LANL finishing system project, 07/05/06
+2. merge_request_form.txt version 1.0
+
+REVIEW TEMPLATE
+===============
+
+          DOCUMENT NAME: 
+              COMMIT ID: 
+ BITBUCKET ISSUE NUMBER: 
+NUMBER OF CHANGED LINES: 
+            AUTHOR NAME: 
+      NAME OF INSPECTOR: 
+          DATE RECEIVED: 
+         RECOMMENDATION: Meeting/Accept As-Is/Accept after issues addressed
+
+Copy & paste this item template for each issue found:
+----------------------------------------------------------------------
+ ISSUE NUMBER: 1
+         LINE: 
+     SEVERITY: Critical/Serious/Minor/Question/Typo (choose one)
+  DESCRIPTION: 
+SUGGESTED FIX: 
+
