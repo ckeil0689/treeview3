@@ -1,9 +1,41 @@
-Commit/Merge Request
-Version 1.0
+COMMIT/MERGE/PULL FORM
+Version 1.1
+Prepared by: Robert Leach
+
+PURPOSE: This template is for use when submitting a merge/pull request.
 
 REFERENCES:
 change_request_form.txt version 1.2
-document_review_form.txt version 1.1
+document_review_form.txt version 1.3
+
+SECTION 1: BITBUCKET PULL REQUEST
++++++++++++++++++++++++++++++++++
+
+USAGE:
+1. When completed changes are ready to be committed to the PSL/PDL/Master
+   Branch, the author must create a pull request on BitBucket, then paste and
+   complete the below form and submit the request.
+2. Once the request has been approved, the changes may be committed/merged with
+   the remote master branch.  Note, changes requiring minor/trivial effort may
+   be approved/rejected by the CCB Librarian directly.  Medium+ effort changes
+   require a document review meeting organized by the CCB Librarian and CM
+   Leader.
+
+COMMIT/MERGE REQUEST FORM
+=========================
+
+DATE OF COMPLETION: 
+
+BITBUCKET ISSUE NUMBER: 
+
+LEVEL OF EFFORT: trivial/minor/medium/major/overhaul (choose one)
+
+DESCRIPTION OF CHANGES:
+
+
+
+SECTION 2: MANUAL MERGE/COMMIT REQUEST
+++++++++++++++++++++++++++++++++++++++
 
 USAGE:
 1. When completed changes are ready to be committed to the PSL/PDL/Master
@@ -33,3 +65,4 @@ DESCRIPTION OF CHANGES:
 
 NOTE: INCLUDE A COPY OF NEW FILES & THE OUTPUT OF `git diff <filename>` ON ALL
 CHANGED FILES WITH THE SUBMISSION OF THIS FORM
+   
