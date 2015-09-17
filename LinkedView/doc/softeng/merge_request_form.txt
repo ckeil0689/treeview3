@@ -10,10 +10,10 @@ USAGE:
    Branch, the author must complete this form and submit it with required
    documentation to the CCB librarian.
 2. Once the request has been approved, the changes may be committed/merged with
-   the remote master branch.  Note, changes requiring minor/trivial effort may
-   be approved/rejected by the CCB Librarian directly.  Medium+ effort changes
-   require a document review meeting organized by the CCB Librarian and CM
-   Leader.
+   the remote master branch by the change author.  Note, changes requiring
+   minor/trivial effort may be approved/rejected by the CCB Librarian directly.
+   Medium+ effort changes require a document review meeting organized by the CCB
+   Librarian and CM Leader.
 
 COMMIT/MERGE REQUEST FORM
 =========================
