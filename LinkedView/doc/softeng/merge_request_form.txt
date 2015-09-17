@@ -20,7 +20,7 @@ COMMIT/MERGE REQUEST FORM
 
            AUTHOR NAME: 
     DATE OF COMPLETION: 
-BITBUCKET ISSUE NUMBER: 
+BITBUCKET ISSUE NUMBER: #
    CHANGED BRANCH NAME: 
        BRANCH LOCATION: local/remote (choose one)
        LEVEL OF EFFORT: trivial/minor/medium/major/overhaul (choose one)
