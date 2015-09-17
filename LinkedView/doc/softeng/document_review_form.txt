@@ -1,7 +1,53 @@
 DOCUMENT REVIEW FORM
-Version 1.2
+Version 1.3
 
 PURPOSE: This template is for use when conducting a document review.
+
+REFERENCES:
+1. inspection_template.txt from the LANL finishing system project, 07/05/06
+2. merge_request_form.txt version 1.1
+
+SECTION 1: BITBUCKET PULL REQUEST REVIEW
+++++++++++++++++++++++++++++++++++++++++
+
+USAGE:
+1. The CCB Librarian reviews a submitted pull request via BitBucket.[2]
+2. When the level of effort of the change is Medium+, the Librarian schedules a
+   document review meeting with the CM Leader.
+3. The CCB Librarian sends a link to the pull request, along with a suggested
+   meeting time, to a minimum of 2 reviewers of his/her choice, including the CM
+   Leader.
+4. Each reviewer inspects the changes via the diff panes on the BitBucket pull
+   request page.  Issues/problems are commented on by hovering over the
+   associated line number.  For each issue comment the below review template is
+   pasted and filled out.  Issues without a clearly applicable line number may
+   be entered using the comment button at the top-right of the diff pane.
+5. The reviewer lastly, adds a comment to the pull request with a recommendation
+   as to whether they feel a meeting is necessary.  The recommendation can be
+   one of: Meeting/Accept As-Is/Accept after issues addressed.
+6. If a period of 2 weeks passes without a scheduled meeting or a response from
+   the CCB Librarian, the merge may proceed as-is.  A merge request may be
+   resubmitted with changes if initially rejected.
+
+BITBUCKET REVIEW TEMPLATE
+=========================
+
+RECOMMENDATION: Meeting/Accept As-Is/Accept after issues addressed
+
+Copy & paste this item template for each issue found:
+----------------------------------------------------------------------
+LINE(S): 
+
+SEVERITY: Critical/Serious/Minor/Question/Typo (choose one)
+
+DESCRIPTION: 
+
+SUGGESTED FIX: 
+
+
+
+SECTION 2: MANUAL MERGE/COMMIT REQUEST REVIEW
++++++++++++++++++++++++++++++++++++++++++++++
 
 USAGE:
 1. A merge request form is submitted for review to the CCB Librarian including a
@@ -18,12 +64,8 @@ USAGE:
    before the file extension.
 5. Completed forms are submitted to the CM Leader 24 hours before the meeting.
 
-REFERENCES:
-1. inspection_template.txt from the LANL finishing system project, 07/05/06
-2. merge_request_form.txt version 1.0
-
-REVIEW TEMPLATE
-===============
+MANUAL REVIEW TEMPLATE
+======================
 
           DOCUMENT NAME: 
               COMMIT ID: 
