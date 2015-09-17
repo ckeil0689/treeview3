@@ -2,11 +2,9 @@ Document Review Meeting Guidelines
 Version 1.1
 Prepared by: Robert Leach
 
-PURPOSE
-
-The purpose of the document review meeting is only to present perceived issues
-with the document(s) being reviewed and to ensure that the issues are understood
-by the developer.
+PURPOSE: The purpose of the document review meeting is only to present perceived
+         issues with the document(s) being reviewed and to ensure that the
+         issues are understood by the developer.
 
 MEETING RULES
 
