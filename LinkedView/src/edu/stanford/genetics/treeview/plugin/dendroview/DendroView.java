@@ -370,7 +370,7 @@ public class DendroView implements Observer, DendroPanel {
 		searchBarPanel = createSearchBarPanel();
 		
 		// Toolbar
-		toolbarPanel = GUIFactory.createJPanel(false, GUIFactory.DEBUG);
+		toolbarPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_NO_INS);
 		toolbarPanel.add(colorValIndicatorPanel, "al left, w 33%");
 		toolbarPanel.add(navBtnPanel, "al center, pushx");
 		toolbarPanel.add(searchBarPanel, "al right, w 33%");
