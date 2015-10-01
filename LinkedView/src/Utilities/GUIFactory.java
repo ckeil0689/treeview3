@@ -155,7 +155,7 @@ public class GUIFactory {
 			break;
 			
 		case TINY_GAPS_INS:
-			comp.setLayout(new MigLayout("gap 1!, ins 3"));
+			comp.setLayout(new MigLayout("gap 2!, ins 3"));
 			break;
 			
 		case DEBUG:

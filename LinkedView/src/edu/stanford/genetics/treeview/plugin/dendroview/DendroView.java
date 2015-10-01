@@ -57,7 +57,6 @@ import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.HeaderFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
-//import com.sun.glass.events.MouseEvent;
 
 /**
  * TODO Refactor this JavaDoc. It's not applicable to the current program
@@ -371,8 +370,8 @@ public class DendroView implements Observer, DendroPanel {
 		searchBarPanel = createSearchBarPanel();
 		
 		// Toolbar
-		toolbarPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_NO_INS);
-		toolbarPanel.add(colorValIndicatorPanel, "w 33%, pushx");
+		toolbarPanel = GUIFactory.createJPanel(false, GUIFactory.DEBUG);
+		toolbarPanel.add(colorValIndicatorPanel, "al left, w 33%");
 		toolbarPanel.add(navBtnPanel, "al center, pushx");
 		toolbarPanel.add(searchBarPanel, "al right, w 33%");
 		
@@ -603,7 +602,7 @@ public class DendroView implements Observer, DendroPanel {
 		globalOverviewPanel = createGlobalOverviewPanel();
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
 		
-		matrixPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_NO_INS);
+		matrixPanel = GUIFactory.createJPanel(false, GUIFactory.TINY_GAPS_INS);
 		matrixPanel.add(globalOverviewPanel, "h 160!, w 160!, grow 0");
 		matrixPanel.add(colDataPane, "h 160!, pushx, "
 				+ "growx, growy 0, wrap");
@@ -1507,9 +1506,6 @@ public class DendroView implements Observer, DendroPanel {
 
 		double rel_div_loc = abs_div_loc / max_div_loc;
 		rel_div_loc = Helper.roundDouble(rel_div_loc, 2);
-		
-//		final int tmp = (int) ((abs_div_loc / max_div_loc) * 100);
-//		final double rel_div_loc = tmp / 100.0;
 
 		return (rel_div_loc > 1.0) ? 1.0 : rel_div_loc;
 	}
