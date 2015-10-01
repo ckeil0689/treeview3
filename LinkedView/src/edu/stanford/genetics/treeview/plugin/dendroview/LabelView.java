@@ -174,10 +174,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		if(isGeneAxis) {
 			scrollPane = new JScrollPane(this,
 				            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-				            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		} else {
 			scrollPane = new JScrollPane(this,
-			                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+			                ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 			                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		}
 		
