@@ -30,6 +30,7 @@ import edu.stanford.genetics.treeview.WideComboBox;
 
 public class GUIFactory {
 
+	// Application fonts
 	public static final Font FONTXS = new Font("Sans Serif", Font.PLAIN, 12);
 	public static final Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
 	public static final Font FONTS_B = new Font("Sans Serif", Font.BOLD, 14);
@@ -38,6 +39,7 @@ public class GUIFactory {
 	public static final Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
 	public static final Font FONTXXL = new Font("Sans Serif", Font.PLAIN, 30);
 
+	// Color scheme
 	public static final Color DEFAULT_BG = UIManager
 			.getColor("Panel.background");
 	public static final Color MAIN = new Color(30, 144, 255, 255);
@@ -45,6 +47,7 @@ public class GUIFactory {
 	public static final Color ELEMENT_HOV = new Color(122, 214, 255, 255);
 	public static final Color RED1 = new Color(240, 80, 50, 255);
 
+	// Layout modes
 	public static final int DEFAULT = 0;
 	public static final int NO_PADDING_FILL = 1;
 	public static final int NO_PADDING = 2;
@@ -55,9 +58,10 @@ public class GUIFactory {
 	public static final int NO_GAPS_NO_INS_X = 7;
 	public static final int NO_GAPS_NO_INS_Y = 8;
 	public static final int NO_GAPS_NO_INS = 9;
-	public static final int NO_GAPS_NO_INS_FILL = 10;
-	public static final int TINY_GAPS_INS = 11;
-	public static final int DEBUG = 12;
+	public static final int NO_GAPS_NO_INS_LEFT_TOP = 10;
+	public static final int NO_GAPS_NO_INS_FILL = 11;
+	public static final int TINY_GAPS_INS = 12;
+	public static final int DEBUG = 13;
 
 	/**
 	 * Creates and returns a simple JPanel with MigLayout to be used as
@@ -96,7 +100,8 @@ public class GUIFactory {
 	 *            Sets the main MigLayout constrains for panel insets.
 	 * @return A JPanel.
 	 */
-	public static JPanel createJPanel(final boolean opaque, final int panel_mode) {
+	public static JPanel createJPanel(final boolean opaque, 
+			final int panel_mode) {
 
 		return createJPanel(opaque, panel_mode, null);
 	}
@@ -150,12 +155,16 @@ public class GUIFactory {
 			comp.setLayout(new MigLayout("gapy 0!, ins 0 5 0 5", "grow"));
 			break;
 			
+		case NO_GAPS_NO_INS_LEFT_TOP:
+			comp.setLayout(new MigLayout("gapy 0!, ins 0 0 5 5", "grow"));
+			break;
+			
 		case NO_GAPS_NO_INS_FILL:
 			comp.setLayout(new MigLayout("gap 0!, ins 0", "grow"));
 			break;
 			
 		case TINY_GAPS_INS:
-			comp.setLayout(new MigLayout("gap 2!, ins 3"));
+			comp.setLayout(new MigLayout("gap 1!, ins 3"));
 			break;
 			
 		case DEBUG:
@@ -266,9 +275,9 @@ public class GUIFactory {
 	 * the layout setting for buttons so that all navigation buttons will look
 	 * similar.
 	 *
-	 * @param title
-	 * @param iconFileName
-	 * @return
+	 * @param iconFileName The name of the icon file.
+	 * @return A 40x40 JButton with an icon if an iconFileName is supplied. A
+	 * default button to highlight a missing icon file otherwise.
 	 */
 	public static JButton createIconBtn(final String iconFileName) {
 
