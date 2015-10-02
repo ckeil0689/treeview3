@@ -529,7 +529,7 @@ public class DendroView implements Observer, DendroPanel {
 		
 		JPanel colNavPanel;
 		
-		colNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_GAPS_NO_INS);
+		colNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_NO_INS);
 		colNavPanel.add(scaleAddLeftX);
 		colNavPanel.add(scaleRemoveLeftX);
 
@@ -550,7 +550,7 @@ public class DendroView implements Observer, DendroPanel {
 		
 		JPanel rowNavPanel;
 		
-		rowNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_GAPS_NO_INS);
+		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_NO_INS);
 		
 		rowNavPanel.add(scaleAddTopY, "wrap");
 		rowNavPanel.add(scaleRemoveTopY, "wrap");
@@ -581,8 +581,8 @@ public class DendroView implements Observer, DendroPanel {
 		interactiveMatrixPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_GAPS_NO_INS);
 		interactiveMatrixPanel.add(interactiveMatrixView, "push, grow");
-		interactiveMatrixPanel.add(rowNavPanel, "gapleft 1, h 100%, wrap");
-		interactiveMatrixPanel.add(colNavPanel, "gaptop 1, w 100%");
+		interactiveMatrixPanel.add(rowNavPanel, "h 100%, wrap");
+		interactiveMatrixPanel.add(colNavPanel, "w 100%");
 		
 		return interactiveMatrixPanel;
 	}
@@ -603,7 +603,7 @@ public class DendroView implements Observer, DendroPanel {
 		globalOverviewPanel = createGlobalOverviewPanel();
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
 		
-		matrixPanel = GUIFactory.createJPanel(true, GUIFactory.TINY_GAPS_INS, Color.CYAN);
+		matrixPanel = GUIFactory.createJPanel(false, GUIFactory.TINY_GAPS_INS);
 		matrixPanel.add(globalOverviewPanel, "h 160!, w 160!, grow 0");
 		matrixPanel.add(colDataPane, "h 160!, pushx, "
 				+ "growx, growy 0, wrap");
