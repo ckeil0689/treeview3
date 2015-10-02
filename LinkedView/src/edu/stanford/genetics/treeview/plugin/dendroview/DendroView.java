@@ -604,10 +604,10 @@ public class DendroView implements Observer, DendroPanel {
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
 		
 		matrixPanel = GUIFactory.createJPanel(false, GUIFactory.TINY_GAPS_INS);
-		matrixPanel.add(globalOverviewPanel, "h 200!, w 200!, grow 0");
-		matrixPanel.add(colDataPane, "h 200!, pushx, "
+		matrixPanel.add(globalOverviewPanel, "h 180!, w 180!, grow 0");
+		matrixPanel.add(colDataPane, "h 180!, pushx, "
 				+ "growx, growy 0, wrap");
-		matrixPanel.add(rowDataPane, "w 200!, pushy, growy, "
+		matrixPanel.add(rowDataPane, "w 180!, pushy, growy, "
 				+ "growx 0");
 		matrixPanel.add(interactiveMatrixPanel, "grow");
 		
