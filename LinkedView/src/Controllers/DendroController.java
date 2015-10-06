@@ -1101,7 +1101,7 @@ public class DendroController implements ConfigNodePersistent, Observer {
 											- rowSelection.getMinIndex() + 1));
 				} else {
 					dendroView.getInteractiveMatrixView()
-							.smoothAnimatedZoomTowardSelection(
+							.smoothAnimatedZoomToTarget(
 									colSelection.getMinIndex(),
 									(colSelection.getMaxIndex()
 											- colSelection.getMinIndex() + 1),

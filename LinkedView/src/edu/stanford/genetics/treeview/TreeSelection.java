@@ -130,6 +130,46 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 		return integerSelection.getMin();
 	}
 
+	/**
+	 * Given a selected index, return the minimum selected index that is
+	 * separated from the initial index be a contiguous series of 0 or more
+	 * selected indexes
+	 * @author rleach
+	 * @param i
+	 * @return int
+	 */
+	public int getMinContiguousIndex(final int i) {
+
+		//Error-check the input
+		if(!isIndexSelected(i) || i == 0) {
+			return(i);
+		}
+
+		int j = i;
+		for(j = i;j > 0 && isIndexSelected(j - 1);j--){}
+		return(j);
+	}
+
+	/**
+	 * Given a selected index, return the minimum selected index that is
+	 * separated from the initial index be a contiguous series of 0 or more
+	 * selected indexes
+	 * @author rleach
+	 * @param i
+	 * @return int
+	 */
+	public int getMaxContiguousIndex(final int i) {
+
+		//Error-check the input
+		if(!isIndexSelected(i) || i == getMaxIndex()) {
+			return(i);
+		}
+
+		int j = i;
+		for(j = i;j < getMaxIndex() && isIndexSelected(j + 1);j++){}
+		return(j);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

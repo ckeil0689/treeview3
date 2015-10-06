@@ -1210,7 +1210,7 @@ public class MapContainer extends Observable implements Observer,
 	 * This function calculates the fraction by which the zoom increment should
 	 * be if you want to draw increments in an animation (e.g. an animated
 	 * zoom).  Drawing large matrices takes a lot of time, thus animations
-	 * should zoom more when there are large abounts of squares to zoom
+	 * should zoom more when there are large amounts of squares to zoom
 	 * through
 	 */
 	public double getOptimalZoomIncrement(int targetNumIndexes,
@@ -2145,5 +2145,29 @@ public class MapContainer extends Observable implements Observer,
 
 	public void setDeSelecting(boolean deselecting) {
 		this.deselecting = deselecting;
+	}
+
+	/**
+	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
+	 * zooming that is aware of aspect ratio
+	 * @author rleach
+	 * @param 
+	 * @return 
+	 * @return
+	 */
+	public double getZoomIncrement() {
+		return(ZOOM_INCREMENT);
+	}
+
+	/**
+	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
+	 * zooming that is aware of aspect ratio
+	 * @author rleach
+	 * @param 
+	 * @return 
+	 * @return
+	 */
+	public double getZoomIncrementFast() {
+		return(ZOOM_INCREMENT_FAST);
 	}
 }
