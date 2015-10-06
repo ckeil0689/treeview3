@@ -409,7 +409,7 @@ public class InteractiveMatrixView extends MatrixView implements
 			final List<Integer> boundaries = new ArrayList<Integer>(2);
 
 			sp = map.getPixel(selectionRange.get(0));
-			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) +1);
+			ep = map.getPixel(selectionRange.get(selectionRange.size() - 1) + 1);
 			// removed + 1 here due to new image drawing (otherwise selection
 			//was not accurate by 1 pixel)
 

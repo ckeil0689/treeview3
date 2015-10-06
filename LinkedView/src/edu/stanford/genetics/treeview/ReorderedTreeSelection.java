@@ -115,12 +115,14 @@ public class ReorderedTreeSelection extends Observable implements
 	public int getMinContiguousIndex(final int i) {
 
 		final int stop = parent.getMinContiguousIndex(i);
-		if(stop == -1)
+		if(stop == -1) {
 			return -1;
+		}
 
 		for(int j = reorderedIndex.length - 1;j >= 0;j--) {
-			if(reorderedIndex[j] == stop)
+			if(reorderedIndex[j] == stop) {
 				return j;
+			}
 		}
 		return(-1);
 	}
@@ -136,12 +138,14 @@ public class ReorderedTreeSelection extends Observable implements
 	public int getMaxContiguousIndex(final int i) {
 
 		final int stop = parent.getMinContiguousIndex(i);
-		if(stop == -1)
+		if(stop == -1) {
 			return -1;
+		}
 
 		for(int j = reorderedIndex.length - 1;j >= 0;j--) {
-			if(reorderedIndex[j] == stop)
+			if(reorderedIndex[j] == stop) {
 				return j;
+			}
 		}
 		return(-1);
 	}

@@ -146,7 +146,11 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 		}
 
 		int j = i;
-		for(j = i;j > 0 && isIndexSelected(j - 1);j--){}
+		for(j = i;j > 0;j--){
+			if(isIndexSelected(j - 1)) {
+				break;
+			}
+		}
 		return(j);
 	}
 
@@ -166,7 +170,11 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 		}
 
 		int j = i;
-		for(j = i;j < getMaxIndex() && isIndexSelected(j + 1);j++){}
+		for(j = i;j < getMaxIndex();j++){
+			if(isIndexSelected(j + 1)) {
+				break;
+			}
+		}
 		return(j);
 	}
 
