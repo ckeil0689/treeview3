@@ -2151,9 +2151,7 @@ public class MapContainer extends Observable implements Observer,
 	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
 	 * zooming that is aware of aspect ratio
 	 * @author rleach
-	 * @param 
-	 * @return 
-	 * @return
+	 * @return double ZOOM_INCREMENT
 	 */
 	public double getZoomIncrement() {
 		return(ZOOM_INCREMENT);
@@ -2163,9 +2161,7 @@ public class MapContainer extends Observable implements Observer,
 	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
 	 * zooming that is aware of aspect ratio
 	 * @author rleach
-	 * @param 
-	 * @return 
-	 * @return
+	 * @return double ZOOM_INCREMENT_FAST
 	 */
 	public double getZoomIncrementFast() {
 		return(ZOOM_INCREMENT_FAST);
