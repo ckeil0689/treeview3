@@ -22,7 +22,6 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -408,6 +407,9 @@ public class DendroView implements Observer, DendroPanel {
 
 		rowLabelPanel.add(rowLabelView.getComponent(), "w 100%, pushy, growy, "
 				+ "wrap");
+		// Row-Label scrollbar in sync with colNavPanel via MigLayout!
+		// Guaranteeing same size and alignment can only be done via manual add.
+		rowLabelPanel.add(rowLabelView.getSecondaryScrollBar(), "w 100%");
 		
 		return rowLabelPanel;
 	}
@@ -470,6 +472,9 @@ public class DendroView implements Observer, DendroPanel {
 		colLabelPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_GAPS_NO_INS);
 		colLabelPanel.add(colLabelView.getComponent(), "h 100%, pushx, growx");
+		// Col-Label scrollbar in sync with rowNavPanel via MigLayout!
+		// Guaranteeing same size and alignment can only be done via manual add.
+		colLabelPanel.add(colLabelView.getSecondaryScrollBar(), "h 100%");
 		
 		return colLabelPanel;
 	}
@@ -533,7 +538,7 @@ public class DendroView implements Observer, DendroPanel {
 		colNavPanel.add(scaleAddLeftX);
 		colNavPanel.add(scaleRemoveLeftX);
 
-		colNavPanel.add(matrixXscrollbar, "h 15px!, w 100%, growx, pushx");
+		colNavPanel.add(matrixXscrollbar, "w 100%, growx, pushx");
 		
 		colNavPanel.add(scaleRemoveRightX);
 		colNavPanel.add(scaleAddRightX);
@@ -555,7 +560,7 @@ public class DendroView implements Observer, DendroPanel {
 		rowNavPanel.add(scaleAddTopY, "wrap");
 		rowNavPanel.add(scaleRemoveTopY, "wrap");
 		
-		rowNavPanel.add(matrixYscrollbar, "w 15px!, growy, pushy, wrap");
+		rowNavPanel.add(matrixYscrollbar, "growy, push, wrap");
 		
 		rowNavPanel.add(scaleRemoveBottomY, "wrap");
 		rowNavPanel.add(scaleAddBottomY, "");

@@ -53,7 +53,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.IntegerMap;
-import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenu;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenuController;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;

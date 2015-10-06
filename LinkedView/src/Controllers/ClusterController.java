@@ -24,7 +24,6 @@ import Views.ClusterView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.IntHeaderInfo;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 

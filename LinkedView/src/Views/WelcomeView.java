@@ -15,10 +15,10 @@ import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
+import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 public class WelcomeView {
 

@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import Utilities.Helper;

@@ -171,15 +171,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		setLabelPortMode(true);
 
-		if(isGeneAxis) {
-			scrollPane = new JScrollPane(this,
-				            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-				            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		} else {
-			scrollPane = new JScrollPane(this,
-			                ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-			                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		}
+		/* 
+		 * This needs to be NEVER because the label scrollbars have to be 
+		 * manually added rather than automatically via JScrollPane. The main 
+		 * matrix scrollbars have also been manually added using MigLayout.
+		 * Otherwise alignment cannot be guaranteed without setting explicit 
+		 * pixel sizes which should rarely if ever be done. - Chris 
+		 */
+		scrollPane = new JScrollPane(this,
+			            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+			            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		scrollPane.setBorder(null);
 
