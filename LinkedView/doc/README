@@ -1,22 +1,45 @@
-This directory contains the documentation for the Java TreeView project.
+## WELCOME
 
-There are primarily two documents, the user's manual and the programmer's guide, in the respective directories  JTVProgrammerGuide  and JTVUserManual. 
-Please see createAllDoc.pl for details of how this are actually built.
+TreeView is a software for visualizing clustergrams. It was first released in
+1998 by Michael Eisen and then, a few years later, by Alok Saldanha, who
+developed an open source version Java TreeView .
 
-The build sequence for the documentation consists of makins a single-page HTML, a multi-page html document, and a pdf 
-using commands similar to the following:
+Despite its popularity (~1,900 downloads/month on average), Java Treeview has
+not been updated in almost a decade and has collected many bug reports and
+feature requests. We are now working on addressing these issues and releasing a
+new version of Java TreeView that will be faster, cleaner and easier to use.
 
-cd JTVUserManual
+Current users of Java TreeView! How are you, gentlepeople? We need your help. We
+need to know which software features you use and which ones are obsolete. We'd
+like to hear your requests, comments, suggestions and complaints.
 
-xsltproc -o single.html /common/docbook/docbook-xsl-1.65.1/html/docbook.xsl JTVUserManual.xml
+If you are interested in providing feedback, or would like to request to be
+added to our pre-release testers email list, please contact us at
+treeview@princeton.edu. We will send you updates and ask for your opinion in
+occasional brief surveys. We will also let you know of early software releases
+for which you can become a beta-tester, if you are interested.
 
-xsltproc /common/docbook/docbook-xsl-1.65.1/html/chunk.xsl JTVUserManual.xml 
+## INSTALL
 
-xsltproc -o JTVUserManual.fo /common/docbook/docbook-xsl-1.65.1/fo/docbook.xsl JTVUserManual.xml 
-/common/docbook/fop-0.20.5/fop.sh -fo JTVUserManual.fo -pdf JTVUserManual.pdf
+TreeView3 can be downloaded from:
 
-This process depends upon 
-1) docbook-xsl, a package from the docbook sourceforge project.
-2) xsltproc, which comes with the docbook-utils package on a default redhat install.
-3) FOP, from
-http://xml.apache.org/fop/
+http://www.princeton.edu/~abarysh/treeview/15-06-02/tv3_alpha02_final.jar
+
+## DEPENDENCIES
+
+Java 7 or higher
+Go to http://java.com/en/download/ to find out what version you currently have.
+
+Place the downloaded JAR file anywhere on your computer and run it by double-
+clicking on the icon. For Mac users, the first time you open the JAR file,
+please do it by right-clicking on the icon and choosing:
+
+Open with > Jar Launcher.app
+
+For all subsequent times, directly double-clicking the icon should work
+perfectly.
+
+### PREFERENCES
+If you tested Alpha 1, we recommend that you reset your preferences before you
+use the new version. This might prove especially helpful if you are experiencing
+issues with the software.
