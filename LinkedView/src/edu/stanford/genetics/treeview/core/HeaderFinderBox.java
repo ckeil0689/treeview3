@@ -81,20 +81,31 @@ public abstract class HeaderFinderBox {
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
 
-	// "Search for Substring"
+	//Handle into the other search box in order to have a single search box be
+	//able to initiate the search using the contents of both boxes
+	protected HeaderFinderBox companionBox;
+
+	//defaultText is what's in the finder box before a term is entered.
+	protected String defaultText;
+
+	/**
+	 * Constructor
+	 * @param type - A string describing what's searched (e.g. Row or Column)
+	 */
 	public HeaderFinderBox(final String type) {
 
 		this.type = type;
-		// final String[] labeledHeaders = setupData(type);
-		//
-		// searchTermBox = GUIFactory.createWideComboBox(labeledHeaders);
-		// searchTermBox.setEditable(true);
-		// searchTermBox.setBorder(null);
-		// searchTermBox.setBackground(GUIFactory.DARK_BG);
-		// AutoCompleteDecorator.decorate(searchTermBox);
-		//
-		// searchTermBox.getEditor().getEditorComponent().addKeyListener(
-		// new BoxKeyListener());
+	}
+
+	/**
+	 * Setting this data member allows a search initiated in 1 box to be able to
+	 * trigger the search in the other box as well so that every search utilizes
+	 * the contents of both search boxes.
+	 * @author rleach
+	 * @param companionBox the companionBox to set
+	 */
+	public void setCompanionBox(HeaderFinderBox companionBox) {
+		this.companionBox = companionBox;
 	}
 
 	/* >>>> Update the object with new data <<<<<< */
@@ -159,7 +170,7 @@ public abstract class HeaderFinderBox {
 
 		final String[][] hA = headerInfo.getHeaderArray();
 
-		final String defaultText = "Search " + type + "s...";
+		defaultText = "Search " + type + "s...";
 
 		searchDataList = new ArrayList<String>();
 		searchDataHeaders = getHeaders(hA);
@@ -222,7 +233,47 @@ public abstract class HeaderFinderBox {
 		return headerArray;
 	}
 
+	/**
+	 * Initiates searches using search terms from this seach term box and the
+	 * companion search term box. (i.e. both a row and column search)
+	 * @author rleach
+	 */
 	public void seekAll() {
+
+		//Deselect my previous search results so that the companion search isn't
+		//limited (which will be narrowed down afterward)
+		searchSelection.setSelectedNode(null);
+		searchSelection.deselectAllIndexes();
+
+		//If the companion box has anything in it, perform that search first so
+		//that the search in the focussed finder box will work as originally
+		//designed (as a search that respects existing search results in the
+		//companion box)
+		if(companionBox.isSearchTermEntered()) {
+			companionBox.seekAllHelper();
+
+			if(otherSelection.getNSelectedIndexes() > 0 &&
+				isSearchTermEntered()) {
+
+				this.seekAllHelper();
+
+				//If there were no results from this search, deselect the
+				//companion's search results
+				if(searchSelection.getNSelectedIndexes() == 0) {
+					otherSelection.setSelectedNode(null);
+					otherSelection.deselectAllIndexes();
+				}
+			}
+		} else {
+			this.seekAllHelper();
+		}
+	}
+
+	/**
+	 * Searches this class's search term box.  Respects selections already found
+	 * from a companion search.
+	 */
+	public void seekAllHelper() {
 
 		searchSelection.setSelectedNode(null);
 		searchSelection.deselectAllIndexes();
@@ -277,12 +328,25 @@ public abstract class HeaderFinderBox {
 		}
 	}
 
+	/**
+	 * Determines whether anything was entered into the finer box.  Returns
+	 * false if the finder box is empty or if its contents are the default text.
+	 * @author rleach
+	 * @return boolean
+	 */
+	public boolean isSearchTermEntered() {
+		if(getSearchTerm() == "" || getSearchTerm() == defaultText) {
+			return(false);
+		}
+		return(true);
+	}
+
 	private List<Integer> findSelected() {
 
 		final List<Integer> indexList = new ArrayList<Integer>();
 		final List<Integer> substrList = new ArrayList<Integer>();
 
-		final String sub = searchTermBox.getSelectedItem().toString();
+		final String sub = getSearchTerm();
 
 		String wildcardsub = sub;
 		if (!"*".equalsIgnoreCase(wildcardsub.substring(0, 1))) {
@@ -306,6 +370,16 @@ public abstract class HeaderFinderBox {
 		if (indexList.size() > 0)
 			return indexList;
 		return (substrList);
+	}
+
+	/**
+	 * This method retrieves the search term that was entered into the finder
+	 * box by the user.
+	 * @author rleach
+	 * @return String
+	 */
+	public String getSearchTerm() {
+		return(searchTermBox.getSelectedItem().toString());
 	}
 
 	/**

@@ -1264,6 +1264,12 @@ public class DendroView implements Observer, DendroPanel {
 
 		this.rowFinderBox = new RowFinderBox();
 		this.colFinderBox = new ColumnFinderBox();
+
+		//This is so a search in either box can initiate the search in the
+		//companion box as well (so that both search terms are respected for
+		//every search).  See Bitbucket Issue #233.
+		rowFinderBox.setCompanionBox(colFinderBox);
+		colFinderBox.setCompanionBox(rowFinderBox);
 	}
 
 	public void setRowFinderBoxFocused() {
