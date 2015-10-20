@@ -138,6 +138,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 * @param i
 	 * @return int
 	 */
+	@Override
 	public int getMinContiguousIndex(final int i) {
 
 		//Error-check the input
@@ -162,6 +163,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 * @param i
 	 * @return int
 	 */
+	@Override
 	public int getMaxContiguousIndex(final int i) {
 
 		//Error-check the input
@@ -170,7 +172,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 		}
 
 		int j = i;
-		for(j = i;j < getMaxIndex();j++){
+		for(j = i; j < getMaxIndex(); j++){
 			if(isIndexSelected(j + 1)) {
 				break;
 			}
@@ -199,6 +201,12 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 		return integerSelection.getMax();
 	}
+	
+	@Override
+	public int getFullSelectionRange() {
+		
+		return getMaxIndex() - getMinIndex() + 1;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -220,6 +228,8 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	@Override
 	public void selectIndexRange(int min, int max) {
 
+		deselectAllIndexes();
+		
 		if (min > max) {
 			final int swap = min;
 			min = max;
@@ -350,8 +360,12 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 		}
 
 		public boolean isSelected(final int i) {
-
-			return isSelected[i];
+			
+			if ((i >= 0) && (i < isSelected.length)) {
+				return isSelected[i];
+			}
+			
+			return false;
 		}
 
 		public int getMin() {

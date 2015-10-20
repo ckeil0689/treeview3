@@ -27,15 +27,12 @@
  */
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Adjustable;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -56,15 +53,9 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 
 	private static final long serialVersionUID = 1L;
 
-	private final JScrollBar scrollbar;
-
 	public ColumnTreeView() {
 
 		super(false);
-
-		scrollbar = new JScrollBar(Adjustable.VERTICAL, 0, 1, 0, 1);
-
-		panel.add(scrollbar, BorderLayout.NORTH);
 
 		isLeft = false;
 
@@ -83,45 +74,6 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 	public String viewName() {
 
 		return "ATRView";
-	}
-
-	/**
-	 * Gets the status attribute of the ATRView object. The status is some
-	 * information which the user might find useful.
-	 *
-	 * @return The status value
-	 */
-	@Override
-	public String[] getStatus() {
-
-		String[] status;
-		// if (selectedNode != null) {
-		// if (selectedNode.isLeaf()) {
-		// status = new String[2];
-		// status[0] = "Leaf Node " + selectedNode.getId();
-		// status[1] = "Pos " + selectedNode.getCorr();
-		//
-		// } else {
-		// final int[] nameIndex = getHeaderSummary().getIncluded();
-		// status = new String[nameIndex.length * 2];
-		// final String[] names = atrHI.getNames();
-		// for (int i = 0; i < nameIndex.length; i++) {
-		// status[2 * i] = names[nameIndex[i]] + ":";
-		// status[2 * i + 1] = " "
-		// + atrHI.getHeader(atrHI.getHeaderIndex(
-		// selectedNode.getId()))[nameIndex[i]];
-		// }
-		// }
-		// } else {
-		// status = new String[2];
-		// status[0] = "Select node to ";
-		// status[1] = "view annotation.";
-		// }
-
-		/* TODO temporary solution until we decide what info to display" */
-		status = new String[3];
-
-		return status;
 	}
 
 	public void setATRHeaderInfo(final HeaderInfo atrHI) {

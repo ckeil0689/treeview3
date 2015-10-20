@@ -140,10 +140,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		setWindowActive(true);
 
-		mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
+		mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS, null);
 
 		/* Setting up main panels */
-		viewPanel = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
+		viewPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS, null);
 
 		/* Add main background panel to the application frame's contentPane */
 		appFrame.add(mainPanel);
@@ -272,7 +272,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void showLogMessages() {
 
 		final JPanel inner = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING, null);
+				GUIFactory.NO_INSETS, null);
 		inner.add(new JLabel("JTV Messages"), "span, wrap");
 		inner.add(new JScrollPane(
 				new LogMessagesPanel(LogBuffer.getSingleton())),
@@ -374,7 +374,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		final JPanel panel = GUIFactory.createJPanel(true,
-				GUIFactory.NO_PADDING, null);
+				GUIFactory.NO_INSETS, null);
 		final JLabel l1 = GUIFactory.createLabel("Work in progress.",
 				GUIFactory.FONTS);
 
@@ -737,7 +737,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 
 		final JPanel panel = GUIFactory.createJPanel(true,
-				GUIFactory.NO_PADDING, null);
+				GUIFactory.NO_INSETS, null);
 
 		final JButton button = GUIFactory.createBtn("OK");
 		button.addActionListener(new ActionListener() {

@@ -19,12 +19,15 @@ public class ColumnLabelView extends LabelView {
 	private static final long serialVersionUID = 1L;
 
 	public ColumnLabelView() {
+		
 		super();
 		d_justified = false;
 		zoomHint = StringRes.lbl_ZoomColLabels;
 	}
 
+	@Override
 	protected boolean labelAndScrollCoordsAreOpposite() {
+		
 		return(true);
 	}
 
@@ -35,12 +38,15 @@ public class ColumnLabelView extends LabelView {
 	 * @param 
 	 * @return boolean
 	 */
+	@Override
 	protected boolean isAColumnPane() {
+		
 		return(true);
 	}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
+		
 		if (parentNode != null) {
 			super.setConfigNode(parentNode.node("ColLabelView"));
 		} else {
@@ -50,18 +56,23 @@ public class ColumnLabelView extends LabelView {
 		}
 	}
 
+	@Override
 	public int determineCursorPixelIndex(Point p) {
+		
 		debug("Cursor x coordinate relative to column labels: [" + p.x + "]",8);
 		return(p.x);
 	}
 
+	@Override
 	public void orientLabelPane(Graphics2D g2d) {
 		g2d.rotate(Math.PI * 3 / 2);
 		g2d.translate(-offscreenSize.height,0);
 	}
 
+	@Override
 	public void orientHintPane(Graphics2D g2d) {}
 
+	@Override
 	protected void setLabelPaneSize(int offscreenPrimarySize,
 	                                int offscreenSecondarySize) {
 		//Set the size of the scrollpane to match the longest string
@@ -73,15 +84,21 @@ public class ColumnLabelView extends LabelView {
 			offscreenSecondarySize + "].",1);
 	}
 
+	@Override
 	protected String getSummary() {
+		
 		return("ColumnSummary");
 	}
 
+	@Override
 	protected String getPaneType() {
+		
 		return("Column");
 	}
 
+	@Override
 	public void setHoverPosition(final MouseEvent e) {
+		
 		map.setHoverPixel(e.getX());
 	}
 
@@ -94,6 +111,7 @@ public class ColumnLabelView extends LabelView {
 	 * @author rleach
 	 * @return boolean
 	 */
+	@Override
 	protected boolean isMatrixJustified() {
 		return(!isRightJustified);
 	}
@@ -106,21 +124,27 @@ public class ColumnLabelView extends LabelView {
 	 * used to infer that the scroll 0 position either corresponds to the string
 	 * 0 position (true) or is oriented in the opposite direction (false).
 	 */
+	@Override
 	protected boolean isLabelStartNearMatrix() {
+		
 		return(true);
 	}
 
 	@Override
 	public JScrollBar getPrimaryScrollBar() {
+		
 		return scrollPane.getHorizontalScrollBar();
 	}
 
 	@Override
 	public JScrollBar getSecondaryScrollBar() {
+		
 		return scrollPane.getVerticalScrollBar();
 	}
 
+	@Override
 	public int getPrimaryHoverPosition(final MouseEvent e) {
+		
 		return(e.getX());
 	}
 
@@ -135,32 +159,46 @@ public class ColumnLabelView extends LabelView {
 		}
 	}
 
+	@Override
 	protected int getPrimaryViewportSize() {
+		
 		return(scrollPane.getViewport().getSize().width);
 	}
-
+	
+	@Override
 	protected int getSecondaryViewportSize() {
+		
 		return(scrollPane.getViewport().getSize().height);
 	}
 
+	@Override
 	protected int getSecondaryPaneSize(final Dimension dims) {
+		
 		return(dims.height);
 	}
 
+	@Override
 	protected int getPrimaryPaneSize(final Dimension dims) {
+		
 		return(dims.width);
 	}
 
+	@Override
 	protected void setSecondaryPaneSize(final Dimension dims,int Size) {
+		
 		secondaryPaneSize = Size;
 		dims.height = Size;
 	}
 
+	@Override
 	public int getLabelOrientation() {
+		
 		return(Adjustable.VERTICAL);
 	}
 
+	@Override
 	protected boolean isASecondaryScroll(final MouseWheelEvent e) {
+		
 		return(!e.isShiftDown());
 	}
 }

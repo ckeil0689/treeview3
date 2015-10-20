@@ -117,7 +117,7 @@ public class ClusterView {
 		this.clusterType = clusterType;
 
 		/* Main background panel */
-		mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS, null);
 
 		/* Background panel for the cluster options */
 		optionsPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);

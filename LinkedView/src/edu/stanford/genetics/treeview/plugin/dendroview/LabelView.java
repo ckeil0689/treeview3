@@ -70,16 +70,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected UrlExtractor urlExtractor;
 
 	/* Default label settings */
-	protected final String  d_face             = "Courier";
-	protected final int     d_style            = 0;
-	protected final int     d_size             = 14;
-	protected final int     d_min              = 5;
-	protected final int     d_max              = 30;
-	protected       boolean d_justified;
-	protected       boolean d_fixed            = false;
-	protected       int     longest_str_index;
-	protected       int     longest_str_length;
-	protected       String  longest_str;
+	protected final String d_face = "Courier";
+	protected final int d_style = 0;
+	protected final int d_size = 14;
+	protected final int d_min = 11;
+	protected final int d_max = 30;
+	protected boolean d_justified;
+	protected boolean d_fixed = false;
+	protected int longest_str_index;
+	protected int longest_str_length;
+	protected String longest_str;
 
 	/* Custom label settings */
 	protected String  face;
@@ -116,7 +116,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected Preferences configNode;
 
 	protected JScrollPane scrollPane;
-	protected String      zoomHint;
+	protected String zoomHint;
 
 	/* "Position indicator" settings for when the label port is active */
 	//matrixBarThickness - the thickness of the matrix position bar.  Must be
@@ -173,10 +173,17 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		setLabelPortMode(true);
 
-		scrollPane =
-			new JScrollPane(this,
-			                ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
-			                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		/* 
+		 * This needs to be NEVER because the label scrollbars have to be 
+		 * manually added rather than automatically via JScrollPane. The main 
+		 * matrix scrollbars have also been manually added using MigLayout.
+		 * Otherwise alignment cannot be guaranteed without setting explicit 
+		 * pixel sizes which should rarely if ever be done. - Chris 
+		 */
+		scrollPane = new JScrollPane(this,
+			            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+			            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		
 		scrollPane.setBorder(null);
 
 		debug = 0;
@@ -672,10 +679,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	/* inherit description */
 	@Override
 	public void updateBuffer(final Graphics g) {
-		updateBuffer(g,offscreenSize);
+		
+		updateBuffer(g, offscreenSize);
 	}
 
 	public void updateBuffer(final Image buf) {
+		
 		updateBuffer(buf.getGraphics(),
 		             new Dimension(buf.getWidth(null),buf.getHeight(null)));
 	}
@@ -1316,6 +1325,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @return
 	 */
 	public Color drawLabelBackground(final Graphics g,int j,int yPos) {
+		
+		if(j > headerInfo.getNumHeaders() - 1) {
+			return Color.black;
+		}
+		
 		final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
 		final String[] strings = headerInfo.getHeader(j);
 		Color bgColor = textBGColor;
@@ -2738,7 +2752,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	abstract public int getLabelOrientation();
 
+	@Override
 	public void adjustmentValueChanged(AdjustmentEvent evt) {
+		
 		Adjustable source = evt.getAdjustable();
 		int orient = source.getOrientation();
 		if(orient == getLabelOrientation()) {
@@ -2840,7 +2856,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			getSecondaryScrollBar().setValue(j + shift);
 		} else {
 			//Value of label length scrollbar
-			map.scrollBy(shift, false);
+			map.scrollBy(shift);
 			updatePrimaryHoverIndexDuringScrollWheel();
 		}
 	}

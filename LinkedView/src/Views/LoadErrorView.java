@@ -45,10 +45,10 @@ public class LoadErrorView {
 	 */
 	public void setupMainPanel() {
 
-		homePanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
+		homePanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS, null);
 
 		final JPanel title_bg = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING, null);
+				GUIFactory.NO_INSETS, null);
 
 		final JLabel jl = GUIFactory.createLabel(StringRes.load_Ohoh,
 				GUIFactory.FONTXXL);

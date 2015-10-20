@@ -50,7 +50,7 @@ public abstract class ModelViewProduced extends ModelView {
 	protected int offscreenScanSize = 0;
 	protected boolean rotateOffscreen = false;
 	
-	protected boolean pixelsChanged;
+	protected boolean dataChanged;
 
 	protected ModelViewProduced() {
 
@@ -97,7 +97,7 @@ public abstract class ModelViewProduced extends ModelView {
 		offscreenImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		WritableRaster raster = ((BufferedImage)offscreenImage).getRaster();
 		offscreenPixels = ((DataBufferInt)raster.getDataBuffer()).getData();
-		pixelsChanged = true;
+		dataChanged = true;
 	}
 
 	/*

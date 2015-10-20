@@ -80,10 +80,11 @@ public class FillMap extends IntegerMap {
 	@Override
 	public int getUsedPixels() {
 
-		if (minindex == -1)
+		if (minindex == -1) {
 			return 0;
-		else
-			return availablepixels;
+		}
+		
+		return availablepixels;
 	}
 
 	/**
@@ -99,13 +100,19 @@ public class FillMap extends IntegerMap {
 	 * @return A short word desribing this type of map
 	 */
 	@Override
-	public String type() {
+	public String typeName() {
 
-		return "Fill";
+		return "FillMap";
 	}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
+	}
+
+	@Override
+	public int type() {
+		
+		return IntegerMap.FILL;
 	}
 }

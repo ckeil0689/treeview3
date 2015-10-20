@@ -65,6 +65,14 @@ public interface TreeSelectionI {
 	 * @return The maximum selected index.
 	 */
 	public abstract int getMaxIndex();
+	
+	/**
+	 * 
+	 * @return The number of indexes between the maximum und minimum selection
+	 * index regardless of whether there are multiple selection rectangles 
+	 * with interruptions or not.
+	 */
+	public abstract int getFullSelectionRange();
 
 	/**
 	 * The maximum selected index contiguous with given index or intervening
