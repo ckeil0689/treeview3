@@ -76,7 +76,7 @@ public class InteractiveMatrixView extends MatrixView {
 		super();
 
 		setLabelPortMode(true);
-		debug = 11;
+		debug = 4;
 		//1 = Debug double-click detection
 		//10 = Debug double-click zooming
 		//11 = Debug zoom animation "toward" selection/sub-selection

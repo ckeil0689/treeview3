@@ -90,7 +90,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 		isMousePressed = true;
 
 		imView.debug("mousePressed: Setting pressedX [" + pressedX +
-			"] and pressedY [" + pressedY + "].",10);
+			"] and pressedY [" + pressedY + "].", 10);
 
 		//If a previous 200ms timer is still running, restart the timer and
 		//increment the clickCount
@@ -1275,9 +1275,13 @@ public class IMVMouseAdapter extends MouseAdapter {
 				yPixel);
 		}
 	
-		imView.debug("Mouse dragged. Updating hover indexes to [" +
-		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
-		      "]",4);
+//		imView.debug("Mouse dragged. Updating hover indexes to [" +
+//		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
+//		      "]", 4);
+		
+		imView.debug("Mouse dragged. Pixels: [" +
+			      xPixelStart + ", " + yPixelStart + ", " + xPixel +
+			      ", " + yPixel + "]", 4);
 		
 		xmap.setHoverIndex(xmap.getIndex(xPixel));
 		ymap.setHoverIndex(ymap.getIndex(yPixel));
@@ -1287,6 +1291,10 @@ public class IMVMouseAdapter extends MouseAdapter {
 		startPoint.setLocation(xmap.getIndex(xPixelStart), 
 				ymap.getIndex(yPixelStart));
 		endPoint.setLocation(xmap.getIndex(xPixel), ymap.getIndex(yPixel));
+		
+		imView.debug("Indexes: [" +
+				xmap.getIndex(xPixelStart) + ", " + ymap.getIndex(yPixelStart) + ", " + xmap.getIndex(xPixel) +
+			      ", " + ymap.getIndex(yPixel) + "]", 4);
 	
 		/* Normal selection */
 		dragRect.setLocation(startPoint);
