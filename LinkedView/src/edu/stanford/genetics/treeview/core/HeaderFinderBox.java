@@ -23,28 +23,43 @@
 package edu.stanford.genetics.treeview.core;
 
 // for summary view...
+//import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+//import java.awt.event.ItemEvent;
+//import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+//import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.plaf.basic.BasicComboPopup;
+import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.JButton;
+//import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+//import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+//import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.text.JTextComponent;
 
 import net.miginfocom.swing.MigLayout;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+
+//import com.sun.glass.events.MouseEvent;
 
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -87,6 +102,8 @@ public abstract class HeaderFinderBox {
 
 	//defaultText is what's in the finder box before a term is entered.
 	protected String defaultText;
+
+	boolean dropdownclicked = false;
 
 	/**
 	 * Constructor
@@ -150,6 +167,108 @@ public abstract class HeaderFinderBox {
 
 		searchTermBox.getEditor().getEditorComponent()
 				.addKeyListener(new BoxKeyListener());
+
+//		SearchMouseCommitListener smcl = new SearchMouseCommitListener();
+//		searchTermBox.addMouseListener(smcl);
+
+//		JPopupMenu tmp = searchTermBox.getComponentPopupMenu();
+//		if(tmp != null) {
+//			tmp.addMouseListener(new SearchMouseCommitListener());
+//		} else {
+//			LogBuffer.println("The popup menu was null");
+//		}
+//		Component[] comps = searchTermBox.getComponents();
+//		for(int i = 0; i < comps.length; i++)
+//		{
+//			comps[i].addMouseListener(new MouseAdapter() {
+//				public void mousePressed(MouseEvent me) {
+//					LogBuffer.println("clicked");
+//					dropdownclicked = true;
+//				}
+//			});
+//		}
+
+		try {
+			Field popupInBasicComboBoxUI = BasicComboBoxUI.class.getDeclaredField("popup");
+			popupInBasicComboBoxUI.setAccessible(true);
+			BasicComboPopup popup = (BasicComboPopup) popupInBasicComboBoxUI.get(searchTermBox.getUI());
+			
+			Field scrollerInBasicComboPopup = BasicComboPopup.class.getDeclaredField("scroller");
+			scrollerInBasicComboPopup.setAccessible(true);
+			JScrollPane scroller = (JScrollPane) scrollerInBasicComboPopup.get(popup);
+			
+			scroller.getViewport().getView().addMouseListener(new SearchMouseCommitListener());
+		}
+		catch (NoSuchFieldException e) {
+		    e.printStackTrace();  
+		}
+		catch (IllegalAccessException e) {
+		    e.printStackTrace();  
+		}
+
+//		searchTermBox.addActionListener(new SearchListener());
+
+		//Well, this works for selecting items in the dropdown with the mouse, but it breaks the ability to type anything into the text field...
+//		searchTermBox.addItemListener(new ItemChangeListener());
+
+		//searchTermBox.getComponentPopupMenu().addMouseListener(new SearchMouseCommitListener());
+
+//		for (int i = 0; i < searchTermBox.getComponentCount(); i++) {
+//			Component component = searchTermBox.getComponent(i);
+//			if(component != null) {
+//				component.addMouseListener(new SearchMouseCommitListener());
+//			}
+//		}
+	}
+
+//	class SearchListener implements ActionListener {
+//		public void actionPerformed(ActionEvent e) {
+//			//if(((JComboBox) e.getSource()).isPopupVisible()) {
+//			LogBuffer.println("Action performed on item from the combo box from " + e.getSource() + " when the combo box dropdown menu was" + (dropdownclicked ? "" : " NOT") + " clicked");
+//			if(dropdownclicked) {
+//				//seekAll();
+//				dropdownclicked = false;
+////				seekAll();
+//			}
+//		}
+//	}
+
+//	class ItemChangeListener implements ItemListener {
+//		
+//	    @Override
+//	    public void itemStateChanged(ItemEvent event) {
+//	       if (event.getStateChange() == ItemEvent.SELECTED) {
+//	    	   LogBuffer.println("Item selected from the combo box");
+//	    	   
+//	          seekAll();
+//	       }
+//	    }
+//	    
+//	}
+
+	class SearchMouseCommitListener implements MouseListener {
+		@Override
+		public void mousePressed(java.awt.event.MouseEvent e) {}
+		@Override
+		public void mouseReleased(java.awt.event.MouseEvent e){
+			dropdownclicked = true;
+			LogBuffer.println("Mouse pressed from the combo box");
+			//seekAll();
+			//Simulate a keypress of the enter key to initiate the search
+			try {
+				Robot robot = new Robot();
+				robot.keyPress(KeyEvent.VK_ENTER);
+				robot.keyRelease(KeyEvent.VK_ENTER);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		@Override
+		public void mouseExited(java.awt.event.MouseEvent e) {}
+		@Override
+		public void mouseEntered(java.awt.event.MouseEvent e){}
+		@Override
+		public void mouseClicked(java.awt.event.MouseEvent e){}
 	}
 
 	/**
