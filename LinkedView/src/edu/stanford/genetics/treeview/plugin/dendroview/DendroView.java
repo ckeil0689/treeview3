@@ -53,7 +53,6 @@ import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.HeaderFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
@@ -138,13 +137,6 @@ public class DendroView implements Observer, DendroPanel {
 
 	private HeaderFinderBox rowFinderBox;
 	private HeaderFinderBox colFinderBox;
-
-	/*
-	 * MapContainers map tile size (scale) to selection rectangles in
-	 * GlobalView, label & tree positions
-	 */
-	protected MapContainer globalXmap = null;
-	protected MapContainer globalYmap = null;
 
 	/**
 	 * Chained constructor for the DendroView object without a name.
@@ -1493,11 +1485,19 @@ public class DendroView implements Observer, DendroPanel {
 		return colDataPane;
 	}
 
+	/**
+	 * Get the InputMap for the DendroPane. This is important for key binding.
+	 * @return An InputMap object belonging to DendroView's dendroPane.
+	 */
 	public InputMap getInputMap() {
 
 		return dendroPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
+	/**
+	 * Get the ActionMap for the DendroPane. This is important for key binding.
+	 * @return An ActionMap object belonging to DendroView's dendroPane.
+	 */
 	public ActionMap getActionMap() {
 
 		return dendroPane.getActionMap();
@@ -1523,14 +1523,6 @@ public class DendroView implements Observer, DendroPanel {
 		rel_div_loc = Helper.roundDouble(rel_div_loc, 2);
 
 		return (rel_div_loc > 1.0) ? 1.0 : rel_div_loc;
-	}
-
-	/**
-	 * Getter for viewFrame
-	 */
-	public ViewFrame getViewFrame() {
-
-		return tvFrame;
 	}
 
 	/**

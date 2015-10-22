@@ -228,6 +228,8 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	@Override
 	public void selectIndexRange(int min, int max) {
 
+		LogBuffer.println("Selection Min: " + min + " Max: " + max);
+		
 		deselectAllIndexes();
 		
 		if (min > max) {

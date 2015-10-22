@@ -539,10 +539,11 @@ public class TVController implements Observer {
 	}
 
 	/**
-	 * Used to retrieve information about the data for proper loading. 
+	 * Used to transfer information to ModelLoader about the data 
+	 * for proper loading. 
 	 * Either through saved information (stored preferences) or by offering
 	 * a dialog to the user in which they can specify parameters.
-	 * @param fileSet FIle name + directory information object.
+	 * @param fileSet File name + directory information object.
 	 * @param isFromCluster Whether the loading happens as a result of 
 	 * clustering.
 	 */
@@ -599,6 +600,12 @@ public class TVController implements Observer {
 		return dataInfo;
 	}
 
+	/**
+	 * Load stored info for a specific file.
+	 * @param fileSet The FileSet for the file to be loaded.
+	 * @return A DataLoadInfo object which contains information relevant for
+	 * setting up the DataLoadDialog.
+	 */
 	public DataLoadInfo getDataLoadInfo(FileSet fileSet) {
 
 		Preferences node = getOldPreferences(fileSet.getRoot(),
@@ -674,6 +681,7 @@ public class TVController implements Observer {
 		arrayUrlExtractor.bindConfig(documentConfig.node("ArrayUrlExtractor"));
 		tvFrame.setArrayUrlExtractor(arrayUrlExtractor);
 
+		LogBuffer.println("Set new selection objects.");
 		tvFrame.setGeneSelection(new TreeSelection(ngene));
 		tvFrame.setArraySelection(new TreeSelection(nexpr));
 	}

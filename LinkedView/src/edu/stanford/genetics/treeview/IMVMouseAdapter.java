@@ -15,14 +15,21 @@ import javax.swing.Timer;
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
+/**
+ * This class handles all mouse input except from the mouse wheel. It needs to
+ * be attached to InteractiveMatrixView in order to make the matrix interactive
+ * for mouse gestures such as selection. 
+ * @author chris0689
+ *
+ */
 public class IMVMouseAdapter extends MouseAdapter {
 
 	// Members
 	private final MatrixViewController mvController;
 	private final InteractiveMatrixView imView;
 	
-	private TreeSelectionI rowSelection;
-	private TreeSelectionI colSelection;
+	private final TreeSelectionI rowSelection;
+	private final TreeSelectionI colSelection;
 	
 	private final MapContainer xmap;
 	private final MapContainer ymap;
@@ -42,14 +49,14 @@ public class IMVMouseAdapter extends MouseAdapter {
 	private boolean isMousePressed;
 	private int clickCount;     //Need to determine single/double/etc clicks
 	
-	
 	//Had to put these in the main class, because when they were in
 	//MatrixMouseListener, setting them in mousePressed did not make them
 	//available when mouseDragged ran
-	int pressedX;
-	int pressedY;
-	MouseEvent dragEvent;
-	MouseEvent pressedEvent;   //To process clicks initiated via timer
+	private int pressedX;
+	private int pressedY;
+	
+	private MouseEvent dragEvent;
+	private MouseEvent pressedEvent;   //To process clicks initiated via timer
 	
 	public IMVMouseAdapter(final MatrixViewController mvController, 
 			final InteractiveMatrixView imView, 
@@ -83,6 +90,8 @@ public class IMVMouseAdapter extends MouseAdapter {
 	@Override
 	public void mousePressed(final MouseEvent e) {
 
+		LogBuffer.println("Mouse pressed");
+		
 		if(!imView.enclosingWindow().isActive()) {
 			return;
 		}
@@ -140,6 +149,8 @@ public class IMVMouseAdapter extends MouseAdapter {
 	@Override
 	public void mouseDragged(final MouseEvent e) {
 
+		LogBuffer.println("// mouse dragged");
+		
 		if (!imView.enclosingWindow().isActive()) {
 			return;
 		}
@@ -172,6 +183,8 @@ public class IMVMouseAdapter extends MouseAdapter {
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 
+		LogBuffer.println("mouse released");
+		
 		if(!imView.enclosingWindow().isActive() || !isMousePressed) {
 			return;
 		}
@@ -339,7 +352,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 		
 		double xdist = dragEvent.getX() - pressedEvent.getX();
 		double ydist = dragEvent.getY() - pressedEvent.getY();
-		double distance = Math.sqrt(xdist*xdist + ydist*ydist);
+		double distance = Math.sqrt(xdist * xdist + ydist * ydist);
 		return(distance > maxPixelDistance);
 	}
 	
@@ -353,6 +366,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	private int multiClickActionInitialDelay = 350;
 	private int multiClickActionDelay = 250;
 	private javax.swing.Timer multiClickActionTimer;
+	
 	ActionListener multiClickActionListener = new ActionListener() {
 
 		/**
@@ -558,7 +572,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	 * @param xPixel
 	 * @param yPixel
 	 */
-	public void processLeftSingleShiftClick(int xPixel,int yPixel) {
+	public void processLeftSingleShiftClick(int xPixel, int yPixel) {
 	
 		final Point start = new Point(xmap.getMinIndex(),ymap.getIndex(yPixel));
 		final Point end   = new Point(xmap.getMaxIndex(),ymap.getIndex(yPixel));
@@ -574,7 +588,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	 * @param xPixel
 	 * @param yPixel
 	 */
-	public void processLeftSingleControlClick(int xPixel,int yPixel) {
+	public void processLeftSingleControlClick(int xPixel, int yPixel) {
 	
 		final Point start = new Point(xmap.getIndex(xPixel),ymap.getMinIndex());
 		final Point end   = new Point(xmap.getIndex(xPixel),ymap.getMaxIndex());
@@ -597,8 +611,8 @@ public class IMVMouseAdapter extends MouseAdapter {
 	 * @param stepwiseZoom
 	 * @param zoomSpeed
 	 */
-	public void processLeftDoubleClickZoomEvent(int xPixel,int yPixel,
-		boolean zoomIn,boolean stepwiseZoom,
+	public void processLeftDoubleClickZoomEvent(int xPixel, int yPixel,
+		boolean zoomIn, boolean stepwiseZoom,
 		int zoomSpeed /* 0=slow,1=med,2=fast */) {
 	
 		//zoomDegree is only used when stepwiseZoom is false
@@ -1162,10 +1176,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 		xmap.setSelectingStart(-1);
 		ymap.setSelectingStart(-1);
 		
-		imView.debug("Mouse dragged. Updating hover indexes to [" +
-		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
-		      "]",4);
-		
 		xmap.setHoverIndex(xmap.getIndex(xPixel));
 		ymap.setHoverIndex(ymap.getIndex(yPixel));
 	
@@ -1178,9 +1188,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 		dragRect.add(endPoint);
 	
 		imView.drawBand(getPixelRect(dragRect));
-	
-		imView.debug("Selecting startpoint: [" + startPoint.x + "," + startPoint.y +
-			"] to endPoint: [" + endPoint.x + "," + endPoint.y + "].", 10);
 		
 		mvController.selectRectangle(startPoint, endPoint);
 	
@@ -1200,9 +1207,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 		
 		xmap.setSelectingStart(-1);
 		ymap.setSelectingStart(-1);
-		
-		imView.debug("Mouse dragged. Updating hover indexes to [" +
-		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) + "]",4);
 		
 		xmap.setHoverIndex(xmap.getIndex(xPixel));
 		ymap.setHoverIndex(ymap.getIndex(yPixel));
@@ -1377,7 +1381,10 @@ public class IMVMouseAdapter extends MouseAdapter {
 	}
 	
 	/**
-	 * Processes a completed right single click
+	 * Processes a completed right single click.
+	 * TODO Delete parameters from method signature UNLESS method will be used
+	 * in a different way which requires them, since we talked about switching
+	 * the deselect-action to another key combo.
 	 * @author rleach
 	 * @param xPixel
 	 * @param yPixel
@@ -1398,6 +1405,11 @@ public class IMVMouseAdapter extends MouseAdapter {
 		imView.drawBand(getPixelRect(dragRect));
 	}
 	
+	/**
+	 * TODO add JavaDoc
+	 * @param xIndex
+	 * @param yIndex
+	 */
 	private void updateDragRect(final int xIndex, final int yIndex) {
 		
 		imView.drawBand(getPixelRect(dragRect));
@@ -1408,6 +1420,11 @@ public class IMVMouseAdapter extends MouseAdapter {
 		dragRect.add(endPoint);
 	}
 	
+	/**
+	 * TODO add JavaDoc
+	 * @param xIndex
+	 * @param yIndex
+	 */
 	private void endDragRect(final int xIndex, final int yIndex) {
 		
 		updateDragRect(xIndex, yIndex);

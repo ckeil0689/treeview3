@@ -447,7 +447,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 
 	protected void setGeneSelection(final TreeSelectionI newSelection) {
 
-		geneSelection = newSelection;
+		this.geneSelection = newSelection;
 	}
 
 	/**
@@ -462,7 +462,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 
 	protected void setArraySelection(final TreeSelectionI newSelection) {
 
-		arraySelection = newSelection;
+		this.arraySelection = newSelection;
 	}
 
 	/**

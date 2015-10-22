@@ -5,6 +5,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.Observable;
@@ -85,13 +87,38 @@ ConfigNodePersistent, Controller {
 	@Override
 	public void addListeners() {
 		
+		removeAllMouseListeners();
+		
 		IMVMouseAdapter mmListener = new IMVMouseAdapter(this, imView, 
 				interactiveXmap, interactiveYmap);
 		
 		imView.addMouseListener(mmListener);
 		imView.addMouseMotionListener(mmListener);
-		
+
 		imView.addMouseWheelListener(new MatrixMouseWheelListener());
+	}
+	
+	/**
+	 * Simply ensures that no listeners are added on top of others. This is
+	 * actually needed due to how InteractiveMatrixView is currently handled
+	 * when loading a new file...
+	 */
+	private void removeAllMouseListeners() {
+		
+		for(MouseListener l : imView.getMouseListeners()) {
+			
+			imView.removeMouseListener(l);
+		}
+		
+		for(MouseMotionListener l : imView.getMouseMotionListeners()) {
+			
+			imView.removeMouseMotionListener(l);
+		}
+		
+		for(MouseWheelListener l : imView.getMouseWheelListeners()) {
+			
+			imView.removeMouseWheelListener(l);
+		}
 	}
 	
 	/**
@@ -603,6 +630,9 @@ ConfigNodePersistent, Controller {
 	 */
 	public void selectRectangle(final Point start, final Point end) {
 
+		LogBuffer.println("Selecting a rectangle: " + start.toString() 
+				+ ", " + end.toString());
+		
 		// sort so that ep is upper left corner
 		if (end.x < start.x) {
 			final int x = end.x;

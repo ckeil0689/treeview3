@@ -349,8 +349,6 @@ public class GUIFactory {
 			iconType = "_dark.png";
 		}
 
-		LogBuffer.println("Icon image used: [" + iconFileName + "].");
-
 		try {
 			final ClassLoader classLoader = Thread.currentThread()
 					.getContextClassLoader();
