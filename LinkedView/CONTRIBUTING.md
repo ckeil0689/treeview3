@@ -1,6 +1,6 @@
-# README #
+# CONTRIBUTING #
 
-This README describes the steps necessary to get TreeView3 up and running.
+This document is a summary of how to get involved in contributing to the TreeView 3 project.
 
 ## Dependencies
 
