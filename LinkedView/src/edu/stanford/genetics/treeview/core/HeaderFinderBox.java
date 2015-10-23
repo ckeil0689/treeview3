@@ -103,7 +103,7 @@ public abstract class HeaderFinderBox {
 	//defaultText is what's in the finder box before a term is entered.
 	protected String defaultText;
 
-	boolean dropdownclicked = false;
+//	boolean dropdownclicked = false;
 
 	/**
 	 * Constructor
@@ -168,93 +168,81 @@ public abstract class HeaderFinderBox {
 		searchTermBox.getEditor().getEditorComponent()
 				.addKeyListener(new BoxKeyListener());
 
-//		SearchMouseCommitListener smcl = new SearchMouseCommitListener();
-//		searchTermBox.addMouseListener(smcl);
-
-//		JPopupMenu tmp = searchTermBox.getComponentPopupMenu();
-//		if(tmp != null) {
-//			tmp.addMouseListener(new SearchMouseCommitListener());
-//		} else {
-//			LogBuffer.println("The popup menu was null");
-//		}
-//		Component[] comps = searchTermBox.getComponents();
-//		for(int i = 0; i < comps.length; i++)
-//		{
-//			comps[i].addMouseListener(new MouseAdapter() {
-//				public void mousePressed(MouseEvent me) {
-//					LogBuffer.println("clicked");
-//					dropdownclicked = true;
-//				}
-//			});
-//		}
-
-		try {
-			Field popupInBasicComboBoxUI = BasicComboBoxUI.class.getDeclaredField("popup");
-			popupInBasicComboBoxUI.setAccessible(true);
-			BasicComboPopup popup = (BasicComboPopup) popupInBasicComboBoxUI.get(searchTermBox.getUI());
-			
-			Field scrollerInBasicComboPopup = BasicComboPopup.class.getDeclaredField("scroller");
-			scrollerInBasicComboPopup.setAccessible(true);
-			JScrollPane scroller = (JScrollPane) scrollerInBasicComboPopup.get(popup);
-			
-			scroller.getViewport().getView().addMouseListener(new SearchMouseCommitListener());
-		}
-		catch (NoSuchFieldException e) {
-		    e.printStackTrace();  
-		}
-		catch (IllegalAccessException e) {
-		    e.printStackTrace();  
-		}
-
-//		searchTermBox.addActionListener(new SearchListener());
-
-		//Well, this works for selecting items in the dropdown with the mouse, but it breaks the ability to type anything into the text field...
-//		searchTermBox.addItemListener(new ItemChangeListener());
-
-		//searchTermBox.getComponentPopupMenu().addMouseListener(new SearchMouseCommitListener());
-
-//		for (int i = 0; i < searchTermBox.getComponentCount(); i++) {
-//			Component component = searchTermBox.getComponent(i);
-//			if(component != null) {
-//				component.addMouseListener(new SearchMouseCommitListener());
-//			}
-//		}
+		//NOTE: This may be removed without side-effect if a better way of
+		//initiating a search upon combobox dropdown click is found
+		addSearchMouseCommitListener();
 	}
 
-//	class SearchListener implements ActionListener {
-//		public void actionPerformed(ActionEvent e) {
-//			//if(((JComboBox) e.getSource()).isPopupVisible()) {
-//			LogBuffer.println("Action performed on item from the combo box from " + e.getSource() + " when the combo box dropdown menu was" + (dropdownclicked ? "" : " NOT") + " clicked");
-//			if(dropdownclicked) {
-//				//seekAll();
-//				dropdownclicked = false;
-////				seekAll();
-//			}
-//		}
-//	}
+	//NOTE: This may be removed without side-effect if a better way of
+	//initiating a search upon combobox dropdown click is found
+	/**
+	 * This method adds a mouse listener (SearchMouseCommitListener) to the
+	 * dropdown menu of a combobox. Its purpose is to detect only 1 event: when
+	 * a user clicks an item in the dropdown so we can capitalize on that
+	 * trigger to initiate the search and display the results in the matrix as
+	 * a yellow highlight.
+	 * @author rleach
+	 */
+	private void addSearchMouseCommitListener() {
+		//Support for catching a mouse-click selection from a combobox dropdown
+		//menu is not standardly supported (without inadvertently triggering
+		//upon other unrelated events as well).  The following code is the
+		//result of extensive searching and tests to find a way to call seekAll
+		//upon mouse selection of an item from the combobox's dropdown menu.
+		//Every other method tried (ActionListener, ItemListener,
+		//PopupMenuListener, MouseListeners attached in various other simple
+		//ways, and even various combinations of multiple listeners did not work
+		//well.  To see some details on those failed attempts, refer to:
+		//http://stackoverflow.com/questions/33268726/how-do-you-detect-when-a-user-commits-a-jcombobox-selection-via-mouse-click-in-j
+		//This solution below can be found here:
+		//http://engin-tekin.blogspot.com/2009/10/hrefhttpkfd.html
+		try {
+			Field popupInBasicComboBoxUI =
+				BasicComboBoxUI.class.getDeclaredField("popup");
+			popupInBasicComboBoxUI.setAccessible(true);
+			BasicComboPopup popup = (BasicComboPopup) popupInBasicComboBoxUI
+				.get(searchTermBox.getUI());
+			
+			Field scrollerInBasicComboPopup =
+				BasicComboPopup.class.getDeclaredField("scroller");
+			scrollerInBasicComboPopup.setAccessible(true);
+			JScrollPane scroller =
+				(JScrollPane) scrollerInBasicComboPopup.get(popup);
+			
+			scroller.getViewport().getView()
+				.addMouseListener(new SearchMouseCommitListener());
+		}
+		catch (NoSuchFieldException e) {
+			e.printStackTrace();  
+		}
+		catch (IllegalAccessException e) {
+			e.printStackTrace();  
+		}
+	}
 
-//	class ItemChangeListener implements ItemListener {
-//		
-//	    @Override
-//	    public void itemStateChanged(ItemEvent event) {
-//	       if (event.getStateChange() == ItemEvent.SELECTED) {
-//	    	   LogBuffer.println("Item selected from the combo box");
-//	    	   
-//	          seekAll();
-//	       }
-//	    }
-//	    
-//	}
-
+	//NOTE: This may be removed without side-effect if a better way of
+	//initiating a search upon combobox dropdown click is found
+	/**
+	 * The following listener only performs 1 function: initiates a search when
+	 * a user clicks a dropdown menu item from a combobox.
+	 * @author rleach
+	 */
 	class SearchMouseCommitListener implements MouseListener {
-		@Override
-		public void mousePressed(java.awt.event.MouseEvent e) {}
+		//Upon mouseReleased, it is assumed that the user has just clicked an
+		//item in a dropdown list in a combobox.  The search is initiated by
+		//simulating an enter keypress using a robot which is caught
+		//by the keyListener.  This is circuitous, but reliable, and easy to
+		//replace using another method if a better way to do this is found.
 		@Override
 		public void mouseReleased(java.awt.event.MouseEvent e){
-			dropdownclicked = true;
-			LogBuffer.println("Mouse pressed from the combo box");
-			//seekAll();
-			//Simulate a keypress of the enter key to initiate the search
+			//Calling seekAll() directly did not work. It worked occasionally
+			//when called from ActionListener's actionPerformed method (only
+			//when dropdownclicked was set to true here).  It turns out that
+			//simulating an enter key keypress here works really well, albeit
+			//admittedly hackily, but there's no standard way to initiate an
+			//action only when an item in the dropdown is clicked without
+			//initiating that action in a bunch of unrelated events as well.
+			//http://stackoverflow.com/questions/18169598/how-can-i-programmatically-generate-keypress-events
 			try {
 				Robot robot = new Robot();
 				robot.keyPress(KeyEvent.VK_ENTER);
@@ -263,11 +251,9 @@ public abstract class HeaderFinderBox {
 				ex.printStackTrace();
 			}
 		}
-		@Override
+		public void mousePressed(java.awt.event.MouseEvent e) {}
 		public void mouseExited(java.awt.event.MouseEvent e) {}
-		@Override
 		public void mouseEntered(java.awt.event.MouseEvent e){}
-		@Override
 		public void mouseClicked(java.awt.event.MouseEvent e){}
 	}
 
@@ -1013,10 +999,9 @@ public abstract class HeaderFinderBox {
 								}
 
 								if (debug) {
-									LogBuffer
-											.println("Trying to force a selection to "
-													+ "be made 2.  Current text: ["
-													+ content + "].");
+									LogBuffer.println("Trying to force a " +
+										"selection to be made 2.  Current " +
+										"text: [" + content + "].");
 								}
 
 								// searchTermBox.setKeySelectionManager(
@@ -1064,8 +1049,8 @@ public abstract class HeaderFinderBox {
 						&& selStartTyped == selStartPressed
 						&& (selEndTyped + 1) == selEndPressed) {
 					if (debug) {
-						LogBuffer
-								.println("Trying to force a selection to be made 3");
+						LogBuffer.println("Trying to force a selection to be " +
+							"made 3");
 					}
 					if ((selStartTyped - 1) > 0) {
 						// Get the current text content
