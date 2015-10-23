@@ -242,7 +242,6 @@ public abstract class HeaderFinderBox {
 
 		//Deselect my previous search results so that the companion search isn't
 		//limited (which will be narrowed down afterward)
-		searchSelection.setSelectedNode(null);
 		searchSelection.deselectAllIndexes();
 
 		//If the companion box has anything in it, perform that search first so
@@ -260,7 +259,6 @@ public abstract class HeaderFinderBox {
 				//If there were no results from this search, deselect the
 				//companion's search results
 				if(searchSelection.getNSelectedIndexes() == 0) {
-					otherSelection.setSelectedNode(null);
 					otherSelection.deselectAllIndexes();
 				}
 			}
@@ -275,7 +273,6 @@ public abstract class HeaderFinderBox {
 	 */
 	public void seekAllHelper() {
 
-		searchSelection.setSelectedNode(null);
 		searchSelection.deselectAllIndexes();
 
 		final List<Integer> indexList = findSelected();
