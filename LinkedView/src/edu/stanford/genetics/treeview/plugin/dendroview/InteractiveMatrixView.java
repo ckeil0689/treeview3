@@ -108,10 +108,11 @@ public class InteractiveMatrixView extends MatrixView implements
 		super();
 
 		setLabelPortMode(true);
-		debug = 11;
+		debug = 0;
 		//1 = Debug double-click detection
-		//10 = Debug double-click zooming
+		//10 = Debug click dragging
 		//11 = Debug zoom animation "toward" selection/sub-selection
+		//12 = Debug double-click zooming
 
 		/* Listeners for interactivity */
 		addMouseListener(new MatrixMouseListener());
@@ -1087,8 +1088,18 @@ public class InteractiveMatrixView extends MatrixView implements
 					!= xmap.getFirstVisible())))) {
 
 				if(stepwiseZoom) {
+
+					debug("Contiguous selection bounds: [array start:" +
+						arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+						", array stop:" +
+						"(" + arraySelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) + " - " + arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel)) + " + 1)" +
+						", gene start:" +
+						geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
+						", gene stop:" + "(" + geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) + " - " + geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) + " + 1)" +
+						"]",12);
 					if(zoomSpeed == 2) {
 
+						debug("Hard zoom event to a contiguous selection",12);
 						hardZoomToTarget(
 							arraySelection.getMinContiguousIndex(
 								xmap.getIndex(xPixel)),
@@ -1104,6 +1115,7 @@ public class InteractiveMatrixView extends MatrixView implements
 									ymap.getIndex(yPixel)) + 1));
 					} else {
 
+						debug("Smooth zoom event to a contiguous selection",12);
 						//Zoom to sub-selection
 						smoothAnimatedZoomToTarget(
 							arraySelection.getMinContiguousIndex(
@@ -1121,6 +1133,7 @@ public class InteractiveMatrixView extends MatrixView implements
 					}
 				} else {
 
+					debug("Smooth zoom event toward a contiguous selection",12);
 					//Zoom to sub-selection
 					smoothAnimatedZoomTowardTarget(
 						arraySelection.getMinContiguousIndex(
@@ -1158,6 +1171,7 @@ public class InteractiveMatrixView extends MatrixView implements
 
 					if(zoomSpeed == 2) {
 
+						debug("Hard zoom event to a disjoint selection",12);
 						hardZoomToTarget(
 							arraySelection.getMinIndex(),
 							(arraySelection.getMaxIndex() -
@@ -1167,6 +1181,7 @@ public class InteractiveMatrixView extends MatrixView implements
 								geneSelection.getMinIndex() + 1));
 					} else {
 
+						debug("Smooth zoom event to a disjoint selection",12);
 						//Zoom to selection
 						smoothAnimatedZoomToTarget(
 							arraySelection.getMinIndex(),
@@ -1178,6 +1193,7 @@ public class InteractiveMatrixView extends MatrixView implements
 					}
 				} else {
 
+					debug("Smooth zoom event toward a disjoint selection",12);
 					//Zoom toward selection
 					smoothAnimatedZoomTowardTarget(
 						arraySelection.getMinIndex(),
@@ -1196,15 +1212,18 @@ public class InteractiveMatrixView extends MatrixView implements
 
 					if(zoomSpeed == 2) {
 
+						debug("Hard zoom event to a tile",12);
 						hardZoomToTarget(xmap.getIndex(xPixel),1,
 							ymap.getIndex(yPixel),1);
 					} else {
 
+						debug("Smooth zoom event to a tile",12);
 						smoothAnimatedZoomToTarget(xmap.getIndex(xPixel),1,
 							ymap.getIndex(yPixel),1);
 					}
 				} else {
 
+					debug("Smooth zoom event toward a tile",12);
 					smoothAnimatedZoomTowardPixel(xPixel,yPixel,zoomDegree);
 				}
 			}
