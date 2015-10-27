@@ -2,7 +2,7 @@
 
 TreeView is a software for visualizing clustergrams. It was first released in
 1998 by Michael Eisen and then, a few years later, by Alok Saldanha, who
-developed an open source version Java TreeView .
+developed an open source version Java TreeView.
 
 Despite its popularity (~1,900 downloads/month on average), Java Treeview has
 not been updated in almost a decade and has collected many bug reports and

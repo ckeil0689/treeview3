@@ -1,11 +1,10 @@
-/*
- * Created on May 16, 2008
+/* BEGIN_HEADER                                                   TreeView 3
  *
- * This class is meant to wrap the menu entirely, so I can
- * easily change between heavyweight menus and lightweight JMenus.
+ * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * Copyright Alok Saldnaha, all rights reserved.
+ * END_HEADER 
  */
+
 package edu.stanford.genetics.treeview.core;
 
 import java.awt.Menu;
