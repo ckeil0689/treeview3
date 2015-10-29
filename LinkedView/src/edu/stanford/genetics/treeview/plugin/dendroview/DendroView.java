@@ -47,6 +47,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
+
 //import com.sun.glass.events.MouseEvent;
 import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
@@ -55,6 +56,7 @@ import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.ViewFrame;
@@ -613,15 +615,6 @@ public class DendroView implements Observer, DendroPanel {
 		/* Reset zoom */
 		zoomBtn = GUIFactory.createIconBtn(StringRes.icon_zoomAll);
 		zoomBtn.setToolTipText(StringRes.tt_home);
-	}
-
-	/**
-	 * Initiates a search of of labels for both axes.
-	 */
-	public void searchLabels() {
-
-		rowFinderBox.seekAll();
-		colFinderBox.seekAll();
 	}
 
 	public void updateTreeMenuBtn(final JSplitPane srcPane) {
@@ -1269,6 +1262,10 @@ public class DendroView implements Observer, DendroPanel {
 	public void setRowFinderBoxFocused() {
 
 		rowFinderBox.getSearchTermBox().requestFocusInWindow();
+	}
+
+	public boolean isAFinderBoxFocussed() {
+		return(rowFinderBox.isSearching() || colFinderBox.isSearching());
 	}
 
 	public void updateSearchTermBoxes(final HeaderInfo rowHI,
