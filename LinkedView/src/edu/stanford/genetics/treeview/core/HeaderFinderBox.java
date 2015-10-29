@@ -293,18 +293,20 @@ public abstract class HeaderFinderBox {
 			wildcardsub = wildcardsub + "*";
 		}
 
-		for (final String header : searchDataList) {
+		for(int i = 0; i < searchDataList.size();i++) {
 
-			if (wildCardMatch(header, sub)) {
-				indexList.add(searchDataList.indexOf(header));
+			final String header = searchDataList.get(i);
+			if(wildCardMatch(header, sub)) {
+				indexList.add(i);
 			}
-			if (wildCardMatch(header, wildcardsub)) {
-				substrList.add(searchDataList.indexOf(header));
+			if(wildCardMatch(header, wildcardsub)) {
+				substrList.add(i);
 			}
 		}
 
-		if (indexList.size() > 0)
+		if(indexList.size() > 0) {
 			return indexList;
+		}
 		return (substrList);
 	}
 
