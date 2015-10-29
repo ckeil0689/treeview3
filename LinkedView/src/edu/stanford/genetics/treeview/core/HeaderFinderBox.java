@@ -23,6 +23,7 @@
 package edu.stanford.genetics.treeview.core;
 
 // for summary view...
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -80,6 +81,9 @@ public abstract class HeaderFinderBox {
 	protected TreeSelectionI otherSelection;
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
+
+	private Color foundColor    = Color.BLACK;
+	private Color notFoundColor = Color.RED;
 
 	// "Search for Substring"
 	public HeaderFinderBox(final String type) {
@@ -275,6 +279,20 @@ public abstract class HeaderFinderBox {
 
 			globalOmap.setToMinScale();
 		}
+
+		if (indexList.size() > 0 &&
+			searchTermBox.getEditor().getEditorComponent().getForeground() !=
+			foundColor) {
+
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(foundColor);
+		} else if(indexList.size() <= 0 &&
+			searchTermBox.getEditor().getEditorComponent().getForeground() !=
+			notFoundColor) {
+
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(notFoundColor);
+		}
 	}
 
 	private List<Integer> findSelected() {
@@ -388,6 +406,13 @@ public abstract class HeaderFinderBox {
 						+ selIndexPressed + "]. " + "Character: ["
 						+ e.getKeyChar() + "]. " + "When cast to int: ["
 						+ (int) e.getKeyChar() + "].");
+			}
+
+			if(searchTermBox.getEditor().getEditorComponent().getForeground() !=
+				foundColor) {
+
+				searchTermBox.getEditor().getEditorComponent().
+					setForeground(foundColor);
 			}
 		}
 
