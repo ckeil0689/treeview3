@@ -280,16 +280,10 @@ public abstract class HeaderFinderBox {
 			globalOmap.setToMinScale();
 		}
 
-		if (indexList.size() > 0 &&
-			searchTermBox.getEditor().getEditorComponent().getForeground() !=
-			foundColor) {
-
+		if (indexList.size() > 0) {
 			searchTermBox.getEditor().getEditorComponent().
 				setForeground(foundColor);
-		} else if(indexList.size() <= 0 &&
-			searchTermBox.getEditor().getEditorComponent().getForeground() !=
-			notFoundColor) {
-
+		} else {
 			searchTermBox.getEditor().getEditorComponent().
 				setForeground(notFoundColor);
 		}
@@ -408,12 +402,8 @@ public abstract class HeaderFinderBox {
 						+ (int) e.getKeyChar() + "].");
 			}
 
-			if(searchTermBox.getEditor().getEditorComponent().getForeground() !=
-				foundColor) {
-
-				searchTermBox.getEditor().getEditorComponent().
-					setForeground(foundColor);
-			}
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(foundColor);
 		}
 
 		// The delete key is selecting what one tries to delete, thus if
