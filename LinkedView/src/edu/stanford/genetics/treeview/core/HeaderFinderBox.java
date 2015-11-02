@@ -33,6 +33,7 @@ import java.awt.event.InputEvent;
 //import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 //import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.lang.reflect.Field;
@@ -60,6 +61,7 @@ import net.miginfocom.swing.MigLayout;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 //import com.sun.glass.events.MouseEvent;
+
 
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -227,7 +229,7 @@ public abstract class HeaderFinderBox {
 	 * a user clicks a dropdown menu item from a combobox.
 	 * @author rleach
 	 */
-	class SearchMouseCommitListener implements MouseListener {
+	private class SearchMouseCommitListener extends MouseAdapter {
 		//Upon mouseReleased, it is assumed that the user has just clicked an
 		//item in a dropdown list in a combobox.  The search is initiated by
 		//simulating an enter keypress using a robot which is caught
@@ -251,10 +253,6 @@ public abstract class HeaderFinderBox {
 				ex.printStackTrace();
 			}
 		}
-		public void mousePressed(java.awt.event.MouseEvent e) {}
-		public void mouseExited(java.awt.event.MouseEvent e) {}
-		public void mouseEntered(java.awt.event.MouseEvent e){}
-		public void mouseClicked(java.awt.event.MouseEvent e){}
 	}
 
 	/**
