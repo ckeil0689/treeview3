@@ -82,8 +82,8 @@ public abstract class HeaderFinderBox {
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
 
-	private Color foundColor    = Color.BLACK;
-	private Color notFoundColor = Color.RED;
+	private static final Color FOUNDCOLOR    = Color.BLACK;
+	private static final Color NOTFOUNDCOLOR = Color.RED;
 
 	// "Search for Substring"
 	public HeaderFinderBox(final String type) {
@@ -282,10 +282,10 @@ public abstract class HeaderFinderBox {
 
 		if (indexList.size() > 0) {
 			searchTermBox.getEditor().getEditorComponent().
-				setForeground(foundColor);
+				setForeground(FOUNDCOLOR);
 		} else {
 			searchTermBox.getEditor().getEditorComponent().
-				setForeground(notFoundColor);
+				setForeground(NOTFOUNDCOLOR);
 		}
 	}
 
@@ -403,7 +403,7 @@ public abstract class HeaderFinderBox {
 			}
 
 			searchTermBox.getEditor().getEditorComponent().
-				setForeground(foundColor);
+				setForeground(FOUNDCOLOR);
 		}
 
 		// The delete key is selecting what one tries to delete, thus if
