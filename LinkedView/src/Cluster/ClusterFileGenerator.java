@@ -14,6 +14,21 @@ import edu.stanford.genetics.treeview.model.IntHeaderInfo;
  */
 public class ClusterFileGenerator {
 
+	private final String ROW_ID_HEADER = "GID";
+	private final String COL_ID_HEADER = "AID";
+	
+//	private final String ROW_WEIGHT_ID = "GWEIGHT";
+	private final String COL_WEIGHT_ID = "EWEIGHT";
+	
+	private final String ROW_AXIS_ID = "ROW";
+	private final String COL_AXIS_ID = "COL";
+	
+	private final String FILE_EXT = ".cdt";
+	
+	private final String KMEANS_DESIGNATOR = "_K";
+	private final String KMEANS_ROW_SUFFIX = "_G";
+	private final String KMEANS_COL_SUFFIX = "_A";
+	
 	private String[] rowHeaders;
 	private String[] colHeaders;
 
@@ -74,8 +89,9 @@ public class ClusterFileGenerator {
 		String fileEnd = "";
 
 		if (isHier) {
-			fileEnd = ".cdt";
+			fileEnd = FILE_EXT;
 
+		// k-means file names have a few more details	
 		} else {
 			String rowC = "";
 			String colC = "";
@@ -83,15 +99,16 @@ public class ClusterFileGenerator {
 			final int row_clusterN = spinnerInput[0];
 			final int col_clusterN = spinnerInput[2];
 
+			
 			if (orderedGIDs != null && orderedGIDs.length > 0) {
-				rowC = "_G" + row_clusterN;
+				rowC = KMEANS_ROW_SUFFIX + row_clusterN;
 			}
 
 			if (orderedAIDs != null && orderedAIDs.length > 0) {
-				colC = "_A" + col_clusterN;
+				colC = KMEANS_COL_SUFFIX + col_clusterN;
 			}
 
-			fileEnd = "_K" + rowC + colC + ".cdt";
+			fileEnd = KMEANS_DESIGNATOR + rowC + colC + FILE_EXT;
 		}
 
 		this.bufferedWriter = new ClusterFileWriter(fileName, fileEnd, link);
@@ -135,7 +152,6 @@ public class ClusterFileGenerator {
 		for (int i = 0; i < cdtData_doubles.length; i++) {
 
 			final double[] element = cdtData_doubles[i];
-
 			final String[] newStringData = new String[element.length];
 
 			for (int j = 0; j < element.length; j++) {
@@ -163,10 +179,12 @@ public class ClusterFileGenerator {
 		int[] reorderedRowIndices = new int[origMatrix.length];
 		int[] reorderedColIndices = new int[colNames.length];
 
-		cdtData_doubles = new double[reorderedRowIndices.length][reorderedColIndices.length];
+		cdtData_doubles = new double[reorderedRowIndices.length]
+				[reorderedColIndices.length];
 
 		if (isRowClustered) {
-			reorderedRowIndices = orderElements(rowNames, orderedGIDs, "GENE");
+			reorderedRowIndices = orderElements(rowNames, orderedGIDs, 
+					ROW_AXIS_ID);
 			
 		} else {
 			/* old order simply remains */
@@ -177,7 +195,8 @@ public class ClusterFileGenerator {
 		}
 
 		if (isColClustered) {
-			reorderedColIndices = orderElements(colNames, orderedAIDs, "ARRY");
+			reorderedColIndices = orderElements(colNames, orderedAIDs, 
+					COL_AXIS_ID);
 			
 		} else {
 			/* TODO change to use index from orderedAIDs instead */
@@ -238,6 +257,7 @@ public class ClusterFileGenerator {
 			
 			final String id = orderedIDs[i];
 			if (isHier) {
+				// extract numerical part of element ID
 				final String adjusted = id.replaceAll("[\\D]", "");
 
 				// gets index from ordered list, e.g. ARRY45X --> 45;
@@ -277,10 +297,10 @@ public class ClusterFileGenerator {
 	 */
 	private void setReorderedNames(String[][] orderedNames, String axisPrefix) {
 
-		if (axisPrefix.equals("GENE")) {
+		if (axisPrefix.equals(ROW_AXIS_ID)) {
 			this.rowNamesOrdered = orderedNames;
 			
-		} else if (axisPrefix.equals("ARRY")) {
+		} else if (axisPrefix.equals(COL_AXIS_ID)) {
 			this.colNamesOrdered = orderedNames;
 		}
 	}
@@ -346,7 +366,7 @@ public class ClusterFileGenerator {
 	 */
 	private void fillHierarchical() {
 
-		final boolean hasGID = findIndex(rowHeaders, "GID") != -1;
+		final boolean hasGID = findIndex(rowHeaders, ROW_ID_HEADER) != -1;
 
 		int rowLength = rowHeaders.length + colNames.length;
 		if (isRowClustered && !hasGID) {
@@ -361,7 +381,7 @@ public class ClusterFileGenerator {
 		/* The first row */
 		addIndex = 0;
 		if (isRowClustered && !hasGID) {
-			cdtRow[addIndex++] = "GID";
+			cdtRow[addIndex++] = ROW_ID_HEADER;
 		}
 
 		System.arraycopy(rowHeaders, 0, cdtRow, addIndex, rowHeaders.length);
@@ -380,7 +400,7 @@ public class ClusterFileGenerator {
 		/* if columns were clustered, make AID row */
 		if (isColClustered) {
 
-			cdtRow[0] = "AID";
+			cdtRow[0] = COL_ID_HEADER;
 
 			/* Fill with AIDs ("ARRY3X") */
 			System.arraycopy(orderedAIDs, 0, cdtRow, dataStart,
@@ -392,7 +412,7 @@ public class ClusterFileGenerator {
 		/* remaining label rows */
 		for (int i = 1; i < colHeaders.length; i++) {
 
-			if (colHeaders[i].equalsIgnoreCase("AID")) {
+			if (colHeaders[i].equals(COL_ID_HEADER)) {
 				continue;
 			}
 
@@ -463,7 +483,7 @@ public class ClusterFileGenerator {
 		addIndex = 0;
 		final String[] cdtRow2 = new String[rowLength];
 
-		cdtRow2[addIndex++] = "EWEIGHT";
+		cdtRow2[addIndex++] = COL_WEIGHT_ID;
 
 		for (int i = 0; i < rowHeaders.length - 1; i++) {
 
