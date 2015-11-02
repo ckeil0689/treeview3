@@ -23,12 +23,16 @@
 package edu.stanford.genetics.treeview.core;
 
 // for summary view...
+//import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,9 +41,12 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.text.JTextComponent;
 
 import net.miginfocom.swing.MigLayout;
@@ -87,6 +94,8 @@ public abstract class HeaderFinderBox {
 
 	//defaultText is what's in the finder box before a term is entered.
 	protected String defaultText;
+
+//	boolean dropdownclicked = false;
 
 	/**
 	 * Constructor
@@ -150,6 +159,90 @@ public abstract class HeaderFinderBox {
 
 		searchTermBox.getEditor().getEditorComponent()
 				.addKeyListener(new BoxKeyListener());
+
+		//NOTE: This may be removed without side-effect if a better way of
+		//initiating a search upon combobox dropdown click is found
+		addSearchMouseCommitListener();
+	}
+
+	//NOTE: This may be removed without side-effect if a better way of
+	//initiating a search upon combobox dropdown click is found
+	/**
+	 * This method adds a mouse listener (SearchMouseCommitListener) to the
+	 * dropdown menu of a combobox. Its purpose is to detect only 1 event: when
+	 * a user clicks an item in the dropdown so we can capitalize on that
+	 * trigger to initiate the search and display the results in the matrix as
+	 * a yellow highlight.
+	 * @author rleach
+	 */
+	private void addSearchMouseCommitListener() {
+		//Support for catching a mouse-click selection from a combobox dropdown
+		//menu is not standardly supported (without inadvertently triggering
+		//upon other unrelated events as well).  The following code is the
+		//result of extensive searching and tests to find a way to call seekAll
+		//upon mouse selection of an item from the combobox's dropdown menu.
+		//Every other method tried (ActionListener, ItemListener,
+		//PopupMenuListener, MouseListeners attached in various other simple
+		//ways, and even various combinations of multiple listeners did not work
+		//well.  To see some details on those failed attempts, refer to:
+		//http://stackoverflow.com/questions/33268726/how-do-you-detect-when-a-user-commits-a-jcombobox-selection-via-mouse-click-in-j
+		//This solution below can be found here:
+		//http://engin-tekin.blogspot.com/2009/10/hrefhttpkfd.html
+		try {
+			Field popupInBasicComboBoxUI =
+				BasicComboBoxUI.class.getDeclaredField("popup");
+			popupInBasicComboBoxUI.setAccessible(true);
+			BasicComboPopup popup = (BasicComboPopup) popupInBasicComboBoxUI
+				.get(searchTermBox.getUI());
+			
+			Field scrollerInBasicComboPopup =
+				BasicComboPopup.class.getDeclaredField("scroller");
+			scrollerInBasicComboPopup.setAccessible(true);
+			JScrollPane scroller =
+				(JScrollPane) scrollerInBasicComboPopup.get(popup);
+			
+			scroller.getViewport().getView()
+				.addMouseListener(new SearchMouseCommitListener());
+		}
+		catch (NoSuchFieldException e) {
+			e.printStackTrace();  
+		}
+		catch (IllegalAccessException e) {
+			e.printStackTrace();  
+		}
+	}
+
+	//NOTE: This may be removed without side-effect if a better way of
+	//initiating a search upon combobox dropdown click is found
+	/**
+	 * The following listener only performs 1 function: initiates a search when
+	 * a user clicks a dropdown menu item from a combobox.
+	 * @author rleach
+	 */
+	private class SearchMouseCommitListener extends MouseAdapter {
+		//Upon mouseReleased, it is assumed that the user has just clicked an
+		//item in a dropdown list in a combobox.  The search is initiated by
+		//simulating an enter keypress using a robot which is caught
+		//by the keyListener.  This is circuitous, but reliable, and easy to
+		//replace using another method if a better way to do this is found.
+		@Override
+		public void mouseReleased(java.awt.event.MouseEvent e){
+			//Calling seekAll() directly did not work. It worked occasionally
+			//when called from ActionListener's actionPerformed method (only
+			//when dropdownclicked was set to true here).  It turns out that
+			//simulating an enter key keypress here works really well, albeit
+			//admittedly hackily, but there's no standard way to initiate an
+			//action only when an item in the dropdown is clicked without
+			//initiating that action in a bunch of unrelated events as well.
+			//http://stackoverflow.com/questions/18169598/how-can-i-programmatically-generate-keypress-events
+			try {
+				Robot robot = new Robot();
+				robot.keyPress(KeyEvent.VK_ENTER);
+				robot.keyRelease(KeyEvent.VK_ENTER);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -891,10 +984,9 @@ public abstract class HeaderFinderBox {
 								}
 
 								if (debug) {
-									LogBuffer
-											.println("Trying to force a selection to "
-													+ "be made 2.  Current text: ["
-													+ content + "].");
+									LogBuffer.println("Trying to force a " +
+										"selection to be made 2.  Current " +
+										"text: [" + content + "].");
 								}
 
 								// searchTermBox.setKeySelectionManager(
@@ -942,8 +1034,8 @@ public abstract class HeaderFinderBox {
 						&& selStartTyped == selStartPressed
 						&& (selEndTyped + 1) == selEndPressed) {
 					if (debug) {
-						LogBuffer
-								.println("Trying to force a selection to be made 3");
+						LogBuffer.println("Trying to force a selection to be " +
+							"made 3");
 					}
 					if ((selStartTyped - 1) > 0) {
 						// Get the current text content
