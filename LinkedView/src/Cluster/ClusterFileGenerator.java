@@ -14,14 +14,14 @@ import edu.stanford.genetics.treeview.model.IntHeaderInfo;
  */
 public class ClusterFileGenerator {
 
+	private final static String ROW_AXIS_ID = "ROW";
+	private final static String COL_AXIS_ID = "COL";
+	
 	private final String ROW_ID_HEADER = "GID";
 	private final String COL_ID_HEADER = "AID";
 	
 //	private final String ROW_WEIGHT_ID = "GWEIGHT";
 	private final String COL_WEIGHT_ID = "EWEIGHT";
-	
-	private final String ROW_AXIS_ID = "ROW";
-	private final String COL_AXIS_ID = "COL";
 	
 	private final String FILE_EXT = ".cdt";
 	
