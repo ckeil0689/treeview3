@@ -148,7 +148,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 		int j = i;
 		for(j = i;j > 0;j--){
-			if(isIndexSelected(j - 1)) {
+			if(!isIndexSelected(j - 1)) {
 				break;
 			}
 		}
@@ -168,12 +168,16 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 		//Error-check the input
 		if(!isIndexSelected(i) || i == getMaxIndex()) {
+			if(!isIndexSelected(i)) {
+				LogBuffer.println("ERROR: Invalid index [" + i + "].  " +
+					"Not selected.");
+			}
 			return(i);
 		}
 
 		int j = i;
 		for(j = i; j < getMaxIndex(); j++){
-			if(isIndexSelected(j + 1)) {
+			if(!isIndexSelected(j + 1)) {
 				break;
 			}
 		}
