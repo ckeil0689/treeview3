@@ -19,7 +19,7 @@ unless (($buildVersion eq $javaVersion) and ($buildVersion eq $version)) {
     print STDERR "Error: Version Mismatch\n";
     print STDERR "Specified Version $version\n";
     print STDERR "build.xml Version $buildVersion\n";
-    print STDERR "Java Treeview Version $javaVersion\n";
+    print STDERR "Treeview Version $javaVersion\n";
     exit(1);
 }
 
