@@ -399,7 +399,6 @@ public class ClusterFileGenerator {
 		/* next row */
 		/* if columns were clustered, make AID row */
 		if (isColClustered) {
-
 			cdtRow[0] = COL_ID_HEADER;
 
 			/* Fill with AIDs ("ARRY3X") */

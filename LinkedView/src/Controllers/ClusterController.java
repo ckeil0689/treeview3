@@ -224,8 +224,9 @@ public class ClusterController {
 			/* Row axis cluster */
 			reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
 
-			if (isCancelled())
+			if (isCancelled()) {
 				return null;
+			}
 
 			/* Column axis cluster */
 			reorderedCols = calculateAxis(colSimilarity, COL, fileName);
@@ -262,8 +263,9 @@ public class ClusterController {
 			final DistanceMatrix distMatrix = new DistanceMatrix(0);
 
 			/* Check if this axis should be clustered */
-			if (!isReady(similarity, axis))
+			if (!isReady(similarity, axis)) {
 				return new String[] {};
+			}
 
 			final String axisPrefix = (axis == ROW) ? "row" : "column";
 
@@ -281,6 +283,9 @@ public class ClusterController {
 
 			publish("Clustering " + axisPrefix + " data...");
 
+			// TODO make a local String[] reorderedAxis variable, set the 
+			// processor.clusterAxis(...) result, and return that. 
+			// --> clearer to understand what is being returned.
 			return processor.clusterAxis(distMatrix,
 					clusterView.getLinkMethod(),
 					clusterView.getSpinnerValues(), isHierarchical(), axis);
@@ -556,7 +561,8 @@ public class ClusterController {
 			break;
 		}
 
-		return (distMeasure != DistMatrixCalculator.NO_CLUSTER && (groups > 0 && iterations > 0));
+		return (distMeasure != DistMatrixCalculator.NO_CLUSTER 
+				&& (groups > 0 && iterations > 0));
 
 	}
 

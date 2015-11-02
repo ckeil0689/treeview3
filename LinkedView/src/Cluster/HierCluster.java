@@ -37,7 +37,7 @@ public class HierCluster {
 	 */
 	private final int linkMethod;
 	private Linker linker;
-	private String axisPrefix;
+	private final String axisPrefix;
 	private final int initial_matrix_size;
 	private int iterNum;
 
@@ -252,6 +252,7 @@ public class HierCluster {
 		return Helper.concatIntArrays(row_cluster, col_cluster);
 	}
 
+	// TODO method never used - remove?
 	private void addNodeToList(String[] link) {
 
 		/* Add new node object to list */
@@ -316,6 +317,7 @@ public class HierCluster {
 		return nodes;
 	}
 
+	// TODO method never used - remove?
 	private Node extractOrderedNodes(Node root, List<Node> nodeList) {
 
 		if (root == null) {
@@ -479,6 +481,7 @@ public class HierCluster {
 		currentClusters = null;
 	}
 
+	// TODO method never used - remove?
 	private void writeReordered() {
 
 		String fileName = "reordered.txt";
@@ -497,11 +500,11 @@ public class HierCluster {
 
 		} catch (UnsupportedEncodingException | FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogBuffer.logException(e);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LogBuffer.logException(e);
 			
 		}
 	}
