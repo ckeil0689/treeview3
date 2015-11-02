@@ -277,9 +277,10 @@ public class ClusterFileGenerator {
 	 */
 	private void setReorderedNames(String[][] orderedNames, String axisPrefix) {
 
-		if (axisPrefix.equalsIgnoreCase("GENE")) {
+		if (axisPrefix.equals("GENE")) {
 			this.rowNamesOrdered = orderedNames;
-		} else if (axisPrefix.equalsIgnoreCase("ARRY")) {
+			
+		} else if (axisPrefix.equals("ARRY")) {
 			this.colNamesOrdered = orderedNames;
 		}
 	}
