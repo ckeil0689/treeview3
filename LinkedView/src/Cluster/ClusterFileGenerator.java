@@ -14,8 +14,8 @@ import edu.stanford.genetics.treeview.model.IntHeaderInfo;
  */
 public class ClusterFileGenerator {
 
-	private final static String ROW_AXIS_ID = "ROW";
-	private final static String COL_AXIS_ID = "COL";
+	public final static String ROW_AXIS_ID = "ROW";
+	public final static String COL_AXIS_ID = "COL";
 	
 	private final String ROW_ID_HEADER = "GID";
 	private final String COL_ID_HEADER = "AID";

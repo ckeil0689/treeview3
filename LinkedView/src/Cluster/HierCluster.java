@@ -96,8 +96,9 @@ public class HierCluster {
 		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
-
-		this.axisPrefix = (axis == ClusterController.ROW) ? "GENE" : "ARRY";
+		this.axisPrefix = (axis == ClusterController.ROW) ? 
+						ClusterFileGenerator.ROW_AXIS_ID : 
+							ClusterFileGenerator.COL_AXIS_ID;
 
 		prepareCluster();
 	}
