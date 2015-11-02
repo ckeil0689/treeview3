@@ -73,6 +73,7 @@ public abstract class HeaderFinderBox {
 	private String[][] searchDataList;
 	private int primarySearchIndex;
 	private int maxSearchIndex;
+	private boolean[] searchExclusions;
 	private WideComboBox searchTermBox;
 	private final String type;
 
@@ -189,16 +190,40 @@ public abstract class HeaderFinderBox {
 		String[] searchDataHeaders = { "" };
 		updateSearchIndexes();
 
-		final String[] labeledHeaders =
-			new String[(searchDataList.length * (maxSearchIndex + 1)) + 1];
+		//Determine which label types to skip
+		searchExclusions = new boolean[maxSearchIndex + 1];
+		int numExclusions = 0;
+		for(int i = 0;i <= maxSearchIndex;i++) {
+			if(allStringsEqual(hA,i) && i != primarySearchIndex) {
+				searchExclusions[i] = true;
+				numExclusions++;
+				continue;
+			} else {
+				searchExclusions[i] = false;
+			}
+		}
+
+		int dropdownSize =
+			//Full number of all labels
+			(searchDataList.length * (maxSearchIndex + 1)) -
+			//Number of excluded labels
+			searchDataList.length * numExclusions +
+			//For the "Search rows..." default text
+			1;
+
+		final String[] labeledHeaders = new String[dropdownSize];
 
 		labeledHeaders[0] = defaultText;
 
 		int startIndex = 1;
 
-		for(int i = 0;i < maxSearchIndex;i++) {
+		for(int i = 0;i <= maxSearchIndex;i++) {
+			if(searchExclusions[i]) {
+				continue;
+			}
+
 			searchDataHeaders = getHeaders(hA,i);
-	
+
 			Arrays.sort(searchDataHeaders);
 	
 			System.arraycopy(searchDataHeaders, 0, labeledHeaders, startIndex,
@@ -212,6 +237,23 @@ public abstract class HeaderFinderBox {
 	}
 
 	/**
+	 * Determines whether all strings located at hA[*][i] are equal so that
+	 * label types which have no discerning search power do not waste space in
+	 * the combobox.
+	 * @author rleach
+	 * @param hA, i
+	 * @return boolean
+	 */
+	public boolean allStringsEqual(String[][] hA,int i) {
+		for(int j = 1;j < hA.length;j++) {
+			if(!hA[0][i].equals(hA[j][i])) {
+				return(false);
+			}
+		}
+		return(true);
+	}
+
+	/**
 	 * Returns the content panel which keeps the GUI components.
 	 *
 	 * @return JPanel
@@ -221,6 +263,11 @@ public abstract class HeaderFinderBox {
 		return searchTermBox;
 	}
 
+	/**
+	 * Copies a 2D array of strings for searching.
+	 * @param old
+	 * @return String[][]
+	 */
 	public String[][] copy2DStringArray(String[][] old) {
 		String[][] copy = new String[old.length][old[0].length];
 		for(int i=0; i<old.length; i++)
@@ -230,26 +277,21 @@ public abstract class HeaderFinderBox {
 	}
 
 	/**
-	 * Extracts the header infos into a String array, so the array can fill the
-	 * comboBox with values to choose from.
+	 * Obtains the visible column/row labels.
 	 *
 	 * @param hA
 	 * @return
 	 */
 	public String[] getHeaders(final String[][] hA) {
-
-		final String[] headerArray = new String[hA.length];
-		updateSearchIndexes();
-
-		for (int i = 0; i < hA.length; i++) {
-
-			final String yorf = hA[i][primarySearchIndex];
-			headerArray[i] = yorf;
-		}
-
-		return headerArray;
+		return(getHeaders(hA,primarySearchIndex));
 	}
 
+	/**
+	 * Obtains all column/row labels.
+	 *
+	 * @param hA
+	 * @return
+	 */
 	public String[] getHeaders(final String[][] hA,int index) {
 
 		final String[] headerArray = new String[hA.length];
@@ -353,7 +395,7 @@ public abstract class HeaderFinderBox {
 
 			//This searches secondary labels (those not visible)
 			for(int j = 0; j <= maxSearchIndex;j++) {
-				if(j == primarySearchIndex) {
+				if(j == primarySearchIndex || searchExclusions[j]) {
 					continue;
 				}
 				header = searchDataList[i][j];
