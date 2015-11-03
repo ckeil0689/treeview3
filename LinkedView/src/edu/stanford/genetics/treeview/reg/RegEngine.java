@@ -1,25 +1,10 @@
-/* BEGIN_HEADER                                              Java TreeView
+/* BEGIN_HEADER                                                   TreeView 3
  *
- * $Author: alokito $
- * $RCSfile: RegEngine.java,v $
- * $Revision: 1.15 $
- * $Date: 2008-07-06 03:25:54 $
- * $Name:  $
+ * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
- *
- * This software is provided under the GNU GPL Version 2. In particular,
- *
- * 1) If you modify a source file, make a comment in it containing your name and the date.
- * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
- *
- * A full copy of the license can be found in gpl.txt or online at
- * http://www.gnu.org/licenses/gpl.txt
- *
- * END_HEADER
+ * END_HEADER 
  */
+
 package edu.stanford.genetics.treeview.reg;
 
 import java.awt.BorderLayout;
@@ -54,7 +39,7 @@ import edu.stanford.genetics.treeview.TreeViewApp;
 import edu.stanford.genetics.treeview.model.LoadProgress;
 
 /**
- * The purpose of this class is to allow registration of java treeview
+ * The purpose of this class is to allow registration of treeview
  * installations for purposes of grant writing.
  * 
  * Registration is by simple HTTP access.
@@ -92,7 +77,7 @@ public class RegEngine {
 	/**
 	 * 
 	 * Verify that the given registration node is up-to-date for this version of
-	 * java treeview If not registered, and user has not yet declined to
+	 * treeview If not registered, and user has not yet declined to
 	 * register, pop up dialog prompting user to register.
 	 * 
 	 * This is typically run at startup
@@ -178,7 +163,7 @@ public class RegEngine {
 	 * @throws Exception
 	 */
 	private void attemptRegistration() throws Exception {
-		loadProgress = new LoadProgress("Registering Java Treeview...", null);
+		loadProgress = new LoadProgress("Registering Treeview...", null);
 		final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
 			@Override
@@ -227,7 +212,7 @@ public class RegEngine {
 				loadProgress.println("key = " + key + ", value = " + val);
 				loadProgress.println("exception " + e);
 				loadProgress
-						.println("if problems persist please alert java treeview maintainers (jtreeview-users@lists.sourceforge.net");
+						.println("if problems persist please alert treeview maintainers (jtreeview-users@lists.sourceforge.net");
 				setException(e);
 				setFinished(true);
 				return;
@@ -243,7 +228,7 @@ public class RegEngine {
 			loadProgress.println("url = " + regUrl);
 			loadProgress.println("exception " + e);
 			loadProgress
-					.println("if problems persist please alert java treeview maintainers (jtreeview-users@lists.sourceforge.net");
+					.println("if problems persist please alert treeview maintainers (jtreeview-users@lists.sourceforge.net");
 			setException(e);
 			setFinished(true);
 			return;
@@ -258,7 +243,7 @@ public class RegEngine {
 			loadProgress.println("exception " + e);
 			loadProgress.println("please check network connection");
 			loadProgress
-					.println("if problems persist please alert java treeview maintainers (jtreeview-users@lists.sourceforge.net");
+					.println("if problems persist please alert treeview maintainers (jtreeview-users@lists.sourceforge.net");
 			setException(e);
 			setFinished(true);
 			return;
@@ -276,7 +261,7 @@ public class RegEngine {
 			loadProgress.println("exception " + e);
 			loadProgress.println("please check network connection");
 			loadProgress
-					.println("if problems persist please alert java treeview maintainers (jtreeview-users@lists.sourceforge.net");
+					.println("if problems persist please alert treeview maintainers (jtreeview-users@lists.sourceforge.net");
 			setException(e);
 			setFinished(true);
 			return;
@@ -307,7 +292,7 @@ public class RegEngine {
 					.println("Error reading response, could not complete registration");
 			loadProgress.println("exception " + e);
 			loadProgress
-					.println("if problems persist please alert java treeview maintainers (jtreeview-users@lists.sourceforge.net");
+					.println("if problems persist please alert treeview maintainers (jtreeview-users@lists.sourceforge.net");
 			setException(e);
 			setFinished(true);
 			return;
@@ -337,9 +322,9 @@ public class RegEngine {
 	 */
 	private void suggestRegistration() {
 		final JTextArea message = new JTextArea();
-		message.append("Please register Java Treeview.\n");
+		message.append("Please register Treeview.\n");
 		message.append("It is critical for our funding that we track the\n");
-		message.append("number of Java Treeview users.");
+		message.append("number of Treeview users.");
 		// pop up dialog suggesting registration
 		final String[] options = { "Register Now", "Register Later",
 				"Do Not Register" };

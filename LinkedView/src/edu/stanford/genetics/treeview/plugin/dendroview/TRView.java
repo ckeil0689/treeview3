@@ -1,6 +1,5 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.AdjustmentEvent;
@@ -8,8 +7,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Observable;
 
-import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
+import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
@@ -24,6 +26,8 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 	protected HeaderSummary headerSummary;
 	protected LinearTransformation xScaleEq, yScaleEq;
 	protected MapContainer map;
+	
+	protected final JScrollPane scrollPane;
 
 	protected TreePainter treePainter = null;
 	protected TreeDrawerNode selectedNode = null;
@@ -35,14 +39,40 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 	public TRView(final boolean isGeneTree) {
 
 		super();
+		
+		setLayout(new MigLayout());
 
 		final String summary = (isGeneTree) ? "GtrSummary" : "AtrSummary";
 		this.headerSummary = new HeaderSummary(summary);
-		panel = new JPanel();
+		
+//		panel = new JPanel();
+		
+		if(isGeneTree) {
+			scrollPane = new JScrollPane(this,
+					ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		} else {
+			scrollPane = new JScrollPane(this,
+					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		}
+		
+		panel = scrollPane;
+		
 		destRect = new Rectangle();
 
-		panel.setLayout(new BorderLayout());
-		panel.add(this, BorderLayout.CENTER);
+//		panel.setLayout(new BorderLayout());
+//		panel.add(this, BorderLayout.CENTER);
+	}
+	
+	public JScrollBar getVerticalScrollBar() {
+		
+		return scrollPane.getVerticalScrollBar();
+	}
+	
+	public JScrollBar getHorizontalScrollBar() {
+		
+		return scrollPane.getHorizontalScrollBar();
 	}
 
 	/**
@@ -391,6 +421,8 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 					selectLeft();
 				}
 			}
+			break;
+		default:
 			break;
 		}
 	}

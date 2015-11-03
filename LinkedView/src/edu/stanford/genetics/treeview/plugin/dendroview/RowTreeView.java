@@ -1,25 +1,10 @@
-/* BEGIN_HEADER                                              Java TreeView
+/* BEGIN_HEADER                                                   TreeView 3
  *
- * $Author: rqluk $
- * $RCSfile: GTRView.java,v $
- * $Revision: 1.1 $
- * $Date: 2006-08-16 19:13:46 $
- * $Name:  $
+ * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
- *
- * This software is provided under the GNU GPL Version 2. In particular,
- *
- * 1) If you modify a source file, make a comment in it containing your name and the date.
- * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
- *
- * A full copy of the license can be found in gpl.txt or online at
- * http://www.gnu.org/licenses/gpl.txt
- *
- * END_HEADER
+ * END_HEADER 
  */
+
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
@@ -47,7 +32,6 @@ public class RowTreeView extends TRView implements MouseMotionListener,
 	public RowTreeView() {
 
 		super(true);
-		panel = this;
 
 		isLeft = true;
 
@@ -65,70 +49,11 @@ public class RowTreeView extends TRView implements MouseMotionListener,
 	}
 
 	@Override
-	public String[] getStatus() {
-
-		String[] status;
-		// <<<<<<< HEAD
-		// if (selectedNode != null) {
-		// if (selectedNode.isLeaf()) {
-		// status = new String[2];
-		// status[0] = "Leaf Node " + selectedNode.getId();
-		// status[1] = "Pos " + selectedNode.getCorr();
-		//
-		// } else {
-		// final int[] nameIndex = getHeaderSummary().getIncluded();
-		// status = new String[nameIndex.length * 2];
-		// final String[] names = gtrHI.getNames();
-		//
-		// for (int i = 0; i < nameIndex.length; i++) {
-		// status[2 * i] = names[nameIndex[i]] + ":";
-		// status[2 * i + 1] = " "
-		// + gtrHI.getHeader(gtrHI.getHeaderIndex(selectedNode
-		// .getId()))[nameIndex[i]];
-		// }
-		// }
-		// } else {
-		// status = new String[2];
-		// status[0] = "Select Node to ";
-		// status[1] = "view annotation.";
-		// }
-		// =======
-		// if (selectedNode != null) {
-		// if (selectedNode.isLeaf()) {
-		// status = new String[2];
-		// status[0] = "Leaf Node " + selectedNode.getId();
-		// status[1] = "Pos " + selectedNode.getCorr();
-		//
-		// } else {
-		// final int[] nameIndex = getHeaderSummary().getIncluded();
-		// status = new String[nameIndex.length * 2];
-		// final String[] names = gtrHI.getNames();
-		//
-		// for (int i = 0; i < nameIndex.length; i++) {
-		// status[2 * i] = names[nameIndex[i]] + ":";
-		// status[2 * i + 1] = " "
-		// + gtrHI.getHeader(gtrHI.getHeaderIndex(
-		// selectedNode.getId()))[nameIndex[i]];
-		// }
-		// }
-		// } else {
-		// status = new String[2];
-		// status[0] = "Select Node to ";
-		// status[1] = "view annotation.";
-		// }
-
-		/* TODO temporary solution until we decide what info to display" */
-		status = new String[3];
-
-		// >>>>>>> bugFix
-		return status;
-	}
-
-	@Override
 	public void updateBuffer(final Graphics g) {
 
-		if (treePainter == null)
+		if (treePainter == null) {
 			return;
+		}
 
 		if (offscreenChanged) {
 			offscreenValid = false;

@@ -1,8 +1,10 @@
-/*
- * Created on Jun 3, 2008
+/* BEGIN_HEADER                                                   TreeView 3
  *
- * Copyright Alok Saldnaha, all rights reserved.
+ * Please refer to our LICENSE file if you wish to make changes to this software
+ *
+ * END_HEADER 
  */
+
 package edu.stanford.genetics.treeview.core;
 
 import java.awt.Toolkit;

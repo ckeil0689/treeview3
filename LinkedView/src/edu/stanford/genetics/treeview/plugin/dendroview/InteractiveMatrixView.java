@@ -1,59 +1,37 @@
-/* BEGIN_HEADER                                              Java TreeView
+/* BEGIN_HEADER                                                   TreeView 3
  *
- * $Author: rqluk $
- * $RCSfile: GlobalView.java,v $
- * $Revision: 1.1 $
- * $Date: 2006-08-16 19:13:45 $
- * $Name:  $
+ * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
- *
- * This software is provided under the GNU GPL Version 2. In particular,
- *
- * 1) If you modify a source file, make a comment in it containing your name and the date.
- * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
- *
- * A full copy of the license can be found in gpl.txt or online at
- * http://www.gnu.org/licenses/gpl.txt
- *
- * END_HEADER
+ * END_HEADER 
  */
+
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
 import javax.swing.JScrollBar;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
 import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
-public class InteractiveMatrixView extends MatrixView implements
-		MouseWheelListener {
+/**
+ * TODO completely remove dependencies on MapContainer + Selections. This is
+ * all Controller stuff. The only thing this class ever needs to know is
+ * GUI painting related. ALL GUI handling + logic code execution happens
+ * in the controller.
+ *
+ */
+public class InteractiveMatrixView extends MatrixView {
 
 	private static final long serialVersionUID = 1L;
 
@@ -61,30 +39,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	public static final int EQUAL = 1;
 	public static final int PROPORT = 2;
 
-	private final String[] statustext = new String[] { "Mouseover Selection",
-			"", "" };
-	private HeaderInfo arrayHI;
-	private HeaderInfo geneHI;
-
-	private HeaderSummary geneSummary;
-	private HeaderSummary arraySummary;
-
-	private int overx;
-	private int overy;
-
 	private double aspectRatio = -1;
-
-	/**
-	 * Points to track candidate selected rows/cols should reflect where the
-	 * mouse has actually been
-	 */
-	private final Point startPoint = new Point();
-	private final Point endPoint = new Point();
-
-	/**
-	 * This rectangle keeps track of where the drag rect was drawn
-	 */
-	private final Rectangle dragRect = new Rectangle();
 
 	/**
 	 * Rectangle to track yellow selected rectangle (pixels)
@@ -96,8 +51,6 @@ public class InteractiveMatrixView extends MatrixView implements
 	 */
 	private List<Ellipse2D.Double> indicatorCircleList = null;
 
-	GlobalMatrixView globalMatrixView = null;
-
 	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
 	 * MapContainer) to help it figure out where to draw things. It also tries
@@ -108,15 +61,10 @@ public class InteractiveMatrixView extends MatrixView implements
 		super();
 
 		setLabelPortMode(true);
-		debug = 11;
+		debug = 0;
 		//1 = Debug double-click detection
-		//10 = Debug double-click zooming
+		//10 = Debug click dragging
 		//11 = Debug zoom animation "toward" selection/sub-selection
-
-		/* Listeners for interactivity */
-		addMouseListener(new MatrixMouseListener());
-		addMouseMotionListener(new MatrixMouseListener());
-		addMouseWheelListener(this);
 	}
 
 	/**
@@ -135,70 +83,6 @@ public class InteractiveMatrixView extends MatrixView implements
 	public JScrollBar getYMapScroll() {
 
 		return scrollPane.getVerticalScrollBar();
-	}
-
-	public void setGlobalMatrixView(GlobalMatrixView gmv) {
-		globalMatrixView = gmv;
-	}
-
-	@Override
-	public String[] getStatus() {
-
-		try {
-			if (xmap.contains(overx) && ymap.contains(overy)) {
-				statustext[0] = "";
-
-				if (geneHI != null) {
-					final int realGene = overy;
-					try {
-						statustext[0] += geneSummary.getSummary(geneHI,
-								realGene);
-
-					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-						LogBuffer.println("ArrayIndexOutOfBoundsException "
-								+ "in getStatus() in GlobalView: "
-								+ e.getMessage());
-						statustext[0] += " (N/A)";
-					}
-				}
-				statustext[1] = "";
-				if (arrayHI != null) {
-					try {
-						statustext[1] += arraySummary
-								.getSummary(arrayHI, overx);
-
-					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-						LogBuffer.println("ArrayIndexOutOfBoundsException "
-								+ "in getStatus() in GlobalView: "
-								+ e.getMessage());
-						statustext[1] += " (N/A)";
-					}
-				}
-
-				if (drawer != null) {
-					if (drawer.isMissing(overx, overy)) {
-						statustext[2] = "No Data";
-
-					} else if (drawer.isEmpty(overx, overy)) {
-						statustext[2] = "";
-
-					} else {
-						statustext[2] = drawer.getSummary(overx, overy);
-					}
-				}
-			}
-		} catch (final ArrayIndexOutOfBoundsException e) {
-			LogBuffer.println("ArrayIndexOutOfBoundsException "
-					+ "in getStatus() in GlobalView: " + e.getMessage());
-		}
-		return statustext;
-	}
-
-	public void setHeaderSummary(final HeaderSummary gene,
-			final HeaderSummary array) {
-
-		this.geneSummary = gene;
-		this.arraySummary = array;
 	}
 
 	/**
@@ -231,6 +115,7 @@ public class InteractiveMatrixView extends MatrixView implements
 			ymap.unsetHoverChanged();
 			return;
 		}
+		
 		Graphics2D g2d = (Graphics2D) g;
 
 		revalidateScreen();
@@ -241,6 +126,7 @@ public class InteractiveMatrixView extends MatrixView implements
 			g2d.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g2d.setColor(Color.black);
 
+			// TODO rectangles not needed anymore, adapt ArrayDrawer methods.
 			final Rectangle destRect = new Rectangle(0, 0,
 					xmap.getUsedPixels(), ymap.getUsedPixels());
 
@@ -263,6 +149,7 @@ public class InteractiveMatrixView extends MatrixView implements
 			ymap.unsetHoverChanged();
 			return;
 		}
+		
 		Graphics2D g2 = (Graphics2D) g;
 
 		if (selectionRectList != null) {
@@ -276,7 +163,6 @@ public class InteractiveMatrixView extends MatrixView implements
 				g2.drawRect(rect.x, rect.y, rect.width, rect.height);
 			}
 
-			//debug("Preparing to draw ellipses.");
 			/*
 			 * draw white selection circle if only 1 tile is selected and small
 			 * enough.
@@ -287,17 +173,12 @@ public class InteractiveMatrixView extends MatrixView implements
 				g2.setColor(Color.yellow);
 				g2.setStroke(new BasicStroke(3));
 				for(Ellipse2D.Double indicatorCircle : indicatorCircleList) {
-					//debug("Drawing ellipse.");
 					g2.draw(indicatorCircle);
 				}
 			}
 		}
 	}
 
-	/**
-	 * Checks the selection of genes and arrays and calculates the appropriate
-	 * selection rectangle.
-	 */
 	@Override
 	protected void recalculateOverlay() {
 
@@ -307,39 +188,30 @@ public class InteractiveMatrixView extends MatrixView implements
 			return;
 		}
 
-		if((geneSelection == null) || (arraySelection == null)) {
+		if((rowSelection == null) || (colSelection == null)) {
 			selectionRectList   = null;
 			indicatorCircleList = null;
+			
 		} else {
-
 			selectionRectList = new ArrayList<Rectangle>();
 	
 			final int[] selectedArrayIndexes =
-				arraySelection.getSelectedIndexes();
+				colSelection.getSelectedIndexes();
 			final int[] selectedGeneIndexes =
-				geneSelection.getSelectedIndexes();
-	
-			globalMatrixView.setIMVselectedIndexes(selectedArrayIndexes,
-												   selectedGeneIndexes);
+				rowSelection.getSelectedIndexes();
 	
 			if (selectedArrayIndexes.length > 0) {
-	
-				// debug("Selected min array index: [" +
-				// selectedArrayIndexes[0] + "] Selected min gene index: [" +
-				// selectedGeneIndexes[0] + "].");
-	
 				List<List<Integer>> arrayBoundaryList;
 				List<List<Integer>> geneBoundaryList;
 	
 				arrayBoundaryList =
-					findRectangleBoundaries(selectedArrayIndexes,xmap);
+					findRectBoundaries(selectedArrayIndexes, xmap);
 				geneBoundaryList =
-					findRectangleBoundaries(selectedGeneIndexes,ymap);
+					findRectBoundaries(selectedGeneIndexes, ymap);
 	
 				// Make the rectangles
 				if (selectionRectList != null) {
 					for(final List<Integer> xBoundaries : arrayBoundaryList) {
-	
 						for(final List<Integer> yBoundaries : geneBoundaryList){
 	
 							selectionRectList
@@ -363,7 +235,7 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * @param map
 	 * @return
 	 */
-	protected List<List<Integer>> findRectangleBoundaries(
+	protected List<List<Integer>> findRectBoundaries(
 			final int[] selectedIndexes, final MapContainer map) {
 
 		int sp = 0;
@@ -435,31 +307,25 @@ public class InteractiveMatrixView extends MatrixView implements
 			ymap.unsetHoverChanged();
 			return;
 		}
-		if (o == geneSelection) {
-			updateSelection(geneSelection, arraySelection);
+		
+		if (o == rowSelection) {
+			updateSelection(rowSelection, colSelection);
 			recalculateOverlay();
 
 			/* trigger updatePixels() */
 			offscreenValid = false;
 			repaint();
 
-		} else if (o == arraySelection) {
-			updateSelection(arraySelection, geneSelection);
+		} else if (o == colSelection) {
+			updateSelection(colSelection, rowSelection);
 			recalculateOverlay();
 
 			offscreenValid = false;
 			repaint();
 
-		} else// if(!xmap.hoverChanged() && !ymap.hoverChanged()) {
+		} else {
 			super.update(o, arg);
-//		} else {
-//			if(xmap.hoverChanged()) {
-//				xmap.unsetHoverChanged();
-//			}
-//			if(ymap.hoverChanged()) {
-//				ymap.unsetHoverChanged();
-//			}
-//		}
+		}
 	}
 
 	/**
@@ -477,7 +343,6 @@ public class InteractiveMatrixView extends MatrixView implements
 			if (origin.getNSelectedIndexes() != 0) {
 				// select all genes if some arrays selected...
 				adjusting.selectAllIndexes();
-				// notifies self...
 				adjusting.notifyObservers();
 				return;
 			}
@@ -491,1436 +356,7 @@ public class InteractiveMatrixView extends MatrixView implements
 			adjusting.notifyObservers();
 		}
 	}
-
-	//Had to put these in the main class, because when they were in
-	//MatrixMouseListener, setting them in mousePressed did not make them
-	//available when mouseDragged ran
-	int pressedX;
-	int pressedY;
-	MouseEvent dragEvent;
-	MouseEvent pressedEvent;   //To process clicks initiated via timer
-
-	/* TODO move to a specified controller class */
-	private class MatrixMouseListener extends MouseAdapter {
-
-		boolean    isMousePressed;
-		int        clickCount;     //Need to determine single/double/etc clicks
-
-		@Override
-		public void mouseMoved(final MouseEvent e) {
-			debug("mouseMoved inside IMV",9);
-			xmap.setHoverIndex(xmap.getIndex(e.getX()));
-			ymap.setHoverIndex(ymap.getIndex(e.getY()));
-
-			setDataStatus(e);
-		}
-
-		private void setDataStatus(final MouseEvent e) {
-
-			final int ooverx = overx;
-			final int oovery = overy;
-			overx = xmap.getIndex(e.getX());
-			overy = ymap.getIndex(e.getY());
-
-			/* Timed repaint to avoid constant unnecessary repainting. */
-
-			if (oovery != overy || ooverx != overx) {
-				if (status != null) {
-					status.setMessages(getStatus());
-				}
-			}
-		}
-
-		@Override
-		public void mouseDragged(final MouseEvent e) {
-
-			//TODO don't draw when out of focus... doesn't recognize
-			//isMousePressed...
-			if(!enclosingWindow().isActive()) {
-				return;
-			}
-
-			dragEvent = e;
-
-			//When left button is used
-			if(SwingUtilities.isLeftMouseButton(e)) {
-				//We are going to send both the start point and the current
-				//point in case the timer has not yet started the drag
-				debug("mouseDragged: pressedEvent is [" +
-					((pressedEvent == null) ? "null" : "defined") + "].",10);
-				debug("mouseDragged: pressedX [" + pressedX + "] pressedY [" +
-					pressedY + "].",10);
-				if(e.isShiftDown()) {
-					processLeftShiftDragDuring(pressedX,pressedY,e.getX(),
-						e.getY());
-				} else if(e.isControlDown()) {
-					processLeftControlDragDuring(pressedX,pressedY,e.getX(),
-						e.getY());
-				} else {
-					processLeftDragDuring(pressedX,pressedY,e.getX(),e.getY());
-				}
-			}
-		}
-
-		@Override
-		public void mouseReleased(final MouseEvent e) {
-
-			if(!enclosingWindow().isActive() || !isMousePressed) {
-				return;
-			}
-
-			isMousePressed = false;
-
-			//If the timer is still running and the user has not dragged the
-			//mouse
-			if(multiClickActionTimer != null &&
-				multiClickActionTimer.isRunning() && !mouseWasDragged()) {
-
-				//Restart the timer to listen for the second click
-				multiClickActionTimer.setDelay(multiClickActionDelay);
-				multiClickActionTimer.restart();
-
-				//Immediately process multiclicks in intervals of the maximum
-				//number of supported clicks (in this case, a double-click).
-				//We will allow multi-clicks to continue and restart the timer
-				//so that they can continue to be detected as a single multi-
-				//click event.
-				if(clickCount > 2 && clickCount % 2 == 0) {
-
-					processClickEvents();
-				}
-
-				//Do nothing & let the timer trigger the click action
-				return;
-			}
-			//Else the mouse was dragged, so process the drag start (if
-			//necessary) and stop the timer
-			else if(multiClickActionTimer != null &&
-				multiClickActionTimer.isRunning()) {
-
-				//If we're not already in selecting mode, process the drag start
-				if(!xmap.isSelecting()) {
-					processLeftDragStart(pressedX,pressedY);
-				}
-
-				multiClickActionTimer.stop();
-			}
-
-			//This is a drag-selection event
-			debug("Mouse released.",4);
-
-			//At this point, we are assured the timer has stopped, so we need to
-			//know if this is a release from a drag or a click event (possibly
-			//multi). xmap.isSelecting will be true if it is a drag.
-			//If this is a drag-select
-			if(xmap.isSelecting()) {
-				debug("Ending a drag-selection",10);
-				/* Full gene selection */
-				if(e.isShiftDown()) {
-					processLeftShiftDragEnd(e.getX(),e.getY());
-				}
-				/* Full array selection */
-				else if(e.isControlDown()) {
-					processLeftControlDragEnd(e.getX(),e.getY());
-				}
-				/* Normal selection */
-				else {
-					processLeftDragEnd(e.getX(),e.getY());
-				}
-			}
-			//Else, the user just had a long click in one spot, so select the
-			//cell. It doesn't matter if they click again immediately after the
-			//long click
-			else {
-				debug("Ending a quick click that didn't move",10);
-				processClickEvents();
-			}
-		}
-
-		@Override
-		public void mousePressed(final MouseEvent e) {
-
-			if(!enclosingWindow().isActive()) {
-				return;
-			}
-
-			isMousePressed = true;
-
-			debug("mousePressed: Setting pressedX [" + pressedX +
-				"] and pressedY [" + pressedY + "].",10);
-
-			//If a previous 200ms timer is still running, restart the timer and
-			//increment the clickCount
-			if(multiClickActionTimer != null &&
-				multiClickActionTimer.isRunning()) {
-
-				multiClickActionTimer.setDelay(multiClickActionDelay);
-				multiClickActionTimer.restart();
-				clickCount++;
-			}
-			//Else this is a first click event - set clickCount to 1 and start
-			//the timer to listen for more clicks
-			else {
-
-				Integer tmp =
-					(Integer) Toolkit.getDefaultToolkit().
-					getDesktopProperty("awt.multiClickInterval");
-				if(tmp != null) {
-					multiClickActionInitialDelay = tmp;
-					multiClickActionDelay        = tmp;
-				}
-
-				clickCount = 1;
-
-				//Always record where the first click happened
-				pressedEvent = e;
-				pressedX = e.getX();
-				pressedY = e.getY();
-
-				//Start the drag event over so that we don't base the
-				//mouseWasDragged() calculation on a previous drag event
-				dragEvent = null;
-
-				if(multiClickActionTimer != null) {
-
-					multiClickActionTimer.
-						setDelay(multiClickActionInitialDelay);
-					multiClickActionTimer.start();
-				} else {
-					multiClickActionTimer =
-						new Timer(multiClickActionInitialDelay,
-							multiClickActionListener);
-					multiClickActionTimer.start();
-				}
-			}
-		}
-
-		//Timer to let the label pane linger a bit (prevents flashing when
-		//passing between panes which do not change the visibility of the label
-		//panes)
-		final private int delay = 250;
-		private javax.swing.Timer turnOffLabelPortTimer;
-		ActionListener turnOffLabelPort = new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				if (evt.getSource() == turnOffLabelPortTimer) {
-					/* Stop timer */
-					turnOffLabelPortTimer.stop();
-					turnOffLabelPortTimer = null;
-				
-					debug("mouseEvent in IMV - ACTED ON",1);
-					xmap.setOverInteractiveMatrix(false);
-					ymap.setOverInteractiveMatrix(false);
-					xmap.notifyObservers();
-					ymap.notifyObservers();
-					revalidate();
-					repaint();
-				}
-			}
-		};
-
-		/**
-		 * This timer initiates single-click, multi-click, & drag events only.
-		 * It is interrupted by mouseDragged. Also, even-numbered double-click
-		 * events during a 3+ click event (including a double-click) are
-		 * initiated in mouseReleased. The fact that this timer is running is
-		 * used to determine whether or not mouseReleased should do anything.
-		 */
-		private int multiClickActionInitialDelay = 350;
-		private int multiClickActionDelay = 250;
-		private javax.swing.Timer multiClickActionTimer;
-		ActionListener multiClickActionListener = new ActionListener() {
-
-			/**
-			 * When a multi-click or a click & hold timer expires, this is
-			 * called
-			 */
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-
-				if(evt.getSource() == multiClickActionTimer) {
-
-					/* Stop timer so it doesn't repeat */
-					multiClickActionTimer.stop();
-					multiClickActionTimer = null;
-
-					//THIS FIRST IF CONDITIONAL MIGHT BE UNNECESSARY
-					//If the left mouse button is pressed, we're not already in
-					//drag-selecting mode, and it's a left-click, process the
-					//drag start.
-					if(isMousePressed && !xmap.isSelecting() &&
-						SwingUtilities.isLeftMouseButton(pressedEvent)) {
-
-						debug("Correcting drag start",10);
-						processLeftDragStart(pressedX,pressedY);
-					}
-					//Else if the mouse button is not pressed and the mouse has
-					//not moved during the click event (possibly multi)
-					else if(!isMousePressed && !mouseWasDragged()) {
-
-						processClickEvents();
-					}
-					//Else if the mouse button is not pressed and the mouse
-					//finished moving before this timer action was triggered,
-					//then the drag end never got called to make the selection,
-					//so call it
-					else if(!isMousePressed && mouseWasDragged()) {
-
-						if(!xmap.isSelecting()) {
-
-							debug("Correcting drag start",10);
-							processLeftDragStart(pressedX,
-								pressedY);
-						}
-
-						//Figure out the end of the drag event
-						int dragX,dragY;
-						if(dragEvent == null) {
-							debug("dragEvent is null",10);
-							Point p =
-								MouseInfo.getPointerInfo().getLocation();
-							SwingUtilities.convertPointFromScreen(p,
-								getComponent());
-							p.y += 1; //fudge factor bec conversion is off by 1
-							dragX = p.x;
-							dragY = p.y;
-						} else {
-							dragX = dragEvent.getX();
-							dragY = dragEvent.getY();
-						}
-
-						/* Full gene selection */
-						if(pressedEvent.isShiftDown()) {
-							processLeftShiftDragEnd(dragX,dragY);
-						}
-						/* Full array selection */
-						else if(pressedEvent.isControlDown()) {
-							processLeftControlDragEnd(dragX,dragY);
-						}
-						/* Normal selection */
-						else {
-							processLeftDragEnd(dragX,dragY);
-						}
-					}
-					//Note, double-clicks are not handled here because they can
-					//be more efficiently detected in real time.  If we were to
-					//introduce triple-click or double-click-drag functionality,
-					//then double-clicks would have to be handled here.
-				}
-			}
-		};
-
-		@Override
-		public void mouseEntered(final MouseEvent e) {
-
-			debug("mouseEntered IMV",9);
-			if(this.turnOffLabelPortTimer != null) {
-				/* Event came too soon, swallow it by resetting the timer.. */
-				this.turnOffLabelPortTimer.stop();
-				this.turnOffLabelPortTimer = null;
-			}
-			xmap.setOverInteractiveMatrix(true);
-			ymap.setOverInteractiveMatrix(true);
-			if (!enclosingWindow().isActive()) {
-				return;
-			}
-			
-			hasMouse = true;
-			requestFocus();
-		}
-
-		@Override
-		public void mouseExited(final MouseEvent e) {
-
-			debug("mouseExited IMV",1);
-			//Turn off the "over a label port view" boolean after a bit
-			if(this.turnOffLabelPortTimer == null) {
-				debug("mouseExited IMV - starting timer",1);
-				/* Start waiting for delay millis to elapse and then
-				 * call actionPerformed of the ActionListener
-				 * "turnOffLabelPort". */
-				if(delay == 0) {
-					debug("mouseEvent in IMV - ACTED ON",1);
-					xmap.setOverInteractiveMatrix(false);
-					ymap.setOverInteractiveMatrix(false);
-					xmap.notifyObservers();
-					ymap.notifyObservers();
-					revalidate();
-					repaint();
-				} else {
-					this.turnOffLabelPortTimer = new Timer(this.delay,
-							turnOffLabelPort);
-					this.turnOffLabelPortTimer.start();
-				}
-			}
-
-			//setOverInteractiveMatrix(false);
-			hasMouse = false;
-
-			xmap.setHoverIndex(-1);
-			ymap.setHoverIndex(-1);
-			// Display empty field
-			statustext[0] = "";
-			statustext[1] = "";
-			statustext[2] = "";
-
-			status.setMessages(statustext);
-		}
-
-		/**
-		 * This method should be called after an N-click event has completed,
-		 * where 'N' is the number of clicks (e.g. single-click, double-click,
-		 * triple-click, etc). It will perform 1 action from the click event.
-		 * This method is not for use in mouse-overs, drags, click-and-hold
-		 * events, etc..
-		 * @author rleach
-		 * @param none
-		 * @return none
-		 */
-		public void processClickEvents() {
-
-			//When left button is used
-			if(SwingUtilities.isLeftMouseButton(pressedEvent)) {
-				//If the click count is even, perform a double-click
-				if(clickCount % 2 == 0) {
-					//option/alt = Zooming out
-					if(pressedEvent.isAltDown()) {
-						//command-shift = slam zoom to target without animation
-						if(pressedEvent.isMetaDown() &&
-							pressedEvent.isShiftDown()) {
-							processLeftDoubleOptionShiftCommandClick(
-								pressedX,pressedY);
-						}
-						//shift = zoom faster
-						else if(pressedEvent.isShiftDown()) {
-							processLeftDoubleOptionShiftClick(
-								pressedX,pressedY);
-						}
-						//command/windows = slam zoom to target
-						else if(pressedEvent.isMetaDown()) {
-							processLeftDoubleOptionCommandClick(
-								pressedX,pressedY);
-						}
-						//control = zoom slower
-						else if(pressedEvent.isControlDown()) {
-							processLeftDoubleOptionControlClick(
-								pressedX,pressedY);
-						}
-						//regular double-click = zoom medium
-						else {
-							processLeftDoubleOptionClick(
-								pressedX,pressedY);
-						}
-					}
-					//No option/alt = Zooming in
-					else {
-						//command-shift = slam zoom to target without animation
-						if(pressedEvent.isMetaDown() &&
-							pressedEvent.isShiftDown()) {
-							processLeftDoubleShiftCommandClick(pressedX,
-								pressedY);
-						}
-						//shift = zoom faster
-						else if(pressedEvent.isShiftDown()) {
-							processLeftDoubleShiftClick(
-								pressedX,pressedY);
-						}
-						//command/windows = slam zoom to target
-						else if(pressedEvent.isMetaDown()) {
-							processLeftDoubleCommandClick(pressedX,
-								pressedY);
-						}
-						//control = zoom slower
-						else if(pressedEvent.isControlDown()) {
-							processLeftDoubleControlClick(
-								pressedX,pressedY);
-						}
-						//Regular double-click = zoom medium
-						else {
-							processLeftDoubleClick(pressedX,
-								pressedY);
-						}
-					}
-				} else if(clickCount == 1) {
-					//shift = select entire row
-					if(pressedEvent.isShiftDown()) {
-						processLeftSingleShiftClick(
-							pressedX,pressedY);
-					}
-					//control = select entire column
-					else if(pressedEvent.isMetaDown()) {
-						processLeftSingleControlClick(pressedX,
-							pressedY);
-					}
-					//Regular click = select a spot
-					else {
-						processLeftSingleClick(pressedX,
-							pressedY);
-					}
-				} else {
-					debug("Odd click count other than 1, so do nothing",debug);
-				}
-			} else if(SwingUtilities.isRightMouseButton(pressedEvent)) {
-				processRightSingleClick(pressedX,
-					pressedY);
-			}
-		}
-
-		/**
-		 * Only to be called by the multiClickDetectionTimer. This method
-		 * returns true if the cursor position changed significantly between the
-		 * first click and the last drag position by the time the timer goes off
-		 * @author rleach
-		 * @param 
-		 * @return 
-		 * @return
-		 */
-		public boolean mouseWasDragged() {
-
-			double maxPixelDistance = 4.0;
-			if(pressedEvent == null || dragEvent == null) {
-				return(false);
-			} else {
-				double xdist = dragEvent.getX() - pressedEvent.getX();
-				double ydist = dragEvent.getY() - pressedEvent.getY();
-				double distance = Math.sqrt(xdist*xdist + ydist*ydist);
-				return(distance > maxPixelDistance);
-			}
-		}
-	}
-
-	/**
-	 * Processed a completed left single click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftSingleClick(int xPixel,int yPixel) {
-
-		final Point start = new Point(xmap.getIndex(xPixel),
-			ymap.getIndex(yPixel));
-		final Point end   = new Point(xmap.getIndex(xPixel),
-			ymap.getIndex(yPixel));
 	
-		selectRectangle(start, end);
-
-		repaint();
-	}
-
-	/**
-	 * Processed a completed left single shift click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftSingleShiftClick(int xPixel,int yPixel) {
-
-		final Point start = new Point(xmap.getMinIndex(),ymap.getIndex(yPixel));
-		final Point end   = new Point(xmap.getMaxIndex(),ymap.getIndex(yPixel));
-	
-		selectRectangle(start, end);
-
-		repaint();
-	}
-
-	/**
-	 * Processed a completed left control click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftSingleControlClick(int xPixel,int yPixel) {
-
-		final Point start = new Point(xmap.getIndex(xPixel),ymap.getMinIndex());
-		final Point end   = new Point(xmap.getIndex(xPixel),ymap.getMaxIndex());
-	
-		selectRectangle(start, end);
-
-		repaint();
-	}
-
-	/**
-	 * This method encapsulates the logic of zooming when a double-click with
-	 * any modifier happens, however it is abstracted from clicks and keyboard
-	 * keys.  It takes the click pixel coordinates, whether we're zooming in or
-	 * out, the speed of the zoom (slow/med/fast), and whether we are doing a
-	 * stepwise zoom or not, all the way to the clicked target.
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 * @param zoomIn
-	 * @param stepwiseZoom
-	 * @param zoomSpeed
-	 */
-	public void processLeftDoubleClickZoomEvent(int xPixel,int yPixel,
-		boolean zoomIn,boolean stepwiseZoom,
-		int zoomSpeed /* 0=slow,1=med,2=fast */) {
-
-		//zoomDegree is only used when stepwiseZoom is false
-		double zoomDegree = 0.3; //Medium
-
-		if(zoomSpeed == 0) {
-
-			zoomDegree = 0.05;   //Slow
-		} else if(zoomSpeed == 2) {
-
-			zoomDegree = 0.6;    //Fast
-		}
-
-		if(zoomIn) {
-
-			//If click was inside a contiguous selection and the selection
-			//is smaller than the current zoom level or if the
-			//selection is the same size but isn't equal to what
-			//is visible
-			if(pixelIsInsideSelection(xPixel,yPixel) &&
-				(subSelectionIsSmallerThanVisible(xmap.getIndex(xPixel),
-					ymap.getIndex(yPixel)) ||
-					(subSelectionIsEqualToVisible(xmap.getIndex(xPixel),
-						ymap.getIndex(yPixel)) &&
-					//Selected area is not scrolled to
-					//visible area
-					(geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel))
-						!= ymap.getFirstVisible() ||
-					arraySelection.getMinContiguousIndex(xmap.getIndex(xPixel))
-					!= xmap.getFirstVisible())))) {
-
-				if(stepwiseZoom) {
-					if(zoomSpeed == 2) {
-
-						hardZoomToTarget(
-							arraySelection.getMinContiguousIndex(
-								xmap.getIndex(xPixel)),
-							(arraySelection.getMaxContiguousIndex(
-								xmap.getIndex(xPixel)) -
-								arraySelection.getMinContiguousIndex(
-									xmap.getIndex(xPixel)) + 1),
-							geneSelection.getMinContiguousIndex(
-								ymap.getIndex(yPixel)),
-							(geneSelection.getMaxContiguousIndex(
-								ymap.getIndex(yPixel)) -
-								geneSelection.getMinContiguousIndex(
-									ymap.getIndex(yPixel)) + 1));
-					} else {
-
-						//Zoom to sub-selection
-						smoothAnimatedZoomToTarget(
-							arraySelection.getMinContiguousIndex(
-								xmap.getIndex(xPixel)),
-							(arraySelection.getMaxContiguousIndex(
-								xmap.getIndex(xPixel)) -
-								arraySelection.getMinContiguousIndex(
-									xmap.getIndex(xPixel)) + 1),
-							geneSelection.getMinContiguousIndex(
-								ymap.getIndex(yPixel)),
-							(geneSelection.getMaxContiguousIndex(
-								ymap.getIndex(yPixel)) -
-								geneSelection.getMinContiguousIndex(
-									ymap.getIndex(yPixel)) + 1));
-					}
-				} else {
-
-					//Zoom to sub-selection
-					smoothAnimatedZoomTowardTarget(
-						arraySelection.getMinContiguousIndex(
-							xmap.getIndex(xPixel)),
-	
-						(arraySelection.getMaxContiguousIndex(
-							xmap.getIndex(xPixel)) -
-							arraySelection.getMinContiguousIndex(
-								xmap.getIndex(xPixel)) + 1),
-	
-						geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)),
-	
-						(geneSelection.getMaxContiguousIndex(ymap.getIndex(yPixel)) -
-						geneSelection.getMinContiguousIndex(ymap.getIndex(yPixel)) +
-						1),
-	
-						zoomDegree);
-				}
-			}
-			//If click was inside a selection or between selections and the
-			//selection area is smaller than the current zoom level or if the
-			//selection area is the same size but isn't equal to what
-			//is visible
-			else if(pixelIsAmidstSelection(xPixel,yPixel) &&
-				(selectionIsSmallerThanVisible() ||
-					(selectionIsEqualToVisible() &&
-						//Selected area is not scrolled to
-						//visible area
-						(geneSelection.getMinIndex() !=
-							ymap.getFirstVisible() ||
-							arraySelection.getMinIndex() !=
-							xmap.getFirstVisible())))) {
-
-				if(stepwiseZoom) {
-
-					if(zoomSpeed == 2) {
-
-						hardZoomToTarget(
-							arraySelection.getMinIndex(),
-							(arraySelection.getMaxIndex() -
-								arraySelection.getMinIndex() + 1),
-							geneSelection.getMinIndex(),
-							(geneSelection.getMaxIndex() -
-								geneSelection.getMinIndex() + 1));
-					} else {
-
-						//Zoom to selection
-						smoothAnimatedZoomToTarget(
-							arraySelection.getMinIndex(),
-							(arraySelection.getMaxIndex() -
-								arraySelection.getMinIndex() + 1),
-							geneSelection.getMinIndex(),
-							(geneSelection.getMaxIndex() -
-								geneSelection.getMinIndex() + 1));
-					}
-				} else {
-
-					//Zoom toward selection
-					smoothAnimatedZoomTowardTarget(
-						arraySelection.getMinIndex(),
-						(arraySelection.getMaxIndex() -
-							arraySelection.getMinIndex() + 1),
-						geneSelection.getMinIndex(),
-						(geneSelection.getMaxIndex() -
-							geneSelection.getMinIndex() + 1),
-						zoomDegree);
-				}
-			}
-			//Else full zoom in
-			else {
-
-				if(stepwiseZoom) {
-
-					if(zoomSpeed == 2) {
-
-						hardZoomToTarget(xmap.getIndex(xPixel),1,
-							ymap.getIndex(yPixel),1);
-					} else {
-
-						smoothAnimatedZoomToTarget(xmap.getIndex(xPixel),1,
-							ymap.getIndex(yPixel),1);
-					}
-				} else {
-
-					smoothAnimatedZoomTowardPixel(xPixel,yPixel,zoomDegree);
-				}
-			}
-		} else {
-
-			if(stepwiseZoom) {
-
-				//If click was inside a contiguous selection and the selection
-				//is larger than the current zoom level
-				if(pixelIsInsideSelection(xPixel,yPixel) &&
-					(subSelectionIsLargerThanVisible(xmap.getIndex(xPixel),
-						ymap.getIndex(yPixel)))) {
-
-					if(zoomSpeed == 2) {
-
-						//Zoom to sub-selection
-						hardZoomToTarget(
-							arraySelection.getMinContiguousIndex(
-								xmap.getIndex(xPixel)),
-							(arraySelection.getMaxContiguousIndex(
-								xmap.getIndex(xPixel)) -
-								arraySelection.getMinContiguousIndex(
-									xmap.getIndex(xPixel)) + 1),
-							geneSelection.getMinContiguousIndex(
-								ymap.getIndex(yPixel)),
-							(geneSelection.getMaxContiguousIndex(
-								ymap.getIndex(yPixel)) -
-								geneSelection.getMinContiguousIndex(
-									ymap.getIndex(yPixel)) + 1));
-					} else {
-
-						//Zoom to sub-selection
-						smoothAnimatedZoomToTarget(
-							arraySelection.getMinContiguousIndex(
-								xmap.getIndex(xPixel)),
-							(arraySelection.getMaxContiguousIndex(
-								xmap.getIndex(xPixel)) -
-								arraySelection.getMinContiguousIndex(
-									xmap.getIndex(xPixel)) + 1),
-							geneSelection.getMinContiguousIndex(
-								ymap.getIndex(yPixel)),
-							(geneSelection.getMaxContiguousIndex(
-								ymap.getIndex(yPixel)) -
-								geneSelection.getMinContiguousIndex(
-									ymap.getIndex(yPixel)) + 1));
-					}
-				}
-				//If click was inside a selection or between selections and the
-				//selection area is larger than the current zoom level
-				else if(pixelIsAmidstSelection(xPixel,yPixel) &&
-					(selectionIsLargerThanVisible())) {
-
-					if(zoomSpeed == 2) {
-
-						//Zoom to selection
-						hardZoomToTarget(
-							arraySelection.getMinIndex(),
-							(arraySelection.getMaxIndex() -
-								arraySelection.getMinIndex() + 1),
-							geneSelection.getMinIndex(),
-							(geneSelection.getMaxIndex() -
-								geneSelection.getMinIndex() + 1));
-					} else {
-
-						//Zoom to selection
-						smoothAnimatedZoomToTarget(
-							arraySelection.getMinIndex(),
-							(arraySelection.getMaxIndex() -
-								arraySelection.getMinIndex() + 1),
-							geneSelection.getMinIndex(),
-							(geneSelection.getMaxIndex() -
-								geneSelection.getMinIndex() + 1));
-					}
-				}
-				//Else full zoom out
-				else {
-
-					if(zoomSpeed == 2) {
-
-						hardZoomToTarget(xmap.getMinIndex(),xmap.getMaxIndex() +
-							1,ymap.getMinIndex(),ymap.getMaxIndex() + 1);
-					} else {
-
-						smoothAnimatedZoomOut();
-					}
-				}
-			} else {
-
-				//All incomplete zoom-outs will perform a precise zoom-out from
-				//the pixel clicked, partly because I haven't implemented a
-				//zoom-away method which takes selection boundaries, but also to
-				//provide more discrete control of where precisely to be zoomed
-				smoothAnimatedZoomFromPixel(xPixel,yPixel,zoomDegree);
-			}
-		}
-	}
-
-	/**
-	 * Processed a completed left double click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDoubleClick(int xPixel,int yPixel) {
-
-		processLeftDoubleClickZoomEvent(xPixel,yPixel,true,false,1);
-	}
-
-	/**
-	 * Processed a completed left double control click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDoubleControlClick(int xPixel,int yPixel) {
-
-		processLeftDoubleClickZoomEvent(xPixel,yPixel,true,false,0);
-	}
-
-	/**
-	 * Processed a completed left double shift click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDoubleShiftClick(int xPixel,int yPixel) {
-
-		processLeftDoubleClickZoomEvent(xPixel,yPixel,true,false,2);
-	}
-
-	/**
-	 * Processed a completed left double command click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDoubleCommandClick(int xPixel,int yPixel) {
-
-		processLeftDoubleClickZoomEvent(xPixel,yPixel,true,true,1);
-	}
-
-	/**
-	 * Returns true if the pixel is either inside a selection or between
-	 * multiple selections, false otherwise
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 * @return boolean
-	 */
-	public boolean pixelIsAmidstSelection(int xPixel,int yPixel) {
-
-		return(//A selection exists
-			geneSelection != null && arraySelection != null &&
-			//Click is amidst a selected area
-			geneSelection.getMinIndex()  <= ymap.getIndex(yPixel) &&
-			geneSelection.getMaxIndex()  >= ymap.getIndex(yPixel) &&
-			arraySelection.getMinIndex() <= xmap.getIndex(xPixel) &&
-			arraySelection.getMaxIndex() >= xmap.getIndex(xPixel));
-	}
-
-	/**
-	 * Returns true if the pixel is either inside a selection or between
-	 * multiple selections, false otherwise
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 * @return boolean
-	 */
-	public boolean pixelIsInsideSelection(int xPixel,int yPixel) {
-
-		return(//A selection exists
-			geneSelection != null && arraySelection != null &&
-			//Click is amidst a selected area
-			geneSelection.isIndexSelected(ymap.getIndex(yPixel)) &&
-			arraySelection.isIndexSelected(xmap.getIndex(xPixel)));
-	}
-
-	/**
-	 * Returns true if a selection exists and the extreme boundaries of either
-	 * dimension of the selection is smaller than the amount visible in the
-	 * respective dimension, false otherwise
-	 * @author rleach
-	 * @return boolean
-	 */
-	public boolean selectionIsSmallerThanVisible() {
-
-		return(//A selection exists
-			geneSelection != null && arraySelection != null &&
-			(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1) <
-			ymap.getNumVisible() ||
-			(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1) <
-			xmap.getNumVisible());
-	}
-
-	/**
-	 * Returns true if a selection exists and the contiguously selected
-	 * boundaries surrounding the supplied selected index of either
-	 * dimension of the selection is smaller than the amount visible in the
-	 * respective dimension, false otherwise
-	 * @author rleach
-	 * @return boolean
-	 */
-	public boolean subSelectionIsSmallerThanVisible(final int xIndex,
-		final int yIndex) {
-
-		return(//A selection exists
-			geneSelection != null && arraySelection != null &&
-			(geneSelection.getMaxContiguousIndex(yIndex) -
-			geneSelection.getMinContiguousIndex(yIndex) + 1) <
-			ymap.getNumVisible() ||
-			(arraySelection.getMaxContiguousIndex(xIndex) -
-			arraySelection.getMinContiguousIndex(xIndex) + 1) <
-			xmap.getNumVisible());
-	}
-
-	/**
-	 * Returns true if a selection exists and the extreme boundaries of either
-	 * dimension of the selection is larger than the amount visible in the
-	 * respective dimension, false otherwise
-	 * @author rleach
-	 * @return boolean
-	 */
-	public boolean selectionIsLargerThanVisible() {
-
-		return(//A selection exists
-			geneSelection != null && arraySelection != null &&
-			(geneSelection.getMaxIndex() -
-			geneSelection.getMinIndex() + 1) >
-			ymap.getNumVisible() ||
-			(arraySelection.getMaxIndex() -
-			arraySelection.getMinIndex() + 1) >
-			xmap.getNumVisible());
-	}
-
-	/**
-	 * Returns true if a selection exists and the contiguously selected
-	 * boundaries surrounding the supplied selected index of either
-	 * dimension of the selection is larger than the amount visible in the
-	 * respective dimension, false otherwise
-	 * @author rleach
-	 * @return boolean
-	 */
-	public boolean subSelectionIsLargerThanVisible(final int xIndex,
-		final int yIndex) {
-
-		return(//A selection exists
-			geneSelection != null && arraySelection != null &&
-			(geneSelection.getMaxContiguousIndex(yIndex) -
-			geneSelection.getMinContiguousIndex(yIndex) + 1) >
-			ymap.getNumVisible() ||
-			(arraySelection.getMaxContiguousIndex(xIndex) -
-			arraySelection.getMinContiguousIndex(xIndex) + 1) >
-			xmap.getNumVisible());
-	}
-
-	/**
-	 * Returns true if a selection exists and the extreme boundaries of both
-	 * dimensions of the selection are equal to the amount visible in the
-	 * respective dimensions, false otherwise
-	 * @author rleach
-	 * @return boolean
-	 */
-	public boolean selectionIsEqualToVisible() {
-
-		return(//A selection exists
-			geneSelection != null && arraySelection != null &&
-			(geneSelection.getMaxIndex() - geneSelection.getMinIndex() + 1) ==
-			ymap.getNumVisible() &&
-			(arraySelection.getMaxIndex() - arraySelection.getMinIndex() + 1) ==
-			xmap.getNumVisible());
-	}
-
-	/**
-	 * Returns true if a selection exists and the contiguously selected
-	 * boundaries surrounding the supplied selected index of either
-	 * dimension of the selection is larger than the amount visible in the
-	 * respective dimension, false otherwise
-	 * @author rleach
-	 * @param xIndex
-	 * @param yIndex
-	 * @return boolean
-	 */
-	public boolean subSelectionIsEqualToVisible(final int xIndex,
-		final int yIndex) {
-
-		return(//A selection exists
-			geneSelection != null && arraySelection != null &&
-			(geneSelection.getMaxContiguousIndex(yIndex) -
-			geneSelection.getMinContiguousIndex(yIndex) + 1) ==
-			ymap.getNumVisible() &&
-			(arraySelection.getMaxContiguousIndex(xIndex) -
-			arraySelection.getMinContiguousIndex(xIndex) + 1) ==
-			xmap.getNumVisible());
-	}
-
-	/**
-	 * Performs the actions related to a Left-Double-Shift-Command-Click
-	 * @author rleach
-	 * @return none
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDoubleShiftCommandClick(int xPixel,int yPixel) {
-
-		processLeftDoubleClickZoomEvent(xPixel,yPixel,true,true,2);
-	}
-
-	/**
-	 * Processes a completed left double option control click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDoubleOptionControlClick(int xPixel,int yPixel) {
-
-		processLeftDoubleClickZoomEvent(xPixel,yPixel,false,false,0);
-	}
-
-	/**
-	 * Processes a completed left double option click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDoubleOptionClick(int xPixel,int yPixel) {
-
-		processLeftDoubleClickZoomEvent(xPixel,yPixel,false,false,1);
-	}
-
-	/**
-	 * Processes a completed left double option shift click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDoubleOptionShiftClick(int xPixel,int yPixel) {
-
-		processLeftDoubleClickZoomEvent(xPixel,yPixel,false,false,2);
-	}
-
-	/**
-	 * Processes a completed left double option command click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDoubleOptionCommandClick(int xPixel,int yPixel) {
-
-		processLeftDoubleClickZoomEvent(xPixel,yPixel,false,true,1);
-	}
-
-	/**
-	 * Processes a completed left double option shift command click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDoubleOptionShiftCommandClick(int xPixel,
-		int yPixel) {
-
-		processLeftDoubleClickZoomEvent(xPixel,yPixel,false,true,2);
-	}
-
-	/**
-	 * Processes left click drag start event
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDragStart(int xPixel,int yPixel) {
-
-		//If this is a correction of the starting point, clear out the previous
-		//dragRect
-		if(xmap.isSelecting()) {
-			debug("processLeftDragStart: Correcting drag start",10);
-			endDragRect(endPoint.x,endPoint.y);
-			drawBand(dragRect);
-		}
-		xmap.setSelecting(true);
-		ymap.setSelecting(true);
-		xmap.setSelectingStart(xmap.getIndex(xPixel));
-		ymap.setSelectingStart(ymap.getIndex(yPixel));
-
-		startPoint.setLocation(xmap.getIndex(xPixel),ymap.getIndex(yPixel));
-		endPoint.setLocation(startPoint.x, startPoint.y);
-
-		dragRect.setLocation(startPoint.x,startPoint.y);
-		dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
-
-		drawBand(dragRect);
-	}
-
-	/**
-	 * Processes left click temporary drag start event (called by
-	 * mouseDragged and not the timer which detects multi-clicks so that double-
-	 * clicks where the mouse is accidentally slightly dragged can perform a
-	 * double-click instead of a drag event and potentially mess up a user's
-	 * existing selection)
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processTemporaryLeftDragStart(int xPixelStart,int yPixelStart,
-		int xPixel,int yPixel) {
-
-		startPoint.setLocation(xmap.getIndex(xPixelStart),
-			ymap.getIndex(yPixelStart));
-		endPoint.setLocation(xmap.getIndex(xPixel),
-			ymap.getIndex(yPixel));
-
-		dragRect.setLocation(startPoint.x,startPoint.y);
-		dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
-
-		drawBand(dragRect);
-		repaint();
-	}
-
-	/**
-	 * Processes left click drag end event
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDragEnd(int xPixel,int yPixel) {
-
-		xmap.setSelecting(false);
-		ymap.setSelecting(false);
-		xmap.setSelectingStart(-1);
-		ymap.setSelectingStart(-1);
-		debug("Mouse dragged. Updating hover indexes to [" +
-		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
-		      "]",4);
-		xmap.setHoverIndex(xmap.getIndex(xPixel));
-		ymap.setHoverIndex(ymap.getIndex(yPixel));
-
-		drawBand(dragRect);
-
-		endPoint.setLocation(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel));
-
-		dragRect.setLocation(startPoint.x,startPoint.y);
-		dragRect.setSize(0,0);
-		dragRect.add(endPoint.x,endPoint.y);
-
-		drawBand(dragRect);
-
-		debug("Selecting startpoint: [" + startPoint.x + "," + startPoint.y +
-			"] to endPoint: [" + endPoint.x + "," + endPoint.y + "].",10);
-		selectRectangle(startPoint,endPoint);
-
-		repaint();
-	}
-
-	/**
-	 * Processes left shift click drag end event
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftShiftDragEnd(int xPixel,int yPixel) {
-
-		xmap.setSelecting(false);
-		ymap.setSelecting(false);
-		xmap.setSelectingStart(-1);
-		ymap.setSelectingStart(-1);
-		debug("Mouse dragged. Updating hover indexes to [" +
-		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
-		      "]",4);
-		xmap.setHoverIndex(xmap.getIndex(xPixel));
-		ymap.setHoverIndex(ymap.getIndex(yPixel));
-
-		drawBand(dragRect);
-
-		endPoint.setLocation(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel));
-
-		dragRect.setLocation(xmap.getMinIndex(),startPoint.y);
-		dragRect.setSize(0, 0);
-		dragRect.add(xmap.getMaxIndex(),endPoint.y);
-
-		drawBand(dragRect);
-
-		final Point start = new Point(xmap.getMinIndex(),startPoint.y);
-		final Point end   = new Point(xmap.getMaxIndex(),endPoint.y);
-
-		selectRectangle(start, end);
-
-		repaint();
-	}
-
-	/**
-	 * Processes left control click drag end event
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftControlDragEnd(int xPixel,int yPixel) {
-		xmap.setSelecting(false);
-		ymap.setSelecting(false);
-		xmap.setSelectingStart(-1);
-		ymap.setSelectingStart(-1);
-		debug("Mouse dragged. Updating hover indexes to [" +
-		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
-		      "]",4);
-		xmap.setHoverIndex(xmap.getIndex(xPixel));
-		ymap.setHoverIndex(ymap.getIndex(yPixel));
-
-		drawBand(dragRect);
-
-		endPoint.setLocation(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel));
-
-		dragRect.setLocation(startPoint.x, ymap.getMinIndex());
-		dragRect.setSize(0, 0);
-		dragRect.add(endPoint.x, ymap.getMaxIndex());
-
-		drawBand(dragRect);
-
-		final Point start = new Point(startPoint.x,ymap.getMinIndex());
-		final Point end   = new Point(endPoint.x,  ymap.getMaxIndex());
-
-		selectRectangle(start, end);
-
-		repaint();
-	}
-
-	/**
-	 * Processes left click drag movement event
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftDragDuring(int xPixelStart,int yPixelStart,
-		int xPixel,int yPixel) {
-
-		//If the timer hasn't done this yet, we now have confirmation this is a
-		//left-click drag event
-		if(!xmap.isSelecting()) {
-			processTemporaryLeftDragStart(xPixelStart,yPixelStart,xPixel,
-				yPixel);
-		}
-
-		debug("Mouse dragged. Updating hover indexes to [" +
-		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
-		      "]",4);
-		xmap.setHoverIndex(xmap.getIndex(xPixel));
-		ymap.setHoverIndex(ymap.getIndex(yPixel));
-
-		drawBand(dragRect);
-
-		endPoint.setLocation(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel));
-
-		/* Normal selection */
-		dragRect.setLocation(startPoint.x,startPoint.y);
-		dragRect.setSize(0,0);
-		dragRect.add(endPoint.x,endPoint.y);
-
-		drawBand(dragRect);
-	}
-
-	/**
-	 * Processes left shift click drag movement event
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftShiftDragDuring(int xPixelStart,int yPixelStart,
-		int xPixel,int yPixel) {
-
-		//If the timer hasn't done this yet, we now have confirmation this is a
-		//left-click drag event
-		if(!xmap.isSelecting()) {
-			processTemporaryLeftDragStart(xPixelStart,yPixelStart,xPixel,
-				yPixel);
-		}
-
-		debug("Mouse dragged. Updating hover indexes to [" +
-		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
-		      "]",4);
-		xmap.setHoverIndex(xmap.getIndex(xPixel));
-		ymap.setHoverIndex(ymap.getIndex(yPixel));
-
-		drawBand(dragRect);
-
-		endPoint.setLocation(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel));
-
-		/* Full gene selection */
-		dragRect.setLocation(xmap.getMinIndex(),startPoint.y);
-		dragRect.setSize(0,0);
-		dragRect.add(xmap.getMaxIndex(),endPoint.y);
-
-		drawBand(dragRect);
-	}
-
-	/**
-	 * Processes left control click drag movement event
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processLeftControlDragDuring(int xPixelStart,int yPixelStart,
-		int xPixel,int yPixel) {
-
-		//If the timer hasn't done this yet, we now have confirmation this is a
-		//left-click drag event
-		if(!xmap.isSelecting()) {
-			processTemporaryLeftDragStart(xPixelStart,yPixelStart,xPixel,
-				yPixel);
-		}
-
-		debug("Mouse dragged. Updating hover indexes to [" +
-		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
-		      "]",4);
-		xmap.setHoverIndex(xmap.getIndex(xPixel));
-		ymap.setHoverIndex(ymap.getIndex(yPixel));
-
-		drawBand(dragRect);
-
-		endPoint.setLocation(xmap.getIndex(xPixel),
-				ymap.getIndex(yPixel));
-
-		/* Full array selection */
-		dragRect.setLocation(startPoint.x, ymap.getMinIndex());
-		dragRect.setSize(0, 0);
-		dragRect.add(endPoint.x, ymap.getMaxIndex());
-
-		drawBand(dragRect);
-	}
-
-	/**
-	 * Processes a completed right single click
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processRightSingleClick(int xPixel,int yPixel) {
-		geneSelection.setSelectedNode(null);
-		geneSelection.deselectAllIndexes();
-
-		arraySelection.setSelectedNode(null);
-		arraySelection.deselectAllIndexes();
-
-		debug("Deselecting.",1);
-
-		geneSelection.notifyObservers();
-		arraySelection.notifyObservers();
-	}
-
-	public void startDragRect(int xIndex,int yIndex) {
-		startPoint.setLocation(xIndex,yIndex);
-		endPoint.setLocation(startPoint.x,startPoint.y);
-		dragRect.setLocation(startPoint.x,startPoint.y);
-		dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
-		drawBand(dragRect);
-	}
-
-	public void updateDragRect(int xIndex,int yIndex) {
-		drawBand(dragRect);
-		endPoint.setLocation(xIndex,yIndex);
-		dragRect.setLocation(startPoint.x,startPoint.y);
-		dragRect.setSize(0,0);
-		dragRect.add(endPoint.x,endPoint.y);
-	}
-
-	public void endDragRect(int xIndex,int yIndex) {
-		updateDragRect(xIndex,yIndex);
-		drawBand(dragRect);
-	}
-
-	/**
-	 * Zooming when the mouse wheel is used in conjunction with the alt/option
-	 * key.  Vertical scrolling if the shift key is not pressed.
-	 */
-	@Override
-	public void mouseWheelMoved(final MouseWheelEvent e) {
-
-		final int notches = e.getWheelRotation();
-		final int shift = (notches < 0) ? -3 : 3;
-
-		//On macs' magic mouse, horizontal scroll comes in as if the shift was
-		//down
-		if(e.isAltDown()) {
-			if (notches < 0) {
-				//This ensures we only zoom toward the cursor when the cursor is
-				//over the map
-				if (status != null) {
-					smoothZoomTowardPixel(e.getX(),e.getY());
-				}
-				//This should happen when the mouse is not over the heatmap
-				else {
-					xmap.zoomInBegin();
-					ymap.zoomInBegin();
-				}
-			} else {
-				if (status != null) {
-					smoothZoomFromPixel(e.getX(),e.getY());
-				} else {
-					xmap.zoomOutBegin();
-					ymap.zoomOutBegin();
-				}
-			}
-		} else if(e.isShiftDown()) {
-			xmap.scrollBy(shift,false);
-			//Now we are hovered over a new index
-			xmap.setHoverIndex(xmap.getIndex(e.getX()));
-		} else {
-			ymap.scrollBy(shift,false);
-			//Now we are hovered over a new index
-			ymap.setHoverIndex(ymap.getIndex(e.getY()));
-		}
-
-		repaint();
-	}
-
 	/**
 	 * This function, given a pixel location (e.g. where the cursor is), will
 	 * intelligently choose a zoom amount to give the appearance of a smooth
@@ -2367,8 +803,8 @@ public class InteractiveMatrixView extends MatrixView implements
 			//debug("smoothZoomTowardSelection bug still exists." +
 			//					"  Working around it.");
 
-			xmap.zoomOutCenter("fast");
-			ymap.zoomOutCenter("fast");
+			xmap.zoomOutCenter(MapContainer.ZOOM_FAST);
+			ymap.zoomOutCenter(MapContainer.ZOOM_FAST);
 		}
 
 		//If we've reached full zoom-out, reset the aspect ratio
@@ -2383,9 +819,9 @@ public class InteractiveMatrixView extends MatrixView implements
 	 * in the dimensions of the matrix
 	 */
 	public void smoothAnimatedZoomOut() {
-
-		smoothAnimatedZoomToTarget(0,(xmap.getMaxIndex() + 1),
-			0,(ymap.getMaxIndex() + 1));
+	
+		smoothAnimatedZoomToTarget(0, (xmap.getTotalTileNum()), 
+				0, (ymap.getTotalTileNum()));
 	}
 
 	/**
@@ -3332,11 +1768,11 @@ public class InteractiveMatrixView extends MatrixView implements
 			//Now let's return the pixel indexes of the selection post-zoom
 			redrawPixelBounds[0] = xmap.getPixel(selecXStartIndex);
 			redrawPixelBounds[2] =
-				(int) Math.round((double) numXSelectedIndexes *
+				(int) Math.round(numXSelectedIndexes *
 				pixelsPerXIndex) + 1; //Added 1 because sometimes inaccurate
 		} else {
 			redrawPixelBounds[0] = xmap.getPixel(prevXFirstVisible);
-			redrawPixelBounds[2] = (int) Math.round((double) prevXNumVisible *
+			redrawPixelBounds[2] = (int) Math.round(prevXNumVisible *
 					pixelsPerXIndex) + 1; //Added 1 because sometimes inaccurate
 		}
 		pixelsPerYIndex = ymap.getScale();
@@ -3346,14 +1782,14 @@ public class InteractiveMatrixView extends MatrixView implements
 			//		"]. Panel dimensions: [" + getHeight() + "].");
 			redrawPixelBounds[1] = ymap.getPixel(selecYStartIndex);
 			redrawPixelBounds[3] =
-				(int) Math.round((double) numYSelectedIndexes *
+				(int) Math.round(numYSelectedIndexes *
 				pixelsPerYIndex) + 1; //Added 1 because sometimes inaccurate
 			//debug("Zoom redraw bounds before fix: [" +
 			//		redrawPixelBounds[0] + "," + redrawPixelBounds[1] + "," +
 			//		redrawPixelBounds[2] + "," + redrawPixelBounds[3] + "].");
 		} else {
 			redrawPixelBounds[1] = ymap.getPixel(prevYFirstVisible);
-			redrawPixelBounds[3] = (int) Math.round((double) prevYNumVisible *
+			redrawPixelBounds[3] = (int) Math.round(prevYNumVisible *
 					pixelsPerYIndex) + 1; //Added 1 because sometimes inaccurate
 		}
 
@@ -3383,30 +1819,21 @@ public class InteractiveMatrixView extends MatrixView implements
 	}
 
 	public void updateAspectRatio() {
-		aspectRatio = getAspectRatio(xmap.getNumVisible(),ymap.getNumVisible());
-		//debug("Aspect Ratio updated to [" + aspectRatio + " : " +
-		//xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
+		
+		aspectRatio = getAspectRatio(xmap.getNumVisible(), ymap.getNumVisible());
 	}
 
 	public void setAspectRatio(int numXDots,int numYDots) {
 		aspectRatio = getAspectRatio(numXDots,numYDots);
-		//debug("Aspect Ratio set to [" + aspectRatio + " : " +
-		//xmap.getNumVisible() + "/" + ymap.getNumVisible() + "].");
 	}
 
-	private void drawBand(final Rectangle l) {
+	public void drawBand(final Rectangle l) {
 
-		final Graphics g = getGraphics();
-		Graphics2D g2d = (Graphics2D) g;
+		Graphics2D g2d = (Graphics2D) getGraphics();
 		g2d.setXORMode(getBackground());
 		g2d.setColor(GUIFactory.MAIN);
 
-		final int x = xmap.getPixel(l.x);
-		final int y = ymap.getPixel(l.y);
-		final int w = xmap.getPixel(l.x + l.width + 1) - x;
-		final int h = ymap.getPixel(l.y + l.height + 1) - y;
-
-		g2d.drawRect(x, y, w, h);
+		g2d.drawRect(l.x, l.y, l.width, l.height);
 		g2d.setPaintMode();
 	}
 
@@ -3421,9 +1848,9 @@ public class InteractiveMatrixView extends MatrixView implements
 		double w = 0;
 		double h = 0;
 
-		if (geneSelection == null || arraySelection == null ||
-			arraySelection.getNSelectedIndexes() == 0 ||
-			geneSelection.getNSelectedIndexes()  == 0) {
+		if (rowSelection == null || colSelection == null ||
+			colSelection.getNSelectedIndexes() == 0 ||
+			rowSelection.getNSelectedIndexes()  == 0) {
 			indicatorCircleList = null;
 			return;
 		}
@@ -3431,15 +1858,15 @@ public class InteractiveMatrixView extends MatrixView implements
 		//Empty the list of
 		indicatorCircleList = new ArrayList<Ellipse2D.Double>();
 
-		final int[] selectedArrayIndexes = arraySelection.getSelectedIndexes();
-		final int[] selectedGeneIndexes  = geneSelection.getSelectedIndexes();
+		final int[] selectedArrayIndexes = colSelection.getSelectedIndexes();
+		final int[] selectedGeneIndexes  = rowSelection.getSelectedIndexes();
 
 		List<List<Integer>> arrayBoundaryList;
 		List<List<Integer>> geneBoundaryList;
 
-		arrayBoundaryList = findRectangleBoundaries(selectedArrayIndexes,
+		arrayBoundaryList = findRectBoundaries(selectedArrayIndexes,
 				xmap);
-		geneBoundaryList  = findRectangleBoundaries(selectedGeneIndexes,
+		geneBoundaryList  = findRectBoundaries(selectedGeneIndexes,
 				ymap);
 
 		/*
@@ -3494,75 +1921,13 @@ public class InteractiveMatrixView extends MatrixView implements
 		}
 	}
 
-	/**
-	 * Selecting a rectangular area in GlobalView
-	 *
-	 * @param start
-	 * @param end
-	 */
-	private void selectRectangle(final Point start, final Point end) {
-
-		// sort so that ep is upper left corner
-		if (end.x < start.x) {
-			final int x = end.x;
-			end.x = start.x;
-			start.x = x;
-		}
-
-		if (end.y < start.y) {
-			final int y = end.y;
-			end.y = start.y;
-			start.y = y;
-		}
-
-		// nodes
-		geneSelection.setSelectedNode(null);
-
-		// genes...
-		geneSelection.deselectAllIndexes();
-
-		for (int i = start.y; i <= end.y; i++) {
-
-			geneSelection.setIndexSelection(i, true);
-		}
-
-		// arrays...
-		arraySelection.setSelectedNode(null);
-		arraySelection.deselectAllIndexes();
-
-		for (int i = start.x; i <= end.x; i++) {
-
-			arraySelection.setIndexSelection(i, true);
-		}
-
-		//debug("Rectangle selected.");
-		globalMatrixView.setIMVselectedIndexes(
-				arraySelection.getSelectedIndexes(),
-				geneSelection.getSelectedIndexes());
-
-		geneSelection.notifyObservers();
-		arraySelection.notifyObservers();
+	public TreeSelectionI getRowSelection() {
+		
+		return rowSelection;
 	}
 
-	/**
-	 * Sets the gene header instance variables of GlobalView.
-	 *
-	 * @param ghi
-	 * @param ahi
-	 */
-	public void setHeaders(final HeaderInfo ghi, final HeaderInfo ahi) {
-
-		geneHI = ghi;
-		arrayHI = ahi;
-	}
-
-	public TreeSelectionI getGeneSelection() {
-
-		return(geneSelection);
-	}
-
-	public TreeSelectionI getArraySelection() {
-
-		return(arraySelection);
+	public TreeSelectionI getColSelection() {
+		
+		return colSelection;
 	}
 }

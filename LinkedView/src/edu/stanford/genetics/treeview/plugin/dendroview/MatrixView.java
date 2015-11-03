@@ -34,11 +34,10 @@ public abstract class MatrixView extends ModelViewProduced {
 	protected MapContainer xmap;
 	protected MapContainer ymap;
 
-	protected TreeSelectionI geneSelection;
-	protected TreeSelectionI arraySelection;
+	protected TreeSelectionI rowSelection;
+	protected TreeSelectionI colSelection;
 
 	protected boolean hasDrawn = false;
-	protected boolean pixelsChanged = false;
 
 	protected ArrayDrawer drawer;
 
@@ -117,9 +116,9 @@ public abstract class MatrixView extends ModelViewProduced {
 			revalidateScreen();
 			setSubImage();
 			
-			if(pixelsChanged) {
+			if(dataChanged) {
 				updatePixels();
-				pixelsChanged = false;
+				dataChanged = false;
 			}
 		}
 			
@@ -250,35 +249,35 @@ public abstract class MatrixView extends ModelViewProduced {
 	/**
 	 * Set geneSelection
 	 *
-	 * @param geneSelection
+	 * @param rowSelection
 	 *            The TreeSelection which is set by selecting genes in the
 	 *            GlobalView
 	 */
-	public void setRowSelection(final TreeSelectionI geneSelection) {
+	public void setRowSelection(final TreeSelectionI rowSelection) {
 
-		if (this.geneSelection != null) {
-			this.geneSelection.deleteObserver(this);
+		if (this.rowSelection != null) {
+			this.rowSelection.deleteObserver(this);
 		}
 
-		this.geneSelection = geneSelection;
-		this.geneSelection.addObserver(this);
+		this.rowSelection = rowSelection;
+		this.rowSelection.addObserver(this);
 	}
 
 	/**
 	 * Set arraySelection
 	 *
-	 * @param arraySelection
+	 * @param colSelection
 	 *            The TreeSelection which is set by selecting arrays in the
 	 *            GlobalView
 	 */
-	public void setColSelection(final TreeSelectionI arraySelection) {
+	public void setColSelection(final TreeSelectionI colSelection) {
 
-		if (this.arraySelection != null) {
-			this.arraySelection.deleteObserver(this);
+		if (this.colSelection != null) {
+			this.colSelection.deleteObserver(this);
 		}
 
-		this.arraySelection = arraySelection;
-		this.arraySelection.addObserver(this);
+		this.colSelection = colSelection;
+		this.colSelection.addObserver(this);
 	}
 
 	/**
@@ -335,8 +334,8 @@ public abstract class MatrixView extends ModelViewProduced {
 	protected void adjustPixelsToMaps() {
 		
 		// correct for zero indexing
-		int x_tiles = xmap.getMaxIndex() + 1;
-		int y_tiles = ymap.getMaxIndex() + 1;
+		int x_tiles = xmap.getTotalTileNum();
+		int y_tiles = ymap.getTotalTileNum();
 		
 		int tileCount = x_tiles * y_tiles;
 		
@@ -384,9 +383,23 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 	}
 	
-	public void setPixelsChanged() {
+	public void setHasMouse(boolean hasMouse) {
 		
-		this.pixelsChanged = true;
+		this.hasMouse = hasMouse;
+	}
+	
+	public boolean hasMouse() {
+		
+		return hasMouse;
+	}
+	
+	/**
+	 * Tells the MatrixView that underlying data has changed and it needs to
+	 * recalculate its pixel color values. 
+	 */
+	public void setDataChanged() {
+		
+		this.dataChanged = true;
 	}
 
 }

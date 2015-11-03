@@ -56,6 +56,9 @@ public class DataImportDialog extends CustomDialog {
 		super("Data Import - [" + filename + "]");
 
 		this.delimiters = new ArrayList<JCheckBox>();
+		
+		// "Cancel" makes more sense here than "Close" - functionality remains
+		closeBtn.setText("Cancel");
 	}
 
 	public void setupDialogComponents() {
@@ -95,12 +98,8 @@ public class DataImportDialog extends CustomDialog {
 		JLabel findDataStartLabel = GUIFactory.createLabel(findDataStartText,
 				GUIFactory.FONTM_B);
 
-		SpinnerNumberModel indexModel = new SpinnerNumberModel(0, 0, 10, 1); // must
-																				// be
-																				// ints
-																				// for
-																				// Spinner
-																				// listener
+		// must be ints for spinner listener
+		SpinnerNumberModel indexModel = new SpinnerNumberModel(0, 0, 10, 1);
 		SpinnerNumberModel indexModel2 = new SpinnerNumberModel(0, 0, 10, 1);
 
 		final String rowSpinnerText = "Row #:";
@@ -122,9 +121,9 @@ public class DataImportDialog extends CustomDialog {
 		indexPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		indexPanel.add(rowSpinnerLabel);
 		indexPanel.add(rowDataStart);
-		indexPanel.add(columnSpinnerLabel, "pushx");
+		indexPanel.add(columnSpinnerLabel, "al right");
 		indexPanel.add(columnDataStart);
-		indexPanel.add(noLabelCheckBox, "pushx, wrap");
+		indexPanel.add(noLabelCheckBox, "al right, pushx, wrap");
 		indexPanel.add(findDataBtn, "span 2 1, align left, pushx");
 		indexPanel.add(noteLabel, "pushx, span 3 1");
 
@@ -141,8 +140,8 @@ public class DataImportDialog extends CustomDialog {
 		proceedBtn.requestFocus();
 
 		buttonPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
-		buttonPanel.add(closeBtn, "align left, pushx");
-		buttonPanel.add(statusIndicator);
+		buttonPanel.add(statusIndicator, "align left, pushx");
+		buttonPanel.add(closeBtn);
 		buttonPanel.add(proceedBtn, "align right");
 
 		getRootPane().setDefaultButton(findDataBtn);

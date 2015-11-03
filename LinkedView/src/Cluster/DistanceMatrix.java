@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 
 import javax.swing.JOptionPane;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.Helper;
 
 public class DistanceMatrix {
@@ -247,10 +248,12 @@ public class DistanceMatrix {
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			LogBuffer.logException(e);
 			e.printStackTrace();
 		}
 	}
 
+	// TODO can be static -> no instance variables used here.
 	private File getNewFile(String oldName) {
 
 		File file = new File(oldName);
