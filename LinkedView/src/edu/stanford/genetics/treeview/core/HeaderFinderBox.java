@@ -321,7 +321,6 @@ public abstract class HeaderFinderBox {
 	 * @author rleach
 	 */
 	public void seekAll() {
-
 		boolean gotSomething = false;
 
 		//Deselect my previous search results so that the companion search isn't

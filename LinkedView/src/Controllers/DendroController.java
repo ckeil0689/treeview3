@@ -1505,11 +1505,16 @@ Controller {
 	 */
 	private void requestFocusForZoomBtn() {
 
+		if(dendroView.isAFinderBoxFocussed()) {
+			return;
+		}
+
 		if (rowSelection.getNSelectedIndexes() > 0) {
 			dendroView.getZoomButton().requestFocusInWindow();
 		} else {
 			dendroView.getXYPlusButton().requestFocusInWindow();
 		}
+
 		setAdaptiveButtonStatus();
 	}
 
