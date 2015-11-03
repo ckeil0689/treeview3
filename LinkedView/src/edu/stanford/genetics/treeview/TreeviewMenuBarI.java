@@ -1,14 +1,8 @@
-/*
- * Created on May 17, 2008
+/* BEGIN_HEADER                                                   TreeView 3
  *
- * The purpose of this interface is to make it easy to switch underlying menu
- * toolkits (i.e. JMenu vs Menu). To use it, the caller should
- * 1) grab the lock using a synchronized block
- * 2) call setMenu and setSubMenu to set the menus
- * 3) pass object to a popluate method. The populate method should assume that
- *   the caller has already positioned the TreeViewMenuBar to the correct menu.
+ * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * Copyright Alok Saldnaha, all rights reserved.
+ * END_HEADER 
  */
 package edu.stanford.genetics.treeview;
 

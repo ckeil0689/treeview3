@@ -216,4 +216,10 @@ public class ReorderedTreeSelection extends Observable implements
 		observers.remove(view);
 	}
 
+	@Override
+	public int getFullSelectionRange() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

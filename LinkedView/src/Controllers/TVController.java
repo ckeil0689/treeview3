@@ -54,7 +54,6 @@ import edu.stanford.genetics.treeview.model.TVModel;
 //=======
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 //>>>>>>> colorUpdate
-import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 
 /**
  * This class controls user interaction with TVFrame and its views.
@@ -246,16 +245,6 @@ public class TVController implements Observer {
 	}
 
 	/**
-	 * Passes the resize call for the matrix to the DendroController.
-	 *
-	 * @param mode
-	 */
-	protected void setMatrixSize(final int mode) {
-
-		dendroController.setMatrixSize(mode);
-	}
-
-	/**
 	 * Load data into the model.
 	 * 
 	 * @param fileSet
@@ -381,6 +370,7 @@ public class TVController implements Observer {
 			Preferences root;
 			if (getConfigNode().nodeExists("File")) {
 				root = getConfigNode().node("File");
+				
 			} else {
 				LogBuffer.println("File node not found. Could not"
 						+ " copy data.");
@@ -407,8 +397,12 @@ public class TVController implements Observer {
 	private void copyOldPreferencesTo(final Preferences loadedNode) {
 
 		if (oldNode == null) {
+			LogBuffer.println("No old node was found when trying to copy old"
+					+ " preferences.");
 			return;
 		}
+		
+		LogBuffer.println("Old node: " + oldNode.name());
 
 		try {
 			dendroController.importLabelPreferences(oldNode);
@@ -417,6 +411,9 @@ public class TVController implements Observer {
 				dendroController.importColorPreferences(oldNode);
 
 				// set node here? maybe it disappears because it's a local var
+			} else {
+				LogBuffer.println("ColorPresets node not found when trying" 
+						+ " to import previous color settings.");
 			}
 
 		} catch (BackingStoreException e) {
@@ -542,10 +539,11 @@ public class TVController implements Observer {
 	}
 
 	/**
-	 * Used to retrieve information about the data for proper loading. 
+	 * Used to transfer information to ModelLoader about the data 
+	 * for proper loading. 
 	 * Either through saved information (stored preferences) or by offering
 	 * a dialog to the user in which they can specify parameters.
-	 * @param fileSet FIle name + directory information object.
+	 * @param fileSet File name + directory information object.
 	 * @param isFromCluster Whether the loading happens as a result of 
 	 * clustering.
 	 */
@@ -602,6 +600,12 @@ public class TVController implements Observer {
 		return dataInfo;
 	}
 
+	/**
+	 * Load stored info for a specific file.
+	 * @param fileSet The FileSet for the file to be loaded.
+	 * @return A DataLoadInfo object which contains information relevant for
+	 * setting up the DataLoadDialog.
+	 */
 	public DataLoadInfo getDataLoadInfo(FileSet fileSet) {
 
 		Preferences node = getOldPreferences(fileSet.getRoot(),
@@ -677,6 +681,7 @@ public class TVController implements Observer {
 		arrayUrlExtractor.bindConfig(documentConfig.node("ArrayUrlExtractor"));
 		tvFrame.setArrayUrlExtractor(arrayUrlExtractor);
 
+		LogBuffer.println("Set new selection objects.");
 		tvFrame.setGeneSelection(new TreeSelection(ngene));
 		tvFrame.setArraySelection(new TreeSelection(nexpr));
 	}
@@ -978,16 +983,20 @@ public class TVController implements Observer {
 	 */
 	public void openColorMenu() {
 
+		// --> move to dendroController
 		final double min = model.getDataMatrix().getMinVal();
 		final double max = model.getDataMatrix().getMaxVal();
 		final double mean = model.getDataMatrix().getMean();
 		final double median = model.getDataMatrix().getMedian();
 
 		/* View */
-		ColorExtractor drawer = ((DoubleArrayDrawer) dendroController
-				.getArrayDrawer()).getColorExtractor();
+		// TODO get colorExtractor instance from dendroController...
+		ColorExtractor colorExtractor = dendroController.getColorExtractor();
+		
+//		ColorExtractor drawer = ((DoubleArrayDrawer) dendroController
+//				.getArrayDrawer()).getColorExtractor();
 
-		final ColorChooserUI gradientPick = new ColorChooserUI(drawer, 
+		final ColorChooserUI gradientPick = new ColorChooserUI(colorExtractor, 
 				min, max, mean, median);
 
 		/* Controller */

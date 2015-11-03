@@ -8,7 +8,6 @@ import Utilities.StringRes;
 import Views.ClusterView;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 
 /**
  * This class contains all the different actions which are being mapped to
@@ -84,15 +83,6 @@ public class MenubarController {
 		// break;
 		case StringRes.menu_URL:
 			controller.openPrefMenu(name);
-			break;
-		case "Fill screen":
-			controller.setMatrixSize(InteractiveMatrixView.FILL);
-			break;
-		case "Equal axes":
-			controller.setMatrixSize(InteractiveMatrixView.EQUAL);
-			break;
-		case "Proportional axes":
-			controller.setMatrixSize(InteractiveMatrixView.PROPORT);
 			break;
 		case StringRes.menu_showTrees:
 		case StringRes.menu_hideTrees:
@@ -173,7 +163,7 @@ public class MenubarController {
 	 * defaults due to not finding a matching function for the supplied MenuItem
 	 * name.
 	 */
-	private void displayError() {
+	private static void displayError() {
 
 		final String message = "A menu button could not be matched with a function.";
 		JOptionPane.showMessageDialog(Frame.getFrames()[0], message, "Alert",

@@ -1,30 +1,8 @@
-/* BEGIN_HEADER                                              Java TreeView
+/* BEGIN_HEADER                                                   TreeView 3
  *
- * $Author: alokito $
- * $RCSfile: TreeViewFrame.java,v $w
- * $Revision: 1.76 $
- * $Date: 2010-05-02 13:34:53 $
- * $Name:  $
+ * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved.
- * Modified by Alex Segal 2004/08/13. Modifications Copyright (C)
- * Lawrence Berkeley Lab.
- *
- * This software is provided under the GNU GPL Version 2. In particular,
- *
- * 1) If you modify a source file, make a comment in it containing your name
- * and the date.
- * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the Java TreeView
- * maintainers at alok@genome.stanford.edu when they make a useful addition.
- * It would be nice if significant contributions could be merged into
- * the main distribution.
- *
- * A full copy of the license can be found in gpl.txt or online at
- * http://www.gnu.org/licenses/gpl.txt
- *
- * END_HEADER
+ * END_HEADER 
  */
 package edu.stanford.genetics.treeview;
 
@@ -140,10 +118,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		setWindowActive(true);
 
-		mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
+		mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS, null);
 
 		/* Setting up main panels */
-		viewPanel = GUIFactory.createJPanel(true, GUIFactory.NO_PADDING, null);
+		viewPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS, null);
 
 		/* Add main background panel to the application frame's contentPane */
 		appFrame.add(mainPanel);
@@ -272,7 +250,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void showLogMessages() {
 
 		final JPanel inner = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING, null);
+				GUIFactory.NO_INSETS, null);
 		inner.add(new JLabel("JTV Messages"), "span, wrap");
 		inner.add(new JScrollPane(
 				new LogMessagesPanel(LogBuffer.getSingleton())),
@@ -374,7 +352,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		final JPanel panel = GUIFactory.createJPanel(true,
-				GUIFactory.NO_PADDING, null);
+				GUIFactory.NO_INSETS, null);
 		final JLabel l1 = GUIFactory.createLabel("Work in progress.",
 				GUIFactory.FONTS);
 
@@ -737,7 +715,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 
 		final JPanel panel = GUIFactory.createJPanel(true,
-				GUIFactory.NO_PADDING, null);
+				GUIFactory.NO_INSETS, null);
 
 		final JButton button = GUIFactory.createBtn("OK");
 		button.addActionListener(new ActionListener() {

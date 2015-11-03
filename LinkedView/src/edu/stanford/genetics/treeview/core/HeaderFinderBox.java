@@ -1,34 +1,23 @@
-/* BEGIN_HEADER                                              Java TreeView
+/* BEGIN_HEADER                                                   TreeView 3
  *
- * $Author: alokito $
- * $RCSfile: HeaderFinder.java,v $
- * $Revision: 1.1 $
- * $Date: 2009-08-26 11:48:27 $
- * $Name:  $
+ * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
- *
- * This software is provided under the GNU GPL Version 2. In particular,
- *
- * 1) If you modify a source file, make a comment in it containing your name and the date.
- * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
- *
- * A full copy of the license can be found in gpl.txt or online at
- * http://www.gnu.org/licenses/gpl.txt
- *
- * END_HEADER
+ * END_HEADER 
  */
+
 package edu.stanford.genetics.treeview.core;
 
 // for summary view...
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,9 +26,12 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.text.JTextComponent;
 
 import net.miginfocom.swing.MigLayout;
@@ -83,20 +75,36 @@ public abstract class HeaderFinderBox {
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
 
-	// "Search for Substring"
+	private static final Color FOUNDCOLOR    = Color.BLACK;
+	private static final Color NOTFOUNDCOLOR = Color.RED;
+
+	//Handle into the other search box in order to have a single search box be
+	//able to initiate the search using the contents of both boxes
+	protected HeaderFinderBox companionBox;
+
+	//defaultText is what's in the finder box before a term is entered.
+	protected String defaultText;
+
+//	boolean dropdownclicked = false;
+
+	/**
+	 * Constructor
+	 * @param type - A string describing what's searched (e.g. Row or Column)
+	 */
 	public HeaderFinderBox(final String type) {
 
 		this.type = type;
-		// final String[] labeledHeaders = setupData(type);
-		//
-		// searchTermBox = GUIFactory.createWideComboBox(labeledHeaders);
-		// searchTermBox.setEditable(true);
-		// searchTermBox.setBorder(null);
-		// searchTermBox.setBackground(GUIFactory.DARK_BG);
-		// AutoCompleteDecorator.decorate(searchTermBox);
-		//
-		// searchTermBox.getEditor().getEditorComponent().addKeyListener(
-		// new BoxKeyListener());
+	}
+
+	/**
+	 * Setting this data member allows a search initiated in 1 box to be able to
+	 * trigger the search in the other box as well so that every search utilizes
+	 * the contents of both search boxes.
+	 * @author rleach
+	 * @param companionBox the companionBox to set
+	 */
+	public void setCompanionBox(HeaderFinderBox companionBox) {
+		this.companionBox = companionBox;
 	}
 
 	/* >>>> Update the object with new data <<<<<< */
@@ -141,6 +149,90 @@ public abstract class HeaderFinderBox {
 
 		searchTermBox.getEditor().getEditorComponent()
 				.addKeyListener(new BoxKeyListener());
+
+		//NOTE: This may be removed without side-effect if a better way of
+		//initiating a search upon combobox dropdown click is found
+		addSearchMouseCommitListener();
+	}
+
+	//NOTE: This may be removed without side-effect if a better way of
+	//initiating a search upon combobox dropdown click is found
+	/**
+	 * This method adds a mouse listener (SearchMouseCommitListener) to the
+	 * dropdown menu of a combobox. Its purpose is to detect only 1 event: when
+	 * a user clicks an item in the dropdown so we can capitalize on that
+	 * trigger to initiate the search and display the results in the matrix as
+	 * a yellow highlight.
+	 * @author rleach
+	 */
+	private void addSearchMouseCommitListener() {
+		//Support for catching a mouse-click selection from a combobox dropdown
+		//menu is not standardly supported (without inadvertently triggering
+		//upon other unrelated events as well).  The following code is the
+		//result of extensive searching and tests to find a way to call seekAll
+		//upon mouse selection of an item from the combobox's dropdown menu.
+		//Every other method tried (ActionListener, ItemListener,
+		//PopupMenuListener, MouseListeners attached in various other simple
+		//ways, and even various combinations of multiple listeners did not work
+		//well.  To see some details on those failed attempts, refer to:
+		//http://stackoverflow.com/questions/33268726/how-do-you-detect-when-a-user-commits-a-jcombobox-selection-via-mouse-click-in-j
+		//This solution below can be found here:
+		//http://engin-tekin.blogspot.com/2009/10/hrefhttpkfd.html
+		try {
+			Field popupInBasicComboBoxUI =
+				BasicComboBoxUI.class.getDeclaredField("popup");
+			popupInBasicComboBoxUI.setAccessible(true);
+			BasicComboPopup popup = (BasicComboPopup) popupInBasicComboBoxUI
+				.get(searchTermBox.getUI());
+			
+			Field scrollerInBasicComboPopup =
+				BasicComboPopup.class.getDeclaredField("scroller");
+			scrollerInBasicComboPopup.setAccessible(true);
+			JScrollPane scroller =
+				(JScrollPane) scrollerInBasicComboPopup.get(popup);
+			
+			scroller.getViewport().getView()
+				.addMouseListener(new SearchMouseCommitListener());
+		}
+		catch (NoSuchFieldException e) {
+			e.printStackTrace();  
+		}
+		catch (IllegalAccessException e) {
+			e.printStackTrace();  
+		}
+	}
+
+	//NOTE: This may be removed without side-effect if a better way of
+	//initiating a search upon combobox dropdown click is found
+	/**
+	 * The following listener only performs 1 function: initiates a search when
+	 * a user clicks a dropdown menu item from a combobox.
+	 * @author rleach
+	 */
+	private class SearchMouseCommitListener extends MouseAdapter {
+		//Upon mouseReleased, it is assumed that the user has just clicked an
+		//item in a dropdown list in a combobox.  The search is initiated by
+		//simulating an enter keypress using a robot which is caught
+		//by the keyListener.  This is circuitous, but reliable, and easy to
+		//replace using another method if a better way to do this is found.
+		@Override
+		public void mouseReleased(java.awt.event.MouseEvent e){
+			//Calling seekAll() directly did not work. It worked occasionally
+			//when called from ActionListener's actionPerformed method (only
+			//when dropdownclicked was set to true here).  It turns out that
+			//simulating an enter key keypress here works really well, albeit
+			//admittedly hackily, but there's no standard way to initiate an
+			//action only when an item in the dropdown is clicked without
+			//initiating that action in a bunch of unrelated events as well.
+			//http://stackoverflow.com/questions/18169598/how-can-i-programmatically-generate-keypress-events
+			try {
+				Robot robot = new Robot();
+				robot.keyPress(KeyEvent.VK_ENTER);
+				robot.keyRelease(KeyEvent.VK_ENTER);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	public void updateSearchIndexes() {
@@ -184,7 +276,7 @@ public abstract class HeaderFinderBox {
 
 		final String[][] hA = headerInfo.getHeaderArray();
 
-		final String defaultText = "Search " + type + "s...";
+		defaultText = "Search " + type + "s...";
 
 		searchDataList    = copy2DStringArray(hA);
 		String[] searchDataHeaders = { "" };
@@ -310,9 +402,57 @@ public abstract class HeaderFinderBox {
 		return(headerArray);
 	}
 
+	/**
+	 * Initiates searches using search terms from this search term box and the
+	 * companion search term box. (i.e. both a row and column search)
+	 * Controls the text color in the box based on whether something was found.
+	 * @author rleach
+	 */
 	public void seekAll() {
 
-		searchSelection.setSelectedNode(null);
+		boolean gotSomething = false;
+
+		//Deselect my previous search results so that the companion search isn't
+		//limited (which will be narrowed down afterward)
+		searchSelection.deselectAllIndexes();
+
+		//If the companion box has anything in it, perform that search first so
+		//that the search in the focussed finder box will work as originally
+		//designed (as a search that respects existing search results in the
+		//companion box)
+		if(companionBox.isSearchTermEntered()) {
+			companionBox.seekAllHelper();
+
+			if(otherSelection.getNSelectedIndexes() > 0 &&
+				isSearchTermEntered()) {
+
+				gotSomething = this.seekAllHelper();
+
+				//If there were no results from this search, deselect the
+				//companion's search results
+				if(searchSelection.getNSelectedIndexes() == 0) {
+					otherSelection.deselectAllIndexes();
+				}
+			}
+		} else {
+			gotSomething = this.seekAllHelper();
+		}
+
+		if(gotSomething) {
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(FOUNDCOLOR);
+		} else {
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(NOTFOUNDCOLOR);
+		}
+	}
+
+	/**
+	 * Searches this class's search term box.  Respects selections already found
+	 * from a companion search.
+	 */
+	public boolean seekAllHelper() {
+
 		searchSelection.deselectAllIndexes();
 
 		final List<Integer> indexList = findSelected();
@@ -363,6 +503,24 @@ public abstract class HeaderFinderBox {
 
 			globalOmap.setToMinScale();
 		}
+
+		if (indexList.size() > 0) {
+			return(true);
+		}
+		return(false);
+	}
+
+	/**
+	 * Determines whether anything was entered into the finer box.  Returns
+	 * false if the finder box is empty or if its contents are the default text.
+	 * @author rleach
+	 * @return boolean
+	 */
+	public boolean isSearchTermEntered() {
+		if(getSearchTerm() == "" || getSearchTerm() == defaultText) {
+			return(false);
+		}
+		return(true);
 	}
 
 	private List<Integer> findSelected() {
@@ -372,7 +530,7 @@ public abstract class HeaderFinderBox {
 		final List<Integer> secondaryIndexList  = new ArrayList<Integer>();
 		final List<Integer> secondarySubstrList = new ArrayList<Integer>();
 
-		final String sub = searchTermBox.getSelectedItem().toString();
+		final String sub = getSearchTerm();
 
 		String wildcardsub = sub;
 		if(!"*".equalsIgnoreCase(wildcardsub.substring(0, 1))) {
@@ -423,6 +581,16 @@ public abstract class HeaderFinderBox {
 		} else {
 			return(secondarySubstrList);
 		}
+	}
+
+	/**
+	 * This method retrieves the search term that was entered into the finder
+	 * box by the user.
+	 * @author rleach
+	 * @return String
+	 */
+	public String getSearchTerm() {
+		return(searchTermBox.getSelectedItem().toString());
 	}
 
 	/**
@@ -506,6 +674,9 @@ public abstract class HeaderFinderBox {
 						+ e.getKeyChar() + "]. " + "When cast to int: ["
 						+ (int) e.getKeyChar() + "].");
 			}
+
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(FOUNDCOLOR);
 		}
 
 		// The delete key is selecting what one tries to delete, thus if
@@ -937,10 +1108,9 @@ public abstract class HeaderFinderBox {
 								}
 
 								if (debug) {
-									LogBuffer
-											.println("Trying to force a selection to "
-													+ "be made 2.  Current text: ["
-													+ content + "].");
+									LogBuffer.println("Trying to force a " +
+										"selection to be made 2.  Current " +
+										"text: [" + content + "].");
 								}
 
 								// searchTermBox.setKeySelectionManager(
@@ -988,8 +1158,8 @@ public abstract class HeaderFinderBox {
 						&& selStartTyped == selStartPressed
 						&& (selEndTyped + 1) == selEndPressed) {
 					if (debug) {
-						LogBuffer
-								.println("Trying to force a selection to be made 3");
+						LogBuffer.println("Trying to force a selection to be " +
+							"made 3");
 					}
 					if ((selStartTyped - 1) > 0) {
 						// Get the current text content

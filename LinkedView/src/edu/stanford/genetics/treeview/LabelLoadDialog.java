@@ -28,7 +28,7 @@ public class LabelLoadDialog {
 		labelLoadFrame.setResizable(false);
 		labelLoadFrame.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 
-		mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS, null);
 
 		prompt = GUIFactory.createLabel("Loading new " + type + " labels...",
 				GUIFactory.FONTM);

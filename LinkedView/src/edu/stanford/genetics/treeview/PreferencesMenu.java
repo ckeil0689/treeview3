@@ -204,7 +204,7 @@ public class PreferencesMenu extends CustomDialog implements
 
 		public URLSettings() {
 
-			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
+			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS,
 					null);
 
 			final UrlSettingsPanel genePanel = new UrlSettingsPanel(
@@ -247,7 +247,7 @@ public class PreferencesMenu extends CustomDialog implements
 
 		public AnnotationPanel() {
 
-			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
+			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS,
 					null);
 
 			genePanel = new HeaderSummaryPanel(geneHI, dendroView
@@ -257,7 +257,7 @@ public class PreferencesMenu extends CustomDialog implements
 					.getColumnLabelView().getHeaderSummary());
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,
-					GUIFactory.NO_PADDING, null);
+					GUIFactory.NO_INSETS, null);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
 			custom_btn = GUIFactory.createBtn(StringRes.btn_CustomLabels);
@@ -386,7 +386,7 @@ public class PreferencesMenu extends CustomDialog implements
 
 		} else {
 			// In case menu cannot be loaded, display excuse.
-			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING,
+			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS,
 					null);
 
 			final JLabel hint = GUIFactory.createLabel("Menu cannot be "
