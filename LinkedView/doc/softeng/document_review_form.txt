@@ -13,16 +13,18 @@ SECTION 1: BITBUCKET PULL REQUEST REVIEW
 
 USAGE:
 1. The CCB Librarian reviews a submitted pull request via BitBucket.[2]
-2. When the level of effort of the change is Medium+, the Librarian schedules a
-   document review meeting with the CM Leader.
+2. When the level of effort of the change is Major+, the Librarian schedules a
+   document review meeting in coordination with the CM Leader.
 3. The CCB Librarian sends a link to the pull request, along with a suggested
    meeting time, to a minimum of 2 reviewers of his/her choice, including the CM
    Leader.
 4. Each reviewer inspects the changes via the diff panes on the BitBucket pull
    request page.  Issues/problems are commented on by hovering over the
-   associated line number.  For each issue comment the below review template is
+   associated line number.  For each comment, the below review template is
    pasted and filled out.  Issues without a clearly applicable line number may
    be entered using the comment button at the top-right of the diff pane.
+   Conflict issues may be commented on must use the form as well and should
+   indicate how conflict resolution is suggested in the "SUGGESTED FIX" comment.
 5. The reviewer lastly, adds a comment to the pull request with a recommendation
    as to whether they feel a meeting is necessary.  The recommendation can be
    one of: Meeting/Accept As-Is/Accept after issues addressed.

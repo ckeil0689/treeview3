@@ -65,6 +65,7 @@ public class InteractiveMatrixView extends MatrixView {
 		//1 = Debug double-click detection
 		//10 = Debug click dragging
 		//11 = Debug zoom animation "toward" selection/sub-selection
+		//13 = Debug zooming to/toward a target
 	}
 
 	/**
