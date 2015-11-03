@@ -81,12 +81,6 @@ public abstract class HeaderFinderBox {
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
 
-	//The isFocusOwner method was returning false after a search - I think
-	//because making a selection implicitly changes focus, so this is a work-
-	//around to prevent focus from changing automatically after a search to
-	//resolve issue #211
-	private boolean searching = false;
-
 	// "Search for Substring"
 	public HeaderFinderBox(final String type) {
 
@@ -229,8 +223,6 @@ public abstract class HeaderFinderBox {
 	}
 
 	public void seekAll() {
-		setSearching(true);
-
 		searchSelection.setSelectedNode(null);
 		searchSelection.deselectAllIndexes();
 
@@ -282,24 +274,6 @@ public abstract class HeaderFinderBox {
 
 			globalOmap.setToMinScale();
 		}
-
-		setSearching(false);
-	}
-
-	/**
-	 * @author rleach
-	 * @return searching
-	 */
-	public boolean isSearching() {
-		return(searching);
-	}
-
-	/**
-	 * @author rleach
-	 * @param hasFocus
-	 */
-	public void setSearching(boolean hasFocus) {
-		this.searching = hasFocus;
 	}
 
 	private List<Integer> findSelected() {

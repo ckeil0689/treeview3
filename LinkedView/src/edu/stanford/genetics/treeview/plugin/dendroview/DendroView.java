@@ -1265,7 +1265,10 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	public boolean isAFinderBoxFocussed() {
-		return(rowFinderBox.isSearching() || colFinderBox.isSearching());
+		return(rowFinderBox.getSearchTermBox().getEditor()
+			.getEditorComponent().isFocusOwner() ||
+			colFinderBox.getSearchTermBox().getEditor()
+			.getEditorComponent().isFocusOwner());
 	}
 
 	public void updateSearchTermBoxes(final HeaderInfo rowHI,

@@ -2042,14 +2042,16 @@ public class DendroController implements ConfigNodePersistent, Observer {
 	 */
 	private void requestFocusForZoomBtn() {
 
-		//If the current focus is not on a finder box, switch focus to zoom btn
-		if(!dendroView.isAFinderBoxFocussed()) {
-			if (rowSelection.getNSelectedIndexes() > 0) {
-				dendroView.getZoomButton().requestFocusInWindow();
-			} else {
-				dendroView.getXYPlusButton().requestFocusInWindow();
-			}
+		if(dendroView.isAFinderBoxFocussed()) {
+			return;
 		}
+
+		if (rowSelection.getNSelectedIndexes() > 0) {
+			dendroView.getZoomButton().requestFocusInWindow();
+		} else {
+			dendroView.getXYPlusButton().requestFocusInWindow();
+		}
+
 		setAdaptiveButtonStatus();
 	}
 
