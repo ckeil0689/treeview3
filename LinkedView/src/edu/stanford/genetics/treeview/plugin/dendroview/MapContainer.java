@@ -1830,7 +1830,9 @@ public class MapContainer extends Observable implements Observer,
 //		}
 	}
 
+	
 	public void setFirstVisible(final int i) {
+		
 		if (i >= 0) {
 			firstVisible = i;
 		}
