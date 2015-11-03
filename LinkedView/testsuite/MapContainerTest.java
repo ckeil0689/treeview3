@@ -144,13 +144,15 @@ public class MapContainerTest {
 		assertEquals("Scrolled back 4", 1, scrollbar.getValue());
 		assertEquals("First Visible #2", 1, mpContainer.getFirstVisible());
 		
+		// Out of bounds - smaller than 0
 		mpContainer.scrollBy(-4);
 		assertEquals("Scrolled back 4 - out of bounds", 0, scrollbar.getValue());
 		assertEquals("First Visible #2", 0, mpContainer.getFirstVisible());
 		
+		// Out of bounds - bigger than MAX_IDX
 		int first_idx = MAX_IDX - 10;
 		int last_idx = MAX_IDX - 3;
-		int range = last_idx - first_idx;
+		int range = last_idx - first_idx + 1;
 		int max_scroll_allowed = MAX_IDX - last_idx;
 		int scroll_num = max_scroll_allowed + 3; // out of bounds by 3
 		
