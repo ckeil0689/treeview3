@@ -82,8 +82,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 	@Override
 	public void mouseMoved(final MouseEvent e) {
 
-		Component comp = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-		LogBuffer.println("MouseMoved: Focus is currently on: [" + comp + "]");
 		/* TODO passing index makes the most sense but an overloaded method 
 		 * that takes a pixel works well too. 
 		 * Reduces clutter in calling classes a little bit.
