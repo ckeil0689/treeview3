@@ -66,6 +66,24 @@ public class MapContainerTest {
 	}
 
 	@Test
+	public void testGetFirstVisible() {
+		fail("Not yet implemented");
+	}
+	
+	@Test
+	public void testGetLastVisible() {
+		fail("Not yet implemented");
+	}
+	
+	@Test
+	public void testGetNumVisible() {
+		
+		// Case 1: Fully zoomed out - all visible
+		assertEquals("Full number of tiles visible.", 100, 
+				mpContainer.getNumVisible());
+	}
+
+	@Test
 	public void testGetBestZoomInVal() {
 		fail("Not yet implemented");
 	}
@@ -87,7 +105,17 @@ public class MapContainerTest {
 
 	@Test
 	public void testScrollToFirstIndex() {
-		fail("Not yet implemented");
+		
+		assertEquals("Scroll value - Before zoom", 0, mpContainer.getScroll().getValue());
+		
+		mpContainer.zoomToSelected(5, 10);
+		
+		assertEquals("Scroll value - After zoom", 0, mpContainer.getScroll().getValue());
+		
+		mpContainer.scrollToFirstIndex(5);
+		
+		assertEquals("Scroll value - After scroll", 5, mpContainer.getScroll().getValue());
+		assertEquals("First Visible - After scroll", 5, mpContainer.getFirstVisible());
 	}
 
 	@Test
@@ -108,11 +136,36 @@ public class MapContainerTest {
 		assertEquals("Scroll - All visible", 0, scrollbar.getValue());
 		assertEquals("First Visible #1", 0, mpContainer.getFirstVisible());
 		
-		mpContainer.zoomToward(5, 10);
+		mpContainer.zoomToSelected(5, 10);
+		mpContainer.scrollToFirstIndex(5);
+		assertEquals("Zoomed to first idx: 5", 5, scrollbar.getValue());
 		
 		mpContainer.scrollBy(-4);
 		assertEquals("Scrolled back 4", 1, scrollbar.getValue());
 		assertEquals("First Visible #2", 1, mpContainer.getFirstVisible());
+		
+		mpContainer.scrollBy(-4);
+		assertEquals("Scrolled back 4 - out of bounds", 0, scrollbar.getValue());
+		assertEquals("First Visible #2", 0, mpContainer.getFirstVisible());
+		
+		int first_idx = MAX_IDX - 10;
+		int last_idx = MAX_IDX - 3;
+		int range = last_idx - first_idx;
+		int max_scroll_allowed = MAX_IDX - last_idx;
+		int scroll_num = max_scroll_allowed + 3; // out of bounds by 3
+		
+		mpContainer.zoomToSelected(first_idx, last_idx);
+		mpContainer.scrollToFirstIndex(first_idx);
+		mpContainer.scrollBy(scroll_num);
+		
+		assertEquals("First visible - scrolled out of bounds", 
+				first_idx + max_scroll_allowed, mpContainer.getFirstVisible());
+		
+		assertEquals("Num visible - scrolled out of bounds", 
+				range, mpContainer.getNumVisible());
+		
+		assertEquals("Last visible - scrolled out of bounds", 
+				MAX_IDX, mpContainer.getLastVisible());
 	}
 
 	@Test
@@ -124,5 +177,14 @@ public class MapContainerTest {
 	public void testGetMinIndex() {
 		fail("Not yet implemented");
 	}
+	
+	// Zoom code tests
+	@Test
+	public void testZoomToSelected() {
+		
+		mpContainer.zoomToSelected(5, 10);
 
+		assertEquals("Num Visible after zoom", 6, 
+				mpContainer.getNumVisible());
+	}
 }

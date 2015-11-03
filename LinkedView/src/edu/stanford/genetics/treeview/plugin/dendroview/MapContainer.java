@@ -1557,17 +1557,21 @@ public class MapContainer extends Observable implements Observer,
 		 * What if only 2 tiles are not shown? Cannot scroll by 3 in this case
 		 * and MapContainer would get the false firstIndex.
 		 */
-		if(i > (getTotalTileNum() - getNumVisible())) {
-			i = getTotalTileNum() - getNumVisible();
-		}
+//		if(i > (getMaxIndex() - getLastVisible())) {
+//			i = getMaxIndex() - getLastVisible();
+//		}
+//		
+//		if(i )
 		
 		final int j = scrollbar.getValue();
-		final int newVal = j + i;
+		int newVal = j + i; // is firstVisible not last... -> error
 
 		// out of range
-		if(newVal < scrollbar.getMinimum() 
-				|| newVal > scrollbar.getMaximum()) {
-			return;
+		if(newVal < scrollbar.getMinimum() ) {
+			newVal = scrollbar.getMinimum();
+			
+		} else if(newVal + getNumVisible() > scrollbar.getMaximum()) {
+			newVal = scrollbar.getMaximum() - getNumVisible();
 		}
 		
 		scrollbar.setValue(newVal);
@@ -1830,9 +1834,7 @@ public class MapContainer extends Observable implements Observer,
 //		}
 	}
 
-	
 	public void setFirstVisible(final int i) {
-		
 		if (i >= 0) {
 			firstVisible = i;
 		}
