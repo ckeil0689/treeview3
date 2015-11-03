@@ -12,12 +12,11 @@ REFERENCES:
 SECTION 1: BITBUCKET PULL REQUEST
 +++++++++++++++++++++++++++++++++
 
-USAGE:
-Refer to section "3.2.4.2 TRANSFERRING CHANGES TO THE MASTER BRANCH" of the
+USAGE: Refer to section "3.2.4.2.1 BITBUCKET COMMIT/MERGE PROCEDURE" of the
 SCMP.[3]
 
-COMMIT/MERGE REQUEST FORM
-=========================
+BITBUCKET COMMIT/MERGE REQUEST FORM
+===================================
 
 DATE OF COMPLETION: 
 
@@ -32,18 +31,11 @@ DESCRIPTION OF CHANGES:
 SECTION 2: MANUAL MERGE/COMMIT REQUEST
 ++++++++++++++++++++++++++++++++++++++
 
-USAGE:
-1. When completed changes are ready to be committed to the PSL/PDL/Master
-   Branch, the author must complete this form and submit it with required
-   documentation to the CCB librarian.
-2. Once the request has been approved, the changes may be committed/merged with
-   the remote master branch by the change author.  Note, changes requiring
-   minor/trivial effort may be approved/rejected by the CCB Librarian directly.
-   Medium+ effort changes require a document review meeting organized by the CCB
-   Librarian and CM Leader.
+USAGE: Refer to section "3.2.4.2.2 MANUAL COMMIT/MERGE PROCEDURE" of the SCMP.
+[3]
 
-COMMIT/MERGE REQUEST FORM
-=========================
+MANUAL COMMIT/MERGE REQUEST FORM
+================================
 
            AUTHOR NAME: 
     DATE OF COMPLETION: 
