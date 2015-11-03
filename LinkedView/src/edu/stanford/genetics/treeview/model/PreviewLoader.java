@@ -21,7 +21,7 @@ public final class PreviewLoader {
 	/*
 	 * For recognizing common labels in a file. Matches (non case-sensitive):
 	 * YORF, ORF, EWEIGHT, GWEIGHT, WEIGHT, COMPLEX, NAME, GID, UID, AID, ID,
-	 * ROW, COL
+	 * ROWID, COLID
 	 */
 	private final static String COMMON_LABELS = "(?i)(COMPLEX|NAME|^Y?ORF$|"
 			+ "^(GENE|G|ARRAY|A|U|ROW|COL)?ID$|^.*WEIGHT$)";
