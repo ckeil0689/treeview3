@@ -44,10 +44,10 @@ public class WelcomeView {
 
 		homePanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
-		title_bg = GUIFactory.createJPanel(false, GUIFactory.NO_PADDING, null);
+		title_bg = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS, null);
 
 		final JPanel titleContainer = GUIFactory.createJPanel(false,
-				GUIFactory.NO_PADDING, null);
+				GUIFactory.NO_INSETS, null);
 
 		loadPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 

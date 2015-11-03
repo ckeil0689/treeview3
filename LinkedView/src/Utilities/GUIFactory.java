@@ -30,6 +30,8 @@ import edu.stanford.genetics.treeview.WideComboBox;
 
 public class GUIFactory {
 
+	// Application fonts
+	public static final Font FONTXS = new Font("Sans Serif", Font.PLAIN, 12);
 	public static final Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
 	public static final Font FONTS_B = new Font("Sans Serif", Font.BOLD, 14);
 	public static final Font FONTM = new Font("Sans Serif", Font.PLAIN, 16);
@@ -37,6 +39,7 @@ public class GUIFactory {
 	public static final Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
 	public static final Font FONTXXL = new Font("Sans Serif", Font.PLAIN, 30);
 
+	// Color scheme
 	public static final Color DEFAULT_BG = UIManager
 			.getColor("Panel.background");
 	public static final Color MAIN = new Color(30, 144, 255, 255);
@@ -44,12 +47,21 @@ public class GUIFactory {
 	public static final Color ELEMENT_HOV = new Color(122, 214, 255, 255);
 	public static final Color RED1 = new Color(240, 80, 50, 255);
 
+	// Layout modes
 	public static final int DEFAULT = 0;
-	public static final int NO_PADDING_FILL = 1;
-	public static final int NO_PADDING = 2;
-	public static final int NO_PADDING_X = 3;
-	public static final int NO_PADDING_Y = 4;
+	public static final int NO_INSETS_FILL = 1;
+	public static final int NO_INSETS = 2;
+	public static final int NO_HORIZ_INSETS = 3;
+	public static final int NO_VERT_INSETS = 4;
 	public static final int FILL = 5;
+	public static final int NO_GAPS = 6;
+	public static final int NO_GAPS_OR_HORIZ_INSETS = 7;
+	public static final int NO_GAPS_OR_VERT_INSETS = 8;
+	public static final int NO_GAPS_OR_INSETS = 9;
+	public static final int NO_GAPS_OR_TOPLEFT_INSETS = 10;
+	public static final int NO_GAPS_OR_INSETS_FILL = 11;
+	public static final int TINY_GAPS_AND_INSETS = 12;
+	public static final int DEBUG = 13;
 
 	/**
 	 * Creates and returns a simple JPanel with MigLayout to be used as
@@ -88,7 +100,8 @@ public class GUIFactory {
 	 *            Sets the main MigLayout constrains for panel insets.
 	 * @return A JPanel.
 	 */
-	public static JPanel createJPanel(final boolean opaque, final int panel_mode) {
+	public static JPanel createJPanel(final boolean opaque, 
+			final int panel_mode) {
 
 		return createJPanel(opaque, panel_mode, null);
 	}
@@ -106,31 +119,62 @@ public class GUIFactory {
 			final int panel_mode) {
 
 		switch (panel_mode) {
-		case NO_PADDING_FILL:
+		case FILL:
+			comp.setLayout(new MigLayout("", "[grow, fill]"));
+			break;
+			
+		case NO_INSETS:
+			comp.setLayout(new MigLayout("ins 0"));
+			break;
+			
+		case NO_INSETS_FILL:
 			comp.setLayout(new MigLayout("ins 0", "[grow, fill]"));
 			break;
 
-		case NO_PADDING:
-			comp.setLayout(new MigLayout("ins 0"));
-			break;
-
-		case NO_PADDING_X:
+		case NO_HORIZ_INSETS:
 			comp.setLayout(new MigLayout("ins 5 0 5 0"));
 			break;
 
-		case NO_PADDING_Y:
+		case NO_VERT_INSETS:
 			comp.setLayout(new MigLayout("ins 0 5 0 5"));
 			break;
-
-		case FILL:
-			comp.setLayout(new MigLayout("", "[grow, fill]"));
+			
+		case NO_GAPS:
+			comp.setLayout(new MigLayout("gap 0!"));
+			break;
+			
+		case NO_GAPS_OR_INSETS:
+			comp.setLayout(new MigLayout("gap 0!, ins 0"));
+			break;
+			
+		case NO_GAPS_OR_HORIZ_INSETS:
+			comp.setLayout(new MigLayout("gapx 0!, ins 5 0 5 0", "grow"));
+			break;
+			
+		case NO_GAPS_OR_VERT_INSETS:
+			comp.setLayout(new MigLayout("gapy 0!, ins 0 5 0 5", "grow"));
+			break;
+			
+		case NO_GAPS_OR_TOPLEFT_INSETS:
+			comp.setLayout(new MigLayout("gapy 0!, ins 0 0 5 5", "grow"));
+			break;
+			
+		case NO_GAPS_OR_INSETS_FILL:
+			comp.setLayout(new MigLayout("gap 0!, ins 0", "fill"));
+			break;
+			
+		case TINY_GAPS_AND_INSETS:
+			comp.setLayout(new MigLayout("gap 1!, ins 3"));
+			break;
+			
+		case DEBUG:
+			comp.setLayout(new MigLayout("debug"));
 			break;
 
 		default:
 			comp.setLayout(new MigLayout());
 			break;
 		}
-
 	}
 
 	/**
@@ -231,9 +275,9 @@ public class GUIFactory {
 	 * the layout setting for buttons so that all navigation buttons will look
 	 * similar.
 	 *
-	 * @param title
-	 * @param iconFileName
-	 * @return
+	 * @param iconFileName The name of the icon file.
+	 * @return A 40x40 JButton with an icon if an iconFileName is supplied. A
+	 * default button to highlight a missing icon file otherwise.
 	 */
 	public static JButton createIconBtn(final String iconFileName) {
 
@@ -304,8 +348,6 @@ public class GUIFactory {
 		if (!subStr.equalsIgnoreCase("png")) {
 			iconType = "_dark.png";
 		}
-
-		LogBuffer.println("Icon image used: [" + iconFileName + "].");
 
 		try {
 			final ClassLoader classLoader = Thread.currentThread()

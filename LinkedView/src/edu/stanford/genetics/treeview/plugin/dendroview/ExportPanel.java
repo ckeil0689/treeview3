@@ -1,25 +1,10 @@
-/* BEGIN_HEADER                                              Java TreeView
+/* BEGIN_HEADER                                                   TreeView 3
  *
- * $Author: alokito $
- * $RCSfile: ExportPanel.java,v $
- * $Revision: 1.2 $
- * $Date: 2010-05-02 13:39:00 $
- * $Name:  $
+ * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * This file is part of Java TreeView
- * Copyright (C) 2001-2003 Alok Saldanha, All Rights Reserved. Modified by Alex Segal 2004/08/13. Modifications Copyright (C) Lawrence Berkeley Lab.
- *
- * This software is provided under the GNU GPL Version 2. In particular,
- *
- * 1) If you modify a source file, make a comment in it containing your name and the date.
- * 2) If you distribute a modified version, you must do it under the GPL 2.
- * 3) Developers are encouraged but not required to notify the Java TreeView maintainers at alok@genome.stanford.edu when they make a useful addition. It would be nice if significant contributions could be merged into the main distribution.
- *
- * A full copy of the license can be found in gpl.txt or online at
- * http://www.gnu.org/licenses/gpl.txt
- *
- * END_HEADER
+ * END_HEADER 
  */
+
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.BorderLayout;
@@ -429,11 +414,11 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 		final HeaderInfo aH = new DummyHeaderInfo();
 		final HeaderInfo gH = new DummyHeaderInfo();
-		final MapContainer aMap = new MapContainer("Fixed", "FixedMap");
+		final MapContainer aMap = new MapContainer(IntegerMap.FIXED, "FixedMap");
 		// aMap.setMap("Fixed");
 		aMap.setScale(10);
 		aMap.setIndexRange(0, aH.getNumHeaders());
-		final MapContainer gMap = new MapContainer("Fixed", "FixedMap");
+		final MapContainer gMap = new MapContainer(IntegerMap.FIXED, "FixedMap");
 		// gMap.setMap("Fixed");
 		gMap.setScale(12);
 		gMap.setIndexRange(0, gH.getNumHeaders());

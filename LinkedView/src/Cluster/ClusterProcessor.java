@@ -328,6 +328,7 @@ public class ClusterProcessor {
 				return clusterer.getReorderedList();
 			}
 			/* K-Means */
+			// TODO "else" word not needed if "if" statement returns something
 			else {
 				int k;
 				int iterations;

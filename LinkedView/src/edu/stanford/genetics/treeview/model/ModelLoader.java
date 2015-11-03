@@ -290,7 +290,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			/* If no node for the file has been found, add one. */
 			if (!fileFound) {
-				documentConfig = fileNode.node("Model "
+				documentConfig = fileNode.node("Model"
 						+ (childrenNodes.length + 1));
 				documentConfig.put("name", fileName);
 				documentConfig.put("extension", fileExt);
