@@ -1,5 +1,7 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -11,6 +13,8 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+
+import org.hamcrest.core.IsAnything;
 
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
@@ -77,7 +81,9 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 	@Override
 	public void mouseMoved(final MouseEvent e) {
-					
+
+		Component comp = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+		LogBuffer.println("MouseMoved: Focus is currently on: [" + comp + "]");
 		/* TODO passing index makes the most sense but an overloaded method 
 		 * that takes a pixel works well too. 
 		 * Reduces clutter in calling classes a little bit.
@@ -298,9 +304,13 @@ public class IMVMouseAdapter extends MouseAdapter {
 		if (!imView.enclosingWindow().isActive()) {
 			return;
 		}
-		
-		imView.setHasMouse(true);
-		imView.requestFocus();
+
+		//Commented the following out because clicking in a search box and then
+		//moving the cursor away before typing was making the focus go away.
+		//The user should explicitly use tab or a click to change focus before
+		//navigating with the keyboard.
+//		imView.setHasMouse(true);
+//		imView.requestFocus();
 	}
 
 	@Override

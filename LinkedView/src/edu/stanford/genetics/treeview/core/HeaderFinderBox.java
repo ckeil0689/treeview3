@@ -332,27 +332,35 @@ public abstract class HeaderFinderBox {
 		//designed (as a search that respects existing search results in the
 		//companion box)
 		if(companionBox.isSearchTermEntered()) {
-			companionBox.seekAllHelper();
+			gotSomething = companionBox.seekAllHelper();
 
 			if(otherSelection.getNSelectedIndexes() > 0 &&
 				isSearchTermEntered()) {
 
 				gotSomething = this.seekAllHelper();
+				updateSearchTextColor(gotSomething);
 
 				//If there were no results from this search, deselect the
 				//companion's search results
 				if(searchSelection.getNSelectedIndexes() == 0) {
 					otherSelection.deselectAllIndexes();
 				}
+			} else {
+				updateSearchTextColor(gotSomething);
 			}
 		} else {
 			gotSomething = this.seekAllHelper();
+			updateSearchTextColor(gotSomething);
 		}
+	}
 
+	public void updateSearchTextColor(final boolean gotSomething) {
 		if(gotSomething) {
+			LogBuffer.println("Changed to found color");
 			searchTermBox.getEditor().getEditorComponent().
 				setForeground(FOUNDCOLOR);
 		} else {
+			LogBuffer.println("Changed to notfound color");
 			searchTermBox.getEditor().getEditorComponent().
 				setForeground(NOTFOUNDCOLOR);
 		}
@@ -415,7 +423,7 @@ public abstract class HeaderFinderBox {
 			globalOmap.setToMinScale();
 		}
 
-		if (indexList.size() > 0) {
+		if(indexList.size() > 0) {
 			return(true);
 		}
 		return(false);
@@ -559,6 +567,7 @@ public abstract class HeaderFinderBox {
 						+ (int) e.getKeyChar() + "].");
 			}
 
+			LogBuffer.println("Color reset to found color");
 			searchTermBox.getEditor().getEditorComponent().
 				setForeground(FOUNDCOLOR);
 		}
