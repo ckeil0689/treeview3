@@ -1546,22 +1546,21 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
-	// TODO method is also broken and fails in boundary cases.
-	public void scrollBy(int i) {
+	/**
+	 * Set a new value for the MapContainer's associated scrollbar. The supplied
+	 * parameter will be added to the current scrollbar value. If it 
+	 * is positive, the value will increase. If negative the scrollbar value
+	 * will decrease. No matter what value is supplied, the scrollbar can 
+	 * never be set to scroll such that the range of visible tiles 
+	 * in MapContainer ends up below its minimum index or above 
+	 * its maximum index. 
+	 * @param i The value by which the current scrollbar value is changed.
+	 */
+	public void scrollBy(final int i) {
 
 		if(showsAllTiles()) {
 			return;
 		}
-		
-		/* 
-		 * What if only 2 tiles are not shown? Cannot scroll by 3 in this case
-		 * and MapContainer would get the false firstIndex.
-		 */
-//		if(i > (getMaxIndex() - getLastVisible())) {
-//			i = getMaxIndex() - getLastVisible();
-//		}
-//		
-//		if(i )
 		
 		final int j = scrollbar.getValue();
 		int newVal = j + i; // is firstVisible not last... -> error
