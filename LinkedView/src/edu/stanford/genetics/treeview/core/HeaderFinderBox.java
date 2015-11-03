@@ -8,7 +8,7 @@
 package edu.stanford.genetics.treeview.core;
 
 // for summary view...
-//import java.awt.Component;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Robot;
 import java.awt.event.ActionEvent;
@@ -72,6 +72,9 @@ public abstract class HeaderFinderBox {
 	protected TreeSelectionI otherSelection;
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
+
+	private static final Color FOUNDCOLOR    = Color.BLACK;
+	private static final Color NOTFOUNDCOLOR = Color.RED;
 
 	//Handle into the other search box in order to have a single search box be
 	//able to initiate the search using the contents of both boxes
@@ -401,6 +404,14 @@ public abstract class HeaderFinderBox {
 
 			globalOmap.setToMinScale();
 		}
+
+		if (indexList.size() > 0) {
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(FOUNDCOLOR);
+		} else {
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(NOTFOUNDCOLOR);
+		}
 	}
 
 	/**
@@ -540,6 +551,9 @@ public abstract class HeaderFinderBox {
 						+ e.getKeyChar() + "]. " + "When cast to int: ["
 						+ (int) e.getKeyChar() + "].");
 			}
+
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(FOUNDCOLOR);
 		}
 
 		// The delete key is selecting what one tries to delete, thus if
