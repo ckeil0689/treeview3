@@ -315,11 +315,14 @@ public abstract class HeaderFinderBox {
 	}
 
 	/**
-	 * Initiates searches using search terms from this seach term box and the
+	 * Initiates searches using search terms from this search term box and the
 	 * companion search term box. (i.e. both a row and column search)
+	 * Controls the text color in the box based on whether something was found.
 	 * @author rleach
 	 */
 	public void seekAll() {
+
+		boolean gotSomething = false;
 
 		//Deselect my previous search results so that the companion search isn't
 		//limited (which will be narrowed down afterward)
@@ -335,7 +338,7 @@ public abstract class HeaderFinderBox {
 			if(otherSelection.getNSelectedIndexes() > 0 &&
 				isSearchTermEntered()) {
 
-				this.seekAllHelper();
+				gotSomething = this.seekAllHelper();
 
 				//If there were no results from this search, deselect the
 				//companion's search results
@@ -344,7 +347,15 @@ public abstract class HeaderFinderBox {
 				}
 			}
 		} else {
-			this.seekAllHelper();
+			gotSomething = this.seekAllHelper();
+		}
+
+		if(gotSomething) {
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(FOUNDCOLOR);
+		} else {
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(NOTFOUNDCOLOR);
 		}
 	}
 
@@ -352,7 +363,7 @@ public abstract class HeaderFinderBox {
 	 * Searches this class's search term box.  Respects selections already found
 	 * from a companion search.
 	 */
-	public void seekAllHelper() {
+	public boolean seekAllHelper() {
 
 		searchSelection.deselectAllIndexes();
 
@@ -406,12 +417,9 @@ public abstract class HeaderFinderBox {
 		}
 
 		if (indexList.size() > 0) {
-			searchTermBox.getEditor().getEditorComponent().
-				setForeground(FOUNDCOLOR);
-		} else {
-			searchTermBox.getEditor().getEditorComponent().
-				setForeground(NOTFOUNDCOLOR);
+			return(true);
 		}
+		return(false);
 	}
 
 	/**
