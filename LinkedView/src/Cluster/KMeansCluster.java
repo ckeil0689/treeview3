@@ -159,14 +159,12 @@ public class KMeansCluster {
 
 				addIndexInner = 0;
 
-				reorderedList[addIndex] = element;
-				addIndex++;
+				reorderedList[addIndex++] = element;
 
 				final String[] dataPair = new String[pairSize];
 				final String index = Integer.toString(i);
 
-				dataPair[addIndexInner] = element;
-				addIndexInner++;
+				dataPair[addIndexInner++] = element;
 
 				dataPair[addIndexInner] = index;
 

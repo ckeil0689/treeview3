@@ -41,10 +41,9 @@ public class HierCluster {
 	private final int initial_matrix_size;
 	private int iterNum;
 
-	/* Half of the Distance Matrix (symmetry) */
+	/* Half of the complete distance matrix (symmetry!) */
 	private final DistanceMatrix distMatrix;
 
-	/* list to keep track of previously used minimum values from distMatrix */
 	private double min;
 	int min_row_index = 0;
 	int min_col_index = 0;
@@ -487,7 +486,8 @@ public class HierCluster {
 
 		String fileName = "reordered.txt";
 		File file = new File(fileName);
-		BufferedWriter bw;
+		BufferedWriter bw = null;
+		
 		try {
 			bw = new BufferedWriter((new OutputStreamWriter(
 					new FileOutputStream(file.getAbsoluteFile()), "UTF-8")));
@@ -497,16 +497,19 @@ public class HierCluster {
 				bw.write("\n");
 			}
 
-			bw.close();
-
 		} catch (UnsupportedEncodingException | FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			LogBuffer.logException(e);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			LogBuffer.logException(e);
 			
+		} finally {
+			try {
+				bw.close();
+				
+			} catch (IOException e) {
+				LogBuffer.logException(e);
+			}
 		}
 	}
 

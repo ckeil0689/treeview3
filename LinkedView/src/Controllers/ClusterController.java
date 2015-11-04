@@ -161,6 +161,67 @@ public class ClusterController {
 		@Override
 		protected Void doInBackground() throws Exception {
 
+			setupClusterViewProgressBar();
+
+			/* Get fileName for saving calculated data */
+			fileName = tvModel.getSource().substring(0,
+					tvModel.getSource().length() - 4);
+
+			/* Initialize the clustering processor and pass the data */
+			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
+					.getDataMatrix();
+			
+			if(isHierarchical()) {
+				processor = new ClusterProcessor(originalMatrix, fileName);
+				
+			} else {
+				final IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
+				final IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
+				
+				processor = new ClusterProcessor(originalMatrix, fileName,
+						geneHeaderI, arrayHeaderI);
+			}
+
+			/* Set zeroes invalid if they should be ignored. */
+			if (clusterView.isIgnoreZeroesChecked()) {
+				originalMatrix.setZeroesToMissing();
+			}
+
+			/* Row axis cluster */
+			reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
+
+			/* Check for cancellation in between axis clustering */
+			if (isCancelled()) {
+				return null;
+			}
+
+			/* Column axis cluster */
+			reorderedCols = calculateAxis(colSimilarity, COL, fileName);
+
+			return null;
+		}
+
+		@Override
+		public void done() {
+
+			if (!isCancelled()) {
+				saveClusterFile(fileName);
+
+			} else {
+				clusterView.setClustering(false);
+				LogBuffer.println("---------------------------------------");
+				LogBuffer.println("Clustering has been cancelled.");
+			}
+		}
+		
+		/**
+		 * In order to show accurate progress information, the JProgressBar in
+		 * ClusterView needs to know some information about the data. This
+		 * method calculates how much data has to be processed based on which 
+		 * axes are clustered as well as the number of labels on each axis.
+		 */
+		private void setupClusterViewProgressBar() {
+			
 			final int rows = tvModel.getRowHeaderInfo().getNumHeaders();
 			final int cols = tvModel.getColumnHeaderInfo().getNumHeaders();
 
@@ -202,49 +263,6 @@ public class ClusterController {
 			}
 
 			ClusterView.setPBarMax(pBarMax);
-
-			/* Get fileName for saving calculated data */
-			fileName = tvModel.getSource().substring(0,
-					tvModel.getSource().length() - 4);
-
-			final IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
-			final IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
-
-			/* Initialize the clustering processor and pass the data */
-			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
-					.getDataMatrix();
-			processor = new ClusterProcessor(originalMatrix, fileName,
-					geneHeaderI, arrayHeaderI);
-
-			/* Set zeroes invalid if they should be ignored. */
-			if (clusterView.isIgnoreZeroesChecked()) {
-				originalMatrix.setZeroesToMissing();
-			}
-
-			/* Row axis cluster */
-			reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
-
-			if (isCancelled()) {
-				return null;
-			}
-
-			/* Column axis cluster */
-			reorderedCols = calculateAxis(colSimilarity, COL, fileName);
-
-			return null;
-		}
-
-		@Override
-		public void done() {
-
-			if (!isCancelled()) {
-				saveClusterFile(fileName);
-
-			} else {
-				clusterView.setClustering(false);
-				LogBuffer.println("---------------------------------------");
-				LogBuffer.println("Clustering has been cancelled.");
-			}
 		}
 
 		/**
@@ -259,15 +277,17 @@ public class ClusterController {
 		private String[] calculateAxis(final int similarity, final int axis,
 				final String fileName) {
 
-			/* Row axis cluster */
-			final DistanceMatrix distMatrix = new DistanceMatrix(0);
-
-			/* Check if this axis should be clustered */
+			/* First, check if this axis should be clustered */
 			if (!isReady(similarity, axis)) {
 				return new String[] {};
 			}
+			
+			boolean isRow = (axis == ROW);
+			
+			/* Row axis cluster */
+			final DistanceMatrix distMatrix = new DistanceMatrix(0);
 
-			final String axisPrefix = (axis == ROW) ? "row" : "column";
+			final String axisPrefix = (isRow) ? "row" : "column";
 
 			/* ProgressBar label */
 			publish("Calculating " + axisPrefix + " distances...");
@@ -276,19 +296,16 @@ public class ClusterController {
 			distMatrix.setMatrix(processor.calcDistance(similarity, axis));
 
 			if (isCancelled()) {
-				return null;
+				return new String[] {}; // TODO add something sensible to return here...
 			}
-
-			// distMatrix.writeMatrix(axisPrefix);
 
 			publish("Clustering " + axisPrefix + " data...");
 
-			// TODO make a local String[] reorderedAxis variable, set the 
-			// processor.clusterAxis(...) result, and return that. 
-			// --> clearer to understand what is being returned.
-			return processor.clusterAxis(distMatrix,
+			String[] reorderedAxisLabels =  processor.clusterAxis(distMatrix,
 					clusterView.getLinkMethod(),
 					clusterView.getSpinnerValues(), isHierarchical(), axis);
+			
+			return reorderedAxisLabels;
 		}
 
 		/**

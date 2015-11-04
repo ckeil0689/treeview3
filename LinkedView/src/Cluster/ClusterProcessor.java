@@ -34,11 +34,36 @@ public class ClusterProcessor {
 	private ClusterTask clusterTask;
 
 	/**
-	 * Constructor for the ClusterProcessor. Sets the pBarCount to 0, which is
-	 * the value that stores progress between multiple tasks, so that a single
-	 * progress bar for the entire process can be displayed.
+	 * Hierarchical Clustering constructor for the ClusterProcessor. 
+	 * HeaderInfo not needed for this version of clustering.
+	 * Sets the pBarCount to 0, which is the value that stores progress 
+	 * between multiple tasks, so that a single progress bar for the entire 
+	 * process can be displayed.
 	 *
-	 * @param model
+	 * @param dataMatrix The original data matrix to be clustered.
+	 * @param fileName The name of the file to which the data matrix belongs.
+	 */
+	public ClusterProcessor(final TVDataMatrix dataMatrix,
+			final String fileName) {
+
+		this.originalMatrix = dataMatrix;
+		this.fileName = fileName;
+		this.geneHeaderI = null;
+		this.arrayHeaderI = null;
+		this.pBarCount = 0;
+	}
+	
+	/**
+	 * K-Means constructor for the ClusterProcessor. 
+	 * HeaderInfo not needed for this version of clustering.
+	 * Sets the pBarCount to 0, which is the value that stores progress 
+	 * between multiple tasks, so that a single progress bar for the entire 
+	 * process can be displayed.
+	 *
+	 * @param dataMatrix The original data matrix to be clustered.
+	 * @param fileName The name of the file to which the data matrix belongs.
+	 * @param geneHeaderI The row HeaderInfo object.
+	 * @param arrayHeaderI The column HeaderInfo object.
 	 */
 	public ClusterProcessor(final TVDataMatrix dataMatrix,
 			final String fileName, final IntHeaderInfo geneHeaderI,
@@ -89,10 +114,8 @@ public class ClusterProcessor {
 	 * @param spinnerInput
 	 * @param hierarchical
 	 * @param axis
-	 *            <<<<<<< HEAD
-	 * @return m x m distance matrix where m is the clustered axis length of the
-	 *         original data matrix. =======
-	 * @return Reordered matrix headers. >>>>>>> origin/master
+	 * 
+	 * @return Reordered matrix headers.
 	 */
 	public String[] clusterAxis(final DistanceMatrix distMatrix,
 			final int linkMethod, final Integer[] spinnerInput,
@@ -292,93 +315,10 @@ public class ClusterProcessor {
 
 			/* Hierarchical */
 			if (hier) {
-				final HierCluster clusterer = new HierCluster(linkMethod,
-						distMatrix, axis);
-
-				clusterer.setupFileWriter(axis, fileName);
-
-				/*
-				 * Continue process until distMatrix has a size of 1, This array
-				 * is the final cluster. Initially every row is its own cluster
-				 * (bottom-up clustering).
-				 */
-				int loopNum = 0;
-				int distMatrixSize = distMatrix.getSize();
-
-				while (distMatrixSize > 1 && !isCancelled()) {
-
-					distMatrixSize = clusterer.cluster();
-					publish(loopNum++);
-				}
-
-				/* Distance matrix needs to be size 1 when cluster finishes! */
-				if (distMatrixSize != 1) {
-					this.cancel(true);
-				}
-
-				/* Return empty String[] if user cancels operation */
-				if (isCancelled()) {
-					LogBuffer.println("ClusterTask cancelled.");
-					return new String[] {};
-				}
-
-				/* Write the tree file */
-				clusterer.finish();
-
-				return clusterer.getReorderedList();
+				return doHierarchicalCluster();
 			}
-			/* K-Means */
-			// TODO "else" word not needed if "if" statement returns something
-			else {
-				int k;
-				int iterations;
-				if (axis == ClusterController.ROW) {
-					k = spinnerInput[0];
-					iterations = spinnerInput[1];
-
-				} else {
-					k = spinnerInput[2];
-					iterations = spinnerInput[3];
-				}
-
-				final KMeansCluster clusterer = new KMeansCluster(distMatrix,
-						axis, k);
-
-				clusterer.setupFileWriter(fileName);
-
-				/*
-				 * Begin iteration of recalculating means and reassigning row
-				 * distance means to clusters.
-				 */
-				for (int i = 0; i < iterations; i++) {
-
-					clusterer.cluster();
-					publish(i);
-				}
-
-				/* Get axis labels */
-				String[][] headerArray;
-				if (axis == ClusterController.ROW) {
-					headerArray = geneHeaderI.getHeaderArray();
-
-				} else {
-					headerArray = arrayHeaderI.getHeaderArray();
-				}
-
-				if (headerArray.length != distMatrix.getSize()) {
-					LogBuffer.println("Label array length does not match "
-							+ "size of distance matrix.");
-					LogBuffer.println("HeaderArray: " + headerArray.length);
-					LogBuffer.println("Distance Matrix: "
-							+ distMatrix.getSize());
-					return new String[] {};
-				}
-
-				/* Write data and close writer */
-				clusterer.finish(headerArray);
-
-				return clusterer.getReorderedList();
-			}
+			
+			return doKMeansCluster();
 		}
 
 		@Override
@@ -387,6 +327,107 @@ public class ClusterProcessor {
 			if (!isCancelled()) {
 				pBarCount += max;
 			}
+		}
+		
+		/**
+		 * Initializes the hierarchical clustering process, 
+		 * starts and finishes the tree file writer, and keeps tracks of
+		 * the GUI aspects such as updating the progress bar for ClusterView.
+		 * @return A reordered list of headers (labels).
+		 */
+		private String[] doHierarchicalCluster() {
+			
+			final HierCluster clusterer = new HierCluster(linkMethod,
+					distMatrix, axis);
+
+			clusterer.setupFileWriter(axis, fileName);
+
+			/*
+			 * Continue process until distMatrix has a size of 1, This array
+			 * is the final cluster. Initially every row is its own cluster
+			 * (bottom-up clustering).
+			 */
+			int loopNum = 0;
+			int distMatrixSize = distMatrix.getSize();
+
+			while (distMatrixSize > 1 && !isCancelled()) {
+
+				distMatrixSize = clusterer.cluster();
+				publish(loopNum++);
+			}
+
+			/* Distance matrix needs to be size 1 when cluster finishes! */
+			if (distMatrixSize != 1) {
+				this.cancel(true);
+			}
+
+			/* Return empty String[] if user cancels operation */
+			if (isCancelled()) {
+				LogBuffer.println("ClusterTask cancelled.");
+				return new String[] {};
+			}
+
+			/* Write the tree file */
+			clusterer.finish();
+
+			return clusterer.getReorderedList();
+		}
+		
+		/**
+		 * Initializes the K-Means clustering process, and keeps tracks of
+		 * the GUI aspects such as updating the progress bar for ClusterView.
+		 * @return A reordered list of headers (labels).
+		 */
+		private String[] doKMeansCluster() {
+			
+			int k;
+			int iterations;
+			if (axis == ClusterController.ROW) {
+				k = spinnerInput[0];
+				iterations = spinnerInput[1];
+
+			} else {
+				k = spinnerInput[2];
+				iterations = spinnerInput[3];
+			}
+
+			final KMeansCluster clusterer = new KMeansCluster(distMatrix,
+					axis, k);
+
+			clusterer.setupFileWriter(fileName);
+
+			/*
+			 * Begin iteration of recalculating means and reassigning row
+			 * distance means to clusters.
+			 */
+			for (int i = 0; i < iterations; i++) {
+
+				clusterer.cluster();
+				publish(i);
+			}
+
+			/* Get axis labels */
+			String[][] headerArray;
+			if (axis == ClusterController.ROW) {
+				headerArray = geneHeaderI.getHeaderArray();
+
+			} else {
+				headerArray = arrayHeaderI.getHeaderArray();
+			}
+
+			if (headerArray.length != distMatrix.getSize()) {
+				LogBuffer.println("Label array length does not match "
+						+ "size of distance matrix.");
+				LogBuffer.println("HeaderArray: " + headerArray.length);
+				LogBuffer.println("Distance Matrix: "
+						+ distMatrix.getSize());
+				return new String[] {};
+			}
+
+			/* Write data and close writer */
+			clusterer.finish(headerArray);
+
+			return clusterer.getReorderedList();
 		}
 	}
 
