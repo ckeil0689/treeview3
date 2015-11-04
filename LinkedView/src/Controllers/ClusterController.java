@@ -187,8 +187,48 @@ public class ClusterController {
 				originalMatrix.setZeroesToMissing();
 			}
 
-			/* Row axis cluster */
-			reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
+			/* First, check if this axis should be clustered at all*/
+			if (isReady(rowSimilarity, ROW)) {
+				/* Row axis cluster 
+				 * First, check if axis is already clustered and ask user 
+				 * whether it should be clustered again. */
+				boolean hasRowTreeFile = tvModel.getFileSet().getGtr()
+						.equals(fileName + ".gtr");
+				boolean shouldCluster = true;
+				
+				if(tvModel.gidFound() && hasRowTreeFile) {
+					String message = "The row axis has been clustered before. "
+							+ "Would you like to cluster it again?";
+					final int choice = JOptionPane.showConfirmDialog(
+							clusterDialog, message);
+					
+					switch(choice) {
+					case JOptionPane.OK_OPTION:
+						shouldCluster = true;
+						break;
+					case JOptionPane.NO_OPTION:
+						shouldCluster = false;
+						break;
+						
+					case JOptionPane.CANCEL_OPTION:
+						shouldCluster = false;
+						cancelAll();
+						return null;
+					default:
+						shouldCluster = true;
+					}
+				}
+				
+				if(shouldCluster) {
+					reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
+					
+				} else {
+					reorderedRows = new String[] {};
+				}
+				
+			} else {
+				reorderedRows = new String[] {};
+			}
 
 			/* Check for cancellation in between axis clustering */
 			if (isCancelled()) {
@@ -277,10 +317,10 @@ public class ClusterController {
 		private String[] calculateAxis(final int similarity, final int axis,
 				final String fileName) {
 
-			/* First, check if this axis should be clustered */
-			if (!isReady(similarity, axis)) {
-				return new String[] {};
-			}
+//			/* First, check if this axis should be clustered */
+//			if (!isReady(similarity, axis)) {
+//				return new String[] {};
+//			}
 			
 			boolean isRow = (axis == ROW);
 			
