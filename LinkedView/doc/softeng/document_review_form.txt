@@ -6,69 +6,35 @@ PURPOSE: This template is for use when conducting a document review.
 
 REFERENCES:
 1. inspection_template.txt from the LANL finishing system project, 07/05/06
-2. merge_request_form.txt version 1.1
-
-SECTION 1: BITBUCKET PULL REQUEST REVIEW
-++++++++++++++++++++++++++++++++++++++++
+2. merge_request_form.txt version 1.2
+3. SCMP_TreeView2.doc
 
 USAGE:
-1. The CCB Librarian reviews a submitted pull request via BitBucket.[2]
-2. When the level of effort of the change is Major+, the Librarian schedules a
-   document review meeting in coordination with the CM Leader.
-3. The CCB Librarian sends a link to the pull request, along with a suggested
-   meeting time, to a minimum of 2 reviewers of his/her choice, including the CM
-   Leader.
-4. Each reviewer inspects the changes via the diff panes on the BitBucket pull
-   request page.  Issues/problems are commented on by hovering over the
-   associated line number.  For each comment, the below review template is
-   pasted and filled out.  Issues without a clearly applicable line number may
-   be entered using the comment button at the top-right of the diff pane.
-   Conflict issues may be commented on must use the form as well and should
-   indicate how conflict resolution is suggested in the "SUGGESTED FIX" comment.
-5. The reviewer lastly, adds a comment to the pull request with a recommendation
-   as to whether they feel a meeting is necessary.  The recommendation can be
-   one of: Meeting/Accept As-Is/Accept after issues addressed.
-6. If a period of 2 weeks passes without a scheduled meeting or a response from
-   the CCB Librarian, the merge may proceed as-is.  A merge request may be
-   resubmitted with changes if initially rejected.
+Please refer to sections 3.2.4.2.2.1 (INDEPENDENT DOCUMENT REVIEWS) of the
+SCMP[3] for details on conducting document reviews using this form, but simply,
+use the following forms for reporting each issue found during the document
+review.
+
 
 BITBUCKET REVIEW TEMPLATE
 =========================
-
-RECOMMENDATION: Meeting/Accept As-Is/Accept after issues addressed
-
 Copy & paste this item template for each issue found:
-----------------------------------------------------------------------
+-----------------------------------------------------
+ISSUE NUMBER: 
+
 LINE(S): 
 
-SEVERITY: Critical/Serious/Minor/Question/Typo (choose one)
+SEVERITY: Critical/Major/Minor/Question/Typo (choose one)
 
 DESCRIPTION: 
 
 SUGGESTED FIX: 
 
 
-
-SECTION 2: MANUAL MERGE/COMMIT REQUEST REVIEW
-+++++++++++++++++++++++++++++++++++++++++++++
-
-USAGE:
-1. A merge request form is submitted for review to the CCB Librarian including a
-   branch or a diff.[2]
-2. When the level of effort of the change is Medium+, the Librarian schedules a
-   document review meeting with the CM Leader.
-3. The CCB Librarian (adds line numbers and) distributes the document (with
-   "_inspection" appended to the file name before the file extension), along
-   with a suggested meeting time, to a minimum of 2 reviewers of his/her choice,
-   including the CM Leader.
-4. Each reviewer inspects the changes, notes issues using the below review
-   template (including the header), and makes a recommendation as to whether a
-   meeting is necessary.  The reviewer appends their first name to the file name
-   before the file extension.
-5. Completed forms are submitted to the CM Leader 24 hours before the meeting.
-
 MANUAL REVIEW TEMPLATE
 ======================
+Copy & paste this header template at the top of each review file:
+-----------------------------------------------------------------
 
           DOCUMENT NAME: 
               COMMIT ID: 
@@ -77,13 +43,13 @@ NUMBER OF CHANGED LINES:
             AUTHOR NAME: 
       NAME OF INSPECTOR: 
           DATE RECEIVED: 
-         RECOMMENDATION: Meeting/Accept As-Is/Accept after issues addressed
+         RECOMMENDATION: Approve/Approve As-Is/Approve after issues addressed
 
 Copy & paste this item template for each issue found:
-----------------------------------------------------------------------
+-----------------------------------------------------
  ISSUE NUMBER: 1
          LINE: 
-     SEVERITY: Critical/Serious/Minor/Question/Typo (choose one)
+     SEVERITY: Critical/Major/Minor/Question/Typo (choose one)
   DESCRIPTION: 
 SUGGESTED FIX: 
 

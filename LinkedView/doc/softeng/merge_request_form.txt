@@ -7,20 +7,19 @@ PURPOSE: This template is for use when submitting a merge/pull request.
 REFERENCES:
 [1] change_request_form.txt version 1.2
 [2] document_review_form.txt version 1.3
-[3] SCMP_TreeView3.doc
+[3] SCMP_TreeView3.doc, section 3.2.4.2.1
+[4] SCMP_TreeView3.doc, section 3.2.4.2.2
 
-SECTION 1: BITBUCKET PULL REQUEST
-+++++++++++++++++++++++++++++++++
+BITBUCKET PULL REQUEST FORM[3]
+==============================
 
-USAGE: Refer to section "3.2.4.2.1 BITBUCKET COMMIT/MERGE PROCEDURE" of the
-SCMP.[3]
-
-BITBUCKET COMMIT/MERGE REQUEST FORM
-===================================
+DATE OF SUBMISSION: 
 
 DATE OF COMPLETION: 
 
 BITBUCKET ISSUE NUMBER: #
+
+LINK TO JAR FILE: 
 
 LEVEL OF EFFORT: trivial/minor/medium/major/overhaul (choose one)
 
@@ -28,19 +27,15 @@ DESCRIPTION OF CHANGES:
 
 
 
-SECTION 2: MANUAL MERGE/COMMIT REQUEST
-++++++++++++++++++++++++++++++++++++++
-
-USAGE: Refer to section "3.2.4.2.2 MANUAL COMMIT/MERGE PROCEDURE" of the SCMP.
-[3]
-
-MANUAL COMMIT/MERGE REQUEST FORM
-================================
+MANUAL COMMIT/MERGE REQUEST FORM[4]
+===================================
 
            AUTHOR NAME: 
+    DATE OF SUBMISSION: 
     DATE OF COMPLETION: 
 BITBUCKET ISSUE NUMBER: #
    CHANGED BRANCH NAME: 
+      LINK TO JAR FILE: 
        BRANCH LOCATION: local/remote (choose one)
        LEVEL OF EFFORT: trivial/minor/medium/major/overhaul (choose one)
 
