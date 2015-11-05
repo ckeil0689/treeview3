@@ -8,7 +8,7 @@
 package edu.stanford.genetics.treeview.core;
 
 // for summary view...
-//import java.awt.Component;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Robot;
 import java.awt.event.ActionEvent;
@@ -72,6 +72,9 @@ public abstract class HeaderFinderBox {
 	protected TreeSelectionI otherSelection;
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
+
+	private static final Color FOUNDCOLOR    = Color.BLACK;
+	private static final Color NOTFOUNDCOLOR = Color.RED;
 
 	//Handle into the other search box in order to have a single search box be
 	//able to initiate the search using the contents of both boxes
@@ -312,11 +315,13 @@ public abstract class HeaderFinderBox {
 	}
 
 	/**
-	 * Initiates searches using search terms from this seach term box and the
+	 * Initiates searches using search terms from this search term box and the
 	 * companion search term box. (i.e. both a row and column search)
+	 * Controls the text color in the box based on whether something was found.
 	 * @author rleach
 	 */
 	public void seekAll() {
+		boolean gotSomething = false;
 
 		//Deselect my previous search results so that the companion search isn't
 		//limited (which will be narrowed down afterward)
@@ -332,7 +337,7 @@ public abstract class HeaderFinderBox {
 			if(otherSelection.getNSelectedIndexes() > 0 &&
 				isSearchTermEntered()) {
 
-				this.seekAllHelper();
+				gotSomething = this.seekAllHelper();
 
 				//If there were no results from this search, deselect the
 				//companion's search results
@@ -341,7 +346,15 @@ public abstract class HeaderFinderBox {
 				}
 			}
 		} else {
-			this.seekAllHelper();
+			gotSomething = this.seekAllHelper();
+		}
+
+		if(gotSomething) {
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(FOUNDCOLOR);
+		} else {
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(NOTFOUNDCOLOR);
 		}
 	}
 
@@ -349,7 +362,7 @@ public abstract class HeaderFinderBox {
 	 * Searches this class's search term box.  Respects selections already found
 	 * from a companion search.
 	 */
-	public void seekAllHelper() {
+	public boolean seekAllHelper() {
 
 		searchSelection.deselectAllIndexes();
 
@@ -401,6 +414,11 @@ public abstract class HeaderFinderBox {
 
 			globalOmap.setToMinScale();
 		}
+
+		if (indexList.size() > 0) {
+			return(true);
+		}
+		return(false);
 	}
 
 	/**
@@ -540,6 +558,9 @@ public abstract class HeaderFinderBox {
 						+ e.getKeyChar() + "]. " + "When cast to int: ["
 						+ (int) e.getKeyChar() + "].");
 			}
+
+			searchTermBox.getEditor().getEditorComponent().
+				setForeground(FOUNDCOLOR);
 		}
 
 		// The delete key is selecting what one tries to delete, thus if

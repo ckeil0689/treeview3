@@ -31,11 +31,13 @@ import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
+
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
@@ -678,16 +680,6 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/**
-	 * TODO move this out of DendroView....nothing like that should be in here.
-	 * Initiates a search of of labels for both axes.
-	 */
-	public void searchLabels() {
-
-		rowFinderBox.seekAll();
-		colFinderBox.seekAll();
-	}
-
-	/**
 	 * Used to update the JMenuItem field "Show trees/ Hide trees" depending
 	 * on the current status of the divider.
 	 */
@@ -1321,6 +1313,13 @@ public class DendroView implements Observer, DendroPanel {
 	public void setRowFinderBoxFocused() {
 
 		rowFinderBox.getSearchTermBox().requestFocusInWindow();
+	}
+
+	public boolean isAFinderBoxFocussed() {
+		return(rowFinderBox.getSearchTermBox().getEditor()
+			.getEditorComponent().isFocusOwner() ||
+			colFinderBox.getSearchTermBox().getEditor()
+			.getEditorComponent().isFocusOwner());
 	}
 
 	public void updateSearchTermBoxes(final HeaderInfo rowHI,
