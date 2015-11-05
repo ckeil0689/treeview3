@@ -121,11 +121,21 @@ public class RowTreeView extends TRView implements MouseMotionListener,
 	}
 
 	@Override
+	public void mouseEntered(final MouseEvent e) {
+
+		if (!isEnabled() || !enclosingWindow().isActive())
+			return;
+
+		map.setOverTree(true);
+	}
+
+	@Override
 	public void mouseExited(final MouseEvent e) {
 
 		if (!isEnabled() || !enclosingWindow().isActive())
 			return;
 
+		map.setOverTree(false);
 		setHoveredNode(null);
 	}
 
