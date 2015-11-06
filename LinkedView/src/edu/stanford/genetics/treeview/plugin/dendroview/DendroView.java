@@ -14,7 +14,6 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
 import java.beans.PropertyChangeListener;
 import java.util.Observable;
 import java.util.Observer;
@@ -31,10 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
-
-import com.sun.glass.events.MouseEvent;
 
 import Utilities.GUIFactory;
 import Utilities.Helper;
