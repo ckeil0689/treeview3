@@ -48,9 +48,10 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 		addMouseMotionListener(this);
 		addKeyListener(this);
 
-		debug = 15;
+		debug = 16;
 		//14 = debug tree repaints linked to whizzing labels
 		//15 = debug tree hover highlighting
+		//16 = debug tree alignment
 	}
 
 	/**
@@ -91,24 +92,50 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
 			g.setColor(Color.black);
 
-			/* calculate scaling */
-			destRect.setBounds(0, 0, map.getUsedPixels(), offscreenSize.height);
-
-			int firstVisIndex = map.getIndex(destRect.x);
-			int lastVisIndex  = map.getIndex(destRect.x + destRect.width);
+			int firstVisIndex;
+			int lastVisIndex;
 
 			//If we're in label port/whizzing label mode
 			if(map.isLabelAnimeRunning() &&
 				map.getFirstVisibleLabel() > -1 &&
 				map.getLastVisibleLabel() > -1) {
+
+				/* calculate scaling */
+				destRect.setBounds(
+					0,
+					0,
+					map.getUsedPixels() -
+					map.getFirstVisibleLabelOffset() -
+					map.getLastVisibleLabelOffset(),
+					offscreenSize.height);
+				
+				debug("pixels used [" + map.getUsedPixels() + "] left offset [" + map.getFirstVisibleLabelOffset() + "] right offset [" + map.getLastVisibleLabelOffset() + "]",16);
+
 				firstVisIndex = map.getFirstVisibleLabel();
 				lastVisIndex  = map.getLastVisibleLabel();
-			}
-			//Determine the offset of the tree (for any partially scrolled
-			//labels)
 
-			xScaleEq = new LinearTransformation(firstVisIndex,
-					destRect.x, lastVisIndex + 1, destRect.x + destRect.width);
+				debug("first visible label index [" + firstVisIndex + "] last visible label index [" + lastVisIndex + "]",16);
+				debug("destRect.x [" + destRect.x + "] map.getFirstVisibleLabelOffset() [" + map.getFirstVisibleLabelOffset() + "] destRect.width [" + destRect.width + "]",16);
+
+				xScaleEq = new LinearTransformation(
+					firstVisIndex,
+					destRect.x + map.getFirstVisibleLabelOffset(),
+					lastVisIndex + 1,
+					destRect.x + map.getFirstVisibleLabelOffset() + destRect.width);
+			} else {
+				/* calculate scaling */
+				destRect.setBounds(0, 0, map.getUsedPixels(), offscreenSize.height);
+
+				firstVisIndex = map.getIndex(destRect.x);
+				lastVisIndex  = map.getIndex(destRect.x + destRect.width);
+
+				xScaleEq = new LinearTransformation(
+					firstVisIndex,
+					destRect.x,
+					lastVisIndex + 1,
+					destRect.x + destRect.width);
+			}
+
 			yScaleEq = new LinearTransformation(treePainter.getCorrMin(),
 					destRect.y, treePainter.getCorrMax(), destRect.y
 							+ destRect.height);

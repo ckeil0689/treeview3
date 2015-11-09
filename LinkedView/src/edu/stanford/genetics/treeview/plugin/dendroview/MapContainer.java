@@ -69,8 +69,10 @@ public class MapContainer extends Observable implements Observer,
 	//track the first and last visible labels (controlled by LabelView) so that
 	//it can be used in other classes (e.g. for matching the trees to the
 	//labels)
-	private int firstVisibleLabel = -1;
-	private int lastVisibleLabel  = -1;
+	private int firstVisibleLabel       = -1;
+	private int lastVisibleLabel        = -1;
+	private int firstVisibleLabelOffset = 0;
+	private int lastVisibleLabelOffset  = 0;
 
 	//Track the explicitly manipulated visible labels. These can change as a
 	//result of a scroll in the label pane
@@ -2338,5 +2340,49 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public int getLastVisibleLabel() {
 		return(lastVisibleLabel);
+	}
+
+	/**
+	 * This provides the number of pixels the first label is offset from the
+	 * nearest edge.  This is required by the trees in order to align the leaves
+	 * with the labels
+	 * @author rleach
+	 * @return the firstVisibleLabelOffset
+	 */
+	public int getFirstVisibleLabelOffset() {
+		return(firstVisibleLabelOffset);
+	}
+
+	/**
+	 * This sets the number of pixels the first label is offset from the
+	 * nearest edge.  This is required by the trees in order to align the leaves
+	 * with the labels
+	 * @author rleach
+	 * @param firstVisibleLabelOffset the firstVisibleLabelOffset to set
+	 */
+	public void setFirstVisibleLabelOffset(int firstVisibleLabelOffset) {
+		this.firstVisibleLabelOffset = firstVisibleLabelOffset;
+	}
+
+	/**
+	 * This provides the number of pixels the last label is offset from the
+	 * nearest edge.  This is required by the trees in order to align the leaves
+	 * with the labels
+	 * @author rleach
+	 * @return the lastVisibleLabelOffset
+	 */
+	public int getLastVisibleLabelOffset() {
+		return(lastVisibleLabelOffset);
+	}
+
+	/**
+	 * This sets the number of pixels the last label is offset from the
+	 * nearest edge.  This is required by the trees in order to align the leaves
+	 * with the labels
+	 * @author rleach
+	 * @param lastVisibleLabelOffset the lastVisibleLabelOffset to set
+	 */
+	public void setLastVisibleLabelOffset(int lastVisibleLabelOffset) {
+		this.lastVisibleLabelOffset = lastVisibleLabelOffset;
 	}
 }

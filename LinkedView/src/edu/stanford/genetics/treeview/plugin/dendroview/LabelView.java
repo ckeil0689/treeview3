@@ -918,6 +918,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		Color bgColor;
 		int minPortLabel           = getPrimaryHoverIndex();
 		int maxPortLabel           = getPrimaryHoverIndex();
+		int minPortLabelOffset     = 0;
+		int maxPortLabelOffset     = 0;
 		int hoverStyle             = Font.BOLD | style;
 
 		//See if the labels are going to be offset because they are near
@@ -975,8 +977,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				      "]",11);
 
 				int indexDiff = j - getPrimaryHoverIndex();
-				int yPos = hoverYPos + indexDiff *
-				           (size + SQUEEZE);
+				int yPos = hoverYPos + indexDiff * (size + SQUEEZE);
 				//Account for offsets from being near an edge
 				debug("edgeOffset: [" + edgeOffset + "]",3);
 				yPos -= edgeOffset;
@@ -984,12 +985,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					bgColor = drawLabelBackground(g,j,yPos - ascent);
 					if(yPos >= ascent){
 						minPortLabel = j;
+						minPortLabelOffset = yPos - ascent;
 						if(j != getPrimaryHoverIndex()) {
 							labelColor = labelPortColor;
 						}
 					}
 					g2d.setColor(labelColor);
 					if(j == getPrimaryHoverIndex()) {
+						//Just in case the hovered label is the right-most label
+						maxPortLabelOffset = getPrimaryViewportSize() - (yPos - ascent + size);
 						debug("Drawing " + getPaneType() +
 							" hover font BOLD [" + hoverStyle + "].",
 							5);
@@ -1066,14 +1070,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				      "]",11);
 
 				int indexDiff = j - getPrimaryHoverIndex();
-				int yPos = hoverYPos + indexDiff *
-				           (size + SQUEEZE);
+				int yPos = hoverYPos + indexDiff * (size + SQUEEZE);
 				debug("edgeOffset: [" + edgeOffset + "]",3);
 				yPos -= edgeOffset;
 				if(yPos < offscreenMatrixSize + ascent / 2) {
 					bgColor = drawLabelBackground(g,j,yPos - ascent);
 					if(yPos <= getPrimaryViewportSize()) {
 						maxPortLabel = j;
+						maxPortLabelOffset = getPrimaryViewportSize() - (yPos - ascent + size);
 						labelColor = labelPortColor;
 					}
 					g2d.setColor(labelColor);
@@ -1100,6 +1104,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Set the first and last visible label for the tree drawing positions
 		map.setFirstVisibleLabel(minPortLabel);
 		map.setLastVisibleLabel(maxPortLabel);
+		map.setFirstVisibleLabelOffset(minPortLabelOffset);
+		map.setLastVisibleLabelOffset(maxPortLabelOffset);
 
 		//Switch to the background color
 		g2d.setColor(textBGColor);
