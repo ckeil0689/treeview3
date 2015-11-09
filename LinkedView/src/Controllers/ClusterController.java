@@ -143,6 +143,9 @@ public class ClusterController {
 	 */
 	private class ClusterTask extends SwingWorker<Void, String> {
 
+		final int ROW_IDX = 0;
+		final int COL_IDX = 1;
+		
 		/* The finished reordered axes */
 		private String[] reorderedRows = new String[] {};
 		private String[] reorderedCols = new String[] {};
@@ -164,11 +167,11 @@ public class ClusterController {
 
 			setupClusterViewProgressBar();
 
-			/* Get fileName for saving calculated data */
+			// Get fileName for saving calculated data
 			fileName = tvModel.getSource().substring(0,
 					tvModel.getSource().length() - 4);
 
-			/* Initialize the clustering processor and pass the data */
+			// Initialize the clustering processor and pass the data
 			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
 					.getDataMatrix();
 			
@@ -183,38 +186,32 @@ public class ClusterController {
 						geneHeaderI, arrayHeaderI);
 			}
 
-			/* Set zeroes invalid if they should be ignored. */
+			// Set zeroes invalid if they should be ignored.
 			if (clusterView.isIgnoreZeroesChecked()) {
 				originalMatrix.setZeroesToMissing();
 			}
 
-			/* Row cluster */
-			if (isReady(rowSimilarity, ROW)) {
-				boolean shouldCluster = checkAxisCluster(
-						tvModel.getFileSet().getGtr(), tvModel.gidFound());
-				
-				if(shouldCluster) {
-					reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
-				}
+			final boolean isRowReady = isReady(rowSimilarity, ROW);
+			final boolean isColReady = isReady(colSimilarity, COL);
+			
+			boolean[] clusterCheck = clusterIsAffirmed(isRowReady, isColReady);
+			
+			if (clusterCheck[ROW_IDX]) {
+				reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
 			}
 
-			/* Check for cancellation in between axis clustering */
+			// Check for cancellation in between axis clustering
 			if (isCancelled()) {
 				reorderedRows = new String[] {};
 				reorderedCols = new String[] {};
 				return null;
 			}
-
-			/* Column cluster */
-			if (isReady(colSimilarity, COL)) {
-				boolean shouldCluster = checkAxisCluster(
-						tvModel.getFileSet().getAtr(), tvModel.aidFound());
-				
-				if(shouldCluster) {
-					reorderedCols = calculateAxis(colSimilarity, COL, fileName);
-				}
+			
+			if (clusterCheck[COL_IDX]) {
+				reorderedCols = calculateAxis(colSimilarity, COL, fileName);
 			}
 
+			// finished setting reordered axis labels
 			return null;
 		}
 
@@ -233,41 +230,106 @@ public class ClusterController {
 			}
 		}
 		
-		/** 
-		 * Checks if row axis is already clustered and if yes, ask user 
-		 * whether it should be clustered again. 
+		/**
+		 * Checks if axis was clustered using its tree file if available and 
+		 * the axis specific ID if available. 
+		 * If it neither is present, it will assume that the axis was NOT 
+		 * clustered.
+		 * @param treeFilePath Path of the axis tree file, if it exists.
+		 * @param treeFileSuffix Axis associated tree file suffix (GTR, ATR).
+		 * @param hasAxisID When loading a file, a check is performed for the
+		 * axis ID label (GID, AID). This can be queried from the TVModel.
+		 * @return Whether an axis is considered to have been clustered before.
 		 */
-		private boolean checkAxisCluster(final String treeFilePath, 
-				final boolean axisIDFound) {
+		private boolean wasAxisClustered(final String treeFilePath, 
+				final String treeFileSuffix, final boolean hasAxisID) {
 			
-			boolean hasRowTreeFile = tvModel.getFileSet().getGtr()
-					.equals(fileName + ".gtr");
-			boolean shouldCluster = true;
+			boolean hasTreeFile = false;
 			
-			if(axisIDFound && hasRowTreeFile) {
-				String message = "The row axis has been clustered before. "
-						+ "Would you like to cluster it again?";
-				final int choice = JOptionPane.showConfirmDialog(
-						clusterDialog, message);
-				
-				switch(choice) {
-				case JOptionPane.OK_OPTION:
-					shouldCluster = true;
-					break;
-				case JOptionPane.NO_OPTION:
-					shouldCluster = false;
-					break;
-					
-				case JOptionPane.CANCEL_OPTION:
-					shouldCluster = false;
-					cancelAll();
-					break;
-				default:
-					shouldCluster = true;
-				}
+			File f = new File(fileName + treeFileSuffix);
+			if(f.exists() && !f.isDirectory()) { 
+			    hasTreeFile = true;
 			}
 			
-			return shouldCluster;
+			return hasAxisID || hasTreeFile;
+		}
+		
+		
+		/** 
+		 * Determines if both axes should be clustered based on available info 
+		 * as well as user input.  
+		 * @param rowReady Whether all GUI input for row clustering allows for
+		 * the row axis to be clustered.
+		 * @param colReady Whether all GUI input for column clustering allows 
+		 * for the column axis to be clustered.
+		 * @return An array of 2 boolean values, each representing whether 
+		 * the respective axis should be clustered.
+		 */
+		private boolean[] clusterIsAffirmed(final boolean rowReady, 
+				final boolean colReady) {
+			
+			// default: depends on ready status
+			boolean[] clusterCheck = new boolean[] {rowReady, colReady};
+			
+			boolean wasRowAxisClustered = wasAxisClustered(
+					tvModel.getFileSet().getGtr(), ".gtr", tvModel.gidFound());
+			boolean wasColAxisClustered = wasAxisClustered(
+					tvModel.getFileSet().getAtr(), ".atr", tvModel.aidFound());
+			
+			String message = "Something happened :(";
+			if(!wasRowAxisClustered && !wasColAxisClustered) {
+				return clusterCheck;
+				
+			} else if(wasRowAxisClustered && wasColAxisClustered) {
+				message = "Both axes have been clustered before. "
+						+ "Would you like to cluster your selected axes again?";
+				
+				if(confirmChoice(message)) {
+					return clusterCheck;
+				}
+				
+			} else if(wasRowAxisClustered && !wasColAxisClustered) {
+				message = "The row axis has been clustered before. "
+						+ "Would you like to cluster the rows again?";
+				
+				clusterCheck[ROW_IDX]= confirmChoice(message);
+					
+			} else {
+				message = "The column axis has been clustered before. "
+						+ "Would you like to cluster the columns again?";
+				
+				clusterCheck[COL_IDX]= confirmChoice(message);
+			}
+			
+			return clusterCheck;
+		}
+		
+		/**
+		 * Opens a dialog to confirm user choice about clustering.
+		 * @param message The text to be displayed in the dialog (depending on
+		 * which axes have been clustered before).
+		 * @return Boolean confirming whether to cluster or not.
+		 */
+		private boolean confirmChoice(final String message) {
+			
+			boolean shouldProceed = false;
+			
+			final int choice = JOptionPane.showConfirmDialog(
+					clusterDialog, message);
+			
+			switch(choice) {
+			case JOptionPane.OK_OPTION:
+				shouldProceed = true;
+				break;
+			case JOptionPane.NO_OPTION: // both options the same
+			case JOptionPane.CANCEL_OPTION:
+				shouldProceed = false;
+				break;
+			default:
+				shouldProceed = true;
+			}
+			
+			return shouldProceed;
 		}
 		
 		/**
@@ -285,7 +347,6 @@ public class ClusterController {
 			 * Set maximum for JProgressBar before any clustering!
 			 */
 			if (rowSimilarity != 0) {
-
 				if (isHierarchical()) {
 					/* Check if should be ranked first or not. */
 					pBarMax += (rowSimilarity == 5) ? (3 * rows) : (2 * rows);
