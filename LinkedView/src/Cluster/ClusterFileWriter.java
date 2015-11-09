@@ -107,17 +107,21 @@ public class ClusterFileWriter {
 		if (start_s > 0
 				&& name.substring(start_s, end_s).equalsIgnoreCase(single_suff)) {
 			end = start_s;
+			
 		} else if (start_c > 0
 				&& name.substring(start_c, end_c).equalsIgnoreCase(
 						complete_suff)) {
 			end = start_c;
+			
 		} else if (start_a > 0
 				&& name.substring(start_a, end_a)
 						.equalsIgnoreCase(average_suff)) {
 			end = start_a;
+			
 		} else if (start_k > 0
 				&& name.substring(start_k, end_k).equalsIgnoreCase(kmeans_suff)) {
 			end = start_k;
+			
 		} else {
 			end = name.length();
 		}

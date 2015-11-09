@@ -312,7 +312,6 @@ public class ClusterProcessor {
 		@Override
 		public String[] doInBackground() {
 
-			/* Hierarchical */
 			if (hier) {
 				return doHierarchicalCluster();
 			}
@@ -339,7 +338,7 @@ public class ClusterProcessor {
 			final HierCluster clusterer = new HierCluster(linkMethod,
 					distMatrix, axis);
 
-			clusterer.setupFileWriter(axis, fileName);
+			clusterer.setupTreeFileWriter(axis, fileName);
 
 			/*
 			 * Continue process until distMatrix has a size of 1, This array
@@ -438,6 +437,7 @@ public class ClusterProcessor {
 		if (distTask != null) {
 			distTask.cancel(true);
 		}
+		
 		if (clusterTask != null) {
 			clusterTask.cancel(true);
 		}

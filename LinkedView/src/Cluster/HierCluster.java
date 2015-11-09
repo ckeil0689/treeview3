@@ -520,7 +520,7 @@ public class HierCluster {
 	 * problem with setting up the buffered writer since there wouldn't be a
 	 * filePath where the cluster data could be saved anyways.
 	 */
-	public void setupFileWriter(final int axis, String fileName) {
+	public void setupTreeFileWriter(final int axis, String fileName) {
 
 		this.treeWriter = new TreeFileWriter(axis, fileName, linkMethod);
 	}

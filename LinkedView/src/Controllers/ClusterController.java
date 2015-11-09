@@ -47,6 +47,9 @@ public class ClusterController {
 	/* Axes identifiers */
 	public final static int ROW = 1;
 	public final static int COL = 2;
+	
+	private final int ROW_IDX = 0;
+	private final int COL_IDX = 1;
 
 	private final DataModel tvModel;
 	private final TVController tvController;
@@ -55,6 +58,8 @@ public class ClusterController {
 
 	/* Delegates the clustering process */
 	private ClusterProcessor processor;
+	
+	private boolean[] overAllClusterStatus;
 
 	/* Initialize with defaults for error checking parameters */
 	private int rowSimilarity = DistMatrixCalculator.PEARSON_UN;
@@ -81,6 +86,7 @@ public class ClusterController {
 		this.tvController = controller;
 		this.tvModel = controller.getDataModel();
 		this.clusterView = dialog.getClusterView();
+		this.overAllClusterStatus = new boolean[]{false, false};
 
 		/* Create and add all view component listeners */
 		addAllListeners();
@@ -142,9 +148,6 @@ public class ClusterController {
 	 *
 	 */
 	private class ClusterTask extends SwingWorker<Void, String> {
-
-		final int ROW_IDX = 0;
-		final int COL_IDX = 1;
 		
 		/* The finished reordered axes */
 		private String[] reorderedRows = new String[] {};
@@ -192,7 +195,8 @@ public class ClusterController {
 			final boolean isRowReady = isReady(rowSimilarity, ROW);
 			final boolean isColReady = isReady(colSimilarity, COL);
 			
-			boolean[] clusterCheck = clusterIsAffirmed(isRowReady, isColReady);
+			boolean[] clusterCheck = reaffirmClusterChoice(isRowReady, 
+					isColReady);
 			
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], 
 					clusterCheck[COL_IDX]);
@@ -265,7 +269,7 @@ public class ClusterController {
 		 * @return An array of 2 boolean values, each representing whether 
 		 * the respective axis should be clustered.
 		 */
-		private boolean[] clusterIsAffirmed(final boolean rowReady, 
+		private boolean[] reaffirmClusterChoice(final boolean rowReady, 
 				final boolean colReady) {
 			
 			// default: depends on ready status
@@ -277,15 +281,13 @@ public class ClusterController {
 					tvModel.getFileSet().getAtr(), ".atr", tvModel.aidFound());
 			
 			String message = "Something happened :(";
-			if(!wasRowAxisClustered && !wasColAxisClustered) {
-				return clusterCheck;
-				
-			} else if(wasRowAxisClustered && wasColAxisClustered) {
+			if(wasRowAxisClustered && wasColAxisClustered) {
 				message = "Both axes have been clustered before. "
 						+ "Would you like to cluster your selected axes again?";
 				
-				if(confirmChoice(message)) {
-					return clusterCheck;
+				if(!confirmChoice(message)) {
+					clusterCheck[ROW_IDX] = false;
+					clusterCheck[COL_IDX] = false;
 				}
 				
 			} else if(wasRowAxisClustered && !wasColAxisClustered) {
@@ -294,12 +296,15 @@ public class ClusterController {
 				
 				clusterCheck[ROW_IDX]= confirmChoice(message);
 					
-			} else {
+			} else if(!wasRowAxisClustered && wasColAxisClustered){
 				message = "The column axis has been clustered before. "
 						+ "Would you like to cluster the columns again?";
 				
 				clusterCheck[COL_IDX]= confirmChoice(message);
 			}
+			
+			overAllClusterStatus[ROW_IDX] = rowReady || clusterCheck[ROW_IDX];
+			overAllClusterStatus[COL_IDX] = colReady || clusterCheck[COL_IDX];
 			
 			return clusterCheck;
 		}
@@ -500,6 +505,7 @@ public class ClusterController {
 		protected void done() {
 
 			if (!isCancelled()) {
+				checkTreeFileIntegrity();
 				ClusterView.setStatusText("Done!");
 				loadClusteredData(filePath);
 
@@ -507,6 +513,81 @@ public class ClusterController {
 				clusterView.setClustering(false);
 				LogBuffer.println("Clustering was cancelled.");
 			}
+		}
+		
+		/**
+		 * Makes sure that a tree file exists for an axis that is supposed to
+		 * be clustered. If not, it attempts to take one from a previous 
+		 * cluster and if that does not exist either it will consider an axis
+		 * as not clustered.
+		 */
+		private void checkTreeFileIntegrity() {
+	
+			LogBuffer.println("Checking tree files...");
+			
+			final String clusterFileSuffix = ".cdt";
+			final String rowTreeSuffix = ".gtr";
+			final String colTreeSuffix = ".atr";
+			
+			final int fileRootNameSize = filePath.length() 
+					- clusterFileSuffix.length();
+			final String newFileRoot = filePath.substring(0, fileRootNameSize);
+			
+			ensureTreeFile(fileName, newFileRoot, rowTreeSuffix, ROW_IDX);
+			ensureTreeFile(fileName, newFileRoot, colTreeSuffix, COL_IDX);
+		}
+		
+		/**
+		 * For a given axis, this ensures that it has its tree file in case
+		 * it is considered to be clustered. This is useful especially if
+		 * an axis was already clustered before so that the old tree file can
+		 * be carried over to the new FileSet.
+		 * @param oldFileRoot
+		 * @param newFileRoot
+		 * @param treeFileSuffix
+		 * @param axisIdx
+		 */
+		private void ensureTreeFile(final String oldFileRoot, 
+				final String newFileRoot, final String treeFileSuffix, 
+				final int axisIdx) { 
+			
+			String axis_id;
+			if(axisIdx == ROW_IDX) {
+				axis_id = "row";
+			} else {
+				axis_id = "column";
+			}
+			
+			if(overAllClusterStatus[axisIdx]) {
+				String newTreeFilePath = newFileRoot + treeFileSuffix;
+				String oldTreeFilePath = oldFileRoot + treeFileSuffix;
+				
+				if(!doesFileExist(newTreeFilePath)) {
+					LogBuffer.println("No file found for " + axis_id 
+							+ " trees.");
+					if(doesFileExist(oldTreeFilePath)) {
+						LogBuffer.println("But old " + axis_id 
+								+ " tree file was found!");
+					}
+				} else {
+					LogBuffer.println("Success! The " + axis_id 
+							+ " tree file was found.");
+				}
+			} else {
+				LogBuffer.println("The " + axis_id 
+						+ "s have not been clustered.");
+			}
+		}
+		
+		/**
+		 * Checks if a file at a given path exists or not.
+		 * @param filePath The complete file path which to check.
+		 * @return Whether the checked file exists or not.
+		 */
+		private boolean doesFileExist(final String filePath) {
+			
+			File f = new File(filePath);
+			return (f.exists() && !f.isDirectory());
 		}
 	}
 
