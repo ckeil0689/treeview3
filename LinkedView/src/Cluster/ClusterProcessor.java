@@ -98,7 +98,6 @@ public class ClusterProcessor {
 			return distTask.get();
 
 		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
 			LogBuffer.logException(e);
 			LogBuffer.println(e.getLocalizedMessage());
 			return new double[][] { { 0 }, { 0 } };

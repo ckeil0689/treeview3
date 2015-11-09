@@ -516,7 +516,7 @@ public class ClusterView {
 	 * @param text
 	 *            Text to be shown by the loading indicator label.
 	 */
-	public static void setLoadText(final String text) {
+	public static void setStatusText(final String text) {
 
 		loadLabel.setText(text);
 	}
