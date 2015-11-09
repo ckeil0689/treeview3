@@ -9,6 +9,8 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -46,8 +48,9 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 		addMouseMotionListener(this);
 		addKeyListener(this);
 
-		debug = 14;
+		debug = 15;
 		//14 = debug tree repaints linked to whizzing labels
+		//15 = debug tree hover highlighting
 	}
 
 	/**
@@ -114,6 +117,8 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 			treePainter.paint(g, xScaleEq, yScaleEq, destRect, selectedNode,
 					isLeft);
 
+			/* Repaint the hovered node */
+			repaintHoveredNode();
 		} else {
 			// System.out.println("didn't update buffer: valid =
 			// " + offscreenValid + " drawer = " + drawer);

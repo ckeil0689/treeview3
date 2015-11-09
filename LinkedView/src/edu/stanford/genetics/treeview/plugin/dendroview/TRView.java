@@ -234,6 +234,18 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 		repaint();
 	}
 
+	public void repaintHoveredNode() {
+		if(hoveredNode == null) {
+			return;
+		}
+
+		/* paint the hovered node and its children */
+		paintNode(hoveredNode, true);
+//
+//		synchMap();
+//		repaint();
+	}
+
 	/**
 	 * Paint a node and its children.
 	 *
