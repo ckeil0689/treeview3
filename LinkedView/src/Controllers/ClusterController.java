@@ -165,8 +165,6 @@ public class ClusterController {
 		@Override
 		protected Void doInBackground() throws Exception {
 
-			setupClusterViewProgressBar();
-
 			// Get fileName for saving calculated data
 			fileName = tvModel.getSource().substring(0,
 					tvModel.getSource().length() - 4);
@@ -195,6 +193,9 @@ public class ClusterController {
 			final boolean isColReady = isReady(colSimilarity, COL);
 			
 			boolean[] clusterCheck = clusterIsAffirmed(isRowReady, isColReady);
+			
+			setupClusterViewProgressBar(clusterCheck[ROW_IDX], 
+					clusterCheck[COL_IDX]);
 			
 			if (clusterCheck[ROW_IDX]) {
 				reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
@@ -225,7 +226,6 @@ public class ClusterController {
 				reorderedRows = new String[] {};
 				reorderedCols = new String[] {};
 				clusterView.setClustering(false);
-				LogBuffer.println("---------------------------------------");
 				LogBuffer.println("Clustering has been cancelled.");
 			}
 		}
@@ -321,8 +321,11 @@ public class ClusterController {
 			case JOptionPane.OK_OPTION:
 				shouldProceed = true;
 				break;
-			case JOptionPane.NO_OPTION: // both options the same
+			case JOptionPane.NO_OPTION:
+				shouldProceed = false;
+				break;
 			case JOptionPane.CANCEL_OPTION:
+				cancelAll();
 				shouldProceed = false;
 				break;
 			default:
@@ -338,7 +341,8 @@ public class ClusterController {
 		 * method calculates how much data has to be processed based on which 
 		 * axes are clustered as well as the number of labels on each axis.
 		 */
-		private void setupClusterViewProgressBar() {
+		private void setupClusterViewProgressBar(final boolean clusterRows, 
+				final boolean clusterCols) {
 			
 			final int rows = tvModel.getRowHeaderInfo().getNumHeaders();
 			final int cols = tvModel.getColumnHeaderInfo().getNumHeaders();
@@ -346,7 +350,7 @@ public class ClusterController {
 			/*
 			 * Set maximum for JProgressBar before any clustering!
 			 */
-			if (rowSimilarity != 0) {
+			if (clusterRows) {
 				if (isHierarchical()) {
 					/* Check if should be ranked first or not. */
 					pBarMax += (rowSimilarity == 5) ? (3 * rows) : (2 * rows);
@@ -362,7 +366,7 @@ public class ClusterController {
 				}
 			}
 
-			if (colSimilarity != 0) {
+			if (clusterCols) {
 				if (isHierarchical()) {
 					/* Check if should be ranked first or not. */
 					pBarMax += (colSimilarity == 5) ? (3 * cols) : (2 * cols);
@@ -533,6 +537,7 @@ public class ClusterController {
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], alert, "Alert",
 					JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + alert);
+			LogBuffer.println("File path: " + filePath);
 		}
 	}
 

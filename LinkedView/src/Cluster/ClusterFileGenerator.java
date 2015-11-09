@@ -183,7 +183,7 @@ public class ClusterFileGenerator {
 		cdtData_doubles = new double[reorderedRowIndices.length]
 				[reorderedColIndices.length];
 
-		if (isRowClustered) {
+		if (isRowClustered && orderedGIDs.length != 0) {
 			reorderedRowIndices = orderElements(rowNames, orderedGIDs, 
 					ROW_AXIS_ID);
 			
@@ -195,12 +195,12 @@ public class ClusterFileGenerator {
 			rowNamesOrdered = rowNames;
 		}
 
-		if (isColClustered) {
+		if (isColClustered && orderedAIDs.length != 0) {
 			reorderedColIndices = orderElements(colNames, orderedAIDs, 
 					COL_AXIS_ID);
 			
 		} else {
-			/* TODO change to use index from orderedAIDs instead */
+			/* old order simply remains */
 			for (int i = 0; i < reorderedColIndices.length; i++) {
 				reorderedColIndices[i] = i;
 			}
