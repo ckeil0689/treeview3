@@ -6,9 +6,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -574,12 +574,7 @@ public class ClusterController {
 					if(doesFileExist(oldTreeFilePath)) {
 						LogBuffer.println("But old " + axis_id 
 								+ " tree file was found!");
-						try {
-							transferFile(oldTreeFilePath, newTreeFilePath);
-							
-						} catch (IOException e) {
-							LogBuffer.logException(e);
-						}
+						copyFile(oldTreeFilePath, newTreeFilePath);
 					}
 				} else {
 					LogBuffer.println("Success! The " + axis_id 
@@ -595,31 +590,23 @@ public class ClusterController {
 		 * Copies an old file to a new one with the correct file name.
 		 * @param oldTreeFilePath The path of the file to be copied.
 		 * @param newTreeFilePath The path to which the old file will be copied.
-		 * @throws IOException 
 		 */
-		private void transferFile(final String oldTreeFilePath, 
-				final String newTreeFilePath) throws IOException {
+		private boolean copyFile(final String oldTreeFilePath, 
+				final String newTreeFilePath) {
 			
-			File oldFile = new File(oldTreeFilePath);
-			File newFile = new File(newTreeFilePath);
-			
-			if(!newFile.exists()) {
-				newFile.createNewFile();
-			}
-			
-			FileChannel source = null;
-		    FileChannel destination = null;
-
-		    source = new RandomAccessFile(oldFile, "rw").getChannel();
-		    destination = new RandomAccessFile(newFile, "rw").getChannel();
-
-		    long position = 0;
-		    long count = source.size();
-
-		    source.transferTo(position, count, destination);
-		     
-		    source.close();
-		    destination.close();
+			try(FileInputStream srcStream = 
+					new FileInputStream(oldTreeFilePath); 
+				FileOutputStream dstStream = 
+						new FileOutputStream(newTreeFilePath)) {
+				
+				dstStream.getChannel().transferFrom(srcStream.getChannel(), 
+						0, srcStream.getChannel().size());
+				return true;
+				
+			} catch (IOException e) {
+				LogBuffer.logException(e);
+				return false;
+			} 
 		}
 		
 		/**
