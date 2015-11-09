@@ -6,6 +6,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -525,6 +528,7 @@ public class ClusterController {
 	
 			LogBuffer.println("Checking tree files...");
 			
+			// those should really be handled centrally somewhere (final static)
 			final String clusterFileSuffix = ".cdt";
 			final String rowTreeSuffix = ".gtr";
 			final String colTreeSuffix = ".atr";
@@ -533,8 +537,10 @@ public class ClusterController {
 					- clusterFileSuffix.length();
 			final String newFileRoot = filePath.substring(0, fileRootNameSize);
 			
-			ensureTreeFile(fileName, newFileRoot, rowTreeSuffix, ROW_IDX);
-			ensureTreeFile(fileName, newFileRoot, colTreeSuffix, COL_IDX);
+			ensureTreeFilePresence(fileName, newFileRoot, rowTreeSuffix, 
+					ROW_IDX);
+			ensureTreeFilePresence(fileName, newFileRoot, colTreeSuffix, 
+					COL_IDX);
 		}
 		
 		/**
@@ -547,7 +553,7 @@ public class ClusterController {
 		 * @param treeFileSuffix
 		 * @param axisIdx
 		 */
-		private void ensureTreeFile(final String oldFileRoot, 
+		private void ensureTreeFilePresence(final String oldFileRoot, 
 				final String newFileRoot, final String treeFileSuffix, 
 				final int axisIdx) { 
 			
@@ -568,6 +574,12 @@ public class ClusterController {
 					if(doesFileExist(oldTreeFilePath)) {
 						LogBuffer.println("But old " + axis_id 
 								+ " tree file was found!");
+						try {
+							transferFile(oldTreeFilePath, newTreeFilePath);
+							
+						} catch (IOException e) {
+							LogBuffer.logException(e);
+						}
 					}
 				} else {
 					LogBuffer.println("Success! The " + axis_id 
@@ -577,6 +589,37 @@ public class ClusterController {
 				LogBuffer.println("The " + axis_id 
 						+ "s have not been clustered.");
 			}
+		}
+		
+		/**
+		 * Copies an old file to a new one with the correct file name.
+		 * @param oldTreeFilePath The path of the file to be copied.
+		 * @param newTreeFilePath The path to which the old file will be copied.
+		 * @throws IOException 
+		 */
+		private void transferFile(final String oldTreeFilePath, 
+				final String newTreeFilePath) throws IOException {
+			
+			File oldFile = new File(oldTreeFilePath);
+			File newFile = new File(newTreeFilePath);
+			
+			if(!newFile.exists()) {
+				newFile.createNewFile();
+			}
+			
+			FileChannel source = null;
+		    FileChannel destination = null;
+
+		    source = new RandomAccessFile(oldFile, "rw").getChannel();
+		    destination = new RandomAccessFile(newFile, "rw").getChannel();
+
+		    long position = 0;
+		    long count = source.size();
+
+		    source.transferTo(position, count, destination);
+		     
+		    source.close();
+		    destination.close();
 		}
 		
 		/**
