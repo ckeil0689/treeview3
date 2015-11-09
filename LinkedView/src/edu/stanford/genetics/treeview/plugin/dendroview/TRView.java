@@ -34,6 +34,8 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 	protected TreeDrawerNode hoveredNode = null;
 	protected Rectangle destRect = null;
 
+	//isLeft is true if the tree being drawn is for the rows (i.e. oriented to
+	//the left of the matrix)
 	protected boolean isLeft;
 
 	public TRView(final boolean isGeneTree) {
@@ -291,8 +293,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 							treeSelection.getMinIndex(),
 							treeSelection.getMaxIndex());
 					// If no candidate was found or the candidate is not an
-					// exact
-					// match
+					// exact match
 					if (cand == null
 							|| ((int) Math.round(cand.getMinIndex()) != treeSelection
 									.getMinIndex() || (int) Math.round(cand

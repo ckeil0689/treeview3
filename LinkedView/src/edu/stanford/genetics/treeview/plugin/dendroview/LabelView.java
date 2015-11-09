@@ -889,6 +889,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		} else {
 			debug("Label port NOT drawn",2);
 			drawLabelHint(g,g2d);
+
+			//Set the first & last visible label for the tree drawing positions
+			map.setFirstVisibleLabel(-1);
+			map.setLastVisibleLabel(-1);
 		}
 	}
 
@@ -1093,6 +1097,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			}
 		}
 
+		//Set the first and last visible label for the tree drawing positions
+		map.setFirstVisibleLabel(minPortLabel);
+		map.setLastVisibleLabel(maxPortLabel);
+
 		//Switch to the background color
 		g2d.setColor(textBGColor);
 
@@ -1187,6 +1195,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		final FontMetrics metrics  = getFontMetrics(g2d.getFont());
 		final int ascent           = metrics.getAscent();
 		int hoverStyle             = Font.BOLD | style;
+
+		//Set the first and last visible label for the tree drawing positions
+		map.setFirstVisibleLabel(start);
+		map.setLastVisibleLabel(end);
 
 		for(int j = start;j <= end;j++) {
 

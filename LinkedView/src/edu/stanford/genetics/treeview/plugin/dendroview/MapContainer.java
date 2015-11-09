@@ -66,6 +66,12 @@ public class MapContainer extends Observable implements Observer,
 	private int numVisible;
 	private int firstVisible;
 
+	//track the first and last visible labels (controlled by LabelView) so that
+	//it can be used in other classes (e.g. for matching the trees to the
+	//labels)
+	private int firstVisibleLabel = -1;
+	private int lastVisibleLabel  = -1;
+
 	//Track the explicitly manipulated visible labels. These can change as a
 	//result of a scroll in the label pane
 	private boolean overLabels            = false;
@@ -2288,5 +2294,49 @@ public class MapContainer extends Observable implements Observer,
 	public double getZoomIncrementFast() {
 		
 		return(ZOOM_INCREMENT_FAST);
+	}
+
+	/**
+	 * Set the first visible label data index.  For use by LabelView.
+	 * -1 = unset
+	 * @author rleach
+	 * @param p
+	 */
+	public void setFirstVisibleLabel(int p) {
+		if(p < getMinIndex() || p > getMaxIndex())
+			firstVisibleLabel = -1;
+		else
+			firstVisibleLabel = p;
+	}
+
+	/**
+	 * Retrieves the first visible label data index
+	 * @author rleach
+	 * @return firstVisiblelabel data index
+	 */
+	public int getFirstVisibleLabel() {
+		return(firstVisibleLabel);
+	}
+
+	/**
+	 * Set the last visible label data index.  For use by LabelView.
+	 * -1 = unset
+	 * @author rleach
+	 * @param p
+	 */
+	public void setLastVisibleLabel(int p) {
+		if(p < getMinIndex() || p > getMaxIndex())
+			lastVisibleLabel = -1;
+		else
+			lastVisibleLabel = p;
+	}
+
+	/**
+	 * Retrieves the last visible label data index
+	 * @author rleach
+	 * @return lastVisiblelabel data index
+	 */
+	public int getLastVisibleLabel() {
+		return(lastVisibleLabel);
 	}
 }
