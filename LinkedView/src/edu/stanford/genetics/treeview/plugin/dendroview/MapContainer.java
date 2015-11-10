@@ -83,6 +83,8 @@ public class MapContainer extends Observable implements Observer,
 	private boolean overDivider           = false;
 	private boolean draggingDivider       = false;
 	private boolean labelsBeingScrolled   = false;
+	private boolean lastTreeModeGlobal    = true;
+	private boolean keepTreeGlobal        = false;
 	private int     hoverPixel            = -1;
 	private int     hoverIndex            = -1;
 	private boolean hoverChanged          = false;
@@ -2397,6 +2399,38 @@ public class MapContainer extends Observable implements Observer,
 		this.lastVisibleLabelOffset = lastVisibleLabelOffset;
 	}
 
+
+	/**
+	 * @author rleach
+	 * @return the lastTreeModeGlobal
+	 */
+	public boolean wasLastTreeModeGlobal() {
+		return(lastTreeModeGlobal);
+	}
+
+	/**
+	 * @author rleach
+	 * @param lastTreeModeGlobal the lastTreeModeGlobal to set
+	 */
+	public void setLastTreeModeGlobal(boolean lastTreeModeGlobal) {
+		this.lastTreeModeGlobal = lastTreeModeGlobal;
+	}
+
+	/**
+	 * @author rleach
+	 * @return the keepTreeGlobal
+	 */
+	public boolean shouldKeepTreeGlobal() {
+		return(keepTreeGlobal);
+	}
+
+	/**
+	 * @author rleach
+	 * @param keepTreeGlobal the keepTreeGlobal to set
+	 */
+	public void setKeepTreeGlobal(boolean keepTreeGlobal) {
+		this.keepTreeGlobal = keepTreeGlobal;
+	}
 
 	public void debug(String msg, int level) {
 		

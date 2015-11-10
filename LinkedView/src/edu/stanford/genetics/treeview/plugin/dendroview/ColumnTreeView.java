@@ -96,6 +96,7 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 
 			//If we're in label port/whizzing label mode
 			if(map.isLabelAnimeRunning() && map.overALabelPortLinkedView() &&
+				!map.shouldKeepTreeGlobal() &&
 				map.getFirstVisibleLabel() > -1 &&
 				map.getLastVisibleLabel() > -1) {
 
@@ -121,6 +122,8 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 					destRect.x + map.getFirstVisibleLabelOffset(),
 					lastVisIndex + 1,
 					destRect.x + map.getFirstVisibleLabelOffset() + destRect.width);
+
+				map.setLastTreeModeGlobal(false);
 			} else {
 				/* calculate scaling */
 				destRect.setBounds(0, 0, map.getUsedPixels(), offscreenSize.height);
@@ -133,6 +136,8 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 					destRect.x,
 					lastVisIndex + 1,
 					destRect.x + destRect.width);
+
+				map.setLastTreeModeGlobal(true);
 			}
 
 			yScaleEq = new LinearTransformation(treePainter.getCorrMin(),
@@ -340,6 +345,9 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 		if (!isEnabled() || !enclosingWindow().isActive())
 			return;
 
+		if(map.wasLastTreeModeGlobal()) {
+			map.setKeepTreeGlobal(true);
+		}
 		map.setOverTree(true);
 	}
 
@@ -349,6 +357,7 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 		if (!isEnabled() || !enclosingWindow().isActive())
 			return;
 
+		map.setKeepTreeGlobal(false);
 		map.setOverTree(false);
 		setHoveredNode(null);
 	}
