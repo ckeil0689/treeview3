@@ -9,13 +9,12 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Observer;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -48,7 +47,7 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 		addMouseMotionListener(this);
 		addKeyListener(this);
 
-		debug = 16;
+		debug = 0;
 		//14 = debug tree repaints linked to whizzing labels
 		//15 = debug tree hover highlighting
 		//16 = debug tree alignment
@@ -96,7 +95,7 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 			int lastVisIndex;
 
 			//If we're in label port/whizzing label mode
-			if(map.isLabelAnimeRunning() &&
+			if(map.isLabelAnimeRunning() && map.overALabelPortLinkedView() &&
 				map.getFirstVisibleLabel() > -1 &&
 				map.getLastVisibleLabel() > -1) {
 

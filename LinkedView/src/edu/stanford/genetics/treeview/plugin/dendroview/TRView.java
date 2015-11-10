@@ -6,6 +6,7 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;

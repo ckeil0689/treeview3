@@ -91,7 +91,8 @@ public class MapContainer extends Observable implements Observer,
 	private boolean deselecting           = false;
 	private int     selectingStart        = -1;
 
-	boolean debug = false;
+	int debug = 0;
+	//1 = debug the state of the variables in overALabelPortLinkedView
 
 	public MapContainer(final String mapName) {
 
@@ -2106,7 +2107,17 @@ public class MapContainer extends Observable implements Observer,
 	//reference for all the classes in the view and is their only way to
 	//communicate with one another.
 	public boolean overALabelPortLinkedView() {
-		
+		debug("overALabelPortLinkedView: overLabels [" +
+			(overLabels ? "true" : "false") + "] overInteractiveMatrix [" +
+			(overInteractiveMatrix ? "true" : "false") +
+			"] overLabelsScrollbar [" +
+			(overLabelsScrollbar ? "true" : "false") +
+			"] labelsBeingScrolled [" +
+			(labelsBeingScrolled ? "true" : "false") +
+			"] selecting [" + (selecting ? "true" : "false") +
+			"] overTree [" + (overTree ? "true" : "false") + "] overDivider [" +
+			(overDivider ? "true" : "false") + "] draggingDivider [" +
+			(draggingDivider ? "true" : "false") + "]",1);
 		return(overLabels || overInteractiveMatrix || overLabelsScrollbar ||
 			labelsBeingScrolled || selecting || overTree || overDivider ||
 			draggingDivider);
@@ -2384,5 +2395,13 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setLastVisibleLabelOffset(int lastVisibleLabelOffset) {
 		this.lastVisibleLabelOffset = lastVisibleLabelOffset;
+	}
+
+
+	public void debug(String msg, int level) {
+		
+		if(level == debug) {
+			LogBuffer.println(msg);
+		}
 	}
 }
