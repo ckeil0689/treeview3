@@ -223,6 +223,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					overScrollLabelPortOffTimer.stop();
 					overScrollLabelPortOffTimer = null;
 				}
+				if(map.wasLastTreeModeGlobal() && map.shouldKeepTreeGlobal()) {
+					map.setKeepTreeGlobal(true);
+				}
 				setPrimaryHoverIndex(map.getMaxIndex());
 				map.setOverLabelsScrollbar(true);
 			}
@@ -250,6 +253,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				if(map.wasLastTreeModeGlobal() && map.shouldKeepTreeGlobal()) {
+					map.setKeepTreeGlobal(true);
+				}
 				map.setLabelsBeingScrolled(true);
 				debug("The mouse has clicked a row label scrollbar",2);
 				if(activeScrollLabelPortOffTimer != null) {
@@ -2612,6 +2618,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			/* Event came too soon, swallow it by resetting the timer.. */
 			paneLabelPortOffTimer.stop();
 			paneLabelPortOffTimer = null;
+		}
+		if(map.wasLastTreeModeGlobal() && map.shouldKeepTreeGlobal()) {
+			map.setKeepTreeGlobal(true);
 		}
 		map.setOverLabels(true);
 		super.mouseEntered(e);

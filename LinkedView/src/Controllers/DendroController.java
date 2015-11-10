@@ -302,6 +302,9 @@ Controller {
 			this.map = map;
 		}
 		public void mouseEntered(MouseEvent e) {
+			if(map.wasLastTreeModeGlobal() && map.shouldKeepTreeGlobal()) {
+				map.setKeepTreeGlobal(true);
+			}
 			map.setOverDivider(true);
 		}
 		public void mouseExited(MouseEvent e) {

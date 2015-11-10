@@ -372,7 +372,6 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 		if (!isEnabled() || !enclosingWindow().isActive())
 			return;
 
-		map.setKeepTreeGlobal(false);
 		map.setOverTree(false);
 		setHoveredNode(null);
 	}

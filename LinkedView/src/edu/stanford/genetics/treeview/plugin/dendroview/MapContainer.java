@@ -2443,6 +2443,10 @@ public class MapContainer extends Observable implements Observer,
 		this.keepTreeGlobal = keepTreeGlobal;
 	}
 
+	public boolean somethingIsDragging() {
+		return(selecting || labelsBeingScrolled || draggingDivider);
+	}
+
 	public void debug(String msg, int level) {
 		
 		if(level == debug) {
