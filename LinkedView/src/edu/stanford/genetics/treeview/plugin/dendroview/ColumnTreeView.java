@@ -146,7 +146,7 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 				xScaleEq = new LinearTransformation(
 					firstVisIndex,
 					destRect.x,
-					lastVisIndex + 1,
+					lastVisIndex,
 					destRect.x + destRect.width);
 
 				map.setLastTreeModeGlobal(true);
