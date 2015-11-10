@@ -756,12 +756,15 @@ public class MapContainer extends Observable implements Observer,
 	//Use this function to pick a pixel to zoom toward when zooming toward a
 	//selection
 	//Assumes that the full selection is visible on the screen
-	public int getZoomTowardPixelOfSelection(int pixelIndexOfSelec,int numPixelsOfSelec) {
+	public int getZoomTowardPixelOfSelection(int pixelIndexOfSelec,
+		int numPixelsOfSelec) {
+
 		int numPixelsOffsetOfSelec = pixelIndexOfSelec;
 		int numTotalPixels = getAvailablePixels();
 
 		//If any of the selected area is above/before the visible area
-		if(pixelIndexOfSelec < 0 && (pixelIndexOfSelec + numPixelsOfSelec) < numTotalPixels) {
+		if(pixelIndexOfSelec < 0 &&
+			(pixelIndexOfSelec + numPixelsOfSelec) < numTotalPixels) {
 			//If zooming out, return the furthest pixel, otherwise return the
 			//closest pixel
 			if(numPixelsOfSelec > numTotalPixels) {
@@ -770,8 +773,10 @@ public class MapContainer extends Observable implements Observer,
 			//LogBuffer.println("Returning Target pixel: [0].");
 			return(0);
 		}
-		//If any of the selected area is below/after the visible area, return the first pixel so that
-		else if((pixelIndexOfSelec + numPixelsOfSelec) > numTotalPixels && pixelIndexOfSelec > 0) {
+		//If any of the selected area is below/after the visible area, return
+		//the first pixel so that
+		else if((pixelIndexOfSelec + numPixelsOfSelec) > numTotalPixels &&
+			pixelIndexOfSelec > 0) {
 			//If zooming out, return the furthest pixel, otherwise return the
 			//closest pixel
 			if(numPixelsOfSelec > numTotalPixels) {
@@ -808,9 +813,12 @@ public class MapContainer extends Observable implements Observer,
 		//	numTotalPixels + " * " + numPixelsOffsetOfSelec + " / (" +
 		//	numPixelsOfSelec + " - " + numTotalPixels + ")");
 		
-		//The equation above actually has 2 solutions.  If the solution is negative, we just need to negate it, otherwise,
-		//the solution turns out to need a slight adjustment because it is on the outside of the selected area.
-		//I'm not sure why, but the difference with the offset just needs to be added to the offset.
+		//The equation above actually has 2 solutions.  If the solution is
+		//negative, we just need to negate it, otherwise, the solution turns out
+		//to need a slight adjustment because it is on the outside of the
+		//selected area.
+		//I'm not sure why, but the difference with the offset just needs to be
+		//added to the offset.
 		if(targetPixel < 0) {
 			//LogBuffer.println("Negating Target pixel: [" + targetPixel +"].");
 			targetPixel = Math.abs(targetPixel);
@@ -984,14 +992,16 @@ public class MapContainer extends Observable implements Observer,
 		
 		int cells = getNumVisible();
 		//If the targetZoomFrac is 1.0, return the remainder of this dimension
-		if((targetZoomFrac % 1) == 0 && ((int) Math.round(targetZoomFrac)) == 1) {
+		if((targetZoomFrac % 1) == 0 &&
+			((int) Math.round(targetZoomFrac)) == 1) {
 			return(getTotalTileNum() - cells);
 		}
 		int zoomVal = (int) Math.round(cells * targetZoomFrac);
 		//int numPixels = getAvailablePixels();
 
 		//If we're at the minimum zoom level, do not zoom in any more
-		if((cells == 1 && targetZoomFrac <= 1) || (targetZoomFrac % 1 == 0) && ((int) Math.round(targetZoomFrac)) == 0) {
+		if((cells == 1 && targetZoomFrac <= 1) || (targetZoomFrac % 1 == 0) &&
+			((int) Math.round(targetZoomFrac)) == 0) {
 			return(0);
 		}
 		if (zoomVal < 2) {
@@ -2036,7 +2046,7 @@ public class MapContainer extends Observable implements Observer,
 		this.labelsBeingScrolled = overLabels;
 		setChanged();
 		setHoverChanged();
-		notifyObservers(); // calls recalculateOverlay for IMV and GMV... shoudlnt
+		notifyObservers(); //calls recalculateOverlay for IMV & GMV... should'nt
 	}
 
 	/**
@@ -2136,7 +2146,8 @@ public class MapContainer extends Observable implements Observer,
 	/* This variable is used and managed from LabelView because running the
 	 * repaints on a timer is much smoother and snappier than via
 	 * notifyObservers */
-	private boolean labelAnimeRunning = false; // TODO only declare member variable before constructor.
+	//TODO only declare member variable before constructor.
+	private boolean labelAnimeRunning = false;
 	public void setLabelAnimeRunning(boolean state) {
 		
 		labelAnimeRunning = state;
@@ -2209,7 +2220,7 @@ public class MapContainer extends Observable implements Observer,
 	 * This is used to decide to not actually repaint because all that changed
 	 * is the hover position of the mouse - however, that DOES trigger a change
 	 * in the LabelView classes
-	 * TODO maybe setChanged & notify shouldn't be triggered on simple hovering...
+	 * TODO maybe setChanged & notify shouldn't be triggered on simple hovering
 	 * @return hoverChanged
 	 */
 	public boolean hoverChanged() {

@@ -14,7 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.Observer;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -109,24 +108,37 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 					map.getLastVisibleLabelOffset(),
 					offscreenSize.height);
 				
-				debug("pixels used [" + map.getUsedPixels() + "] left offset [" + map.getFirstVisibleLabelOffset() + "] right offset [" + map.getLastVisibleLabelOffset() + "]",16);
+				debug("pixels used [" + map.getUsedPixels() +
+					"] left offset [" + map.getFirstVisibleLabelOffset() +
+					"] right offset [" + map.getLastVisibleLabelOffset() + "]",
+					16);
 
 				firstVisIndex = map.getFirstVisibleLabel();
 				lastVisIndex  = map.getLastVisibleLabel();
 
-				debug("first visible label index [" + firstVisIndex + "] last visible label index [" + lastVisIndex + "]",16);
-				debug("destRect.x [" + destRect.x + "] map.getFirstVisibleLabelOffset() [" + map.getFirstVisibleLabelOffset() + "] destRect.width [" + destRect.width + "]",16);
+				debug("first visible label index [" + firstVisIndex +
+					"] last visible label index [" + lastVisIndex + "]",16);
+
+				debug("destRect.x [" + destRect.x +
+					"] map.getFirstVisibleLabelOffset() [" +
+					map.getFirstVisibleLabelOffset() + "] destRect.width [" +
+					destRect.width + "]",16);
 
 				xScaleEq = new LinearTransformation(
 					firstVisIndex,
 					destRect.x + map.getFirstVisibleLabelOffset(),
 					lastVisIndex + 1,
-					destRect.x + map.getFirstVisibleLabelOffset() + destRect.width);
+					destRect.x + map.getFirstVisibleLabelOffset() +
+					destRect.width);
 
 				map.setLastTreeModeGlobal(false);
 			} else {
 				/* calculate scaling */
-				destRect.setBounds(0, 0, map.getUsedPixels(), offscreenSize.height);
+				destRect.setBounds(
+					0,
+					0,
+					map.getUsedPixels(),
+					offscreenSize.height);
 
 				firstVisIndex = map.getIndex(destRect.x);
 				lastVisIndex  = map.getIndex(destRect.x + destRect.width);
@@ -221,11 +233,12 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 		//last hover index, and tell mapcontainer that the animation has stopped
 		if(!map.overALabelPortLinkedView()) {
 			if(repaintTimer != null && repaintTimer.isRunning()) {
-				debug("Not hovering over a label port linked view - stopping animation",9);
+				debug("Not hovering over a label port linked view - stopping " +
+					"animation",9);
 				repaintTimer.stop();
 				lastHoverIndex = -1;
-				//Disable the turnOffRepaintTimer if it is running, because we've
-				//already stopped repaints
+				//Disable the turnOffRepaintTimer if it is running, because
+				//we've already stopped repaints
 				if(slowDownRepaintTimer != null) {
 					slowDownRepaintTimer.stop();
 					slowDownRepaintTimer = null;
@@ -242,13 +255,14 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 				debug("Hovering across matrix - starting up animation",9);
 				repaintTimer.start();
 				lastHoverIndex = getPrimaryHoverIndex();
-				//Disable any slowDownRepaintTimer that might have been left over
+				//Disable any slowDownRepaintTimer that might've been left over
 				if(slowDownRepaintTimer != null) {
 					slowDownRepaintTimer.stop();
 					slowDownRepaintTimer = null;
 				}
 			} else {
-				debug("The repaint timer was in fact running even though map.isLabelAnimeRunning() said it wasn't.",9);
+				debug("The repaint timer was in fact running even though " +
+					"map.isLabelAnimeRunning() said it wasn't.",9);
 			}
 		}
 		//Else if the mouse hasn't moved, start the second timer to slow down
@@ -260,11 +274,13 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 				debug("Hovering on one spot [" + lastHoverIndex +
 				      "] - slowing animation",9);
 				if(slowDownRepaintTimer == null) {
-					slowDownRepaintTimer = new Timer(delay,slowDownRepaintListener);
+					slowDownRepaintTimer =
+						new Timer(delay,slowDownRepaintListener);
 					slowDownRepaintTimer.start();
 				}
 			} else {
-				debug("Animation already slowed down to [" + repaintTimer.getDelay() + "ms].",9);
+				debug("Animation already slowed down to [" +
+					repaintTimer.getDelay() + "ms].",9);
 			}
 		}
 		//Else, disable the slowDownRepaintTimer, update the hover index, and
@@ -336,7 +352,6 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 	@Override
 	public void mouseDragged(final MouseEvent e) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override

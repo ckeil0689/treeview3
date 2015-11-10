@@ -6,7 +6,6 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -284,7 +283,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 			if (treeSelection.getNSelectedIndexes() > 0) {
 				// This clause selects the array node if only a
 				// single array is selected.
-				if (treeSelection.getMinIndex() == treeSelection.getMaxIndex()) {
+				if(treeSelection.getMinIndex() == treeSelection.getMaxIndex()) {
 					cand = treePainter.getLeaf(treeSelection.getMinIndex());
 				}
 				// this clause selects the root node if all arrays are selected.
@@ -292,26 +291,26 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 						&& treeSelection.getMaxIndex() == map.getMaxIndex() &&
 						// All the intervening rows/cols are selected
 						(treeSelection.getMaxIndex()
-								- treeSelection.getMinIndex() + 1) == treeSelection
-								.getNSelectedIndexes()) {
+								- treeSelection.getMinIndex() + 1) ==
+								treeSelection.getNSelectedIndexes()) {
 					cand = treePainter.getRootNode();
 
 				} else if (treeSelection.getMinIndex() >= map.getMinIndex()
 						&& treeSelection.getMaxIndex() <= map.getMaxIndex() &&
 						// All the intervening rows/cols are selected
 						(treeSelection.getMaxIndex()
-								- treeSelection.getMinIndex() + 1) == treeSelection
-								.getNSelectedIndexes()) {
+								- treeSelection.getMinIndex() + 1) ==
+								treeSelection.getNSelectedIndexes()) {
 					cand = treePainter.getNearestNode(
 							treeSelection.getMinIndex(),
 							treeSelection.getMaxIndex());
 					// If no candidate was found or the candidate is not an
 					// exact match
 					if (cand == null
-							|| ((int) Math.round(cand.getMinIndex()) != treeSelection
-									.getMinIndex() || (int) Math.round(cand
-									.getMaxIndex()) != treeSelection
-									.getMaxIndex())) {
+							|| ((int) Math.round(cand.getMinIndex()) !=
+							treeSelection.getMinIndex() ||
+							(int) Math.round(cand.getMaxIndex()) !=
+							treeSelection.getMaxIndex())) {
 						oddSelection = true;
 					}
 				}
