@@ -72,7 +72,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		
 		destRect = new Rectangle();
 
-		debug = 17;
+		debug = 0;
 		//17 = debug whizzing tree mode
 
 //		panel.setLayout(new BorderLayout());
