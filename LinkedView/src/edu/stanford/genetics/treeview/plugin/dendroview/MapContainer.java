@@ -92,6 +92,7 @@ public class MapContainer extends Observable implements Observer,
 	private boolean toggling              = false;
 	private boolean deselecting           = false;
 	private int     selectingStart        = -1;
+	private boolean whizMode              = false;
 
 	int debug = 0;
 	//1 = debug the state of the variables in overALabelPortLinkedView
@@ -2445,6 +2446,22 @@ public class MapContainer extends Observable implements Observer,
 
 	public boolean somethingIsDragging() {
 		return(selecting || labelsBeingScrolled || draggingDivider);
+	}
+
+	/**
+	 * @author rleach
+	 * @return the whizMode
+	 */
+	public boolean isWhizMode() {
+		return(whizMode);
+	}
+
+	/**
+	 * @author rleach
+	 * @param whizMode the whizMode to set
+	 */
+	public void setWhizMode(boolean whizMode) {
+		this.whizMode = whizMode;
 	}
 
 	public void debug(String msg, int level) {

@@ -844,6 +844,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			int               offscreenMatrixSize =
 				map.getPixel(map.getMaxIndex() + 1) - 1 - map.getPixel(0);
 
+			map.setWhizMode(drawLabelPort);
 
 			//If the label pane's secondary dimension changed sizes or if the
 			//font size has changed
@@ -899,6 +900,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			//Set the first & last visible label for the tree drawing positions
 			map.setFirstVisibleLabel(-1);
 			map.setLastVisibleLabel(-1);
+			map.setWhizMode(false);
 		}
 	}
 

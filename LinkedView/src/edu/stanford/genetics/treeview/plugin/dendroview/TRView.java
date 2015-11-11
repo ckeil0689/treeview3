@@ -384,7 +384,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 
 			//If we're in label port/whizzing label mode
 			if(map.isLabelAnimeRunning() && map.overALabelPortLinkedView() &&
-				!map.shouldKeepTreeGlobal() &&
+				!map.shouldKeepTreeGlobal() && map.isWhizMode() &&
 				map.getFirstVisibleLabel() > -1 &&
 				map.getLastVisibleLabel() > -1) {
 
