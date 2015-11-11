@@ -72,6 +72,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		
 		destRect = new Rectangle();
 
+		debug = 17;
+		//17 = debug whizzing tree mode
+
 //		panel.setLayout(new BorderLayout());
 //		panel.add(this, BorderLayout.CENTER);
 	}
@@ -265,7 +268,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 
 		if (xScaleEq != null) {
 			treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-					destRect, node, isColored, isLeft);
+					destRect, node, isColored, isLeft, map.getHoverIndex());
 		}
 	}
 
@@ -385,6 +388,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 				map.getFirstVisibleLabel() > -1 &&
 				map.getLastVisibleLabel() > -1) {
 
+				debug("Whizzing Tree mode",17);
+
 				/* calculate scaling */
 				setWhizzingDestRectBounds();
 				
@@ -437,7 +442,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 
 			/* draw trees */
 			treePainter.paint(g, xScaleEq, yScaleEq, destRect, selectedNode,
-					isLeft);
+					isLeft, map.getHoverIndex());
 
 			/* Repaint the hovered node */
 			repaintHoveredNode();
@@ -464,6 +469,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 	protected abstract void setSecondaryScaleEq(final LinearTransformation
 		scaleEq);
 	protected abstract TreeDrawerNode getClosestNode(final MouseEvent e);
+	protected abstract int getPrimaryPixelIndex(final MouseEvent e);
 
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
@@ -555,9 +561,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		}
 
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, current, true, isLeft);
+				destRect, current, true, isLeft, map.getHoverIndex());
 		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, selectedNode, true, isLeft);
+				destRect, selectedNode, true, isLeft, map.getHoverIndex());
 
 		synchMap();
 		repaint();
@@ -572,9 +578,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		selectedNode = current.getRight();
 
 		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, current, false, isLeft);
+				destRect, current, false, isLeft, map.getHoverIndex());
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, current.getLeft(), false, isLeft);
+				destRect, current.getLeft(), false, isLeft,map.getHoverIndex());
 
 		synchMap();
 		repaint();
@@ -589,9 +595,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		selectedNode = current.getLeft();
 
 		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, current, false, isLeft);
+				destRect, current, false, isLeft, map.getHoverIndex());
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, current.getRight(), false, isLeft);
+				destRect, current.getRight(), false, isLeft,
+				map.getHoverIndex());
 
 		synchMap();
 		repaint();
@@ -798,6 +805,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 			return;
 
 		setHoveredNode(getClosestNode(e));
+		map.setHoverPixel(getPrimaryPixelIndex(e));
+		map.setHoverIndex(map.getIndex(getPrimaryPixelIndex(e)));
 	}
 
 	@Override

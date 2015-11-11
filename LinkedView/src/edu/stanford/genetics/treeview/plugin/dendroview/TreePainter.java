@@ -32,7 +32,8 @@ public class TreePainter extends TreeDrawer {
 	public void paint(final Graphics graphics,
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
-			final TreeDrawerNode selected, final boolean isLeft) {
+			final TreeDrawerNode selected, final boolean isLeft,
+			final int hoverIndex) {
 
 		if ((getRootNode() == null) || (getRootNode().isLeaf())) {
 			LogBuffer.println("Root node is null or leaf in paint() "
@@ -42,7 +43,7 @@ public class TreePainter extends TreeDrawer {
 			// recursively drawtree...
 			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
 					selected, dest);
-			nd.draw(getRootNode());
+			nd.draw(getRootNode(),hoverIndex);
 		}
 	}
 
@@ -51,7 +52,7 @@ public class TreePainter extends TreeDrawer {
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode root, final boolean isSelected,
-			final boolean isLeft) {
+			final boolean isLeft,final int hoverIndex) {
 
 		if ((root == null) || (root.isLeaf()) || (xScaleEq == null)
 				|| (yScaleEq == null))
@@ -62,14 +63,14 @@ public class TreePainter extends TreeDrawer {
 		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
 				null, dest);
 		nd.isSelected = isSelected;
-		nd.draw(root);
+		nd.draw(root,hoverIndex);
 	}
 
 	public void paintSubtree(final Graphics graphics,
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode root, final TreeDrawerNode selected,
-			final boolean isLeft) {
+			final boolean isLeft,final int hoverIndex) {
 
 		if ((root == null) || (root.isLeaf()))
 			return;
@@ -78,14 +79,14 @@ public class TreePainter extends TreeDrawer {
 		// recursively drawtree...
 		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
 				selected, dest);
-		nd.draw(root);
+		nd.draw(root,hoverIndex);
 	}
 
 	public void paintSingle(final Graphics graphics,
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode root, final boolean isSelected,
-			final boolean isLeft) {
+			final boolean isLeft, int hoverIndex) {
 
 		if ((root == null) || (root.isLeaf()))
 			return;
@@ -95,7 +96,7 @@ public class TreePainter extends TreeDrawer {
 				null, dest);
 		nd.isSelected = isSelected;
 		if (!root.isLeaf()) {
-			nd.drawSingle(root);
+			nd.drawSingle(root,hoverIndex);
 
 		} else {
 			LogBuffer.println("Root was leaf?");
@@ -162,7 +163,7 @@ public class TreePainter extends TreeDrawer {
 		/**
 		 * the draw method actually does the drawing
 		 */
-		public void draw(final TreeDrawerNode startNode) {
+		public void draw(final TreeDrawerNode startNode,final int hoverIndex) {
 
 			final Stack<TreeDrawerNode> remaining = new Stack<TreeDrawerNode>();
 			remaining.push(startNode);
@@ -206,7 +207,7 @@ public class TreePainter extends TreeDrawer {
 				}
 
 				// finally draw
-				drawSingle(node);
+				drawSingle(node,hoverIndex);
 			}
 		}
 
@@ -240,13 +241,128 @@ public class TreePainter extends TreeDrawer {
 		 * graphics.setColor(t); }
 		 */
 
-		private void drawSingle(final TreeDrawerNode node) {
-
-			final TreeDrawerNode left = node.getLeft();
-			final TreeDrawerNode right = node.getRight();
+		private void drawSingle(final TreeDrawerNode node,
+			final int hoverIndex) {
 
 			if (xT == null) {
 				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			if (node.getRight() == null) {
+				LogBuffer.println("right in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			// draw our (flipped) polyline...
+			if (isSelected) {
+				graphics.setColor(sel_color);
+
+			} else {
+				graphics.setColor(node.getColor());
+			}
+
+			drawLeftBranch(node,hoverIndex);
+			drawRightBranch(node,hoverIndex);
+
+			// graphics.setColor(t);
+		}
+
+		public void drawLeftBranch(final TreeDrawerNode node,
+			final int hoverIndex) {
+
+			final TreeDrawerNode left = node.getLeft();
+			final boolean hovered = (node.getLeft().getIndex() == hoverIndex);
+
+			if (xT == null) {
+				LogBuffer.println("xt in drawLeftBranch in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			if (left == null) {
+				LogBuffer.println("left in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			int lx = 0;
+			int tx = 0;
+
+			int ly = 0;
+			int ty = 0;
+
+			int c = 0;
+
+			// GTRView
+			if (isLeft) {
+				lx = (int) xT.transform(left.getCorr());
+				tx = (int) xT.transform(node.getCorr());
+
+				ly = (int) yT.transform(left.getIndex() + .5);
+				c = (int) yT.transform(node.getIndex() + .5);
+
+				// ATRView
+			} else {
+				ly = (int) yT.transform(left.getCorr());
+				ty = (int) yT.transform(node.getCorr());
+
+				lx = (int) xT.transform(left.getIndex() + .5);
+				c = (int) xT.transform(node.getIndex() + .5);
+				// int tx = (int) xT.transform(node.getIndex() + .5);
+			}
+
+			// draw our (flipped) polyline...
+			if (hovered) {
+				graphics.setColor(Color.red);
+			} else if (isSelected) {
+				graphics.setColor(sel_color);
+			} else {
+				graphics.setColor(node.getColor());
+			}
+
+			if (isLeft) {
+				graphics.drawPolyline(
+					new int[] {
+						tx,
+						tx,
+						lx
+					},
+					new int[] {
+						c,
+						ly,
+						ly
+					},
+					3);
+
+			} else {
+				graphics.drawPolyline(
+					new int[] {   //Basically, an 'n' is drawn right to left
+						//Horizontal coordinates
+						c,        //center
+						lx,       //left leaf corner
+						lx        //left leaf end
+					},
+					new int[] {   //Basically, an 'n' is drawn right to left
+						//Vertical coordinates
+						ty,       //center
+						ty,       //left leaf corner
+						ly        //left leaf end
+					},
+					3);
+			}
+		}
+
+		private void drawRightBranch(final TreeDrawerNode node,
+			final int hoverIndex) {
+
+			final TreeDrawerNode right = node.getRight();
+			final boolean hovered = (node.getRight().getIndex() == hoverIndex);
+
+			if (xT == null) {
+				LogBuffer.println("xt in drawRightBranch in InvertedTreeDrawer "
 						+ "was null.");
 				return;
 			}
@@ -258,35 +374,35 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			int rx = 0;
-			int lx = 0;
 			int tx = 0;
 
 			int ry = 0;
-			int ly = 0;
 			int ty = 0;
+
+			int c = 0;
 
 			// GTRView
 			if (isLeft) {
 				rx = (int) xT.transform(right.getCorr());
-				lx = (int) xT.transform(left.getCorr());
 				tx = (int) xT.transform(node.getCorr());
 
 				ry = (int) yT.transform(right.getIndex() + .5);
-				ly = (int) yT.transform(left.getIndex() + .5);
+				c = (int) yT.transform(node.getIndex() + .5);
 
 				// ATRView
 			} else {
 				ry = (int) yT.transform(right.getCorr());
-				ly = (int) yT.transform(left.getCorr());
 				ty = (int) yT.transform(node.getCorr());
 
 				rx = (int) xT.transform(right.getIndex() + .5);
-				lx = (int) xT.transform(left.getIndex() + .5);
+				c = (int) xT.transform(node.getIndex() + .5);
 				// int tx = (int) xT.transform(node.getIndex() + .5);
 			}
 
 			// draw our (flipped) polyline...
-			if (isSelected) {
+			if(hovered) {
+				graphics.setColor(Color.red);
+			} else if (isSelected) {
 				graphics.setColor(sel_color);
 
 			} else {
@@ -294,15 +410,35 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			if (isLeft) {
-				graphics.drawPolyline(new int[] { rx, tx, tx, lx }, new int[] {
-						ry, ry, ly, ly }, 4);
+				graphics.drawPolyline(
+					new int[] {
+						rx,
+						tx,
+						tx
+					},
+					new int[] {
+						ry,
+						ry,
+						c
+					},
+					3);
 
 			} else {
-				graphics.drawPolyline(new int[] { rx, rx, lx, lx }, new int[] {
-						ry, ty, ty, ly }, 4);
+				graphics.drawPolyline(
+					new int[] {   //Basically, an 'n' is drawn right to left
+						//Horizontal coordinates
+						rx,       //right leaf end
+						rx,       //right leaf corner
+						c         //center
+					},
+					new int[] {   //Basically, an 'n' is drawn right to left
+						//Vertical coordinates
+						ry,       //right leaf end
+						ty,       //right leaf corner
+						ty        //center
+					},
+					3);
 			}
-
-			// graphics.setColor(t);
 		}
 	}
 }

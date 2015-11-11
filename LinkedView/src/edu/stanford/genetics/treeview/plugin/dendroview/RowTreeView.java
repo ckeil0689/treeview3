@@ -156,4 +156,8 @@ public class RowTreeView extends TRView {
 			getXScaleEq().inverseTransform(e.getX()),
 			getXScaleEq().getSlope() / getYScaleEq().getSlope()));
 	}
+
+	protected int getPrimaryPixelIndex(final MouseEvent e) {
+		return(e.getY());
+	}
 }

@@ -167,4 +167,8 @@ public class ColumnTreeView extends TRView {
 			getYScaleEq().inverseTransform(e.getY()),
 			getYScaleEq().getSlope() / getXScaleEq().getSlope()));
 	}
+
+	protected int getPrimaryPixelIndex(final MouseEvent e) {
+		return(e.getX());
+	}
 }
