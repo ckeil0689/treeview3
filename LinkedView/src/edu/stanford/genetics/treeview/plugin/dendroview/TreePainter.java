@@ -266,8 +266,6 @@ public class TreePainter extends TreeDrawer {
 
 			drawLeftBranch(node,hoverIndex);
 			drawRightBranch(node,hoverIndex);
-
-			// graphics.setColor(t);
 		}
 
 		public void drawLeftBranch(final TreeDrawerNode node,
@@ -337,21 +335,82 @@ public class TreePainter extends TreeDrawer {
 					},
 					3);
 
+				if(hovered) {
+					graphics.drawPolyline(
+						new int[] {
+							//Horizontal coordinates
+							tx + 1,
+							tx + 1,
+							lx
+						},
+						new int[] {
+							//Vertical coordinates
+							c,
+							ly - 1,
+							ly - 1
+						},
+						3);
+					graphics.drawPolyline(
+						new int[] {
+							//Horizontal coordinates
+							tx - 1,
+							tx - 1,
+							lx
+						},
+						new int[] {
+							//Vertical coordinates
+							c,
+							ly + 1,
+							ly + 1
+						},
+						3);
+				}
 			} else {
 				graphics.drawPolyline(
-					new int[] {   //Basically, an 'n' is drawn right to left
+					new int[] {
 						//Horizontal coordinates
 						c,        //center
 						lx,       //left leaf corner
 						lx        //left leaf end
 					},
-					new int[] {   //Basically, an 'n' is drawn right to left
+					new int[] {
 						//Vertical coordinates
 						ty,       //center
 						ty,       //left leaf corner
 						ly        //left leaf end
 					},
 					3);
+
+				if(hovered) {
+					graphics.drawPolyline(
+						new int[] {
+							//Horizontal coordinates
+							c,            //center
+							lx - 1,       //left leaf corner
+							lx - 1        //left leaf end
+						},
+						new int[] {
+							//Vertical coordinates
+							ty + 1,       //center
+							ty + 1,       //left leaf corner
+							ly            //left leaf end
+						},
+						3);
+					graphics.drawPolyline(
+						new int[] {
+							//Horizontal coordinates
+							c,            //center
+							lx + 1,       //left leaf corner
+							lx + 1        //left leaf end
+						},
+						new int[] {
+							//Vertical coordinates
+							ty - 1,       //center
+							ty - 1,       //left leaf corner
+							ly            //left leaf end
+						},
+						3);
+				}
 			}
 		}
 
@@ -423,21 +482,84 @@ public class TreePainter extends TreeDrawer {
 					},
 					3);
 
+				//If this is the hovered leaf, make it bold
+				if(hovered) {
+					graphics.drawPolyline(
+						new int[] {
+							//Horizontal coordinates
+							rx,           //right leaf end
+							tx - 1,       //right leaf corner
+							tx - 1        //center
+						},
+						new int[] {
+							//Vertical coordinates
+							ry - 1,       //right leaf end
+							ry - 1,       //right leaf corner
+							c             //center
+						},
+						3);
+					graphics.drawPolyline(
+						new int[] {
+							//Horizontal coordinates
+							rx,           //right leaf end
+							tx + 1,       //right leaf corner
+							tx + 1        //center
+						},
+						new int[] {
+							//Vertical coordinates
+							ry + 1,       //right leaf end
+							ry + 1,       //right leaf corner
+							c             //center
+						},
+						3);
+				}
 			} else {
 				graphics.drawPolyline(
-					new int[] {   //Basically, an 'n' is drawn right to left
+					new int[] {
 						//Horizontal coordinates
 						rx,       //right leaf end
 						rx,       //right leaf corner
 						c         //center
 					},
-					new int[] {   //Basically, an 'n' is drawn right to left
+					new int[] {
 						//Vertical coordinates
 						ry,       //right leaf end
 						ty,       //right leaf corner
 						ty        //center
 					},
 					3);
+
+				//If this is the hovered leaf, make it bold
+				if(hovered) {
+					graphics.drawPolyline(
+						new int[] {
+							//Horizontal coordinates
+							rx - 1,       //right leaf end
+							rx - 1,       //right leaf corner
+							c             //center
+						},
+						new int[] {
+							//Vertical coordinates
+							ry,           //right leaf end
+							ty - 1,       //right leaf corner
+							ty - 1        //center
+						},
+						3);
+					graphics.drawPolyline(
+						new int[] {
+							//Horizontal coordinates
+							rx + 1,       //right leaf end
+							rx + 1,       //right leaf corner
+							c             //center
+						},
+						new int[] {
+							//Vertical coordinates
+							ry,           //right leaf end
+							ty + 1,       //right leaf corner
+							ty + 1        //center
+						},
+						3);
+				}
 			}
 		}
 	}

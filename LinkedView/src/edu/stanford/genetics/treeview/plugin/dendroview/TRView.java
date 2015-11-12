@@ -268,7 +268,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 
 		if (xScaleEq != null) {
 			treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-					destRect, node, isColored, isLeft, map.getHoverIndex());
+					destRect, node, isColored, isLeft, getPrimaryHoverIndex());
 		}
 	}
 
@@ -442,7 +442,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 
 			/* draw trees */
 			treePainter.paint(g, xScaleEq, yScaleEq, destRect, selectedNode,
-					isLeft, map.getHoverIndex());
+					isLeft, getPrimaryHoverIndex());
 
 			/* Repaint the hovered node */
 			repaintHoveredNode();
@@ -561,9 +561,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		}
 
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, current, true, isLeft, map.getHoverIndex());
+				destRect, current, true, isLeft, getPrimaryHoverIndex());
 		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, selectedNode, true, isLeft, map.getHoverIndex());
+				destRect, selectedNode, true, isLeft, getPrimaryHoverIndex());
 
 		synchMap();
 		repaint();
@@ -578,9 +578,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		selectedNode = current.getRight();
 
 		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, current, false, isLeft, map.getHoverIndex());
+				destRect, current, false, isLeft, getPrimaryHoverIndex());
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, current.getLeft(), false, isLeft,map.getHoverIndex());
+				destRect, current.getLeft(), false, isLeft,getPrimaryHoverIndex());
 
 		synchMap();
 		repaint();
@@ -595,10 +595,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		selectedNode = current.getLeft();
 
 		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, current, false, isLeft, map.getHoverIndex());
+				destRect, current, false, isLeft, getPrimaryHoverIndex());
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 				destRect, current.getRight(), false, isLeft,
-				map.getHoverIndex());
+				getPrimaryHoverIndex());
 
 		synchMap();
 		repaint();
