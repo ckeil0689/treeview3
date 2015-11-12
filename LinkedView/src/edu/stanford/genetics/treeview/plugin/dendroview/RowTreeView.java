@@ -159,8 +159,12 @@ public class RowTreeView extends TRView {
 
 	@Override
 	protected TreeDrawerNode getClosestParentNode(final MouseEvent e) {
-		return(treePainter.getClosestParent(treePainter.getLeaf(
-			getPrimaryHoverIndex()),getXScaleEq().inverseTransform(e.getX())));
+		int i = getPrimaryHoverIndex();
+		if(i < 0) {
+			return(null);
+		}
+		return(treePainter.getClosestParent(treePainter.getLeaf(i),
+			getXScaleEq().inverseTransform(e.getX())));
 	}
 
 	protected int getPrimaryPixelIndex(final MouseEvent e) {

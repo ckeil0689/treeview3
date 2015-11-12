@@ -461,7 +461,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 	public TreeDrawerNode getClosestParent(TreeDrawerNode leaf,
 		final double corr) {
 
-		if (rootNode == null) {
+		if (rootNode == null || leaf == null) {
 			return null;
 		}
 

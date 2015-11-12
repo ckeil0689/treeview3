@@ -181,8 +181,12 @@ public class ColumnTreeView extends TRView {
 	 */
 	@Override
 	protected TreeDrawerNode getClosestParentNode(final MouseEvent e) {
-		return(treePainter.getClosestParent(treePainter.getLeaf(
-			getPrimaryHoverIndex()),getYScaleEq().inverseTransform(e.getY())));
+		int i = getPrimaryHoverIndex();
+		if(i < 0) {
+			return(null);
+		}
+		return(treePainter.getClosestParent(treePainter.getLeaf(i),
+			getYScaleEq().inverseTransform(e.getY())));
 	}
 
 	protected int getPrimaryPixelIndex(final MouseEvent e) {
