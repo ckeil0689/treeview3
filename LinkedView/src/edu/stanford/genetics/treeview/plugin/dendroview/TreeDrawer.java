@@ -140,7 +140,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 
 	public TreeDrawerNode getLeaf(final int i) {
 
-		if (leafList != null) {
+		if (leafList != null && i > -1 && i < leafList.length) {
 			try {
 				return leafList[i];
 
