@@ -472,6 +472,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		scaleEq);
 	protected abstract TreeDrawerNode getClosestNode(final MouseEvent e);
 	protected abstract int getPrimaryPixelIndex(final MouseEvent e);
+	protected abstract TreeDrawerNode getClosestParentNode(final MouseEvent e);
 
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
@@ -793,7 +794,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 			return;
 
 		if (SwingUtilities.isLeftMouseButton(e)) {
-			setSelectedNode(getClosestNode(e));
+			setSelectedNode(getClosestParentNode(e));
 		} else {
 			treeSelection.deselectAllIndexes();
 			treeSelection.notifyObservers();
@@ -808,7 +809,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		if (treePainter == null)
 			return;
 
-		setHoveredNode(getClosestNode(e));
+		setHoveredNode(getClosestParentNode(e));
 		map.setHoverPixel(getPrimaryPixelIndex(e));
 		map.setHoverIndex(map.getIndex(getPrimaryPixelIndex(e)));
 	}

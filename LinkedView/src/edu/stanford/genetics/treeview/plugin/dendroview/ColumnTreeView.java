@@ -160,12 +160,29 @@ public class ColumnTreeView extends TRView {
 		setYScaleEq(scaleEq);
 	}
 
+	/**
+	 * This method gets the closest internal node "as the crow flies"
+	 * @param MouseEvent
+	 * @return TreeDrawerNode
+	 */
 	@Override
 	protected TreeDrawerNode getClosestNode(final MouseEvent e) {
 		return(treePainter.getClosest(
 			getXScaleEq().inverseTransform(e.getX()),
 			getYScaleEq().inverseTransform(e.getY()),
 			getYScaleEq().getSlope() / getXScaleEq().getSlope()));
+	}
+
+	/**
+	 * This method figures out the leaf at the current cursor position and
+	 * searches up the tree in a direct heirarchical line to find the parent
+	 * node which the cursor has just passed (before it reaches the next parent
+	 * node)
+	 */
+	@Override
+	protected TreeDrawerNode getClosestParentNode(final MouseEvent e) {
+		return(treePainter.getClosestParent(treePainter.getLeaf(
+			getPrimaryHoverIndex()),getYScaleEq().inverseTransform(e.getY())));
 	}
 
 	protected int getPrimaryPixelIndex(final MouseEvent e) {

@@ -269,6 +269,15 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			drawLeftBranch(node,hoverIndex);
+
+			if(isNodeHovered) {
+				graphics.setColor(Color.red);
+			} else if (isSelected) {
+				graphics.setColor(sel_color);
+			} else {
+				graphics.setColor(node.getColor());
+			}
+
 			drawRightBranch(node,hoverIndex);
 		}
 
@@ -339,19 +348,22 @@ public class TreePainter extends TreeDrawer {
 					},
 					3);
 
-				if(hovered) {
+				if(hovered || isSelected) {
+					if(!hovered) {
+						graphics.setColor(new Color(249,238,160));//yellow
+					}
 					graphics.drawPolyline(
 						new int[] {
 							//Horizontal coordinates
 							tx + 1,
 							tx + 1,
-							lx
+							lx - 2
 						},
 						new int[] {
 							//Vertical coordinates
 							c,
-							ly - 1,
-							ly - 1
+							ly + 1,
+							ly + 1
 						},
 						3);
 					graphics.drawPolyline(
@@ -359,13 +371,13 @@ public class TreePainter extends TreeDrawer {
 							//Horizontal coordinates
 							tx - 1,
 							tx - 1,
-							lx
+							lx - 2
 						},
 						new int[] {
 							//Vertical coordinates
 							c,
-							ly + 1,
-							ly + 1
+							ly - 1,
+							ly - 1
 						},
 						3);
 				}
@@ -385,21 +397,10 @@ public class TreePainter extends TreeDrawer {
 					},
 					3);
 
-				if(hovered) {
-					graphics.drawPolyline(
-						new int[] {
-							//Horizontal coordinates
-							c,            //center
-							lx - 1,       //left leaf corner
-							lx - 1        //left leaf end
-						},
-						new int[] {
-							//Vertical coordinates
-							ty + 1,       //center
-							ty + 1,       //left leaf corner
-							ly            //left leaf end
-						},
-						3);
+				if(hovered || isSelected) {
+					if(!hovered) {
+						graphics.setColor(new Color(249,238,160));//yellow
+					}
 					graphics.drawPolyline(
 						new int[] {
 							//Horizontal coordinates
@@ -409,9 +410,23 @@ public class TreePainter extends TreeDrawer {
 						},
 						new int[] {
 							//Vertical coordinates
+							ty + 1,       //center
+							ty + 1,       //left leaf corner
+							ly - 2        //left leaf end
+						},
+						3);
+					graphics.drawPolyline(
+						new int[] {
+							//Horizontal coordinates
+							c,            //center
+							lx - 1,       //left leaf corner
+							lx - 1        //left leaf end
+						},
+						new int[] {
+							//Vertical coordinates
 							ty - 1,       //center
 							ty - 1,       //left leaf corner
-							ly            //left leaf end
+							ly - 2        //left leaf end
 						},
 						3);
 				}
@@ -486,13 +501,16 @@ public class TreePainter extends TreeDrawer {
 					3);
 
 				//If this is the hovered leaf, make it bold
-				if(hovered) {
+				if(hovered || isSelected) {
+					if(!hovered) {
+						graphics.setColor(new Color(249,238,160));//yellow
+					}
 					graphics.drawPolyline(
 						new int[] {
 							//Horizontal coordinates
-							rx,           //right leaf end
-							tx - 1,       //right leaf corner
-							tx - 1        //center
+							rx - 2,       //right leaf end
+							tx + 1,       //right leaf corner
+							tx + 1        //center
 						},
 						new int[] {
 							//Vertical coordinates
@@ -504,9 +522,9 @@ public class TreePainter extends TreeDrawer {
 					graphics.drawPolyline(
 						new int[] {
 							//Horizontal coordinates
-							rx,           //right leaf end
-							tx + 1,       //right leaf corner
-							tx + 1        //center
+							rx - 2,       //right leaf end
+							tx - 1,       //right leaf corner
+							tx - 1        //center
 						},
 						new int[] {
 							//Vertical coordinates
@@ -533,21 +551,10 @@ public class TreePainter extends TreeDrawer {
 					3);
 
 				//If this is the hovered leaf, make it bold
-				if(hovered) {
-					graphics.drawPolyline(
-						new int[] {
-							//Horizontal coordinates
-							rx - 1,       //right leaf end
-							rx - 1,       //right leaf corner
-							c             //center
-						},
-						new int[] {
-							//Vertical coordinates
-							ry,           //right leaf end
-							ty - 1,       //right leaf corner
-							ty - 1        //center
-						},
-						3);
+				if(hovered || isSelected) {
+					if(!hovered) {
+						graphics.setColor(new Color(249,238,160));//yellow
+					}
 					graphics.drawPolyline(
 						new int[] {
 							//Horizontal coordinates
@@ -557,7 +564,21 @@ public class TreePainter extends TreeDrawer {
 						},
 						new int[] {
 							//Vertical coordinates
-							ry,           //right leaf end
+							ry - 2,       //right leaf end
+							ty - 1,       //right leaf corner
+							ty - 1        //center
+						},
+						3);
+					graphics.drawPolyline(
+						new int[] {
+							//Horizontal coordinates
+							rx - 1,       //right leaf end
+							rx - 1,       //right leaf corner
+							c             //center
+						},
+						new int[] {
+							//Vertical coordinates
+							ry - 2,       //right leaf end
 							ty + 1,       //right leaf corner
 							ty + 1        //center
 						},

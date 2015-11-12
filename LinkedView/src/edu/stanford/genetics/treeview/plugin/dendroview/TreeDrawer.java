@@ -458,6 +458,31 @@ abstract class TreeDrawer extends Observable implements Observer {
 		return rcf.find(rootNode);
 	}
 
+	public TreeDrawerNode getClosestParent(TreeDrawerNode leaf,
+		final double corr) {
+
+		if (rootNode == null) {
+			return null;
+		}
+
+		TreeDrawerNode previousNode = leaf;
+		TreeDrawerNode currentNode = leaf;
+
+		//Going to search up the tree from the leaf
+		while(currentNode != rootNode) {
+			currentNode = currentNode.getParent();
+			//If the relative correlation of the cursor position (corr) is
+			//greater than the correlation at the point where the parent node
+			//splits
+			LogBuffer.println("Searching for correlation [" + corr + "]. Comparing to parent [" + currentNode.getCorr() + "].");
+			if(currentNode.getCorr() < corr) {
+				return(previousNode);
+			}
+			previousNode = currentNode;
+		}
+		return(currentNode);
+	}
+
 	/**
 	 * Get node by Id returns null if no matching id
 	 */
