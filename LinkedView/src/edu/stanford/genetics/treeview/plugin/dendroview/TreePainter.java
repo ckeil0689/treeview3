@@ -43,7 +43,7 @@ public class TreePainter extends TreeDrawer {
 			// recursively drawtree...
 			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
 					selected, dest);
-			nd.draw(getRootNode(),hoverIndex);
+			nd.draw(getRootNode(),hoverIndex,false);
 		}
 	}
 
@@ -52,7 +52,8 @@ public class TreePainter extends TreeDrawer {
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode root, final boolean isSelected,
-			final boolean isLeft,final int hoverIndex) {
+			final boolean isLeft,final int hoverIndex,
+			final boolean isNodeHovered) {
 
 		if ((root == null) || (root.isLeaf()) || (xScaleEq == null)
 				|| (yScaleEq == null))
@@ -63,14 +64,15 @@ public class TreePainter extends TreeDrawer {
 		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
 				null, dest);
 		nd.isSelected = isSelected;
-		nd.draw(root,hoverIndex);
+		nd.draw(root,hoverIndex,isNodeHovered);
 	}
 
 	public void paintSubtree(final Graphics graphics,
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode root, final TreeDrawerNode selected,
-			final boolean isLeft,final int hoverIndex) {
+			final boolean isLeft,final int hoverIndex,
+			final boolean isNodeHovered) {
 
 		if ((root == null) || (root.isLeaf()))
 			return;
@@ -79,14 +81,14 @@ public class TreePainter extends TreeDrawer {
 		// recursively drawtree...
 		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
 				selected, dest);
-		nd.draw(root,hoverIndex);
+		nd.draw(root,hoverIndex,isNodeHovered);
 	}
 
 	public void paintSingle(final Graphics graphics,
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode root, final boolean isSelected,
-			final boolean isLeft, int hoverIndex) {
+			final boolean isLeft, int hoverIndex,final boolean isNodeHovered) {
 
 		if ((root == null) || (root.isLeaf()))
 			return;
@@ -96,7 +98,7 @@ public class TreePainter extends TreeDrawer {
 				null, dest);
 		nd.isSelected = isSelected;
 		if (!root.isLeaf()) {
-			nd.drawSingle(root,hoverIndex);
+			nd.drawSingle(root,hoverIndex,isNodeHovered);
 
 		} else {
 			LogBuffer.println("Root was leaf?");
@@ -163,7 +165,8 @@ public class TreePainter extends TreeDrawer {
 		/**
 		 * the draw method actually does the drawing
 		 */
-		public void draw(final TreeDrawerNode startNode,final int hoverIndex) {
+		public void draw(final TreeDrawerNode startNode,final int hoverIndex,
+			final boolean isNodeHovered) {
 
 			final Stack<TreeDrawerNode> remaining = new Stack<TreeDrawerNode>();
 			remaining.push(startNode);
@@ -207,7 +210,7 @@ public class TreePainter extends TreeDrawer {
 				}
 
 				// finally draw
-				drawSingle(node,hoverIndex);
+				drawSingle(node,hoverIndex,isNodeHovered);
 			}
 		}
 
@@ -242,7 +245,7 @@ public class TreePainter extends TreeDrawer {
 		 */
 
 		private void drawSingle(final TreeDrawerNode node,
-			final int hoverIndex) {
+			final int hoverIndex,final boolean isNodeHovered) {
 
 			if (xT == null) {
 				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
@@ -257,9 +260,10 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			// draw our (flipped) polyline...
-			if (isSelected) {
+			if(isNodeHovered) {
+				graphics.setColor(Color.red);
+			} else if (isSelected) {
 				graphics.setColor(sel_color);
-
 			} else {
 				graphics.setColor(node.getColor());
 			}
@@ -315,10 +319,10 @@ public class TreePainter extends TreeDrawer {
 			// draw our (flipped) polyline...
 			if (hovered) {
 				graphics.setColor(Color.red);
-			} else if (isSelected) {
-				graphics.setColor(sel_color);
-			} else {
-				graphics.setColor(node.getColor());
+//			} else if (isSelected) {
+//				graphics.setColor(sel_color);
+//			} else {
+//				graphics.setColor(node.getColor());
 			}
 
 			if (isLeft) {
@@ -461,11 +465,10 @@ public class TreePainter extends TreeDrawer {
 			// draw our (flipped) polyline...
 			if(hovered) {
 				graphics.setColor(Color.red);
-			} else if (isSelected) {
-				graphics.setColor(sel_color);
-
-			} else {
-				graphics.setColor(node.getColor());
+//			} else if (isSelected) {
+//				graphics.setColor(sel_color);
+//			} else {
+//				graphics.setColor(node.getColor());
 			}
 
 			if (isLeft) {
