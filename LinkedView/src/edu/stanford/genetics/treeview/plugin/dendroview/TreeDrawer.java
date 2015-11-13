@@ -465,7 +465,6 @@ abstract class TreeDrawer extends Observable implements Observer {
 			return null;
 		}
 
-		TreeDrawerNode previousNode = leaf;
 		TreeDrawerNode currentNode = leaf;
 
 		//Going to search up the tree from the leaf
@@ -474,11 +473,9 @@ abstract class TreeDrawer extends Observable implements Observer {
 			//If the relative correlation of the cursor position (corr) is
 			//greater than the correlation at the point where the parent node
 			//splits
-			LogBuffer.println("Searching for correlation [" + corr + "]. Comparing to parent [" + currentNode.getCorr() + "].");
 			if(currentNode.getCorr() < corr) {
-				return(previousNode);
+				return(currentNode);
 			}
-			previousNode = currentNode;
 		}
 		return(currentNode);
 	}
