@@ -157,6 +157,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 			treeSelection.notifyObservers();
 		}
 
+		if(hoveredNode != null) {
+			map.setHoverTreeMinIndex(
+				(int) hoveredNode.getLeftLeaf().getIndex());
+			map.setHoverTreeMaxIndex(
+				(int) hoveredNode.getRightLeaf().getIndex());
+		}
 		// if ((status != null) && hasMouse) {
 		// status.setMessages(getStatus());
 		// }
@@ -812,6 +818,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		setHoveredNode(getClosestParentNode(e));
 		map.setHoverPixel(getPrimaryPixelIndex(e));
 		map.setHoverIndex(map.getIndex(getPrimaryPixelIndex(e)));
+		synchMap();
 	}
 
 	@Override

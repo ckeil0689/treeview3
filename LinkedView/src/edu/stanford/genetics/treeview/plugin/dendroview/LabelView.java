@@ -186,7 +186,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		
 		scrollPane.setBorder(null);
 
-		debug = 0;
+		debug = 23;
 		//Debug modes:
 		//9  = debug repaint timer intervals and updates to label panels
 		//10 = Debug label drawing issues when split pane divider adjusted
@@ -208,6 +208,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//21 = Test whether the pixel index determined by 2 different methods is
 		//     the same
 		//22 = Debug the ChangeListener attached to the secondary scrollbar
+		//23 = Debug tree-hover label coloring
 
 		panel = scrollPane;
 
@@ -959,9 +960,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				}
 
 				/* Set label color */
-				if(j == getPrimaryHoverIndex()) {
+				if(j == getPrimaryHoverIndex() ||
+					(map.getHoverTreeMinIndex() > -1 &&
+						j >= map.getHoverTreeMinIndex() &&
+						j <= map.getHoverTreeMaxIndex())) {
 					labelColor = hoverTextFGColor;
+					debug("Label at index [" + j + "] is tree-hovered",23);
 				} else {
+					debug("Label at index [" + j + "] is NOT tree-hovered",23);
 					if(drawSelection.isIndexSelected(j)) {
 						labelColor = textFGColor;
 						if(colorIndex > 0) {
@@ -994,7 +1000,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					if(yPos >= ascent){
 						minPortLabel = j;
 						minPortLabelOffset = yPos - ascent;
-						if(j != getPrimaryHoverIndex()) {
+						if(j != getPrimaryHoverIndex() &&
+							(map.getHoverTreeMinIndex() == -1 ||
+								j < map.getHoverTreeMinIndex() ||
+								j > map.getHoverTreeMaxIndex())) {
 							labelColor = labelPortColor;
 						}
 					}
@@ -1054,7 +1063,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				}
 
 				/* Set label color */
-				if(drawSelection.isIndexSelected(j)) {
+				if(map.getHoverTreeMinIndex() > -1 &&
+					j >= map.getHoverTreeMinIndex() &&
+					j <= map.getHoverTreeMaxIndex()) {
+
+					labelColor = hoverTextFGColor;
+					debug("Label at index [" + j + "] is tree-hovered",23);
+				} else if(drawSelection.isIndexSelected(j)) {
+					debug("Label at index [" + j + "] is NOT tree-hovered",23);
 					if(colorIndex > 0) {
 						g.setColor(TreeColorer
 						           .getColor(headers[colorIndex]));
@@ -1067,6 +1083,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					}
 
 				} else {
+					debug("Label at index [" + j + "] is NOT tree-hovered",23);
 					labelColor = Color.black;
 				}
 
@@ -1086,7 +1103,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					if(yPos <= getPrimaryViewportSize()) {
 						maxPortLabel = j;
 						maxPortLabelOffset = getPrimaryViewportSize() - (yPos - ascent + size);
-						labelColor = labelPortColor;
+						if(map.getHoverTreeMinIndex() == -1 ||
+							j < map.getHoverTreeMinIndex() ||
+							j > map.getHoverTreeMaxIndex()) {
+							labelColor = labelPortColor;
+						}
 					}
 					g2d.setColor(labelColor);
 
@@ -1231,15 +1252,25 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				/* Set label color */
 				if((drawSelection.isIndexSelected(j) &&
 					doDrawLabelPort()) ||
-				   j == getPrimaryHoverIndex()) {
+				   j == getPrimaryHoverIndex() ||
+				   ((map.getHoverTreeMinIndex() > -1 &&
+						j >= map.getHoverTreeMinIndex() &&
+						j <= map.getHoverTreeMaxIndex()))) {
 					if(colorIndex > 0) {
 						g.setColor(TreeColorer
 						           .getColor(headers[colorIndex]));
 					}
 
-					if(j == getPrimaryHoverIndex()) {
+					if(j == getPrimaryHoverIndex() ||
+						(map.getHoverTreeMinIndex() > -1 &&
+							j >= map.getHoverTreeMinIndex() &&
+							j <= map.getHoverTreeMaxIndex())) {
 						g2d.setColor(hoverTextFGColor);
-						g2d.setFont(new Font(face,hoverStyle,size));
+						if(j == getPrimaryHoverIndex()) {
+							g2d.setFont(new Font(face,hoverStyle,size));
+						} else {
+							g2d.setFont(new Font(face,style,size));
+						}
 					} else {
 						g2d.setColor(fore);
 						g2d.setFont(new Font(face,style,size));

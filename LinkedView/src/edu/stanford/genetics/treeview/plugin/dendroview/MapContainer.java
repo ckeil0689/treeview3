@@ -87,6 +87,8 @@ public class MapContainer extends Observable implements Observer,
 	private boolean keepTreeGlobal        = false;
 	private int     hoverPixel            = -1;
 	private int     hoverIndex            = -1;
+	private int     hoverTreeMinIndex     = -1;
+	private int     hoverTreeMaxIndex     = -1;
 	private boolean hoverChanged          = false;
 	private boolean selecting             = false;
 	private boolean toggling              = false;
@@ -94,8 +96,9 @@ public class MapContainer extends Observable implements Observer,
 	private int     selectingStart        = -1;
 	private boolean whizMode              = false;
 
-	int debug = 0;
+	int debug = 18;
 	//1 = debug the state of the variables in overALabelPortLinkedView
+	//18 = debug tree hover highlighting of labels
 
 	public MapContainer(final String mapName) {
 
@@ -2064,6 +2067,8 @@ public class MapContainer extends Observable implements Observer,
 	public void setOverTree(boolean overTree) {
 		
 		this.overTree = overTree;
+		unsetHoverTreeMinIndex();
+		unsetHoverTreeMaxIndex();
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
@@ -2245,6 +2250,66 @@ public class MapContainer extends Observable implements Observer,
 	public void unsetHoverChanged() {
 		
 		hoverChanged = false;
+	}
+
+	/**
+	 * @author rleach
+	 * @return the hoverTreeMinIndex
+	 */
+	public int getHoverTreeMinIndex() {
+		return(hoverTreeMinIndex);
+	}
+
+	/**
+	 * @author rleach
+	 * @param hoverTreeMinIndex the hoverTreeMinIndex to set
+	 */
+	public void setHoverTreeMinIndex(int hoverTreeMinIndex) {
+		this.hoverTreeMinIndex = hoverTreeMinIndex;
+		debug("Setting new tree min index hover to [" + hoverTreeMinIndex + "].",18);
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @author rleach
+	 */
+	public void unsetHoverTreeMinIndex() {
+		this.hoverTreeMinIndex = -1;
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @author rleach
+	 * @return the hoverTreeMaxIndex
+	 */
+	public int getHoverTreeMaxIndex() {
+		return(hoverTreeMaxIndex);
+	}
+
+	/**
+	 * @author rleach
+	 * @param hoverTreeMaxIndex the hoverTreeMaxIndex to set
+	 */
+	public void setHoverTreeMaxIndex(int hoverTreeMaxIndex) {
+		this.hoverTreeMaxIndex = hoverTreeMaxIndex;
+		debug("Setting new tree max index hover to [" + hoverTreeMaxIndex + "].",18);
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @author rleach
+	 */
+	public void unsetHoverTreeMaxIndex() {
+		this.hoverTreeMaxIndex = -1;
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
 	}
 
 	/**
