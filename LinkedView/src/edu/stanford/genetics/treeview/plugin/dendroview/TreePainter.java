@@ -98,7 +98,7 @@ public class TreePainter extends TreeDrawer {
 				null, dest);
 		nd.isSelected = isSelected;
 		if (!root.isLeaf()) {
-			nd.drawSingle(root,hoverIndex,isNodeHovered);
+			nd.drawSingle(root,hoverIndex,isNodeHovered,false);
 
 		} else {
 			LogBuffer.println("Root was leaf?");
@@ -210,7 +210,7 @@ public class TreePainter extends TreeDrawer {
 				}
 
 				// finally draw
-				drawSingle(node,hoverIndex,isNodeHovered);
+				drawSingle(node,hoverIndex,isNodeHovered,(node == startNode));
 			}
 		}
 
@@ -245,7 +245,8 @@ public class TreePainter extends TreeDrawer {
 		 */
 
 		private void drawSingle(final TreeDrawerNode node,
-			final int hoverIndex,final boolean isNodeHovered) {
+			final int hoverIndex,final boolean isNodeHovered,
+			final boolean isTop) {
 
 			if (xT == null) {
 				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
@@ -272,13 +273,29 @@ public class TreePainter extends TreeDrawer {
 
 			if(isNodeHovered) {
 				graphics.setColor(Color.red);
-			} else if (isSelected) {
+			} else if(isSelected) {
 				graphics.setColor(sel_color);
 			} else {
 				graphics.setColor(node.getColor());
 			}
 
 			drawRightBranch(node,hoverIndex);
+
+			int x = 0;
+			int y = 0;
+
+			if(isLeft) {
+				x = (int) xT.transform(node.getCorr()) - 2;
+				y = (int) yT.transform(node.getIndex() + .5) - 2;
+			} else {
+				y = (int) yT.transform(node.getCorr()) - 2;
+				x = (int) xT.transform(node.getIndex() + .5) - 2;
+			}
+
+			//If this is the top selected/hovered node, draw a dot at its root
+			if((isTop && (isSelected || isNodeHovered)) || node == selected) {
+				graphics.fillRect(x,y,5,5);
+			}
 		}
 
 		public void drawLeftBranch(final TreeDrawerNode node,
@@ -326,15 +343,11 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			// draw our (flipped) polyline...
-			if (hovered) {
+			if(hovered) {
 				graphics.setColor(Color.red);
-//			} else if (isSelected) {
-//				graphics.setColor(sel_color);
-//			} else {
-//				graphics.setColor(node.getColor());
 			}
 
-			if (isLeft) {
+			if(isLeft) {
 				graphics.drawPolyline(
 					new int[] {
 						tx,
@@ -480,10 +493,6 @@ public class TreePainter extends TreeDrawer {
 			// draw our (flipped) polyline...
 			if(hovered) {
 				graphics.setColor(Color.red);
-//			} else if (isSelected) {
-//				graphics.setColor(sel_color);
-//			} else {
-//				graphics.setColor(node.getColor());
 			}
 
 			if (isLeft) {
