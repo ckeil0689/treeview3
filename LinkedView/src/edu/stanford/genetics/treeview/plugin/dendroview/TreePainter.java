@@ -263,7 +263,7 @@ public class TreePainter extends TreeDrawer {
 			// draw our (flipped) polyline...
 			if(isNodeHovered) {
 				graphics.setColor(Color.red);
-			} else if (isSelected) {
+			} else if(isSelected) {
 				graphics.setColor(sel_color);
 			} else {
 				graphics.setColor(node.getColor());
@@ -324,6 +324,8 @@ public class TreePainter extends TreeDrawer {
 
 			int c = 0;
 
+			int pointerBaseOffset = (left.isLeaf() ? 2 : 0);
+
 			// GTRView
 			if (isLeft) {
 				lx = (int) xT.transform(left.getCorr());
@@ -332,6 +334,9 @@ public class TreePainter extends TreeDrawer {
 				ly = (int) yT.transform(left.getIndex() + .5);
 				c = (int) yT.transform(node.getIndex() + .5);
 
+				if(Math.abs(lx - tx) < 3) {
+					pointerBaseOffset = 0;
+				}
 				// ATRView
 			} else {
 				ly = (int) yT.transform(left.getCorr());
@@ -340,6 +345,10 @@ public class TreePainter extends TreeDrawer {
 				lx = (int) xT.transform(left.getIndex() + .5);
 				c = (int) xT.transform(node.getIndex() + .5);
 				// int tx = (int) xT.transform(node.getIndex() + .5);
+
+				if(Math.abs(ly - ty) < 3) {
+					pointerBaseOffset = 0;
+				}
 			}
 
 			// draw our (flipped) polyline...
@@ -370,7 +379,7 @@ public class TreePainter extends TreeDrawer {
 							//Horizontal coordinates
 							tx + 1,
 							tx + 1,
-							lx - 2
+							lx - pointerBaseOffset
 						},
 						new int[] {
 							//Vertical coordinates
@@ -384,7 +393,7 @@ public class TreePainter extends TreeDrawer {
 							//Horizontal coordinates
 							tx - 1,
 							tx - 1,
-							lx - 2
+							lx - pointerBaseOffset
 						},
 						new int[] {
 							//Vertical coordinates
@@ -425,7 +434,7 @@ public class TreePainter extends TreeDrawer {
 							//Vertical coordinates
 							ty + 1,       //center
 							ty + 1,       //left leaf corner
-							ly - 2        //left leaf end
+							ly - pointerBaseOffset        //left leaf end
 						},
 						3);
 					graphics.drawPolyline(
@@ -439,7 +448,7 @@ public class TreePainter extends TreeDrawer {
 							//Vertical coordinates
 							ty - 1,       //center
 							ty - 1,       //left leaf corner
-							ly - 2        //left leaf end
+							ly - pointerBaseOffset        //left leaf end
 						},
 						3);
 				}
@@ -472,6 +481,8 @@ public class TreePainter extends TreeDrawer {
 
 			int c = 0;
 
+			int pointerBaseOffset = (right.isLeaf() ? 2 : 0);
+
 			// GTRView
 			if (isLeft) {
 				rx = (int) xT.transform(right.getCorr());
@@ -479,6 +490,10 @@ public class TreePainter extends TreeDrawer {
 
 				ry = (int) yT.transform(right.getIndex() + .5);
 				c = (int) yT.transform(node.getIndex() + .5);
+
+				if(Math.abs(rx - tx) < 3) {
+					pointerBaseOffset = 0;
+				}
 
 				// ATRView
 			} else {
@@ -488,6 +503,10 @@ public class TreePainter extends TreeDrawer {
 				rx = (int) xT.transform(right.getIndex() + .5);
 				c = (int) xT.transform(node.getIndex() + .5);
 				// int tx = (int) xT.transform(node.getIndex() + .5);
+
+				if(Math.abs(ry - ty) < 3) {
+					pointerBaseOffset = 0;
+				}
 			}
 
 			// draw our (flipped) polyline...
@@ -517,7 +536,7 @@ public class TreePainter extends TreeDrawer {
 					graphics.drawPolyline(
 						new int[] {
 							//Horizontal coordinates
-							rx - 2,       //right leaf end
+							rx - pointerBaseOffset,       //right leaf end
 							tx + 1,       //right leaf corner
 							tx + 1        //center
 						},
@@ -531,7 +550,7 @@ public class TreePainter extends TreeDrawer {
 					graphics.drawPolyline(
 						new int[] {
 							//Horizontal coordinates
-							rx - 2,       //right leaf end
+							rx - pointerBaseOffset,       //right leaf end
 							tx - 1,       //right leaf corner
 							tx - 1        //center
 						},
@@ -573,7 +592,7 @@ public class TreePainter extends TreeDrawer {
 						},
 						new int[] {
 							//Vertical coordinates
-							ry - 2,       //right leaf end
+							ry - pointerBaseOffset,       //right leaf end
 							ty - 1,       //right leaf corner
 							ty - 1        //center
 						},
@@ -587,7 +606,7 @@ public class TreePainter extends TreeDrawer {
 						},
 						new int[] {
 							//Vertical coordinates
-							ry - 2,       //right leaf end
+							ry - pointerBaseOffset,       //right leaf end
 							ty + 1,       //right leaf corner
 							ty + 1        //center
 						},
