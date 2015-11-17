@@ -8,6 +8,7 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -64,6 +65,21 @@ public class ColumnTreeView extends TRView {
 			0,
 			0,
 			getUsedWhizzingLength(),
+			getSecondaryPaneSize(offscreenSize));
+	}
+
+	@Override
+	protected void drawWhizBackground(final Graphics g) {
+		g.fillRect(getWhizzingDestRectStart(),0,getWhizzingDestRectLength(),
+			getSecondaryPaneSize(offscreenSize));
+	}
+
+	@Override
+	protected void drawFittedWhizBackground(final Graphics g,LinearTransformation scaleEq) {
+		if(map.getFirstVisibleLabel() < 0) {
+			return;
+		}
+		g.fillRect((int) scaleEq.transform((double) map.getFirstVisibleLabel()),0,(int) scaleEq.transform((double) map.getNumVisibleLabels()),
 			getSecondaryPaneSize(offscreenSize));
 	}
 
@@ -153,6 +169,11 @@ public class ColumnTreeView extends TRView {
 	@Override
 	protected void setPrimaryScaleEq(final LinearTransformation scaleEq) {
 		setXScaleEq(scaleEq);
+	}
+
+	@Override
+	protected LinearTransformation getPrimaryScaleEq() {
+		return(getXScaleEq());
 	}
 
 	@Override

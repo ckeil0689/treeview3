@@ -2433,6 +2433,18 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
+	 * Retrieves the last visible label data index
+	 * @author rleach
+	 * @return lastVisiblelabel data index
+	 */
+	public int getNumVisibleLabels() {
+		if(lastVisibleLabel < 0) {
+			return(-1);
+		}
+		return(lastVisibleLabel - firstVisibleLabel + 1);
+	}
+
+	/**
 	 * This provides the number of pixels the first label is offset from the
 	 * nearest edge.  This is required by the trees in order to align the leaves
 	 * with the labels

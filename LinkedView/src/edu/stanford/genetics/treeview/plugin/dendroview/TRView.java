@@ -20,6 +20,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
@@ -31,11 +32,13 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 
 	private static final long serialVersionUID = 1L;
 
+	private final Color whiz_color = GUIFactory.MAIN;
+	private final Color whiz_bg_color = new Color(215,234,251); //light pale blue
 	protected TreeSelectionI treeSelection;
 	protected HeaderSummary headerSummary;
 	protected LinearTransformation xScaleEq, yScaleEq;
 	protected MapContainer map;
-	
+
 	protected final JScrollPane scrollPane;
 
 	protected TreePainter treePainter = null;
@@ -386,7 +389,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 			/* clear the panel */
 			g.setColor(this.getBackground());
 			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-			g.setColor(Color.black);
 
 			int firstVisIndex;
 			int lastVisIndex;
@@ -396,6 +398,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 				!map.shouldKeepTreeGlobal() && map.isWhizMode() &&
 				map.getFirstVisibleLabel() > -1 &&
 				map.getLastVisibleLabel() > -1) {
+
+//				g.setColor(whiz_bg_color);
+//
+//				drawWhizBackground(g);
+
+				g.setColor(Color.black);
 
 				debug("Whizzing Tree mode",17);
 
@@ -428,6 +436,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 
 				map.setLastTreeModeGlobal(false);
 			} else {
+				g.setColor(whiz_bg_color);
+
+				drawFittedWhizBackground(g,getPrimaryScaleEq());
+
+				g.setColor(Color.black);
+
 				/* calculate scaling */
 				setFittedDestRectBounds();
 
@@ -476,11 +490,14 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 	protected abstract int  getSecondaryDestRectEnd();
 	protected abstract void setPrimaryScaleEq(final LinearTransformation
 		scaleEq);
+	protected abstract LinearTransformation getPrimaryScaleEq();
 	protected abstract void setSecondaryScaleEq(final LinearTransformation
 		scaleEq);
 	protected abstract TreeDrawerNode getClosestNode(final MouseEvent e);
 	protected abstract int getPrimaryPixelIndex(final MouseEvent e);
 	protected abstract TreeDrawerNode getClosestParentNode(final MouseEvent e);
+	protected abstract void drawWhizBackground(final Graphics g);
+	protected abstract void drawFittedWhizBackground(final Graphics g,LinearTransformation scaleEq);
 
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
@@ -492,6 +509,13 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 	public void adjustmentValueChanged(final AdjustmentEvent evt) {
 
 		repaint();
+	}
+
+	protected int getWhizzingDestRectLength() {
+		if(destRect == null) {
+			return(-1);
+		}
+		return(getWhizzingDestRectEnd() - getWhizzingDestRectStart() + 1);
 	}
 
 	/**
