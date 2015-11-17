@@ -84,7 +84,7 @@ public class MapContainer extends Observable implements Observer,
 	private boolean draggingDivider       = false;
 	private boolean labelsBeingScrolled   = false;
 	private boolean lastTreeModeGlobal    = true;
-	private boolean keepTreeGlobal        = false;
+	private boolean keepTreeGlobal        = true;
 	private int     hoverPixel            = -1;
 	private int     hoverIndex            = -1;
 	private int     hoverTreeMinIndex     = -1;

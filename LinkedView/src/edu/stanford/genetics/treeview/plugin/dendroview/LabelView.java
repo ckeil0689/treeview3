@@ -2652,9 +2652,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			paneLabelPortOffTimer.stop();
 			paneLabelPortOffTimer = null;
 		}
-		if(map.wasLastTreeModeGlobal() && map.shouldKeepTreeGlobal()) {
-			map.setKeepTreeGlobal(true);
-		}
+//		if(map.wasLastTreeModeGlobal() && map.shouldKeepTreeGlobal()) {
+//			map.setKeepTreeGlobal(true);
+//		} else {
+			map.setKeepTreeGlobal(false);
+//		}
 		map.setOverLabels(true);
 		super.mouseEntered(e);
 	}
@@ -2676,6 +2678,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				paneLabelPortOffTimer.start();
 			}
 		}
+
+		map.setKeepTreeGlobal(true);
 
 		map.unsetHoverPixel();
 		unsetPrimaryHoverIndex();

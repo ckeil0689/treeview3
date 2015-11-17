@@ -288,14 +288,14 @@ public class IMVMouseAdapter extends MouseAdapter {
 			this.turnOffLabelPortTimer = null;
 		}
 
-		//If the mouse has entered while not during a drag event and when we're
-		//forcing a global tree mode, turn off the maintenance of the global
-		//tree mode
-		if((xmap.shouldKeepTreeGlobal() || ymap.shouldKeepTreeGlobal()) &&
-			!xmap.somethingIsDragging() && !ymap.somethingIsDragging()) {
-			xmap.setKeepTreeGlobal(false);
-			ymap.setKeepTreeGlobal(false);
-		}
+//		//If the mouse has entered while not during a drag event and when we're
+//		//forcing a global tree mode, turn off the maintenance of the global
+//		//tree mode
+//		if((xmap.shouldKeepTreeGlobal() || ymap.shouldKeepTreeGlobal()) &&
+//			!xmap.somethingIsDragging() && !ymap.somethingIsDragging()) {
+//			xmap.setKeepTreeGlobal(true);
+//			ymap.setKeepTreeGlobal(true);
+//		}
 
 		xmap.setOverInteractiveMatrix(true);
 		ymap.setOverInteractiveMatrix(true);
