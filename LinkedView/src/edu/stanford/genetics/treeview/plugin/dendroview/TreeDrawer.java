@@ -440,7 +440,8 @@ abstract class TreeDrawer extends Observable implements Observer {
 	abstract public void paint(Graphics graphics,
 			LinearTransformation xScaleEq, LinearTransformation yScaleEq,
 			Rectangle dest, TreeDrawerNode selected, boolean isLeft,
-			int hoverIndex);
+			int hoverIndex,final int minVisLabelIndex,
+			final int maxVisLabelIndex);
 
 	/**
 	 * Get the closest node to the given (index, correlation) pair.

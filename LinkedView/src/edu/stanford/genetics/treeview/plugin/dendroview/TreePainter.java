@@ -33,7 +33,8 @@ public class TreePainter extends TreeDrawer {
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode selected, final boolean isLeft,
-			final int hoverIndex) {
+			final int hoverIndex,final int minVisLabelIndex,
+			final int maxVisLabelIndex) {
 
 		if ((getRootNode() == null) || (getRootNode().isLeaf())) {
 			LogBuffer.println("Root node is null or leaf in paint() "
@@ -43,7 +44,8 @@ public class TreePainter extends TreeDrawer {
 			// recursively drawtree...
 			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
 					selected, dest);
-			nd.draw(getRootNode(),hoverIndex,false);
+			nd.draw(getRootNode(),hoverIndex,false,minVisLabelIndex,
+				maxVisLabelIndex);
 		}
 	}
 
@@ -53,7 +55,8 @@ public class TreePainter extends TreeDrawer {
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode root, final boolean isSelected,
 			final boolean isLeft,final int hoverIndex,
-			final boolean isNodeHovered) {
+			final boolean isNodeHovered,final int minVisLabelIndex,
+			final int maxVisLabelIndex) {
 
 		if ((root == null) || (root.isLeaf()) || (xScaleEq == null)
 				|| (yScaleEq == null))
@@ -64,7 +67,8 @@ public class TreePainter extends TreeDrawer {
 		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
 				null, dest);
 		nd.isSelected = isSelected;
-		nd.draw(root,hoverIndex,isNodeHovered);
+		nd.draw(root,hoverIndex,isNodeHovered,minVisLabelIndex,
+			maxVisLabelIndex);
 	}
 
 	public void paintSubtree(final Graphics graphics,
@@ -72,7 +76,8 @@ public class TreePainter extends TreeDrawer {
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode root, final TreeDrawerNode selected,
 			final boolean isLeft,final int hoverIndex,
-			final boolean isNodeHovered) {
+			final boolean isNodeHovered,final int minVisLabelIndex,
+			final int maxVisLabelIndex) {
 
 		if ((root == null) || (root.isLeaf()))
 			return;
@@ -81,14 +86,16 @@ public class TreePainter extends TreeDrawer {
 		// recursively drawtree...
 		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
 				selected, dest);
-		nd.draw(root,hoverIndex,isNodeHovered);
+		nd.draw(root,hoverIndex,isNodeHovered,minVisLabelIndex,
+			maxVisLabelIndex);
 	}
 
 	public void paintSingle(final Graphics graphics,
 			final LinearTransformation xScaleEq,
 			final LinearTransformation yScaleEq, final Rectangle dest,
 			final TreeDrawerNode root, final boolean isSelected,
-			final boolean isLeft, int hoverIndex,final boolean isNodeHovered) {
+			final boolean isLeft, int hoverIndex,final boolean isNodeHovered,
+			final int minVisLabelIndex,final int maxVisLabelIndex) {
 
 		if ((root == null) || (root.isLeaf()))
 			return;
@@ -98,7 +105,8 @@ public class TreePainter extends TreeDrawer {
 				null, dest);
 		nd.isSelected = isSelected;
 		if (!root.isLeaf()) {
-			nd.drawSingle(root,hoverIndex,isNodeHovered,false);
+			nd.drawSingle(root,hoverIndex,isNodeHovered,false,minVisLabelIndex,
+				maxVisLabelIndex);
 
 		} else {
 			LogBuffer.println("Root was leaf?");
@@ -113,7 +121,7 @@ public class TreePainter extends TreeDrawer {
 	 */
 	class NodeDrawer {
 
-		private final Color sel_color = GUIFactory.MAIN;
+		private final Color whiz_color = GUIFactory.MAIN;
 		private final Graphics graphics;
 		private final TreeDrawerNode selected;
 		private final LinearTransformation xT, yT;
@@ -166,7 +174,8 @@ public class TreePainter extends TreeDrawer {
 		 * the draw method actually does the drawing
 		 */
 		public void draw(final TreeDrawerNode startNode,final int hoverIndex,
-			final boolean isNodeHovered) {
+			final boolean isNodeHovered,final int minVisLabelIndex,
+			final int maxVisLabelIndex) {
 
 			final Stack<TreeDrawerNode> remaining = new Stack<TreeDrawerNode>();
 			remaining.push(startNode);
@@ -210,7 +219,8 @@ public class TreePainter extends TreeDrawer {
 				}
 
 				// finally draw
-				drawSingle(node,hoverIndex,isNodeHovered,(node == startNode));
+				drawSingle(node,hoverIndex,isNodeHovered,(node == startNode),
+					minVisLabelIndex,maxVisLabelIndex);
 			}
 		}
 
@@ -236,7 +246,7 @@ public class TreePainter extends TreeDrawer {
 		 * graphics.drawOval(tx - 1,ty - 1,2,2);
 		 * 
 		 * //draw our (flipped) polyline... if (isSelected)
-		 * graphics.setColor(sel_color); else graphics.setColor(t);
+		 * graphics.setColor(whiz_color); else graphics.setColor(t);
 		 * 
 		 * graphics.drawPolyline(new int[] {rx, rx, lx, lx}, new int[] {ry, ty,
 		 * ty, ly}, 4); if (left.isLeaf() == false) draw(left); if
@@ -246,7 +256,8 @@ public class TreePainter extends TreeDrawer {
 
 		private void drawSingle(final TreeDrawerNode node,
 			final int hoverIndex,final boolean isNodeHovered,
-			final boolean isTop) {
+			final boolean isTop,final int minVisLabelIndex,
+			final int maxVisLabelIndex) {
 
 			if (xT == null) {
 				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
@@ -263,23 +274,21 @@ public class TreePainter extends TreeDrawer {
 			// draw our (flipped) polyline...
 			if(isNodeHovered) {
 				graphics.setColor(Color.red);
-			} else if(isSelected) {
-				graphics.setColor(sel_color);
 			} else {
 				graphics.setColor(node.getColor());
 			}
 
-			drawLeftBranch(node,hoverIndex);
+			drawLeftBranch(node,hoverIndex,minVisLabelIndex,maxVisLabelIndex,
+				isNodeHovered);
 
 			if(isNodeHovered) {
 				graphics.setColor(Color.red);
-			} else if(isSelected) {
-				graphics.setColor(sel_color);
 			} else {
 				graphics.setColor(node.getColor());
 			}
 
-			drawRightBranch(node,hoverIndex);
+			drawRightBranch(node,hoverIndex,minVisLabelIndex,maxVisLabelIndex,
+				isNodeHovered);
 
 			int x = 0;
 			int y = 0;
@@ -299,10 +308,23 @@ public class TreePainter extends TreeDrawer {
 		}
 
 		public void drawLeftBranch(final TreeDrawerNode node,
-			final int hoverIndex) {
+			final int hoverIndex,final int minVisLabelIndex,
+			final int maxVisLabelIndex,final boolean isHovered) {
 
 			final TreeDrawerNode left = node.getLeft();
 			final boolean hovered = (node.getLeft().getIndex() == hoverIndex);
+			final TreeDrawerNode leftLeaf = node.getLeftLeaf();
+			final TreeDrawerNode rightLeaf = node.getRightLeaf();
+			boolean allLabelsVisible = false;
+			boolean leftLabelVisible = false;
+			if((int) leftLeaf.getIndex() >= minVisLabelIndex &&
+				(int) rightLeaf.getIndex() <= maxVisLabelIndex) {
+				allLabelsVisible = true;
+			} else if(left.isLeaf() &&
+				(int) left.getIndex() >= minVisLabelIndex &&
+				(int) left.getIndex() <= maxVisLabelIndex) {
+				leftLabelVisible = true;
+			}
 
 			if (xT == null) {
 				LogBuffer.println("xt in drawLeftBranch in InvertedTreeDrawer "
@@ -352,8 +374,10 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			// draw our (flipped) polyline...
-			if(hovered) {
+			if(hovered || isHovered) {
 				graphics.setColor(Color.red);
+			} else if(allLabelsVisible || leftLabelVisible) {
+				graphics.setColor(whiz_color);
 			}
 
 			if(isLeft) {
@@ -456,10 +480,24 @@ public class TreePainter extends TreeDrawer {
 		}
 
 		private void drawRightBranch(final TreeDrawerNode node,
-			final int hoverIndex) {
+			final int hoverIndex,final int minVisLabelIndex,
+			final int maxVisLabelIndex,final boolean isHovered) {
 
 			final TreeDrawerNode right = node.getRight();
 			final boolean hovered = (node.getRight().getIndex() == hoverIndex);
+			final TreeDrawerNode leftLeaf = node.getLeftLeaf();
+			final TreeDrawerNode rightLeaf = node.getRightLeaf();
+			boolean allLabelsVisible  = false;
+			boolean rightLabelVisible = false;
+			if((int) leftLeaf.getIndex() >= minVisLabelIndex &&
+				(int) rightLeaf.getIndex() <= maxVisLabelIndex) {
+				allLabelsVisible  = true;
+				rightLabelVisible = true;
+			} else if(right.isLeaf() &&
+				(int) right.getIndex() >= minVisLabelIndex &&
+				(int) right.getIndex() <= maxVisLabelIndex) {
+				rightLabelVisible = true;
+			}
 
 			if (xT == null) {
 				LogBuffer.println("xt in drawRightBranch in InvertedTreeDrawer "
@@ -510,8 +548,10 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			// draw our (flipped) polyline...
-			if(hovered) {
+			if(hovered || isHovered) {
 				graphics.setColor(Color.red);
+			} else if(allLabelsVisible || rightLabelVisible) {
+				graphics.setColor(whiz_color);
 			}
 
 			if (isLeft) {
