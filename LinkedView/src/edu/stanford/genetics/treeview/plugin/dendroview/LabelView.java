@@ -186,7 +186,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		
 		scrollPane.setBorder(null);
 
-		debug = 23;
+		debug = 24;
 		//Debug modes:
 		//9  = debug repaint timer intervals and updates to label panels
 		//10 = Debug label drawing issues when split pane divider adjusted
@@ -209,6 +209,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//     the same
 		//22 = Debug the ChangeListener attached to the secondary scrollbar
 		//23 = Debug tree-hover label coloring
+		//24 = Debug the lightening of the non-label-port labels
 
 		panel = scrollPane;
 
@@ -1000,12 +1001,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					if(yPos >= ascent){
 						minPortLabel = j;
 						minPortLabelOffset = yPos - ascent;
-						if(j != getPrimaryHoverIndex() &&
-							(map.getHoverTreeMinIndex() == -1 ||
-								j < map.getHoverTreeMinIndex() ||
-								j > map.getHoverTreeMaxIndex())) {
-							labelColor = labelPortColor;
-						}
+//						if(j != getPrimaryHoverIndex() &&
+//							(map.getHoverTreeMinIndex() == -1 ||
+//								j < map.getHoverTreeMinIndex() ||
+//								j > map.getHoverTreeMaxIndex())) {
+//							labelColor = labelPortColor;
+//						}
+					} else if(indexDiff != 0) {
+						debug("Lightening edge-labels",24);
+						labelColor = lightenColor(labelColor);
 					}
 					g2d.setColor(labelColor);
 					if(j == getPrimaryHoverIndex()) {
@@ -1103,11 +1107,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					if(yPos <= getPrimaryViewportSize()) {
 						maxPortLabel = j;
 						maxPortLabelOffset = getPrimaryViewportSize() - (yPos - ascent + size);
-						if(map.getHoverTreeMinIndex() == -1 ||
-							j < map.getHoverTreeMinIndex() ||
-							j > map.getHoverTreeMaxIndex()) {
-							labelColor = labelPortColor;
-						}
+//						if(map.getHoverTreeMinIndex() == -1 ||
+//							j < map.getHoverTreeMinIndex() ||
+//							j > map.getHoverTreeMaxIndex()) {
+//							labelColor = labelPortColor;
+//						}
+					} else {
+						debug("Lightening edge-labels",24);
+						labelColor = lightenColor(labelColor);
 					}
 					g2d.setColor(labelColor);
 
@@ -1220,6 +1227,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				labelIndent,
 				getPrimaryPaneSize(offscreenSize));
 		}
+	}
+
+	/**
+	 * Lightens a color by simply making it transparent (with an arbitrary alpha
+	 * value)
+	 * @author rleach
+	 * @param aColor
+	 * @return newColor
+	 */
+	private Color lightenColor(final Color aColor) {
+		Color newColor = new Color(aColor.getRed(),aColor.getGreen(),
+			aColor.getBlue(),100);
+		return(newColor);
 	}
 
 	private void drawFittedLabels(final Graphics g,final Graphics2D g2d) {

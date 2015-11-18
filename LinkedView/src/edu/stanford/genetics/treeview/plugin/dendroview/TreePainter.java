@@ -121,7 +121,6 @@ public class TreePainter extends TreeDrawer {
 	 */
 	class NodeDrawer {
 
-		private final Color whiz_color = GUIFactory.MAIN;
 		private final Graphics graphics;
 		private final TreeDrawerNode selected;
 		private final LinearTransformation xT, yT;
