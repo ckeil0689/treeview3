@@ -75,11 +75,15 @@ public class ColumnTreeView extends TRView {
 	}
 
 	@Override
-	protected void drawFittedWhizBackground(final Graphics g,LinearTransformation scaleEq) {
+	protected void drawFittedWhizBackground(final Graphics g,
+		LinearTransformation scaleEq) {
+
 		if(map.getFirstVisibleLabel() < 0) {
 			return;
 		}
-		g.fillRect((int) scaleEq.transform((double) map.getFirstVisibleLabel()),0,(int) scaleEq.transform((double) map.getNumVisibleLabels()),
+		g.fillRect((int) scaleEq.transform((double) map.getFirstVisibleLabel()),
+			0,(int) scaleEq.transform((double) map.getFirstVisible() +
+				(double) map.getNumVisibleLabels()),
 			getSecondaryPaneSize(offscreenSize));
 	}
 

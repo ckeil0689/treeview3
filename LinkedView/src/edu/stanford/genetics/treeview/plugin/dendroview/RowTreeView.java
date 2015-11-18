@@ -76,12 +76,16 @@ public class RowTreeView extends TRView {
 	}
 
 	@Override
-	protected void drawFittedWhizBackground(final Graphics g,LinearTransformation scaleEq) {
+	protected void drawFittedWhizBackground(final Graphics g,
+		LinearTransformation scaleEq) {
+
 		if(map.getFirstVisibleLabel() < 0) {
 			return;
 		}
 		g.fillRect(0,(int) scaleEq.transform((double) map.getFirstVisibleLabel()),
-			getSecondaryPaneSize(offscreenSize),(int) scaleEq.transform((double) map.getNumVisibleLabels()));
+			getSecondaryPaneSize(offscreenSize),
+			(int) scaleEq.transform((double) map.getFirstVisible() +
+				(double) map.getNumVisibleLabels()));
 	}
 
 	@Override
