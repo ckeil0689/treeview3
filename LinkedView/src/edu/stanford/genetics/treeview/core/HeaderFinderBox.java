@@ -49,7 +49,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 /**
  * This class allows users to look for row or column elements by choosing them
  * in a drop down menu. The menu is populated with headers from the loaded data
- * matrix. The class is abstract and a basis for the defaultTextinderPanel class
+ * matrix. The class is abstract and a basis for the GeneFinderPanel class
  * as well as the ArrayFinderPanel class.
  *
  * It extends JPanel and can be used as a Swing component.
@@ -62,8 +62,10 @@ public abstract class HeaderFinderBox {
 	private HeaderInfo headerInfo;
 	private HeaderSummary headerSummary;
 
-	private List<String> searchDataList;
-	private String[] searchDataHeaders = { "" };
+	private String[][] searchDataList;
+	private int primarySearchIndex;
+	private int maxSearchIndex;
+	private boolean[] searchExclusions;
 	private WideComboBox searchTermBox;
 	private final String type;
 
@@ -233,6 +235,29 @@ public abstract class HeaderFinderBox {
 		}
 	}
 
+	public void updateSearchIndexes() {
+		if(searchDataList == null || searchDataList.length == 0) {
+			setEmptySearchTermBox();
+			primarySearchIndex = -1;
+			maxSearchIndex = -1;
+			return;
+		}
+
+		primarySearchIndex = headerSummary.getIncluded()[0];
+
+		//If the saved label index to use (e.g. GID, UID, NAME, etc.) does
+		//not exist among the headers in the file (which can be the case if
+		//you had a file open with a bunch of header labels and the last one
+		//was selected, and then you open a new file with fewer header
+		//labels), revert the saved index to 0
+		if(primarySearchIndex >= searchDataList[0].length) {
+			primarySearchIndex = 0;
+			headerSummary.setIncluded(new int[] { 0 });
+		}
+
+		maxSearchIndex = searchDataList[0].length - 1;
+	}
+
 	/**
 	 * Used for errors.
 	 */
@@ -253,24 +278,71 @@ public abstract class HeaderFinderBox {
 
 		defaultText = "Search " + type + "s...";
 
-		searchDataList = new ArrayList<String>();
-		searchDataHeaders = getHeaders(hA);
+		searchDataList    = copy2DStringArray(hA);
+		String[] searchDataHeaders = { "" };
+		updateSearchIndexes();
 
-		for (final String gene : searchDataHeaders) {
-
-			searchDataList.add(gene);
+		//Determine which label types to skip
+		searchExclusions = new boolean[maxSearchIndex + 1];
+		int numExclusions = 0;
+		for(int i = 0;i <= maxSearchIndex;i++) {
+			if(allStringsEqual(hA,i) && i != primarySearchIndex) {
+				searchExclusions[i] = true;
+				numExclusions++;
+				continue;
+			} else {
+				searchExclusions[i] = false;
+			}
 		}
 
-		final String[] labeledHeaders = new String[searchDataHeaders.length + 1];
+		int dropdownSize =
+			//Full number of all labels
+			(searchDataList.length * (maxSearchIndex + 1)) -
+			//Number of excluded labels
+			searchDataList.length * numExclusions +
+			//For the "Search rows..." default text
+			1;
+
+		final String[] labeledHeaders = new String[dropdownSize];
 
 		labeledHeaders[0] = defaultText;
 
-		Arrays.sort(searchDataHeaders);
+		int startIndex = 1;
 
-		System.arraycopy(searchDataHeaders, 0, labeledHeaders, 1,
-				searchDataHeaders.length);
+		for(int i = 0;i <= maxSearchIndex;i++) {
+			if(searchExclusions[i]) {
+				continue;
+			}
 
-		return labeledHeaders;
+			searchDataHeaders = getHeaders(hA,i);
+
+			Arrays.sort(searchDataHeaders);
+	
+			System.arraycopy(searchDataHeaders, 0, labeledHeaders, startIndex,
+					searchDataHeaders.length);
+
+			startIndex += searchDataHeaders.length;
+		}
+
+		//Returns an array of labels for use by the combobox's dropdown list
+		return(labeledHeaders);
+	}
+
+	/**
+	 * Determines whether all strings located at hA[*][i] are equal so that
+	 * label types which have no discerning search power do not waste space in
+	 * the combobox.
+	 * @author rleach
+	 * @param hA, i
+	 * @return boolean
+	 */
+	public boolean allStringsEqual(String[][] hA,int i) {
+		for(int j = 1;j < hA.length;j++) {
+			if(!hA[0][i].equals(hA[j][i])) {
+				return(false);
+			}
+		}
+		return(true);
 	}
 
 	/**
@@ -284,34 +356,53 @@ public abstract class HeaderFinderBox {
 	}
 
 	/**
-	 * Extracts the header infos into a String array, so the array can fill the
-	 * comboBox with values to choose from.
+	 * Copies a 2D array of strings for searching.
+	 * @param old
+	 * @return String[][]
+	 */
+	public String[][] copy2DStringArray(String[][] old) {
+		if(old == null || old[0] == null) {
+			return(old);
+		}
+		String[][] copy = new String[old.length][old[0].length];
+		for(int i=0; i<old.length; i++)
+			for(int j=0; j<old[i].length; j++)
+				copy[i][j]=old[i][j];
+		return(copy);
+	}
+
+	/**
+	 * Obtains the visible column/row labels.
 	 *
 	 * @param hA
 	 * @return
 	 */
 	public String[] getHeaders(final String[][] hA) {
+		return(getHeaders(hA,primarySearchIndex));
+	}
+
+	/**
+	 * Obtains all column/row labels.
+	 *
+	 * @param hA
+	 * @return
+	 */
+	public String[] getHeaders(final String[][] hA,int index) {
 
 		final String[] headerArray = new String[hA.length];
-		int idIndex = headerSummary.getIncluded()[0];
+		updateSearchIndexes();
 
-		//If the saved label index to use (e.g. GID, UID, NAME, etc.) does
-		//not exist among the headers in the file (which can be the case if
-		//you had a file open with a bunch of header labels and the last one
-		//was selected, and then you open a new file with fewer header
-		//labels), revert the saved index to 0
-		if(hA.length > 0 && idIndex >= hA[0].length) {
-			idIndex = 0;
-			headerSummary.setIncluded(new int[] { 0 });
+		if(hA.length == 0 || (index + 1) > hA[0].length) {
+			return(headerArray);
 		}
 
 		for (int i = 0; i < hA.length; i++) {
 
-			final String yorf = hA[i][idIndex];
+			final String yorf = hA[i][index];
 			headerArray[i] = yorf;
 		}
 
-		return headerArray;
+		return(headerArray);
 	}
 
 	/**
@@ -464,35 +555,62 @@ public abstract class HeaderFinderBox {
 
 	private List<Integer> findSelected() {
 
-		final List<Integer> indexList = new ArrayList<Integer>();
-		final List<Integer> substrList = new ArrayList<Integer>();
+		final List<Integer> primaryIndexList    = new ArrayList<Integer>();
+		final List<Integer> primarySubstrList   = new ArrayList<Integer>();
+		final List<Integer> secondaryIndexList  = new ArrayList<Integer>();
+		final List<Integer> secondarySubstrList = new ArrayList<Integer>();
 
 		final String sub = getSearchTerm();
 
 		String wildcardsub = sub;
-		if (!"*".equalsIgnoreCase(wildcardsub.substring(0, 1))) {
+		if(!"*".equalsIgnoreCase(wildcardsub.substring(0, 1))) {
 			wildcardsub = "*" + wildcardsub;
 		}
-		if ("*".equals(wildcardsub.substring((wildcardsub.length() - 1),
-				wildcardsub.length()))) {
+		if("*".equals(wildcardsub.substring((wildcardsub.length() - 1),
+			wildcardsub.length()))) {
+
 			wildcardsub = wildcardsub + "*";
 		}
 
-		for(int i = 0; i < searchDataList.size();i++) {
-
-			final String header = searchDataList.get(i);
+		for(int i = 0; i < searchDataList.length;i++) {
+			String header = searchDataList[i][primarySearchIndex];
 			if(wildCardMatch(header, sub)) {
-				indexList.add(i);
+				primaryIndexList.add(i);
 			}
 			if(wildCardMatch(header, wildcardsub)) {
-				substrList.add(i);
+				primarySubstrList.add(i);
+			}
+
+			//This searches secondary labels (those not visible)
+			for(int j = 0; j <= maxSearchIndex;j++) {
+				if(j == primarySearchIndex || searchExclusions[j]) {
+					continue;
+				}
+				header = searchDataList[i][j];
+				if(wildCardMatch(header, sub)) {
+					secondaryIndexList.add(i);
+					break;
+				}
+				if(wildCardMatch(header, wildcardsub)) {
+					secondarySubstrList.add(i);
+					break;
+				}
 			}
 		}
 
-		if(indexList.size() > 0) {
-			return indexList;
+		//Only returns a perfect match in the visible label type if a match
+		//exists.  If not, it steps through: substring matches in the visible
+		//label type, perfect matches to labels that are not visible, and
+		//substring matches to labels that are not visible
+		if(primaryIndexList.size() > 0) {
+			return(primaryIndexList);
+		} else if(primarySubstrList.size() > 0) {
+			return(primarySubstrList);
+		} else if(secondaryIndexList.size() > 0) {
+			return(secondaryIndexList);
+		} else {
+			return(secondarySubstrList);
 		}
-		return (substrList);
 	}
 
 	/**
