@@ -173,6 +173,23 @@ public class ReorderedTreeSelection extends Observable implements
 	}
 
 	@Override
+	public void selectAddedIndexRange(int min, int max) {
+
+		while((reorderedIndex[min] == -1) && (min < reorderedIndex.length)) {
+			min++;
+		}
+
+		while((reorderedIndex[max] == -1) && (max > 0)) {
+			max--;
+		}
+
+		if((max >= 0) && (min <= reorderedIndex.length)) {
+			parent.selectAddedIndexRange(reorderedIndex[min],
+				reorderedIndex[max]);
+		}
+	}
+
+	@Override
 	public int getNSelectedIndexes() {
 
 		return parent.getNSelectedIndexes();
