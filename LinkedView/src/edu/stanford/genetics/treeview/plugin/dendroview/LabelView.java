@@ -1848,6 +1848,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					toggleSelectRange(map.getSelectingStart(),
 					                  hDI);
 				} else if(e.isAltDown()) {
+					debug("Toggling selection of index range [" +
+						map.getSelectingStart() +
+						"] to [" + hDI + "]",23);
 					deSelectRange(map.getSelectingStart(),
 						hDI);
 				} else {
