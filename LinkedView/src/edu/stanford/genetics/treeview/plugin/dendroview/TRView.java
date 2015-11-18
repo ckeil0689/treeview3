@@ -436,9 +436,14 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 
 				map.setLastTreeModeGlobal(false);
 			} else {
-				g.setColor(whiz_bg_color);
+				//If we are looking at a global/data-linked tree with whizzing
+				//labels
+				if(map.isWhizMode()) {
 
-				drawFittedWhizBackground(g,getPrimaryScaleEq());
+					g.setColor(whiz_bg_color);
+
+					drawFittedWhizBackground(g,getPrimaryScaleEq());
+				}
 
 				g.setColor(Color.black);
 
