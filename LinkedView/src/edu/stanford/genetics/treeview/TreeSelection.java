@@ -217,7 +217,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	public void selectIndexRange(int min, int max) {
 
 		LogBuffer.println("Selection Min: " + min + " Max: " + max);
-		
+
 		deselectAllIndexes();
 		
 		if (min > max) {
@@ -229,6 +229,25 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 		for (int i = min; i <= max; i++) {
 
 			integerSelection.set(i, true);
+		}
+	}
+
+	/**
+	 * Selects a range of indexes. Indexes do not need to be sorted min/max.
+	 * @param min
+	 * @param max
+	 */
+	@Override
+	public void selectAddedIndexRange(int min, int max) {
+
+		if(min > max) {
+			final int swap = min;
+			min = max;
+			max = swap;
+		}
+
+		for(int i = min;i <= max;i++) {
+			integerSelection.set(i,true);
 		}
 	}
 

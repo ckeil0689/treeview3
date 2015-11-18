@@ -90,14 +90,24 @@ public interface TreeSelectionI {
 	public abstract int getNumIndexes();
 
 	/**
+	 * Deselects existing selection and selects a range of indexes.
+	 *
+	 * @param min
+	 *            the minimum index to select
+	 * @param max
+	 *            the maximum index to select
+	 */
+	public abstract void selectIndexRange(int min, int max);
+
+	/**
 	 * Selects a range of indexes.
 	 *
 	 * @param min
-	 *            the minimum gene to select
+	 *            the minimum index to select
 	 * @param max
-	 *            the maximum gene to select
+	 *            the maximum index to select
 	 */
-	public abstract void selectIndexRange(int min, int max);
+	public abstract void selectAddedIndexRange(int min, int max);
 
 	/**
 	 * @return The number of selected indexes.
