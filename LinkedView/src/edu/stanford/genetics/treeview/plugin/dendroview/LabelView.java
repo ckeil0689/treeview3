@@ -1842,12 +1842,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					drawSelection.selectAddedIndexRange(map.getSelectingStart(),
 						hDI);
 				} else if(e.isMetaDown()) {
-					toggleSelectRange(map.getSelectingStart(),
-					                  hDI);
-				} else if(e.isAltDown()) {
 					debug("Toggling selection of index range [" +
 						map.getSelectingStart() +
 						"] to [" + hDI + "]",23);
+					toggleSelectRange(map.getSelectingStart(),
+					                  hDI);
+				} else if(e.isAltDown()) {
 					deSelectRange(map.getSelectingStart(),
 						hDI);
 				} else {
@@ -1860,7 +1860,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					drawSelection.selectIndexRange(map.getSelectingStart(),
 					                               hDI);
 				}
-			} else {
+			} else if(!e.isAltDown()) {
 				//Assumes there is no selection at all & selects what was
 				//dragged over
 				otherSelection.selectAllIndexes();
