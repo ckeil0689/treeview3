@@ -77,7 +77,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 	@Override
 	public void mouseMoved(final MouseEvent e) {
-					
+
 		/* TODO passing index makes the most sense but an overloaded method 
 		 * that takes a pixel works well too. 
 		 * Reduces clutter in calling classes a little bit.
@@ -298,9 +298,13 @@ public class IMVMouseAdapter extends MouseAdapter {
 		if (!imView.enclosingWindow().isActive()) {
 			return;
 		}
-		
-		imView.setHasMouse(true);
-		imView.requestFocus();
+
+		//Commented the following out because clicking in a search box and then
+		//moving the cursor away before typing was making the focus go away.
+		//The user should explicitly use tab or a click to change focus before
+		//navigating with the keyboard.
+//		imView.setHasMouse(true);
+//		imView.requestFocus();
 	}
 
 	@Override

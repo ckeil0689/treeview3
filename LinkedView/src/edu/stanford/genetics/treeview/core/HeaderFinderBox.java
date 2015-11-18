@@ -73,7 +73,7 @@ public abstract class HeaderFinderBox {
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
 
-	private static final Color FOUNDCOLOR    = Color.BLACK;
+	private static final Color FOUNDCOLOR    = Color.WHITE;
 	private static final Color NOTFOUNDCOLOR = Color.RED;
 
 	//Handle into the other search box in order to have a single search box be
@@ -328,33 +328,61 @@ public abstract class HeaderFinderBox {
 		searchSelection.deselectAllIndexes();
 
 		//If the companion box has anything in it, perform that search first so
-		//that the search in the focussed finder box will work as originally
+		//that the search in the focused finder box will work as originally
 		//designed (as a search that respects existing search results in the
 		//companion box)
 		if(companionBox.isSearchTermEntered()) {
-			companionBox.seekAllHelper();
+			companionBox.updateSearchTextColor(companionBox.seekAllHelper());
 
 			if(otherSelection.getNSelectedIndexes() > 0 &&
 				isSearchTermEntered()) {
 
 				gotSomething = this.seekAllHelper();
-
-				//If there were no results from this search, deselect the
-				//companion's search results
-				if(searchSelection.getNSelectedIndexes() == 0) {
-					otherSelection.deselectAllIndexes();
+				updateSearchTextColor(gotSomething);
+				
+				//If this search box produced no results, default to the results
+				//from the other search box
+				if(!gotSomething) {
+					companionBox.seekAllHelper();
 				}
+
+				//Commented this out because the red background's prominence is
+				//good enough to indicate that there's a problem, therefore
+				//highlighting the good results from the other search box should
+				//not be a problem.
+//				//If there were no results from this search, deselect the
+//				//companion's search results
+//				if(searchSelection.getNSelectedIndexes() == 0) {
+//					otherSelection.deselectAllIndexes();
+//				}
+			} else {
+				if(isSearchTermEntered()) {
+					gotSomething = this.seekAllHelper();
+				} else {
+					//The search box is empty, so there's no reason for it to
+					//possibly remain red from a previously failed search.
+					gotSomething = true;
+				}
+				updateSearchTextColor(gotSomething);
 			}
 		} else {
+			//The companion search box is empty, so there's no reason for it to
+			//possibly remain red from a previously failed search.
+			companionBox.updateSearchTextColor(true);
 			gotSomething = this.seekAllHelper();
+			updateSearchTextColor(gotSomething);
 		}
+	}
 
+	public void updateSearchTextColor(final boolean gotSomething) {
 		if(gotSomething) {
+			LogBuffer.println("Changed to found color");
 			searchTermBox.getEditor().getEditorComponent().
-				setForeground(FOUNDCOLOR);
+				setBackground(FOUNDCOLOR);
 		} else {
+			LogBuffer.println("Changed to notfound color");
 			searchTermBox.getEditor().getEditorComponent().
-				setForeground(NOTFOUNDCOLOR);
+				setBackground(NOTFOUNDCOLOR);
 		}
 	}
 
@@ -415,7 +443,7 @@ public abstract class HeaderFinderBox {
 			globalOmap.setToMinScale();
 		}
 
-		if (indexList.size() > 0) {
+		if(indexList.size() > 0) {
 			return(true);
 		}
 		return(false);
@@ -559,8 +587,11 @@ public abstract class HeaderFinderBox {
 						+ (int) e.getKeyChar() + "].");
 			}
 
-			searchTermBox.getEditor().getEditorComponent().
-				setForeground(FOUNDCOLOR);
+			//Commented this out so that the background would possibly remain
+			//red until good results are found.
+//			LogBuffer.println("Color reset to found color");
+//			searchTermBox.getEditor().getEditorComponent().
+//				setBackground(FOUNDCOLOR);
 		}
 
 		// The delete key is selecting what one tries to delete, thus if
