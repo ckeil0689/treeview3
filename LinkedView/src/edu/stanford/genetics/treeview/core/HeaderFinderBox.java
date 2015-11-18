@@ -361,6 +361,9 @@ public abstract class HeaderFinderBox {
 	 * @return String[][]
 	 */
 	public String[][] copy2DStringArray(String[][] old) {
+		if(old == null || old[0] == null) {
+			return(old);
+		}
 		String[][] copy = new String[old.length][old[0].length];
 		for(int i=0; i<old.length; i++)
 			for(int j=0; j<old[i].length; j++)
