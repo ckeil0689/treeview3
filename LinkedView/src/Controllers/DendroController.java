@@ -296,7 +296,7 @@ Controller {
 	 * @author rleach
 	 */
 	private class DividerAdapter extends MouseAdapter {
-		MapContainer map;
+		private MapContainer map;
 		public DividerAdapter(MapContainer map) {
 			super();
 			this.map = map;
