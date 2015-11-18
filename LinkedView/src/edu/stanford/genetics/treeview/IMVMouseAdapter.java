@@ -1,7 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Component;
-import java.awt.KeyboardFocusManager;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -13,8 +11,6 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-
-import org.hamcrest.core.IsAnything;
 
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
