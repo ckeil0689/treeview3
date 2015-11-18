@@ -1,10 +1,14 @@
 Document Review Meeting Guidelines
-Version 1.1
+Version 1.2
 Prepared by: Robert Leach
 
 PURPOSE: The purpose of the document review meeting is only to present perceived
          issues with the document(s) being reviewed and to ensure that the
          issues are understood by the developer.
+
+REFERENCES:
+[1] document_review_form.txt version 1.3
+[2] SCMP_TreeView3.doc
 
 MEETING RULES
 
@@ -41,19 +45,21 @@ The following rules will be followed in the document review meeting:
 	   the meeting, he/she may suggest that the topic be discussed after the
 	   meeting and direct the reviewer to advance to the next issue.
 
+BEFORE THE MEETING
+
+Refer to section 3.2.4.2.2.1 INDEPENDENT DOCUMENT REVIEWS of the SCMP[2].
+
 MEETING STRUCTURE
 
-In turn, each reviewer will go through their document review items aloud.
-Reviewers who have not yet had their turn will cross off redundant items from
-their document review forms.  The developer may respond to reviewers' question
-items to clarify document elements.  Upon completion, the developer receives all
-of the document review forms in order to address the issues brought up and the
-meeting ends.
+In turn, each issue marked as major or higher severity is stated aloud.  Lower
+severity issues may be included at the discretion of the attendees.  The
+developer is given the opportunity to ask for clarifications of the nature of
+any issue or its suggested change.  The developer may respond to reviewers'
+issues that are marked as questions to clarify document elements.  Note, the
+purpose of all review meeting discussions is not to determine *how* to resolve
+an issue, but rather to define what an issue is.  The meeting ends once all
+major and higher severity issues have been discussed.
 
 ISSUE RESOLUTION
 
-The developer, on his/her own time, makes document edits to address (or not
-address) issues brought up in the document review meeting as they see fit.  The
-developer then resubmits his/her commit/merge request, whereupon the CCB
-Librarian may either accept the changes (of any severity level) or initiate
-another document review meeting with the CM Leader.
+Refer to section 3.2.4.2.2.2.5 ISSUE RESOLUTION of the SCMP[2].

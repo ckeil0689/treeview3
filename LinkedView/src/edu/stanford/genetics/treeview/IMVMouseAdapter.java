@@ -57,7 +57,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 	private MouseEvent dragEvent;
 	private MouseEvent pressedEvent;   //To process clicks initiated via timer
-	
+
 	public IMVMouseAdapter(final MatrixViewController mvController, 
 			final InteractiveMatrixView imView, 
 			final MapContainer interactiveXmap, 
@@ -644,6 +644,13 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 				if(stepwiseZoom) {
 					if(zoomSpeed == 2) {
+						imView.debug("Hard zooming to columns: " +
+							colSelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+							",(" + colSelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) +
+							" - " + colSelection.getMinContiguousIndex(xmap.getIndex(xPixel)) + " + 1) and rows: " +
+							rowSelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+							",(" + rowSelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) +
+							" - " + rowSelection.getMinContiguousIndex(xmap.getIndex(xPixel)) + " + 1)",13);
 						imView.hardZoomToTarget(
 							colSelection.getMinContiguousIndex(
 								xmap.getIndex(xPixel)),
