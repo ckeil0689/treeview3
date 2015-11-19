@@ -45,7 +45,7 @@ public class TreePainter extends TreeDrawer {
 			final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
 					selected, dest);
 			nd.draw(getRootNode(),hoverIndex,false,minVisLabelIndex,
-				maxVisLabelIndex);
+				maxVisLabelIndex,true,false);
 		}
 	}
 
@@ -68,27 +68,27 @@ public class TreePainter extends TreeDrawer {
 				null, dest);
 		nd.isSelected = isSelected;
 		nd.draw(root,hoverIndex,isNodeHovered,minVisLabelIndex,
-			maxVisLabelIndex);
+			maxVisLabelIndex,true,false);
 	}
 
-	public void paintSubtree(final Graphics graphics,
-			final LinearTransformation xScaleEq,
-			final LinearTransformation yScaleEq, final Rectangle dest,
-			final TreeDrawerNode root, final TreeDrawerNode selected,
-			final boolean isLeft,final int hoverIndex,
-			final boolean isNodeHovered,final int minVisLabelIndex,
-			final int maxVisLabelIndex) {
-
-		if ((root == null) || (root.isLeaf()))
-			return;
-		
-		this.isLeft = isLeft;
-		// recursively drawtree...
-		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
-				selected, dest);
-		nd.draw(root,hoverIndex,isNodeHovered,minVisLabelIndex,
-			maxVisLabelIndex);
-	}
+//	public void paintSubtree(final Graphics graphics,
+//			final LinearTransformation xScaleEq,
+//			final LinearTransformation yScaleEq, final Rectangle dest,
+//			final TreeDrawerNode root, final TreeDrawerNode selected,
+//			final boolean isLeft,final int hoverIndex,
+//			final boolean isNodeHovered,final int minVisLabelIndex,
+//			final int maxVisLabelIndex) {
+//
+//		if ((root == null) || (root.isLeaf()))
+//			return;
+//		
+//		this.isLeft = isLeft;
+//		// recursively drawtree...
+//		final NodeDrawer nd = new NodeDrawer(graphics, xScaleEq, yScaleEq,
+//				selected, dest);
+//		nd.draw(root,hoverIndex,isNodeHovered,minVisLabelIndex,
+//			maxVisLabelIndex);
+//	}
 
 	public void paintSingle(final Graphics graphics,
 			final LinearTransformation xScaleEq,
@@ -106,7 +106,7 @@ public class TreePainter extends TreeDrawer {
 		nd.isSelected = isSelected;
 		if (!root.isLeaf()) {
 			nd.drawSingle(root,hoverIndex,isNodeHovered,false,minVisLabelIndex,
-				maxVisLabelIndex);
+				maxVisLabelIndex,isSelected);
 
 		} else {
 			LogBuffer.println("Root was leaf?");
@@ -169,58 +169,116 @@ public class TreePainter extends TreeDrawer {
 			}
 		}
 
+		public void draw(final TreeDrawerNode node,final int hoverIndex,
+ 			final boolean isNodeHovered,final int minVisLabelIndex,
+ 			final int maxVisLabelIndex,final boolean isTop,
+ 			boolean isSelected) {
+			TreeDrawerNode dotNode =
+				drawDFS(node,hoverIndex,isNodeHovered,minVisLabelIndex,
+					maxVisLabelIndex,isTop,isSelected);
+			drawNodeDot(dotNode,isNodeHovered);
+		}
+
 		/**
 		 * the draw method actually does the drawing
 		 */
-		public void draw(final TreeDrawerNode startNode,final int hoverIndex,
-			final boolean isNodeHovered,final int minVisLabelIndex,
-			final int maxVisLabelIndex) {
+		public TreeDrawerNode drawDFS(final TreeDrawerNode node,
+			final int hoverIndex,final boolean isNodeHovered,
+			final int minVisLabelIndex,
+			final int maxVisLabelIndex,final boolean isTop,
+			boolean isSelected) {
 
-			final Stack<TreeDrawerNode> remaining = new Stack<TreeDrawerNode>();
-			remaining.push(startNode);
+			TreeDrawerNode dotNode = (isTop ? node : null);
+			TreeDrawerNode tmpDotNode = null;
 
-			while (!remaining.empty()) {
-
-				final TreeDrawerNode node = remaining.pop();
-
-				// just return if no subkids visible.
-				if ((node.getMaxIndex() < minInd)
-						|| (node.getMinIndex() > maxInd)) {
-					continue;
-				}
-
-				// handle selection...
-				if (node == selected) {
-					if (isSelected == false) {
-						isSelected = true;
-
-						// push onto stack, so we know when we're finished
-						// with the selected subtree..
-						remaining.push(selected);
-
-					} else {
-						// isSelected is true, so we're pulling the selected
-						// node off the second time.
-						isSelected = false;
-						continue;
-					}
-				}
-
-				// lots of stack allocation...
-				final TreeDrawerNode left = node.getLeft();
-				final TreeDrawerNode right = node.getRight();
-				if (!left.isLeaf()) {
-					remaining.push(left);
-				}
-
-				if (!right.isLeaf()) {
-					remaining.push(right);
-				}
-
-				// finally draw
-				drawSingle(node,hoverIndex,isNodeHovered,(node == startNode),
-					minVisLabelIndex,maxVisLabelIndex);
+			// just return if no subkids visible.
+			if((node.getMaxIndex() < minInd) ||
+				(node.getMinIndex() > maxInd)) {
+				return(dotNode);
 			}
+
+			// handle selection...
+			if(node == selected) {
+				this.isSelected = true;
+				isSelected = true;
+			} else if(isTop) {
+				this.isSelected = false;
+				isSelected = false;
+			}
+
+			//Recursive calls (leaves will be drawn first)
+			if(node.getLeft() != null) {
+				tmpDotNode = drawDFS(node.getLeft(),hoverIndex,isNodeHovered,
+					minVisLabelIndex,maxVisLabelIndex,false,isSelected);
+				if(tmpDotNode != null) {
+					dotNode = tmpDotNode;
+				}
+			}
+			if(node.getRight() != null) {
+				tmpDotNode = drawDFS(node.getRight(),hoverIndex,isNodeHovered,minVisLabelIndex,
+					maxVisLabelIndex,false,isSelected);
+				if(tmpDotNode != null) {
+					dotNode = tmpDotNode;
+				}
+			}
+
+			// finally draw
+			drawSingle(node,hoverIndex,isNodeHovered,isTop,
+				minVisLabelIndex,maxVisLabelIndex,isSelected);
+
+			if(node.getLeft() != null && node.getRight() != null) {
+				if(isDotNode(node.getLeft(),false,isNodeHovered,isSelected)) {
+					return(node.getLeft());
+				}
+				if(isDotNode(node.getRight(),false,isNodeHovered,isSelected)) {
+					return(node.getRight());
+				}
+			}
+			if(isTop) {
+				if(isDotNode(node,isTop,isNodeHovered,isSelected)) {
+					return(node);
+				}
+			}
+			return(dotNode);
+		}
+
+		public boolean isDotNode(final TreeDrawerNode node,final boolean isTop,
+			final boolean isNodeHovered,final boolean isSelected) {
+			//If this is the top selected/hovered node, draw a dot at its root
+			if((isTop && (isSelected || isNodeHovered)) || node == selected) {
+				return(true);
+			}
+			return(false);
+		}
+
+		/**
+		 * This method is intended to draw a dot over a hovered or selected top
+		 * node after its parent branch has been drawn so that the dot ends up
+		 * on top of the branch lines
+		 * @author rleach
+		 * @param node
+		 * @param isTop
+		 * @param isNodeHovered
+		 */
+		public void drawNodeDot(final TreeDrawerNode node,
+			final boolean isNodeHovered) {
+
+			int x = 0;
+			int y = 0;
+
+			if(isLeft) {
+				x = (int) xT.transform(node.getCorr()) - 2;
+				y = (int) yT.transform(node.getIndex() + .5) - 2;
+			} else {
+				y = (int) yT.transform(node.getCorr()) - 2;
+				x = (int) xT.transform(node.getIndex() + .5) - 2;
+			}
+
+			//If this is the top selected/hovered node, draw a dot at its root
+			if(!isNodeHovered) {
+				graphics.setColor(new Color(197,181,66));//dark yellow
+			}
+			graphics.fillRect(x,y,5,5);
 		}
 
 		/*
@@ -256,7 +314,7 @@ public class TreePainter extends TreeDrawer {
 		private void drawSingle(final TreeDrawerNode node,
 			final int hoverIndex,final boolean isNodeHovered,
 			final boolean isTop,final int minVisLabelIndex,
-			final int maxVisLabelIndex) {
+			final int maxVisLabelIndex,final boolean isSelected) {
 
 			if (xT == null) {
 				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
@@ -278,7 +336,7 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			drawLeftBranch(node,hoverIndex,minVisLabelIndex,maxVisLabelIndex,
-				isNodeHovered);
+				isNodeHovered,isSelected);
 
 			if(isNodeHovered) {
 				graphics.setColor(Color.red);
@@ -287,36 +345,18 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			drawRightBranch(node,hoverIndex,minVisLabelIndex,maxVisLabelIndex,
-				isNodeHovered);
-
-			int x = 0;
-			int y = 0;
-
-			if(isLeft) {
-				x = (int) xT.transform(node.getCorr()) - 2;
-				y = (int) yT.transform(node.getIndex() + .5) - 2;
-			} else {
-				y = (int) yT.transform(node.getCorr()) - 2;
-				x = (int) xT.transform(node.getIndex() + .5) - 2;
-			}
-
-			//If this is the top selected/hovered node, draw a dot at its root
-			if((isTop && (isSelected || isNodeHovered)) || node == selected) {
-				if(!isNodeHovered) {
-					graphics.setColor(new Color(197,181,66));//dark yellow
-				}
-				graphics.fillRect(x,y,5,5);
-			}
+				isNodeHovered,isSelected);
 		}
 
 		public void drawLeftBranch(final TreeDrawerNode node,
 			final int hoverIndex,final int minVisLabelIndex,
-			final int maxVisLabelIndex,final boolean isHovered) {
+			final int maxVisLabelIndex,final boolean isHovered,
+			final boolean isSelected) {
 
 			final TreeDrawerNode left = node.getLeft();
 			final boolean hovered = (node.getLeft().getIndex() == hoverIndex);
-			final TreeDrawerNode leftLeaf = node.getLeftLeaf();
-			final TreeDrawerNode rightLeaf = node.getRightLeaf();
+//			final TreeDrawerNode leftLeaf = node.getLeftLeaf();
+//			final TreeDrawerNode rightLeaf = node.getRightLeaf();
 //			boolean allLabelsVisible = false;
 //			boolean leftLabelVisible = false;
 //			if((int) leftLeaf.getIndex() >= minVisLabelIndex &&
@@ -348,7 +388,7 @@ public class TreePainter extends TreeDrawer {
 
 			int c = 0;
 
-			int pointerBaseOffset = (left.isLeaf() ? 2 : 0);
+			int pointerBaseOffset = (left.isLeaf() ? 2 : 1);
 
 			// GTRView
 			if (isLeft) {
@@ -483,12 +523,13 @@ public class TreePainter extends TreeDrawer {
 
 		private void drawRightBranch(final TreeDrawerNode node,
 			final int hoverIndex,final int minVisLabelIndex,
-			final int maxVisLabelIndex,final boolean isHovered) {
+			final int maxVisLabelIndex,final boolean isHovered,
+			final boolean isSelected) {
 
 			final TreeDrawerNode right = node.getRight();
 			final boolean hovered = (node.getRight().getIndex() == hoverIndex);
-			final TreeDrawerNode leftLeaf = node.getLeftLeaf();
-			final TreeDrawerNode rightLeaf = node.getRightLeaf();
+//			final TreeDrawerNode leftLeaf = node.getLeftLeaf();
+//			final TreeDrawerNode rightLeaf = node.getRightLeaf();
 //			boolean allLabelsVisible  = false;
 //			boolean rightLabelVisible = false;
 //			if((int) leftLeaf.getIndex() >= minVisLabelIndex &&
