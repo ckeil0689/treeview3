@@ -632,7 +632,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	//notifyObservers method called from MapContainer was resulting in sluggish
 	//updates
 	private int repaintInterval = 50;      //update every 50 milliseconds
-	private int slowRepaintInterval = 1000;//update every 1s if mouse not moving
+//	private int slowRepaintInterval = 1000;//update every 1s if mouse not moving
 	private int lastHoverIndex = -1;
 	private Timer repaintTimer =
 		new Timer(repaintInterval,
@@ -657,34 +657,34 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			}
 		});
 
-	//Timer to wait a bit before slowing down the slice _timer for painting.
-	//This conserves processor cycles in the interests of performance.  Note
-	//that there is a pair of timers for each axis.
-	final private int delay = 1000;
-	private javax.swing.Timer slowDownRepaintTimer;
-	ActionListener slowDownRepaintListener = new ActionListener() {
-
-		@Override
-		public void actionPerformed(ActionEvent evt) {
-			if(evt.getSource() == slowDownRepaintTimer) {
-				/* Stop timer */
-				slowDownRepaintTimer.stop();
-				slowDownRepaintTimer = null;
-
-				//If we are still over a label port view panel, just slow the
-				//repaint timer, because this was triggered by the mouse not
-				//moving
-				if(map.overALabelPortLinkedView()) {
-					debug("Slowing the repaint interval presumably because " +
-					      "of lack of mouse movement",9);
-					repaintTimer.setDelay(slowRepaintInterval);
-				} else {
-					repaintTimer.stop();
-					map.setLabelAnimeRunning(false);
-				}
-			}
-		}
-	};
+//	//Timer to wait a bit before slowing down the slice _timer for painting.
+//	//This conserves processor cycles in the interests of performance.  Note
+//	//that there is a pair of timers for each axis.
+//	final private int delay = 1000;
+//	private javax.swing.Timer slowDownRepaintTimer;
+//	ActionListener slowDownRepaintListener = new ActionListener() {
+//
+//		@Override
+//		public void actionPerformed(ActionEvent evt) {
+//			if(evt.getSource() == slowDownRepaintTimer) {
+//				/* Stop timer */
+//				slowDownRepaintTimer.stop();
+//				slowDownRepaintTimer = null;
+//
+//				//If we are still over a label port view panel, just slow the
+//				//repaint timer, because this was triggered by the mouse not
+//				//moving
+//				if(map.overALabelPortLinkedView()) {
+////					debug("Slowing the repaint interval presumably because " +
+////					      "of lack of mouse movement",9);
+////					repaintTimer.setDelay(slowRepaintInterval);
+//				} else {
+//					repaintTimer.stop();
+//					map.setLabelAnimeRunning(false);
+//				}
+//			}
+//		}
+//	};
 
 	/* inherit description */
 	@Override
@@ -708,12 +708,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				repaintTimer.stop();
 				lastHoverIndex = -1;
 				map.setLabelAnimeRunning(false);
-				//Disable the turnOffRepaintTimer if it is running, because we've
-				//already stopped repaints
-				if(slowDownRepaintTimer != null) {
-					slowDownRepaintTimer.stop();
-					slowDownRepaintTimer = null;
-				}
+//				//Disable the turnOffRepaintTimer if it is running, because we've
+//				//already stopped repaints
+//				if(slowDownRepaintTimer != null) {
+//					slowDownRepaintTimer.stop();
+//					slowDownRepaintTimer = null;
+//				}
 			} else {
 				debug("The repaint timer is not running. This updateBuffer " +
 					"call was initiated by something else.",9);
@@ -727,11 +727,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				repaintTimer.start();
 				map.setLabelAnimeRunning(true);
 				lastHoverIndex = getPrimaryHoverIndex();
-				//Disable any slowDownRepaintTimer that might have been left over
-				if(slowDownRepaintTimer != null) {
-					slowDownRepaintTimer.stop();
-					slowDownRepaintTimer = null;
-				}
+//				//Disable any slowDownRepaintTimer that might have been left over
+//				if(slowDownRepaintTimer != null) {
+//					slowDownRepaintTimer.stop();
+//					slowDownRepaintTimer = null;
+//				}
 			} else {
 				debug("The repaint timer was in fact running even though map.isLabelAnimeRunning() said it wasn't.",9);
 			}
@@ -741,16 +741,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//after a brief period of no motion)
 		else if(map.overALabelPortLinkedView() &&
 			getPrimaryHoverIndex() == lastHoverIndex) {
-			if(repaintTimer.getDelay() == repaintInterval) {
-				debug("Hovering on one spot [" + lastHoverIndex +
-				      "] - slowing animation",9);
-				if(slowDownRepaintTimer == null) {
-					slowDownRepaintTimer = new Timer(delay,slowDownRepaintListener);
-					slowDownRepaintTimer.start();
-				}
-			} else {
-				debug("Animation already slowed down to [" + repaintTimer.getDelay() + "ms].",9);
-			}
+//			if(repaintTimer.getDelay() == repaintInterval) {
+//				debug("Hovering on one spot [" + lastHoverIndex +
+//				      "] - slowing animation",9);
+//				if(slowDownRepaintTimer == null) {
+//					slowDownRepaintTimer = new Timer(delay,slowDownRepaintListener);
+//					slowDownRepaintTimer.start();
+//				}
+//			} else {
+//				debug("Animation already slowed down to [" + repaintTimer.getDelay() + "ms].",9);
+//			}
 		}
 		//Else, disable the slowDownRepaintTimer, update the hover index, and
 		//set the repaint interval to normal speed
@@ -758,20 +758,20 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			debug("Hovering across matrix - keeping animation going",9);
 			debug("Last hover Index: [" + lastHoverIndex +
 				"] current hover index [" + getPrimaryHoverIndex() + "]",9);
-			if(repaintTimer != null && !repaintTimer.isRunning()) {
-				repaintTimer.start();
-			} else if(repaintTimer.getDelay() == slowRepaintInterval) {
-				debug("Speeding up the repaint interval because mouse " +
-				      "movement detected",9);
-				repaintTimer.setDelay(repaintInterval);
-				repaintTimer.restart();
-			}
-			//Disable the slowDownRepaintTimer because we have detected
-			//continued mouse motion
-			if(slowDownRepaintTimer != null) {
-				slowDownRepaintTimer.stop();
-				slowDownRepaintTimer = null;
-			}
+//			if(repaintTimer != null && !repaintTimer.isRunning()) {
+//				repaintTimer.start();
+//			} else if(repaintTimer.getDelay() == slowRepaintInterval) {
+//				debug("Speeding up the repaint interval because mouse " +
+//				      "movement detected",9);
+//				repaintTimer.setDelay(repaintInterval);
+//				repaintTimer.restart();
+//			}
+//			//Disable the slowDownRepaintTimer because we have detected
+//			//continued mouse motion
+//			if(slowDownRepaintTimer != null) {
+//				slowDownRepaintTimer.stop();
+//				slowDownRepaintTimer = null;
+//			}
 			lastHoverIndex = getPrimaryHoverIndex();
 			map.setLabelAnimeRunning(true);
 		}
@@ -1834,12 +1834,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		debug("Selecting from " + map.getSelectingStart() + " to " +
 		      map.getIndex(getPrimaryHoverPosition(e)),8);
 
-		//This is not necessary, but makes things a tad more responsive
-		if(repaintTimer != null &&
-		   repaintTimer.getDelay() == slowRepaintInterval) {
-			repaintTimer.setDelay(repaintInterval);
-			repaintTimer.restart();
-		}
+//		//This is not necessary, but makes things a tad more responsive
+//		if(repaintTimer != null &&
+//		   repaintTimer.getDelay() == slowRepaintInterval) {
+//			repaintTimer.setDelay(repaintInterval);
+//			repaintTimer.restart();
+//		}
 
 		repaint();
 
@@ -2035,12 +2035,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Note that the hover index is updated by forceUpdatePrimaryHoverIndex
 		//which is called from updateBuffer
 
-		//This is not necessary, but makes things a tad more responsive
-		if(repaintTimer != null &&
-		   repaintTimer.getDelay() == slowRepaintInterval) {
-			repaintTimer.setDelay(repaintInterval);
-			repaintTimer.restart();
-		}
+//		//This is not necessary, but makes things a tad more responsive
+//		if(repaintTimer != null &&
+//		   repaintTimer.getDelay() == slowRepaintInterval) {
+//			repaintTimer.setDelay(repaintInterval);
+//			repaintTimer.restart();
+//		}
 
 		repaint();
 	}
