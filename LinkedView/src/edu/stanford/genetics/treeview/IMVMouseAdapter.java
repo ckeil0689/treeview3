@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -12,6 +13,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
@@ -58,6 +60,8 @@ public class IMVMouseAdapter extends MouseAdapter {
 	private MouseEvent dragEvent;
 	private MouseEvent pressedEvent;   //To process clicks initiated via timer
 
+	private int debug;
+
 	public IMVMouseAdapter(final MatrixViewController mvController, 
 			final InteractiveMatrixView imView, 
 			final MapContainer interactiveXmap, 
@@ -73,6 +77,9 @@ public class IMVMouseAdapter extends MouseAdapter {
 		
 		this.xmap = interactiveXmap;
 		this.ymap = interactiveYmap;
+
+		debug = 1;
+		//1 = Debug the temporary band drawn for single-clicks
 	}
 	
 	@Override
@@ -113,6 +120,8 @@ public class IMVMouseAdapter extends MouseAdapter {
 		//Else this is a first click event - set clickCount to 1 and start
 		//the timer to listen for more clicks
 		else {
+			processTemporaryLeftClick(e.getX(),e.getY());
+
 			Integer tmp =
 				(Integer) Toolkit.getDefaultToolkit().
 				getDesktopProperty("awt.multiClickInterval");
@@ -1172,7 +1181,28 @@ public class IMVMouseAdapter extends MouseAdapter {
 		
 		imView.repaint();
 	}
-	
+
+	public void processTemporaryLeftClick(int xPixelStart,int yPixelStart) {
+		debug("Drawing band temporarily for a possible single-click.",1);
+
+		imView.drawBand(getPixelRect(dragRect));
+
+		startPoint.setLocation(xmap.getPixel(xmap.getIndex(xPixelStart)),
+			ymap.getPixel(ymap.getIndex(yPixelStart)));
+
+		endPoint.setLocation(xmap.getPixel(xmap.getIndex(xPixelStart) + 1),
+			ymap.getPixel(ymap.getIndex(yPixelStart) + 1));
+
+		dragRect.setLocation(startPoint);
+		dragRect.setSize((int) xmap.getScale(),(int) ymap.getScale());
+		dragRect.add(endPoint);
+
+		imView.setTmpRect(dragRect);
+
+		imView.setOverlayTempChange(true);
+		imView.repaint();
+	}
+
 	/**
 	 * Processes left click drag end event
 	 * @author rleach
@@ -1457,5 +1487,11 @@ public class IMVMouseAdapter extends MouseAdapter {
 		int h = ymap.getPixel(l.y + l.height + 1) - y;
 		
 		return new Rectangle(x, y, w, h);
+	}
+
+	private void debug(String msg,int level) {
+		if(level == debug) {
+			LogBuffer.println(msg);
+		}
 	}
 }
