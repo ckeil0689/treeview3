@@ -223,10 +223,10 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			// finally draw
-			drawSingle(node,hoverIndex,isNodeHovered,isTop,
-				minVisLabelIndex,maxVisLabelIndex,isSelected);
-
 			if(node.getLeft() != null && node.getRight() != null) {
+				drawSingle(node,hoverIndex,isNodeHovered,isTop,
+							minVisLabelIndex,maxVisLabelIndex,isSelected);
+
 				if(isDotNode(node.getLeft(),false,isNodeHovered,isSelected)) {
 					return(node.getLeft());
 				}

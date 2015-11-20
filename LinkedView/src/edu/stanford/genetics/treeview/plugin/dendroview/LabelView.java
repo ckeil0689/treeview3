@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -186,9 +187,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		
 		scrollPane.setBorder(null);
 
-		debug = 24;
+		debug = 0;
 		//Debug modes:
-		//9  = debug repaint timer intervals and updates to label panels
+		//5  = Debug bold font rendering issues
+		//9  = Debug repaint timer intervals and updates to label panels
 		//10 = Debug label drawing issues when split pane divider adjusted
 		//12 = Debug issues where strings and indicator bar are starting in the
 		//     wrong place
@@ -822,6 +824,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 
 		final Graphics2D      g2d  = (Graphics2D) g;
+		//Added this anti-aliasing setting to address an issue on Mac where bold
+		//labels were not being rendered as bold when certain fonts were at
+		//certain sizes, e.g. Courier sizes 12, 18, and 24.
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
 		final AffineTransform orig = g2d.getTransform();
 
 		debug("Resetting justification for " + getPaneType() + "s!!!!",1);
