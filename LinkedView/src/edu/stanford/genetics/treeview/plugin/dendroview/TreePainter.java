@@ -176,7 +176,7 @@ public class TreePainter extends TreeDrawer {
 			TreeDrawerNode dotNode =
 				drawDFS(node,hoverIndex,isNodeHovered,minVisLabelIndex,
 					maxVisLabelIndex,isTop,isSelected);
-			drawNodeDot(dotNode,isNodeHovered);
+			drawNodeDot(dotNode,isNodeHovered,isSelected);
 		}
 
 		/**
@@ -261,7 +261,7 @@ public class TreePainter extends TreeDrawer {
 		 * @param isNodeHovered
 		 */
 		public void drawNodeDot(final TreeDrawerNode node,
-			final boolean isNodeHovered) {
+			final boolean isNodeHovered,final boolean isSelected) {
 
 			int x = 0;
 			int y = 0;
@@ -276,6 +276,9 @@ public class TreePainter extends TreeDrawer {
 
 			//If this is the top selected/hovered node, draw a dot at its root
 			if(!isNodeHovered) {
+				if(!isSelected && (selected == null || selected != node)) {
+					return;
+				}
 				graphics.setColor(new Color(197,181,66));//dark yellow
 			}
 			graphics.fillRect(x,y,5,5);
