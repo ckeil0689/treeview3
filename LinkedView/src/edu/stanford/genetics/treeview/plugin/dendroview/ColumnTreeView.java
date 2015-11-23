@@ -10,6 +10,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LinearTransformation;
@@ -216,5 +217,11 @@ public class ColumnTreeView extends TRView {
 
 	protected int getPrimaryPixelIndex(final MouseEvent e) {
 		return(e.getX());
+	}
+
+	@Override
+	protected boolean isAPrimaryScroll(final MouseWheelEvent e) {
+		
+		return(e.isShiftDown());
 	}
 }

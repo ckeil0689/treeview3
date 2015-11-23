@@ -12,6 +12,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Observable;
 
 import javax.swing.JScrollBar;
@@ -28,7 +30,8 @@ import edu.stanford.genetics.treeview.ModelViewBuffered;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
-public abstract class TRView extends ModelViewBuffered implements KeyListener,MouseListener,MouseMotionListener {
+public abstract class TRView extends ModelViewBuffered implements KeyListener,
+	MouseListener,MouseMotionListener,MouseWheelListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -61,6 +64,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 		
 //		panel = new JPanel();
 		
+		addMouseWheelListener(this);
+
 		if(isGeneTree) {
 			scrollPane = new JScrollPane(this,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
@@ -70,7 +75,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		}
-		
+
 		panel = scrollPane;
 		
 		destRect = new Rectangle();
@@ -882,5 +887,45 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,Mo
 
 		map.setOverTree(false);
 		setHoveredNode(null);
+	}
+
+	@Override
+	public void mouseWheelMoved(final MouseWheelEvent e) {
+
+		final int notches = e.getWheelRotation();
+		int shift = (notches < 0) ? -6 : 6;
+
+		// On macs' magic mouse, horizontal scroll comes in as if the shift was
+		// down
+		if(isAPrimaryScroll(e)) {
+			//Value of label length scrollbar
+			map.scrollBy(shift);
+			updatePrimaryHoverIndexDuringScrollWheel();
+		}
+	}
+
+	protected abstract boolean isAPrimaryScroll(final MouseWheelEvent e);
+
+	public void updatePrimaryHoverIndexDuringScrollWheel() {
+		if(map.getHoverPixel() == -1) {
+			unsetPrimaryHoverIndex();
+		} else {
+			setPrimaryHoverIndex(map.getIndex(map.getHoverPixel()));
+		}
+	}
+
+	/**
+	 * This setter allows a hover index to be manually set in cases where the
+	 * cursor is for example, over the secondary scroll bar, drag-selecting off
+	 * the edge of the matrix, or dragging the opposing labels' secondary
+	 * scrollbar
+	 * @param i
+	 */
+	public void setPrimaryHoverIndex(final int i) {
+		map.setHoverIndex(i);
+	}
+
+	public void unsetPrimaryHoverIndex() {
+		map.unsetHoverIndex();
 	}
 }

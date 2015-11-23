@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
 
 import javax.swing.SwingUtilities;
 
@@ -194,5 +195,11 @@ public class RowTreeView extends TRView {
 
 	protected int getPrimaryPixelIndex(final MouseEvent e) {
 		return(e.getY());
+	}
+
+	@Override
+	protected boolean isAPrimaryScroll(final MouseWheelEvent e) {
+		
+		return(!e.isShiftDown());
 	}
 }
