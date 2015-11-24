@@ -18,6 +18,7 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
+import edu.stanford.genetics.treeview.TreeSelectionI;
 
 /**
  * Class for Drawing and Manipulating Trees
@@ -441,7 +442,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 			LinearTransformation xScaleEq, LinearTransformation yScaleEq,
 			Rectangle dest, TreeDrawerNode selected, boolean isLeft,
 			int hoverIndex,final int minVisLabelIndex,
-			final int maxVisLabelIndex);
+			final int maxVisLabelIndex,final TreeSelectionI treeSelection);
 
 	/**
 	 * Get the closest node to the given (index, correlation) pair.
