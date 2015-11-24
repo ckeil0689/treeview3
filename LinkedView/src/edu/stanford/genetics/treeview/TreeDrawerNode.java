@@ -273,9 +273,6 @@ public class TreeDrawerNode {
 		corr = newCorr;
 	}
 
-	// public void setLeft (TreeDrawerNode n) { left = n;}
-	// public void setRight (TreeDrawerNode n) { right = n;}
-
 	public void setColor(final Color c) {
 
 		color = c;
