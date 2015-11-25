@@ -173,9 +173,9 @@ public class TreePainter extends TreeDrawer {
 
 			graphics.setColor(new Color(197,181,66));//dark yellow
 			drawNodeDots(selectedNodeStack);
-			if(isNodeHovered(node)) {
+			if(aNodeIsHovered()) {
 				graphics.setColor(Color.RED);
-				drawNodeDot(node);
+				drawNodeDot(getHoveredNode());
 			}
 		}
 
@@ -186,6 +186,10 @@ public class TreePainter extends TreeDrawer {
 				return(true);
 			}
 			return(false);
+		}
+
+		public boolean aNodeIsHovered() {
+			return(isNodeHovered(getHoveredNode()));
 		}
 
 		/**

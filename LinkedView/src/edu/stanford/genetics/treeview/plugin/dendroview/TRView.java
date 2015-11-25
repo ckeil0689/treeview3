@@ -55,14 +55,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	public TRView(final boolean isGeneTree) {
 
 		super();
-		
+
 		setLayout(new MigLayout());
 
 		final String summary = (isGeneTree) ? "GtrSummary" : "AtrSummary";
 		this.headerSummary = new HeaderSummary(summary);
-		
-//		panel = new JPanel();
-		
+
 		addMouseWheelListener(this);
 
 		if(isGeneTree) {
@@ -153,8 +151,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 */
 	private void synchMap() {
 
-		if ((selectedNode != null) && (treeSelection != null)) {// &&
-			// treeSelection.getNSelectedIndexes() == 1) {
+		if((selectedNode != null) && (treeSelection != null)) {
 			final int start = (int) (selectedNode.getLeftLeaf().getIndex());
 			final int end = (int) (selectedNode.getRightLeaf().getIndex());
 
@@ -214,17 +211,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		if (selectedNode == n)
 			return;
 
-		/* deselecting previously selected node -- painting it black again */
-		if (selectedNode != null) {
-			paintNode(selectedNode,false,false);
-		}
-
 		selectedNode = n;
-
-		/* paint the selected node and its children */
-		if (selectedNode != null) {
-			paintNode(selectedNode,true,false);
-		}
 
 		synchMap();
 		repaint();
