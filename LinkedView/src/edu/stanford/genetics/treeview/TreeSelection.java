@@ -219,17 +219,8 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 		LogBuffer.println("Selection Min: " + min + " Max: " + max);
 
 		deselectAllIndexes();
-		
-		if (min > max) {
-			final int swap = min;
-			min = max;
-			max = swap;
-		}
 
-		for (int i = min; i <= max; i++) {
-
-			integerSelection.set(i, true);
-		}
+		selectIndexRange(min,max);
 	}
 
 	/**
