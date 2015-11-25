@@ -79,9 +79,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		debug = 0;
 		//17 = debug whizzing tree mode
-
-//		panel.setLayout(new BorderLayout());
-//		panel.add(this, BorderLayout.CENTER);
 	}
 	
 	public JScrollBar getVerticalScrollBar() {
@@ -147,7 +144,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	}
 
 	/**
-	 * make sure the selected array range reflects the selected node, if any.
+	 * Make sure the selected array range reflects the selected node, if any,
+	 * and that the hover tree indexes are up to date.
 	 */
 	private void synchMap() {
 
@@ -235,6 +233,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		repaint();
 	}
 
+	/**
+	 * Sets the hoveredNode to null
+	 * @author rleach
+	 */
 	public void unsetHoveredNode() {
 		hoveredNode = null;
 	}
@@ -372,10 +374,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 				map.getFirstVisibleLabel() > -1 &&
 				map.getLastVisibleLabel() > -1) {
 
-//				g.setColor(whiz_bg_color);
-//
-//				drawWhizBackground(g);
-
 				g.setColor(Color.black);
 
 				debug("Whizzing Tree mode",17);
@@ -447,6 +445,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		}
 	}
 
+	/* Abstract methods */
 	protected abstract int  getSecondaryPaneSize(final Dimension dims);
 	protected abstract int  getPrimaryPaneSize(final Dimension dims);
 	protected abstract int  getUsedWhizzingLength();
@@ -468,7 +467,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	protected abstract int getPrimaryPixelIndex(final MouseEvent e);
 	protected abstract TreeDrawerNode getClosestParentNode(final MouseEvent e);
 	protected abstract void drawWhizBackground(final Graphics g);
-	protected abstract void drawFittedWhizBackground(final Graphics g,LinearTransformation scaleEq);
+	protected abstract void drawFittedWhizBackground(final Graphics g,
+		LinearTransformation scaleEq);
 
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
@@ -482,6 +482,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		repaint();
 	}
 
+	/**
+	 * 
+	 * @author rleach
+	 * @return the length of the area the whizzing labels represent in data
+	 * pixels
+	 */
 	protected int getWhizzingDestRectLength() {
 		if(destRect == null) {
 			return(-1);
@@ -781,6 +787,11 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		}
 	}
 
+	/**
+	 * Gets the data index that is hovered over
+	 * @author rleach
+	 * @return data index
+	 */
 	public int getPrimaryHoverIndex() {
 		return(map.getHoverIndex());
 	}
@@ -881,6 +892,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		map.setHoverIndex(i);
 	}
 
+	/**
+	 * Sets the hover index to -1
+	 * @author rleach
+	 */
 	public void unsetPrimaryHoverIndex() {
 		map.unsetHoverIndex();
 	}

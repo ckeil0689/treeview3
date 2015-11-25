@@ -175,6 +175,11 @@ public class RowTreeView extends TRView {
 		setXScaleEq(scaleEq);
 	}
 
+	/**
+	 * This method gets the closest internal node "as the crow flies"
+	 * @param MouseEvent
+	 * @return TreeDrawerNode
+	 */
 	@Override
 	protected TreeDrawerNode getClosestNode(final MouseEvent e) {
 		return(treePainter.getClosest(
@@ -183,6 +188,14 @@ public class RowTreeView extends TRView {
 			getXScaleEq().getSlope() / getYScaleEq().getSlope()));
 	}
 
+	/**
+	 * This method figures out the leaf at the current cursor position and
+	 * searches up the tree in a direct hierarchical line to find the parent
+	 * node which the cursor has just passed (before it reaches the next parent
+	 * node)
+	 * @param mouse event e
+	 * @return closest parent node
+	 */
 	@Override
 	protected TreeDrawerNode getClosestParentNode(final MouseEvent e) {
 		int i = getPrimaryHoverIndex();
@@ -193,10 +206,20 @@ public class RowTreeView extends TRView {
 			getXScaleEq().inverseTransform(e.getX())));
 	}
 
+	/**
+	 * Returns the pixel index relative to the data
+	 * @param mouse event e
+	 * @return pixel index
+	 */
 	protected int getPrimaryPixelIndex(final MouseEvent e) {
 		return(e.getY());
 	}
 
+	/**
+	 * Determines whether the scroll is for scrolling the data or not
+	 * @param mouse event e
+	 * @return boolean
+	 */
 	@Override
 	protected boolean isAPrimaryScroll(final MouseWheelEvent e) {
 		

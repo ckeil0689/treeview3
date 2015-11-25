@@ -201,9 +201,11 @@ public class ColumnTreeView extends TRView {
 
 	/**
 	 * This method figures out the leaf at the current cursor position and
-	 * searches up the tree in a direct heirarchical line to find the parent
+	 * searches up the tree in a direct hierarchical line to find the parent
 	 * node which the cursor has just passed (before it reaches the next parent
 	 * node)
+	 * @param mouse event e
+	 * @return closest parent node
 	 */
 	@Override
 	protected TreeDrawerNode getClosestParentNode(final MouseEvent e) {
@@ -215,13 +217,22 @@ public class ColumnTreeView extends TRView {
 			getYScaleEq().inverseTransform(e.getY())));
 	}
 
+	/**
+	 * Returns the pixel index relative to the data
+	 * @param mouse event e
+	 * @return pixel index
+	 */
 	protected int getPrimaryPixelIndex(final MouseEvent e) {
 		return(e.getX());
 	}
 
+	/**
+	 * Determines whether the scroll is for scrolling the data or not
+	 * @param mouse event e
+	 * @return boolean
+	 */
 	@Override
 	protected boolean isAPrimaryScroll(final MouseWheelEvent e) {
-		
 		return(e.isShiftDown());
 	}
 }

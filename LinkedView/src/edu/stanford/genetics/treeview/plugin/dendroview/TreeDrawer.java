@@ -432,11 +432,11 @@ abstract class TreeDrawer extends Observable implements Observer {
 	 *            Equation describing mapping from pixels to index
 	 * @param dest
 	 *            Specifies Rectangle of pixels to draw to
-	 * @param selected
-	 *            A selected node
-	 *
-	 *            the actual implementation of this depends, of course, on the
-	 *            orientation of the tree.
+	 * @param isLeft
+	 *            Whether this is for row or column trees
+	 * @param hoverIndex - the data index the cursor is over
+	 * @param treeSelection - contains the selected data indexes
+	 * @param hoveredNode - the node the cursor is nearest
 	 */
 	abstract public void paint(Graphics graphics,
 		LinearTransformation xScaleEq,LinearTransformation yScaleEq,
@@ -459,6 +459,15 @@ abstract class TreeDrawer extends Observable implements Observer {
 		return rcf.find(rootNode);
 	}
 
+	/**
+	 * This method takes a leaf and a correlation value (i.e. cursor position)
+	 * and travels up the tree from the leaf to find the parent node that the
+	 * cursor is just under
+	 * @author rleach
+	 * @param leaf - the leaf (i.e. the closest one to the cursor)
+	 * @param corr - the correlation position of the cursor
+	 * @return - the parent node along the path from the leaf to the cursor
+	 */
 	public TreeDrawerNode getClosestParent(TreeDrawerNode leaf,
 		final double corr) {
 

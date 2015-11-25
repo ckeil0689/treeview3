@@ -120,10 +120,13 @@ public class TreePainter extends TreeDrawer {
 		 *
 		 *            maybe foreground color, selection color and node color
 		 *            should be options?
+		 *
+		 * @param d - where to draw
+		 * @param hoveredNode - the currently hovered tree node
 		 */
-		public NodeDrawer(final Graphics g,
-			final LinearTransformation xScaleEq,
-			final LinearTransformation yScaleEq,final Rectangle d,final TreeDrawerNode hoveredNode) {
+		public NodeDrawer(final Graphics g,final LinearTransformation xScaleEq,
+			final LinearTransformation yScaleEq,final Rectangle d,
+			final TreeDrawerNode hoveredNode) {
 
 			graphics = g;
 			xT = xScaleEq;
@@ -142,6 +145,19 @@ public class TreePainter extends TreeDrawer {
 			}
 		}
 
+		/**
+		 * Wrapper for drawDFS, which has an additional parameter for recursion
+		 * in order to propagate the hovered node state down its subtree and
+		 * thus draw the hovered node's subtree red.  It also draws dots over
+		 * top of the tree for all selected subtrees and leaves, as well as the
+		 * hovered node after the tree is finished (so that the dots don't get
+		 * drawn over).
+		 * @author rleach
+		 * @param node - The top node whose subtree to draw.
+		 * @param hoverIndex - The data index the cursor is in alignment with
+		 *                     over the matrix
+		 * @param treeSelection - contains the selected data indexes
+		 */
 		public void draw(final TreeDrawerNode node,final int hoverIndex,
  			final TreeSelectionI treeSelection) {
 
@@ -156,6 +172,12 @@ public class TreePainter extends TreeDrawer {
 			}
 		}
 
+		/**
+		 * Determines whether a given node is the hovered node
+		 * @author rleach
+		 * @param node - the node to test
+		 * @return boolean
+		 */
 		public boolean isNodeHovered(TreeDrawerNode node) {
 			if(getHoveredNode() != null && node != null &&
 				node == getHoveredNode()) {
@@ -165,6 +187,11 @@ public class TreePainter extends TreeDrawer {
 			return(false);
 		}
 
+		/**
+		 * Returns whether a node is currently hovered over
+		 * @author rleach
+		 * @return boolean
+		 */
 		public boolean aNodeIsHovered() {
 			return(isNodeHovered(getHoveredNode()));
 		}
@@ -172,6 +199,14 @@ public class TreePainter extends TreeDrawer {
 		/**
 		 * The drawing method works recursively and returns a stack of the
 		 * selected nodes
+		 * @author rleach
+		 * @param node - The top node to draw
+		 * @param hoverIndex - The data index the cursor is in alignment with
+		 *                     over the matrix
+		 * @param isNodeHovered - whether we're under a hovered node
+		 * @param treeSelection - contains the selected data indexes
+		 * @return a stack of selected nodes (either only the top ones or a
+		 *         group of disjoint selected nodes, including leaves)
 		 */
 		public Stack<TreeDrawerNode> drawDFS(final TreeDrawerNode node,
 			final int hoverIndex,boolean isNodeHovered,
@@ -260,12 +295,12 @@ public class TreePainter extends TreeDrawer {
 		}
 
 		/**
+		 * Determines whether all the leaves under a given node have indexes
+		 * that are selected
 		 * @author rleach
-		 * @param 
-		 * @return 
-		 * @param node
-		 * @param treeSelection
-		 * @return
+		 * @param node - the tree node to check the leaves of
+		 * @param treeSelection - contains the selected data indexes
+		 * @return boolean
 		 */
 		private boolean isNodeSelected(TreeDrawerNode node,
 			TreeSelectionI treeSelection) {
@@ -281,6 +316,7 @@ public class TreePainter extends TreeDrawer {
 		}
 
 		/**
+		 * Accessor
 		 * @author rleach
 		 * @return the hoveredNode
 		 */
@@ -289,6 +325,7 @@ public class TreePainter extends TreeDrawer {
 		}
 
 		/**
+		 * Setter
 		 * @author rleach
 		 * @param hoveredNode the hoveredNode to set
 		 */
@@ -319,6 +356,11 @@ public class TreePainter extends TreeDrawer {
 			graphics.fillRect(x,y,5,5);
 		}
 
+		/**
+		 * Draws all the tree node dots in a stack of nodes
+		 * @author rleach
+		 * @param nodeStack
+		 */
 		public void drawNodeDots(final Stack<TreeDrawerNode> nodeStack) {
 			if(nodeStack == null || nodeStack.isEmpty()) {
 				return;
@@ -329,36 +371,14 @@ public class TreePainter extends TreeDrawer {
 			}
 		}
 
-		/*
-		 * // just return if no subkids visible. if ((node.getMaxIndex() <
-		 * minInd) || (node.getMinIndex() > maxInd)) return;
-		 * 
-		 * // lots of stack allocation... TreeDrawerNode left = node.getLeft();
-		 * TreeDrawerNode right = node.getRight();
-		 * 
-		 * int ry = (int) yT.transform(right.getCorr()); int ly = (int)
-		 * yT.transform(left.getCorr()); int ty = (int)
-		 * yT.transform(node.getCorr());
-		 * 
-		 * int rx = (int) xT.transform(right.getIndex() + .5); int lx = (int)
-		 * xT.transform(left.getIndex() + .5); int tx = (int)
-		 * xT.transform(node.getIndex() + .5); Color t = graphics.getColor();
-		 * 
-		 * isSelected = (node == selected); // System.out.println("rx = " + rx +
-		 * ", ry = " + ry + ", lx = " + lx + ", ly = " + ly);
-		 * 
-		 * // oval first?... // graphics.setColor(node_color); //
-		 * graphics.drawOval(tx - 1,ty - 1,2,2);
-		 * 
-		 * //draw our (flipped) polyline... if (isSelected)
-		 * graphics.setColor(whiz_color); else graphics.setColor(t);
-		 * 
-		 * graphics.drawPolyline(new int[] {rx, rx, lx, lx}, new int[] {ry, ty,
-		 * ty, ly}, 4); if (left.isLeaf() == false) draw(left); if
-		 * (right.isLeaf() == false) draw(right); if (isSelected)
-		 * graphics.setColor(t); }
+		/**
+		 * Draws 2 branches stemming from a given node
+		 * @author rleach
+		 * @param node - the node from which to draw the branches
+		 * @param hoverIndex - the data index corresponding to the cursor
+		 * @param isNodeHovered - if we are under a hovered node
+		 * @param isSelected - if this node is selected
 		 */
-
 		private void drawSingle(final TreeDrawerNode node,
 			final int hoverIndex,final boolean isNodeHovered,
 			final boolean isSelected) {
@@ -393,6 +413,14 @@ public class TreePainter extends TreeDrawer {
 			drawRightBranch(node,hoverIndex,isNodeHovered,isSelected);
 		}
 
+		/**
+		 * Draws the left branch stemming from a given node
+		 * @author rleach
+		 * @param node - the node from which to draw the branches
+		 * @param hoverIndex - the data index corresponding to the cursor
+		 * @param isNodeHovered - if we are under a hovered node
+		 * @param isSelected - if this node is selected
+		 */
 		public void drawLeftBranch(final TreeDrawerNode node,
 			final int hoverIndex,final boolean isHovered,
 			final boolean isSelected) {
@@ -555,6 +583,14 @@ public class TreePainter extends TreeDrawer {
 			}
 		}
 
+		/**
+		 * Draws the right branch stemming from a given node
+		 * @author rleach
+		 * @param node - the node from which to draw the branches
+		 * @param hoverIndex - the data index corresponding to the cursor
+		 * @param isNodeHovered - if we are under a hovered node
+		 * @param isSelected - if this node is selected
+		 */
 		private void drawRightBranch(final TreeDrawerNode node,
 			final int hoverIndex,final boolean isHovered,
 			final boolean isSelected) {
