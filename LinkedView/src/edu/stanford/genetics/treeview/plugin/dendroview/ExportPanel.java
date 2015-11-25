@@ -861,7 +861,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 		// draw
 		geneTreeDrawer.paintSubtree(g,xScaleEq,yScaleEq,destRect,
-			getGeneNode(),true,-1,false,geneSelection,null);
+			getGeneNode(),true,-1,geneSelection,null);
 	}
 
 	/**
@@ -895,7 +895,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 		// draw
 		arrayTreeDrawer.paintSubtree(g,xScaleEq,yScaleEq,destRect,
-			getArrayNode(),false,-1,false,arraySelection,null);
+			getArrayNode(),false,-1,arraySelection,null);
 	}
 
 	/**

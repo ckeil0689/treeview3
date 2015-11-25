@@ -248,13 +248,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 *            Whether the node and its children should be black or colored.
 	 *            Colored is used for hovering and selected nodes.
 	 */
-	private void paintNode(final TreeDrawerNode node, final boolean isSelected,
-		final boolean isNodeHovered) {
+	private void paintNode(final TreeDrawerNode node,final boolean isSelected) {
 
 		if (xScaleEq != null) {
-			treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-				destRect, node, isLeft, getPrimaryHoverIndex(),
-				isNodeHovered,treeSelection,hoveredNode);
+			treePainter.paintSubtree(offscreenGraphics,xScaleEq,yScaleEq,
+				destRect,node,isLeft,getPrimaryHoverIndex(),treeSelection,
+				hoveredNode);
 		}
 	}
 
@@ -573,8 +572,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		//Paint from the parent down based on new selection
 		treePainter.paintSubtree(offscreenGraphics,xScaleEq,yScaleEq,
-			destRect,selectedNode,isLeft,getPrimaryHoverIndex(),false,
-			treeSelection,hoveredNode);
+			destRect,selectedNode,isLeft,getPrimaryHoverIndex(),treeSelection,
+			hoveredNode);
 
 		repaint();
 	}
@@ -590,7 +589,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		synchMap();
 
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-			destRect,current,isLeft,getPrimaryHoverIndex(),false,treeSelection,
+			destRect,current,isLeft,getPrimaryHoverIndex(),treeSelection,
 			hoveredNode);
 
 		repaint();
@@ -607,7 +606,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		synchMap();
 
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-			destRect,current,isLeft,getPrimaryHoverIndex(),false,treeSelection,
+			destRect,current,isLeft,getPrimaryHoverIndex(),treeSelection,
 			hoveredNode);
 
 		repaint();

@@ -28,6 +28,17 @@ public class TreePainter extends TreeDrawer {
 
 	private boolean isLeft;
 
+	/**
+	 * Paints the entire tree
+	 * @param graphics - the graphics object with which to paint
+	 * @param xScaleEq - X coord calculations object
+	 * @param yScaleEq - Y coord calculations object
+	 * @param dest - The coords where to draw the tree
+	 * @param isLeft - left tree or top tree
+	 * @param hoverIndex - the data index hovered over
+	 * @param treeSelection - contains the selected indexes
+	 * @param hoveredNode - the node the cursor is closest to
+	 */
 	@Override
 	public void paint(final Graphics graphics,
 		final LinearTransformation xScaleEq,
@@ -43,16 +54,28 @@ public class TreePainter extends TreeDrawer {
 			// recursively drawtree...
 			final NodeDrawer nd =
 				new NodeDrawer(graphics,xScaleEq,yScaleEq,dest,hoveredNode);
-			nd.draw(getRootNode(),hoverIndex,false,treeSelection);
+			nd.draw(getRootNode(),hoverIndex,treeSelection);
 		}
 	}
 
+	/**
+	 * Paints a subtree
+	 * @author rleach
+	 * @param graphics - the graphics object with which to paint
+	 * @param xScaleEq - X coord calculations object
+	 * @param yScaleEq - Y coord calculations object
+	 * @param dest - The coords where to draw the tree
+	 * @param root - the top node to draw
+	 * @param isLeft - left tree or top tree
+	 * @param hoverIndex - the data index hovered over
+	 * @param treeSelection - contains the selected indexes
+	 * @param hoveredNode - the node the cursor is closest to
+	 */
 	public void paintSubtree(final Graphics graphics,
 		final LinearTransformation xScaleEq,
 		final LinearTransformation yScaleEq, final Rectangle dest,
 		final TreeDrawerNode root,final boolean isLeft,final int hoverIndex,
-		final boolean isNodeHovered,final TreeSelectionI treeSelection,
-		final TreeDrawerNode hoveredNode) {
+		final TreeSelectionI treeSelection,final TreeDrawerNode hoveredNode) {
 
 		if ((root == null) || (root.isLeaf()) || (xScaleEq == null)
 				|| (yScaleEq == null))
@@ -62,53 +85,7 @@ public class TreePainter extends TreeDrawer {
 		// recursively drawtree...
 		final NodeDrawer nd =
 			new NodeDrawer(graphics,xScaleEq,yScaleEq,dest,hoveredNode);
-		nd.draw(root,hoverIndex,isNodeHovered,treeSelection);
-	}
-
-	/**
-	 * This class is used to store where to draw selected node dots while the
-	 * tree is drawn in DFS order.  These objects are passed back to parent
-	 * nodes in a stack.  They store whether they are selected or not.
-	 * @author rleach
-	 *
-	 */
-	class NodeStackItem {
-		TreeDrawerNode node;
-		boolean isSelected;
-		public NodeStackItem(final TreeDrawerNode node,
-			final boolean isSelected) {
-
-			this.node = node;
-			this.isSelected = isSelected;
-		}
-		/**
-		 * @author rleach
-		 * @return the node
-		 */
-		public TreeDrawerNode getNode() {
-			return(node);
-		}
-		/**
-		 * @author rleach
-		 * @param node the node to set
-		 */
-		public void setNode(TreeDrawerNode node) {
-			this.node = node;
-		}
-		/**
-		 * @author rleach
-		 * @return the isSelected
-		 */
-		public boolean isSelected() {
-			return(isSelected);
-		}
-		/**
-		 * @author rleach
-		 * @param isSelected the isSelected to set
-		 */
-		public void setSelected(boolean isSelected) {
-			this.isSelected = isSelected;
-		}
+		nd.draw(root,hoverIndex,treeSelection);
 	}
 
 	/**
@@ -166,9 +143,9 @@ public class TreePainter extends TreeDrawer {
 		}
 
 		public void draw(final TreeDrawerNode node,final int hoverIndex,
- 			final boolean isNodeHovered,final TreeSelectionI treeSelection) {
+ 			final TreeSelectionI treeSelection) {
 
-			Stack<NodeStackItem> selectedNodeStack =
+			Stack<TreeDrawerNode> selectedNodeStack =
 				drawDFS(node,hoverIndex,false,treeSelection);
 
 			graphics.setColor(new Color(197,181,66));//dark yellow
@@ -196,11 +173,11 @@ public class TreePainter extends TreeDrawer {
 		 * The drawing method works recursively and returns a stack of the
 		 * selected nodes
 		 */
-		public Stack<NodeStackItem> drawDFS(final TreeDrawerNode node,
+		public Stack<TreeDrawerNode> drawDFS(final TreeDrawerNode node,
 			final int hoverIndex,boolean isNodeHovered,
 			final TreeSelectionI treeSelection) {
 
-			Stack<NodeStackItem> returnStack = new Stack<NodeStackItem>();
+			Stack<TreeDrawerNode> returnStack = new Stack<TreeDrawerNode>();
 
 			//If we've hit the hovered node, set it to true for this and all
 			//child nodes
@@ -211,18 +188,18 @@ public class TreePainter extends TreeDrawer {
 			// just return if no subkids visible.
 			if((node.getMaxIndex() < minInd) ||
 				(node.getMinIndex() > maxInd)) {
-				LogBuffer.println("Returning because kids aren't visible");
 				if(isNodeSelected(node,treeSelection)) {
-					LogBuffer.println("Adding this node to the stack.");
-					returnStack.push(new NodeStackItem(node,true));
+					returnStack.push(node);
 				}
 				return(returnStack);
 			}
 
 			//These will keep track of the selected nodes so that the dots can
 			//be drawn on top and the branch colors can be determined
-			Stack<NodeStackItem> leftDotNodeStack  = new Stack<NodeStackItem>();
-			Stack<NodeStackItem> rightDotNodeStack = new Stack<NodeStackItem>();
+			Stack<TreeDrawerNode> leftDotNodeStack  =
+				new Stack<TreeDrawerNode>();
+			Stack<TreeDrawerNode> rightDotNodeStack =
+				new Stack<TreeDrawerNode>();
 
 			/* Recursive calls (leaves will be drawn first) */
 
@@ -236,8 +213,7 @@ public class TreePainter extends TreeDrawer {
 			else if(treeSelection.isIndexSelected(
 				(int) node.getLeft().getIndex())) {
 
-				leftDotNodeStack.push(
-					new NodeStackItem(node.getLeft(),true));
+				leftDotNodeStack.push(node.getLeft());
 			}
 
 			//Do the right side
@@ -250,8 +226,7 @@ public class TreePainter extends TreeDrawer {
 			else if(treeSelection.isIndexSelected(
 				(int) node.getRight().getIndex())) {
 
-				rightDotNodeStack.push(
-					new NodeStackItem(node.getRight(),true));
+				rightDotNodeStack.push(node.getRight());
 			}
 
 			boolean thisNodeIsSelected = false;
@@ -262,16 +237,13 @@ public class TreePainter extends TreeDrawer {
 			//Ignore the child nodes and push this node onto a new stack to
 			//return.  Otherwise, all all the selected subtrees & leaves on top
 			//of which to draw dots.
-			if(!leftDotNodeStack.isEmpty() && !rightDotNodeStack.isEmpty() &&
+			if(!leftDotNodeStack.isEmpty()   && !rightDotNodeStack.isEmpty()  &&
 				leftDotNodeStack.size() == 1 && rightDotNodeStack.size() == 1 &&
-				leftDotNodeStack.peek().getNode().getId() ==
-				node.getLeft().getId() &&
-				rightDotNodeStack.peek().getNode().getId() ==
-				node.getRight().getId()) {
+				leftDotNodeStack.peek().getId()  == node.getLeft().getId()    &&
+				rightDotNodeStack.peek().getId() == node.getRight().getId()) {
 
-				thisNodeIsSelected = (leftDotNodeStack.peek().isSelected() &&
-					rightDotNodeStack.peek().isSelected());
-				returnStack.push(new NodeStackItem(node,thisNodeIsSelected));
+				thisNodeIsSelected = true;
+				returnStack.push(node);
 			} else {
 				if(!leftDotNodeStack.isEmpty()) {
 					returnStack.addAll(leftDotNodeStack);
@@ -301,7 +273,6 @@ public class TreePainter extends TreeDrawer {
 			for(int i = (int) node.getLeftLeaf().getIndex();
 				i <= (int) node.getRightLeaf().getIndex();i++) {
 				if(!treeSelection.isIndexSelected(i)) {
-					LogBuffer.println("Index [" + i + "] is not selected");
 					selected = false;
 					break;
 				}
@@ -348,13 +319,13 @@ public class TreePainter extends TreeDrawer {
 			graphics.fillRect(x,y,5,5);
 		}
 
-		public void drawNodeDots(final Stack<NodeStackItem> nodeStack) {
+		public void drawNodeDots(final Stack<TreeDrawerNode> nodeStack) {
 			if(nodeStack == null || nodeStack.isEmpty()) {
 				return;
 			}
 			while(!nodeStack.isEmpty()) {
-				NodeStackItem nodeItem = nodeStack.pop();
-				drawNodeDot(nodeItem.getNode());
+				TreeDrawerNode node = nodeStack.pop();
+				drawNodeDot(node);
 			}
 		}
 
