@@ -97,7 +97,7 @@ public interface TreeSelectionI {
 	 * @param max
 	 *            the maximum index to select
 	 */
-	public abstract void selectIndexRange(int min, int max);
+	public abstract void selectNewIndexRange(int min, int max);
 
 	/**
 	 * Selects a range of indexes.
@@ -107,7 +107,7 @@ public interface TreeSelectionI {
 	 * @param max
 	 *            the maximum index to select
 	 */
-	public abstract void selectAddedIndexRange(int min, int max);
+	public abstract void selectIndexRange(int min, int max);
 
 	/**
 	 * @return The number of selected indexes.

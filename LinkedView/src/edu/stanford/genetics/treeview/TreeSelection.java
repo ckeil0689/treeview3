@@ -210,11 +210,11 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectIndexRange(int,
-	 * int)
+	 * @see edu.stanford.genetics.treeview.TreeSelectionI#selectNewIndexRange(
+	 * int,int)
 	 */
 	@Override
-	public void selectIndexRange(int min, int max) {
+	public void selectNewIndexRange(int min, int max) {
 
 		LogBuffer.println("Selection Min: " + min + " Max: " + max);
 
@@ -238,7 +238,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 * @param max
 	 */
 	@Override
-	public void selectAddedIndexRange(int min, int max) {
+	public void selectIndexRange(int min, int max) {
 
 		if(min > max) {
 			final int swap = min;

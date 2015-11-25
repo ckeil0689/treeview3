@@ -134,7 +134,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 //			final int end = (int) (selectedNode.getRightLeaf().getIndex());
 //
 //			geneSelection.deselectAllIndexes();
-//			geneSelection.selectIndexRange(start, end);
+//			geneSelection.selectNewIndexRange(start, end);
 //			geneSelection.setSelectedNode(selectedNode.getId());
 //			
 //		} else {
