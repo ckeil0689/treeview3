@@ -238,7 +238,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 		}
 
 		for(int i = min;i <= max;i++) {
-			integerSelection.set(i,true);
+			setIndexSelection(i,true);
 		}
 	}
 
