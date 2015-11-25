@@ -1,5 +1,7 @@
 package Controllers;
 
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -323,7 +325,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * @author rleach
 	 */
 	private class DividerAdapter extends MouseAdapter {
-		MapContainer map;
+		private MapContainer map;
 		public DividerAdapter(MapContainer map) {
 			super();
 			this.map = map;
