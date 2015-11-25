@@ -153,7 +153,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 //
 //			arraySelection.deselectAllIndexes();
 //			arraySelection.setSelectedNode(selectedNode.getId());
-//			arraySelection.selectIndexRange(start, end);
+//			arraySelection.selectNewIndexRange(start, end);
 //			arraySelection.notifyObservers();
 //			arraySelection.notifyObservers();
 //		}

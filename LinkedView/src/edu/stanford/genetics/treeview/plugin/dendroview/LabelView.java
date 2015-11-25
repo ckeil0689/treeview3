@@ -210,7 +210,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//21 = Test whether the pixel index determined by 2 different methods is
 		//     the same
 		//22 = Debug the ChangeListener attached to the secondary scrollbar
-		//23 = Debug tree-hover label coloring
+		//23 = Debug tree-hover label coloring &  option-click deselect when nothing is selected
 		//24 = Debug the lightening of the non-label-port labels
 
 		panel = scrollPane;
@@ -1853,8 +1853,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public void mousePressed(final MouseEvent e) {
 
-		if(!enclosingWindow().isActive())
+		if(!enclosingWindow().isActive() ||
+			(SwingUtilities.isLeftMouseButton(e) && e.isControlDown())) {
+			debug("Control is down - do nothing on pressed",23);
 			return;
+		}
 
 		// if left button is used
 		if(SwingUtilities.isLeftMouseButton(e)) {
@@ -1892,8 +1895,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 
-		if (!enclosingWindow().isActive())
+		if (!enclosingWindow().isActive() ||
+			(SwingUtilities.isLeftMouseButton(e) && e.isControlDown())) {
+			debug("Control is down - do nothing on release",23);
 			return;
+		}
 
 		//When left button is used
 		//This might interfere with mouseClicked - That should be checked...
@@ -1917,13 +1923,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			if(otherSelection.getNSelectedIndexes() > 0) {
 				if(e.isShiftDown()) {
 					drawSelection.selectIndexRange(map.getSelectingStart(),
-					                               hDI);
+						hDI);
 				} else if(e.isMetaDown()) {
+					debug("Toggling selection of index range [" +
+						map.getSelectingStart() +
+						"] to [" + hDI + "]",23);
 					toggleSelectRange(map.getSelectingStart(),
 					                  hDI);
 				} else if(e.isAltDown()) {
+					debug("Toggling selection of index range [" +
+						map.getSelectingStart() +
+						"] to [" + hDI + "]",23);
 					deSelectRange(map.getSelectingStart(),
-					              hDI);
+						hDI);
 				} else {
 					//Deselect everything
 					drawSelection.deselectAllIndexes();
@@ -1931,16 +1943,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 					//Select what was dragged over
 					otherSelection.selectAllIndexes();
-					drawSelection.selectIndexRange(map.getSelectingStart(),
-					                               hDI);
+					drawSelection.selectNewIndexRange(map.getSelectingStart(),
+						hDI);
 				}
-			} else {
+			} else if(!e.isAltDown()) {
 				//Assumes there is no selection at all & selects what was
 				//dragged over
 				otherSelection.selectAllIndexes();
 				drawSelection
-				.selectIndexRange(map.getSelectingStart(),
-				                  map.getIndex(getPrimaryHoverPosition(e)));
+				.selectNewIndexRange(map.getSelectingStart(),
+					map.getIndex(getPrimaryHoverPosition(e)));
 			}
 		}
 
@@ -2010,6 +2022,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 
 		for(int i = start;i <= end;i++) {
+			debug("Setting selection of index [" + i + "] to false in loop",
+				23);
 			drawSelection.setIndexSelection(i,false);
 		}
 	}
@@ -2718,6 +2732,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		final int index = getPrimaryHoverIndex(e);
 
 		if (SwingUtilities.isLeftMouseButton(e)) {
+			if(e.isControlDown()) {
+				debug("Control is down - do nothing on click",23);
+				return;
+			}
 			if (otherSelection.getNSelectedIndexes() > 0) {
 				if(e.isMetaDown() && e.isAltDown()) {
 					drawSelection.deselectAllIndexes();
@@ -2725,13 +2743,17 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				} else if(e.isShiftDown()) {
 					toggleSelectFromClosestToIndex(drawSelection,index);
 				} else if(e.isMetaDown()) {
+					debug("Toggling selection of index [" + index +
+						"]",23);
 					toggleSelect(drawSelection,index);
 				} else if(e.isAltDown()) {
-					drawSelection.setIndexSelection(index, false);
+					debug("Setting selection of index [" + index + "] to false",
+						23);
+					drawSelection.setIndexSelection(index,false);
 				} else {
 					selectAnew(drawSelection,index);
 				}
-			} else {
+			} else if(!e.isAltDown()) {
 				//Assumes there is no selection at all
 				drawSelection.setIndexSelection(index, true);
 				otherSelection.selectAllIndexes();
