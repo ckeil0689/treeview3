@@ -45,11 +45,14 @@ public class InteractiveMatrixView extends MatrixView {
 	 * Rectangle to track yellow selected rectangle (pixels)
 	 */
 	private List<Rectangle> selectionRectList = new ArrayList<Rectangle>();
+	private Rectangle tmpRect = new Rectangle();
 
 	/**
 	 * Circle to be used as indicator for selection
 	 */
 	private List<Ellipse2D.Double> indicatorCircleList = null;
+
+	private boolean overlayTempChange = false;
 
 	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
@@ -61,10 +64,12 @@ public class InteractiveMatrixView extends MatrixView {
 		super();
 
 		setLabelPortMode(true);
-		debug = 0;
+		debug = 14;
 		//1 = Debug double-click detection
 		//10 = Debug click dragging
 		//11 = Debug zoom animation "toward" selection/sub-selection
+		//13 = Debug zooming to/toward a target
+		//14 = Debug temporary band drawing upon mousePressed
 	}
 
 	/**
@@ -110,6 +115,10 @@ public class InteractiveMatrixView extends MatrixView {
 	@Override
 	protected void updateBuffer(final Graphics g) {
 
+		debug("Updating buffer.  Temporary band change? [" + (isOverlayTempChange() ? "yes" : "no") + "]",14);
+
+		//Don't need to repaint on only a hover change - waste of effort - it's
+		//only for other observers and other functionality here
 		if(xmap.hoverChanged() || ymap.hoverChanged()) {
 			xmap.unsetHoverChanged();
 			ymap.unsetHoverChanged();
@@ -120,7 +129,8 @@ public class InteractiveMatrixView extends MatrixView {
 
 		revalidateScreen();
 
-		if (!offscreenValid) {
+		if (!offscreenValid || isOverlayTempChange()) {
+			setOverlayTempChange(false);
 			// clear the pallette...
 			g2d.setColor(GUIFactory.DEFAULT_BG);
 			g2d.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
@@ -144,13 +154,20 @@ public class InteractiveMatrixView extends MatrixView {
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
 
+		debug("paintComposite.  Temporary band change? [" + (isOverlayTempChange() ? "yes" : "no") + "]",14);
+
 		if(xmap.hoverChanged() || ymap.hoverChanged()) {
 			xmap.unsetHoverChanged();
 			ymap.unsetHoverChanged();
 			return;
 		}
-		
+
 		Graphics2D g2 = (Graphics2D) g;
+
+		if(isOverlayTempChange()) {
+			setOverlayTempChange(false);
+			g2.drawRect(tmpRect.x, tmpRect.y, tmpRect.width, tmpRect.height);
+		}
 
 		if (selectionRectList != null) {
 			//Reinitialize the graphics object
@@ -226,6 +243,30 @@ public class InteractiveMatrixView extends MatrixView {
 			
 			setIndicatorCircleBounds();
 		}
+	}
+
+	/**
+	 * @author rleach
+	 * @return the overlayTempChange
+	 */
+	public boolean isOverlayTempChange() {
+		return(overlayTempChange);
+	}
+
+	/**
+	 * @author rleach
+	 * @param overlayTempChange the overlayTempChange to set
+	 */
+	public void setOverlayTempChange(boolean overlayTempChange) {
+		this.overlayTempChange = overlayTempChange;
+	}
+
+	/**
+	 * @author rleach
+	 * @param tmpRect the tmpRect to set
+	 */
+	public void setTmpRect(Rectangle tmpRect) {
+		this.tmpRect = tmpRect;
 	}
 
 	/**

@@ -1,5 +1,7 @@
 package Controllers;
 
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +11,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -29,6 +32,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.CdtFilter;
@@ -59,6 +64,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
+import java.awt.event.MouseListener;
 
 /* 
  * NOTES: 
@@ -261,11 +267,56 @@ Controller {
 		dendroView.addSplitPaneListener(new SplitPaneListener());
 		dendroView.addResizeListener(new AppFrameListener());
 		dendroView.addDeselectClickListener(new PanelClickDeselector());
-		
+		addDividerHoverListeners();
+
 		mvController.addListeners();
 	}
 
 	/* -------------- Listeners --------------------- */
+	/**
+	 * This adds mouse listeners to the split pane divider so that when the
+	 * cursor is over a divider, we can detect it and keep the whizzing labels
+	 * visible.
+	 * @author rleach
+	 */
+	private void addDividerHoverListeners() {
+
+		BasicSplitPaneUI rbspUI =
+			(BasicSplitPaneUI) dendroView.getRowSplitPane().getUI();
+		BasicSplitPaneDivider rbspDivider = rbspUI.getDivider();
+		rbspDivider.addMouseListener(new DividerAdapter(interactiveYmap));
+
+		BasicSplitPaneUI cbspUI =
+			(BasicSplitPaneUI) dendroView.getColSplitPane().getUI();
+		BasicSplitPaneDivider cbspDivider = cbspUI.getDivider();
+		cbspDivider.addMouseListener(new DividerAdapter(interactiveXmap));
+	}
+
+	/**
+	 * This mouse adapter extension allows one to control the visibility of the
+	 * labels by setting values in mapcontainer objects.
+	 * @author rleach
+	 */
+	private class DividerAdapter extends MouseAdapter {
+		private MapContainer map;
+		public DividerAdapter(MapContainer map) {
+			super();
+			this.map = map;
+		}
+		public void mouseEntered(MouseEvent e) {
+			map.setOverDivider(true);
+		}
+		public void mouseExited(MouseEvent e) {
+			map.setOverDivider(false);
+		}
+		public void mousePressed(MouseEvent e) {
+			map.setDraggingDivider(true);
+		}
+		public void mouseReleased(MouseEvent e) {
+			map.setDraggingDivider(false);
+		}
+	}
+
 	/**
 	 * When mouse click happens on dendroPane in DendroView, everything will be
 	 * deselected.

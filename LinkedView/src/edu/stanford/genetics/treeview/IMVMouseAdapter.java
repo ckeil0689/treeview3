@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -12,6 +13,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
@@ -57,7 +59,9 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 	private MouseEvent dragEvent;
 	private MouseEvent pressedEvent;   //To process clicks initiated via timer
-	
+
+	private int debug;
+
 	public IMVMouseAdapter(final MatrixViewController mvController, 
 			final InteractiveMatrixView imView, 
 			final MapContainer interactiveXmap, 
@@ -73,11 +77,14 @@ public class IMVMouseAdapter extends MouseAdapter {
 		
 		this.xmap = interactiveXmap;
 		this.ymap = interactiveYmap;
+
+		debug = 1;
+		//1 = Debug the temporary band drawn for single-clicks
 	}
 	
 	@Override
 	public void mouseMoved(final MouseEvent e) {
-					
+
 		/* TODO passing index makes the most sense but an overloaded method 
 		 * that takes a pixel works well too. 
 		 * Reduces clutter in calling classes a little bit.
@@ -90,8 +97,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 	@Override
 	public void mousePressed(final MouseEvent e) {
 
-		LogBuffer.println("Mouse pressed");
-		
 		if(!imView.enclosingWindow().isActive()) {
 			return;
 		}
@@ -113,6 +118,8 @@ public class IMVMouseAdapter extends MouseAdapter {
 		//Else this is a first click event - set clickCount to 1 and start
 		//the timer to listen for more clicks
 		else {
+			processTemporaryLeftClick(e.getX(),e.getY());
+
 			Integer tmp =
 				(Integer) Toolkit.getDefaultToolkit().
 				getDesktopProperty("awt.multiClickInterval");
@@ -149,7 +156,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	@Override
 	public void mouseDragged(final MouseEvent e) {
 
-		LogBuffer.println("// mouse dragged");
+		imView.debug("mouse dragged",10);
 		
 		if (!imView.enclosingWindow().isActive()) {
 			return;
@@ -183,8 +190,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 
-		LogBuffer.println("mouse released");
-		
 		if(!imView.enclosingWindow().isActive() || !isMousePressed) {
 			return;
 		}
@@ -298,9 +303,13 @@ public class IMVMouseAdapter extends MouseAdapter {
 		if (!imView.enclosingWindow().isActive()) {
 			return;
 		}
-		
-		imView.setHasMouse(true);
-		imView.requestFocus();
+
+		//Commented the following out because clicking in a search box and then
+		//moving the cursor away before typing was making the focus go away.
+		//The user should explicitly use tab or a click to change focus before
+		//navigating with the keyboard.
+//		imView.setHasMouse(true);
+//		imView.requestFocus();
 	}
 
 	@Override
@@ -644,6 +653,13 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 				if(stepwiseZoom) {
 					if(zoomSpeed == 2) {
+						imView.debug("Hard zooming to columns: " +
+							colSelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+							",(" + colSelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) +
+							" - " + colSelection.getMinContiguousIndex(xmap.getIndex(xPixel)) + " + 1) and rows: " +
+							rowSelection.getMinContiguousIndex(xmap.getIndex(xPixel)) +
+							",(" + rowSelection.getMaxContiguousIndex(xmap.getIndex(xPixel)) +
+							" - " + rowSelection.getMinContiguousIndex(xmap.getIndex(xPixel)) + " + 1)",13);
 						imView.hardZoomToTarget(
 							colSelection.getMinContiguousIndex(
 								xmap.getIndex(xPixel)),
@@ -1161,7 +1177,28 @@ public class IMVMouseAdapter extends MouseAdapter {
 		
 		imView.repaint();
 	}
-	
+
+	public void processTemporaryLeftClick(int xPixelStart,int yPixelStart) {
+		debug("Drawing band temporarily for a possible single-click.",1);
+
+		imView.drawBand(getPixelRect(dragRect));
+
+		startPoint.setLocation(xmap.getPixel(xmap.getIndex(xPixelStart)),
+			ymap.getPixel(ymap.getIndex(yPixelStart)));
+
+		endPoint.setLocation(xmap.getPixel(xmap.getIndex(xPixelStart) + 1),
+			ymap.getPixel(ymap.getIndex(yPixelStart) + 1));
+
+		dragRect.setLocation(startPoint);
+		dragRect.setSize((int) xmap.getScale(),(int) ymap.getScale());
+		dragRect.add(endPoint);
+
+		imView.setTmpRect(dragRect);
+
+		imView.setOverlayTempChange(true);
+		imView.repaint();
+	}
+
 	/**
 	 * Processes left click drag end event
 	 * @author rleach
@@ -1446,5 +1483,11 @@ public class IMVMouseAdapter extends MouseAdapter {
 		int h = ymap.getPixel(l.y + l.height + 1) - y;
 		
 		return new Rectangle(x, y, w, h);
+	}
+
+	private void debug(String msg,int level) {
+		if(level == debug) {
+			LogBuffer.println(msg);
+		}
 	}
 }

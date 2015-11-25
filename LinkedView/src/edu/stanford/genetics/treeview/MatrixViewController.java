@@ -630,8 +630,8 @@ ConfigNodePersistent, Controller {
 	 */
 	public void selectRectangle(final Point start, final Point end) {
 
-		LogBuffer.println("Selecting a rectangle: " + start.toString() 
-				+ ", " + end.toString());
+//		LogBuffer.println("Selecting a rectangle: " + start.toString() 
+//				+ ", " + end.toString());
 		
 		// sort so that ep is upper left corner
 		if (end.x < start.x) {
