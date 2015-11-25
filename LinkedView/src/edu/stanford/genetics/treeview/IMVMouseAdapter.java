@@ -97,8 +97,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 	@Override
 	public void mousePressed(final MouseEvent e) {
 
-		LogBuffer.println("Mouse pressed");
-		
 		if(!imView.enclosingWindow().isActive()) {
 			return;
 		}
@@ -158,7 +156,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	@Override
 	public void mouseDragged(final MouseEvent e) {
 
-		LogBuffer.println("// mouse dragged");
+		imView.debug("mouse dragged",10);
 		
 		if (!imView.enclosingWindow().isActive()) {
 			return;
@@ -192,8 +190,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 
-		LogBuffer.println("mouse released");
-		
 		if(!imView.enclosingWindow().isActive() || !isMousePressed) {
 			return;
 		}

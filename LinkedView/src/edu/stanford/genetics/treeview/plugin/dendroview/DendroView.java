@@ -31,7 +31,6 @@ import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
-
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;

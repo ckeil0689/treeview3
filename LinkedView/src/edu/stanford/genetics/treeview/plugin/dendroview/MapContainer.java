@@ -71,6 +71,9 @@ public class MapContainer extends Observable implements Observer,
 	private boolean overLabels            = false;
 	private boolean overLabelsScrollbar   = false;
 	private boolean overInteractiveMatrix = false;
+	private boolean overTree              = false;
+	private boolean overDivider           = false;
+	private boolean draggingDivider       = false;
 	private boolean labelsBeingScrolled   = false;
 	private int     hoverPixel            = -1;
 	private int     hoverIndex            = -1;
@@ -2037,6 +2040,44 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	/**
+	 * @param overTree the overTree to set
+	 */
+	public void setOverTree(boolean overTree) {
+		
+		this.overTree = overTree;
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @param overDivider the overDivider to set
+	 */
+	public void setOverDivider(boolean overDivider) {
+		
+		this.overDivider = overDivider;
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @author rleach
+	 * @return the draggingDivider
+	 */
+	public boolean isDraggingDivider() {
+		return(draggingDivider);
+	}
+
+	/**
+	 * @author rleach
+	 * @param draggingDivider the draggingDivider to set
+	 */
+	public void setDraggingDivider(boolean draggingDivider) {
+		this.draggingDivider = draggingDivider;
+	}
+
+	/**
 	 * @param overInteractiveMatrix the overInteractiveMatrix to set
 	 */
 	public void setOverInteractiveMatrix(boolean overInteractiveMatrix) {
@@ -2062,7 +2103,8 @@ public class MapContainer extends Observable implements Observer,
 	public boolean overALabelPortLinkedView() {
 		
 		return(overLabels || overInteractiveMatrix || overLabelsScrollbar ||
-		       labelsBeingScrolled || selecting);
+			labelsBeingScrolled || selecting || overTree || overDivider ||
+			draggingDivider);
 	}
 
 	/**
