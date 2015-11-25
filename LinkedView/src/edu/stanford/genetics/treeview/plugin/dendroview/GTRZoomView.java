@@ -135,7 +135,7 @@ public class GTRZoomView extends ModelView implements MouseListener,
 
 			geneSelection.deselectAllIndexes();
 			geneSelection.setSelectedNode(selectedNode.getId());
-			geneSelection.selectIndexRange(start, end);
+			geneSelection.selectNewIndexRange(start, end);
 			geneSelection.notifyObservers();
 		}
 	}

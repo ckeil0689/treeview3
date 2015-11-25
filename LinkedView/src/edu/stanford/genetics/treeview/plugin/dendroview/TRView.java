@@ -139,7 +139,7 @@ public class TRView extends ModelViewBuffered implements KeyListener {
 
 			treeSelection.deselectAllIndexes();
 			treeSelection.setSelectedNode(selectedNode.getId());
-			treeSelection.selectIndexRange(start, end);
+			treeSelection.selectNewIndexRange(start,end);
 			treeSelection.notifyObservers();
 		}
 

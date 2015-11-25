@@ -646,8 +646,8 @@ ConfigNodePersistent, Controller {
 			start.y = y;
 		}
 
-		rowSelection.selectIndexRange(start.y, end.y);
-		colSelection.selectIndexRange(start.x, end.x);
+		rowSelection.selectNewIndexRange(start.y, end.y);
+		colSelection.selectNewIndexRange(start.x, end.x);
 
 		rowSelection.notifyObservers();
 		colSelection.notifyObservers();
