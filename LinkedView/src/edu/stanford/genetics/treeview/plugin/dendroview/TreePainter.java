@@ -52,8 +52,7 @@ public class TreePainter extends TreeDrawer {
 	public void paintSubtree(final Graphics graphics,
 		final LinearTransformation xScaleEq,
 		final LinearTransformation yScaleEq, final Rectangle dest,
-		final TreeDrawerNode root, final boolean isSelected,
-		final boolean isLeft,final int hoverIndex,
+		final TreeDrawerNode root,final boolean isLeft,final int hoverIndex,
 		final boolean isNodeHovered,final int minVisLabelIndex,
 		final int maxVisLabelIndex,final TreeSelectionI treeSelection,
 		final TreeDrawerNode hoveredNode) {
