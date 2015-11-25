@@ -35,7 +35,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	private static final long serialVersionUID = 1L;
 
-	private final Color whiz_color = GUIFactory.MAIN;
 	private final Color whiz_bg_color = new Color(215,234,251); //light pale blue
 	protected TreeSelectionI treeSelection;
 	protected HeaderSummary headerSummary;
@@ -165,15 +164,14 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			treeSelection.notifyObservers();
 		}
 
+		//Keep the min and max updated so that the labels will color correctly
+		//based on tree hover
 		if(hoveredNode != null) {
 			map.setHoverTreeMinIndex(
 				(int) hoveredNode.getLeftLeaf().getIndex());
 			map.setHoverTreeMaxIndex(
 				(int) hoveredNode.getRightLeaf().getIndex());
 		}
-		// if ((status != null) && hasMouse) {
-		// status.setMessages(getStatus());
-		// }
 	}
 
 	/**
@@ -240,22 +238,11 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 */
 	public void setHoveredNode(final TreeDrawerNode n) {
 
-		if (hoveredNode == n) {
+		if(hoveredNode == n) {
 			return;
 		}
 
-		/* painting old hovered node black again */
-		paintNode(hoveredNode,false,false);
-
-		/* keep old node selected (if it is) while hovering */
-		if (selectedNode != null) {
-			paintNode(selectedNode,true,false);
-		}
-
 		hoveredNode = n;
-
-		/* paint the hovered node and its children */
-		paintNode(hoveredNode,false,true);
 
 		synchMap();
 		repaint();
@@ -263,15 +250,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	public void unsetHoveredNode() {
 		hoveredNode = null;
-	}
-
-	public void repaintHoveredNode() {
-		if(hoveredNode == null) {
-			return;
-		}
-
-		/* paint the hovered node and its children */
-		paintNode(hoveredNode,false,true);
 	}
 
 	/**
@@ -480,12 +458,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			/* draw trees */
 			treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,
 				getPrimaryHoverIndex(),treeSelection,hoveredNode);
-
-			/* Repaint the hovered node */
-			repaintHoveredNode();
-		} else {
-			// System.out.println("didn't update buffer: valid =
-			// " + offscreenValid + " drawer = " + drawer);
 		}
 	}
 
@@ -541,8 +513,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	@Override
 	public void keyPressed(final KeyEvent e) {
 
-		if (selectedNode == null)
+		if(selectedNode == null) {
 			return;
+		}
 
 		final int c = e.getKeyCode();
 
@@ -615,14 +588,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		treePainter.paintSubtree(offscreenGraphics,xScaleEq,yScaleEq,
 			destRect,selectedNode,isLeft,getPrimaryHoverIndex(),false,
 			treeSelection,hoveredNode);
-//		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-//				destRect, current, true, isLeft, getPrimaryHoverIndex(),false,
-//				map.getFirstVisibleLabel(),map.getLastVisibleLabel());
-//		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
-//				destRect, selectedNode, true, isLeft, getPrimaryHoverIndex(),
-//				false,map.getFirstVisibleLabel(),map.getLastVisibleLabel());
 
-//		synchMap();
 		repaint();
 	}
 
@@ -639,15 +605,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 			destRect,current,isLeft,getPrimaryHoverIndex(),false,treeSelection,
 			hoveredNode);
-//		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
-//				destRect, current, false, isLeft, getPrimaryHoverIndex(),false,
-//				map.getFirstVisibleLabel(),map.getLastVisibleLabel());
-//		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-//				destRect, current.getLeft(), false, isLeft,
-//				getPrimaryHoverIndex(),false,map.getFirstVisibleLabel(),
-//				map.getLastVisibleLabel());
 
-//		synchMap();
 		repaint();
 	}
 
@@ -664,15 +622,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
 			destRect,current,isLeft,getPrimaryHoverIndex(),false,treeSelection,
 			hoveredNode);
-//		treePainter.paintSingle(offscreenGraphics, xScaleEq, yScaleEq,
-//				destRect, current, false, isLeft, getPrimaryHoverIndex(),false,
-//				map.getFirstVisibleLabel(),map.getLastVisibleLabel());
-//		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-//				destRect, current.getRight(), false, isLeft,
-//				getPrimaryHoverIndex(),false,map.getFirstVisibleLabel(),
-//				map.getLastVisibleLabel());
 
-//		synchMap();
 		repaint();
 	}
 
