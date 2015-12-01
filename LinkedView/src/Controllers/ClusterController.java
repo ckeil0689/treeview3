@@ -283,8 +283,12 @@ public class ClusterController {
 			boolean wasColAxisClustered = wasAxisClustered(
 					tvModel.getFileSet().getAtr(), ".atr", tvModel.aidFound());
 			
+			// only warn of axis was clustered before AND user wants to cluster
+			boolean warnRowAxis = wasRowAxisClustered && rowReady;
+			boolean warnColAxis = wasColAxisClustered && colReady;
+			
 			String message = "Something happened :(";
-			if(wasRowAxisClustered && wasColAxisClustered) {
+			if(warnRowAxis && warnColAxis) {
 				message = "Both axes have been clustered before. "
 						+ "Would you like to cluster your selected axes again?";
 				
@@ -293,21 +297,24 @@ public class ClusterController {
 					clusterCheck[COL_IDX] = false;
 				}
 				
-			} else if(wasRowAxisClustered && !wasColAxisClustered) {
+			} else if(warnRowAxis && !warnColAxis) {
 				message = "The row axis has been clustered before. "
 						+ "Would you like to cluster the rows again?";
 				
 				clusterCheck[ROW_IDX]= confirmChoice(message);
 					
-			} else if(!wasRowAxisClustered && wasColAxisClustered){
+			} else if(!warnRowAxis && warnColAxis){
 				message = "The column axis has been clustered before. "
 						+ "Would you like to cluster the columns again?";
 				
 				clusterCheck[COL_IDX]= confirmChoice(message);
 			}
 			
-			overAllClusterStatus[ROW_IDX] = rowReady || clusterCheck[ROW_IDX];
-			overAllClusterStatus[COL_IDX] = colReady || clusterCheck[COL_IDX];
+			// final cluster status for later tree file integrity check
+			overAllClusterStatus[ROW_IDX] = wasRowAxisClustered 
+					|| clusterCheck[ROW_IDX];
+			overAllClusterStatus[COL_IDX] = wasColAxisClustered 
+					|| clusterCheck[COL_IDX];
 			
 			return clusterCheck;
 		}
