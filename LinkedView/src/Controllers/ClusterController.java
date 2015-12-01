@@ -555,10 +555,11 @@ public class ClusterController {
 		 * it is considered to be clustered. This is useful especially if
 		 * an axis was already clustered before so that the old tree file can
 		 * be carried over to the new FileSet.
-		 * @param oldFileRoot
-		 * @param newFileRoot
-		 * @param treeFileSuffix
-		 * @param axisIdx
+		 * @param oldFileRoot The root name of the older cdt file.
+		 * @param newFileRoot The root name of the new cdt file.
+		 * @param treeFileSuffix The tree file suffix to be used if a new file
+		 * is created.
+		 * @param axisIdx An integer identifying the axis.
 		 */
 		private void ensureTreeFilePresence(final String oldFileRoot, 
 				final String newFileRoot, final String treeFileSuffix, 
