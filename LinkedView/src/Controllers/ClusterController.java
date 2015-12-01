@@ -583,6 +583,11 @@ public class ClusterController {
 						LogBuffer.println("But old " + axis_id 
 								+ " tree file was found!");
 						copyFile(oldTreeFilePath, newTreeFilePath);
+					} else {
+						String message = "The tree file for the " + axis_id 
+								+ " axis could not be recovered. No trees "
+								+ "can be shown.";
+						JOptionPane.showMessageDialog(clusterDialog, message);
 					}
 				} else {
 					LogBuffer.println("Success! The " + axis_id 
