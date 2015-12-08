@@ -304,11 +304,11 @@ public class IMVMouseAdapter extends MouseAdapter {
 			return;
 		}
 
+		imView.setHasMouse(true);
 		//Commented the following out because clicking in a search box and then
 		//moving the cursor away before typing was making the focus go away.
 		//The user should explicitly use tab or a click to change focus before
 		//navigating with the keyboard.
-//		imView.setHasMouse(true);
 //		imView.requestFocus();
 	}
 
