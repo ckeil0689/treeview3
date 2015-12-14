@@ -52,6 +52,14 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	//the left of the matrix)
 	protected boolean isLeft;
 
+	private final static int REPAINT_INTERVAL = 50;  //update every 50 millisecs
+	/* TODO: If anastasia doesn't like trees linked to whizzing labels,
+	 * uncomment the following commented code. If she likes it, delete. This
+	 * code saves compute cycles, but makes the trees sometimes move out of sync
+	 * with the labels. */
+//	private int slowRepaintInterval = 1000;//update every 1s if mouse not moving
+	private int lastHoverIndex = -1;
+
 	public TRView(final boolean isGeneTree) {
 
 		super();
@@ -652,11 +660,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	//the tree panes to update more quickly and regularly, as the
 	//notifyObservers method called from MapContainer was resulting in sluggish
 	//updates
-	private int repaintInterval = 50;      //update every 50 milliseconds
-//	private int slowRepaintInterval = 1000;//update every 1s if mouse not moving
-	private int lastHoverIndex = -1;
 	private Timer repaintTimer =
-		new Timer(repaintInterval,
+		new Timer(REPAINT_INTERVAL,
 		          new ActionListener() {
 			/**
 			 * The timer "ticks" by calling
@@ -679,6 +684,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			}
 		});
 
+	/* TODO: If anastasia doesn't like trees linked to whizzing labels,
+	 * uncomment the following commented code. If she likes it, delete. This
+	 * code saves compute cycles, but makes the trees sometimes move out of sync
+	 * with the labels. */
 //	//Timer to wait a bit before slowing down the slice _timer for painting.
 //	//This conserves processor cycles in the interests of performance.  Note
 //	//that there is a pair of timers for each axis.
@@ -717,6 +726,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 					"animation",9);
 				repaintTimer.stop();
 				lastHoverIndex = -1;
+				/* TODO: If anastasia doesn't like trees linked to whizzing labels,
+				 * uncomment the following commented code. If she likes it, delete. This
+				 * code saves compute cycles, but makes the trees sometimes move out of sync
+				 * with the labels. */
 //				//Disable the turnOffRepaintTimer if it is running, because
 //				//we've already stopped repaints
 //				if(slowDownRepaintTimer != null) {
@@ -735,6 +748,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 				debug("Hovering across matrix - starting up animation",9);
 				repaintTimer.start();
 				lastHoverIndex = getPrimaryHoverIndex();
+				/* TODO: If anastasia doesn't like trees linked to whizzing labels,
+				 * uncomment the following commented code. If she likes it, delete. This
+				 * code saves compute cycles, but makes the trees sometimes move out of sync
+				 * with the labels. */
 //				//Disable any slowDownRepaintTimer that might've been left over
 //				if(slowDownRepaintTimer != null) {
 //					slowDownRepaintTimer.stop();
@@ -750,9 +767,13 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		//after a brief period of no motion)
 		else if(map.overALabelPortLinkedView() &&
 			getPrimaryHoverIndex() == lastHoverIndex) {
-			if(repaintTimer.getDelay() == repaintInterval) {
+			if(repaintTimer.getDelay() == REPAINT_INTERVAL) {
 				debug("Hovering on one spot [" + lastHoverIndex +
 				      "] - slowing animation",9);
+				/* TODO: If anastasia doesn't like trees linked to whizzing labels,
+				 * uncomment the following commented code. If she likes it, delete. This
+				 * code saves compute cycles, but makes the trees sometimes move out of sync
+				 * with the labels. */
 //				if(slowDownRepaintTimer == null) {
 //					slowDownRepaintTimer =
 //						new Timer(delay,slowDownRepaintListener);
@@ -771,10 +792,14 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 				"] current hover index [" + getPrimaryHoverIndex() + "]",9);
 			if(repaintTimer != null && !repaintTimer.isRunning()) {
 				repaintTimer.start();
+				/* TODO: If anastasia doesn't like trees linked to whizzing labels,
+				 * uncomment the following commented code. If she likes it, delete. This
+				 * code saves compute cycles, but makes the trees sometimes move out of sync
+				 * with the labels. */
 //			} else if(repaintTimer.getDelay() == slowRepaintInterval) {
 //				debug("Speeding up the repaint interval because mouse " +
 //				      "movement detected",9);
-//				repaintTimer.setDelay(repaintInterval);
+//				repaintTimer.setDelay(REPAINT_INTERVAL);
 //				repaintTimer.restart();
 			}
 //			//Disable the slowDownRepaintTimer because we have detected
