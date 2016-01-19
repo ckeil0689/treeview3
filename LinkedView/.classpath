@@ -8,6 +8,13 @@
 	<classpathentry kind="lib" path="compile_lib/miglayout-4.0-swing.jar"/>
 	<classpathentry kind="lib" path="compile_lib/swingx-core-1.6.2-AutoCompletition.jar"/>
 	<classpathentry kind="lib" path="compile_lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="compile_lib/freehep-graphics2d-2.4.jar"/>
+	<classpathentry kind="lib" path="compile_lib/freehep-graphicsbase-2.4.jar"/>
+	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-2.4.jar"/>
+	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-java-2.4.jar"/>
+	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-pdf-2.4.jar"/>
+	<classpathentry kind="lib" path="compile_lib/freehep-io-2.0.2.jar"/>
+	<classpathentry kind="lib" path="compile_lib/freehep-util-2.0.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

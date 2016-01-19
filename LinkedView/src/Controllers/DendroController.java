@@ -26,6 +26,7 @@ import javax.swing.ActionMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -64,7 +65,18 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
+
 import java.awt.event.MouseListener;
+
+//Testing PDF export options
+import java.awt.Dimension;
+import java.io.File;
+import java.util.Properties;
+
+import org.freehep.graphics2d.VectorGraphics;
+//import org.freehep.graphicsio.ps.PSGraphics2D;
+//import org.freehep.util.export.ExportDialog;
+import org.freehep.graphicsio.pdf.PDFGraphics2D;
 
 /* 
  * NOTES: 
@@ -559,6 +571,26 @@ Controller {
 				} else {
 					dendroView.getInteractiveMatrixView()
 							.smoothAnimatedZoomOut();
+				}
+			} else if (e.getSource() == dendroView.getExportButton()) {
+
+				try {
+					Properties p = new Properties();
+					p.setProperty("PageSize","A5");
+					VectorGraphics g = new PDFGraphics2D(new File("Output.pdf"), new Dimension(400,300)); 
+					g.setProperties(p); 
+					g.startExport(); 
+					getInteractiveMatrixView().print(g);
+					g.endExport();
+					
+					//Had issues with the built-in export dialog:
+					//ExportDialog export = new ExportDialog();
+					//export.showExportDialog( null, "Export view as ...", (JComponent) getInteractiveMatrixView(), "export" );
+					//System.err.println("Image save complete");
+				
+				}
+				catch(Exception exc) {
+					exc.printStackTrace();
 				}
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
