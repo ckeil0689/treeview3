@@ -2,6 +2,7 @@ package Controllers;
 
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -77,6 +78,7 @@ import org.freehep.graphics2d.VectorGraphics;
 //import org.freehep.graphicsio.ps.PSGraphics2D;
 //import org.freehep.util.export.ExportDialog;
 import org.freehep.graphicsio.pdf.PDFGraphics2D;
+import org.freehep.graphicsio.svg.SVGGraphics2D;
 
 /* 
  * NOTES: 
@@ -578,9 +580,11 @@ Controller {
 					Properties p = new Properties();
 					p.setProperty("PageSize","A5");
 					VectorGraphics g = new PDFGraphics2D(new File("Output.pdf"), new Dimension(400,300)); 
+					//VectorGraphics g = new SVGGraphics2D(new File("Output.svg"), new Dimension(400,300)); 
 					g.setProperties(p); 
-					g.startExport(); 
-					getInteractiveMatrixView().print(g);
+					g.startExport();
+					//getInteractiveMatrixView().exportPixels(400,300);
+					getInteractiveMatrixView().exportPixels(g,400,300);
 					g.endExport();
 					
 					//Had issues with the built-in export dialog:

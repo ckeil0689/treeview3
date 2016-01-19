@@ -125,7 +125,38 @@ public abstract class MatrixView extends ModelViewProduced {
 		xmap.notifyObservers();
 		ymap.notifyObservers();
 	}
-	
+
+	public void exportPixels(int w, int h) {
+		/* TODO remove rectangle dependency of drawer. not needed. */
+		final Rectangle destRect = new Rectangle(0,0,w,h);
+		
+		final Rectangle sourceRect = new Rectangle(0, 0, 
+				xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
+
+		if (drawer != null) {
+			/* Set new offscreenPixels (pixel colors) */
+			drawer.paint(offscreenPixels, sourceRect, destRect,
+					offscreenScanSize);
+		}
+	}
+
+	public void exportPixels(Graphics g,int w, int h) {
+		/* TODO remove rectangle dependency of drawer. not needed. */
+		final Rectangle destRect = new Rectangle(0,0,w,h);
+		
+		final Rectangle sourceRect = new Rectangle(0, 0, 
+				xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
+
+		if (drawer != null) {
+			/* Set new offscreenPixels (pixel colors) */
+			drawer.paint(g, sourceRect, destRect, null);
+		}
+	}
+
+	public ArrayDrawer getDrawer() {
+		return(drawer);
+	}
+
 	@Override
 	protected void updatePixels() {
 		
@@ -343,7 +374,11 @@ public abstract class MatrixView extends ModelViewProduced {
 			createNewBuffer(x_tiles, y_tiles);
 		}
 	}
-	
+
+	public void refreshBuffer() {
+		offscreenImage = null;
+	}
+
 	/**
 	 * If an image does not exist yet, it will be created here. Its dimensions
 	 * in pixels directly correspond to the axis dimensions of the loaded model.
@@ -401,5 +436,4 @@ public abstract class MatrixView extends ModelViewProduced {
 		
 		this.dataChanged = true;
 	}
-
 }
