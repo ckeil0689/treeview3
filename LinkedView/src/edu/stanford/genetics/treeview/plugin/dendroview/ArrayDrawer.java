@@ -175,6 +175,32 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	}
 
 	/**
+	 * This method is intended to be used for drawing the matrix using vector
+	 * graphics (freehep's VectorGraphics2D object), thus there are no resizing
+	 * calculations.
+	 * @author rleach
+	 * @param g - Graphics or Graphics2D or VectorGraphics2D object
+	 * @param width - This should be the size of xmap
+	 * @param height - This should be the size of ymap
+	 */
+	public void paint(final Graphics g, final int width, final int height) {
+		for (int j = height - 1; j >= 0; j--) {
+			for (int i = width - 1; i >= 0; i--) {
+				//setPaintMode seems to help color overlapping (affecting the
+				//colors) a little, but doesn't fix it altogether. Probably
+				//useless. Note there appears to be an alpha channel in the
+				//output PDF.
+				g.setPaintMode();
+				g.setColor(getColor(i,j));
+				//drawRect is better than fillRect because there're no gaps, but
+				//still some color bleed for some reason at some zoom levels - I
+				//think that's due to the reader's poor rendering
+				g.drawRect(i,j,1,1);
+			}
+		}
+	}
+
+	/**
 	 * Paint the array values onto pixels. This method will do averaging if
 	 * multiple values map to the same pixel.
 	 *

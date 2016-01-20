@@ -126,35 +126,11 @@ public abstract class MatrixView extends ModelViewProduced {
 		ymap.notifyObservers();
 	}
 
-	public void exportPixels(int w, int h) {
-		/* TODO remove rectangle dependency of drawer. not needed. */
-		final Rectangle destRect = new Rectangle(0,0,w,h);
-		
-		final Rectangle sourceRect = new Rectangle(0, 0, 
-				xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
-
-		if (drawer != null) {
-			/* Set new offscreenPixels (pixel colors) */
-			drawer.paint(offscreenPixels, sourceRect, destRect,
-					offscreenScanSize);
-		}
-	}
-
 	public void exportPixels(Graphics g,int w, int h) {
-		/* TODO remove rectangle dependency of drawer. not needed. */
-		final Rectangle destRect = new Rectangle(0,0,w,h);
-		
-		final Rectangle sourceRect = new Rectangle(0, 0, 
-				xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
-
 		if (drawer != null) {
 			/* Set new offscreenPixels (pixel colors) */
-			drawer.paint(g, sourceRect, destRect, null);
+			drawer.paint(g,xmap.getMaxIndex() + 1,ymap.getMaxIndex() + 1);
 		}
-	}
-
-	public ArrayDrawer getDrawer() {
-		return(drawer);
 	}
 
 	@Override

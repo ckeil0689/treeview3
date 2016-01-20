@@ -576,22 +576,28 @@ Controller {
 				}
 			} else if (e.getSource() == dendroView.getExportButton()) {
 
+				//The following uses the forked freehep 2.4 project, compiled by
+				//maven 2, along with 2 jar files from the original freehep
+				//2.1.1 project
 				try {
 					Properties p = new Properties();
 					p.setProperty("PageSize","A5");
-					VectorGraphics g = new PDFGraphics2D(new File("Output.pdf"), new Dimension(400,300)); 
-					//VectorGraphics g = new SVGGraphics2D(new File("Output.svg"), new Dimension(400,300)); 
+					VectorGraphics g =
+						new PDFGraphics2D(new File("Output.pdf"),
+							new Dimension(interactiveXmap.getMaxIndex() + 1,
+								interactiveYmap.getMaxIndex() + 1));
+					//If we add any more formats, we will have to add the
+					//corresponding freehep 2.4 jar files to compile_lib and the
+					//build path
+					//VectorGraphics g = new SVGGraphics2D(new File("Output.svg"),
+					//	new Dimension(interactiveXmap.getMaxIndex() + 1,
+					//			interactiveYmap.getMaxIndex() + 1)); 
 					g.setProperties(p); 
 					g.startExport();
-					//getInteractiveMatrixView().exportPixels(400,300);
-					getInteractiveMatrixView().exportPixels(g,400,300);
+					getInteractiveMatrixView().exportPixels(g,
+						interactiveXmap.getMaxIndex() + 1,
+						interactiveYmap.getMaxIndex() + 1);
 					g.endExport();
-					
-					//Had issues with the built-in export dialog:
-					//ExportDialog export = new ExportDialog();
-					//export.showExportDialog( null, "Export view as ...", (JComponent) getInteractiveMatrixView(), "export" );
-					//System.err.println("Image save complete");
-				
 				}
 				catch(Exception exc) {
 					exc.printStackTrace();
