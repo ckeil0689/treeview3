@@ -65,15 +65,8 @@ public class Linker {
 			double distanceVal = 0;
 			int selectedRow = 0;
 
-			final int[] currentCluster = Helper.intListToArray(currentClusters.get(i));
-//					new int[currentClusters.get(i).size()];
-//
-//			/* Filling the array */
-//			for (int z = 0; z < currentCluster.length; z++) {
-//
-//				currentCluster[z] = currentClusters.get(i).get(z);
-//			}
-			
+			final int[] currentCluster = 
+					Helper.intListToArray(currentClusters.get(i));
 
 			/*
 			 * Only calculate distance if the current cluster is not part of the
