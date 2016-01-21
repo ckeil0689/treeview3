@@ -25,8 +25,8 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 public class ClusterProcessor {
 
 	private final TVDataMatrix originalMatrix;
-	private final IntHeaderInfo geneHeaderI;
-	private final IntHeaderInfo arrayHeaderI;
+	private final IntHeaderInfo rowHeaderI;
+	private final IntHeaderInfo colHeaderI;
 
 	private final String fileName;
 	private int pBarCount;
@@ -48,8 +48,8 @@ public class ClusterProcessor {
 
 		this.originalMatrix = dataMatrix;
 		this.fileName = fileName;
-		this.geneHeaderI = null;
-		this.arrayHeaderI = null;
+		this.rowHeaderI = null;
+		this.colHeaderI = null;
 		this.pBarCount = 0;
 	}
 	
@@ -62,17 +62,17 @@ public class ClusterProcessor {
 	 *
 	 * @param dataMatrix The original data matrix to be clustered.
 	 * @param fileName The name of the file to which the data matrix belongs.
-	 * @param geneHeaderI The row HeaderInfo object.
-	 * @param arrayHeaderI The column HeaderInfo object.
+	 * @param rowHeaderI The row HeaderInfo object.
+	 * @param colHeaderI The column HeaderInfo object.
 	 */
 	public ClusterProcessor(final TVDataMatrix dataMatrix,
-			final String fileName, final IntHeaderInfo geneHeaderI,
-			final IntHeaderInfo arrayHeaderI) {
+			final String fileName, final IntHeaderInfo rowHeaderI,
+			final IntHeaderInfo colHeaderI) {
 
 		this.originalMatrix = dataMatrix;
 		this.fileName = fileName;
-		this.geneHeaderI = geneHeaderI;
-		this.arrayHeaderI = arrayHeaderI;
+		this.rowHeaderI = rowHeaderI;
+		this.colHeaderI = colHeaderI;
 		this.pBarCount = 0;
 	}
 
@@ -407,10 +407,10 @@ public class ClusterProcessor {
 			/* Get axis labels */
 			String[][] headerArray;
 			if (axis == ClusterController.ROW) {
-				headerArray = geneHeaderI.getHeaderArray();
+				headerArray = rowHeaderI.getHeaderArray();
 
 			} else {
-				headerArray = arrayHeaderI.getHeaderArray();
+				headerArray = colHeaderI.getHeaderArray();
 			}
 
 			if (headerArray.length != distMatrix.getSize()) {
