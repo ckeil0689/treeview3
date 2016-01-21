@@ -172,8 +172,10 @@ public class ClusterController {
 		protected Void doInBackground() throws Exception {
 
 			// Get fileName for saving calculated data
+			final int extlen = tvModel.getFileSet().getExt().length();
+			
 			fileName = tvModel.getSource().substring(0,
-					tvModel.getSource().length() - 4);
+					tvModel.getSource().length() - extlen);
 
 			// Initialize the clustering processor and pass the data
 			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
@@ -183,11 +185,11 @@ public class ClusterController {
 				processor = new ClusterProcessor(originalMatrix, fileName);
 				
 			} else {
-				final IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
-				final IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
+				final IntHeaderInfo rowHeaderI = tvModel.getRowHeaderInfo();
+				final IntHeaderInfo colHeaderI = tvModel.getColumnHeaderInfo();
 				
 				processor = new ClusterProcessor(originalMatrix, fileName,
-						geneHeaderI, arrayHeaderI);
+						rowHeaderI, colHeaderI);
 			}
 
 			// Set zeroes invalid if they should be ignored.
@@ -500,10 +502,10 @@ public class ClusterController {
 			cdtGen.setupWriter(fileName, clusterView.getLinkMethod(),
 					clusterView.getSpinnerValues());
 
-			final IntHeaderInfo geneHeaderI = tvModel.getRowHeaderInfo();
-			final IntHeaderInfo arrayHeaderI = tvModel.getColumnHeaderInfo();
+			final IntHeaderInfo rowHeaderI = tvModel.getRowHeaderInfo();
+			final IntHeaderInfo colHeaderI = tvModel.getColumnHeaderInfo();
 
-			cdtGen.prepare(geneHeaderI, arrayHeaderI);
+			cdtGen.prepare(rowHeaderI, colHeaderI);
 			cdtGen.generateCDT();
 
 			filePath = cdtGen.finish();
