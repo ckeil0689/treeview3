@@ -12,6 +12,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -64,6 +66,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
+
 import java.awt.event.MouseListener;
 
 /* 
@@ -79,7 +82,7 @@ import java.awt.event.MouseListener;
  *
  */
 public class DendroController implements ConfigNodePersistent, Observer, 
-Controller {
+	Controller {
 
 	private DendroView dendroView;
 	private final TreeViewFrame tvFrame;
@@ -268,6 +271,7 @@ Controller {
 		dendroView.addResizeListener(new AppFrameListener());
 		dendroView.addDeselectClickListener(new PanelClickDeselector());
 		addDividerHoverListeners();
+		addDividerMouseWheelListeners();
 
 		mvController.addListeners();
 	}
@@ -293,6 +297,29 @@ Controller {
 	}
 
 	/**
+	 * This adds mouse listeners to the split pane divider so that when the
+	 * cursor is over a divider, we can detect the mouse wheel actions and
+	 * scroll the matrix.
+	 * @author rleach
+	 */
+	private void addDividerMouseWheelListeners() {
+
+		boolean isColumnPane = false;
+		BasicSplitPaneUI rbspUI =
+			(BasicSplitPaneUI) dendroView.getRowSplitPane().getUI();
+		BasicSplitPaneDivider rbspDivider = rbspUI.getDivider();
+		rbspDivider.addMouseWheelListener(
+			new DividerMouseWheelListener(interactiveYmap,isColumnPane));
+
+		isColumnPane = true;
+		BasicSplitPaneUI cbspUI =
+			(BasicSplitPaneUI) dendroView.getColSplitPane().getUI();
+		BasicSplitPaneDivider cbspDivider = cbspUI.getDivider();
+		cbspDivider.addMouseWheelListener(
+			new DividerMouseWheelListener(interactiveXmap,isColumnPane));
+	}
+
+	/**
 	 * This mouse adapter extension allows one to control the visibility of the
 	 * labels by setting values in mapcontainer objects.
 	 * @author rleach
@@ -304,6 +331,9 @@ Controller {
 			this.map = map;
 		}
 		public void mouseEntered(MouseEvent e) {
+			if(map.wasLastTreeModeGlobal() && map.shouldKeepTreeGlobal()) {
+				map.setKeepTreeGlobal(true);
+			}
 			map.setOverDivider(true);
 		}
 		public void mouseExited(MouseEvent e) {
@@ -314,6 +344,53 @@ Controller {
 		}
 		public void mouseReleased(MouseEvent e) {
 			map.setDraggingDivider(false);
+		}
+	}
+
+	/**
+	 * This mouse wheel listener allows one to control the matrix scroll using
+	 * the mouse while hovered over the divider.
+	 * @author rleach
+	 */
+	private class DividerMouseWheelListener implements MouseWheelListener {
+		MapContainer map;
+		final boolean isColPane;
+
+		public DividerMouseWheelListener(MapContainer map,
+			final boolean isColPane) {
+			super();
+			this.map = map;
+			this.isColPane = isColPane;
+		}
+
+		public void mouseWheelMoved(final MouseWheelEvent e) {
+
+			final int notches = e.getWheelRotation();
+			int shift = (notches < 0) ? -6 : 6;
+
+			// On macs' magic mouse, horizontal scroll comes in as if the shift was
+			// down
+			if(e.isShiftDown() == isColPane) {
+				//Value of label length scrollbar
+				map.scrollBy(shift);
+				updatePrimaryHoverIndexDuringScrollWheel();
+			}
+		}
+
+		public void updatePrimaryHoverIndexDuringScrollWheel() {
+			if(map.getHoverPixel() == -1) {
+				unsetPrimaryHoverIndex();
+			} else {
+				setPrimaryHoverIndex(map.getIndex(map.getHoverPixel()));
+			}
+		}
+
+		public void setPrimaryHoverIndex(final int i) {
+			map.setHoverIndex(i);
+		}
+
+		public void unsetPrimaryHoverIndex() {
+			map.unsetHoverIndex();
 		}
 	}
 

@@ -66,6 +66,14 @@ public class MapContainer extends Observable implements Observer,
 	private int numVisible;
 	private int firstVisible;
 
+	//track the first and last visible labels (controlled by LabelView) so that
+	//it can be used in other classes (e.g. for matching the trees to the
+	//labels)
+	private int firstVisibleLabel       = -1;
+	private int lastVisibleLabel        = -1;
+	private int firstVisibleLabelOffset = 0;
+	private int lastVisibleLabelOffset  = 0;
+
 	//Track the explicitly manipulated visible labels. These can change as a
 	//result of a scroll in the label pane
 	private boolean overLabels            = false;
@@ -75,15 +83,22 @@ public class MapContainer extends Observable implements Observer,
 	private boolean overDivider           = false;
 	private boolean draggingDivider       = false;
 	private boolean labelsBeingScrolled   = false;
+	private boolean lastTreeModeGlobal    = true;
+	private boolean keepTreeGlobal        = true;
 	private int     hoverPixel            = -1;
 	private int     hoverIndex            = -1;
+	private int     hoverTreeMinIndex     = -1;
+	private int     hoverTreeMaxIndex     = -1;
 	private boolean hoverChanged          = false;
 	private boolean selecting             = false;
 	private boolean toggling              = false;
 	private boolean deselecting           = false;
 	private int     selectingStart        = -1;
+	private boolean whizMode              = false;
 
-	boolean debug = false;
+	int debug = 0;
+	//1 = debug the state of the variables in overALabelPortLinkedView
+	//18 = debug tree hover highlighting of labels
 
 	public MapContainer(final String mapName) {
 
@@ -745,12 +760,15 @@ public class MapContainer extends Observable implements Observer,
 	//Use this function to pick a pixel to zoom toward when zooming toward a
 	//selection
 	//Assumes that the full selection is visible on the screen
-	public int getZoomTowardPixelOfSelection(int pixelIndexOfSelec,int numPixelsOfSelec) {
+	public int getZoomTowardPixelOfSelection(int pixelIndexOfSelec,
+		int numPixelsOfSelec) {
+
 		int numPixelsOffsetOfSelec = pixelIndexOfSelec;
 		int numTotalPixels = getAvailablePixels();
 
 		//If any of the selected area is above/before the visible area
-		if(pixelIndexOfSelec < 0 && (pixelIndexOfSelec + numPixelsOfSelec) < numTotalPixels) {
+		if(pixelIndexOfSelec < 0 &&
+			(pixelIndexOfSelec + numPixelsOfSelec) < numTotalPixels) {
 			//If zooming out, return the furthest pixel, otherwise return the
 			//closest pixel
 			if(numPixelsOfSelec > numTotalPixels) {
@@ -759,8 +777,10 @@ public class MapContainer extends Observable implements Observer,
 			//LogBuffer.println("Returning Target pixel: [0].");
 			return(0);
 		}
-		//If any of the selected area is below/after the visible area, return the first pixel so that
-		else if((pixelIndexOfSelec + numPixelsOfSelec) > numTotalPixels && pixelIndexOfSelec > 0) {
+		//If any of the selected area is below/after the visible area, return
+		//the first pixel so that
+		else if((pixelIndexOfSelec + numPixelsOfSelec) > numTotalPixels &&
+			pixelIndexOfSelec > 0) {
 			//If zooming out, return the furthest pixel, otherwise return the
 			//closest pixel
 			if(numPixelsOfSelec > numTotalPixels) {
@@ -797,9 +817,12 @@ public class MapContainer extends Observable implements Observer,
 		//	numTotalPixels + " * " + numPixelsOffsetOfSelec + " / (" +
 		//	numPixelsOfSelec + " - " + numTotalPixels + ")");
 		
-		//The equation above actually has 2 solutions.  If the solution is negative, we just need to negate it, otherwise,
-		//the solution turns out to need a slight adjustment because it is on the outside of the selected area.
-		//I'm not sure why, but the difference with the offset just needs to be added to the offset.
+		//The equation above actually has 2 solutions.  If the solution is
+		//negative, we just need to negate it, otherwise, the solution turns out
+		//to need a slight adjustment because it is on the outside of the
+		//selected area.
+		//I'm not sure why, but the difference with the offset just needs to be
+		//added to the offset.
 		if(targetPixel < 0) {
 			//LogBuffer.println("Negating Target pixel: [" + targetPixel +"].");
 			targetPixel = Math.abs(targetPixel);
@@ -973,14 +996,16 @@ public class MapContainer extends Observable implements Observer,
 		
 		int cells = getNumVisible();
 		//If the targetZoomFrac is 1.0, return the remainder of this dimension
-		if((targetZoomFrac % 1) == 0 && ((int) Math.round(targetZoomFrac)) == 1) {
+		if((targetZoomFrac % 1) == 0 &&
+			((int) Math.round(targetZoomFrac)) == 1) {
 			return(getTotalTileNum() - cells);
 		}
 		int zoomVal = (int) Math.round(cells * targetZoomFrac);
 		//int numPixels = getAvailablePixels();
 
 		//If we're at the minimum zoom level, do not zoom in any more
-		if((cells == 1 && targetZoomFrac <= 1) || (targetZoomFrac % 1 == 0) && ((int) Math.round(targetZoomFrac)) == 0) {
+		if((cells == 1 && targetZoomFrac <= 1) || (targetZoomFrac % 1 == 0) &&
+			((int) Math.round(targetZoomFrac)) == 0) {
 			return(0);
 		}
 		if (zoomVal < 2) {
@@ -2028,7 +2053,7 @@ public class MapContainer extends Observable implements Observer,
 		this.labelsBeingScrolled = overLabels;
 		setChanged();
 		setHoverChanged();
-		notifyObservers(); // calls recalculateOverlay for IMV and GMV... shoudlnt
+		notifyObservers(); //calls recalculateOverlay for IMV & GMV... should'nt
 	}
 
 	/**
@@ -2045,6 +2070,8 @@ public class MapContainer extends Observable implements Observer,
 	public void setOverTree(boolean overTree) {
 		
 		this.overTree = overTree;
+		unsetHoverTreeMinIndex();
+		unsetHoverTreeMaxIndex();
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
@@ -2101,7 +2128,17 @@ public class MapContainer extends Observable implements Observer,
 	//reference for all the classes in the view and is their only way to
 	//communicate with one another.
 	public boolean overALabelPortLinkedView() {
-		
+		debug("overALabelPortLinkedView: overLabels [" +
+			(overLabels ? "true" : "false") + "] overInteractiveMatrix [" +
+			(overInteractiveMatrix ? "true" : "false") +
+			"] overLabelsScrollbar [" +
+			(overLabelsScrollbar ? "true" : "false") +
+			"] labelsBeingScrolled [" +
+			(labelsBeingScrolled ? "true" : "false") +
+			"] selecting [" + (selecting ? "true" : "false") +
+			"] overTree [" + (overTree ? "true" : "false") + "] overDivider [" +
+			(overDivider ? "true" : "false") + "] draggingDivider [" +
+			(draggingDivider ? "true" : "false") + "]",1);
 		return(overLabels || overInteractiveMatrix || overLabelsScrollbar ||
 			labelsBeingScrolled || selecting || overTree || overDivider ||
 			draggingDivider);
@@ -2118,7 +2155,8 @@ public class MapContainer extends Observable implements Observer,
 	/* This variable is used and managed from LabelView because running the
 	 * repaints on a timer is much smoother and snappier than via
 	 * notifyObservers */
-	private boolean labelAnimeRunning = false; // TODO only declare member variable before constructor.
+	//TODO only declare member variable before constructor.
+	private boolean labelAnimeRunning = false;
 	public void setLabelAnimeRunning(boolean state) {
 		
 		labelAnimeRunning = state;
@@ -2191,7 +2229,7 @@ public class MapContainer extends Observable implements Observer,
 	 * This is used to decide to not actually repaint because all that changed
 	 * is the hover position of the mouse - however, that DOES trigger a change
 	 * in the LabelView classes
-	 * TODO maybe setChanged & notify shouldn't be triggered on simple hovering...
+	 * TODO maybe setChanged & notify shouldn't be triggered on simple hovering
 	 * @return hoverChanged
 	 */
 	public boolean hoverChanged() {
@@ -2215,6 +2253,66 @@ public class MapContainer extends Observable implements Observer,
 	public void unsetHoverChanged() {
 		
 		hoverChanged = false;
+	}
+
+	/**
+	 * @author rleach
+	 * @return the hoverTreeMinIndex
+	 */
+	public int getHoverTreeMinIndex() {
+		return(hoverTreeMinIndex);
+	}
+
+	/**
+	 * @author rleach
+	 * @param hoverTreeMinIndex the hoverTreeMinIndex to set
+	 */
+	public void setHoverTreeMinIndex(int hoverTreeMinIndex) {
+		this.hoverTreeMinIndex = hoverTreeMinIndex;
+		debug("Setting new tree min index hover to [" + hoverTreeMinIndex + "].",18);
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @author rleach
+	 */
+	public void unsetHoverTreeMinIndex() {
+		this.hoverTreeMinIndex = -1;
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @author rleach
+	 * @return the hoverTreeMaxIndex
+	 */
+	public int getHoverTreeMaxIndex() {
+		return(hoverTreeMaxIndex);
+	}
+
+	/**
+	 * @author rleach
+	 * @param hoverTreeMaxIndex the hoverTreeMaxIndex to set
+	 */
+	public void setHoverTreeMaxIndex(int hoverTreeMaxIndex) {
+		this.hoverTreeMaxIndex = hoverTreeMaxIndex;
+		debug("Setting new tree max index hover to [" + hoverTreeMaxIndex + "].",18);
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * @author rleach
+	 */
+	public void unsetHoverTreeMaxIndex() {
+		this.hoverTreeMaxIndex = -1;
+		setChanged();
+		setHoverChanged();
+		notifyObservers();
 	}
 
 	/**
@@ -2291,5 +2389,165 @@ public class MapContainer extends Observable implements Observer,
 	public double getZoomIncrementFast() {
 		
 		return(ZOOM_INCREMENT_FAST);
+	}
+
+	/**
+	 * Set the first visible label data index.  For use by LabelView.
+	 * -1 = unset
+	 * @author rleach
+	 * @param p
+	 */
+	public void setFirstVisibleLabel(int p) {
+		if(p < getMinIndex() || p > getMaxIndex())
+			firstVisibleLabel = -1;
+		else
+			firstVisibleLabel = p;
+	}
+
+	/**
+	 * Retrieves the first visible label data index
+	 * @author rleach
+	 * @return firstVisiblelabel data index
+	 */
+	public int getFirstVisibleLabel() {
+		return(firstVisibleLabel);
+	}
+
+	/**
+	 * Set the last visible label data index.  For use by LabelView.
+	 * -1 = unset
+	 * @author rleach
+	 * @param p
+	 */
+	public void setLastVisibleLabel(int p) {
+		if(p < getMinIndex() || p > getMaxIndex())
+			lastVisibleLabel = -1;
+		else
+			lastVisibleLabel = p;
+	}
+
+	/**
+	 * Retrieves the last visible label data index
+	 * @author rleach
+	 * @return lastVisiblelabel data index
+	 */
+	public int getLastVisibleLabel() {
+		return(lastVisibleLabel);
+	}
+
+	/**
+	 * Retrieves the last visible label data index
+	 * @author rleach
+	 * @return lastVisiblelabel data index
+	 */
+	public int getNumVisibleLabels() {
+		if(lastVisibleLabel < 0) {
+			return(-1);
+		}
+		return(lastVisibleLabel - firstVisibleLabel + 1);
+	}
+
+	/**
+	 * This provides the number of pixels the first label is offset from the
+	 * nearest edge.  This is required by the trees in order to align the leaves
+	 * with the labels
+	 * @author rleach
+	 * @return the firstVisibleLabelOffset
+	 */
+	public int getFirstVisibleLabelOffset() {
+		return(firstVisibleLabelOffset);
+	}
+
+	/**
+	 * This sets the number of pixels the first label is offset from the
+	 * nearest edge.  This is required by the trees in order to align the leaves
+	 * with the labels
+	 * @author rleach
+	 * @param firstVisibleLabelOffset the firstVisibleLabelOffset to set
+	 */
+	public void setFirstVisibleLabelOffset(int firstVisibleLabelOffset) {
+		this.firstVisibleLabelOffset = firstVisibleLabelOffset;
+	}
+
+	/**
+	 * This provides the number of pixels the last label is offset from the
+	 * nearest edge.  This is required by the trees in order to align the leaves
+	 * with the labels
+	 * @author rleach
+	 * @return the lastVisibleLabelOffset
+	 */
+	public int getLastVisibleLabelOffset() {
+		return(lastVisibleLabelOffset);
+	}
+
+	/**
+	 * This sets the number of pixels the last label is offset from the
+	 * nearest edge.  This is required by the trees in order to align the leaves
+	 * with the labels
+	 * @author rleach
+	 * @param lastVisibleLabelOffset the lastVisibleLabelOffset to set
+	 */
+	public void setLastVisibleLabelOffset(int lastVisibleLabelOffset) {
+		this.lastVisibleLabelOffset = lastVisibleLabelOffset;
+	}
+
+
+	/**
+	 * @author rleach
+	 * @return the lastTreeModeGlobal
+	 */
+	public boolean wasLastTreeModeGlobal() {
+		return(lastTreeModeGlobal);
+	}
+
+	/**
+	 * @author rleach
+	 * @param lastTreeModeGlobal the lastTreeModeGlobal to set
+	 */
+	public void setLastTreeModeGlobal(boolean lastTreeModeGlobal) {
+		this.lastTreeModeGlobal = lastTreeModeGlobal;
+	}
+
+	/**
+	 * @author rleach
+	 * @return the keepTreeGlobal
+	 */
+	public boolean shouldKeepTreeGlobal() {
+		return(keepTreeGlobal);
+	}
+
+	/**
+	 * @author rleach
+	 * @param keepTreeGlobal the keepTreeGlobal to set
+	 */
+	public void setKeepTreeGlobal(boolean keepTreeGlobal) {
+		this.keepTreeGlobal = keepTreeGlobal;
+	}
+
+	public boolean somethingIsDragging() {
+		return(selecting || labelsBeingScrolled || draggingDivider);
+	}
+
+	/**
+	 * @author rleach
+	 * @return the whizMode
+	 */
+	public boolean isWhizMode() {
+		return(whizMode);
+	}
+
+	/**
+	 * @author rleach
+	 * @param whizMode the whizMode to set
+	 */
+	public void setWhizMode(boolean whizMode) {
+		this.whizMode = whizMode;
+	}
+
+	public void debug(String msg, int level) {
+		
+		if(level == debug) {
+			LogBuffer.println(msg);
+		}
 	}
 }

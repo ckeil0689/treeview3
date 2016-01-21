@@ -1,6 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -13,7 +12,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
@@ -296,7 +294,21 @@ public class IMVMouseAdapter extends MouseAdapter {
 			this.turnOffLabelPortTimer.stop();
 			this.turnOffLabelPortTimer = null;
 		}
-		
+
+		/* TODO: commented, because it implements the linking of the trees to
+		 * the labels in a different way - a method I'd considered and showed to
+		 * Anastasia. I wasn't sure which method she'd prefer. If it turns out
+		 * she likes the previous method, I'll uncomment the code. If she likes
+		 * the new way, I'll delete. */
+//		//If the mouse has entered while not during a drag event and when we're
+//		//forcing a global tree mode, turn off the maintenance of the global
+//		//tree mode
+//		if((xmap.shouldKeepTreeGlobal() || ymap.shouldKeepTreeGlobal()) &&
+//			!xmap.somethingIsDragging() && !ymap.somethingIsDragging()) {
+//			xmap.setKeepTreeGlobal(true);
+//			ymap.setKeepTreeGlobal(true);
+//		}
+
 		xmap.setOverInteractiveMatrix(true);
 		ymap.setOverInteractiveMatrix(true);
 		
@@ -1315,11 +1327,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 			processTemporaryLeftDragStart(xPixelStart, yPixelStart, xPixel,
 				yPixel);
 		}
-	
-//		imView.debug("Mouse dragged. Updating hover indexes to [" +
-//		      xmap.getIndex(xPixel) + "x" + ymap.getIndex(yPixel) +
-//		      "]", 4);
-		
+
 		imView.debug("Mouse dragged. Pixels: [" +
 			      xPixelStart + ", " + yPixelStart + ", " + xPixel +
 			      ", " + yPixel + "]", 4);
@@ -1430,18 +1438,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 		
 		mvController.deselectAll();
 	}
-	
-	// TODO use or delete.
-	private void startDragRect(int xIndex, int yIndex) {
-		
-		startPoint.setLocation(xIndex, yIndex);
-		endPoint.setLocation(startPoint);
-		dragRect.setLocation(startPoint);
-		dragRect.setSize(endPoint.x - dragRect.x,endPoint.y - dragRect.y);
-		
-		imView.drawBand(getPixelRect(dragRect));
-	}
-	
+
 	/**
 	 * TODO add JavaDoc
 	 * @param xIndex
