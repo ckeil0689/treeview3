@@ -659,6 +659,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				try {
 					Properties p = new Properties();
 					p.setProperty("PageSize","A5");
+					/* TODO: This needs to supply a size of an export region */
 					VectorGraphics g =
 						new PDFGraphics2D(new File("Output.pdf"),
 							new Dimension(interactiveXmap.getMaxIndex() + 1,
@@ -674,9 +675,9 @@ public class DendroController implements ConfigNodePersistent, Observer,
 					//			interactiveYmap.getMaxIndex() + 1)); 
 					g.setProperties(p); 
 					g.startExport();
-					getInteractiveMatrixView().exportPixels(g,
-						interactiveXmap.getMaxIndex() + 1,
-						interactiveYmap.getMaxIndex() + 1);
+					/* TODO: This needs to supply a start end end index for each
+					 * dimension fining the export region */
+					getInteractiveMatrixView().exportPixels(g);
 					g.endExport();
 				}
 				catch(Exception exc) {

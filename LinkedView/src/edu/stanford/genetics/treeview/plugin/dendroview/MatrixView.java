@@ -126,7 +126,9 @@ public abstract class MatrixView extends ModelViewProduced {
 		ymap.notifyObservers();
 	}
 
-	public void exportPixels(Graphics g,int w, int h) {
+	/* TODO: This needs to take a start end end index for each dimension fining
+	 * the export region */
+	public void exportPixels(Graphics g) {
 		if (drawer != null) {
 			/* Set new offscreenPixels (pixel colors) */
 			drawer.paint(g,xmap.getMaxIndex() + 1,ymap.getMaxIndex() + 1);
@@ -349,10 +351,6 @@ public abstract class MatrixView extends ModelViewProduced {
 		if(offscreenPixels.length != tileCount) {
 			createNewBuffer(x_tiles, y_tiles);
 		}
-	}
-
-	public void refreshBuffer() {
-		offscreenImage = null;
 	}
 
 	/**

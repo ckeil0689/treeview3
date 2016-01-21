@@ -183,6 +183,8 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 * @param width - This should be the size of xmap
 	 * @param height - This should be the size of ymap
 	 */
+	/* TODO: This needs to take a start end end index for each dimension fining
+	 * the export region */
 	public void paint(final Graphics g, final int width, final int height) {
 		for (int j = height - 1; j >= 0; j--) {
 			for (int i = width - 1; i >= 0; i--) {
