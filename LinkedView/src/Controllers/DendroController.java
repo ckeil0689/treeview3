@@ -78,6 +78,7 @@ import org.freehep.graphics2d.VectorGraphics;
 //import org.freehep.graphicsio.ps.PSGraphics2D;
 //import org.freehep.util.export.ExportDialog;
 import org.freehep.graphicsio.pdf.PDFGraphics2D;
+import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.freehep.graphicsio.svg.SVGGraphics2D;
 
 /* 
@@ -586,9 +587,12 @@ Controller {
 						new PDFGraphics2D(new File("Output.pdf"),
 							new Dimension(interactiveXmap.getMaxIndex() + 1,
 								interactiveYmap.getMaxIndex() + 1));
-					//If we add any more formats, we will have to add the
-					//corresponding freehep 2.4 jar files to compile_lib and the
-					//build path
+					/* TODO: Create an interface that allows the user to select
+					 * the export format among those provided here */
+					//VectorGraphics g =
+					//	new PSGraphics2D(new File("Output.ps"),
+					//		new Dimension(interactiveXmap.getMaxIndex() + 1,
+					//			interactiveYmap.getMaxIndex() + 1));
 					//VectorGraphics g = new SVGGraphics2D(new File("Output.svg"),
 					//	new Dimension(interactiveXmap.getMaxIndex() + 1,
 					//			interactiveYmap.getMaxIndex() + 1)); 
