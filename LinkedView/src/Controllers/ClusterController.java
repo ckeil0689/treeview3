@@ -242,7 +242,7 @@ public class ClusterController {
 		/**
 		 * Checks if axis was clustered using its tree file if available and 
 		 * the axis specific ID if available. 
-		 * If it neither is present, it will assume that the axis was NOT 
+		 * If neither is present, it will assume that the axis was NOT 
 		 * clustered.
 		 * @param treeFilePath Path of the axis tree file, if it exists.
 		 * @param treeFileSuffix Axis associated tree file suffix (GTR, ATR).
@@ -251,11 +251,11 @@ public class ClusterController {
 		 * @return Whether an axis is considered to have been clustered before.
 		 */
 		private boolean wasAxisClustered(final String treeFilePath, 
-				final String treeFileSuffix, final boolean hasAxisID) {
+				final boolean hasAxisID) {
 			
 			boolean hasTreeFile = false;
 			
-			File f = new File(fileName + treeFileSuffix);
+			File f = new File(treeFilePath);
 			if(f.exists() && !f.isDirectory()) { 
 			    hasTreeFile = true;
 			}
@@ -281,9 +281,9 @@ public class ClusterController {
 			boolean[] clusterCheck = new boolean[] {rowReady, colReady};
 			
 			boolean wasRowAxisClustered = wasAxisClustered(
-					tvModel.getFileSet().getGtr(), ".gtr", tvModel.gidFound());
+					tvModel.getFileSet().getGtr(), tvModel.gidFound());
 			boolean wasColAxisClustered = wasAxisClustered(
-					tvModel.getFileSet().getAtr(), ".atr", tvModel.aidFound());
+					tvModel.getFileSet().getAtr(), tvModel.aidFound());
 			
 			// only warn of axis was clustered before AND user wants to cluster
 			boolean warnRowAxis = wasRowAxisClustered && rowReady;
