@@ -18,6 +18,7 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
+import edu.stanford.genetics.treeview.TreeSelectionI;
 
 /**
  * Class for Drawing and Manipulating Trees
@@ -140,7 +141,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 
 	public TreeDrawerNode getLeaf(final int i) {
 
-		if (leafList != null) {
+		if (leafList != null && i > -1 && i < leafList.length) {
 			try {
 				return leafList[i];
 
@@ -431,15 +432,16 @@ abstract class TreeDrawer extends Observable implements Observer {
 	 *            Equation describing mapping from pixels to index
 	 * @param dest
 	 *            Specifies Rectangle of pixels to draw to
-	 * @param selected
-	 *            A selected node
-	 *
-	 *            the actual implementation of this depends, of course, on the
-	 *            orientation of the tree.
+	 * @param isLeft
+	 *            Whether this is for row or column trees
+	 * @param hoverIndex - the data index the cursor is over
+	 * @param treeSelection - contains the selected data indexes
+	 * @param hoveredNode - the node the cursor is nearest
 	 */
 	abstract public void paint(Graphics graphics,
-			LinearTransformation xScaleEq, LinearTransformation yScaleEq,
-			Rectangle dest, TreeDrawerNode selected, boolean isLeft);
+		LinearTransformation xScaleEq,LinearTransformation yScaleEq,
+		Rectangle dest,boolean isLeft,int hoverIndex,
+		final TreeSelectionI treeSelection,final TreeDrawerNode hoveredNode);
 
 	/**
 	 * Get the closest node to the given (index, correlation) pair.
@@ -455,6 +457,37 @@ abstract class TreeDrawer extends Observable implements Observer {
 				corr, weight);
 
 		return rcf.find(rootNode);
+	}
+
+	/**
+	 * This method takes a leaf and a correlation value (i.e. cursor position)
+	 * and travels up the tree from the leaf to find the parent node that the
+	 * cursor is just under
+	 * @author rleach
+	 * @param leaf - the leaf (i.e. the closest one to the cursor)
+	 * @param corr - the correlation position of the cursor
+	 * @return - the parent node along the path from the leaf to the cursor
+	 */
+	public TreeDrawerNode getClosestParent(TreeDrawerNode leaf,
+		final double corr) {
+
+		if (rootNode == null || leaf == null) {
+			return null;
+		}
+
+		TreeDrawerNode currentNode = leaf;
+
+		//Going to search up the tree from the leaf
+		while(currentNode != rootNode) {
+			currentNode = currentNode.getParent();
+			//If the relative correlation of the cursor position (corr) is
+			//greater than the correlation at the point where the parent node
+			//splits
+			if(currentNode.getCorr() < corr) {
+				return(currentNode);
+			}
+		}
+		return(currentNode);
 	}
 
 	/**

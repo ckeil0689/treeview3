@@ -7,16 +7,14 @@
 
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
-import javax.swing.SwingUtilities;
+import java.awt.event.MouseWheelEvent;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LinearTransformation;
+import edu.stanford.genetics.treeview.TreeDrawerNode;
 
 /**
  * Draws an array tree to show the relations between arrays. This object
@@ -28,8 +26,7 @@ import edu.stanford.genetics.treeview.LinearTransformation;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.2 $ $Date: 2010-05-02 13:39:00 $
  */
-public class ColumnTreeView extends TRView implements MouseMotionListener,
-		MouseListener {
+public class ColumnTreeView extends TRView {
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,6 +39,11 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
+
+		debug = 0;
+		//14 = debug tree repaints linked to whizzing labels
+		//15 = debug tree hover highlighting
+		//16 = debug tree alignment
 	}
 
 	/**
@@ -56,106 +58,181 @@ public class ColumnTreeView extends TRView implements MouseMotionListener,
 		return "ATRView";
 	}
 
-	public void setATRHeaderInfo(final HeaderInfo atrHI) {
+	public void setATRHeaderInfo(final HeaderInfo atrHI) {}
+
+	@Override
+	protected void setWhizzingDestRectBounds() {
+		destRect.setBounds(
+			0,
+			0,
+			getUsedWhizzingLength(),
+			getSecondaryPaneSize(offscreenSize));
 	}
 
 	@Override
-	public void updateBuffer(final Graphics g) {
+	protected void drawWhizBackground(final Graphics g) {
+		g.fillRect(getWhizzingDestRectStart(),0,getWhizzingDestRectLength(),
+			getSecondaryPaneSize(offscreenSize));
+	}
 
-		if (treePainter == null)
+	@Override
+	protected void drawFittedWhizBackground(final Graphics g,
+		LinearTransformation scaleEq) {
+
+		if(map.getFirstVisibleLabel() < 0) {
 			return;
-
-		if (offscreenChanged) {
-			offscreenValid = false;
 		}
+		g.fillRect((int) scaleEq.transform((double) map.getFirstVisibleLabel()),
+			0,(int) scaleEq.transform((double) map.getFirstVisible() +
+				(double) map.getNumVisibleLabels()),
+			getSecondaryPaneSize(offscreenSize));
+	}
 
-		if (!offscreenValid) {
-			map.setAvailablePixels(offscreenSize.width);
-
-			/* clear the panel */
-			g.setColor(this.getBackground());
-			g.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
-			g.setColor(Color.black);
-
-			/* calculate scaling */
-			destRect.setBounds(0, 0, map.getUsedPixels(), offscreenSize.height);
-			xScaleEq = new LinearTransformation(map.getIndex(destRect.x),
-					destRect.x, map.getIndex(destRect.x + destRect.width),
-					destRect.x + destRect.width);
-			yScaleEq = new LinearTransformation(treePainter.getCorrMin(),
-					destRect.y, treePainter.getCorrMax(), destRect.y
-							+ destRect.height);
-
-			/* draw trees */
-			treePainter.paint(g, xScaleEq, yScaleEq, destRect, selectedNode,
-					isLeft);
-
-		} else {
-			// System.out.println("didn't update buffer: valid =
-			// " + offscreenValid + " drawer = " + drawer);
+	@Override
+	protected int getWhizzingDestRectStart() {
+		if(destRect == null) {
+			return(-1);
 		}
+		return(destRect.x + map.getFirstVisibleLabelOffset());
+	}
+
+	@Override
+	protected int getWhizzingDestRectEnd() {
+		if(destRect == null) {
+			return(-1);
+		}
+		return(destRect.x + map.getFirstVisibleLabelOffset() + destRect.width);
+	}
+
+	@Override
+	protected void setFittedDestRectBounds() {
+		destRect.setBounds(
+			0,
+			0,
+			map.getUsedPixels(),
+			getSecondaryPaneSize(offscreenSize));
+	}
+
+	@Override
+	protected int getFittedDestRectStart() {
+		if(destRect == null) {
+			return(-1);
+		}
+		return(destRect.x);
+	}
+
+	@Override
+	protected int getFittedDestRectEnd() {
+		if(destRect == null) {
+			return(-1);
+		}
+		return(destRect.x + destRect.width);
+	}
+
+	@Override
+	protected int getFittedDestRectLength() {
+		if(destRect == null) {
+			return(-1);
+		}
+		return(destRect.width);
+	}
+
+	@Override
+	protected int getSecondaryDestRectStart() {
+		if(destRect == null) {
+			return(-1);
+		}
+		return(destRect.y);
+	}
+
+	@Override
+	protected int getSecondaryDestRectEnd() {
+		if(destRect == null) {
+			return(-1);
+		}
+		return(destRect.y + destRect.height);
+	}
+
+	@Override
+	protected int getUsedWhizzingLength() {
+		return(map.getUsedPixels() - map.getFirstVisibleLabelOffset() -
+			map.getLastVisibleLabelOffset());
+	}
+
+	@Override
+	protected int getSecondaryPaneSize(final Dimension dims) {
+		
+		return(dims.height);
+	}
+
+	@Override
+	protected int getPrimaryPaneSize(final Dimension dims) {
+		
+		return(dims.width);
+	}
+
+	@Override
+	protected void setPrimaryScaleEq(final LinearTransformation scaleEq) {
+		setXScaleEq(scaleEq);
+	}
+
+	@Override
+	protected LinearTransformation getPrimaryScaleEq() {
+		return(getXScaleEq());
+	}
+
+	@Override
+	protected void setSecondaryScaleEq(final LinearTransformation scaleEq) {
+		setYScaleEq(scaleEq);
 	}
 
 	/**
-	 * When a mouse is clicked, a node is selected.
+	 * This method gets the closest internal node "as the crow flies"
+	 * @param MouseEvent
+	 * @return TreeDrawerNode
 	 */
 	@Override
-	public void mouseClicked(final MouseEvent e) {
+	protected TreeDrawerNode getClosestNode(final MouseEvent e) {
+		return(treePainter.getClosest(
+			getXScaleEq().inverseTransform(e.getX()),
+			getYScaleEq().inverseTransform(e.getY()),
+			getYScaleEq().getSlope() / getXScaleEq().getSlope()));
+	}
 
-		if (!isEnabled() || !enclosingWindow().isActive())
-			return;
-		if (treePainter == null)
-			return;
-
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			setSelectedNode(treePainter.getClosest(
-					xScaleEq.inverseTransform(e.getX()),
-					yScaleEq.inverseTransform(e.getY()), yScaleEq.getSlope()
-							/ xScaleEq.getSlope()));
-		} else {
-			treeSelection.deselectAllIndexes();
-			treeSelection.notifyObservers();
+	/**
+	 * This method figures out the leaf at the current cursor position and
+	 * searches up the tree in a direct hierarchical line to find the parent
+	 * node which the cursor has just passed (before it reaches the next parent
+	 * node)
+	 * @param mouse event e
+	 * @return closest parent node
+	 */
+	@Override
+	protected TreeDrawerNode getClosestParentNode(final MouseEvent e) {
+		int i = getPrimaryHoverIndex();
+		if(i < 0) {
+			return(null);
 		}
+		return(treePainter.getClosestParent(treePainter.getLeaf(i),
+			getYScaleEq().inverseTransform(e.getY())));
 	}
 
-	@Override
-	public void mouseMoved(final MouseEvent e) {
-
-		if (!isEnabled() || !enclosingWindow().isActive())
-			return;
-		if (treePainter == null)
-			return;
-
-		// if (treeSelection.getNSelectedIndexes() == 0) {
-		setHoveredNode(treePainter.getClosest(
-				xScaleEq.inverseTransform(e.getX()),
-				yScaleEq.inverseTransform(e.getY()), yScaleEq.getSlope()
-						/ xScaleEq.getSlope()));
-		// }
+	/**
+	 * Returns the pixel index relative to the data
+	 * @param mouse event e
+	 * @return pixel index
+	 */
+	protected int getPrimaryPixelIndex(final MouseEvent e) {
+		return(e.getX());
 	}
 
+	/**
+	 * Determines whether the scroll is for scrolling the data or not
+	 * @param mouse event e
+	 * @return boolean
+	 */
 	@Override
-	public void mouseDragged(final MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseEntered(final MouseEvent e) {
-
-		if (!isEnabled() || !enclosingWindow().isActive())
-			return;
-
-		map.setOverTree(true);
-	}
-
-	@Override
-	public void mouseExited(final MouseEvent e) {
-
-		if (!isEnabled() || !enclosingWindow().isActive())
-			return;
-
-		map.setOverTree(false);
-		setHoveredNode(null);
+	protected boolean isAPrimaryScroll(final MouseWheelEvent e) {
+		return(e.isShiftDown());
 	}
 }
