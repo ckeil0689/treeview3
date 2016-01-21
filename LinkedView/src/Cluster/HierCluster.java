@@ -497,9 +497,6 @@ public class HierCluster {
 				bw.write("\n");
 			}
 
-		} catch (UnsupportedEncodingException | FileNotFoundException e) {
-			LogBuffer.logException(e);
-			
 		} catch (IOException e) {
 			LogBuffer.logException(e);
 			
