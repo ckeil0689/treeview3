@@ -507,7 +507,8 @@ public class ClusterController {
 			final double[][] data = originalMatrix.getExprData();
 
 			final ClusterFileGenerator cdtGen = new ClusterFileGenerator(data, 
-					reorderedRows, reorderedCols, rowSimilarity, colSimilarity,
+					reorderedRows, reorderedCols, treeFileCheck[ROW_IDX], 
+					treeFileCheck[COL_IDX],//rowSimilarity, colSimilarity, 
 					isHierarchical());
 
 			cdtGen.setupWriter(fileName, clusterView.getLinkMethod(),

@@ -67,14 +67,14 @@ public class ClusterFileGenerator {
 	 */
 	public ClusterFileGenerator(final double[][] origMatrix,
 			final String[] orderedRows, final String[] orderedCols,
-			final int rowSimilarity, final int colSimilarity,
+			final boolean isRowClustered, final boolean isColClustered,
 			final boolean isHier) {
 
 		this.origMatrix = origMatrix;
 		this.orderedGIDs = orderedRows;
 		this.orderedAIDs = orderedCols;
-		this.isRowClustered = (rowSimilarity != 0);
-		this.isColClustered = (colSimilarity != 0);
+		this.isRowClustered = isRowClustered;
+		this.isColClustered = isColClustered;
 		this.isHier = isHier;
 	}
 
@@ -402,7 +402,7 @@ public class ClusterFileGenerator {
 		if (isColClustered) {
 			cdtRow[0] = COL_ID_HEADER;
 
-			/* Fill with AIDs ("ARRY3X") */
+			/* Fill with AIDs ("COL3X") */
 			System.arraycopy(orderedAIDs, 0, cdtRow, dataStart,
 					orderedAIDs.length);
 
