@@ -203,6 +203,10 @@ public class ClusterController {
 			boolean[] clusterCheck = reaffirmClusterChoice(isRowReady, 
 					isColReady);
 			
+			if(!clusterCheck[ROW_IDX] && !clusterCheck[COL_IDX]) {
+				cancelAll();
+			}
+			
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], 
 					clusterCheck[COL_IDX]);
 			
