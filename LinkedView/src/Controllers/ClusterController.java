@@ -62,7 +62,7 @@ public class ClusterController {
 	/* Delegates the clustering process */
 	private ClusterProcessor processor;
 	
-	private boolean[] overAllClusterStatus;
+	private boolean[] treeFileCheck;
 
 	/* Initialize with defaults for error checking parameters */
 	private int rowSimilarity = DistMatrixCalculator.PEARSON_UN;
@@ -89,7 +89,7 @@ public class ClusterController {
 		this.tvController = controller;
 		this.tvModel = controller.getDataModel();
 		this.clusterView = dialog.getClusterView();
-		this.overAllClusterStatus = new boolean[]{false, false};
+		this.treeFileCheck = new boolean[]{false, false};
 
 		/* Create and add all view component listeners */
 		addAllListeners();
@@ -313,11 +313,17 @@ public class ClusterController {
 				clusterCheck[COL_IDX]= confirmChoice(message);
 			}
 			
-			// final cluster status for later tree file integrity check
-			overAllClusterStatus[ROW_IDX] = wasRowAxisClustered 
+			/* 
+			 * Keeping track of cluster status for both axes here which is
+			 * later (and exclusively) used to ensure tree file presence if 
+			 * an axis is considered to be clustered. 
+			 */
+			final boolean ensureRowTreeFile = wasRowAxisClustered 
 					|| clusterCheck[ROW_IDX];
-			overAllClusterStatus[COL_IDX] = wasColAxisClustered 
+			final boolean ensureColTreeFile = wasColAxisClustered 
 					|| clusterCheck[COL_IDX];
+			
+			setTreeFileCheck(ensureRowTreeFile, ensureColTreeFile);
 			
 			return clusterCheck;
 		}
@@ -554,7 +560,7 @@ public class ClusterController {
 		}
 		
 		/**
-		 * For a given axis, this ensures that it has its tree file in case
+		 * For a given axis, this ensures that its tree file exists in case
 		 * it is considered to be clustered. This is useful especially if
 		 * an axis was already clustered before so that the old tree file can
 		 * be carried over to the new FileSet.
@@ -575,7 +581,7 @@ public class ClusterController {
 				axis_id = "column";
 			}
 			
-			if(overAllClusterStatus[axisIdx]) {
+			if(treeFileNeedsCheck(axisIdx)) {
 				String newTreeFilePath = newFileRoot + treeFileSuffix;
 				String oldTreeFilePath = oldFileRoot + treeFileSuffix;
 				
@@ -603,7 +609,8 @@ public class ClusterController {
 		}
 		
 		/**
-		 * Copies an old file to a new one with the correct file name.
+		 * Copies an old file to a new one with the correct file name. This 
+		 * is used for transferring old tree files to new clustered matrices.
 		 * @param oldTreeFilePath The path of the file to be copied.
 		 * @param newTreeFilePath The path to which the old file will be copied.
 		 */
@@ -853,5 +860,29 @@ public class ClusterController {
 
 		return clusterView.getClusterMethod().equalsIgnoreCase(
 				StringRes.menu_Hier);
+	}
+	
+	/**
+	 * Setter for overallClusterStatus member. 
+	 */
+	public void setTreeFileCheck(final boolean row, final boolean col) {
+		
+		this.treeFileCheck[0] = row;
+		this.treeFileCheck[1] = col;
+	}
+	
+	/**
+	 * 
+	 * @return A boolean from an array of 2 boolean elements. 
+	 * Element 0 describes the cluster status for the row axis. 
+	 * Element describes the status for the column index. 
+	 */
+	public boolean treeFileNeedsCheck(final int axisID) {
+		
+		if(axisID < 0 || axisID > 1) {
+			return false;
+		}
+		
+		return this.treeFileCheck[axisID];
 	}
 }
