@@ -436,16 +436,26 @@ public class ClusterFileGenerator {
 
 			addIndex = 0;
 			final String[] row = new String[rowLength];
-
-			/* Adding GIDs ("GENE130X") */
+			String[] names = rowNamesOrdered[i];
+			
+			/* Adding GIDs ("ROW130X") */
 			if (isRowClustered && !hasGID) {
 				row[addIndex++] = orderedGIDs[i];
+			
+			/* 
+			 * Ensure the labels are consistent with what was created for 
+			 * orderedGIDs. For example, an old file might already contain 
+			 * GENE23X etc. but the naming was ditched for ROW23X. If this
+			 * isn't corrected, then tree files will not match up with the
+			 * cdt.	
+			 */
+			} else if (isRowClustered && hasGID){
+				names[0] = orderedGIDs[i];
 			}
 
 			/* Adding row names */
-			System.arraycopy(rowNamesOrdered[i], 0, row, addIndex,
-					rowNamesOrdered[i].length);
-			addIndex += rowNamesOrdered[i].length;
+			System.arraycopy(names, 0, row, addIndex, names.length);
+			addIndex += names.length;
 
 			/* Adding data values */
 			System.arraycopy(cdtData_s[i], 0, row, addIndex,
