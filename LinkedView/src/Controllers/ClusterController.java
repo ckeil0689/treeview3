@@ -285,7 +285,7 @@ public class ClusterController {
 			boolean wasColAxisClustered = wasAxisClustered(
 					tvModel.getFileSet().getAtr(), tvModel.aidFound());
 			
-			// only warn of axis was clustered before AND user wants to cluster
+			// only warn if axis was clustered before AND user wants to cluster
 			boolean warnRowAxis = wasRowAxisClustered && rowReady;
 			boolean warnColAxis = wasColAxisClustered && colReady;
 			
@@ -297,6 +297,7 @@ public class ClusterController {
 				if(!confirmChoice(message)) {
 					clusterCheck[ROW_IDX] = false;
 					clusterCheck[COL_IDX] = false;
+					cancelAll();
 				}
 				
 			} else if(warnRowAxis && !warnColAxis) {
