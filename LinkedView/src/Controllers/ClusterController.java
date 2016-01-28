@@ -9,7 +9,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -153,13 +156,21 @@ public class ClusterController {
 	private class ClusterTask extends SwingWorker<Void, String> {
 		
 		/* The finished reordered axes */
-		private String[] reorderedRows = new String[] {};
-		private String[] reorderedCols = new String[] {};
+		private String[] reorderedRows;
+		private String[] reorderedCols;
 
 		private String fileName;
 
 		/* Used to set upper limit of cluster progress bar in GUI */
 		private int pBarMax = 0;
+		
+		public ClusterTask() {
+			
+			this.reorderedRows = getOldIDs(ROW_IDX);
+			this.reorderedCols = getOldIDs(COL_IDX);
+			
+			LogBuffer.println(Arrays.toString(reorderedRows));
+		}
 
 		@Override
 		protected void process(final List<String> chunks) {
@@ -216,13 +227,15 @@ public class ClusterController {
 
 			// Check for cancellation in between axis clustering
 			if (isCancelled()) {
-				reorderedRows = new String[] {};
-				reorderedCols = new String[] {};
 				return null;
 			}
 			
 			if (clusterCheck[COL_IDX]) {
 				reorderedCols = calculateAxis(colSimilarity, COL, fileName);
+			}
+			
+			if(!isReorderingValid(clusterCheck)) {
+				cancelAll();
 			}
 
 			// finished setting reordered axis labels
@@ -243,6 +256,84 @@ public class ClusterController {
 			}
 		}
 		
+		/**
+		 * Checks if the arrays of reordered labels are the same size as
+		 * the header arrays for each axis.
+		 * @return True if reordered arrays are the same size as the axis 
+		 * header arrays and the specific axis is supposed to be clustered.
+		 */
+		private boolean isReorderingValid(boolean[] clusterCheck) {
+			
+			boolean rowsValid;
+			boolean colsValid;
+			
+			int numRowHeaders = tvModel.getRowHeaderInfo().getNumHeaders();
+			int numColHeaders = tvModel.getColumnHeaderInfo().getNumHeaders();
+			
+			if(clusterCheck[ROW_IDX] || tvModel.gidFound()) {
+				rowsValid = (reorderedRows.length == numRowHeaders); 
+			} else {
+				rowsValid = (reorderedRows.length == 0);
+			}
+			
+			if(clusterCheck[COL_IDX] || tvModel.aidFound()) {
+				colsValid = (reorderedCols.length == numColHeaders); 
+			} else {
+				colsValid = (reorderedCols.length == 0);
+			}
+			
+			return rowsValid && colsValid;
+		}
+		
+		/**
+		 * Extracts the old IDs
+		 * @param axisID
+		 * @return
+		 */
+		private String[] getOldIDs(final int axisID) {
+			
+			String[][] headerArray;
+			String[] oldIDs; 
+			Pattern p;
+			int pos = 0;
+			
+            if(axisID == ROW_IDX) {
+            	headerArray = tvModel.getRowHeaderInfo().getHeaderArray();
+            	
+            	if(!tvModel.gidFound()) {
+            		return new String[]{};
+            	}
+            	
+            	/* Find ID index */
+            	p = Pattern.compile("ROW\\d+X");
+            	
+            } else {
+            	headerArray = tvModel.getColumnHeaderInfo().getHeaderArray();
+            	
+            	if(!tvModel.aidFound()) {
+            		return new String[]{};
+            	}
+            	
+            	p = Pattern.compile("COL\\d+X");
+            }
+			
+            /* Find ID index */
+        	for(int i = 0; i < headerArray[0].length; i++) {
+        		Matcher m = p.matcher(headerArray[0][i]);
+        		if(m.find()) {
+        			pos = i;
+        			break;
+        		}
+        	}
+        	
+			oldIDs = new String[headerArray.length];
+			
+			for(int i = 0; i < headerArray.length; i++) {
+				oldIDs[i] = headerArray[i][pos];
+			}
+			
+			return oldIDs;
+		}
 		/**
 		 * Checks if axis was clustered using its tree file if available and 
 		 * the axis specific ID if available. 
