@@ -158,6 +158,9 @@ public class ClusterController {
 		/* The finished reordered axes */
 		private String[] reorderedRows;
 		private String[] reorderedCols;
+		
+		private boolean shouldReorderRows = false;
+		private boolean shouldReorderCols = false;
 
 		private String fileName;
 
@@ -223,6 +226,7 @@ public class ClusterController {
 			
 			if (clusterCheck[ROW_IDX]) {
 				reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
+				shouldReorderRows = true;
 			}
 
 			// Check for cancellation in between axis clustering
@@ -232,6 +236,7 @@ public class ClusterController {
 			
 			if (clusterCheck[COL_IDX]) {
 				reorderedCols = calculateAxis(colSimilarity, COL, fileName);
+				shouldReorderCols = true;
 			}
 			
 			if(!isReorderingValid(clusterCheck)) {
@@ -246,7 +251,7 @@ public class ClusterController {
 		public void done() {
 
 			if (!isCancelled()) {
-				saveClusterFile(fileName);
+				saveClusterFile(fileName, shouldReorderRows, shouldReorderCols);
 
 			} else {
 				reorderedRows = new String[] {};
@@ -547,11 +552,14 @@ public class ClusterController {
 		 * Saves the clustering output (reordered axes) to a new CDT file, so it
 		 * can later be loaded and displayed.
 		 */
-		private void saveClusterFile(final String fileName) {
+		private void saveClusterFile(final String fileName, 
+				final boolean shouldReorderRows, 
+				final boolean shouldReorderCols) {
 
 			if (reorderedRows != null || reorderedCols != null) {
 				ClusterView.setStatusText("Saving...");
-				saveTask = new SaveTask(reorderedRows, reorderedCols, fileName);
+				saveTask = new SaveTask(reorderedRows, reorderedCols, 
+						shouldReorderRows, shouldReorderCols, fileName);
 				saveTask.execute();
 
 			} else {
@@ -578,15 +586,23 @@ public class ClusterController {
 		/* The finished reordered axes */
 		private final String[] reorderedRows;
 		private final String[] reorderedCols;
+		
+		private final boolean shouldReorderRows;
+		private final boolean shouldReorderCols;
 
 		private final String fileName;
 		private String filePath;
 
 		public SaveTask(final String[] reorderedRows,
-				final String[] reorderedCols, final String fileName) {
+				final String[] reorderedCols, final boolean shouldReorderRows,
+				final boolean shouldReorderCols, final String fileName) {
 
 			this.reorderedRows = reorderedRows;
 			this.reorderedCols = reorderedCols;
+			
+			this.shouldReorderRows = shouldReorderRows;
+			this.shouldReorderCols = shouldReorderCols;
+			
 			this.fileName = fileName;
 		}
 
@@ -598,8 +614,8 @@ public class ClusterController {
 			final double[][] data = originalMatrix.getExprData();
 
 			final ClusterFileGenerator cdtGen = new ClusterFileGenerator(data, 
-					reorderedRows, reorderedCols, treeFileCheck[ROW_IDX], 
-					treeFileCheck[COL_IDX],//rowSimilarity, colSimilarity, 
+					reorderedRows, treeFileCheck[ROW_IDX], shouldReorderRows,
+					reorderedCols, treeFileCheck[COL_IDX], shouldReorderCols,//rowSimilarity, colSimilarity, 
 					isHierarchical());
 
 			cdtGen.setupWriter(fileName, clusterView.getLinkMethod(),

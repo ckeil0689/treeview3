@@ -35,10 +35,12 @@ public class ClusterFileGenerator {
 
 	private final boolean isHier;
 	private final boolean isRowClustered;
+	private final boolean shouldReorderRows;
 	private final boolean isColClustered;
+	private final boolean shouldReorderCols;
 
 	private final double[][] origMatrix;
-	private double[][] cdtData_doubles;
+//	private double[][] cdtData_doubles;
 
 	private String[][] rowNames;
 	private String[][] colNames;
@@ -56,25 +58,38 @@ public class ClusterFileGenerator {
 	 * clustering and format it into a new CDT file that can be read and
 	 * interpreted by TreeView.
 	 *
-	 * @param origMatrix
-	 *            The original data matrix.
-	 * @param orderedRows
-	 *            Row labels after clustering.
-	 * @param orderedCols
-	 *            Column labels after clustering.
-	 * @param isHier
-	 *            Indicates type of clustering.
+	 * @param origMatrix The original data matrix.
+	 * @param orderedRows Row labels after clustering.
+	 * @param orderedCols Column labels after clustering.
+	 * @param isRowClustered Indicates whether the row axis is considered to
+	 * be clustered.
+	 * @param shouldReorderRows Indicates, whether row labels should be reordered. 
+	 * This is different from <isRowClustered> because a row can be considered
+	 * clustered and should not undergo reordering, e.g. tree file transfer
+	 * when an axis was already clustered earlier.
+	 * @param isColClustered Indicates whether the row axis is considered to
+	 * be clustered.
+	 * @param shouldReorderCols Indicates, whether row labels should be reordered. 
+	 * This is different from <isColClustered> because a row can be considered
+	 * clustered and should not undergo reordering, e.g. tree file transfer
+	 * when an axis was already clustered earlier.
+	 * @param isHier Indicates type of clustering. If true, clustering is
+	 * hierarchical. If false, clustering is k-means.
 	 */
 	public ClusterFileGenerator(final double[][] origMatrix,
-			final String[] orderedRows, final String[] orderedCols,
-			final boolean isRowClustered, final boolean isColClustered,
+			final String[] orderedRows, final boolean isRowClustered, 
+			final boolean shouldReorderRows, 
+			final String[] orderedCols, final boolean isColClustered, 
+			final boolean shouldReorderCols,
 			final boolean isHier) {
 
 		this.origMatrix = origMatrix;
 		this.orderedGIDs = orderedRows;
 		this.orderedAIDs = orderedCols;
 		this.isRowClustered = isRowClustered;
+		this.shouldReorderRows = shouldReorderRows;
 		this.isColClustered = isColClustered;
+		this.shouldReorderCols = shouldReorderCols;
 		this.isHier = isHier;
 	}
 
@@ -118,41 +133,48 @@ public class ClusterFileGenerator {
 	/**
 	 * Sets up instance variables needed for writing.
 	 *
-	 * @param geneHeaderI
-	 * @param arrayHeaderI
+	 * @param rowHeaderI <IntHeaderInfo> object for the row labels.
+	 * @param colHeaderI <IntHeaderInfo> object for the column labels.
 	 */
-	public void prepare(final IntHeaderInfo geneHeaderI,
-			final IntHeaderInfo arrayHeaderI) {
+	public void prepare(final IntHeaderInfo rowHeaderI,
+			final IntHeaderInfo colHeaderI) {
 
-		this.rowHeaders = geneHeaderI.getNames();
-		this.colHeaders = arrayHeaderI.getNames();
+		this.rowHeaders = rowHeaderI.getNames();
+		this.colHeaders = colHeaderI.getNames();
 
 		/* The list containing all the reorganized row-data */
-		this.cdtData_doubles = new double[origMatrix.length][];
+//		this.cdtData_doubles = new double[origMatrix.length][];
 		this.cdtData_s = new String[origMatrix.length][];
 
-		// retrieving names and weights of row elements
-		// format: [[YAL063C, 1.0], ..., [...]]
-		this.rowNames = geneHeaderI.getHeaderArray();
+		/* 
+		 * retrieving names and weights of row elements
+		 * format: [[YAL063C, 1.0], ..., [...]]
+		 */
+		this.rowNames = rowHeaderI.getHeaderArray();
 
-		// retrieving names and weights of column elements
-		// format: [[YAL063C, 1.0], ..., [...]]
-		this.colNames = arrayHeaderI.getHeaderArray();
+		/* 
+		 * retrieving names and weights of column elements
+		 * format: [[YAL063C, 1.0], ..., [...]]
+		 */
+		this.colNames = colHeaderI.getHeaderArray();
 
-		// Lists to be filled with reordered strings
+		/* Lists to be filled with reordered strings */
 		this.rowNamesOrdered = new String[rowNames.length][];
 		this.colNamesOrdered = new String[colNames.length][];
 	}
 
+	/**
+	 * Manages the generation of a clustered data table (CDT) file.
+	 */
 	public void generateCDT() {
 
 		/* First order the data according to clustering */
-		orderData();
+		double[][] reorderedMatrixData = orderData();
 
 		/* Transform cdtDataFile from double lists to string lists */
-		for (int i = 0; i < cdtData_doubles.length; i++) {
+		for (int i = 0; i < reorderedMatrixData.length; i++) {
 
-			final double[] element = cdtData_doubles[i];
+			final double[] element = reorderedMatrixData[i];
 			final String[] newStringData = new String[element.length];
 
 			for (int j = 0; j < element.length; j++) {
@@ -173,17 +195,18 @@ public class ClusterFileGenerator {
 	}
 
 	/**
-	 * This method reorders the double data if the axis was clustered.
+	 * This method reorders the matrix data for an axis if it was newly 
+	 * clustered. Transferred cluster files (from old data sets) are considered
+	 * clustered, but do not have to be reordered.
 	 */
-	private void orderData() {
-
+	private double[][] orderData() {
+		
 		int[] reorderedRowIndices = new int[origMatrix.length];
 		int[] reorderedColIndices = new int[colNames.length];
 
-		cdtData_doubles = new double[reorderedRowIndices.length]
-				[reorderedColIndices.length];
-
-		if (isRowClustered && orderedGIDs.length != 0) {
+		// TODO implement axis settings object to store axis features 
+		//such as row names, orderedIDs etc. and just retrieve them by axisID.
+		if (shouldReorderRows && isRowClustered && orderedGIDs.length != 0) {
 			reorderedRowIndices = orderElements(rowNames, orderedGIDs, 
 					ROW_AXIS_ID);
 			
@@ -195,7 +218,7 @@ public class ClusterFileGenerator {
 			rowNamesOrdered = rowNames;
 		}
 
-		if (isColClustered && orderedAIDs.length != 0) {
+		if (shouldReorderCols && isColClustered && orderedAIDs.length != 0) {
 			reorderedColIndices = orderElements(colNames, orderedAIDs, 
 					COL_AXIS_ID);
 			
@@ -204,24 +227,42 @@ public class ClusterFileGenerator {
 			for (int i = 0; i < reorderedColIndices.length; i++) {
 				reorderedColIndices[i] = i;
 			}
-
 			colNamesOrdered = colNames;
 		}
 
 		/* Order the numerical data. */
+		return reorderMatrixData(reorderedRowIndices, 
+				reorderedColIndices, origMatrix);
+	}
+	
+	/**
+	 * Uses lists of reordered axis indices to reorder the data matrix.
+	 * @param reorderedRowIndices List of reordered row indices.
+	 * @param reorderedColIndices List of reordered column indices 
+	 * @param origMatrix The data matrix to be reordered.
+	 */
+	private static double[][] reorderMatrixData(final int[] reorderedRowIndices, 
+			final int[] reorderedColIndices, final double[][] origMatrix) {
+		
+		int rows = reorderedRowIndices.length;
+		int cols = reorderedColIndices.length;
+
+		double[][] reorderedMatrixData = new double[rows][cols];
+		
+		/* Order the numerical data. */
 		int row = -1;
 		int col = -1;
 
-		for (int i = 0; i < reorderedRowIndices.length; i++) {
-
+		for (int i = 0; i < rows; i++) {
 			row = reorderedRowIndices[i];
 
-			for (int j = 0; j < reorderedColIndices.length; j++) {
-
+			for (int j = 0; j < cols; j++) {
 				col = reorderedColIndices[j];
-				cdtData_doubles[i][j] = origMatrix[row][col];
+				reorderedMatrixData[i][j] = origMatrix[row][col];
 			}
 		}
+		
+		return reorderedMatrixData;
 	}
 
 	/**
@@ -529,4 +570,21 @@ public class ClusterFileGenerator {
 			bufferedWriter.writeContent(row);
 		}
 	}
+	
+//	/**
+//	 * Setter for <cdtData_doubles> member.
+//	 * @param cdtDataMatrix The new <double> data matrix. 
+//	 */
+//	private void setCDTDataMatrix(double[][] cdtDataMatrix) {
+//		
+//		this.cdtData_doubles = cdtDataMatrix;
+//	}
+//	
+//	/**
+//	 * Getter for <cdtData_doubles> member.
+//	 */
+//	private double[][] getCDTDataMatrix() {
+//		
+//		return this.cdtData_doubles;
+//	}
 }
