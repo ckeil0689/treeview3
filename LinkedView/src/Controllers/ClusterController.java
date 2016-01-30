@@ -22,6 +22,7 @@ import javax.swing.event.ChangeListener;
 
 import Cluster.ClusterFileGenerator;
 import Cluster.ClusterProcessor;
+import Cluster.ClusteredAxisData;
 import Cluster.DistMatrixCalculator;
 import Cluster.DistanceMatrix;
 import Utilities.StringRes;
@@ -64,8 +65,6 @@ public class ClusterController {
 
 	/* Delegates the clustering process */
 	private ClusterProcessor processor;
-	
-	private boolean[] treeFileCheck;
 
 	/* Initialize with defaults for error checking parameters */
 	private int rowSimilarity = DistMatrixCalculator.PEARSON_UN;
@@ -92,7 +91,6 @@ public class ClusterController {
 		this.tvController = controller;
 		this.tvModel = controller.getDataModel();
 		this.clusterView = dialog.getClusterView();
-		this.treeFileCheck = new boolean[]{false, false};
 
 		/* Create and add all view component listeners */
 		addAllListeners();
@@ -156,11 +154,8 @@ public class ClusterController {
 	private class ClusterTask extends SwingWorker<Void, String> {
 		
 		/* The finished reordered axes */
-		private String[] reorderedRows;
-		private String[] reorderedCols;
-		
-		private boolean shouldReorderRows = false;
-		private boolean shouldReorderCols = false;
+		private ClusteredAxisData rowClusterData;
+		private ClusteredAxisData colClusterData;
 
 		private String fileName;
 
@@ -169,10 +164,13 @@ public class ClusterController {
 		
 		public ClusterTask() {
 			
-			this.reorderedRows = getOldIDs(ROW_IDX);
-			this.reorderedCols = getOldIDs(COL_IDX);
+			this.rowClusterData = new ClusteredAxisData(ROW_IDX);
+			this.colClusterData = new ClusteredAxisData(COL_IDX);
 			
-			LogBuffer.println(Arrays.toString(reorderedRows));
+			rowClusterData.setReorderedIDs(getOldIDs(ROW_IDX));
+			colClusterData.setReorderedIDs(getOldIDs(COL_IDX));
+			
+			LogBuffer.println(Arrays.toString(rowClusterData.getReorderedIDs()));
 		}
 
 		@Override
@@ -225,8 +223,9 @@ public class ClusterController {
 					clusterCheck[COL_IDX]);
 			
 			if (clusterCheck[ROW_IDX]) {
-				reorderedRows = calculateAxis(rowSimilarity, ROW, fileName);
-				shouldReorderRows = true;
+				rowClusterData.setReorderedIDs(
+						calculateAxis(rowSimilarity, ROW, fileName));
+				rowClusterData.shouldReorderAxis(true);
 			}
 
 			// Check for cancellation in between axis clustering
@@ -235,8 +234,9 @@ public class ClusterController {
 			}
 			
 			if (clusterCheck[COL_IDX]) {
-				reorderedCols = calculateAxis(colSimilarity, COL, fileName);
-				shouldReorderCols = true;
+				colClusterData.setReorderedIDs(
+						calculateAxis(colSimilarity, COL, fileName));
+				rowClusterData.shouldReorderAxis(true);
 			}
 			
 			if(!isReorderingValid(clusterCheck)) {
@@ -251,12 +251,13 @@ public class ClusterController {
 		public void done() {
 
 			if (!isCancelled()) {
-				saveClusterFile(fileName, shouldReorderRows, shouldReorderCols);
+				saveClusterFile(fileName, rowClusterData, colClusterData);
 
 			} else {
-				reorderedRows = new String[] {};
-				reorderedCols = new String[] {};
+				rowClusterData.setReorderedIDs(new String[] {});
+				colClusterData.setReorderedIDs(new String[] {});
 				clusterView.setClustering(false);
+				
 				LogBuffer.println("Clustering has been cancelled.");
 			}
 		}
@@ -275,16 +276,19 @@ public class ClusterController {
 			int numRowHeaders = tvModel.getRowHeaderInfo().getNumHeaders();
 			int numColHeaders = tvModel.getColumnHeaderInfo().getNumHeaders();
 			
+			int numReorderedRowIDs = rowClusterData.getReorderedIDs().length;
+			int numReorderedColIDs = colClusterData.getReorderedIDs().length;
+			
 			if(clusterCheck[ROW_IDX] || tvModel.gidFound()) {
-				rowsValid = (reorderedRows.length == numRowHeaders); 
+				rowsValid = (numReorderedRowIDs == numRowHeaders); 
 			} else {
-				rowsValid = (reorderedRows.length == 0);
+				rowsValid = (numReorderedRowIDs == 0);
 			}
 			
 			if(clusterCheck[COL_IDX] || tvModel.aidFound()) {
-				colsValid = (reorderedCols.length == numColHeaders); 
+				colsValid = (numReorderedColIDs == numColHeaders); 
 			} else {
-				colsValid = (reorderedCols.length == 0);
+				colsValid = (numReorderedColIDs == 0);
 			}
 			
 			return rowsValid && colsValid;
@@ -339,30 +343,6 @@ public class ClusterController {
 			
 			return oldIDs;
 		}
-		/**
-		 * Checks if axis was clustered using its tree file if available and 
-		 * the axis specific ID if available. 
-		 * If neither is present, it will assume that the axis was NOT 
-		 * clustered.
-		 * @param treeFilePath Path of the axis tree file, if it exists.
-		 * @param treeFileSuffix Axis associated tree file suffix (GTR, ATR).
-		 * @param hasAxisID When loading a file, a check is performed for the
-		 * axis ID label (GID, AID). This can be queried from the TVModel.
-		 * @return Whether an axis is considered to have been clustered before.
-		 */
-		private boolean wasAxisClustered(final String treeFilePath, 
-				final boolean hasAxisID) {
-			
-			boolean hasTreeFile = false;
-			
-			File f = new File(treeFilePath);
-			if(f.exists() && !f.isDirectory()) { 
-			    hasTreeFile = true;
-			}
-			
-			return hasAxisID || hasTreeFile;
-		}
-		
 		
 		/** 
 		 * Determines if both axes should be clustered based on available info 
@@ -423,9 +403,34 @@ public class ClusterController {
 			final boolean ensureColTreeFile = wasColAxisClustered 
 					|| clusterCheck[COL_IDX];
 			
-			setTreeFileCheck(ensureRowTreeFile, ensureColTreeFile);
+			rowClusterData.setTreeFileCheck(ensureRowTreeFile);
+			colClusterData.setTreeFileCheck(ensureColTreeFile);
 			
 			return clusterCheck;
+		}
+		
+		/**
+		 * Checks if axis was clustered using its tree file if available and 
+		 * the axis specific ID if available. 
+		 * If neither is present, it will assume that the axis was NOT 
+		 * clustered.
+		 * @param treeFilePath Path of the axis tree file, if it exists.
+		 * @param treeFileSuffix Axis associated tree file suffix (GTR, ATR).
+		 * @param hasAxisID When loading a file, a check is performed for the
+		 * axis ID label (GID, AID). This can be queried from the TVModel.
+		 * @return Whether an axis is considered to have been clustered before.
+		 */
+		private boolean wasAxisClustered(final String treeFilePath, 
+				final boolean hasAxisID) {
+			
+			boolean hasTreeFile = false;
+			
+			File f = new File(treeFilePath);
+			if(f.exists() && !f.isDirectory()) { 
+			    hasTreeFile = true;
+			}
+			
+			return hasAxisID || hasTreeFile;
 		}
 		
 		/**
@@ -553,17 +558,19 @@ public class ClusterController {
 		 * can later be loaded and displayed.
 		 */
 		private void saveClusterFile(final String fileName, 
-				final boolean shouldReorderRows, 
-				final boolean shouldReorderCols) {
+				final ClusteredAxisData rowClusterData, 
+				final ClusteredAxisData colClusterData) {
 
-			if (reorderedRows != null || reorderedCols != null) {
+			if (rowClusterData.getReorderedIDs() != null 
+					|| colClusterData.getReorderedIDs() != null) {
 				ClusterView.setStatusText("Saving...");
-				saveTask = new SaveTask(reorderedRows, reorderedCols, 
-						shouldReorderRows, shouldReorderCols, fileName);
+				saveTask = new SaveTask(rowClusterData, colClusterData, 
+						fileName);
 				saveTask.execute();
 
 			} else {
-				final String message = "Cannot save. No clustered data was created.";
+				final String message = "Cannot save. No clustered data "
+						+ "was created.";
 				JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
 						"Error", JOptionPane.ERROR_MESSAGE);
 				LogBuffer.println("Alert: " + message);
@@ -584,24 +591,18 @@ public class ClusterController {
 	private class SaveTask extends SwingWorker<Void, Void> {
 
 		/* The finished reordered axes */
-		private final String[] reorderedRows;
-		private final String[] reorderedCols;
-		
-		private final boolean shouldReorderRows;
-		private final boolean shouldReorderCols;
+		private final ClusteredAxisData rowClusterData;
+		private final ClusteredAxisData colClusterData;
 
 		private final String fileName;
 		private String filePath;
 
-		public SaveTask(final String[] reorderedRows,
-				final String[] reorderedCols, final boolean shouldReorderRows,
-				final boolean shouldReorderCols, final String fileName) {
+		public SaveTask(final ClusteredAxisData rowClusterData, 
+				final ClusteredAxisData colClusterData, 
+				final String fileName) {
 
-			this.reorderedRows = reorderedRows;
-			this.reorderedCols = reorderedCols;
-			
-			this.shouldReorderRows = shouldReorderRows;
-			this.shouldReorderCols = shouldReorderCols;
+			this.rowClusterData = rowClusterData;
+			this.colClusterData = colClusterData;
 			
 			this.fileName = fileName;
 		}
@@ -614,9 +615,7 @@ public class ClusterController {
 			final double[][] data = originalMatrix.getExprData();
 
 			final ClusterFileGenerator cdtGen = new ClusterFileGenerator(data, 
-					reorderedRows, treeFileCheck[ROW_IDX], shouldReorderRows,
-					reorderedCols, treeFileCheck[COL_IDX], shouldReorderCols,//rowSimilarity, colSimilarity, 
-					isHierarchical());
+					rowClusterData, colClusterData, isHierarchical());
 
 			cdtGen.setupWriter(fileName, clusterView.getLinkMethod(),
 					clusterView.getSpinnerValues());
@@ -687,13 +686,17 @@ public class ClusterController {
 				final int axisIdx) { 
 			
 			String axis_id;
+			boolean axisNeedsTreeFileCheck;
+			
 			if(axisIdx == ROW_IDX) {
 				axis_id = "row";
+				axisNeedsTreeFileCheck = rowClusterData.needsTreeFileCheck();
 			} else {
 				axis_id = "column";
+				axisNeedsTreeFileCheck = colClusterData.needsTreeFileCheck();
 			}
 			
-			if(treeFileNeedsCheck(axisIdx)) {
+			if(axisNeedsTreeFileCheck) {
 				String newTreeFilePath = newFileRoot + treeFileSuffix;
 				String oldTreeFilePath = oldFileRoot + treeFileSuffix;
 				
@@ -972,29 +975,5 @@ public class ClusterController {
 
 		return clusterView.getClusterMethod().equalsIgnoreCase(
 				StringRes.menu_Hier);
-	}
-	
-	/**
-	 * Setter for overallClusterStatus member. 
-	 */
-	public void setTreeFileCheck(final boolean row, final boolean col) {
-		
-		this.treeFileCheck[0] = row;
-		this.treeFileCheck[1] = col;
-	}
-	
-	/**
-	 * 
-	 * @return A boolean from an array of 2 boolean elements. 
-	 * Element 0 describes the cluster status for the row axis. 
-	 * Element describes the status for the column index. 
-	 */
-	public boolean treeFileNeedsCheck(final int axisID) {
-		
-		if(axisID < 0 || axisID > 1) {
-			return false;
-		}
-		
-		return this.treeFileCheck[axisID];
 	}
 }

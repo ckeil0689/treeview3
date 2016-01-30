@@ -15,8 +15,8 @@ import edu.stanford.genetics.treeview.model.IntHeaderInfo;
 public class ClusterFileGenerator {
 
 	// Important cluster strings for the files
-	public final static String ROW_AXIS_ID = "ROW";
-	public final static String COL_AXIS_ID = "COL";
+	public final static String ROW_AXIS_BASEID = "ROW";
+	public final static String COL_AXIS_BASEID = "COL";
 	
 	public final static String ROW_ID_HEADER = "GID";
 	public final static String COL_ID_HEADER = "AID";
@@ -29,26 +29,22 @@ public class ClusterFileGenerator {
 	private final String KMEANS_DESIGNATOR = "_K";
 	private final String KMEANS_ROW_SUFFIX = "_G";
 	private final String KMEANS_COL_SUFFIX = "_A";
-	
-	private String[] rowHeaders;
-	private String[] colHeaders;
-
-	private final boolean isHier;
-	private final boolean isRowClustered;
-	private final boolean shouldReorderRows;
-	private final boolean isColClustered;
-	private final boolean shouldReorderCols;
 
 	private final double[][] origMatrix;
+	private final ClusteredAxisData rowClusterData;
+	private final ClusteredAxisData colClusterData;
+	private final boolean isHier;
 
+	private String[] rowHeaders;
+	private String[] colHeaders;
+	
 	private String[][] rowNames;
 	private String[][] colNames;
+	
 	private String[][] rowNamesOrdered;
 	private String[][] colNamesOrdered;
+	
 	private String[][] cdtData_s;
-
-	private final String[] orderedGIDs;
-	private final String[] orderedAIDs;
 
 	private ClusterFileWriter bufferedWriter;
 
@@ -76,19 +72,13 @@ public class ClusterFileGenerator {
 	 * hierarchical. If false, clustering is k-means.
 	 */
 	public ClusterFileGenerator(final double[][] origMatrix,
-			final String[] orderedRows, final boolean isRowClustered, 
-			final boolean shouldReorderRows, 
-			final String[] orderedCols, final boolean isColClustered, 
-			final boolean shouldReorderCols,
+			final ClusteredAxisData rowClusterData, 
+			final ClusteredAxisData colClusterData,
 			final boolean isHier) {
 
 		this.origMatrix = origMatrix;
-		this.orderedGIDs = orderedRows;
-		this.orderedAIDs = orderedCols;
-		this.isRowClustered = isRowClustered;
-		this.shouldReorderRows = shouldReorderRows;
-		this.isColClustered = isColClustered;
-		this.shouldReorderCols = shouldReorderCols;
+		this.rowClusterData = rowClusterData;
+		this.colClusterData = colClusterData;
 		this.isHier = isHier;
 	}
 
@@ -114,6 +104,8 @@ public class ClusterFileGenerator {
 			final int row_clusterN = spinnerInput[0];
 			final int col_clusterN = spinnerInput[2];
 
+			final String[] orderedGIDs = rowClusterData.getReorderedIDs();
+			final String[] orderedAIDs = colClusterData.getReorderedIDs();
 			
 			if (orderedGIDs != null && orderedGIDs.length > 0) {
 				rowC = KMEANS_ROW_SUFFIX + row_clusterN;
@@ -201,12 +193,15 @@ public class ClusterFileGenerator {
 		
 		int[] reorderedRowIndices = new int[origMatrix.length];
 		int[] reorderedColIndices = new int[colNames.length];
+		
+		String[] orderedGIDs = rowClusterData.getReorderedIDs();
+		String[] orderedAIDs = colClusterData.getReorderedIDs();
 
-		// TODO implement axis settings object to store axis features 
-		//such as row names, orderedIDs etc. and just retrieve them by axisID.
-		if (shouldReorderRows && isRowClustered && orderedGIDs.length != 0) {
+		if (rowClusterData.shouldReorderAxis() 
+				&& rowClusterData.isAxisClustered() 
+				&& orderedGIDs.length != 0) {
 			reorderedRowIndices = orderElements(rowNames, orderedGIDs, 
-					ROW_AXIS_ID);
+					ROW_AXIS_BASEID);
 			
 		} else {
 			/* old order simply remains */
@@ -216,9 +211,11 @@ public class ClusterFileGenerator {
 			rowNamesOrdered = rowNames;
 		}
 
-		if (shouldReorderCols && isColClustered && orderedAIDs.length != 0) {
+		if (colClusterData.shouldReorderAxis() 
+				&& colClusterData.isAxisClustered() 
+				&& orderedAIDs.length != 0) {
 			reorderedColIndices = orderElements(colNames, orderedAIDs, 
-					COL_AXIS_ID);
+					COL_AXIS_BASEID);
 			
 		} else {
 			/* old order simply remains */
@@ -326,10 +323,10 @@ public class ClusterFileGenerator {
 	 */
 	private void setReorderedNames(String[][] orderedNames, String axisPrefix) {
 
-		if (axisPrefix.equals(ROW_AXIS_ID)) {
+		if (axisPrefix.equals(ROW_AXIS_BASEID)) {
 			this.rowNamesOrdered = orderedNames;
 			
-		} else if (axisPrefix.equals(COL_AXIS_ID)) {
+		} else if (axisPrefix.equals(COL_AXIS_BASEID)) {
 			this.colNamesOrdered = orderedNames;
 		}
 	}
@@ -374,9 +371,12 @@ public class ClusterFileGenerator {
 	private void fillHierarchical() {
 
 		final boolean hasGID = findIndex(rowHeaders, ROW_ID_HEADER) != -1;
+		
+		String[] orderedGIDs = rowClusterData.getReorderedIDs();
+		String[] orderedAIDs = colClusterData.getReorderedIDs();
 
 		int rowLength = rowHeaders.length + colNames.length;
-		if (isRowClustered && !hasGID) {
+		if (rowClusterData.isAxisClustered() && !hasGID) {
 			rowLength++;
 		}
 
@@ -387,7 +387,7 @@ public class ClusterFileGenerator {
 
 		/* The first row */
 		addIndex = 0;
-		if (isRowClustered && !hasGID) {
+		if (rowClusterData.isAxisClustered() && !hasGID) {
 			cdtRow[addIndex++] = ROW_ID_HEADER;
 		}
 
@@ -405,7 +405,7 @@ public class ClusterFileGenerator {
 
 		/* next row */
 		/* if columns were clustered, make AID row */
-		if (isColClustered) {
+		if (colClusterData.isAxisClustered()) {
 			cdtRow[0] = COL_ID_HEADER;
 
 			/* Fill with AIDs ("COL3X") */
@@ -445,7 +445,7 @@ public class ClusterFileGenerator {
 			String[] names = rowNamesOrdered[i];
 			
 			/* Adding GIDs ("ROW130X") */
-			if (isRowClustered && !hasGID) {
+			if (rowClusterData.isAxisClustered() && !hasGID) {
 				row[addIndex++] = orderedGIDs[i];
 			
 			/* 
@@ -455,7 +455,7 @@ public class ClusterFileGenerator {
 			 * isn't corrected, then tree files will not match up with the
 			 * cdt.	
 			 */
-			} else if (isRowClustered && hasGID){
+			} else if (rowClusterData.isAxisClustered() && hasGID){
 				names[0] = orderedGIDs[i];
 			}
 

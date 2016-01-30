@@ -19,10 +19,14 @@ public class ClusteredAxisData {
 	
 	private boolean isAxisClustered;
 	private boolean shouldReorderAxis;
+	private boolean needsTreeFileCheck;
 	
 	public ClusteredAxisData(final int axisID) {
 		
 		this.AXIS_ID = axisID;
+		this.shouldReorderAxis = false;
+		this.isAxisClustered = false;
+		this.needsTreeFileCheck = false;
 	}
 	
 	/* Setters */
@@ -54,6 +58,11 @@ public class ClusteredAxisData {
 	public void shouldReorderAxis(final boolean shouldReorderAxis) {
 		
 		this.shouldReorderAxis = shouldReorderAxis;
+	}
+	
+	public void setTreeFileCheck(final boolean needsTreeFileCheck) {
+		
+		this.needsTreeFileCheck = needsTreeFileCheck;
 	}
 	
 	/* Getters */
@@ -90,5 +99,10 @@ public class ClusteredAxisData {
 	public boolean shouldReorderAxis() {
 		
 		return shouldReorderAxis;
+	}
+	
+	public boolean needsTreeFileCheck() {
+		
+		return needsTreeFileCheck;
 	}
 }

@@ -96,8 +96,8 @@ public class HierCluster {
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
 		this.axisPrefix = (axis == ClusterController.ROW) ? 
-						ClusterFileGenerator.ROW_AXIS_ID : 
-							ClusterFileGenerator.COL_AXIS_ID;
+						ClusterFileGenerator.ROW_AXIS_BASEID : 
+							ClusterFileGenerator.COL_AXIS_BASEID;
 
 		prepareCluster();
 	}
