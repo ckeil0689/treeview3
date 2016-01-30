@@ -40,7 +40,6 @@ public class ClusterFileGenerator {
 	private final boolean shouldReorderCols;
 
 	private final double[][] origMatrix;
-//	private double[][] cdtData_doubles;
 
 	private String[][] rowNames;
 	private String[][] colNames;
@@ -143,7 +142,6 @@ public class ClusterFileGenerator {
 		this.colHeaders = colHeaderI.getNames();
 
 		/* The list containing all the reorganized row-data */
-//		this.cdtData_doubles = new double[origMatrix.length][];
 		this.cdtData_s = new String[origMatrix.length][];
 
 		/* 
@@ -302,7 +300,7 @@ public class ClusterFileGenerator {
 				// extract numerical part of element ID
 				final String adjusted = id.replaceAll("[\\D]", "");
 
-				// gets index from ordered list, e.g. ARRY45X --> 45;
+				// gets index from ordered list, e.g. COL45X --> 45;
 				index = Integer.parseInt(adjusted);
 
 			} else {
@@ -311,19 +309,8 @@ public class ClusterFileGenerator {
 
 			reorderedIndices[i] = index;
 
-/* what was this for... */ 	
-//			int axisID;
-//			if (axisPrefix.equalsIgnoreCase("GENE")) {
-//				axisID = 0;
-//			} else {
-//				axisID = 1;
-//			}
-//
-//			final int newColIndex = findID(orderedIDs, id, axisID);
-//			final int finalIndex = (newColIndex == -1) ? index : newColIndex;
-
 			// reordering column names
-			orderedNames[i] = origNames[index];//finalIndex];
+			orderedNames[i] = origNames[index];
 		}
 
 		setReorderedNames(orderedNames, axisPrefix);
@@ -373,28 +360,6 @@ public class ClusterFileGenerator {
 		for (int i = 0; i < array.length; i++) {
 
 			if (array[i].equalsIgnoreCase(element)) {
-				index = i;
-			}
-		}
-
-		return index;
-	}
-
-	/**
-	 * Finds the index of an element in a String array.
-	 *
-	 * @param array
-	 * @param axis_id
-	 * @return
-	 */
-	private static int findID(final String[][] array, final String axis_id,
-			final int axis) {
-
-		int index = -1;
-		for (int i = 0; i < array.length; i++) {
-
-			String arrayElem = array[i][axis];
-			if (arrayElem.equalsIgnoreCase(axis_id)) {
 				index = i;
 			}
 		}
@@ -570,21 +535,4 @@ public class ClusterFileGenerator {
 			bufferedWriter.writeContent(row);
 		}
 	}
-	
-//	/**
-//	 * Setter for <cdtData_doubles> member.
-//	 * @param cdtDataMatrix The new <double> data matrix. 
-//	 */
-//	private void setCDTDataMatrix(double[][] cdtDataMatrix) {
-//		
-//		this.cdtData_doubles = cdtDataMatrix;
-//	}
-//	
-//	/**
-//	 * Getter for <cdtData_doubles> member.
-//	 */
-//	private double[][] getCDTDataMatrix() {
-//		
-//		return this.cdtData_doubles;
-//	}
 }
