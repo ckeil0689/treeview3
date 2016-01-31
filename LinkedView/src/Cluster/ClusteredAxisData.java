@@ -11,9 +11,10 @@ package Cluster;
 public class ClusteredAxisData {
 
 	private final int AXIS_ID;
+	private final String AXIS_BASEID;
 	
 	private String[] reorderedIDs;
-	private String[][] axisHeaders;
+	private String[] axisHeaders;
 	private String[][] axisLabels;
 	private String[][] orderedAxisLabels;
 	
@@ -23,6 +24,7 @@ public class ClusteredAxisData {
 	public ClusteredAxisData(final int axisID) {
 		
 		this.AXIS_ID = axisID;
+		this.AXIS_BASEID = (axisID == 0) ? "ROW" : "COL";
 		this.shouldReorderAxis = false;
 		this.isAxisClustered = false;
 	}
@@ -33,7 +35,7 @@ public class ClusteredAxisData {
 		this.reorderedIDs = newReorderedIDs;
 	}
 	
-	public void setAxisHeaders(final String[][] newAxisHeaders) {
+	public void setAxisHeaders(final String[] newAxisHeaders) {
 		
 		this.axisHeaders = newAxisHeaders;
 	}
@@ -64,12 +66,17 @@ public class ClusteredAxisData {
 		return AXIS_ID;
 	}
 	
+	public String getAxisBaseID() {
+		
+		return AXIS_BASEID;
+	}
+	
 	public String[] getReorderedIDs() {
 		
 		return reorderedIDs;
 	}
 	
-	public String[][] getAxisHeaders() {
+	public String[] getAxisHeaders() {
 		
 		return axisHeaders;
 	}
@@ -77,6 +84,11 @@ public class ClusteredAxisData {
 	public String[][] getAxisLabels() {
 		
 		return axisLabels;
+	}
+	
+	public int getAxisLabelNum() {
+		
+		return axisLabels.length;
 	}
 	
 	public String[][] getOrderedAxisLabels() {
