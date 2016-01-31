@@ -704,11 +704,11 @@ public class TVController implements Observer {
 		/* Erase selection */
 		dendroController.deselectAll();
 
-		/* Making a new Window to display clustering components */
+		/* Making a new dialog to display cluster UI */
 		final ClusterDialog clusterView = new ClusterDialog(clusterType);
 
 		/* Creating the Controller for this view. */
-		ClusterController cController = new ClusterController(clusterView,
+		ClusterDialogController cController = new ClusterDialogController(clusterView,
 				TVController.this);
 
 		cController.displayView();

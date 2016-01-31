@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -43,6 +44,23 @@ public final class Helper {
 			return diff < (EPSILON * Float.MIN_NORMAL);
 		else
 			return diff / (absA + absB) < EPSILON;
+	}
+	
+	/**
+	 * Helper to transform a List<Integer> object to an int array.
+	 * @param intList The integer List object to be transformed.
+	 * @return An int array version of the List<Integer> object.
+	 */
+	public static int[] intListToArray(List<Integer> intList) {
+		
+		int[] intArray = new int[intList.size()];
+		
+		for (int i = 0; i < intArray.length; i++) {
+
+			intArray[i] = intList.get(i);
+		}
+		
+		return intArray;
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package Cluster;
 
-import Controllers.ClusterController;
+import Controllers.ClusterDialogController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -27,7 +27,7 @@ public class TreeFileWriter {
 	 */
 	public TreeFileWriter(final int axis, String fileName, int linkMethod) {
 
-		String fileSuffix = (axis == ClusterController.ROW) ? ".gtr" : ".atr";
+		String fileSuffix = (axis == ClusterDialogController.ROW) ? ".gtr" : ".atr";
 
 		this.bufferedWriter = new ClusterFileWriter(fileName, fileSuffix,
 				linkMethod);
