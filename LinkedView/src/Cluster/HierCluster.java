@@ -14,7 +14,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import Controllers.ClusterController;
+import Controllers.ClusterDialogController;
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -95,7 +95,7 @@ public class HierCluster {
 		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
-		this.axisPrefix = (axis == ClusterController.ROW) ? 
+		this.axisPrefix = (axis == ClusterDialogController.ROW) ? 
 						ClusterFileGenerator.ROW_AXIS_BASEID : 
 							ClusterFileGenerator.COL_AXIS_BASEID;
 

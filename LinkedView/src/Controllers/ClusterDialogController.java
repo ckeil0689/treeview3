@@ -49,7 +49,7 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  * @author CKeil
  *
  */
-public class ClusterController {
+public class ClusterDialogController {
 
 	/* Axes identifiers */
 	public final static int ROW = 1;
@@ -84,7 +84,7 @@ public class ClusterController {
 	 * @param controller
 	 *            The TVFrameController, mostly used to enable file loading.
 	 */
-	public ClusterController(final ClusterDialog dialog,
+	public ClusterDialogController(final ClusterDialog dialog,
 			final TVController controller) {
 
 		this.clusterDialog = dialog;
@@ -236,7 +236,7 @@ public class ClusterController {
 			if (clusterCheck[COL_IDX]) {
 				colClusterData.setReorderedIDs(
 						calculateAxis(colSimilarity, COL, fileName));
-				rowClusterData.shouldReorderAxis(true);
+				colClusterData.shouldReorderAxis(true);
 			}
 			
 			if(!isReorderingValid(clusterCheck)) {
@@ -312,7 +312,6 @@ public class ClusterController {
             	if(!tvModel.gidFound()) {
             		return new String[]{};
             	}
-            	
             	/* Find ID index */
             	p = Pattern.compile("ROW\\d+X");
             	
@@ -322,12 +321,12 @@ public class ClusterController {
             	if(!tvModel.aidFound()) {
             		return new String[]{};
             	}
-            	
             	p = Pattern.compile("COL\\d+X");
             }
 			
             /* Find ID index */
         	for(int i = 0; i < headerArray[0].length; i++) {
+        	
         		Matcher m = p.matcher(headerArray[0][i]);
         		if(m.find()) {
         			pos = i;
@@ -395,16 +394,16 @@ public class ClusterController {
 			
 			/* 
 			 * Keeping track of cluster status for both axes here which is
-			 * later (and exclusively) used to ensure tree file presence if 
-			 * an axis is considered to be clustered. 
+			 * later used to ensure tree file presence if an axis is 
+			 * considered to be clustered. 
 			 */
-			final boolean ensureRowTreeFile = wasRowAxisClustered 
+			final boolean checkForRowTreeFile = wasRowAxisClustered 
 					|| clusterCheck[ROW_IDX];
-			final boolean ensureColTreeFile = wasColAxisClustered 
+			final boolean checkForColTreeFile = wasColAxisClustered 
 					|| clusterCheck[COL_IDX];
 			
-			rowClusterData.setTreeFileCheck(ensureRowTreeFile);
-			colClusterData.setTreeFileCheck(ensureColTreeFile);
+			rowClusterData.setAxisClustered(checkForRowTreeFile);
+			colClusterData.setAxisClustered(checkForColTreeFile);
 			
 			return clusterCheck;
 		}
@@ -458,7 +457,7 @@ public class ClusterController {
 				shouldProceed = false;
 				break;
 			default:
-				shouldProceed = true;
+				shouldProceed = false;
 			}
 			
 			return shouldProceed;
@@ -531,7 +530,6 @@ public class ClusterController {
 			
 			/* Row axis cluster */
 			final DistanceMatrix distMatrix = new DistanceMatrix(0);
-
 			final String axisPrefix = (isRow) ? "row" : "column";
 
 			/* ProgressBar label */
@@ -690,10 +688,10 @@ public class ClusterController {
 			
 			if(axisIdx == ROW_IDX) {
 				axis_id = "row";
-				axisNeedsTreeFileCheck = rowClusterData.needsTreeFileCheck();
+				axisNeedsTreeFileCheck = rowClusterData.isAxisClustered();
 			} else {
 				axis_id = "column";
-				axisNeedsTreeFileCheck = colClusterData.needsTreeFileCheck();
+				axisNeedsTreeFileCheck = colClusterData.isAxisClustered();
 			}
 			
 			if(axisNeedsTreeFileCheck) {
@@ -774,11 +772,7 @@ public class ClusterController {
 					file.getParent() + File.separator);
 
 			clusterDialog.dispose();
-
 			tvController.getDataInfoAndLoad(fileSet, true);
-			// DataLoadInfo dataInfo = new DataLoadInfo(new int[]{0,0}, "\\t");
-			// // TODO replace with actual values
-			// tvController.loadData(fileSet, true, dataInfo);
 
 		} else {
 			final String alert = "When trying to load the clustered file, no "
@@ -813,8 +807,8 @@ public class ClusterController {
 	}
 
 	/**
-	 * Listens to a change in selection for the linkChooser JComboBox in
-	 * clusterView. Calls a new layout setup as a response.
+	 * Listens to a change in selection for the <JComboBox> linkChooser in
+	 * the <ClusterDialog>. Calls a new layout setup as a response.
 	 *
 	 * @author CKeil
 	 *
@@ -824,7 +818,6 @@ public class ClusterController {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			LogBuffer.println("Reprint link method tips.");
 			clusterView.setupLayout();
 		}
 	}

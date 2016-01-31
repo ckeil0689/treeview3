@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import Controllers.ClusterController;
+import Controllers.ClusterDialogController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -68,7 +68,7 @@ public class KMeansCluster {
 	 */
 	public void setupFileWriter(final String fileName) {
 
-		final String fileEnd = (axis == ClusterController.ROW) ? "_K_G" + k
+		final String fileEnd = (axis == ClusterDialogController.ROW) ? "_K_G" + k
 				+ ".kgg" : "_K_A" + k + ".kag";
 
 		bufferedWriter = new ClusterFileWriter(fileName, fileEnd, -1);
@@ -139,7 +139,7 @@ public class KMeansCluster {
 		int addIndex = 0;
 
 		/* Setting up header line */
-		initial[addIndex] = (axis == ClusterController.ROW) ? "ORF" : "ARRAY";
+		initial[addIndex] = (axis == ClusterDialogController.ROW) ? "ORF" : "ARRAY";
 		addIndex++;
 
 		initial[addIndex] = "GROUP";

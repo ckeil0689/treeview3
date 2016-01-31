@@ -708,7 +708,7 @@ public class TVController implements Observer {
 		final ClusterDialog clusterView = new ClusterDialog(clusterType);
 
 		/* Creating the Controller for this view. */
-		ClusterController cController = new ClusterController(clusterView,
+		ClusterDialogController cController = new ClusterDialogController(clusterView,
 				TVController.this);
 
 		cController.displayView();

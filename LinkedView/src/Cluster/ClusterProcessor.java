@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import Controllers.ClusterController;
+import Controllers.ClusterDialogController;
 import Views.ClusterView;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntHeaderInfo;
@@ -156,7 +156,7 @@ public class ClusterProcessor {
 			this.distMeasure = distMeasure;
 			this.axis = axis;
 
-			if (axis == ClusterController.ROW) {
+			if (axis == ClusterDialogController.ROW) {
 				this.axisSize = originalMatrix.getNumRow();
 
 			} else {
@@ -177,7 +177,7 @@ public class ClusterProcessor {
 
 			/* Calculate distance matrix */
 			double[][] data = null;
-			if (axis == ClusterController.ROW) {
+			if (axis == ClusterDialogController.ROW) {
 				data = originalMatrix.getExprData();
 
 			} else {
@@ -380,7 +380,7 @@ public class ClusterProcessor {
 			
 			int k;
 			int iterations;
-			if (axis == ClusterController.ROW) {
+			if (axis == ClusterDialogController.ROW) {
 				k = spinnerInput[0];
 				iterations = spinnerInput[1];
 
@@ -406,7 +406,7 @@ public class ClusterProcessor {
 
 			/* Get axis labels */
 			String[][] headerArray;
-			if (axis == ClusterController.ROW) {
+			if (axis == ClusterDialogController.ROW) {
 				headerArray = rowHeaderI.getHeaderArray();
 
 			} else {
