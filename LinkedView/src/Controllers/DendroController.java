@@ -1,8 +1,10 @@
 package Controllers;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics2D;
 import java.awt.KeyboardFocusManager;
-import java.awt.Rectangle;
+//import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +20,7 @@ import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
@@ -71,17 +74,34 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 
 import java.awt.event.MouseListener;
 
-//Testing PDF export options
+//Testing PDF export options with freehep
 import java.awt.Dimension;
 import java.io.File;
 import java.util.Properties;
 
 import org.freehep.graphics2d.VectorGraphics;
-//import org.freehep.graphicsio.ps.PSGraphics2D;
-//import org.freehep.util.export.ExportDialog;
 import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.freehep.graphicsio.svg.SVGGraphics2D;
+
+
+
+
+
+
+
+import com.itextpdf.awt.PdfGraphics2D;
+//Testing PDF export options with itextpdf
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfTemplate;
+import com.itextpdf.text.pdf.PdfWriter;
+
 
 /* 
  * NOTES: 
@@ -657,28 +677,62 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				//maven 2, along with 2 jar files from the original freehep
 				//2.1.1 project
 				try {
-					Properties p = new Properties();
-					p.setProperty("PageSize","A5");
-					/* TODO: This needs to supply a size of an export region */
-					VectorGraphics g =
-						new PDFGraphics2D(new File("Output.pdf"),
-							new Dimension(interactiveXmap.getMaxIndex() + 1,
-								interactiveYmap.getMaxIndex() + 1));
-					/* TODO: Create an interface that allows the user to select
-					 * the export format among those provided here */
-					//VectorGraphics g =
-					//	new PSGraphics2D(new File("Output.ps"),
-					//		new Dimension(interactiveXmap.getMaxIndex() + 1,
-					//			interactiveYmap.getMaxIndex() + 1));
-					//VectorGraphics g = new SVGGraphics2D(new File("Output.svg"),
-					//	new Dimension(interactiveXmap.getMaxIndex() + 1,
-					//			interactiveYmap.getMaxIndex() + 1)); 
-					g.setProperties(p); 
-					g.startExport();
-					/* TODO: This needs to supply a start end end index for each
-					 * dimension fining the export region */
-					getInteractiveMatrixView().exportPixels(g);
-					g.endExport();
+//					/* Based on: http://developers.itextpdf.com/examples/graphics/graphics2d-examples
+//					 * It did not work. For some reason, the output pdf was always blank... */
+//					Document document = new Document(new Rectangle(14000,14000));
+//					PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream("Output.pdf"));
+//					document.open();
+//					PdfContentByte canvas = writer.getDirectContent();
+//					PdfTemplate template = canvas.createTemplate(14000,14000);
+//					Graphics2D g2d = new PdfGraphics2D(template,14000,14000);
+//					//Graphics2D g2d = template.createGraphics(14000,14000);
+//					g2d.setColor(Color.black);
+//					//getInteractiveMatrixView().exportPixels(g2d);
+//					g2d.drawString(String.format("(%s,%s)",50,50),50,50);
+//			        for (int x = 10; x < 14000; x += 100) {
+//			            for (int y = 10; y < 14000; y += 100) {
+//			                g2d.drawString(String.format("(%s,%s)", x, y), x, y);
+//			            }
+//			        }
+//					g2d.dispose();
+//					canvas.addTemplate(template,0,14000);
+//					document.newPage();
+//					document.close();
+
+
+
+					Document document = new Document();
+					PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream("Output.pdf"));
+					document.open();
+					PdfPTable table = createTable();
+					table.setSpacingBefore(5);
+					table.setSpacingAfter(5);
+					document.add(table);
+					document.close();
+
+					
+//					Properties p = new Properties();
+//					p.setProperty("PageSize","A5");
+//					/* TODO: This needs to supply a size of an export region */
+//					VectorGraphics g =
+//						new PDFGraphics2D(new File("Output.pdf"),
+//							new Dimension(interactiveXmap.getMaxIndex() + 1,
+//								interactiveYmap.getMaxIndex() + 1));
+//					/* TODO: Create an interface that allows the user to select
+//					 * the export format among those provided here */
+//					//VectorGraphics g =
+//					//	new PSGraphics2D(new File("Output.ps"),
+//					//		new Dimension(interactiveXmap.getMaxIndex() + 1,
+//					//			interactiveYmap.getMaxIndex() + 1));
+//					//VectorGraphics g = new SVGGraphics2D(new File("Output.svg"),
+//					//	new Dimension(interactiveXmap.getMaxIndex() + 1,
+//					//			interactiveYmap.getMaxIndex() + 1)); 
+//					g.setProperties(p); 
+//					g.startExport();
+//					/* TODO: This needs to supply a start end end index for each
+//					 * dimension fining the export region */
+//					getInteractiveMatrixView().exportPixels(g);
+//					g.endExport();
 				}
 				catch(Exception exc) {
 					exc.printStackTrace();
@@ -690,6 +744,25 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 			notifyAllMapObservers();
 		}
+	}
+
+	public static PdfPTable createTable() throws DocumentException {
+		PdfPTable table = new PdfPTable(3);
+		table.setWidthPercentage(100);
+		table.setWidths(new int[]{1,3,7});
+		PdfPCell cell;
+		cell = new PdfPCell(new Phrase("Table 1"));
+		table.addCell(cell);
+		cell = new PdfPCell(new Phrase("Cell 2"));
+		table.addCell(cell);
+		table.addCell("cell 3");
+		table.addCell("cell 4");
+		table.addCell("cell 5");
+		table.addCell("cell 6");
+		table.addCell("cell 7");
+		table.addCell("cell 8");
+		table.addCell("cell 9");
+		return table;
 	}
 
 	/**

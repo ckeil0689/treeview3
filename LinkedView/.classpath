@@ -17,6 +17,12 @@
 	<classpathentry kind="lib" path="compile_lib/freehep-util-2.0.2.jar"/>
 	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-svg-2.4.jar"/>
 	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-ps-2.4.jar"/>
+	<classpathentry kind="lib" path="compile_lib/itextpdf-5.5.8.jar"/>
+	<classpathentry kind="lib" path="compile_lib/itextpdf-5.5.8-javadoc.jar"/>
+	<classpathentry kind="lib" path="compile_lib/itext-xtra-5.5.8.jar"/>
+	<classpathentry kind="lib" path="compile_lib/itextpdf-5.5.8-sources.jar"/>
+	<classpathentry kind="lib" path="compile_lib/itext-pdfa-5.5.8.jar"/>
+	<classpathentry kind="lib" path="compile_lib/xmlworker-5.5.8.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
