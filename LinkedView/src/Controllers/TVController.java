@@ -35,9 +35,9 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GeneListMaker;
+import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -194,7 +194,7 @@ public class TVController implements Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			openFile();
+			openFile(null);
 		}
 	}
 
@@ -209,7 +209,7 @@ public class TVController implements Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			final FileSet last = tvFrame.getFileMRU().getLast();
-			getDataInfoAndLoad(last, false);
+			openFile(last);
 		}
 	}
 
@@ -514,20 +514,27 @@ public class TVController implements Observer {
 	 *
 	 * @throws LoadException
 	 */
-	public void openFile() {
+	public void openFile(FileSet fileSet) {
 
 		String message;
 		try {
-			file = tvFrame.selectFile();
-
-			/* Only run loader, if JFileChooser wasn't canceled. */
-			if (file != null) {
-				FileSet fileSet = tvFrame.getFileSet(file);
-				getDataInfoAndLoad(fileSet, false);
-
-			} else {
-				return;
+			if(fileSet == null) {
+				file = tvFrame.selectFile();
+	
+				/* Only run loader, if JFileChooser wasn't canceled. */
+				if (file != null) {
+					fileSet = tvFrame.getFileSet(file);
+	
+				} else {
+					message = "No file was selected. Cannot begin "
+							+ "loading data.";
+					showWarning(message);
+					return;
+				}
 			}
+			
+			getDataInfoAndLoad(fileSet, false);
+			
 		} catch (final LoadException e) {
 			message = "Loading the file was interrupted.";
 			showWarning(message);
@@ -552,7 +559,7 @@ public class TVController implements Observer {
 				fileSet.getExt());
 
 		DataLoadInfo dataInfo;
-		if ((FileSet.TRV).equalsIgnoreCase(fileSet.getExt()) && node != null) { // better way?
+		if ((FileSet.TRV).equalsIgnoreCase(fileSet.getExt()) && node != null) {
 			dataInfo = getDataLoadInfo(fileSet);
 			
 		} else {
@@ -935,9 +942,7 @@ public class TVController implements Observer {
 			fileMenuSet = tvFrame.findFileSet((JMenuItem) actionEvent
 					.getSource());// tvFrame.getFileMenuSet();
 
-			tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
-
-			getDataInfoAndLoad(fileMenuSet, false);
+			openFile(fileMenuSet);
 		}
 	}
 
