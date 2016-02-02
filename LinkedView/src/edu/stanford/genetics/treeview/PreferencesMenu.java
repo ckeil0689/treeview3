@@ -36,8 +36,8 @@ public class PreferencesMenu extends CustomDialog implements
 	private static final long serialVersionUID = 1L;
 
 	private final TreeViewFrame tvFrame;
-	private HeaderInfo geneHI;
-	private HeaderInfo arrayHI;
+	private HeaderInfo rowHI;
+	private HeaderInfo colHI;
 	private Preferences configNode;
 
 	private final DendroView dendroView;
@@ -53,17 +53,17 @@ public class PreferencesMenu extends CustomDialog implements
 	 */
 	public PreferencesMenu(final TreeViewFrame tvFrame) {
 
-		super(StringRes.dlg_prefs);
+		super(StringRes.dlg_Labels);
 		this.tvFrame = tvFrame;
 		this.dendroView = tvFrame.getDendroView();
 
 		getContentPane().add(mainPanel);
 	}
 
-	public void setHeaderInfo(final HeaderInfo geneHI, final HeaderInfo arrayHI) {
+	public void setHeaderInfo(final HeaderInfo rowHI, final HeaderInfo colHI) {
 
-		this.geneHI = geneHI;
-		this.arrayHI = arrayHI;
+		this.rowHI = rowHI;
+		this.colHI = colHI;
 	}
 
 	/**
@@ -250,10 +250,10 @@ public class PreferencesMenu extends CustomDialog implements
 			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS,
 					null);
 
-			genePanel = new HeaderSummaryPanel(geneHI, dendroView
+			genePanel = new HeaderSummaryPanel(rowHI, dendroView
 					.getRowLabelView().getHeaderSummary());
 
-			arrayPanel = new HeaderSummaryPanel(arrayHI, dendroView
+			arrayPanel = new HeaderSummaryPanel(colHI, dendroView
 					.getColumnLabelView().getHeaderSummary());
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,

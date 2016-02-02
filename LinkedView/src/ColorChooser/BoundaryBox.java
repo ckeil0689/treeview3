@@ -62,7 +62,7 @@ public class BoundaryBox extends ThumbBox {
 		g2.fillRect(t.getX() - (stringWidth / 2), 0, stringWidth, stringHeight);
 		g2.setColor(Color.black);
 
-		g2.drawString(Double.toString(value), t.getX() - (stringWidth / 2),
+		g2.drawString(value_s, t.getX() - (stringWidth / 2),
 				(int) ((boundaryRect.getHeight() / 4) + boundaryRect.getMinY()));
 	}
 

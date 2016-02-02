@@ -990,11 +990,7 @@ public class TVController implements Observer {
 		final double median = model.getDataMatrix().getMedian();
 
 		/* View */
-		// TODO get colorExtractor instance from dendroController...
 		ColorExtractor colorExtractor = dendroController.getColorExtractor();
-		
-//		ColorExtractor drawer = ((DoubleArrayDrawer) dendroController
-//				.getArrayDrawer()).getColorExtractor();
 
 		final ColorChooserUI gradientPick = new ColorChooserUI(colorExtractor, 
 				min, max, mean, median);

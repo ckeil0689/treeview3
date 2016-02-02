@@ -33,7 +33,8 @@ public class StringRes {
 	public static final String dlg_Cluster = "Cluster View";
 	public static final String dlg_search = "Search Labels";
 	public static final String dlg_loadLabels = "Loading Labels";
-	public static final String dlg_prefs = "Preferences";
+	public static final String dlg_Labels = "Labels";
+	public static final String dlg_Colors = "Colors";
 	public static final String dlg_exitConfirm = "Confirm Exit";
 	public static final String dlg_about = "About";
 
@@ -63,7 +64,7 @@ public class StringRes {
 	public static final String menu_Prefs = "Preferences";
 	public static final String menu_ResetPrefs = "Reset Preferences";
 	public static final String menu_RowAndCol = "Labels...";
-	public static final String menu_Color = "Color settings...";
+	public static final String menu_Color = "Colors...";
 	public static final String menu_showTrees = "Show Trees...";
 	public static final String menu_hideTrees = "Hide Trees...";
 	public static final String menu_Hier = "Hierarchical";
