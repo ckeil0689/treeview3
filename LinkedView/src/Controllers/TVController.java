@@ -36,7 +36,7 @@ import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GeneListMaker;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.PreferencesMenu;
+import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -952,7 +952,7 @@ public class TVController implements Observer {
 	public void openPrefMenu(final String menu) {
 
 		// View
-		final PreferencesMenu preferences = new PreferencesMenu(tvFrame);
+		final LabelSettings preferences = new LabelSettings(tvFrame);
 
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 			preferences.setHeaderInfo(model.getRowHeaderInfo(),

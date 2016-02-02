@@ -72,7 +72,6 @@ public class ColorChooserUI extends CustomDialog {
 		this.gradientPanel = colorPicker.getContainerPanel();
 
 		setLayout();
-
 		add(mainPanel);
 
 		pack();
@@ -84,8 +83,8 @@ public class ColorChooserUI extends CustomDialog {
 	 */
 	private void setLayout() {
 
-		mainPanel = GUIFactory.createJPanel(true, GUIFactory.DEFAULT, Color.red);
-		contentPanel = GUIFactory.createJPanel(true, GUIFactory.DEFAULT);
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		addBtn = GUIFactory.createBtn("Add New Color");
 		editBtn = GUIFactory.createBtn("Edit Selected Color");

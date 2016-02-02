@@ -48,7 +48,6 @@ public class BoundaryBox extends ThumbBox {
 		}
 
 		paintString(g2, value, thumb);
-
 		thumb.paint(g2);
 	}
 
@@ -56,14 +55,13 @@ public class BoundaryBox extends ThumbBox {
 
 		String value_s = Double.toString(value);
 		int stringWidth = fm.stringWidth(value_s);
-		int stringHeight = fm.getHeight();
+		
+		int x = t.getX() - (stringWidth / 2);
+		int y = (int) ((boundaryRect.getHeight() / 3) + boundaryRect.getMinY());
 
-		g2.setColor(GUIFactory.DEFAULT_BG);
-		g2.fillRect(t.getX() - (stringWidth / 2), 0, stringWidth, stringHeight);
 		g2.setColor(Color.black);
-
-		g2.drawString(value_s, t.getX() - (stringWidth / 2),
-				(int) ((boundaryRect.getHeight() / 4) + boundaryRect.getMinY()));
+		g2.setFont(GUIFactory.FONTS);
+		g2.drawString(value_s, x, y);
 	}
 
 	@Override

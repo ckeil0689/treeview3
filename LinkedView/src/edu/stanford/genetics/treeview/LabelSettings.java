@@ -27,7 +27,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
  * @author CKeil
  *
  */
-public class PreferencesMenu extends CustomDialog implements
+public class LabelSettings extends CustomDialog implements
 		ConfigNodePersistent {
 
 	/**
@@ -51,7 +51,7 @@ public class PreferencesMenu extends CustomDialog implements
 	 *
 	 * @param tvFrame
 	 */
-	public PreferencesMenu(final TreeViewFrame tvFrame) {
+	public LabelSettings(final TreeViewFrame tvFrame) {
 
 		super(StringRes.dlg_Labels);
 		this.tvFrame = tvFrame;
