@@ -1,6 +1,7 @@
 package Cluster;
 
-import Controllers.ClusterDialogController;
+import java.io.File;
+
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -25,12 +26,11 @@ public class TreeFileWriter {
 	 * @param linkMethod
 	 *            Identifier for link method used for clustering.
 	 */
-	public TreeFileWriter(final int axis, String fileName, int linkMethod) {
+	public TreeFileWriter(final File file) {
 
-		String fileSuffix = (axis == ClusterDialogController.ROW) ? ".gtr" : ".atr";
+//		String fileSuffix = (axis == ClusterDialogController.ROW) ? ".gtr" : ".atr";
 
-		this.bufferedWriter = new ClusterFileWriter(fileName, fileSuffix,
-				linkMethod);
+		this.bufferedWriter = new ClusterFileWriter(file);
 
 	}
 

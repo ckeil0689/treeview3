@@ -71,15 +71,15 @@ public class TVController implements Observer {
 	private FileSet fileMenuSet;
 
 	private Preferences oldNode;
-	private String[] clusterNodeSourceKeys;
-	private final String[] selectedLabels;
+	//private String[] clusterNodeSourceKeys;
+	//private final String[] selectedLabels;
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
 		this.dendroController = new DendroController(tvFrame, this);
-		this.selectedLabels = new String[2];
+		//this.selectedLabels = new String[2];
 
 		/* Add the view as observer to the model */
 		((TVModel) model).addObserver(tvFrame);
@@ -255,33 +255,50 @@ public class TVController implements Observer {
 	 *            should be copied to the new one. It should only occur when a
 	 *            file is being clustered.
 	 */
-	public void loadData(final FileSet fileSet, final boolean isClusterFile,
-			final DataLoadInfo dataInfo) {
+	public void loadData(final FileSet fileSet, final DataLoadInfo dataInfo) {
 
 		/* Setting loading screen */
 		tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
 
 		/* Loading TVModel */
 		final TVModel tvModel = (TVModel) model;
+		final FileSet oldFileSet = tvModel.getFileSet();
 
-		if (isClusterFile && clusterNodeSourceKeys != null) {
-			String srcName = clusterNodeSourceKeys[0];
-			String srcExtension = clusterNodeSourceKeys[1];
-			this.oldNode = getOldPreferences(srcName, srcExtension);
+		/* 
+		 * If data is loaded after clustering, transfer the Preferences from
+		 * the last loaded file.
+		 */
+		String srcName;
+		String srcExtension;
+		if (dataInfo.isClusteredFile()) {
+			srcName = oldFileSet.getRoot();
+			srcExtension = oldFileSet.getExt();
 
+		/*
+		 * If it this isn't post-cluster, check if any Preferences exist for 
+		 * the file to be loaded.	
+		 */
 		} else {
-			this.oldNode = null;
+			srcName = fileSet.getRoot();
+			srcExtension = fileSet.getExt();
 		}
+		
+		this.oldNode = getOldPreferences(srcName, srcExtension);
 
-		fileMenuSet = (fileSet != null) ? fileSet : tvFrame.getFileSet(file);
+		if(oldNode == null) {
+			LogBuffer.println("Found no old preferences settings. File should "
+					+ "be loaded with default settings.");
+		}
+		
+		setFileMenuSet(fileSet);
 
 		try {
-			if (dendroController.hasDendroView()) {
-				final String[] rowNames = tvModel.getRowHeaderInfo().getNames();
-				final String[] colNames = tvModel.getColHeaderInfo().getNames();
-
-				storeSelectedLabels(rowNames, colNames);
-			}
+//			if (dendroController.hasDendroView()) {
+//				final String[] rowNames = tvModel.getRowHeaderInfo().getNames();
+//				final String[] colNames = tvModel.getColHeaderInfo().getNames();
+//
+//				storeSelectedLabels(rowNames, colNames);
+//			}
 
 			/* ensure reset of the model data */
 			tvModel.resetState();
@@ -307,8 +324,9 @@ public class TVController implements Observer {
 	/**
 	 * Finish up loading by setting the model loaded status to true and creating
 	 * a new DendroView.
+	 * @param wasClusterFile Whether a file is being loaded after clustering.
 	 */
-	public void finishLoading() {
+	public void finishLoading(boolean wasClusterFile) {
 
 		if (model.getDataMatrix().getNumRow() > 0) {
 
@@ -367,6 +385,13 @@ public class TVController implements Observer {
 		addMenuListeners();
 	}
 
+	/**
+	 * Checks if the root File node is parent to a node with the supplied 
+	 * srcName and srcExtension stored as name values.
+	 * @param srcName
+	 * @param srcExtension
+	 * @return The target Preferences node, if it exists. Otherwise null.
+	 */
 	private Preferences getOldPreferences(String srcName, String srcExtension) {
 
 		try {
@@ -405,8 +430,6 @@ public class TVController implements Observer {
 					+ " preferences.");
 			return;
 		}
-		
-		LogBuffer.println("Old node: " + oldNode.name());
 
 		try {
 			dendroController.importLabelPreferences(oldNode);
@@ -470,17 +493,31 @@ public class TVController implements Observer {
 	 * @param rowNames
 	 * @param colNames
 	 */
-	private void storeSelectedLabels(final String[] rowNames,
-			final String[] colNames) {
-
-		/* save label type selection before loading new file */
-		final int rowIncluded = dendroController.getRowIncluded()[0];
-		final int colIncluded = dendroController.getColumnIncluded()[0];
-
-		if (rowNames.length > 0 && colNames.length > 0) {
-			selectedLabels[0] = rowNames[rowIncluded];
-			selectedLabels[1] = colNames[colIncluded];
+//	private void storeSelectedLabels(final String[] rowNames,
+//			final String[] colNames) {
+//
+//		/* save label type selection before loading new file */
+//		final int rowIncluded = dendroController.getRowIncluded()[0];
+//		final int colIncluded = dendroController.getColumnIncluded()[0];
+//
+//		if (rowNames.length > 0 && colNames.length > 0) {
+//			selectedLabels[0] = rowNames[rowIncluded];
+//			selectedLabels[1] = colNames[colIncluded];
+//		}
+//	}
+	
+	private void setFileMenuSet(final FileSet fs) {
+		
+		FileSet newFs;
+		
+		if(fs != null) {
+			newFs =  fs;
+			
+		} else {
+			newFs = tvFrame.getFileSet(file);
 		}
+		
+		this.fileMenuSet = newFs;
 	}
 
 	/**
@@ -488,28 +525,28 @@ public class TVController implements Observer {
 	 * been stored and select them again in the model. This should happen right
 	 * after the model has been loaded and the new DendroView was set up.
 	 */
-	private void resetLabelSelection() {
-
-		final int[] newGSelected = new int[] { 0 };
-		final String[] geneNames = model.getRowHeaderInfo().getNames();
-		for (int i = 0; i < geneNames.length; i++) {
-			if (geneNames[i].equalsIgnoreCase(selectedLabels[0])) {
-				newGSelected[0] = i;
-				break;
-			}
-		}
-
-		final int[] newASelected = new int[] { 0 };
-		final String[] arrayNames = model.getColHeaderInfo().getNames();
-		for (int i = 0; i < arrayNames.length; i++) {
-			if (arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
-				newASelected[0] = i;
-				break;
-			}
-		}
-
-		dendroController.setNewIncluded(newGSelected, newASelected);
-	}
+//	private void resetLabelSelection() {
+//
+//		final int[] newGSelected = new int[] { 0 };
+//		final String[] geneNames = model.getRowHeaderInfo().getNames();
+//		for (int i = 0; i < geneNames.length; i++) {
+//			if (geneNames[i].equalsIgnoreCase(selectedLabels[0])) {
+//				newGSelected[0] = i;
+//				break;
+//			}
+//		}
+//
+//		final int[] newASelected = new int[] { 0 };
+//		final String[] arrayNames = model.getColHeaderInfo().getNames();
+//		for (int i = 0; i < arrayNames.length; i++) {
+//			if (arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
+//				newASelected[0] = i;
+//				break;
+//			}
+//		}
+//
+//		dendroController.setNewIncluded(newGSelected, newASelected);
+//	}
 
 	/**
 	 * This method opens a file dialog to open either the visualization view or
@@ -553,20 +590,29 @@ public class TVController implements Observer {
 	 */
 	public void getDataInfoAndLoad(FileSet fileSet, boolean isFromCluster) {
 
-		/* To check if file was loaded before */
-		Preferences node = getOldPreferences(fileSet.getRoot(),
-				fileSet.getExt());
+		Preferences node;
+		/* Transfer settings to clustered file */
+		if(isFromCluster) {
+		    FileSet preClusterFS = ((TVModel) model).getFileSet();
+			node = getOldPreferences(preClusterFS.getRoot(), 
+					preClusterFS.getExt());
+		/* Check if file was loaded before */
+		} else {
+			node = getOldPreferences(fileSet.getRoot(), fileSet.getExt());
+		}
 
+//		boolean isFileTRV = (FileSet.TRV).equalsIgnoreCase(fileSet.getExt());
 		DataLoadInfo dataInfo;
-		if ((FileSet.TRV).equalsIgnoreCase(fileSet.getExt()) && node != null) { // better way?
-			dataInfo = getDataLoadInfo(fileSet);
+		if (node != null) {
+			dataInfo = getDataLoadInfo(fileSet, node);
 			
 		} else {
 			dataInfo = useImportDialog(fileSet);
 		}
 
 		if (dataInfo != null) {
-			loadData(fileSet, isFromCluster, dataInfo);
+			dataInfo.setIsClusteredFile(isFromCluster);
+			loadData(fileSet, dataInfo);
 			
 		} else {
 			String message = "Data loading was interrupted.";
@@ -610,16 +656,23 @@ public class TVController implements Observer {
 	 * @return A DataLoadInfo object which contains information relevant for
 	 * setting up the DataLoadDialog.
 	 */
-	public DataLoadInfo getDataLoadInfo(FileSet fileSet) {
-
-		Preferences node = getOldPreferences(fileSet.getRoot(),
-				fileSet.getExt());
-
+	public DataLoadInfo getDataLoadInfo(FileSet fileSet, Preferences node) {
+//
+//		Preferences node = getOldPreferences(fileSet.getRoot(),
+//				fileSet.getExt());
+		
+        DataLoadInfo dataInfo;
 		String delimiter = node.get("delimiter", ModelLoader.DEFAULT_DELIM);
-		int[] dataCoords = new int[] { node.getInt("rowCoord", 0),
-				node.getInt("colCoord", 0) };
-
-		return new DataLoadInfo(dataCoords, delimiter);
+		
+		/* Amount of label headers may vary, they have to be redetected */
+		DataImportController importController = new DataImportController(
+				delimiter);
+		importController.setFileSet(fileSet);
+		int[] dataCoords = importController.detectDataBoundaries();
+//		int[] dataCoords = new int[] { node.getInt("rowCoord", 0),
+//				node.getInt("colCoord", 0) };
+        dataInfo = new DataLoadInfo(dataCoords, delimiter);
+		return dataInfo;
 	}
 
 	/**
@@ -702,8 +755,8 @@ public class TVController implements Observer {
 		 * To quickly find Preferences node of pre-cluster file to carry over
 		 * settings like color and font.
 		 */
-		FileSet fs = ((TVModel) model).getFileSet();
-		this.clusterNodeSourceKeys = new String[] { fs.getRoot(), fs.getExt() };
+//		FileSet fs = ((TVModel) model).getFileSet();
+//		this.clusterNodeSourceKeys = new String[] { fs.getRoot(), fs.getExt() };
 
 		/* Erase selection */
 		dendroController.deselectAll();

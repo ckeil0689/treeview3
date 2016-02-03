@@ -1,6 +1,7 @@
 package Cluster;
 
 import java.awt.Frame;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -28,7 +29,7 @@ public class ClusterProcessor {
 	private final IntHeaderInfo rowHeaderI;
 	private final IntHeaderInfo colHeaderI;
 
-	private final String fileName;
+//	private final String fileName;
 	private int pBarCount;
 	private DistanceWorker distTask;
 	private ClusterTask clusterTask;
@@ -43,11 +44,9 @@ public class ClusterProcessor {
 	 * @param dataMatrix The original data matrix to be clustered.
 	 * @param fileName The name of the file to which the data matrix belongs.
 	 */
-	public ClusterProcessor(final TVDataMatrix dataMatrix,
-			final String fileName) {
+	public ClusterProcessor(final TVDataMatrix dataMatrix) {
 
 		this.originalMatrix = dataMatrix;
-		this.fileName = fileName;
 		this.rowHeaderI = null;
 		this.colHeaderI = null;
 		this.pBarCount = 0;
@@ -70,7 +69,6 @@ public class ClusterProcessor {
 			final IntHeaderInfo colHeaderI) {
 
 		this.originalMatrix = dataMatrix;
-		this.fileName = fileName;
 		this.rowHeaderI = rowHeaderI;
 		this.colHeaderI = colHeaderI;
 		this.pBarCount = 0;
@@ -118,11 +116,11 @@ public class ClusterProcessor {
 	 */
 	public String[] clusterAxis(final DistanceMatrix distMatrix,
 			final int linkMethod, final Integer[] spinnerInput,
-			final boolean hierarchical, final int axis) {
+			final boolean hierarchical, final int axis, final File treeFile) {
 
 		try {
 			this.clusterTask = new ClusterTask(distMatrix, linkMethod,
-					spinnerInput, hierarchical, axis);
+					spinnerInput, hierarchical, axis, treeFile);
 			clusterTask.execute();
 
 			/*
@@ -286,16 +284,18 @@ public class ClusterProcessor {
 		private final int axis;
 		private final int max;
 		private final boolean hier;
+		private final File treeFile;
 
 		public ClusterTask(final DistanceMatrix distMatrix,
 				final int linkMethod, final Integer[] spinnerInput,
-				final boolean hier, final int axis) {
+				final boolean hier, final int axis, final File treeFile) {
 
 			this.distMatrix = distMatrix;
 			this.linkMethod = linkMethod;
 			this.spinnerInput = spinnerInput;
 			this.hier = hier;
 			this.axis = axis;
+			this.treeFile = treeFile;
 
 			/* Progress bar max dependent on selected clustering type */
 			this.max = (hier) ? distMatrix.getSize() - 1 : spinnerInput[0];
@@ -335,10 +335,15 @@ public class ClusterProcessor {
 		 */
 		private String[] doHierarchicalCluster() {
 			
+			if(treeFile == null) {
+				LogBuffer.println("TreeFile not set, aborting cluster.");
+				return new String[] {};
+			}
+			
 			final HierCluster clusterer = new HierCluster(linkMethod,
 					distMatrix, axis);
 
-			clusterer.setupTreeFileWriter(axis, fileName);
+			clusterer.setupTreeFileWriter(treeFile);
 
 			/*
 			 * Continue process until distMatrix has a size of 1, This array
@@ -392,7 +397,7 @@ public class ClusterProcessor {
 			final KMeansCluster clusterer = new KMeansCluster(distMatrix,
 					axis, k);
 
-			clusterer.setupFileWriter(fileName);
+			clusterer.setupFileWriter(treeFile);
 
 			/*
 			 * Begin iteration of recalculating means and reassigning row

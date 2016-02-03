@@ -20,6 +20,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import Cluster.ClusterFileGenerator;
+import Cluster.ClusterFileStorage;
 import Cluster.ClusterProcessor;
 import Cluster.ClusteredAxisData;
 import Cluster.DistMatrixCalculator;
@@ -51,6 +52,9 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 public class ClusterDialogController {
 
 	/* Axes identifiers */
+	public final static String GTR_END = ".gtr";
+	public final static String ATR_END = ".atr";
+	
 	public final static int ROW = 1;
 	public final static int COL = 2;
 	
@@ -61,6 +65,10 @@ public class ClusterDialogController {
 	private final TVController tvController;
 	private final ClusterView clusterView;
 	private final ClusterDialog clusterDialog;
+	
+	private File cdtFile;
+	private File atrFile;
+	private File gtrFile;
 
 	/* Delegates the clustering process */
 	private ClusterProcessor processor;
@@ -181,6 +189,7 @@ public class ClusterDialogController {
 		protected Void doInBackground() throws Exception {
 
 			// Get fileName for saving calculated data
+			final ClusterFileStorage clusStore = new ClusterFileStorage();
 			final int extlen = tvModel.getFileSet().getExt().length();
 			
 			fileName = tvModel.getSource().substring(0,
@@ -191,7 +200,7 @@ public class ClusterDialogController {
 					.getDataMatrix();
 			
 			if(isHierarchical()) {
-				processor = new ClusterProcessor(originalMatrix, fileName);
+				processor = new ClusterProcessor(originalMatrix);
 				
 			} else {
 				final IntHeaderInfo rowHeaderI = tvModel.getRowHeaderInfo();
@@ -220,8 +229,10 @@ public class ClusterDialogController {
 					clusterCheck[COL_IDX]);
 			
 			if (clusterCheck[ROW_IDX]) {
+				gtrFile = clusStore.createFile(fileName, GTR_END, 
+						clusterView.getLinkMethod());
 				rowClusterData.setReorderedIDs(
-						calculateAxis(rowSimilarity, ROW, fileName));
+						calculateAxis(rowSimilarity, ROW, gtrFile));
 				rowClusterData.shouldReorderAxis(true);
 			}
 
@@ -231,14 +242,24 @@ public class ClusterDialogController {
 			}
 			
 			if (clusterCheck[COL_IDX]) {
+				atrFile = clusStore.createFile(fileName, ATR_END, 
+						clusterView.getLinkMethod());
 				colClusterData.setReorderedIDs(
-						calculateAxis(colSimilarity, COL, fileName));
+						calculateAxis(colSimilarity, COL, atrFile));
 				colClusterData.shouldReorderAxis(true);
 			}
 			
 			if(!isReorderingValid(clusterCheck)) {
 				cancelAll();
 			}
+			
+			/* If all went smooth, create File object for CDT file */
+			String fileEnd = clusStore.getClusterFileExtension(
+					isHierarchical(), clusterView.getSpinnerValues(), 
+					rowClusterData, colClusterData);
+			
+			cdtFile = clusStore.createFile(fileName, fileEnd, 
+					clusterView.getLinkMethod());
 
 			// finished setting reordered axis labels
 			return null;
@@ -521,7 +542,7 @@ public class ClusterDialogController {
 		 * @return A list of reordered axis elements.
 		 */
 		private String[] calculateAxis(final int similarity, final int axis,
-				final String fileName) {
+				final File treeFile) {
 			
 			boolean isRow = (axis == ROW);
 			
@@ -543,7 +564,8 @@ public class ClusterDialogController {
 
 			String[] reorderedAxisLabels =  processor.clusterAxis(distMatrix,
 					clusterView.getLinkMethod(),
-					clusterView.getSpinnerValues(), isHierarchical(), axis);
+					clusterView.getSpinnerValues(), isHierarchical(), axis, 
+					treeFile);
 			
 			return reorderedAxisLabels;
 		}
@@ -612,8 +634,7 @@ public class ClusterDialogController {
 			final ClusterFileGenerator cdtGen = new ClusterFileGenerator(data, 
 					rowClusterData, colClusterData, isHierarchical());
 
-			cdtGen.setupWriter(fileName, clusterView.getLinkMethod(),
-					clusterView.getSpinnerValues());
+			cdtGen.setupWriter(cdtFile);
 
 			final IntHeaderInfo rowHeaderI = tvModel.getRowHeaderInfo();
 			final IntHeaderInfo colHeaderI = tvModel.getColHeaderInfo();
@@ -752,6 +773,13 @@ public class ClusterDialogController {
 			File f = new File(filePath);
 			return (f.exists() && !f.isDirectory());
 		}
+	}
+	
+	/**
+	 * Deletes all files associated with the last clustering step.
+	 */
+	public void deleteAllFiles() {
+		
 	}
 
 	/**

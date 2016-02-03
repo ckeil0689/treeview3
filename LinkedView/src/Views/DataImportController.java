@@ -25,6 +25,12 @@ public class DataImportController {
 	private FileSet fileSet;
 	private String selectedDelimiter;
 
+	public DataImportController(final String selectedDelimiter) {
+
+		this.previewDialog = null;
+		this.selectedDelimiter = selectedDelimiter;
+	}
+	
 	public DataImportController(DataImportDialog dialog) {
 
 		this.previewDialog = dialog;
@@ -141,16 +147,20 @@ public class DataImportController {
 	 * and the selectedDelimiter. Then it updates the JSpinner values which
 	 * describe the data boundaries in the dialog.
 	 */
-	public void detectDataBoundaries() {
+	public int[] detectDataBoundaries() {
 		
 		String filename = fileSet.getCdt();
 		int[] dataStartCoords = PreviewLoader.findDataStartCoords(filename,
 				selectedDelimiter);
 
-		int rowCount = dataStartCoords[0];
-		int columnCount = dataStartCoords[1];
-
-		previewDialog.setSpinnerValues(rowCount, columnCount);
+		/* This method can be called without the actual dialog being open! */
+		if(previewDialog != null) {
+			int rowCount = dataStartCoords[0];
+			int columnCount = dataStartCoords[1];
+			previewDialog.setSpinnerValues(rowCount, columnCount);
+		}
+		
+		return dataStartCoords;
 	}
 
 	/**
