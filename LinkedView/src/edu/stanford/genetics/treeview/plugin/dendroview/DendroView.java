@@ -144,46 +144,41 @@ public class DendroView implements Observer, DendroPanel {
 	/**
 	 * Constructor for the DendroView object
 	 *
-	 * @param tvFrame
-	 *            parent ViewFrame of DendroView
-	 * @param name
-	 *            name of this view.
+	 * @param tvFrame parent ViewFrame of DendroView
+	 * @param name name of this view.
 	 */
 	public DendroView(final TreeViewFrame tvFrame, final String name) {
 
 		this.tvFrame = tvFrame;
 		this.name = "DendroView";
 
-		/* main panel */
+		/* Main panel to which all components are added */
+		dendroPane = GUIFactory.createJPanel(false, 
+				GUIFactory.TINY_GAPS_AND_INSETS);
+		
+		/* Search panel containing the search bars */
+		searchPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_GAPS_OR_INSETS);
 
-		searchPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
-		dendroPane = GUIFactory.createJPanel(false, GUIFactory.TINY_GAPS_AND_INSETS);
-
-		/* Create the Global view (JPanel to display) */
+		/* The two matrix views (big, interactive & small, overview) */
 		globalMatrixView = new GlobalMatrixView();
 		interactiveMatrixView = new InteractiveMatrixView();
 
-		/* scrollbars, mostly used by maps */
+		/* Main matrix JScrollbars */
 		matrixXscrollbar = interactiveMatrixView.getXMapScroll();
 		matrixYscrollbar = interactiveMatrixView.getYMapScroll();
 
-		/* Set up the gene label display */
+		/* Label views */
 		rowLabelView = new RowLabelView();
-
-		/* Set up the array label display */
 		colLabelView = new ColumnLabelView();
 		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
 		colLabelScroll = colLabelView.getSecondaryScrollBar();
 		rowLabelScroll = rowLabelView.getSecondaryScrollBar();
 
-		// Set up row dendrogram
+		/* Dendrograms */
 		rowTreeView = new RowTreeView();
-		rowTreeView.getHeaderSummary().setIncluded(new int[] { 0, 3 });
-
-		// Set up column dendrogram
 		colTreeView = new ColumnTreeView();
-		colTreeView.getHeaderSummary().setIncluded(new int[] { 0, 3 });
 
 		setupScaleButtons();
 	}
@@ -215,9 +210,11 @@ public class DendroView implements Observer, DendroPanel {
 	 *
 	 * @return JPanel
 	 */
-	private void setSearchPanel() {
+	private void setupSearchPanel() {
 
 		if (rowFinderBox == null || colFinderBox == null) {
+			LogBuffer.println("Could not set up search. A search bar has"
+					+ " not been set up.");
 			return;
 		}
 
@@ -252,7 +249,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		setSearchTermBoxes();
 		updateSearchTermBoxes(geneHI, arrayHI, xmap, ymap);
-		setSearchPanel();
+		setupSearchPanel();
 	}
 
 	/**
@@ -421,9 +418,11 @@ public class DendroView implements Observer, DendroPanel {
 				0.5d);
 		if (rowTreeView.isEnabled()) {
 			rowDataPane.setDividerLocation(oldRowDiv);
+			setRowTRViewEnabled(true);
 			
 		} else {
 			rowDataPane.setDividerLocation(0.0);
+			setRowTRViewEnabled(false);
 		}
 	}
 	
@@ -491,9 +490,11 @@ public class DendroView implements Observer, DendroPanel {
 				0.5d);
 		if (colTreeView.isEnabled()) {
 			colDataPane.setDividerLocation(oldColDiv);
+			setColTRViewEnabled(true);
 			
 		} else {
 			colDataPane.setDividerLocation(0.0);
+			setColTRViewEnabled(false);
 		}
 	}
 	
@@ -521,7 +522,8 @@ public class DendroView implements Observer, DendroPanel {
 		
 		JPanel colNavPanel;
 		
-		colNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+		colNavPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.NO_GAPS_OR_INSETS);
 		colNavPanel.add(scaleAddLeftX);
 		colNavPanel.add(scaleRemoveLeftX);
 
@@ -595,7 +597,8 @@ public class DendroView implements Observer, DendroPanel {
 		globalOverviewPanel = createGlobalOverviewPanel();
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
 		
-		matrixPanel = GUIFactory.createJPanel(false, GUIFactory.TINY_GAPS_AND_INSETS);
+		matrixPanel = GUIFactory.createJPanel(false, 
+				GUIFactory.TINY_GAPS_AND_INSETS);
 		matrixPanel.add(globalOverviewPanel, "h 180!, w 180!, grow 0");
 		matrixPanel.add(colDataPane, "h 180!, pushx, "
 				+ "growx, growy 0, wrap");
@@ -1339,7 +1342,39 @@ public class DendroView implements Observer, DendroPanel {
 				tvFrame.getRowSelection());
 		colFinderBox.setNewSearchTermBox();
 
-		setSearchPanel();
+		setupSearchPanel();
+	}
+	
+	/**
+	 * Disables the ColumnTreeView and its JSplitPane to make divider
+	 * movement / resizing impossible.
+	 * @param enabled Enable / disable the column TreeView.
+	 */
+	public void setColTRViewEnabled(final boolean enabled) {
+		
+		if(colTreeView == null || colDataPane == null) {
+			LogBuffer.println("colTreeView could not be enabled/ disabled "
+					+ "because it was null");
+		}
+		
+		colTreeView.setEnabled(enabled);
+		colDataPane.setEnabled(enabled);
+	}
+	
+	/**
+	 * Disables the RowTreeView and its JSplitPane to make divider
+	 * movement / resizing impossible.
+	 * @param enabled Enable / disable the row TreeView.
+	 */
+	public void setRowTRViewEnabled(final boolean enabled) {
+		
+		if(rowTreeView == null || rowDataPane == null) {
+			LogBuffer.println("rowTreeView could not be enabled/ disabled "
+					+ "because it was null");
+		}
+		
+		rowTreeView.setEnabled(enabled);
+		rowDataPane.setEnabled(enabled);
 	}
 
 	@Override
@@ -1515,10 +1550,9 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	/**
-	 * Returns a boolean which indicates whether the dendrogram ModelViews are
-	 * enabled.
+	 * Returns a boolean which indicates whether any Dendrogram is enabled.
 	 *
-	 * @return
+	 * @return boolean
 	 */
 	public boolean treesEnabled() {
 

@@ -401,9 +401,6 @@ public class PreferencesMenu extends CustomDialog implements
 
 		mainPanel.revalidate();
 		mainPanel.repaint();
-
-		// dialog.pack();
-		// dialog.setLocationRelativeTo(tvFrame.getAppFrame());
 	}
 
 	/**

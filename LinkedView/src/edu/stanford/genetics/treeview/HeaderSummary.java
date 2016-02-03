@@ -16,13 +16,26 @@ import java.util.prefs.Preferences;
 public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 	private Preferences configNode;
-	private int[] included = new int[] { 1 };
+	private int[] included = new int[] { 0 };
 	private final String type;
 
 	public HeaderSummary(final String type) {
 
 		super();
 		this.type = type;
+	}
+	
+	@Override
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
+			this.configNode = parentNode.node(type);
+
+		} else {
+			LogBuffer.println("Could not find or create " + type
+					+ " node because parentNode was null.");
+		}
+		synchronizeFrom();
 	}
 
 	public void setIncluded(final int[] newIncluded) {
@@ -57,13 +70,15 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			return null;
 		}
 
-		if (strings == null)
+		if (strings == null) {
 			return "";
+		}
 
 		final StringBuffer out = new StringBuffer();
 		int count = 0;
-		if (included.length == 0)
+		if (included.length == 0) {
 			return "";
+		}
 
 		for (final int element : included) {
 			try {
@@ -88,7 +103,15 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		return (count == 0) ? "" : out.toString();
 	}
 
-	public String[] getSummaryArray(final HeaderInfo headerInfo, final int index) {
+	/**
+	 * Retrieves a String array containing the labels for all included 
+	 * headers at a certain index.
+	 * @param headerInfo The HeaderInfo object from which to take the labels.
+	 * @param index The axis index of the label to be returned. 
+	 * @return A String array of labels at a defined index.
+	 */
+	public String[] getSummaryArray(final HeaderInfo headerInfo, 
+			final int index) {
 
 		String[] strings = null;
 		try {
@@ -103,11 +126,13 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			return null;
 		}
 
-		if (strings == null)
+		if (strings == null) {
 			return null;
+		}
 
-		if (included.length == 0)
+		if (included.length == 0) {
 			return null;
+		}
 
 		final String[] out = new String[included.length];
 		int count = 0;
@@ -126,26 +151,18 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		return out;
 	}
 
-	@Override
-	public void setConfigNode(final Preferences parentNode) {
-
-		if (parentNode != null) {
-			this.configNode = parentNode.node(type);
-
-		} else {
-			LogBuffer.println("Could not find or create HeaderSummary"
-					+ "node because parentNode was null.");
-		}
-		synchronizeFrom();
-	}
-
+	/**
+	 * Checks the included-key of the Preferences node and sets the stored
+	 * values as the new included index array.
+	 */
 	private void synchronizeFrom() {
 
-		if (configNode == null)
+		if (configNode == null) {
 			return;
+		}
 
 		if (nodeHasAttribute("included")) {
-			final String incString = configNode.get("included", "1");
+			final String incString = configNode.get("included", "0");
 			if (incString.equals("")) {
 				setIncluded(new int[0]);
 
@@ -184,10 +201,14 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 	}
 
+	/**
+	 * Stores included indices as a String in the Preferences node. 
+	 */
 	private void synchronizeTo() {
 
-		if (configNode == null)
+		if (configNode == null) {
 			return;
+		}
 
 		final int[] vec = getIncluded();
 		final StringBuffer temp = new StringBuffer();
@@ -196,33 +217,33 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 
 		for (int i = 1; i < vec.length; i++) {
-
 			temp.append(',');
 			temp.append(vec[i]);
 		}
+		
 		configNode.put("included", temp.toString());
 	}
 
+	/**
+	 * Checks if a Preferences node contains the key name.
+	 * @param name The key to check for.
+	 * @return boolean Whether key exists or not.
+	 */
 	public boolean nodeHasAttribute(final String name) {
-
-		boolean contains = false;
 
 		try {
 			final String[] keys = configNode.keys();
 
 			for (final String key : keys) {
-
 				if (key.equalsIgnoreCase(name)) {
-					contains = true;
-					break;
+					return true;
 				}
 			}
-			return contains;
+			return false;
 
 		} catch (final BackingStoreException e) {
 			LogBuffer.logException(e);
-			;
-			return contains;
+			return false;
 		}
 	}
 }

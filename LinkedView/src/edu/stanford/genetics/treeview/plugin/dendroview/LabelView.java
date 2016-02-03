@@ -34,7 +34,6 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
@@ -44,6 +43,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
+import net.miginfocom.swing.MigLayout;
 
 public abstract class LabelView extends ModelView implements MouseListener,
 	MouseMotionListener,FontSelectable,ConfigNodePersistent,MouseWheelListener,
@@ -317,7 +317,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	public void generateView(final UrlExtractor uExtractor) {
 		setUrlExtractor(uExtractor);
-		headerSummary.setIncluded(new int[] { 0 });
+//		headerSummary.setIncluded(new int[] { 0 });
 		headerSummary.addObserver(this);
 	}
 
