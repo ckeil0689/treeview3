@@ -24,12 +24,6 @@ public class ClusterFileGenerator {
 	
 	public final static String ROW_WEIGHT_ID = "GWEIGHT";
 	public final static String COL_WEIGHT_ID = "EWEIGHT";
-	
-//	private final String FILE_EXT = ".cdt";
-//	
-//	private final String KMEANS_DESIGNATOR = "_K";
-//	private final String KMEANS_ROW_SUFFIX = "_G";
-//	private final String KMEANS_COL_SUFFIX = "_A";
 
 	private double[][] origMatrix;
 	private final ClusteredAxisData rowClusterData;
@@ -80,36 +74,7 @@ public class ClusterFileGenerator {
 	 *
 	 * @throws IOException
 	 */
-//	public void setupWriter(final String fileName, final int link,
-//			final Integer[] spinnerInput) {
 	public void setupWriter(final File file) {
-
-//		String fileEnd = "";
-//
-//		if (isHier) {
-//			fileEnd = FILE_EXT;
-//
-//		// k-means file names have a few more details	
-//		} else {
-//			String rowC = "";
-//			String colC = "";
-//
-//			final int row_clusterN = spinnerInput[0];
-//			final int col_clusterN = spinnerInput[2];
-//
-//			final String[] orderedGIDs = rowClusterData.getReorderedIDs();
-//			final String[] orderedAIDs = colClusterData.getReorderedIDs();
-//			
-//			if (orderedGIDs != null && orderedGIDs.length > 0) {
-//				rowC = KMEANS_ROW_SUFFIX + row_clusterN;
-//			}
-//
-//			if (orderedAIDs != null && orderedAIDs.length > 0) {
-//				colC = KMEANS_COL_SUFFIX + col_clusterN;
-//			}
-//
-//			fileEnd = KMEANS_DESIGNATOR + rowC + colC + FILE_EXT;
-//		}
 
 		this.bufferedWriter = new ClusterFileWriter(file);
 	}

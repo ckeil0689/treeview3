@@ -780,6 +780,29 @@ public class ClusterDialogController {
 	 */
 	public void deleteAllFiles() {
 		
+		deleteFile(cdtFile);
+		deleteFile(atrFile);
+		deleteFile(gtrFile);
+	}
+	
+	private void deleteFile(File file) {
+		
+		if(file == null) {
+			return;
+		}
+
+		boolean success = false;
+		String name = file.getName();
+		
+		if(file.exists()) {
+			success = file.delete();
+		}
+		
+		if(success) {
+			LogBuffer.println("File " + name + " was successfully deleted.");
+		} else {
+			LogBuffer.println("File " + name + " could not be deleted.");
+		}
 	}
 
 	/**
@@ -981,6 +1004,8 @@ public class ClusterDialogController {
 		if (saveTask != null) {
 			saveTask.cancel(true);
 		}
+		
+		deleteAllFiles();
 	}
 
 	/**
