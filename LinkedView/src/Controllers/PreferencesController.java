@@ -272,7 +272,7 @@ public class PreferencesController {
 				headerInfo = model.getRowHeaderInfo();
 
 			} else if (type.equalsIgnoreCase(StringRes.main_cols)) {
-				headerInfo = model.getColumnHeaderInfo();
+				headerInfo = model.getColHeaderInfo();
 				
 			} else {
 				LogBuffer.println("Could not set HeaderInfo"

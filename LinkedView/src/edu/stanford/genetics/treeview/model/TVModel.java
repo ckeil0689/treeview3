@@ -94,7 +94,7 @@ public class TVModel extends Observable implements DataModel {
 	}
 
 	@Override
-	public IntHeaderInfo getColumnHeaderInfo() {
+	public IntHeaderInfo getColHeaderInfo() {
 
 		return arrayHeaderInfo;
 	}

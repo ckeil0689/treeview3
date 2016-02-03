@@ -94,7 +94,7 @@ public interface DataModel {
 	/**
 	 * Gets the HeaderInfo associated with arrays for this DataModel.
 	 */
-	public IntHeaderInfo getColumnHeaderInfo();
+	public IntHeaderInfo getColHeaderInfo();
 
 	/**
 	 * Gets the HeaderInfo associated with gene tree for this DataModel.

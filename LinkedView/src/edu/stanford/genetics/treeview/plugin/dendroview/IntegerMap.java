@@ -59,8 +59,6 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 	 * @param type
 	 */
 	public void setType(final int type) {
-
-		this.type = type;
 		
 		switch(type) {
 		

@@ -838,7 +838,7 @@ public class DendroView implements Observer, DendroPanel {
 	public boolean[] getLabelAligns() {
 
 		final boolean[] alignments = { getRowLabelView().getJustifyOption(),
-				getColumnLabelView().getJustifyOption() };
+				getColLabelView().getJustifyOption() };
 
 		return alignments;
 	}
@@ -854,11 +854,11 @@ public class DendroView implements Observer, DendroPanel {
 	public void setLabelAlignment(final boolean isRowRight,
 			final boolean isColRight) {
 
-		if (getRowLabelView() == null || getColumnLabelView() == null)
+		if (getRowLabelView() == null || getColLabelView() == null)
 			return;
 
 		getRowLabelView().setJustifyOption(isRowRight);
-		getColumnLabelView().setJustifyOption(isColRight);
+		getColLabelView().setJustifyOption(isColRight);
 	}
 
 	// @Override
@@ -1336,7 +1336,7 @@ public class DendroView implements Observer, DendroPanel {
 		rowFinderBox.setNewSearchTermBox();
 
 		colFinderBox.setHeaderInfo(columnHI);
-		colFinderBox.setHeaderSummary(getColumnLabelView().getHeaderSummary());
+		colFinderBox.setHeaderSummary(getColLabelView().getHeaderSummary());
 		colFinderBox.setMapContainers(xmap, ymap);
 		colFinderBox.setSelection(tvFrame.getColumnSelection(),
 				tvFrame.getRowSelection());
@@ -1479,7 +1479,7 @@ public class DendroView implements Observer, DendroPanel {
 		return globalMatrixView;
 	}
 
-	public LabelView getColumnLabelView() {
+	public LabelView getColLabelView() {
 
 		return colLabelView;
 	}

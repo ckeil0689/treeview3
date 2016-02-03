@@ -152,7 +152,7 @@ public class MenubarController {
 		final String source = controller.getDataModel().getSource();
 		final int rowNum = controller.getDataModel().getRowHeaderInfo()
 				.getNumHeaders();
-		final int colNum = controller.getDataModel().getColumnHeaderInfo()
+		final int colNum = controller.getDataModel().getColHeaderInfo()
 				.getNumHeaders();
 
 		tvFrame.openStatsView(source, rowNum, colNum);

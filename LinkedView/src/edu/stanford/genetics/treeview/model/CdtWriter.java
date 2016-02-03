@@ -21,9 +21,9 @@ public class CdtWriter {
 		try {
 			out = new FileWriter(spool);
 			// first, the array annotations.
-			for (int headerrow = 0; headerrow < dataModel.getColumnHeaderInfo()
+			for (int headerrow = 0; headerrow < dataModel.getColHeaderInfo()
 					.getNumNames(); headerrow++) {
-				for (int column = 0; column < dataModel.getColumnHeaderInfo()
+				for (int column = 0; column < dataModel.getColHeaderInfo()
 						.getNumHeaders()
 						+ dataModel.getRowHeaderInfo().getNumNames(); column++) {
 					if (column > 0) {
@@ -38,7 +38,7 @@ public class CdtWriter {
 						} else if (column == 0) {
 							// for the first column, write out the name from the
 							// array header info.
-							printNotNull(out, dataModel.getColumnHeaderInfo()
+							printNotNull(out, dataModel.getColHeaderInfo()
 									.getNames()[headerrow]);
 						} else {
 							// otherwise, just leave empty.
@@ -47,7 +47,7 @@ public class CdtWriter {
 						// write out actual array annotation.
 						printNotNull(
 								out,
-								dataModel.getColumnHeaderInfo().getHeader(
+								dataModel.getColHeaderInfo().getHeader(
 										column
 												- dataModel.getRowHeaderInfo()
 														.getNumNames(),
@@ -59,7 +59,7 @@ public class CdtWriter {
 			// next the data rows.
 			for (int gene = 0; gene < dataModel.getRowHeaderInfo()
 					.getNumHeaders(); gene++) {
-				for (int column = 0; column < dataModel.getColumnHeaderInfo()
+				for (int column = 0; column < dataModel.getColHeaderInfo()
 						.getNumHeaders()
 						+ dataModel.getRowHeaderInfo().getNumNames(); column++) {
 					if (column > 0) {

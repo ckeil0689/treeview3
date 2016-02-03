@@ -1500,23 +1500,23 @@ public class MapContainer extends Observable implements Observer,
 		}
 
 		IntegerMap newMap = null;
-		if (nullMap.equalsType(type)) {
+		switch(type) {
+		
+		case IntegerMap.NULL:
 			newMap = nullMap;
-
-		} else if (fillMap.equalsType(type)) {
-			newMap = fillMap;
-
-		} else if (fixedMap.equalsType(type)) {
+			break;
+			
+		case IntegerMap.FIXED:
 			newMap = fixedMap;
-		}
-
-		if (newMap == null) {
-			LogBuffer.println("Couldn't find map matching type " + type
-					+ " in MapContainer.java");
-			LogBuffer.println("Choices include");
-			LogBuffer.println(nullMap.typeName());
-			LogBuffer.println(fixedMap.typeName());
-			LogBuffer.println(fillMap.typeName());
+			break;
+			
+		case IntegerMap.FILL:
+			newMap = fillMap;
+			break;
+			
+		default:
+			LogBuffer.println("Map type (" + type + ") not found. "
+					+ "Setting fixed map.");
 			newMap = fixedMap;
 		}
 

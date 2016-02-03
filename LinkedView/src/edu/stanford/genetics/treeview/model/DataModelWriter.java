@@ -67,7 +67,7 @@ public class DataModelWriter {
 			}
 		}
 		if (dataModel.getDataMatrix().getModified()
-				|| dataModel.getColumnHeaderInfo().getModified()
+				|| dataModel.getColHeaderInfo().getModified()
 				|| dataModel.getRowHeaderInfo().getModified()) {
 			if (writeCdt(fileSet.getCdt())) {
 				written.add(DataModelFileType.CDT);
@@ -130,7 +130,7 @@ public class DataModelWriter {
 			final File f = new File(spool);
 			if (f.renameTo(new File(file))) {
 				dataModel.getDataMatrix().setModified(false);
-				dataModel.getColumnHeaderInfo().setModified(false);
+				dataModel.getColHeaderInfo().setModified(false);
 				dataModel.getRowHeaderInfo().setModified(false);
 			}
 			return true;

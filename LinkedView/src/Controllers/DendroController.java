@@ -163,7 +163,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		bindComponentFunctions();
 
 		dendroView.setupSearch(tvModel.getRowHeaderInfo(),
-						tvModel.getColumnHeaderInfo(), interactiveXmap,
+						tvModel.getColHeaderInfo(), interactiveXmap,
 						interactiveYmap);
 		
 		dendroView.setupLayout();
@@ -239,7 +239,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		/* Label views */
 		dendroView.getRowLabelView().getHeaderSummary().addObserver(this);
-		dendroView.getColumnLabelView().getHeaderSummary().addObserver(this);
+		dendroView.getColLabelView().getHeaderSummary().addObserver(this);
 
 		/* MapContainers */
 		interactiveXmap.addObserver(this);
@@ -830,8 +830,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	public void setKMeansIndexes() {
 
-		if (tvModel.getColumnHeaderInfo().getIndex("GROUP") != -1) {
-			final HeaderInfo headerInfo = tvModel.getColumnHeaderInfo();
+		if (tvModel.getColHeaderInfo().getIndex("GROUP") != -1) {
+			final HeaderInfo headerInfo = tvModel.getColHeaderInfo();
 			final int groupIndex = headerInfo.getIndex("GROUP");
 
 			arrayIndex = getGroupVector(headerInfo, groupIndex);
@@ -942,7 +942,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		LabelContextMenuController lCMenuController = new LabelContextMenuController(
 				lCMenu, tvController);
 		dendroView.getRowLabelView().setComponentPopupMenu(lCMenu);
-		dendroView.getColumnLabelView().setComponentPopupMenu(lCMenu);
+		dendroView.getColLabelView().setComponentPopupMenu(lCMenu);
 
 		// perhaps I could remember this stuff in the MapContainer...
 		interactiveXmap.setIndexRange(0,
@@ -970,7 +970,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		mvController.getColorExtractor().setConfigNode(configNode);
 
 		dendroView.getRowLabelView().setConfigNode(configNode);
-		dendroView.getColumnLabelView().setConfigNode(configNode);
+		dendroView.getColLabelView().setConfigNode(configNode);
 		dendroView.getColumnTreeView().getHeaderSummary()
 				.setConfigNode(configNode);
 		dendroView.getRowTreeView().getHeaderSummary()
@@ -983,7 +983,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	private void setupMapContainers() {
 
 		dendroView.getColumnTreeView().setMap(interactiveXmap);
-		dendroView.getColumnLabelView().setMap(interactiveXmap);
+		dendroView.getColLabelView().setMap(interactiveXmap);
 		dendroView.getRowTreeView().setMap(interactiveYmap);
 		dendroView.getRowLabelView().setMap(interactiveYmap);
 
@@ -1001,8 +1001,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				tvModel.getAtrHeaderInfo());
 		dendroView.getRowTreeView()
 				.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
-		dendroView.getColumnLabelView().setHeaderInfo(
-				tvModel.getColumnHeaderInfo());
+		dendroView.getColLabelView().setHeaderInfo(
+				tvModel.getColHeaderInfo());
 		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
 	}
 
@@ -1040,7 +1040,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		try {
 			invertedTreeDrawer.setData(tvModel.getAtrHeaderInfo(),
-					tvModel.getColumnHeaderInfo());
+					tvModel.getColHeaderInfo());
 			final HeaderInfo trHeaderInfo = tvModel.getAtrHeaderInfo();
 
 			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
@@ -1177,8 +1177,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 			int[] ordering;
 			ordering = AtrAligner.align(tvModel.getAtrHeaderInfo(),
-					tvModel.getColumnHeaderInfo(), model.getAtrHeaderInfo(),
-					model.getColumnHeaderInfo());
+					tvModel.getColHeaderInfo(), model.getAtrHeaderInfo(),
+					model.getColHeaderInfo());
 
 			/*
 			 * System.out.print("New ordering: "); for(int i = 0; i <
@@ -1350,7 +1350,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				dendroView.getColumnTreeView().setEnabled(true);
 
 				invertedTreeDrawer.setData(tvModel.getAtrHeaderInfo(),
-						tvModel.getColumnHeaderInfo());
+						tvModel.getColHeaderInfo());
 				final HeaderInfo trHeaderInfo = tvModel.getAtrHeaderInfo();
 
 				if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
@@ -1481,16 +1481,24 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Update the state of label views to reflect settings from an imported
 	 * node.
 	 * 
-	 * @param node
+	 * @param parent
 	 */
-	public void importLabelPreferences(Preferences node) {
+	public void importLabelPreferences(Preferences parent) {
 
 		LogBuffer.println("Importing labels...");
 		
-		dendroView.getRowLabelView().importSettingsFromNode(
-				node.node("RowLabelView"));
-		dendroView.getColumnLabelView().importSettingsFromNode(
-				node.node("ColLabelView"));
+		Preferences rowLabelNode = parent.node("RowLabelView");
+		Preferences colLabelNode = parent.node("ColLabelView");
+		
+		/* Label views for font, orientation, etc. */
+		dendroView.getRowLabelView().importSettingsFromNode(rowLabelNode);
+		dendroView.getColLabelView().importSettingsFromNode(colLabelNode);
+		
+		HeaderSummary rowHS = dendroView.getRowLabelView().getHeaderSummary();
+		HeaderSummary colHS = dendroView.getColLabelView().getHeaderSummary();
+		
+		rowHS.setConfigNode(rowLabelNode.node("RowSummary"));
+		colHS.setConfigNode(colLabelNode.node("ColSummary"));
 	}
 
 	// /**
@@ -1521,7 +1529,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		dendroView.getColumnTreeView().setTreeSelection(colSelection);
 		dendroView.getRowLabelView().setOtherSelection(colSelection);
-		dendroView.getColumnLabelView().setDrawSelection(colSelection);
+		dendroView.getColLabelView().setDrawSelection(colSelection);
 	}
 
 	/**
@@ -1543,19 +1551,19 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		dendroView.getRowTreeView().setTreeSelection(rowSelection);
 		dendroView.getRowLabelView().setDrawSelection(rowSelection);
-		dendroView.getColumnLabelView().setOtherSelection(rowSelection);
+		dendroView.getColLabelView().setOtherSelection(rowSelection);
 	}
 
 	public void setNewIncluded(final int[] gIncluded, final int[] aIncluded) {
 
 		dendroView.getRowLabelView().getHeaderSummary().setIncluded(gIncluded);
-		dendroView.getColumnLabelView().getHeaderSummary()
+		dendroView.getColLabelView().getHeaderSummary()
 				.setIncluded(aIncluded);
 	}
 
 	public int[] getColumnIncluded() {
 
-		return dendroView.getColumnLabelView().getHeaderSummary().getIncluded();
+		return dendroView.getColLabelView().getHeaderSummary().getIncluded();
 	}
 
 	public int[] getRowIncluded() {
@@ -1618,7 +1626,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	private void updateSearchBoxes() {
 
 		dendroView.updateSearchTermBoxes(tvModel.getRowHeaderInfo(),
-						tvModel.getColumnHeaderInfo(), interactiveXmap,
+						tvModel.getColHeaderInfo(), interactiveXmap,
 						interactiveYmap);
 	}
 

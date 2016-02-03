@@ -181,7 +181,7 @@ public class PreferencesMenu extends CustomDialog implements
 
 			final FontSettings fontSettings = new FontSettings(
 					dendroView.getRowLabelView(),
-					dendroView.getColumnLabelView());
+					dendroView.getColLabelView());
 
 			mainPanel = fontSettings.makeFontPanel();
 		}
@@ -254,7 +254,7 @@ public class PreferencesMenu extends CustomDialog implements
 					.getRowLabelView().getHeaderSummary());
 
 			arrayPanel = new HeaderSummaryPanel(arrayHI, dendroView
-					.getColumnLabelView().getHeaderSummary());
+					.getColLabelView().getHeaderSummary());
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,
 					GUIFactory.NO_INSETS, null);
@@ -296,7 +296,7 @@ public class PreferencesMenu extends CustomDialog implements
 			colRightJustBtn = GUIFactory.createRadioBtn("Top");
 			colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
 
-			if (dendroView.getColumnLabelView().getJustifyOption()) {
+			if (dendroView.getColLabelView().getJustifyOption()) {
 				colRightJustBtn.setSelected(true);
 			} else {
 				colLeftJustBtn.setSelected(true);

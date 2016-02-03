@@ -183,7 +183,7 @@ public class KnnModel extends TVModel implements DataModel {
 
 	public void setAClusters(final String[][] labels, final int kagparse) {
 
-		final HeaderInfo arrayHeader = getColumnHeaderInfo();
+		final HeaderInfo arrayHeader = getColHeaderInfo();
 		// final boolean result = checkCorrespondence(tempTable, arrayHeader,
 		// kagparse);
 		final boolean result = checkCorrespondence(labels, arrayHeader,
@@ -204,7 +204,7 @@ public class KnnModel extends TVModel implements DataModel {
 	public void parseClusters() throws LoadException {
 
 		gClusterMembers = calculateMembership(getRowHeaderInfo(), "GROUP");
-		aClusterMembers = calculateMembership(getColumnHeaderInfo(), "GROUP");
+		aClusterMembers = calculateMembership(getColHeaderInfo(), "GROUP");
 	}
 
 	public int[][] calculateMembership(final HeaderInfo headerInfo,

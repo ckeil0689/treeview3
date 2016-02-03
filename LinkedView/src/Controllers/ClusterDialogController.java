@@ -195,7 +195,7 @@ public class ClusterDialogController {
 				
 			} else {
 				final IntHeaderInfo rowHeaderI = tvModel.getRowHeaderInfo();
-				final IntHeaderInfo colHeaderI = tvModel.getColumnHeaderInfo();
+				final IntHeaderInfo colHeaderI = tvModel.getColHeaderInfo();
 				
 				processor = new ClusterProcessor(originalMatrix, fileName,
 						rowHeaderI, colHeaderI);
@@ -271,7 +271,7 @@ public class ClusterDialogController {
 			boolean colsValid;
 			
 			int numRowHeaders = tvModel.getRowHeaderInfo().getNumHeaders();
-			int numColHeaders = tvModel.getColumnHeaderInfo().getNumHeaders();
+			int numColHeaders = tvModel.getColHeaderInfo().getNumHeaders();
 			
 			int numReorderedRowIDs = rowClusterData.getReorderedIDs().length;
 			int numReorderedColIDs = colClusterData.getReorderedIDs().length;
@@ -313,7 +313,7 @@ public class ClusterDialogController {
             	p = Pattern.compile("ROW\\d+X");
             	
             } else {
-            	headerArray = tvModel.getColumnHeaderInfo().getHeaderArray();
+            	headerArray = tvModel.getColHeaderInfo().getHeaderArray();
             	
             	if(!tvModel.aidFound()) {
             		return new String[]{};
@@ -470,7 +470,7 @@ public class ClusterDialogController {
 				final boolean clusterCols) {
 			
 			final int rows = tvModel.getRowHeaderInfo().getNumHeaders();
-			final int cols = tvModel.getColumnHeaderInfo().getNumHeaders();
+			final int cols = tvModel.getColHeaderInfo().getNumHeaders();
 
 			/*
 			 * Set maximum for JProgressBar before any clustering!
@@ -616,7 +616,7 @@ public class ClusterDialogController {
 					clusterView.getSpinnerValues());
 
 			final IntHeaderInfo rowHeaderI = tvModel.getRowHeaderInfo();
-			final IntHeaderInfo colHeaderI = tvModel.getColumnHeaderInfo();
+			final IntHeaderInfo colHeaderI = tvModel.getColHeaderInfo();
 
 			cdtGen.prepare(rowHeaderI, colHeaderI);
 			cdtGen.generateCDT();

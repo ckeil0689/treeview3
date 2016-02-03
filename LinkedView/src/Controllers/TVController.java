@@ -277,26 +277,24 @@ public class TVController implements Observer {
 
 		try {
 			if (dendroController.hasDendroView()) {
-				final String[] geneNames = tvModel.getRowHeaderInfo()
-						.getNames();
-				final String[] arrayNames = tvModel.getColumnHeaderInfo()
-						.getNames();
+				final String[] rowNames = tvModel.getRowHeaderInfo().getNames();
+				final String[] colNames = tvModel.getColHeaderInfo().getNames();
 
-				storeSelectedLabels(geneNames, arrayNames);
+				storeSelectedLabels(rowNames, colNames);
 			}
 
 			/* ensure reset of the model data */
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
 
-			if (tvModel.getColumnHeaderInfo().getNumHeaders() == 0) {
+			if (tvModel.getColHeaderInfo().getNumHeaders() == 0) {
 				/* ------ Load Process -------- */
 				final ModelLoader loader = new ModelLoader(tvModel, this,
 						dataInfo);
 				loader.execute();
 
 			} else {
-				LogBuffer.println("ArrayHeaders not reset, aborted loading.");
+				LogBuffer.println("ColumnHeaders not reset, aborted loading.");
 			}
 
 		} catch (final OutOfMemoryError e) {
@@ -318,32 +316,38 @@ public class TVController implements Observer {
 
 			/* Will notify view of successful loading. */
 			((TVModel) model).setLoaded(true);
-
 			setDataModel();
-
 			dendroController.setNewMatrix(tvFrame.getDendroView(), model);
 
-			/*
-			 * TODO Needs to happen after setNewMatrix because a new
-			 * ColorExtractor object is created, which would void the updated
-			 * ColorExtractor state if copying happens before. Implement a nicer
-			 * solution one day...
-			 */
-			Preferences loadedNode = getOldPreferences(fileMenuSet.getRoot(),
-					fileMenuSet.getExt());
-			copyOldPreferencesTo(loadedNode);
-
 			if (fileMenuSet != null) {
+				/*
+				 * TODO Needs to happen after setNewMatrix because a new
+				 * ColorExtractor object is created, which would void the 
+				 * updated ColorExtractor state if copying happens before. 
+				 * Implement a nicer solution one day...
+				 */
+				Preferences loadedNode = getOldPreferences(
+						fileMenuSet.getRoot(), fileMenuSet.getExt());
+				
+				if(loadedNode != null) { 
+					copyOldPreferencesTo(loadedNode);
+					
+				} else {
+					LogBuffer.println("No old preferences could be loaded. "
+							+ "Cannot set preferences for current file.");
+				}
+
 				fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
 				tvFrame.getFileMRU().setLast(fileMenuSet);
 				fileMenuSet = null;
 
 			} else {
-				LogBuffer.println("FileSet is null.");
+				LogBuffer.println("FileSet is null. Could not load old "
+						+ "preferences and add last file to recent file list.");
 			}
 
 			/* set the selected label type to the old one */
-			resetLabelSelection();
+			//resetLabelSelection();
 
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
@@ -463,19 +467,19 @@ public class TVController implements Observer {
 	/**
 	 * Store the currently selected labels.
 	 *
-	 * @param geneNames
-	 * @param arrayNames
+	 * @param rowNames
+	 * @param colNames
 	 */
-	private void storeSelectedLabels(final String[] geneNames,
-			final String[] arrayNames) {
+	private void storeSelectedLabels(final String[] rowNames,
+			final String[] colNames) {
 
 		/* save label type selection before loading new file */
-		final int geneIncluded = dendroController.getRowIncluded()[0];
-		final int arrayIncluded = dendroController.getColumnIncluded()[0];
+		final int rowIncluded = dendroController.getRowIncluded()[0];
+		final int colIncluded = dendroController.getColumnIncluded()[0];
 
-		if (geneNames.length > 0 && arrayNames.length > 0) {
-			selectedLabels[0] = geneNames[geneIncluded];
-			selectedLabels[1] = arrayNames[arrayIncluded];
+		if (rowNames.length > 0 && colNames.length > 0) {
+			selectedLabels[0] = rowNames[rowIncluded];
+			selectedLabels[1] = colNames[colIncluded];
 		}
 	}
 
@@ -496,7 +500,7 @@ public class TVController implements Observer {
 		}
 
 		final int[] newASelected = new int[] { 0 };
-		final String[] arrayNames = model.getColumnHeaderInfo().getNames();
+		final String[] arrayNames = model.getColHeaderInfo().getNames();
 		for (int i = 0; i < arrayNames.length; i++) {
 			if (arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
 				newASelected[0] = i;
@@ -676,7 +680,7 @@ public class TVController implements Observer {
 
 		final UrlPresets arrayPresets = tvFrame.getArrayUrlPresets();
 		final UrlExtractor arrayUrlExtractor = new UrlExtractor(
-				model.getColumnHeaderInfo(), arrayPresets);
+				model.getColHeaderInfo(), arrayPresets);
 
 		arrayUrlExtractor.bindConfig(documentConfig.node("ArrayUrlExtractor"));
 		tvFrame.setArrayUrlExtractor(arrayUrlExtractor);
@@ -766,7 +770,7 @@ public class TVController implements Observer {
 					(JFrame) Frame.getFrames()[0], tvFrame.getRowSelection(),
 					model.getRowHeaderInfo(), def);
 
-			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(),
+			t.setDataMatrix(model.getDataMatrix(), model.getColHeaderInfo(),
 					DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
@@ -788,7 +792,7 @@ public class TVController implements Observer {
 					model.getRowHeaderInfo(), source.getDir()
 							+ source.getRoot() + "_data.cdt");
 
-			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(),
+			t.setDataMatrix(model.getDataMatrix(), model.getColHeaderInfo(),
 					DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
@@ -956,7 +960,7 @@ public class TVController implements Observer {
 
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 			preferences.setHeaderInfo(model.getRowHeaderInfo(),
-					model.getColumnHeaderInfo());
+					model.getColHeaderInfo());
 		}
 
 		preferences.setupLayout(menu);
