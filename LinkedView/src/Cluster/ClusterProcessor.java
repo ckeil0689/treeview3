@@ -188,14 +188,16 @@ public class ClusterProcessor {
 
 				/* Ranking data if Spearman was chosen */
 				if (distMeasure == DistMatrixCalculator.SPEARMAN) {
-
-					final double[][] rankMatrix = new double[data.length][data[0].length];
+					final double[][] rankMatrix = 
+							new double[data.length][data[0].length];
 
 					/* Iterate over every row of the matrix. */
 					for (int i = 0; i < rankMatrix.length; i++) {
 
-						if (isCancelled())
+						if (isCancelled()) {
 							return new double[0][];
+						}
+						
 						publish(i);
 						rankMatrix[i] = dCalc.spearman(data[i]);
 					}
@@ -439,11 +441,11 @@ public class ClusterProcessor {
 	 */
 	public void cancelAll() {
 
-		if (distTask != null) {
+		if (distTask != null && !distTask.isDone()) {
 			distTask.cancel(true);
 		}
 		
-		if (clusterTask != null) {
+		if (clusterTask != null && !clusterTask.isDone()) {
 			clusterTask.cancel(true);
 		}
 	}
