@@ -131,7 +131,7 @@ public class ClusterProcessor {
 
 		} catch (InterruptedException | ExecutionException e) {
 			LogBuffer.logException(e);
-			return new String[] { "No clustered data." };
+			return new String[] {};
 		}
 	}
 
@@ -182,7 +182,7 @@ public class ClusterProcessor {
 				data = formatColData(originalMatrix.getExprData());
 			}
 
-			if (data != null) {
+			if (data != null && !isCancelled()) {
 				final DistMatrixCalculator dCalc = new DistMatrixCalculator(
 						data, distMeasure, axis);
 
@@ -214,7 +214,6 @@ public class ClusterProcessor {
 					for (int i = 0; i < data.length; i++) {
 
 						if (isCancelled()) {
-							LogBuffer.println("DistTask cancelled.");
 							return new double[0][];
 						}
 						publish(i);
@@ -251,6 +250,9 @@ public class ClusterProcessor {
 			if (!isCancelled()) {
 				/* keep track of overall progress */
 				pBarCount += axisSize;
+				LogBuffer.println("DistTask is done: success.");
+			} else {
+				LogBuffer.println("DistTask is done: cancelled.");
 			}
 		}
 
@@ -265,7 +267,6 @@ public class ClusterProcessor {
 		public double[][] formatColData(final double[][] unformattedData) {
 
 			final DataFormatter formattedData = new DataFormatter();
-
 			return formattedData.splitColumns(unformattedData);
 		}
 	}
@@ -326,6 +327,9 @@ public class ClusterProcessor {
 
 			if (!isCancelled()) {
 				pBarCount += max;
+				LogBuffer.println("ProcessorClusterTask is done: success.");
+			} else {
+				LogBuffer.println("ProcessorClusterTask is done: cancelled.");
 			}
 		}
 		
@@ -368,7 +372,6 @@ public class ClusterProcessor {
 
 			/* Return empty String[] if user cancels operation */
 			if (isCancelled()) {
-				LogBuffer.println("ClusterTask cancelled.");
 				return new String[] {};
 			}
 
@@ -406,7 +409,6 @@ public class ClusterProcessor {
 			 * distance means to clusters.
 			 */
 			for (int i = 0; i < iterations; i++) {
-
 				clusterer.cluster();
 				publish(i);
 			}
@@ -436,8 +438,31 @@ public class ClusterProcessor {
 		}
 	}
 
+	public boolean areTasksDone() {
+			
+			boolean clusterDone = false;
+			boolean distDone = false;
+			
+			if(clusterTask == null) {
+				clusterDone = true;
+			} else {
+				clusterDone = clusterTask.isDone();
+			}
+			
+			if(distTask == null) {
+				distDone = true;
+			} else {
+				distDone = distTask.isDone();
+			}
+			
+			
+			return clusterDone && distDone;
+	}
+	
 	/**
 	 * Cancels all currently running threads.
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 */
 	public void cancelAll() {
 

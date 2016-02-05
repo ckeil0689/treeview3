@@ -27,6 +27,7 @@ public class ClusteredAxisData {
 		this.AXIS_BASEID = (axisID == 0) ? "ROW" : "COL";
 		this.shouldReorderAxis = false;
 		this.isAxisClustered = false;
+		this.reorderedIDs = new String[] {};
 	}
 	
 	/* Setters */

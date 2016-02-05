@@ -143,24 +143,9 @@ public class ClusterDialogController {
 			/* Only starts with valid selections. */
 			if (isReady(rowSimilarity, ROW) || isReady(colSimilarity, COL)) {
 				/* Tell ClusterView that clustering begins */
-//				boolean success = false;
-				
 				clusterView.setClustering(true);
 				clusterTask = new ClusterTask();
 				clusterTask.execute();
-				
-//				try {
-//					success = clusterTask.get();
-//					
-//				} catch (InterruptedException | ExecutionException e1) {
-//					LogBuffer.logException(e1);
-//					success = false;
-//				}
-//				
-//				if(!success) {
-//					LogBuffer.println("Deleting created files.");
-//					deleteAllFiles();
-//				}
 			}
 		}
 	}
@@ -180,7 +165,7 @@ public class ClusterDialogController {
 		private ClusteredAxisData rowClusterData;
 		private ClusteredAxisData colClusterData;
 
-		private String fileName;
+		private String oldFileName;
 
 		/* Used to set upper limit of cluster progress bar in GUI */
 		private int pBarMax = 0;
@@ -208,13 +193,14 @@ public class ClusterDialogController {
 			final ClusterFileStorage clusStore = new ClusterFileStorage();
 			final int extlen = tvModel.getFileSet().getExt().length();
 			
-			fileName = tvModel.getSource().substring(0,
+			this.oldFileName = tvModel.getSource().substring(0,
 					tvModel.getSource().length() - extlen);
 
 			// Initialize the clustering processor and pass the data
 			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
 					.getDataMatrix();
 			
+			/* Initialize the cluster processor */
 			if(isHierarchical()) {
 				processor = new ClusterProcessor(originalMatrix);
 				
@@ -222,7 +208,7 @@ public class ClusterDialogController {
 				final IntHeaderInfo rowHeaderI = tvModel.getRowHeaderInfo();
 				final IntHeaderInfo colHeaderI = tvModel.getColHeaderInfo();
 				
-				processor = new ClusterProcessor(originalMatrix, fileName,
+				processor = new ClusterProcessor(originalMatrix, oldFileName,
 						rowHeaderI, colHeaderI);
 			}
 
@@ -245,8 +231,9 @@ public class ClusterDialogController {
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], 
 					clusterCheck[COL_IDX]);
 			
+			/* Cluster rows */
 			if (clusterCheck[ROW_IDX]) {
-				gtrFile = clusStore.createFile(fileName, GTR_END, 
+				gtrFile = clusStore.createFile(oldFileName, GTR_END, 
 						clusterView.getLinkMethod());
 				rowClusterData.setReorderedIDs(
 						calculateAxis(rowSimilarity, ROW, gtrFile));
@@ -258,8 +245,9 @@ public class ClusterDialogController {
 				return false;
 			}
 			
+			/* Cluster columns */
 			if (clusterCheck[COL_IDX]) {
-				atrFile = clusStore.createFile(fileName, ATR_END, 
+				atrFile = clusStore.createFile(oldFileName, ATR_END, 
 						clusterView.getLinkMethod());
 				colClusterData.setReorderedIDs(
 						calculateAxis(colSimilarity, COL, atrFile));
@@ -276,7 +264,7 @@ public class ClusterDialogController {
 					isHierarchical(), clusterView.getSpinnerValues(), 
 					rowClusterData, colClusterData);
 			
-			cdtFile = clusStore.createFile(fileName, fileEnd, 
+			cdtFile = clusStore.createFile(oldFileName, fileEnd, 
 					clusterView.getLinkMethod());
 
 			if(cdtFile == null) {
@@ -290,15 +278,21 @@ public class ClusterDialogController {
 		@Override
 		public void done() {
 
-			if (!isCancelled()) {
-				saveClusterFile(fileName, rowClusterData, colClusterData);
+			boolean shouldSave = true;
+			if(rowClusterData.getReorderedIDs().length == 0 
+					|| colClusterData.getReorderedIDs().length == 0) {
+				LogBuffer.println("Something occurred during reordering.");
+				shouldSave = false;
+			}
+			
+			if (!isCancelled() && shouldSave) {
+				saveClusterFile(oldFileName, rowClusterData, colClusterData);
 				LogBuffer.println("ClusterTask is done: success.");
 
 			} else {
 				rowClusterData.setReorderedIDs(new String[] {});
 				colClusterData.setReorderedIDs(new String[] {});
 				clusterView.setClustering(false);
-				cancelAll();
 				LogBuffer.println("ClusterTask is done: cancelled.");
 			}
 		}
@@ -417,7 +411,8 @@ public class ClusterDialogController {
 				if(!confirmChoice(message)) {
 					clusterCheck[ROW_IDX] = false;
 					clusterCheck[COL_IDX] = false;
-					cancelAll();
+					this.cancel(true);
+					return clusterCheck;
 				}
 				
 			} else if(warnRowAxis && !warnColAxis) {
@@ -606,24 +601,9 @@ public class ClusterDialogController {
 				|| colClusterData.getReorderedIDs() != null) {
 			ClusterView.setStatusText("Saving...");
 			
-//			boolean success = false;
-			
 			saveTask = new SaveTask(rowClusterData, colClusterData, 
 					fileName);
 			saveTask.execute();
-//			
-//			try {
-//				success = saveTask.get();
-//				
-//			} catch (InterruptedException | ExecutionException e1) {
-//				LogBuffer.logException(e1);
-//				success = false;
-//			}
-//			
-//			if(!success) {
-//				LogBuffer.println("Deleting created files.");
-//				deleteAllFiles();
-//			}
 
 		} else {
 			final String message = "Cannot save. No clustered data "
@@ -631,7 +611,6 @@ public class ClusterDialogController {
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
 					"Error", JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println("Alert: " + message);
-			cancelAll();
 		}
 	}
 
@@ -710,7 +689,6 @@ public class ClusterDialogController {
 			} else {
 				clusterView.setClustering(false);
 				LogBuffer.println("SaveTask is done: cancelled.");
-				cancelAll();
 			}
 		}
 		
@@ -886,6 +864,7 @@ public class ClusterDialogController {
 		
 		if(file.isFile() && file.exists()) {
 			success = file.delete();
+			LogBuffer.println("Attempted delete of " + name);
 		} else {
 			LogBuffer.println(name + " is not a file or file does not exist.");
 		}
@@ -910,6 +889,9 @@ public class ClusterDialogController {
 			File[] files = file.listFiles();
 			if(files.length == 0) {
 				success = file.delete();
+			} else {
+				LogBuffer.println("Directory " + name + "still has " 
+						+ files.length + " files.");
 			}
 		} else {
 			LogBuffer.println(name + " is not a directory.");
@@ -1062,6 +1044,7 @@ public class ClusterDialogController {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
+			LogBuffer.println("clusterTask already done? cancelAll()" + clusterTask.isDone());
 			LogBuffer.println("Cancelling...");
 			cancelAll();
 		}
@@ -1109,42 +1092,58 @@ public class ClusterDialogController {
 
 	/**
 	 * Cancels all active threads related to clustering.
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 */
 	private void cancelAll() {
 		
-		LogBuffer.println("CancelAll called.");
-
-		if (clusterTask != null && !clusterTask.isDone()) {
-			clusterTask.cancel(true);
-			try {
-				clusterTask.get();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		LogBuffer.println("clusterTask already done? cancelAll() in" + clusterTask.isDone());
 		
 		if (processor != null) {
+			LogBuffer.println("Cancelling processor tasks...");
 			processor.cancelAll();
 		}
 		
-		if (saveTask != null && !saveTask.isDone()) {
-			saveTask.cancel(true);
-			try {
-				saveTask.get();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		LogBuffer.println("clusterTask already done? after Processor" + clusterTask.isDone());
+
+		if (clusterTask != null) {
+			LogBuffer.println("clusterTask already done? before cancel" + clusterTask.isDone());
+			LogBuffer.println("Cancelling cluster task...");
+			clusterTask.cancel(true);
+			LogBuffer.println("clusterTask already done? after cancel" + clusterTask.isDone());
 		}
 		
+		if (saveTask != null) {
+			LogBuffer.println("Cancelling save task...");
+			saveTask.cancel(true);
+		}
+		
+		if(!processor.areTasksDone() && !areTasksDone()) {
+			LogBuffer.println("Not all tasks done yet.");
+		}
+
 		deleteAllFiles();
+	}
+	
+	private boolean areTasksDone() {
+		
+		boolean clusterDone = false;
+		boolean saverDone = false;
+		
+		if(clusterTask == null) {
+			clusterDone = true;
+		} else {
+			clusterDone = clusterTask.isDone();
+		}
+		
+		if(saveTask == null) {
+			saverDone = true;
+		} else {
+			saverDone = saveTask.isDone();
+		}
+		
+		
+		return clusterDone && saverDone;
 	}
 
 	/**
