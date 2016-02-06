@@ -680,15 +680,19 @@ public class ClusterDialogController {
 		@Override
 		protected void done() {
 
-			if (!isCancelled()) {
-				checkTreeFileIntegrity();
+			if (!isCancelled() && checkTreeFileIntegrity()) {
 				ClusterView.setStatusText("Done!");
 				loadClusteredData(filePath);
 				LogBuffer.println("SaveTask is done: success.");
 
-			} else {
+			} else if(isCancelled()){
 				clusterView.setClustering(false);
 				LogBuffer.println("SaveTask is done: cancelled.");
+				
+			} else {
+				clusterView.setClustering(false);
+				LogBuffer.println("Tree file integrity could not be ensured.");
+				deleteAllFiles();
 			}
 		}
 		
@@ -698,8 +702,12 @@ public class ClusterDialogController {
 		 * cluster and if that does not exist either it will consider an axis
 		 * as not clustered.
 		 */
-		private void checkTreeFileIntegrity() {
+		private boolean checkTreeFileIntegrity() {
 	
+			if(filePath == null || fileName == null) {
+				return false;
+			}
+			
 			LogBuffer.println("Checking tree files...");
 			
 			// those should really be handled centrally somewhere (final static)
@@ -715,6 +723,8 @@ public class ClusterDialogController {
 					ROW_IDX);
 			ensureTreeFilePresence(fileName, newFileRoot, colTreeSuffix, 
 					COL_IDX);
+			
+			return true;
 		}
 		
 		/**
@@ -1044,7 +1054,6 @@ public class ClusterDialogController {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			LogBuffer.println("clusterTask already done? cancelAll()" + clusterTask.isDone());
 			LogBuffer.println("Cancelling...");
 			cancelAll();
 		}
@@ -1097,20 +1106,14 @@ public class ClusterDialogController {
 	 */
 	private void cancelAll() {
 		
-		LogBuffer.println("clusterTask already done? cancelAll() in" + clusterTask.isDone());
-		
 		if (processor != null) {
 			LogBuffer.println("Cancelling processor tasks...");
 			processor.cancelAll();
 		}
-		
-		LogBuffer.println("clusterTask already done? after Processor" + clusterTask.isDone());
 
 		if (clusterTask != null) {
-			LogBuffer.println("clusterTask already done? before cancel" + clusterTask.isDone());
 			LogBuffer.println("Cancelling cluster task...");
 			clusterTask.cancel(true);
-			LogBuffer.println("clusterTask already done? after cancel" + clusterTask.isDone());
 		}
 		
 		if (saveTask != null) {
