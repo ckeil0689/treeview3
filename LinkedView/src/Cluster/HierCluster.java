@@ -97,6 +97,11 @@ public class HierCluster {
 
 		prepareCluster();
 	}
+	
+	public TreeFileWriter getTreeFileWriter() {
+		
+		return this.treeWriter;
+	}
 
 	/**
 	 * Goes through a bunch of steps to prepare the object and data for

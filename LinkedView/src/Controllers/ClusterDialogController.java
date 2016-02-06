@@ -10,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,6 +52,7 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 public class ClusterDialogController {
 
 	/* Axes identifiers */
+	public final static String CDT_END = ".cdt";
 	public final static String GTR_END = ".gtr";
 	public final static String ATR_END = ".atr";
 	
@@ -182,6 +182,7 @@ public class ClusterDialogController {
 		@Override
 		protected void process(final List<String> chunks) {
 
+			if(isCancelled()) return;
 			final String s = chunks.get(chunks.size() - 1);
 			ClusterView.setStatusText(s);
 		}
@@ -189,14 +190,14 @@ public class ClusterDialogController {
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
-			// Get fileName for saving calculated data
+			/* Get fileName for saving calculated data */
 			final ClusterFileStorage clusStore = new ClusterFileStorage();
 			final int extlen = tvModel.getFileSet().getExt().length();
 			
 			this.oldFileName = tvModel.getSource().substring(0,
 					tvModel.getSource().length() - extlen);
 
-			// Initialize the clustering processor and pass the data
+			/* Initialize the clustering processor and pass the data */
 			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
 					.getDataMatrix();
 			
@@ -212,7 +213,7 @@ public class ClusterDialogController {
 						rowHeaderI, colHeaderI);
 			}
 
-			// Set zeroes invalid if they should be ignored.
+			/* Set zeroes invalid if they should be ignored. */
 			if (clusterView.isIgnoreZeroesChecked()) {
 				originalMatrix.setZeroesToMissing();
 			}
@@ -294,6 +295,7 @@ public class ClusterDialogController {
 				colClusterData.setReorderedIDs(new String[] {});
 				clusterView.setClustering(false);
 				LogBuffer.println("ClusterTask is done: cancelled.");
+				deleteAllFiles();
 			}
 		}
 		
@@ -361,7 +363,6 @@ public class ClusterDialogController {
 			
             /* Find ID index */
         	for(int i = 0; i < headerArray[0].length; i++) {
-        	
         		Matcher m = p.matcher(headerArray[0][i]);
         		if(m.find()) {
         			pos = i;
@@ -575,7 +576,7 @@ public class ClusterDialogController {
 			distMatrix.setMatrix(processor.calcDistance(similarity, axis));
 
 			if (isCancelled()) {
-				return new String[] {}; // TODO add something sensible to return here...
+				return new String[] {};
 			}
 
 			publish("Clustering " + axisPrefix + " data...");
@@ -664,7 +665,6 @@ public class ClusterDialogController {
 			filePath = cdtGen.finish();
 			
 			if(isCancelled()) {
-				LogBuffer.println("SaveTask was cancelled...");
 				return false;
 			}
 			
@@ -681,17 +681,13 @@ public class ClusterDialogController {
 		protected void done() {
 
 			if (!isCancelled() && checkTreeFileIntegrity()) {
-				ClusterView.setStatusText("Done!");
+				ClusterView.setStatusText("Saving done!");
 				loadClusteredData(filePath);
 				LogBuffer.println("SaveTask is done: success.");
-
-			} else if(isCancelled()){
-				clusterView.setClustering(false);
-				LogBuffer.println("SaveTask is done: cancelled.");
 				
 			} else {
 				clusterView.setClustering(false);
-				LogBuffer.println("Tree file integrity could not be ensured.");
+				LogBuffer.println("Saving did not finish successfully.");
 				deleteAllFiles();
 			}
 		}
@@ -708,21 +704,11 @@ public class ClusterDialogController {
 				return false;
 			}
 			
-			LogBuffer.println("Checking tree files...");
-			
-			// those should really be handled centrally somewhere (final static)
-			final String clusterFileSuffix = ".cdt";
-			final String rowTreeSuffix = ".gtr";
-			final String colTreeSuffix = ".atr";
-			
-			final int fileRootNameSize = filePath.length() 
-					- clusterFileSuffix.length();
+			final int fileRootNameSize = filePath.length() - CDT_END.length();
 			final String newFileRoot = filePath.substring(0, fileRootNameSize);
 			
-			ensureTreeFilePresence(fileName, newFileRoot, rowTreeSuffix, 
-					ROW_IDX);
-			ensureTreeFilePresence(fileName, newFileRoot, colTreeSuffix, 
-					COL_IDX);
+			ensureTreeFilePresence(fileName, newFileRoot, GTR_END, ROW_IDX);
+			ensureTreeFilePresence(fileName, newFileRoot, ATR_END, COL_IDX);
 			
 			return true;
 		}
@@ -868,7 +854,7 @@ public class ClusterDialogController {
 		if(file == null) {
 			return;
 		}
-
+		
 		boolean success = false;
 		String name = file.getName();
 		
@@ -886,21 +872,21 @@ public class ClusterDialogController {
 		}
 	}
 	
-	private void deleteDir(File file) {
+	private void deleteDir(File dir) {
 		
-		if(file == null) {
+		if(dir == null) {
 			return;
 		}
 		
 		boolean success = false;
-		String name = file.getName();
+		String name = dir.getName();
 		
-		if(file.isDirectory()) {
-			File[] files = file.listFiles();
+		if(dir.isDirectory()) {
+			File[] files = dir.listFiles();
 			if(files.length == 0) {
-				success = file.delete();
+				success = dir.delete();
 			} else {
-				LogBuffer.println("Directory " + name + "still has " 
+				LogBuffer.println("Directory " + name + " still has " 
 						+ files.length + " files.");
 			}
 		} else {
@@ -964,8 +950,8 @@ public class ClusterDialogController {
 	}
 
 	/**
-	 * Listens to a change in selection for the <JComboBox> linkChooser in
-	 * the <ClusterDialog>. Calls a new layout setup as a response.
+	 * Listens to a change in selection for the JComboBox linkChooser in
+	 * the ClusterDialog. Calls a new layout setup as a response.
 	 *
 	 * @author CKeil
 	 *
@@ -1101,8 +1087,9 @@ public class ClusterDialogController {
 
 	/**
 	 * Cancels all active threads related to clustering.
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * Attention: Swingworker.cancel(true/false) immediately calls done(). 
+	 * This causes isDone() to be true before doInBackground() actually 
+	 * finishes.
 	 */
 	private void cancelAll() {
 		
@@ -1120,33 +1107,8 @@ public class ClusterDialogController {
 			LogBuffer.println("Cancelling save task...");
 			saveTask.cancel(true);
 		}
-		
-		if(!processor.areTasksDone() && !areTasksDone()) {
-			LogBuffer.println("Not all tasks done yet.");
-		}
 
-		deleteAllFiles();
-	}
-	
-	private boolean areTasksDone() {
-		
-		boolean clusterDone = false;
-		boolean saverDone = false;
-		
-		if(clusterTask == null) {
-			clusterDone = true;
-		} else {
-			clusterDone = clusterTask.isDone();
-		}
-		
-		if(saveTask == null) {
-			saverDone = true;
-		} else {
-			saverDone = saveTask.isDone();
-		}
-		
-		
-		return clusterDone && saverDone;
+//		deleteAllFiles();
 	}
 
 	/**

@@ -32,7 +32,7 @@ public class ClusterProcessor {
 //	private final String fileName;
 	private int pBarCount;
 	private DistanceWorker distTask;
-	private ClusterTask clusterTask;
+	private Clusterer clusterer;
 
 	/**
 	 * Hierarchical Clustering constructor for the ClusterProcessor. 
@@ -119,15 +119,15 @@ public class ClusterProcessor {
 			final boolean hierarchical, final int axis, final File treeFile) {
 
 		try {
-			this.clusterTask = new ClusterTask(distMatrix, linkMethod,
+			this.clusterer = new Clusterer(distMatrix, linkMethod,
 					spinnerInput, hierarchical, axis, treeFile);
-			clusterTask.execute();
+			clusterer.execute();
 
 			/*
 			 * Get() blocks until this thread finishes, so the following code
 			 * waits for this procedure to finish.
 			 */
-			return clusterTask.get();
+			return clusterer.get();
 
 		} catch (InterruptedException | ExecutionException e) {
 			LogBuffer.logException(e);
@@ -279,7 +279,7 @@ public class ClusterProcessor {
 	 * so it can respond appropriately. Input data is translated into output
 	 * data here.
 	 */
-	private class ClusterTask extends SwingWorker<String[], Integer> {
+	private class Clusterer extends SwingWorker<String[], Integer> {
 
 		private final DistanceMatrix distMatrix;
 		private final int linkMethod;
@@ -287,9 +287,11 @@ public class ClusterProcessor {
 		private final int axis;
 		private final int max;
 		private final boolean hier;
+		
+		private ClusterFileWriter treeFileWriter;
 		private final File treeFile;
 
-		public ClusterTask(final DistanceMatrix distMatrix,
+		public Clusterer(final DistanceMatrix distMatrix,
 				final int linkMethod, final Integer[] spinnerInput,
 				final boolean hier, final int axis, final File treeFile) {
 
@@ -307,6 +309,7 @@ public class ClusterProcessor {
 		@Override
 		protected void process(final List<Integer> chunks) {
 
+			if(isCancelled()) return;
 			final int i = chunks.get(chunks.size() - 1);
 			final int progress = (isCancelled()) ? 0 : pBarCount + i;
 			ClusterView.updatePBar(progress);
@@ -325,6 +328,16 @@ public class ClusterProcessor {
 		@Override
 		public void done() {
 
+			/* 
+			 * One MUST ensure that the file writer for ATR/ GTR is closed
+			 * if cancellation (mayInterrupt = true) has occurred because
+			 * the cluster code was likely halted before the streamw as closed.
+			 * This will make file deletion in ClusterDialogController fail!
+			 */
+			if(treeFileWriter != null) {
+				treeFileWriter.closeWriter();
+			}
+			
 			if (!isCancelled()) {
 				pBarCount += max;
 				LogBuffer.println("ProcessorClusterTask is done: success.");
@@ -348,8 +361,8 @@ public class ClusterProcessor {
 			
 			final HierCluster clusterer = new HierCluster(linkMethod,
 					distMatrix, axis);
-
 			clusterer.setupTreeFileWriter(treeFile);
+			treeFileWriter = clusterer.getTreeFileWriter();
 
 			/*
 			 * Continue process until distMatrix has a size of 1, This array
@@ -360,7 +373,6 @@ public class ClusterProcessor {
 			int distMatrixSize = distMatrix.getSize();
 
 			while (distMatrixSize > 1 && !isCancelled()) {
-
 				distMatrixSize = clusterer.cluster();
 				publish(loopNum++);
 			}
@@ -403,7 +415,8 @@ public class ClusterProcessor {
 					axis, k);
 
 			clusterer.setupFileWriter(treeFile);
-
+			treeFileWriter = clusterer.getClusterFileWriter();
+			
 			/*
 			 * Begin iteration of recalculating means and reassigning row
 			 * distance means to clusters.
@@ -437,27 +450,6 @@ public class ClusterProcessor {
 			return clusterer.getReorderedList();
 		}
 	}
-
-	public boolean areTasksDone() {
-			
-			boolean clusterDone = false;
-			boolean distDone = false;
-			
-			if(clusterTask == null) {
-				clusterDone = true;
-			} else {
-				clusterDone = clusterTask.isDone();
-			}
-			
-			if(distTask == null) {
-				distDone = true;
-			} else {
-				distDone = distTask.isDone();
-			}
-			
-			
-			return clusterDone && distDone;
-	}
 	
 	/**
 	 * Cancels all currently running threads.
@@ -470,8 +462,8 @@ public class ClusterProcessor {
 			distTask.cancel(true);
 		}
 		
-		if (clusterTask != null && !clusterTask.isDone()) {
-			clusterTask.cancel(true);
+		if (clusterer != null && !clusterer.isDone()) {
+			clusterer.cancel(true);
 		}
 	}
 }

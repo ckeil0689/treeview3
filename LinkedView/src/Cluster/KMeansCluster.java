@@ -60,6 +60,11 @@ public class KMeansCluster {
 
 		prepare();
 	}
+	
+	public ClusterFileWriter getClusterFileWriter() {
+		
+		return bufferedWriter;
+	}
 
 	/**
 	 * Sets up a buffered writer used to save the data created during the
