@@ -39,7 +39,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -49,6 +48,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
+import utilities.GUIFactory;
 
 /**
  * This class is a superclass which implements a GUI for selection of options

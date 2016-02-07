@@ -19,7 +19,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import net.miginfocom.swing.MigLayout;
-import Utilities.GUIFactory;
+import utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ContrastSelectable;
 
 class ContrastSelector extends JPanel implements AdjustmentListener {

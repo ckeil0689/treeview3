@@ -14,7 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import Utilities.GUIFactory;
+import utilities.GUIFactory;
 
 /**
  * this is a dialog which displays a modeless settings dialog. it includes a

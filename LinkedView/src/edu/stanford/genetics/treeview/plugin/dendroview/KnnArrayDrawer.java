@@ -9,9 +9,9 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Rectangle;
 
-import Utilities.Helper;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
+import utilities.Helper;
 
 /**
  * Class for Drawing PixelViews.

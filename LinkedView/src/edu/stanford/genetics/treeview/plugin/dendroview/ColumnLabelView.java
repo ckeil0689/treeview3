@@ -11,8 +11,8 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
 
-import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
+import utilities.StringRes;
 
 public class ColumnLabelView extends LabelView {
 

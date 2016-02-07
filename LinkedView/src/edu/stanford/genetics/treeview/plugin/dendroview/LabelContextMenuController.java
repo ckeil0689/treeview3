@@ -3,8 +3,8 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import Controllers.TVController;
-import Utilities.StringRes;
+import controllers.TVController;
+import utilities.StringRes;
 
 public class LabelContextMenuController {
 

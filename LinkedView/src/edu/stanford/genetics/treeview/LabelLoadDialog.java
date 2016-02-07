@@ -9,8 +9,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 
-import Utilities.GUIFactory;
-import Utilities.StringRes;
+import utilities.GUIFactory;
+import utilities.StringRes;
 
 public class LabelLoadDialog {
 

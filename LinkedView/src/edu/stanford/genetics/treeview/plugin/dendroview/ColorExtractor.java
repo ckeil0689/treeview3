@@ -14,11 +14,11 @@ import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.ContrastSelectable;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.TVModel;
+import utilities.Helper;
 
 /**
  * The purpose of this class is to convert a data value into a color.

@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import Utilities.GUIFactory;
+import utilities.GUIFactory;
 
 /**
  * this is a dialog which displays a single cancelable settings panel

@@ -3,8 +3,8 @@ package edu.stanford.genetics.treeview.model;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import Utilities.Helper;
 import edu.stanford.genetics.treeview.DataModel;
+import utilities.Helper;
 
 public class CdtWriter {
 

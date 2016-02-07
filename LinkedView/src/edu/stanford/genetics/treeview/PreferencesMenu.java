@@ -13,11 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import Utilities.CustomDialog;
-import Utilities.GUIFactory;
-import Utilities.StringRes;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
+import utilities.CustomDialog;
+import utilities.GUIFactory;
+import utilities.StringRes;
 
 /**
  * A dialog that can contain various menus, depending on which the user chooses

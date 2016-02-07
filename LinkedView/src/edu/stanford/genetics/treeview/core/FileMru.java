@@ -11,10 +11,10 @@ import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import Utilities.StringRes;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
+import utilities.StringRes;
 
 /*
  *  Decompiled by Mocha from FileMru.class

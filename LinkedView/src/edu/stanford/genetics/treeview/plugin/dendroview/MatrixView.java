@@ -14,8 +14,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import net.miginfocom.swing.MigLayout;
-import ColorChooser.ColorChooserController;
-import Utilities.GUIFactory;
+import utilities.GUIFactory;
+import colorChooser.ColorChooserController;
 import edu.stanford.genetics.treeview.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;

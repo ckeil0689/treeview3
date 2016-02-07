@@ -14,7 +14,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 
-import Utilities.StringRes;
+import utilities.StringRes;
 
 /**
  * Encapsulates a set of files corresponding to a typical hierarchical cluster

@@ -4,8 +4,8 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import Utilities.CustomDialog;
-import Utilities.GUIFactory;
+import utilities.CustomDialog;
+import utilities.GUIFactory;
 
 public class ShortcutDialog extends CustomDialog {
 
