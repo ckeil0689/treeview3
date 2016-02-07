@@ -32,7 +32,7 @@ public class ClusterFileGenerator {
 	
 	//private String[][] cdtData_s;
 
-	private ClusterFileWriter bufferedWriter;
+	private ClusterFileWriter clusterFileWriter;
 
 	/**
 	 * The task for this class is to take supplied data that is the result of
@@ -76,7 +76,7 @@ public class ClusterFileGenerator {
 	 */
 	public void setupWriter(final File file) {
 
-		this.bufferedWriter = new ClusterFileWriter(file);
+		this.clusterFileWriter = new ClusterFileWriter(file);
 	}
 
 	/**
@@ -270,9 +270,9 @@ public class ClusterFileGenerator {
 	 */
 	public String finish() {
 
-		final String filePath = bufferedWriter.getFilePath();
+		final String filePath = clusterFileWriter.getFilePath();
 
-		bufferedWriter.closeWriter();
+		clusterFileWriter.closeWriter();
 
 		return filePath;
 	}
@@ -338,7 +338,7 @@ public class ClusterFileGenerator {
 		}
 
 		/* write finished row */
-		bufferedWriter.writeContent(cdtRow);
+		clusterFileWriter.writeData(cdtRow);
 
 		/* next row */
 		/* if columns were clustered, make AID row */
@@ -349,7 +349,7 @@ public class ClusterFileGenerator {
 			System.arraycopy(orderedAIDs, 0, cdtRow, dataStart, 
 					orderedAIDs.length);
 
-			bufferedWriter.writeContent(cdtRow);
+			clusterFileWriter.writeData(cdtRow);
 		}
 
 		/* remaining label rows */
@@ -374,7 +374,7 @@ public class ClusterFileGenerator {
 				addIndex++;
 			}
 
-			bufferedWriter.writeContent(cdtRow);
+			clusterFileWriter.writeData(cdtRow);
 		}
 
 		/* Filling the data rows */
@@ -409,7 +409,7 @@ public class ClusterFileGenerator {
 			String[] rowData = getStringArray(origMatrix[i]);
 			System.arraycopy(rowData, 0, row, addIndex, rowData.length);
 
-			bufferedWriter.writeContent(row);
+			clusterFileWriter.writeData(row);
 		}
 	}
 	
@@ -453,7 +453,7 @@ public class ClusterFileGenerator {
 			addIndex++;
 		}
 
-		bufferedWriter.writeContent(cdtRow1);
+		clusterFileWriter.writeData(cdtRow1);
 
 		/* Fill and add second row */
 		addIndex = 0;
@@ -473,7 +473,7 @@ public class ClusterFileGenerator {
 			addIndex++;
 		}
 
-		bufferedWriter.writeContent(cdtRow2);
+		clusterFileWriter.writeData(cdtRow2);
 
 		/* 
 		 * Add gene names in ORF and NAME columns (0 & 1) and GWeights (2)
@@ -495,7 +495,7 @@ public class ClusterFileGenerator {
 			}
 
 			// Check whether it's the last line
-			bufferedWriter.writeContent(row);
+			clusterFileWriter.writeData(row);
 		}
 	}
 }

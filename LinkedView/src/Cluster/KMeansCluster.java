@@ -152,7 +152,7 @@ public class KMeansCluster {
 		addIndex++;
 
 		/* Writing the header line */
-		bufferedWriter.writeContent(initial);
+		bufferedWriter.writeData(initial);
 
 		/* Write the calculated data */
 		addIndex = 0;
@@ -176,7 +176,7 @@ public class KMeansCluster {
 
 				dataPair[addIndexInner] = index;
 
-				bufferedWriter.writeContent(dataPair);
+				bufferedWriter.writeData(dataPair);
 			}
 		}
 	}

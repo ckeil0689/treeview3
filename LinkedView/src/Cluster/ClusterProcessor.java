@@ -288,7 +288,7 @@ public class ClusterProcessor {
 		private final int max;
 		private final boolean hier;
 		
-		private ClusterFileWriter treeFileWriter;
+		private ClusterFileWriter fileWriter;
 		private final File treeFile;
 
 		public Clusterer(final DistanceMatrix distMatrix,
@@ -334,8 +334,8 @@ public class ClusterProcessor {
 			 * the cluster code was likely halted before the streamw as closed.
 			 * This will make file deletion in ClusterDialogController fail!
 			 */
-			if(treeFileWriter != null) {
-				treeFileWriter.closeWriter();
+			if(fileWriter != null) {
+				fileWriter.closeWriter();
 			}
 			
 			if (!isCancelled()) {
@@ -362,7 +362,7 @@ public class ClusterProcessor {
 			final HierCluster clusterer = new HierCluster(linkMethod,
 					distMatrix, axis);
 			clusterer.setupTreeFileWriter(treeFile);
-			treeFileWriter = clusterer.getTreeFileWriter();
+			fileWriter = clusterer.getTreeFileWriter();
 
 			/*
 			 * Continue process until distMatrix has a size of 1, This array
@@ -415,7 +415,7 @@ public class ClusterProcessor {
 					axis, k);
 
 			clusterer.setupFileWriter(treeFile);
-			treeFileWriter = clusterer.getClusterFileWriter();
+			fileWriter = clusterer.getClusterFileWriter();
 			
 			/*
 			 * Begin iteration of recalculating means and reassigning row

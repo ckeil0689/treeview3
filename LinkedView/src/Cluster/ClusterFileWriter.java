@@ -1,4 +1,5 @@
 package Cluster;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,12 +11,12 @@ import java.io.UnsupportedEncodingException;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class ClusterFileWriter {
-
+	
 	private final String SEPARATOR = "\t";
 	private final String END_OF_ROW = "\n";
 	
-	private BufferedWriter bw;
-	private final File file;
+	private File file;
+	protected BufferedWriter bw;
 	
 	public ClusterFileWriter(final File file) {
 
@@ -23,54 +24,6 @@ public class ClusterFileWriter {
 		setupWriter();
 	}
 	
-	private void setupWriter() {
-
-		try {
-			bw = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(file.getAbsoluteFile()), "UTF-8"));
-			
-		} catch (UnsupportedEncodingException e) {
-			LogBuffer.logException(e);
-			
-		} catch (FileNotFoundException e) {
-			LogBuffer.logException(e);
-		}
-	}
-
-	/**
-	 * This methods writes the string from the doParse() method to local storage
-	 * using the original name of the file and the specified file extension.
-	 *
-	 * @param input
-	 * @param fileEnd
-	 */
-	public void writeContent(final String[] input) {
-
-		final String content = doParse(input);
-
-		try {
-			bw.write(content);
-
-		} catch (final IOException e) {
-			LogBuffer.logException(e);
-		}
-	}
-
-	/**
-	 * Closes this BufferedWriter and prints a notification to console.
-	 */
-	public void closeWriter() {
-
-		try {
-			bw.close();
-
-		} catch (final IOException e) {
-			LogBuffer.logException(e);
-		}
-
-		LogBuffer.println("Done." + file.getAbsolutePath());
-	}
-
 	/**
 	 * A method to parse a String array into one tab-delimited string.
 	 *
@@ -96,14 +49,64 @@ public class ClusterFileWriter {
 
 		return sb.toString();
 	}
+	
+	/**
+	 * Defines how exactly the FileWriter writes its data.
+	 */
+	public void writeData(final String[] data) {
+			
+		final String content = doParse(data);
 
+		try {
+			bw.write(content);
+
+		} catch (final IOException e) {
+			LogBuffer.logException(e);
+		}
+	}
+	
+	/**
+	 * Set up the BufferedWriter.
+	 */
+	public void setupWriter() {
+		
+		try {
+			this.bw = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(file.getAbsoluteFile()), "UTF-8"));
+			
+		} catch (UnsupportedEncodingException e) {
+			LogBuffer.logException(e);
+			
+		} catch (FileNotFoundException e) {
+			LogBuffer.logException(e);
+		}
+	}
+	
+	/**
+	 * Closes this BufferedWriter and prints a notification to console.
+	 */
+	public void closeWriter() {
+
+		try {
+			bw.close();
+			LogBuffer.println("Done." + file.getAbsolutePath());
+			
+		} catch (final IOException e) {
+			LogBuffer.logException(e);
+            bw = null;
+		}
+	}
+	
 	public String getFilePath() {
-
 		return file.getAbsolutePath();
 	}
 
 	public File getFile() {
-
 		return file;
 	}
+	
+	public BufferedWriter getBufferedWriter() {
+		return bw;
+	}
+	
 }
