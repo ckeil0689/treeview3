@@ -6,9 +6,10 @@ import java.io.IOException;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
- * This class is used to save data from clustering to the local storage by
- * converting it to a tab-delimited string and using a BufferedWriter.
- *
+ * This class determines the file name structure (full path) for a file 
+ * that will be written during clustering. The name will be dependent on 
+ * the linkage type (avg, single, complete) and what kind of file will 
+ * be created.
  * @author CKeil
  *
  */

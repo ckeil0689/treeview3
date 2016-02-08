@@ -16,6 +16,7 @@ import javax.swing.ToolTipManager;
 
 import controllers.TVController;
 import edu.stanford.genetics.treeview.model.TVModel;
+import utilities.StringRes;
 
 /**
  * This class defines the treeview application. In practice, it holds the common
@@ -149,7 +150,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 	 */
 	public Preferences setPreferences() {
 
-		return Preferences.userRoot().node("TreeViewApp");
+		return Preferences.userRoot().node(StringRes.pnode_globalMain);
 	}
 
 	/**

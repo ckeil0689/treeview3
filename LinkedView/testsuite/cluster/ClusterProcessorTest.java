@@ -1,6 +1,6 @@
-package controllers;
+package cluster;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ClusterControllerTest {
+public class ClusterProcessorTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -27,12 +27,27 @@ public class ClusterControllerTest {
 	}
 
 	@Test
-	public void testClusterController() {
+	public void testClusterProcessorTVDataMatrixString() {
 		fail("Not yet implemented");
 	}
 
 	@Test
-	public void testDisplayView() {
+	public void testClusterProcessorTVDataMatrixStringIntHeaderInfoIntHeaderInfo() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testCalcDistance() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testClusterAxis() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testCancelAll() {
 		fail("Not yet implemented");
 	}
 

@@ -904,18 +904,23 @@ public class ClusterDialogController {
 	 * Sets a new DendroView with the new data loaded into TVModel, displaying
 	 * an updated HeatMap. It should also close the ClusterViewFrame.
 	 */
-	private void loadClusteredData(final String filePath) {
+	private void loadClusteredData(final String newFilePath) {
 
 		File file = null;
+		
+		if (newFilePath != null) {
+			file = new File(newFilePath);
 
-		if (filePath != null) {
-			file = new File(filePath);
-
-			final FileSet fileSet = new FileSet(file.getName(),
+			LogBuffer.println("TVModel in loadClustered 2"  + tvModel.getFileSet());
+			
+			// TODO instantiating a new local fileSet soemhow changes the fileset of TVModel... (???)
+			final FileSet newFileSet = new FileSet(file.getName(),
 					file.getParent() + File.separator);
 
+			LogBuffer.println("TVModel in loadClustered 3"  + tvModel.getFileSet());
+			
 			clusterDialog.dispose();
-			tvController.getDataInfoAndLoad(fileSet, true);
+			tvController.getDataInfoAndLoad(newFileSet, true);
 
 		} else {
 			final String alert = "When trying to load the clustered file, no "
@@ -923,7 +928,7 @@ public class ClusterDialogController {
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], alert, "Alert",
 					JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + alert);
-			LogBuffer.println("File path: " + filePath);
+			LogBuffer.println("File path: " + newFilePath);
 		}
 	}
 

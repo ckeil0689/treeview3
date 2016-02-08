@@ -87,6 +87,7 @@ public class StringRes {
 
 	// Preferences API
 	// Nodes
+	public static final String pnode_globalMain = "TreeViewApp";
 	public static final String pnode_Preferences = "Preferences";
 	public static final String pnode_Labels = "Labels";
 	public static final String pnode_DendroView = "DendroView";

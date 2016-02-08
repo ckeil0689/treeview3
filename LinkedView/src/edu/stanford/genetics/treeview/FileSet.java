@@ -98,7 +98,7 @@ public class FileSet {
 	 */
 	public FileSet(final String cdt, final String dir) {
 
-		node = Preferences.userRoot().node(StringRes.pnode_TVFrame)
+		node = Preferences.userRoot().node(StringRes.pnode_globalMain)
 				.node("FileSet");
 		// this.getClass().getName());
 		setCdt(cdt);
