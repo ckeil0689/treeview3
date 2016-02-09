@@ -59,6 +59,27 @@ public class TreePainter extends TreeDrawer {
 	}
 
 	/**
+	 * A method to export to a PDF
+	 */
+	public void paint(final Graphics graphics,
+		final LinearTransformation xScaleEq,
+		final LinearTransformation yScaleEq,final Rectangle dest,
+		final boolean isLeft,final TreeSelectionI treeSelection,
+		final int xIndent,final int yIndent,final int size) {
+	
+		if ((getRootNode() == null) || (getRootNode().isLeaf())) {
+			LogBuffer.println("Root node is null or leaf in paint() "
+					+ "in InvertedTreeDrawer!");
+		} else {
+			this.isLeft = isLeft;
+			// recursively drawtree...
+			final NodeDrawer nd =
+				new NodeDrawer(graphics,xScaleEq,yScaleEq,dest,null);
+			nd.draw(getRootNode(),treeSelection,xIndent,yIndent,size);
+		}
+	}
+
+	/**
 	 * Paints a subtree
 	 * @author rleach
 	 * @param graphics - the graphics object with which to paint
@@ -159,7 +180,7 @@ public class TreePainter extends TreeDrawer {
 		 * @param treeSelection - contains the selected data indexes
 		 */
 		public void draw(final TreeDrawerNode node,final int hoverIndex,
- 			final TreeSelectionI treeSelection) {
+			final TreeSelectionI treeSelection) {
 
 			Stack<TreeDrawerNode> selectedNodeStack =
 				drawDFS(node,hoverIndex,false,treeSelection);
@@ -170,6 +191,14 @@ public class TreePainter extends TreeDrawer {
 				graphics.setColor(Color.RED);
 				drawNodeDot(getHoveredNode());
 			}
+		}
+
+		public void draw(final TreeDrawerNode node,
+			final TreeSelectionI treeSelection,final int xIndent,
+			final int yIndent,final int size) {
+
+			exportDFS(node,-1,false,treeSelection,xIndent,yIndent,size,
+				node.getMinCorr(),node.getMaxCorr());
 		}
 
 		/**
@@ -294,6 +323,97 @@ public class TreePainter extends TreeDrawer {
 			return(returnStack);
 		}
 
+		public Stack<TreeDrawerNode> exportDFS(final TreeDrawerNode node,
+			final int hoverIndex,boolean isNodeHovered,
+			final TreeSelectionI treeSelection,
+			final int xIndent,final int yIndent,final int size,
+			final double minCorr,final double maxCorr) {
+	
+			Stack<TreeDrawerNode> returnStack = new Stack<TreeDrawerNode>();
+	
+			//If we've hit the hovered node, set it to true for this and all
+			//child nodes
+			if(isNodeHovered(node)) {
+				isNodeHovered = true;
+			}
+	
+//			// just return if no subkids visible.
+//			if((node.getMaxIndex() < minInd) ||
+//				(node.getMinIndex() > maxInd)) {
+//				if(isNodeSelected(node,treeSelection)) {
+//					returnStack.push(node);
+//				}
+//				return(returnStack);
+//			}
+	
+			//These will keep track of the selected nodes so that the dots can
+			//be drawn on top and the branch colors can be determined
+			Stack<TreeDrawerNode> leftDotNodeStack  =
+				new Stack<TreeDrawerNode>();
+			Stack<TreeDrawerNode> rightDotNodeStack =
+				new Stack<TreeDrawerNode>();
+	
+			/* Recursive calls (leaves will be drawn first) */
+	
+			//Do the left side
+			if(!node.getLeft().isLeaf()) {
+				leftDotNodeStack = exportDFS(node.getLeft(),hoverIndex,
+					isNodeHovered,treeSelection,xIndent,yIndent,size,minCorr,
+					maxCorr);
+			}
+//			//We do not recurse down to the leaves, so add them to the stack
+//			//here
+//			else if(treeSelection.isIndexSelected(
+//				(int) node.getLeft().getIndex())) {
+//	
+//				leftDotNodeStack.push(node.getLeft());
+//			}
+	
+			//Do the right side
+			if(!node.getRight().isLeaf()) {
+				rightDotNodeStack = exportDFS(node.getRight(),hoverIndex,
+					isNodeHovered,treeSelection,xIndent,yIndent,size,minCorr,
+					maxCorr);
+			}
+//			//We do not recurse down to the leaves, so add them to the stack
+//			//here
+//			else if(treeSelection.isIndexSelected(
+//				(int) node.getRight().getIndex())) {
+//	
+//				rightDotNodeStack.push(node.getRight());
+//			}
+	
+			boolean thisNodeIsSelected = false;
+	
+//			//If the stack returned from each child contains 1 selected
+//			//node and that node is the child of this node, then we're not going
+//			//to draw dots for those nodes and just draw a dot for this node.
+//			//Ignore the child nodes and push this node onto a new stack to
+//			//return.  Otherwise, all all the selected subtrees & leaves on top
+//			//of which to draw dots.
+//			if(!leftDotNodeStack.isEmpty()   && !rightDotNodeStack.isEmpty()  &&
+//				leftDotNodeStack.size() == 1 && rightDotNodeStack.size() == 1 &&
+//				leftDotNodeStack.peek().getId()  == node.getLeft().getId()    &&
+//				rightDotNodeStack.peek().getId() == node.getRight().getId()) {
+//	
+//				thisNodeIsSelected = true;
+//				returnStack.push(node);
+//			} else {
+//				if(!leftDotNodeStack.isEmpty()) {
+//					returnStack.addAll(leftDotNodeStack);
+//				}
+//				if(!rightDotNodeStack.isEmpty()) {
+//					returnStack.addAll(rightDotNodeStack);
+//				}
+//			}
+	
+			// finally draw
+			exportSingle(node,hoverIndex,isNodeHovered,thisNodeIsSelected,
+				xIndent,yIndent,size,minCorr,maxCorr);
+	
+			return(returnStack);
+		}
+
 		/**
 		 * Determines whether all the leaves under a given node have indexes
 		 * that are selected
@@ -411,6 +531,43 @@ public class TreePainter extends TreeDrawer {
 			}
 
 			drawRightBranch(node,hoverIndex,isNodeHovered,isSelected);
+		}
+
+		private void exportSingle(final TreeDrawerNode node,
+			final int hoverIndex,final boolean isNodeHovered,
+			final boolean isSelected,final int xIndent,final int yIndent,
+			final int size,final double minCorr,final double maxCorr) {
+	
+			if (xT == null) {
+				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+	
+			if (node.getRight() == null) {
+				LogBuffer.println("right in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+	
+			// draw our (flipped) polyline...
+			if(isNodeHovered) {
+				graphics.setColor(Color.red);
+			} else {
+				graphics.setColor(node.getColor());
+			}
+	
+			exportLeftBranch(node,hoverIndex,isNodeHovered,isSelected,xIndent,
+				yIndent,size,minCorr,maxCorr);
+	
+			if(isNodeHovered) {
+				graphics.setColor(Color.red);
+			} else {
+				graphics.setColor(node.getColor());
+			}
+	
+			exportRightBranch(node,hoverIndex,isNodeHovered,isSelected,xIndent,
+				yIndent,size,minCorr,maxCorr);
 		}
 
 		/**
@@ -583,6 +740,181 @@ public class TreePainter extends TreeDrawer {
 			}
 		}
 
+		public void exportLeftBranch(final TreeDrawerNode node,
+			final int hoverIndex,final boolean isHovered,
+			final boolean isSelected,final int xIndent,final int yIndent,
+			final int size,final double minCorr,final double maxCorr) {
+	
+			final TreeDrawerNode left = node.getLeft();
+//			final boolean hovered = (node.getLeft().getIndex() == hoverIndex);
+	
+			if (xT == null) {
+				LogBuffer.println("xt in drawLeftBranch in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+	
+			if (left == null) {
+				LogBuffer.println("left in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+	
+			int lx = 0;
+			int tx = 0;
+	
+			int ly = 0;
+			int ty = 0;
+	
+			int c = 0;
+	
+//			int pointerBaseOffset = (left.isLeaf() ? 2 : 1);
+	
+			// GTRView
+			if (isLeft) {
+				lx = (int) Math.round((left.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
+				tx = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
+
+				ly = yIndent + (int) Math.round(left.getIndex() * size + (size / 2));
+				c = yIndent + (int) Math.round(node.getIndex() * size + (size / 2));
+	
+//				if(Math.abs(lx - tx) < 3) {
+//					pointerBaseOffset = 0;
+//				}
+				// ATRView
+			} else {
+				ly = (int) Math.round((left.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
+				ty = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
+	
+				lx = xIndent + (int) Math.round(left.getIndex() * size + (size / 2));
+				c = xIndent + (int) Math.round(node.getIndex() * size + (size / 2));
+				// int tx = (int) xT.transform(node.getIndex() + .5);
+	
+//				if(Math.abs(ly - ty) < 3) {
+//					pointerBaseOffset = 0;
+//				}
+			}
+	
+//			if(hovered || isHovered) {
+//				graphics.setColor(Color.red);
+//			}
+	
+			// draw our (flipped) polyline...
+			if(isLeft) {
+//				graphics.drawPolyline(
+//					new int[] {
+//						tx,
+//						tx,
+//						lx
+//					},
+//					new int[] {
+//						c,
+//						ly,
+//						ly
+//					},
+//					3);
+				//The VectorGraphics2D library messes up the drawPolyline call
+				//above sometimes and skips the center point, so drawing two-
+				//separate lines (while less attractively drawn) is more
+				//reliable
+				graphics.drawLine(tx,c,tx,ly);
+				graphics.drawLine(tx,ly,lx,ly);
+	
+//				//Draw an outline around the line to either bold a hovered
+//				//branch or highlight a selected branch
+//				if(hovered || isSelected) {
+//					if(!hovered) {
+//						graphics.setColor(new Color(249,238,160));//yellow
+//					}
+//					graphics.drawPolyline(
+//						new int[] {
+//							//Horizontal coordinates
+//							tx + 1,
+//							tx + 1,
+//							lx - pointerBaseOffset
+//						},
+//						new int[] {
+//							//Vertical coordinates
+//							c,
+//							ly + 1,
+//							ly + 1
+//						},
+//						3);
+//					graphics.drawPolyline(
+//						new int[] {
+//							//Horizontal coordinates
+//							tx - 1,
+//							tx - 1,
+//							lx - pointerBaseOffset
+//						},
+//						new int[] {
+//							//Vertical coordinates
+//							c,
+//							ly - 1,
+//							ly - 1
+//						},
+//						3);
+//				}
+			} else {
+//				graphics.drawPolyline(
+//					new int[] {
+//						//Horizontal coordinates
+//						c,                                //center
+//						lx,                               //left leaf corner
+//						lx                                //left leaf end
+//					},
+//					new int[] {
+//						//Vertical coordinates
+//						ty,                               //center
+//						ty,                               //left leaf corner
+//						ly                                //left leaf end
+//					},
+//					3);
+				//The VectorGraphics2D library messes up the drawPolyline call
+				//above sometimes and skips the center point, so drawing two-
+				//separate lines (while less attractively drawn) is more
+				//reliable
+				graphics.drawLine(c,ty,lx,ty);
+				graphics.drawLine(lx,ty,lx,ly);
+	
+//				//Draw an outline around the line to either bold a hovered
+//				//branch or highlight a selected branch
+//				if(hovered || isSelected) {
+//					if(!hovered) {
+//						graphics.setColor(new Color(249,238,160));//yellow
+//					}
+//					graphics.drawPolyline(
+//						new int[] {
+//							//Horizontal coordinates
+//							c,                            //center
+//							lx + 1,                       //left leaf corner
+//							lx + 1                        //left leaf end
+//						},
+//						new int[] {
+//							//Vertical coordinates
+//							ty + 1,                       //center
+//							ty + 1,                       //left leaf corner
+//							ly - pointerBaseOffset        //left leaf end
+//						},
+//						3);
+//					graphics.drawPolyline(
+//						new int[] {
+//							//Horizontal coordinates
+//							c,                            //center
+//							lx - 1,                       //left leaf corner
+//							lx - 1                        //left leaf end
+//						},
+//						new int[] {
+//							//Vertical coordinates
+//							ty - 1,                       //center
+//							ty - 1,                       //left leaf corner
+//							ly - pointerBaseOffset        //left leaf end
+//						},
+//						3);
+//				}
+			}
+		}
+
 		/**
 		 * Draws the right branch stemming from a given node
 		 * @author rleach
@@ -750,6 +1082,181 @@ public class TreePainter extends TreeDrawer {
 						},
 						3);
 				}
+			}
+		}
+
+		public void exportRightBranch(final TreeDrawerNode node,
+			final int hoverIndex,final boolean isHovered,
+			final boolean isSelected,final int xIndent,final int yIndent,
+			final int size,final double minCorr,final double maxCorr) {
+
+			final TreeDrawerNode right = node.getRight();
+//			final boolean hovered = (node.getRight().getIndex() == hoverIndex);
+
+			if (xT == null) {
+				LogBuffer.println("xt in drawRightBranch in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			if (right == null) {
+				LogBuffer.println("right in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			int rx = 0;
+			int tx = 0;
+
+			int ry = 0;
+			int ty = 0;
+
+			int c = 0;
+
+//			int pointerBaseOffset = (right.isLeaf() ? 2 : 0);
+
+			// GTRView
+			if (isLeft) {
+				rx = (int) Math.round((right.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
+				tx = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
+
+				ry = yIndent + (int) Math.round(right.getIndex() * size + (size / 2));
+				c = yIndent + (int) Math.round(node.getIndex() * size + (size / 2));
+
+//				if(Math.abs(rx - tx) < 3) {
+//					pointerBaseOffset = 0;
+//				}
+
+			}
+			// ATRView
+			else {
+				ry = (int) Math.round((right.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
+				ty = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
+
+				rx = xIndent + (int) Math.round(right.getIndex() * size + (size / 2));
+				c = xIndent + (int) Math.round(node.getIndex() * size + (size / 2));
+				// int tx = (int) xT.transform(node.getIndex() + .5);
+
+//				if(Math.abs(ry - ty) < 3) {
+//					pointerBaseOffset = 0;
+//				}
+			}
+
+//			// draw our (flipped) polyline...
+//			if(hovered || isHovered) {
+//				graphics.setColor(Color.red);
+//			}
+
+			if (isLeft) {
+//				graphics.drawPolyline(
+//					new int[] {
+//						rx,
+//						tx,
+//						tx
+//					},
+//					new int[] {
+//						ry,
+//						ry,
+//						c
+//					},
+//					3);
+				//The VectorGraphics2D library messes up the drawPolyline call
+				//above sometimes and skips the center point, so drawing two-
+				//separate lines (while less attractively drawn) is more
+				//reliable
+				graphics.drawLine(rx,ry,tx,ry);
+				graphics.drawLine(tx,ry,tx,c);
+
+//				//If this is the hovered leaf, make it bold
+//				if(hovered || isSelected) {
+//					if(!hovered) {
+//						graphics.setColor(new Color(249,238,160));//yellow
+//					}
+//					graphics.drawPolyline(
+//						new int[] {
+//							//Horizontal coordinates
+//							rx - pointerBaseOffset,       //right leaf end
+//							tx + 1,                       //right leaf corner
+//							tx + 1                        //center
+//						},
+//						new int[] {
+//							//Vertical coordinates
+//							ry - 1,                       //right leaf end
+//							ry - 1,                       //right leaf corner
+//							c                             //center
+//						},
+//						3);
+//					graphics.drawPolyline(
+//						new int[] {
+//							//Horizontal coordinates
+//							rx - pointerBaseOffset,       //right leaf end
+//							tx - 1,                       //right leaf corner
+//							tx - 1                        //center
+//						},
+//						new int[] {
+//							//Vertical coordinates
+//							ry + 1,                       //right leaf end
+//							ry + 1,                       //right leaf corner
+//							c                             //center
+//						},
+//						3);
+//				}
+			} else {
+//				graphics.drawPolyline(
+//					new int[] {
+//						//Horizontal coordinates
+//						rx,                               //right leaf end
+//						rx,                               //right leaf corner
+//						c                                 //center
+//					},
+//					new int[] {
+//						//Vertical coordinates
+//						ry,                               //right leaf end
+//						ty,                               //right leaf corner
+//						ty                                //center
+//					},
+//					3);
+				//The VectorGraphics2D library messes up the drawPolyline call
+				//above sometimes and skips the center point, so drawing two-
+				//separate lines (while less attractively drawn) is more
+				//reliable
+				graphics.drawLine(rx,ry,rx,ty);
+				graphics.drawLine(rx,ty,c,ty);
+
+//				//If this is the hovered leaf, make it bold
+//				if(hovered || isSelected) {
+//					if(!hovered) {
+//						graphics.setColor(new Color(249,238,160));//yellow
+//					}
+//					graphics.drawPolyline(
+//						new int[] {
+//							//Horizontal coordinates
+//							rx + 1,                       //right leaf end
+//							rx + 1,                       //right leaf corner
+//							c                             //center
+//						},
+//						new int[] {
+//							//Vertical coordinates
+//							ry - pointerBaseOffset,       //right leaf end
+//							ty - 1,                       //right leaf corner
+//							ty - 1                        //center
+//						},
+//						3);
+//					graphics.drawPolyline(
+//						new int[] {
+//							//Horizontal coordinates
+//							rx - 1,                       //right leaf end
+//							rx - 1,                       //right leaf corner
+//							c                             //center
+//						},
+//						new int[] {
+//							//Vertical coordinates
+//							ry - pointerBaseOffset,       //right leaf end
+//							ty + 1,                       //right leaf corner
+//							ty + 1                        //center
+//						},
+//						3);
+//				}
 			}
 		}
 	}

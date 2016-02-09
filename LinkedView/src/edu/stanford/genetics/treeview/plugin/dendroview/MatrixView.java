@@ -126,8 +126,8 @@ public abstract class MatrixView extends ModelViewProduced {
 		ymap.notifyObservers();
 	}
 
-	/* TODO: This needs to take a start end end index for each dimension fining
-	 * the export region */
+	/* TODO: This needs to take a start end end index for each dimension
+	 * defining the export region */
 	public void exportPixels(Graphics g) {
 		if (drawer != null) {
 			/* Set new offscreenPixels (pixel colors) */
@@ -135,9 +135,20 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 	}
 
+	/* TODO: This needs to take a start end end index for each dimension
+	 * defining the export region */
+	public void exportPixels(Graphics g,int xIndent,int yIndent,int size) {
+		if (drawer != null) {
+
+			/* Set new offscreenPixels (pixel colors) */
+			drawer.paint(g,xmap.getTotalTileNum(),ymap.getTotalTileNum(),
+				xIndent,yIndent,size);
+		}
+	}
+
 	@Override
 	protected void updatePixels() {
-		
+
 		/* TODO remove rectangle dependency of drawer. not needed. */
 		final Rectangle destRect = new Rectangle(0, 0,
 				xmap.getUsedPixels(), ymap.getUsedPixels());

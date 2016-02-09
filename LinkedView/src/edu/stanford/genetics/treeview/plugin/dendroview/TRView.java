@@ -453,6 +453,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		}
 	}
 
+	public void exportTree(final Graphics g,final int xIndent,final int yIndent,final int size) {
+		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,xIndent,yIndent,size);//-1,treeSelection,hoveredNode);//instead of -1...: 
+	}
+
 	/* Abstract methods */
 	protected abstract int  getSecondaryPaneSize(final Dimension dims);
 	protected abstract int  getPrimaryPaneSize(final Dimension dims);

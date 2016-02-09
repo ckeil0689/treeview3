@@ -1,9 +1,6 @@
 package Controllers;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.KeyboardFocusManager;
 //import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -14,25 +11,23 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -72,11 +67,9 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
 
-import java.awt.event.MouseListener;
-
+import java.awt.image.BufferedImage;
 //Testing PDF export options with freehep
 import java.awt.Dimension;
-import java.io.File;
 import java.util.Properties;
 
 import org.freehep.graphics2d.VectorGraphics;
@@ -84,23 +77,6 @@ import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.freehep.graphicsio.svg.SVGGraphics2D;
 
-
-
-
-
-
-
-import com.itextpdf.awt.PdfGraphics2D;
-//Testing PDF export options with itextpdf
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfTemplate;
-import com.itextpdf.text.pdf.PdfWriter;
 
 
 /* 
@@ -676,48 +652,43 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				//The following uses the forked freehep 2.4 project, compiled by
 				//maven 2, along with 2 jar files from the original freehep
 				//2.1.1 project
-				try {
-//					/* Based on: http://developers.itextpdf.com/examples/graphics/graphics2d-examples
-//					 * It did not work. For some reason, the output pdf was always blank... */
-//					Document document = new Document(new Rectangle(14000,14000));
-//					PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream("Output.pdf"));
-//					document.open();
-//					PdfContentByte canvas = writer.getDirectContent();
-//					PdfTemplate template = canvas.createTemplate(14000,14000);
-//					Graphics2D g2d = new PdfGraphics2D(template,14000,14000);
-//					//Graphics2D g2d = template.createGraphics(14000,14000);
-//					g2d.setColor(Color.black);
-//					//getInteractiveMatrixView().exportPixels(g2d);
-//					g2d.drawString(String.format("(%s,%s)",50,50),50,50);
-//			        for (int x = 10; x < 14000; x += 100) {
-//			            for (int y = 10; y < 14000; y += 100) {
-//			                g2d.drawString(String.format("(%s,%s)", x, y), x, y);
-//			            }
-//			        }
-//					g2d.dispose();
-//					canvas.addTemplate(template,0,14000);
-//					document.newPage();
-//					document.close();
-
-
-
-					Document document = new Document();
-					PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream("Output.pdf"));
-					document.open();
-					PdfPTable table = createTable();
-					table.setSpacingBefore(5);
-					table.setSpacingAfter(5);
-					document.add(table);
-					document.close();
-
-					
+				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
+					interactiveYmap);
+				eh.export("png","Output.png");
+//				try {
+//					int indent = 500; //This is the height for the trees on both axes
+//					int tileDim = 20;
+//					int gap     = (int) (0.005 *
+//						((interactiveXmap.getTotalTileNum() >
+//						interactiveYmap.getTotalTileNum() ?
+//							interactiveXmap.getTotalTileNum() :
+//								interactiveYmap.getTotalTileNum()) * tileDim +
+//								indent));
+//					if(gap == 0) {
+//						gap = 1;
+//					}
+//
+//					final BufferedImage im = new BufferedImage(
+//						interactiveXmap.getTotalTileNum() * tileDim + indent + gap,
+//						interactiveYmap.getTotalTileNum() * tileDim + indent + gap,
+//						BufferedImage.TYPE_INT_ARGB);
+//
+//					Graphics2D g2d = (Graphics2D) im.getGraphics();
+//					// panel.paint(im.getGraphics());
+//					getInteractiveMatrixView().exportPixels(g2d,indent + gap,indent + gap,tileDim);
+//					dendroView.getColumnTreeView().exportTree(g2d,indent + gap,indent,tileDim);
+//					dendroView.getRowTreeView().exportTree(g2d,indent,indent + gap,tileDim);
+//					File saveFile = new File("Output.png");
+//					ImageIO.write(im,"PNG",saveFile);
+//
+//
 //					Properties p = new Properties();
 //					p.setProperty("PageSize","A5");
 //					/* TODO: This needs to supply a size of an export region */
 //					VectorGraphics g =
 //						new PDFGraphics2D(new File("Output.pdf"),
-//							new Dimension(interactiveXmap.getMaxIndex() + 1,
-//								interactiveYmap.getMaxIndex() + 1));
+//							new Dimension(interactiveXmap.getTotalTileNum() * tileDim + indent + gap,
+//								interactiveYmap.getTotalTileNum() * tileDim + indent + gap));
 //					/* TODO: Create an interface that allows the user to select
 //					 * the export format among those provided here */
 //					//VectorGraphics g =
@@ -731,12 +702,14 @@ public class DendroController implements ConfigNodePersistent, Observer,
 //					g.startExport();
 //					/* TODO: This needs to supply a start end end index for each
 //					 * dimension fining the export region */
-//					getInteractiveMatrixView().exportPixels(g);
+//					dendroView.getInteractiveMatrixView().exportPixels(g,indent + gap,indent + gap,tileDim);
+//					dendroView.getColumnTreeView().exportTree(g,indent + gap,indent,tileDim);
+//					dendroView.getRowTreeView().exportTree(g,indent,indent + gap,tileDim);
 //					g.endExport();
-				}
-				catch(Exception exc) {
-					exc.printStackTrace();
-				}
+//				}
+//				catch(Exception exc) {
+//					exc.printStackTrace();
+//				}
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
 						+ "in DendroController ScaleListener.");
@@ -746,24 +719,24 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		}
 	}
 
-	public static PdfPTable createTable() throws DocumentException {
-		PdfPTable table = new PdfPTable(3);
-		table.setWidthPercentage(100);
-		table.setWidths(new int[]{1,3,7});
-		PdfPCell cell;
-		cell = new PdfPCell(new Phrase("Table 1"));
-		table.addCell(cell);
-		cell = new PdfPCell(new Phrase("Cell 2"));
-		table.addCell(cell);
-		table.addCell("cell 3");
-		table.addCell("cell 4");
-		table.addCell("cell 5");
-		table.addCell("cell 6");
-		table.addCell("cell 7");
-		table.addCell("cell 8");
-		table.addCell("cell 9");
-		return table;
-	}
+//	public static PdfPTable createTable() throws DocumentException {
+//		PdfPTable table = new PdfPTable(3);
+//		table.setWidthPercentage(100);
+//		table.setWidths(new int[]{1,3,7});
+//		PdfPCell cell;
+//		cell = new PdfPCell(new Phrase("Table 1"));
+//		table.addCell(cell);
+//		cell = new PdfPCell(new Phrase("Cell 2"));
+//		table.addCell(cell);
+//		table.addCell("cell 3");
+//		table.addCell("cell 4");
+//		table.addCell("cell 5");
+//		table.addCell("cell 6");
+//		table.addCell("cell 7");
+//		table.addCell("cell 8");
+//		table.addCell("cell 9");
+//		return table;
+//	}
 
 	/**
 	 * Defines what happens when component properties of the two JSplitPanes

@@ -185,7 +185,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 */
 	/* TODO: This needs to take a start end end index for each dimension fining
 	 * the export region */
-	public void paint(final Graphics g, final int width, final int height) {
+	public void paint(final Graphics g,final int width,final int height) {
 		for (int j = height - 1; j >= 0; j--) {
 			for (int i = width - 1; i >= 0; i--) {
 				//setPaintMode seems to help color overlapping (affecting the
@@ -198,6 +198,37 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				//still some color bleed for some reason at some zoom levels - I
 				//think that's due to the reader's poor rendering
 				g.drawRect(i,j,1,1);
+			}
+		}
+	}
+
+	/* TODO: This needs to take a start end end index for each dimension fining
+	 * the export region */
+	public void paint(final Graphics g,final int width,final int height,
+		final int xIndent,final int yIndent,final int size) {
+
+//		/* TODO: Remove this temporary code that is used only to ensure the tree
+//		 * is aligned in the correct region */
+//		//Temporary code to force the regions for the trees to be included
+//		g.setPaintMode();
+//		g.setColor(Color.GRAY);
+//		g.fillRect(0,yIndent,xIndent,height * size);
+//		g.setPaintMode();
+//		g.setColor(Color.GRAY);
+//		g.fillRect(xIndent,0,width * size,yIndent);
+		for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
+				//setPaintMode seems to help color overlapping (affecting the
+				//colors) a little, but doesn't fix it altogether. Probably
+				//useless. Note there appears to be an alpha channel in the
+				//output PDF.
+				g.setPaintMode();
+				g.setColor(getColor(i,j));
+				//drawRect is better than fillRect because there're no gaps, but
+				//still some color bleed for some reason at some zoom levels - I
+				//think that's due to the reader's poor rendering
+				g.drawRect(xIndent + i*size,yIndent + j*size,size,size);
+				g.fillRect(xIndent + i*size,yIndent + j*size,size,size);
 			}
 		}
 	}
