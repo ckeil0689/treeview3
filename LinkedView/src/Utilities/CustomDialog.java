@@ -16,7 +16,7 @@ import javax.swing.WindowConstants;
  * @author CKeil
  *
  */
-public class CustomDialog extends JDialog {
+public abstract class CustomDialog extends JDialog {
 
 	/**
 	 * Default serial version ID to keep Eclipse happy...
@@ -58,6 +58,11 @@ public class CustomDialog extends JDialog {
 			dispose();
 		}
 	}
+	
+	/**
+	 * Used to populate the mainPanel object with GUI components.
+	 */
+	protected abstract void setupLayout();
 
 	/**
 	 * Sets the visibility of exitFrame;

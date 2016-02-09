@@ -60,6 +60,7 @@ public class StringRes {
 	public static final String menu_SaveAs = "Save As...";
 	public static final String menu_Font = "Font...";
 	public static final String menu_URL = "URL...";
+	public static final String menu_Export = "Export...";
 	public static final String menu_Prefs = "Preferences";
 	public static final String menu_ResetPrefs = "Reset Preferences";
 	public static final String menu_RowAndCol = "Labels...";

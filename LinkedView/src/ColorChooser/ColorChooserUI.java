@@ -71,18 +71,14 @@ public class ColorChooserUI extends CustomDialog {
 				mean, median);
 		this.gradientPanel = colorPicker.getContainerPanel();
 
-		setLayout();
-
-		add(mainPanel);
-
-		pack();
-		setLocationRelativeTo(JFrame.getFrames()[0]);
+		setupLayout();
 	}
 
 	/**
 	 * Sets up the GUI layout of the ColorChooser object.
 	 */
-	private void setLayout() {
+	@Override
+	protected void setupLayout() {
 
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
 
@@ -129,6 +125,11 @@ public class ColorChooserUI extends CustomDialog {
 
 		mainPanel.add(applyBtn, "al right, pushx");
 		mainPanel.add(closeBtn, "al right, pushx");
+		
+		getContentPane().add(mainPanel);
+
+		pack();
+		setLocationRelativeTo(JFrame.getFrames()[0]);
 	}
 
 	/**

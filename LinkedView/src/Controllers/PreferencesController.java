@@ -334,7 +334,9 @@ public class PreferencesController {
 			// Refresh labels
 			preferences.synchronizeAnnotation();
 
-			preferences.setupLayout(StringRes.menu_RowAndCol);
+			// TODO uncommented due to another issue - refactoring will be done
+			// anyway and this isn't active atm
+//			preferences.setupLayout(StringRes.menu_RowAndCol);
 			addListeners();
 		}
 	}

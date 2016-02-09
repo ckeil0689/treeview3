@@ -36,6 +36,8 @@ public class PreferencesMenu extends CustomDialog implements
 	private static final long serialVersionUID = 1L;
 
 	private final TreeViewFrame tvFrame;
+	private final String menu;
+	
 	private HeaderInfo geneHI;
 	private HeaderInfo arrayHI;
 	private Preferences configNode;
@@ -51,13 +53,28 @@ public class PreferencesMenu extends CustomDialog implements
 	 *
 	 * @param tvFrame
 	 */
-	public PreferencesMenu(final TreeViewFrame tvFrame) {
+	public PreferencesMenu(final TreeViewFrame tvFrame, final String menu) {
+
+		this(tvFrame, menu, null, null);
+	}
+	
+	/**
+	 * Main constructor for Preferences Menu
+	 *
+	 * @param tvFrame
+	 */
+	public PreferencesMenu(final TreeViewFrame tvFrame, final String menu, 
+			final HeaderInfo geneHI, final HeaderInfo arrayHI) {
 
 		super(StringRes.dlg_prefs);
 		this.tvFrame = tvFrame;
+		this.geneHI = geneHI;
+		this.arrayHI = arrayHI;
+		
+		this.menu = menu;
 		this.dendroView = tvFrame.getDendroView();
-
-		getContentPane().add(mainPanel);
+		
+		setupLayout();
 	}
 
 	public void setHeaderInfo(final HeaderInfo geneHI, final HeaderInfo arrayHI) {
@@ -369,7 +386,8 @@ public class PreferencesMenu extends CustomDialog implements
 	 *
 	 * @param title
 	 */
-	public void setupLayout(final String menu) {
+	@Override
+	protected void setupLayout() {
 
 		mainPanel.removeAll();
 
@@ -401,9 +419,6 @@ public class PreferencesMenu extends CustomDialog implements
 
 		mainPanel.revalidate();
 		mainPanel.repaint();
-
-		// dialog.pack();
-		// dialog.setLocationRelativeTo(tvFrame.getAppFrame());
 	}
 
 	/**

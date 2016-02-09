@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import java.util.Observable;
 
 import javax.swing.JScrollBar;
@@ -22,13 +23,12 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import Utilities.GUIFactory;
-import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
+import net.miginfocom.swing.MigLayout;
 
 public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	MouseListener,MouseMotionListener,MouseWheelListener {
@@ -923,5 +923,15 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 */
 	public void unsetPrimaryHoverIndex() {
 		map.unsetHoverIndex();
+	}
+	
+	public BufferedImage getSnapshot(final int width, final int height) {
+		
+		BufferedImage img = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
+		
+		paint(img.getGraphics());
+		
+		return img;
 	}
 }

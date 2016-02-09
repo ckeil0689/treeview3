@@ -71,7 +71,8 @@ public class DataImportDialog extends CustomDialog {
 	/**
 	 * Sets up the GUI for the data import dialog.
 	 */
-	private void setupLayout() {
+	@Override
+	protected void setupLayout() {
 
 		JPanel delimPanel;
 		JPanel checkboxPanel;

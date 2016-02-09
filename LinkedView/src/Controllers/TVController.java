@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
@@ -32,6 +33,10 @@ import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
+import edu.stanford.genetics.treeview.ExportDialog;
+import edu.stanford.genetics.treeview.ExportDialogController;
+import edu.stanford.genetics.treeview.ExportPreviewMatrix;
+import edu.stanford.genetics.treeview.ExportPreviewTrees;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GeneListMaker;
 import edu.stanford.genetics.treeview.LoadException;
@@ -952,14 +957,15 @@ public class TVController implements Observer {
 	public void openPrefMenu(final String menu) {
 
 		// View
-		final PreferencesMenu preferences = new PreferencesMenu(tvFrame);
+		final PreferencesMenu preferences;
 
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
-			preferences.setHeaderInfo(model.getRowHeaderInfo(),
+			preferences = new PreferencesMenu(tvFrame, menu, 
+					model.getRowHeaderInfo(),
 					model.getColumnHeaderInfo());
+		} else {
+			preferences = new PreferencesMenu(tvFrame, menu);
 		}
-
-		preferences.setupLayout(menu);
 
 		preferences.setConfigNode(tvFrame.getConfigNode().node(
 				StringRes.pnode_Preferences));
@@ -968,6 +974,35 @@ public class TVController implements Observer {
 		new PreferencesController(tvFrame, model, preferences);
 
 		preferences.setVisible(true);
+	}
+	
+	/**
+	 * Opens the preferences menu and sets the displayed menu to the specified
+	 * option using a string as identification.
+	 *
+	 * @param menu
+	 */
+	public void openExportMenu() {
+
+		BufferedImage rowTrees = tvFrame.getDendroView()
+				.getRowTreeView().getSnapshot(ExportPreviewTrees.HEIGHT, 
+						ExportPreviewTrees.WIDTH);
+		BufferedImage colTrees = tvFrame.getDendroView()
+				.getColumnTreeView().getSnapshot(ExportPreviewTrees.WIDTH, 
+						ExportPreviewTrees.HEIGHT);
+		BufferedImage matrix = tvFrame.getDendroView()
+				.getInteractiveMatrixView().getVisibleImage();
+		
+		ExportPreviewMatrix expMatrix = new ExportPreviewMatrix(matrix);
+		ExportPreviewTrees expRowTrees = new ExportPreviewTrees(rowTrees, true);
+		ExportPreviewTrees expColTrees = new ExportPreviewTrees(colTrees, false);
+		
+		ExportDialog exportDialog = new ExportDialog();
+		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
+		
+		new ExportDialogController(exportDialog, tvFrame.getDendroView());
+		
+		exportDialog.setVisible(true);
 	}
 
 	/*
