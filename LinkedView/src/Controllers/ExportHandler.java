@@ -133,14 +133,16 @@ public class ExportHandler {
 			File exportFile = new File(fileName);
 			if(format == "png") {
 				ImageIO.write(im,"png",exportFile);
-			}
-			else if(format == "jpg") {
+			} else if(format == "jpg") {
 				ImageIO.write(im,"jpg",exportFile);
-			}
-			else if(format == "ppm") { //ppm = bitmat
+			} else if(format == "ppm") { //ppm = bitmat
 				final OutputStream os = new BufferedOutputStream(
 					new FileOutputStream(exportFile));
 				PpmWriter.writePpm(im,os);
+			} else {
+				LogBuffer.println("Unrecognized export format: [" + format +
+					"].");
+				return;
 			}
 		}
 		catch(Exception exc) {

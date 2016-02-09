@@ -76,7 +76,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 		this.xmap = interactiveXmap;
 		this.ymap = interactiveYmap;
 
-		debug = 1;
+		debug = 0;
 		//1 = Debug the temporary band drawn for single-clicks
 	}
 	

@@ -283,7 +283,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 					/* Stop timer */
 					saveResizeTimer.stop();
 					saveResizeTimer = null;
-					LogBuffer.println("Saving window dimensions & position.");
+					//LogBuffer.println("Saving window dimensions & position.");
 
 					saveSettings();
 				}
