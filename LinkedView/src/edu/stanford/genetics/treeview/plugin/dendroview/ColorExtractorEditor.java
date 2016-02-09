@@ -8,8 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.LogBuffer;
-import utilities.GUIFactory;
 
 /**
  * This class allows editing of a color set...

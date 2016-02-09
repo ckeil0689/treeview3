@@ -35,10 +35,10 @@ import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.text.JTextComponent;
 
 import net.miginfocom.swing.MigLayout;
-import utilities.GUIFactory;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;

@@ -14,9 +14,9 @@ import java.util.prefs.Preferences;
 
 import javax.swing.ToolTipManager;
 
-import controllers.TVController;
+import Controllers.TVController;
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.model.TVModel;
-import utilities.StringRes;
 
 /**
  * This class defines the treeview application. In practice, it holds the common

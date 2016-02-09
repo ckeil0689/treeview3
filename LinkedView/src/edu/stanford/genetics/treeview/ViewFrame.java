@@ -34,7 +34,7 @@ import javax.swing.Timer;
 //import javax.swing.WindowConstants;
 import javax.swing.WindowConstants;
 
-import cluster.ClusterFileFilter;
+import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
 
 /* BEGIN_HEADER                                                   TreeView 3

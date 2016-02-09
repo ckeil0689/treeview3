@@ -16,7 +16,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 
-import controllers.TVController;
+import Controllers.TVController;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;

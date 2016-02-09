@@ -10,9 +10,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import utilities.CustomDialog;
-import utilities.GUIFactory;
-import utilities.StringRes;
+import Utilities.CustomDialog;
+import Utilities.GUIFactory;
+import Utilities.StringRes;
 
 /**
  * A class that generates a JDialog to display some small amounts of

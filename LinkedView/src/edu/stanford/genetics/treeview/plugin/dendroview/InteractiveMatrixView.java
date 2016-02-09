@@ -20,9 +20,9 @@ import java.util.Observable;
 
 import javax.swing.JScrollBar;
 
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
-import utilities.GUIFactory;
 
 /**
  * TODO completely remove dependencies on MapContainer + Selections. This is

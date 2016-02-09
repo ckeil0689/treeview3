@@ -1,4 +1,4 @@
-package cluster;
+package Cluster;
 
 import static org.junit.Assert.fail;
 

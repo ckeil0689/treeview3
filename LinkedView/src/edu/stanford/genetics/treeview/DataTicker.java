@@ -15,8 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
-import utilities.GUIFactory;
 
 public class DataTicker {
 

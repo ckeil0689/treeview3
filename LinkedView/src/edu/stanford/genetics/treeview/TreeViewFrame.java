@@ -33,6 +33,10 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
+import Utilities.GUIFactory;
+import Utilities.StringRes;
+import Views.LoadErrorView;
+import Views.WelcomeView;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
@@ -40,10 +44,6 @@ import edu.stanford.genetics.treeview.core.LogSettingsPanel;
 //import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
-import utilities.GUIFactory;
-import utilities.StringRes;
-import views.LoadErrorView;
-import views.WelcomeView;
 
 /**
  * This class is the main window of TreeView 3. It holds all views to be

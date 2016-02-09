@@ -22,8 +22,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
-import utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.ModelViewBuffered;

@@ -22,7 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import utilities.GUIFactory;
+import Utilities.GUIFactory;
 
 /**
  * This class displays editable Url settings.

@@ -14,7 +14,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.MemoryImageSource;
 
-import utilities.GUIFactory;
+import Utilities.GUIFactory;
 
 /**
  * superclass, to hold info and code common to all model views

@@ -3,8 +3,8 @@ package edu.stanford.genetics.treeview;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import utilities.CustomDialog;
-import utilities.GUIFactory;
+import Utilities.CustomDialog;
+import Utilities.GUIFactory;
 
 public class HintDialog extends CustomDialog {
 

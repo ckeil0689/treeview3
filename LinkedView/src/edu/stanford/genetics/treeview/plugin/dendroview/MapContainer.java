@@ -16,10 +16,10 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
-import utilities.Helper;
 
 /**
  * MapContainers tell the views which pixel offset to draw each array or gene

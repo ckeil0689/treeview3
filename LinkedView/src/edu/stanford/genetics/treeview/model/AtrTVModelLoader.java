@@ -8,7 +8,7 @@
 
 package edu.stanford.genetics.treeview.model;
 
-import controllers.TVController;
+import Controllers.TVController;
 
 /**
  * @author avsegal

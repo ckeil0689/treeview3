@@ -13,9 +13,9 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import ColorChooser.ColorChooserController;
+import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
-import utilities.GUIFactory;
-import colorChooser.ColorChooserController;
 import edu.stanford.genetics.treeview.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;

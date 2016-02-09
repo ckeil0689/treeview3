@@ -12,13 +12,13 @@ import java.util.Hashtable;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.FileSetListener;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
-import utilities.Helper;
 
 public class TVModel extends Observable implements DataModel {
 

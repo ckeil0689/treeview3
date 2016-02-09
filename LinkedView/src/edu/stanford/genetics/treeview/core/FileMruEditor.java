@@ -27,9 +27,9 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.FileSet;
-import utilities.GUIFactory;
 
 /**
  * This class allows you to edit the file mru, and also get some info about them

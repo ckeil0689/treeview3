@@ -10,13 +10,13 @@ import java.util.prefs.Preferences;
 
 import javax.swing.SwingWorker;
 
-import controllers.TVController;
+import Controllers.TVController;
+import Utilities.Helper;
+import Views.WelcomeView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
-import utilities.Helper;
-import views.WelcomeView;
 
 /**
  * The class responsible for loading data into the TVModel.
