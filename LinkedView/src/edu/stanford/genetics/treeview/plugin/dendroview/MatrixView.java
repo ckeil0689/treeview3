@@ -135,14 +135,76 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 	}
 
-	/* TODO: This needs to take a start end end index for each dimension
-	 * defining the export region */
-	public void exportPixels(Graphics g,int xIndent,int yIndent,int size) {
-		if (drawer != null) {
+	/**
+	 * Export all data to a file
+	 * @author rleach
+	 * @param g - Graphics object
+	 * @param xIndent - The number of points to indent the image on the x axis
+	 * @param yIndent - The number of points to indent the image on the y axis
+	 * @param size - The number of points in each dimension of a square tile
+	 */
+	public void export(final Graphics g,final int xIndent,final int yIndent,
+		final int tileXsize,final int tileYsize,final String region) {
 
-			/* Set new offscreenPixels (pixel colors) */
+		if(region == "all") {
+			exportAll(g,xIndent,yIndent,tileXsize,tileYsize);
+		} else if(region == "visible") {
+			exportVisible(g,xIndent,yIndent,tileXsize,tileYsize);
+		} else if(region == "selection") {
+			exportSelection(g,xIndent,yIndent,tileXsize,tileYsize);
+		} else {
+			LogBuffer.println("ERROR: Invalid export region: [" + region +
+				"].");
+		}
+	}
+
+	public void exportAll(final Graphics g,final int xIndent,final int yIndent,
+		final int tileXsize,final int tileYsize) {
+
+		if(drawer != null) {
 			drawer.paint(g,xmap.getTotalTileNum(),ymap.getTotalTileNum(),
-				xIndent,yIndent,size);
+				xIndent,yIndent,tileXsize,tileYsize);
+		}
+	}
+
+	/**
+	 * Export the currently visible data to a file
+	 * @author rleach
+	 * @param g - Graphics object
+	 * @param xIndent - The number of points to indent the image on the x axis
+	 * @param yIndent - The number of points to indent the image on the y axis
+	 * @param size - The number of points in each dimension of a square tile
+	 */
+	public void exportVisible(final Graphics g,final int xIndent,
+		final int yIndent,final int tileXsize,final int tileYsize) {
+
+		if(drawer != null) {
+			drawer.paint(g,xmap.getLastVisible(),ymap.getLastVisible(),
+				xIndent,yIndent,tileXsize,tileYsize,xmap.getFirstVisible(),
+				ymap.getFirstVisible());
+		}
+	}
+
+	/**
+	 * Export the currently selected (and intervening) data to a file
+	 * @author rleach
+	 * @param g - Graphics object
+	 * @param xIndent - The number of points to indent the image on the x axis
+	 * @param yIndent - The number of points to indent the image on the y axis
+	 * @param size - The number of points in each dimension of a square tile
+	 */
+	public void exportSelection(final Graphics g,final int xIndent,
+		final int yIndent,final int tileXsize,final int tileYsize) {
+
+		if(drawer != null) {
+			if(colSelection != null && colSelection.getNSelectedIndexes() > 0) {
+				drawer.paint(g,
+					colSelection.getMaxIndex(),rowSelection.getMaxIndex(),
+					xIndent,yIndent,tileXsize,tileYsize,
+					colSelection.getMinIndex(),rowSelection.getMinIndex());
+			} else {
+				LogBuffer.println("ERROR: No selection exists.");
+			}
 		}
 	}
 

@@ -26,6 +26,7 @@ import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -453,8 +454,41 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		}
 	}
 
-	public void exportTree(final Graphics g,final int xIndent,final int yIndent,final int size) {
-		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,xIndent,yIndent,size);//-1,treeSelection,hoveredNode);//instead of -1...: 
+	public void export(final Graphics g,final int xIndent,final int yIndent,
+		final int size,final String region) {
+
+		if(region == "all") {
+			exportAll(g,xIndent,yIndent,size);
+		} else if(region == "visible") {
+			exportVisible(g,xIndent,yIndent,size);
+		} else if(region == "selection") {
+			exportSelection(g,xIndent,yIndent,size);
+		} else {
+			LogBuffer.println("ERROR: Invalid export region: [" + region +
+				"].");
+		}
+	}
+
+	public void exportAll(final Graphics g,final int xIndent,final int yIndent,
+		final int size) {
+	
+		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,
+			xIndent,yIndent,size,0,map.getMaxIndex());
+	}
+
+	public void exportVisible(final Graphics g,final int xIndent,
+		final int yIndent,final int size) {
+	
+		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,
+			xIndent,yIndent,size,map.getFirstVisible(),map.getLastVisible());
+	}
+
+	public void exportSelection(final Graphics g,final int xIndent,
+		final int yIndent,final int size) {
+	
+		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,
+			xIndent,yIndent,size,treeSelection.getMinIndex(),
+			treeSelection.getMaxIndex());
 	}
 
 	/* Abstract methods */
@@ -927,5 +961,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 */
 	public void unsetPrimaryHoverIndex() {
 		map.unsetHoverIndex();
+	}
+
+	public boolean TreeExists() {
+		return(treePainter != null && treePainter.getRootNode() != null);
 	}
 }

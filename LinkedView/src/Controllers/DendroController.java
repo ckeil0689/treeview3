@@ -653,8 +653,10 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				//maven 2, along with 2 jar files from the original freehep
 				//2.1.1 project
 				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
-					interactiveYmap);
-				eh.export("png","Output.png");
+					interactiveYmap,colSelection,rowSelection);
+//				eh.setTreeRatio(0.8);
+				eh.setTileAspectRatioToScreen("visible");
+				eh.export("png","Output.png","selection");
 //				try {
 //					int indent = 500; //This is the height for the trees on both axes
 //					int tileDim = 20;

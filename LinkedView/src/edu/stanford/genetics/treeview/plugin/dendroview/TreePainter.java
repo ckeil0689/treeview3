@@ -65,7 +65,8 @@ public class TreePainter extends TreeDrawer {
 		final LinearTransformation xScaleEq,
 		final LinearTransformation yScaleEq,final Rectangle dest,
 		final boolean isLeft,final TreeSelectionI treeSelection,
-		final int xIndent,final int yIndent,final int size) {
+		final int xIndent,final int yIndent,final int size,
+		final int startIndex,final int endIndex) {
 	
 		if ((getRootNode() == null) || (getRootNode().isLeaf())) {
 			LogBuffer.println("Root node is null or leaf in paint() "
@@ -75,7 +76,8 @@ public class TreePainter extends TreeDrawer {
 			// recursively drawtree...
 			final NodeDrawer nd =
 				new NodeDrawer(graphics,xScaleEq,yScaleEq,dest,null);
-			nd.draw(getRootNode(),treeSelection,xIndent,yIndent,size);
+			nd.draw(getRootNode(),treeSelection,xIndent,yIndent,size,
+				startIndex,endIndex);
 		}
 	}
 
@@ -195,10 +197,11 @@ public class TreePainter extends TreeDrawer {
 
 		public void draw(final TreeDrawerNode node,
 			final TreeSelectionI treeSelection,final int xIndent,
-			final int yIndent,final int size) {
+			final int yIndent,final int size,final int startIndex,
+			final int endIndex) {
 
 			exportDFS(node,-1,false,treeSelection,xIndent,yIndent,size,
-				node.getMinCorr(),node.getMaxCorr());
+				node.getMinCorr(),node.getMaxCorr(),startIndex,endIndex);
 		}
 
 		/**
@@ -327,7 +330,8 @@ public class TreePainter extends TreeDrawer {
 			final int hoverIndex,boolean isNodeHovered,
 			final TreeSelectionI treeSelection,
 			final int xIndent,final int yIndent,final int size,
-			final double minCorr,final double maxCorr) {
+			final double minCorr,final double maxCorr,final int startIndex,
+			final int endIndex) {
 	
 			Stack<TreeDrawerNode> returnStack = new Stack<TreeDrawerNode>();
 	
@@ -359,7 +363,7 @@ public class TreePainter extends TreeDrawer {
 			if(!node.getLeft().isLeaf()) {
 				leftDotNodeStack = exportDFS(node.getLeft(),hoverIndex,
 					isNodeHovered,treeSelection,xIndent,yIndent,size,minCorr,
-					maxCorr);
+					maxCorr,startIndex,endIndex);
 			}
 //			//We do not recurse down to the leaves, so add them to the stack
 //			//here
@@ -373,7 +377,7 @@ public class TreePainter extends TreeDrawer {
 			if(!node.getRight().isLeaf()) {
 				rightDotNodeStack = exportDFS(node.getRight(),hoverIndex,
 					isNodeHovered,treeSelection,xIndent,yIndent,size,minCorr,
-					maxCorr);
+					maxCorr,startIndex,endIndex);
 			}
 //			//We do not recurse down to the leaves, so add them to the stack
 //			//here
@@ -409,7 +413,7 @@ public class TreePainter extends TreeDrawer {
 	
 			// finally draw
 			exportSingle(node,hoverIndex,isNodeHovered,thisNodeIsSelected,
-				xIndent,yIndent,size,minCorr,maxCorr);
+				xIndent,yIndent,size,minCorr,maxCorr,startIndex,endIndex);
 	
 			return(returnStack);
 		}
@@ -536,7 +540,8 @@ public class TreePainter extends TreeDrawer {
 		private void exportSingle(final TreeDrawerNode node,
 			final int hoverIndex,final boolean isNodeHovered,
 			final boolean isSelected,final int xIndent,final int yIndent,
-			final int size,final double minCorr,final double maxCorr) {
+			final int size,final double minCorr,final double maxCorr,
+			final int startIndex,final int endIndex) {
 	
 			if (xT == null) {
 				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
@@ -558,7 +563,7 @@ public class TreePainter extends TreeDrawer {
 			}
 	
 			exportLeftBranch(node,hoverIndex,isNodeHovered,isSelected,xIndent,
-				yIndent,size,minCorr,maxCorr);
+				yIndent,size,minCorr,maxCorr,startIndex,endIndex);
 	
 			if(isNodeHovered) {
 				graphics.setColor(Color.red);
@@ -567,7 +572,7 @@ public class TreePainter extends TreeDrawer {
 			}
 	
 			exportRightBranch(node,hoverIndex,isNodeHovered,isSelected,xIndent,
-				yIndent,size,minCorr,maxCorr);
+				yIndent,size,minCorr,maxCorr,startIndex,endIndex);
 		}
 
 		/**
@@ -743,7 +748,8 @@ public class TreePainter extends TreeDrawer {
 		public void exportLeftBranch(final TreeDrawerNode node,
 			final int hoverIndex,final boolean isHovered,
 			final boolean isSelected,final int xIndent,final int yIndent,
-			final int size,final double minCorr,final double maxCorr) {
+			final int size,final double minCorr,final double maxCorr,
+			final int startIndex,final int endIndex) {
 	
 			final TreeDrawerNode left = node.getLeft();
 //			final boolean hovered = (node.getLeft().getIndex() == hoverIndex);
@@ -769,15 +775,44 @@ public class TreePainter extends TreeDrawer {
 			int c = 0;
 	
 //			int pointerBaseOffset = (left.isLeaf() ? 2 : 1);
-	
+			int minCoord = 0;
+			int maxCoord = 0;
+			boolean shoulderOnly = false;
+
 			// GTRView
 			if (isLeft) {
 				lx = (int) Math.round((left.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
 				tx = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
 
-				ly = yIndent + (int) Math.round(left.getIndex() * size + (size / 2));
-				c = yIndent + (int) Math.round(node.getIndex() * size + (size / 2));
+				ly = yIndent + (int) Math.round(left.getIndex() * size + (size / 2)) - startIndex * size;
+				c = yIndent + (int) Math.round(node.getIndex() * size + (size / 2)) - startIndex * size;
 	
+				//These values define the "horizontal" drawing area
+				minCoord = yIndent;// + startIndex * size;
+				maxCoord = yIndent + endIndex * size - startIndex * size + size;
+
+				//This conditional adjusts coordinates to not overrun the min/
+				//max boundaries and either sets a boolean that prevents
+				//"vertical" lines which are completely outside the drawing area
+				//from drawing or returns if both lines to be drawn are outside
+				//the drawing area
+				if((ly < minCoord && c < minCoord) ||
+					(ly > maxCoord && c > maxCoord)) {
+					return;
+				} else if(ly >= minCoord && c >= minCoord &&
+					ly <= maxCoord && c <= maxCoord) {
+					//Do nothing
+				} else if(ly < minCoord && c > maxCoord) {
+					shoulderOnly = true;
+					c = maxCoord;
+					ly = minCoord;
+				} else if(ly < minCoord) {
+					shoulderOnly = true;
+					ly = minCoord;
+				} else if(c > maxCoord) {
+					c = maxCoord;
+				}
+
 //				if(Math.abs(lx - tx) < 3) {
 //					pointerBaseOffset = 0;
 //				}
@@ -786,10 +821,35 @@ public class TreePainter extends TreeDrawer {
 				ly = (int) Math.round((left.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
 				ty = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
 	
-				lx = xIndent + (int) Math.round(left.getIndex() * size + (size / 2));
-				c = xIndent + (int) Math.round(node.getIndex() * size + (size / 2));
-				// int tx = (int) xT.transform(node.getIndex() + .5);
+				lx = xIndent + (int) Math.round(left.getIndex() * size + (size / 2)) - startIndex * size;
+				c = xIndent + (int) Math.round(node.getIndex() * size + (size / 2)) - startIndex * size;
 	
+				//These values define the "horizontal" drawing area
+				minCoord = xIndent;// + startIndex * size;
+				maxCoord = xIndent + endIndex * size - startIndex * size + size;
+
+				//This conditional adjusts coordinates to not overrun the min/
+				//max boundaries and either sets a boolean that prevents
+				//"vertical" lines which are completely outside the drawing area
+				//from drawing or returns if both lines to be drawn are outside
+				//the drawing area
+				if((lx < minCoord && c < minCoord) ||
+					(lx > maxCoord && c > maxCoord)) {
+					return;
+				} else if(lx >= minCoord && c >= minCoord &&
+					lx <= maxCoord && c <= maxCoord) {
+					//Do nothing
+				} else if(lx < minCoord && c > maxCoord) {
+					shoulderOnly = true;
+					c = maxCoord;
+					lx = minCoord;
+				} else if(lx < minCoord) {
+					shoulderOnly = true;
+					lx = minCoord;
+				} else if(c > maxCoord) {
+					c = maxCoord;
+				}
+
 //				if(Math.abs(ly - ty) < 3) {
 //					pointerBaseOffset = 0;
 //				}
@@ -818,8 +878,10 @@ public class TreePainter extends TreeDrawer {
 				//separate lines (while less attractively drawn) is more
 				//reliable
 				graphics.drawLine(tx,c,tx,ly);
-				graphics.drawLine(tx,ly,lx,ly);
-	
+				if(!shoulderOnly) {
+					graphics.drawLine(tx,ly,lx,ly);
+				}
+
 //				//Draw an outline around the line to either bold a hovered
 //				//branch or highlight a selected branch
 //				if(hovered || isSelected) {
@@ -875,8 +937,10 @@ public class TreePainter extends TreeDrawer {
 				//separate lines (while less attractively drawn) is more
 				//reliable
 				graphics.drawLine(c,ty,lx,ty);
-				graphics.drawLine(lx,ty,lx,ly);
-	
+				if(!shoulderOnly) {
+					graphics.drawLine(lx,ty,lx,ly);
+				}
+
 //				//Draw an outline around the line to either bold a hovered
 //				//branch or highlight a selected branch
 //				if(hovered || isSelected) {
@@ -1088,7 +1152,8 @@ public class TreePainter extends TreeDrawer {
 		public void exportRightBranch(final TreeDrawerNode node,
 			final int hoverIndex,final boolean isHovered,
 			final boolean isSelected,final int xIndent,final int yIndent,
-			final int size,final double minCorr,final double maxCorr) {
+			final int size,final double minCorr,final double maxCorr,
+			final int startIndex,final int endIndex) {
 
 			final TreeDrawerNode right = node.getRight();
 //			final boolean hovered = (node.getRight().getIndex() == hoverIndex);
@@ -1114,14 +1179,43 @@ public class TreePainter extends TreeDrawer {
 			int c = 0;
 
 //			int pointerBaseOffset = (right.isLeaf() ? 2 : 0);
+			int minCoord = 0;
+			int maxCoord = 0;
+			boolean shoulderOnly = false;
 
 			// GTRView
 			if (isLeft) {
 				rx = (int) Math.round((right.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
 				tx = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
 
-				ry = yIndent + (int) Math.round(right.getIndex() * size + (size / 2));
-				c = yIndent + (int) Math.round(node.getIndex() * size + (size / 2));
+				ry = yIndent + (int) Math.round(right.getIndex() * size + (size / 2)) - startIndex * size;
+				c = yIndent + (int) Math.round(node.getIndex() * size + (size / 2)) - startIndex * size;
+
+				//These values define the "horizontal" drawing area
+				minCoord = yIndent;// + startIndex * size;
+				maxCoord = yIndent + endIndex * size - startIndex * size + size;
+
+				//This conditional adjusts coordinates to not overrun the min/
+				//max boundaries and either sets a boolean that prevents
+				//"vertical" lines which are completely outside the drawing area
+				//from drawing or returns if both lines to be drawn are outside
+				//the drawing area
+				if((ry < minCoord && c < minCoord) ||
+					(ry > maxCoord && c > maxCoord)) {
+					return;
+				} else if(ry >= minCoord && c >= minCoord &&
+					ry <= maxCoord && c <= maxCoord) {
+					//Do nothing
+				} else if(ry > maxCoord && c < minCoord) {
+					shoulderOnly = true;
+					c = minCoord;
+					ry = maxCoord;
+				} else if(c < minCoord) {
+					c = minCoord;
+				} else if(ry > maxCoord) {
+					shoulderOnly = true;
+					ry = maxCoord;
+				}
 
 //				if(Math.abs(rx - tx) < 3) {
 //					pointerBaseOffset = 0;
@@ -1133,9 +1227,34 @@ public class TreePainter extends TreeDrawer {
 				ry = (int) Math.round((right.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
 				ty = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
 
-				rx = xIndent + (int) Math.round(right.getIndex() * size + (size / 2));
-				c = xIndent + (int) Math.round(node.getIndex() * size + (size / 2));
-				// int tx = (int) xT.transform(node.getIndex() + .5);
+				rx = xIndent + (int) Math.round(right.getIndex() * size + (size / 2)) - startIndex * size;
+				c = xIndent + (int) Math.round(node.getIndex() * size + (size / 2)) - startIndex * size;
+
+				//These values define the "horizontal" drawing area
+				minCoord = xIndent;// + startIndex * size;
+				maxCoord = xIndent + endIndex * size - startIndex * size + size;
+
+				//This conditional adjusts coordinates to not overrun the min/
+				//max boundaries and either sets a boolean that prevents
+				//"vertical" lines which are completely outside the drawing area
+				//from drawing or returns if both lines to be drawn are outside
+				//the drawing area
+				if((rx < minCoord && c < minCoord) ||
+					(rx > maxCoord && c > maxCoord)) {
+					return;
+				} else if(rx >= minCoord && c >= minCoord &&
+					rx <= maxCoord && c <= maxCoord) {
+					//Do nothing
+				} else if(rx > maxCoord && c < minCoord) {
+					shoulderOnly = true;
+					c = minCoord;
+					rx = maxCoord;
+				} else if(c < minCoord) {
+					c = minCoord;
+				} else if(rx > maxCoord) {
+					shoulderOnly = true;
+					rx = maxCoord;
+				}
 
 //				if(Math.abs(ry - ty) < 3) {
 //					pointerBaseOffset = 0;
@@ -1164,7 +1283,9 @@ public class TreePainter extends TreeDrawer {
 				//above sometimes and skips the center point, so drawing two-
 				//separate lines (while less attractively drawn) is more
 				//reliable
-				graphics.drawLine(rx,ry,tx,ry);
+				if(!shoulderOnly) {
+					graphics.drawLine(rx,ry,tx,ry);
+				}
 				graphics.drawLine(tx,ry,tx,c);
 
 //				//If this is the hovered leaf, make it bold
@@ -1220,7 +1341,9 @@ public class TreePainter extends TreeDrawer {
 				//above sometimes and skips the center point, so drawing two-
 				//separate lines (while less attractively drawn) is more
 				//reliable
-				graphics.drawLine(rx,ry,rx,ty);
+				if(!shoulderOnly) {
+					graphics.drawLine(rx,ry,rx,ty);
+				}
 				graphics.drawLine(rx,ty,c,ty);
 
 //				//If this is the hovered leaf, make it bold

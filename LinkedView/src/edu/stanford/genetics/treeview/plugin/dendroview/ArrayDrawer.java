@@ -202,22 +202,41 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 		}
 	}
 
-	/* TODO: This needs to take a start end end index for each dimension fining
-	 * the export region */
+	/**
+	 * A wrapper for exporting the entire matrix.
+	 * @author rleach
+	 * @param g - A graphics2D-compatible object
+	 * @param width - The number of columns of data
+	 * @param height - The number of rows of data
+	 * @param xIndent - The x start position of the image
+	 * @param yIndent - The y start position of the image
+	 * @param size - The number of "pixels" high/wide each tile is to be drawn
+	 */
 	public void paint(final Graphics g,final int width,final int height,
-		final int xIndent,final int yIndent,final int size) {
+		final int xIndent,final int yIndent,final int tileXsize,
+		final int tileYsize) {
 
-//		/* TODO: Remove this temporary code that is used only to ensure the tree
-//		 * is aligned in the correct region */
-//		//Temporary code to force the regions for the trees to be included
-//		g.setPaintMode();
-//		g.setColor(Color.GRAY);
-//		g.fillRect(0,yIndent,xIndent,height * size);
-//		g.setPaintMode();
-//		g.setColor(Color.GRAY);
-//		g.fillRect(xIndent,0,width * size,yIndent);
-		for (int j = 0; j < height; j++) {
-			for (int i = 0; i < width; i++) {
+		paint(g,width - 1,height - 1,xIndent,yIndent,tileXsize,tileYsize,0,0);
+	}
+
+	/**
+	 * A method to export a portion of the matrix
+	 * @author rleach
+	 * @param g - A graphics2D-compatible object
+	 * @param xend - The index of the last column of data to be included
+	 * @param yend - The index of the last row of data to be included
+	 * @param xIndent - The x start position of the image
+	 * @param yIndent - The y start position of the image
+	 * @param size - The number of "pixels" high/wide each tile is to be drawn
+	 * @param xstart - The index of the first column of data to be included
+	 * @param ystart - The index of the first row of data to be included
+	 */
+	public void paint(final Graphics g,final int xend,final int yend,
+		final int xIndent,final int yIndent,final int tileXsize,
+		final int tileYsize,final int xstart,final int ystart) {
+	
+		for (int j = ystart; j <= yend; j++) {
+			for (int i = xstart; i <= xend; i++) {
 				//setPaintMode seems to help color overlapping (affecting the
 				//colors) a little, but doesn't fix it altogether. Probably
 				//useless. Note there appears to be an alpha channel in the
@@ -227,8 +246,10 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				//drawRect is better than fillRect because there're no gaps, but
 				//still some color bleed for some reason at some zoom levels - I
 				//think that's due to the reader's poor rendering
-				g.drawRect(xIndent + i*size,yIndent + j*size,size,size);
-				g.fillRect(xIndent + i*size,yIndent + j*size,size,size);
+				g.drawRect(xIndent + (i - xstart) * tileXsize,
+					yIndent + (j - ystart) * tileYsize,tileXsize,tileYsize);
+				g.fillRect(xIndent + (i - xstart) * tileXsize,
+					yIndent + (j - ystart) * tileYsize,tileXsize,tileYsize);
 			}
 		}
 	}
