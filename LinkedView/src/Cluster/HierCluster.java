@@ -14,7 +14,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import Controllers.ClusterController;
+import Controllers.ClusterDialogController;
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -41,10 +41,9 @@ public class HierCluster {
 	private final int initial_matrix_size;
 	private int iterNum;
 
-	/* Half of the Distance Matrix (symmetry) */
+	/* Half of the complete distance matrix (symmetry!) */
 	private final DistanceMatrix distMatrix;
 
-	/* list to keep track of previously used minimum values from distMatrix */
 	private double min;
 	int min_row_index = 0;
 	int min_col_index = 0;
@@ -96,9 +95,9 @@ public class HierCluster {
 		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
-		this.axisPrefix = (axis == ClusterController.ROW) ? 
-						ClusterFileGenerator.ROW_AXIS_ID : 
-							ClusterFileGenerator.COL_AXIS_ID;
+		this.axisPrefix = (axis == ClusterDialogController.ROW) ? 
+						ClusterFileGenerator.ROW_AXIS_BASEID : 
+							ClusterFileGenerator.COL_AXIS_BASEID;
 
 		prepareCluster();
 	}
@@ -487,7 +486,8 @@ public class HierCluster {
 
 		String fileName = "reordered.txt";
 		File file = new File(fileName);
-		BufferedWriter bw;
+		BufferedWriter bw = null;
+		
 		try {
 			bw = new BufferedWriter((new OutputStreamWriter(
 					new FileOutputStream(file.getAbsoluteFile()), "UTF-8")));
@@ -497,16 +497,16 @@ public class HierCluster {
 				bw.write("\n");
 			}
 
-			bw.close();
-
-		} catch (UnsupportedEncodingException | FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			LogBuffer.logException(e);
-			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			LogBuffer.logException(e);
 			
+		} finally {
+			try {
+				bw.close();
+				
+			} catch (IOException e) {
+				LogBuffer.logException(e);
+			}
 		}
 	}
 
@@ -517,7 +517,7 @@ public class HierCluster {
 	 * problem with setting up the buffered writer since there wouldn't be a
 	 * filePath where the cluster data could be saved anyways.
 	 */
-	public void setupFileWriter(final int axis, String fileName) {
+	public void setupTreeFileWriter(final int axis, String fileName) {
 
 		this.treeWriter = new TreeFileWriter(axis, fileName, linkMethod);
 	}

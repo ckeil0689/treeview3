@@ -37,6 +37,7 @@ public class Linker {
 		if (linkMethod == SINGLE || linkMethod == COMPLETE) {
 			return singleCompleteLink(fusedClusters, currentClusters);
 		}
+		
 		return averageLink(fusedClusters, currentClusters);
 	}
 
@@ -64,13 +65,8 @@ public class Linker {
 			double distanceVal = 0;
 			int selectedRow = 0;
 
-			final int[] currentCluster = new int[currentClusters.get(i).size()];
-
-			/* Filling the array */
-			for (int z = 0; z < currentCluster.length; z++) {
-
-				currentCluster[z] = currentClusters.get(i).get(z);
-			}
+			final int[] currentCluster = 
+					Helper.intListToArray(currentClusters.get(i));
 
 			/*
 			 * Only calculate distance if the current cluster is not part of the
@@ -137,14 +133,11 @@ public class Linker {
 				/*
 				 * Single Link - Minimum distance between the new cluster and
 				 * the other clusters.
+				 * 
+				 * Complete Link - Maximum distance between the new cluster and
+				 * the other clusters.
 				 */
-				if (linkMethod == SINGLE) {
-					newRow[i] = min;
-				}
-				/* Complete Link - Maximum */
-				else {
-					newRow[i] = max;
-				}
+				newRow[i] = (linkMethod == SINGLE) ? min : max;
 			}
 			/* all elements in common */
 			else {

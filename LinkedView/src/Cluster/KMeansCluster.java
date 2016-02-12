@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import Controllers.ClusterController;
+import Controllers.ClusterDialogController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -68,7 +68,7 @@ public class KMeansCluster {
 	 */
 	public void setupFileWriter(final String fileName) {
 
-		final String fileEnd = (axis == ClusterController.ROW) ? "_K_G" + k
+		final String fileEnd = (axis == ClusterDialogController.ROW) ? "_K_G" + k
 				+ ".kgg" : "_K_A" + k + ".kag";
 
 		bufferedWriter = new ClusterFileWriter(fileName, fileEnd, -1);
@@ -139,7 +139,7 @@ public class KMeansCluster {
 		int addIndex = 0;
 
 		/* Setting up header line */
-		initial[addIndex] = (axis == ClusterController.ROW) ? "ORF" : "ARRAY";
+		initial[addIndex] = (axis == ClusterDialogController.ROW) ? "ORF" : "ARRAY";
 		addIndex++;
 
 		initial[addIndex] = "GROUP";
@@ -188,7 +188,7 @@ public class KMeansCluster {
 	 * @param matrix
 	 * @return Array of means/ centroids.
 	 */
-	private double[] generateCentroids(final DistanceMatrix matrix) {
+	private static double[] generateCentroids(final DistanceMatrix matrix) {
 
 		final double[] centroidList = new double[matrix.getSize()];
 
@@ -321,11 +321,11 @@ public class KMeansCluster {
 				distance = Math.abs(seed - mean);
 
 				if (distance < bestD) {
-
 					bestD = distance;
 					meanIndexes[addIndexInner] = j;
 					bestInd = j;
 					addIndexInner++;
+					
 				} else {
 					meanIndexes[addIndexInner] = bestInd;
 					addIndexInner++;
@@ -366,7 +366,7 @@ public class KMeansCluster {
 	 * @param kClusters
 	 * @return
 	 */
-	private double[][] indicesToMeans(final double[] centroidList,
+	private static double[][] indicesToMeans(final double[] centroidList,
 			final int[][] kClusters) {
 
 		final double[][] clusterMeans = new double[kClusters.length][];
@@ -378,7 +378,6 @@ public class KMeansCluster {
 
 			int addIndexInner = 0;
 			for (final int row : cluster) {
-
 				meanCluster[addIndexInner] = centroidList[row];
 				addIndexInner++;
 			}
@@ -408,7 +407,6 @@ public class KMeansCluster {
 			double sum = 0;
 			double newMean = 0;
 			for (final Double mean : group) {
-
 				sum += mean;
 			}
 
@@ -428,7 +426,7 @@ public class KMeansCluster {
 	 * @param kClusters
 	 * @return
 	 */
-	private String[][] indexToString(final int[][] kClusters,
+	private static String[][] indexToString(final int[][] kClusters,
 			final String[][] headerArray) {
 
 		final String[][] kClusters_string = new String[kClusters.length][];
@@ -441,7 +439,6 @@ public class KMeansCluster {
 
 			int addIndexInner = 0;
 			for (final int mean : cluster) {
-
 				geneNames[addIndexInner] = headerArray[mean][0]; // label;
 				addIndexInner++;
 			}
@@ -481,6 +478,7 @@ public class KMeansCluster {
 		for (final int ind : clusters) {
 
 			final double seedMean = elementMeanList[ind];
+			
 			seedMeans[addIndex] = seedMean;
 			addIndex++;
 		}
