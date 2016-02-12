@@ -15,6 +15,7 @@ import javax.swing.SwingWorker;
 
 import net.miginfocom.swing.MigLayout;
 import ColorChooser.ColorChooserController;
+import Controllers.Region;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -144,13 +145,13 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * @param size - The number of points in each dimension of a square tile
 	 */
 	public void export(final Graphics g,final int xIndent,final int yIndent,
-		final int tileXsize,final int tileYsize,final String region) {
+		final int tileXsize,final int tileYsize,final Region region) {
 
-		if(region == "all") {
+		if(region == Region.ALL) {
 			exportAll(g,xIndent,yIndent,tileXsize,tileYsize);
-		} else if(region == "visible") {
+		} else if(region == Region.VISIBLE) {
 			exportVisible(g,xIndent,yIndent,tileXsize,tileYsize);
-		} else if(region == "selection") {
+		} else if(region == Region.SELECTION) {
 			exportSelection(g,xIndent,yIndent,tileXsize,tileYsize);
 		} else {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +

@@ -655,8 +655,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
 					interactiveYmap,colSelection,rowSelection);
 //				eh.setTreeRatio(0.8);
-				eh.setTileAspectRatioToScreen("visible");
-				eh.export("png","Output.png","selection");
+				eh.setTileAspectRatioToScreen(Region.VISIBLE);
+				eh.export(Format.PNG,"Output.png",Region.SELECTION);
 //				try {
 //					int indent = 500; //This is the height for the trees on both axes
 //					int tileDim = 20;

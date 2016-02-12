@@ -26,8 +26,8 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
 /**
+ * This class provides export functionality of the matrix and trees to a file.
  * @author rleach
- *
  */
 public class ExportHandler {
 
@@ -36,17 +36,28 @@ public class ExportHandler {
 	protected MapContainer interactiveYmap = null;
 	protected TreeSelectionI colSelection = null;
 	protected TreeSelectionI rowSelection = null;
-	protected double treeMatrixGapRatio = 0.005;
-	protected int treeMatrixGapMin = 5;
-	protected int treeMatrixGapSize = 20;
-	protected String defPageSize = "A5";
-	protected double aspectRatio = 1.0;
-	protected int minTileDim = 11;
-	protected int minTreeHeight = 100;
-	protected int treesHeight = 100;
-	protected int tileHeight = 11;
-	protected int tileWidth = 11;
+
+	protected String defPageSize = "A5"; //See freehep manual for options
+
+	protected double aspectRatio = 1.0; //x / y
 	protected double treeRatio = 0.2; //fraction of the long content dimension
+	protected double treeMatrixGapRatio = 0.005; //Gap bet tree & matrix
+
+	/* Note: The height in "points" a tree is determines whether should provide
+	 * enough space to separate a node's shoulder line from its parent's and
+	 * childrens' shoulders.  Note, this package always outputs trees that are
+	 * the same "height" for both column and row trees. */
+	protected int minTreeHeight = 100; //Min number of "points" for tree height
+	protected int treesHeight = 100; //Number of "points" for a tree's height
+	
+	/* Note: The line width of the tree is 1, so the more points thicker the
+	 * tile is, the relatively more narrow the tree lines are */
+	protected int minTileDim = 11; //Min number of "points" for a tile's edge
+	protected int tileHeight = 11; //Number of "points" for a tile's height
+	protected int tileWidth  = 11; //Number of "points" for a tile's width
+
+	protected int treeMatrixGapMin = 5; //Min number of "points" bet tree/matrix
+	protected int treeMatrixGapSize = 20; //Number of "points" bet tree/matrix
 
 	public ExportHandler(final DendroView dendroView,
 		final MapContainer interactiveXmap,final MapContainer interactiveYmap,
@@ -71,7 +82,7 @@ public class ExportHandler {
 		this.defPageSize = dps;
 	}
 
-	public int getXDim(final String region) {
+	public int getXDim(final Region region) {
 		LogBuffer.println("getXDim calculation: getNumXExportIndexes(region) * tileWidth + (dendroView.getRowTreeView().TreeExists() ? treesHeight + treeMatrixGapSize : 0) -> " +
 			getNumXExportIndexes(region) + " * " + tileWidth + " + (" + dendroView.getRowTreeView().TreeExists() + " ? " + treesHeight + " + " + treeMatrixGapSize + " : 0)");
 		LogBuffer.println("Row trees " + (dendroView.getRowTreeView().TreeExists() ? "exist" : "") + ".  So XDim is [" + (getNumXExportIndexes(region) * tileWidth +
@@ -82,7 +93,7 @@ public class ExportHandler {
 				treeMatrixGapSize : 0));
 	}
 
-	public int getYDim(final String region) {
+	public int getYDim(final Region region) {
 		LogBuffer.println("Column trees " + (dendroView.getColumnTreeView().TreeExists() ? "exist" : "") + ".  So YDim is [" + (getNumYExportIndexes(region) * tileHeight +
 			(dendroView.getColumnTreeView().TreeExists() ? treesHeight +
 				treeMatrixGapSize : 0)) + "]");
@@ -91,12 +102,12 @@ public class ExportHandler {
 				treeMatrixGapSize : 0));
 	}
 
-	public int getNumXExportIndexes(final String region) {
-		if(region == "all") {
+	public int getNumXExportIndexes(final Region region) {
+		if(region == Region.ALL) {
 			return(interactiveXmap.getTotalTileNum());
-		} else if(region == "visible") {
+		} else if(region == Region.VISIBLE) {
 			return(interactiveXmap.getNumVisible());
-		} else if(region == "selection") {
+		} else if(region == Region.SELECTION) {
 			if(colSelection == null ||
 				colSelection.getNSelectedIndexes() == 0) {
 				LogBuffer.println("ERROR: Selection uninitialized or empty.");
@@ -109,12 +120,12 @@ public class ExportHandler {
 		}
 	}
 
-	public int getNumYExportIndexes(final String region) {
-		if(region == "all") {
+	public int getNumYExportIndexes(final Region region) {
+		if(region == Region.ALL) {
 			return(interactiveYmap.getTotalTileNum());
-		} else if(region == "visible") {
+		} else if(region == Region.VISIBLE) {
 			return(interactiveYmap.getNumVisible());
-		} else if(region == "selection") {
+		} else if(region == Region.SELECTION) {
 			if(rowSelection == null ||
 				rowSelection.getNSelectedIndexes() == 0) {
 				LogBuffer.println("ERROR: Selection uninitialized or empty.");
@@ -131,7 +142,7 @@ public class ExportHandler {
 		this.aspectRatio = aR;
 	}
 
-	public void setTileAspectRatioToScreen(final String region) {
+	public void setTileAspectRatioToScreen(final Region region) {
 		int screenWidth = dendroView.getInteractiveMatrixView().getWidth();
 		int screenHeight = dendroView.getInteractiveMatrixView().getHeight();
 		int numCols = getNumXExportIndexes(region);
@@ -174,7 +185,7 @@ public class ExportHandler {
 		this.treeMatrixGapRatio = treeMatrixGapRatio;
 	}
 
-	public void calculateDimensions(final String region) {
+	public void calculateDimensions(final Region region) {
 		//Calculates: treesHeight,treeMatrixGapSize,tileHeight, and tileWidth
 		//Using: treeMatrixGapRatio,aspectRatio,treeRatio
 		//And adjusting using: treeMatrixGapMin,minTileDim,minTreeHeight
@@ -233,7 +244,7 @@ public class ExportHandler {
 	 * @param region
 	 * @return int
 	 */
-	public int calculateMaxFinalImageDim(final String region) {
+	public int calculateMaxFinalImageDim(final Region region) {
 		int matrixWidth = getNumXExportIndexes(region) * tileWidth;
 		int matrixHeight = getNumYExportIndexes(region) * tileHeight;
 		int maxMatrixDim = (matrixWidth > matrixHeight ? matrixWidth : matrixHeight);
@@ -266,22 +277,22 @@ public class ExportHandler {
 	 * @param region - String.  Implied recognized values: all, visible,
 	 *                 selection
 	 */
-	public void export(final String format,final String fileName,
-		final String region) { //E.g. "png","Output.pdf","visible"
+	public void export(final Format format,final String fileName,
+		final Region region) { //E.g. Format.PNG,"Output.pdf",Region.VISIBLE
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region + "].");
 			return;
 		}
 
-		if(format == "pdf" || format == "svg" || format == "ps") {
+		if(format == Format.PDF || format == Format.SVG || format == Format.PS) {
 			exportDocument(format,defPageSize,fileName,region);
 		} else {
 			exportImage(format,fileName,region);
 		}
 	}
 
-	public void exportImage(String format,String fileName,final String region) { //E.g. "png","A5","Output.pdf"
+	public void exportImage(final Format format,final String fileName,final Region region) { //E.g. Format.PNG,"A5","Output.pdf"
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region + "].");
 			return;
@@ -297,11 +308,11 @@ public class ExportHandler {
 			createContent(g2d,region);
 
 			File exportFile = new File(fileName);
-			if(format == "png") {
+			if(format == Format.PNG) {
 				ImageIO.write(im,"png",exportFile);
-			} else if(format == "jpg") {
+			} else if(format == Format.JPG) {
 				ImageIO.write(im,"jpg",exportFile);
-			} else if(format == "ppm") { //ppm = bitmat
+			} else if(format == Format.PPM) { //ppm = bitmat
 				final OutputStream os = new BufferedOutputStream(
 					new FileOutputStream(exportFile));
 				PpmWriter.writePpm(im,os);
@@ -316,12 +327,12 @@ public class ExportHandler {
 		}
 	}
 
-	public boolean isExportValid(final String region) {
-		if(region == "all") {
+	public boolean isExportValid(final Region region) {
+		if(region == Region.ALL) {
 			return(interactiveXmap.getTotalTileNum() > 0);
-		} else if(region == "visible") {
+		} else if(region == Region.VISIBLE) {
 			return(interactiveXmap.getNumVisible() > 0);
-		} else if(region == "selection") {
+		} else if(region == Region.SELECTION) {
 			return(!(colSelection == null ||
 				colSelection.getNSelectedIndexes() == 0));
 		}
@@ -329,7 +340,9 @@ public class ExportHandler {
 		return(false);
 	}
 
-	public void exportDocument(String format,String pageSize,String fileName,final String region) { //E.g. "pdf","A5","Output.pdf"
+	public void exportDocument(final Format format,final String pageSize,
+		String fileName,final Region region) { //E.g. Format.PDF,"A5","Output.pdf"
+
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region + "].");
 			return;
@@ -344,17 +357,17 @@ public class ExportHandler {
 
 			VectorGraphics g;
 			/* TODO: This needs to supply a size of an export region */
-			if(format == "pdf") {
+			if(format == Format.PDF) {
 				if (!fileName.endsWith(".pdf")) {
 					fileName += ".pdf";
 				}
 				g = new PDFGraphics2D(exportFile,dims);
-			} else if(format == "ps") {
+			} else if(format == Format.PS) {
 				if (!fileName.endsWith(".ps")) {
 					fileName += ".ps";
 				}
 				g = new PSGraphics2D(exportFile,dims);
-			} else if(format == "svg") {
+			} else if(format == Format.SVG) {
 				if (!fileName.endsWith(".svg")) {
 					fileName += ".svg";
 				}
@@ -379,7 +392,7 @@ public class ExportHandler {
 		}
 	}
 
-	public void createContent(Graphics2D g2d,final String region) {
+	public void createContent(Graphics2D g2d,final Region region) {
 		dendroView.getInteractiveMatrixView().export(g2d,
 			(dendroView.getRowTreeView().TreeExists() ?
 				treesHeight + treeMatrixGapSize : 0),
@@ -388,11 +401,14 @@ public class ExportHandler {
 			tileWidth,tileHeight,region);
 		if(dendroView.getColumnTreeView().TreeExists()) {
 			dendroView.getColumnTreeView().export(g2d,
-				(dendroView.getRowTreeView().TreeExists() ? treesHeight + treeMatrixGapSize : 0),treesHeight,tileWidth,region);
+				(dendroView.getRowTreeView().TreeExists() ?
+					treesHeight + treeMatrixGapSize : 0),treesHeight,tileWidth,
+					region);
 		}
 		if(dendroView.getRowTreeView().TreeExists()) {
 			dendroView.getRowTreeView().export(g2d,treesHeight,
-				(dendroView.getColumnTreeView().TreeExists() ? treesHeight + treeMatrixGapSize : 0),tileHeight,region);
+				(dendroView.getColumnTreeView().TreeExists() ?
+					treesHeight + treeMatrixGapSize : 0),tileHeight,region);
 		}
 	}
 }

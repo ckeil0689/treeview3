@@ -22,6 +22,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import Controllers.Region;
 import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.HeaderSummary;
@@ -455,13 +456,13 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	}
 
 	public void export(final Graphics g,final int xIndent,final int yIndent,
-		final int size,final String region) {
+		final int size,final Region region) {
 
-		if(region == "all") {
+		if(region == Region.ALL) {
 			exportAll(g,xIndent,yIndent,size);
-		} else if(region == "visible") {
+		} else if(region == Region.VISIBLE) {
 			exportVisible(g,xIndent,yIndent,size);
-		} else if(region == "selection") {
+		} else if(region == Region.SELECTION) {
 			exportSelection(g,xIndent,yIndent,size);
 		} else {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
