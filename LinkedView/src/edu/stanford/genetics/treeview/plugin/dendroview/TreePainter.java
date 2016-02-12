@@ -59,7 +59,20 @@ public class TreePainter extends TreeDrawer {
 	}
 
 	/**
-	 * A method to export to a PDF
+	 * Export to file method which paints a portion of a tree in a position
+	 * aligned with the matrix and the other tree.
+	 * @author rleach
+	 * @param graphics - the graphics object with which to paint
+	 * @param xScaleEq - X coord calculations object
+	 * @param yScaleEq - Y coord calculations object
+	 * @param dest - The coords where to draw the tree
+	 * @param isLeft - left tree or top tree
+	 * @param treeSelection - contains the selected indexes
+	 * @param xIndent - where to start drawing the (entire) tree
+	 * @param yIndent - where to start drawing the (entire) tree
+	 * @param size - The size of an edge of a tile in the matrix
+	 * @param startIndex - The data index where the drawing starts
+	 * @param endIndex - The data index where the drawing ends
 	 */
 	public void paint(final Graphics graphics,
 		final LinearTransformation xScaleEq,
@@ -195,13 +208,24 @@ public class TreePainter extends TreeDrawer {
 			}
 		}
 
+		/**
+		 * 
+		 * @author rleach
+		 * @param node - root node of the tree
+		 * @param treeSelection - selection object
+		 * @param xIndent - where to start drawing the (entire) tree
+		 * @param yIndent - where to start drawing the (entire) tree
+		 * @param size - The size of an edge of a tile in the matrix
+		 * @param startIndex - The data index where the drawing starts
+		 * @param endIndex - The data index where the drawing ends
+		 */
 		public void draw(final TreeDrawerNode node,
 			final TreeSelectionI treeSelection,final int xIndent,
 			final int yIndent,final int size,final int startIndex,
 			final int endIndex) {
 
-			exportDFS(node,-1,false,treeSelection,xIndent,yIndent,size,
-				node.getMinCorr(),node.getMaxCorr(),startIndex,endIndex);
+			exportDFS(node,treeSelection,xIndent,yIndent,size,node.getMinCorr(),
+				node.getMaxCorr(),startIndex,endIndex);
 		}
 
 		/**
@@ -326,20 +350,30 @@ public class TreePainter extends TreeDrawer {
 			return(returnStack);
 		}
 
+		/**
+		 * Exports a portion of a tree to a file in a position aligned with the
+		 * matrix and other tree
+		 * @author rleach
+		 * @param node - root node of the tree
+		 * @param hoverIndex - 
+		 * @param isNodeHovered
+		 * @param treeSelection - selection object
+		 * @param xIndent - where to start drawing the (entire) tree
+		 * @param yIndent - where to start drawing the (entire) tree
+		 * @param size - The size of an edge of a tile in the matrix
+		 * @param minCorr - minimum correlation value
+		 * @param maxCorr - maximum correlation value
+		 * @param startIndex - The data index where the drawing starts
+		 * @param endIndex - The data index where the drawing ends
+		 * @return
+		 */
 		public Stack<TreeDrawerNode> exportDFS(final TreeDrawerNode node,
-			final int hoverIndex,boolean isNodeHovered,
 			final TreeSelectionI treeSelection,
 			final int xIndent,final int yIndent,final int size,
 			final double minCorr,final double maxCorr,final int startIndex,
 			final int endIndex) {
 	
 			Stack<TreeDrawerNode> returnStack = new Stack<TreeDrawerNode>();
-	
-			//If we've hit the hovered node, set it to true for this and all
-			//child nodes
-			if(isNodeHovered(node)) {
-				isNodeHovered = true;
-			}
 	
 //			// just return if no subkids visible.
 //			if((node.getMaxIndex() < minInd) ||
@@ -361,9 +395,8 @@ public class TreePainter extends TreeDrawer {
 	
 			//Do the left side
 			if(!node.getLeft().isLeaf()) {
-				leftDotNodeStack = exportDFS(node.getLeft(),hoverIndex,
-					isNodeHovered,treeSelection,xIndent,yIndent,size,minCorr,
-					maxCorr,startIndex,endIndex);
+				leftDotNodeStack = exportDFS(node.getLeft(),treeSelection,
+					xIndent,yIndent,size,minCorr,maxCorr,startIndex,endIndex);
 			}
 //			//We do not recurse down to the leaves, so add them to the stack
 //			//here
@@ -375,9 +408,8 @@ public class TreePainter extends TreeDrawer {
 	
 			//Do the right side
 			if(!node.getRight().isLeaf()) {
-				rightDotNodeStack = exportDFS(node.getRight(),hoverIndex,
-					isNodeHovered,treeSelection,xIndent,yIndent,size,minCorr,
-					maxCorr,startIndex,endIndex);
+				rightDotNodeStack = exportDFS(node.getRight(),treeSelection,
+					xIndent,yIndent,size,minCorr,maxCorr,startIndex,endIndex);
 			}
 //			//We do not recurse down to the leaves, so add them to the stack
 //			//here
@@ -412,8 +444,8 @@ public class TreePainter extends TreeDrawer {
 //			}
 	
 			// finally draw
-			exportSingle(node,hoverIndex,isNodeHovered,thisNodeIsSelected,
-				xIndent,yIndent,size,minCorr,maxCorr,startIndex,endIndex);
+			exportSingle(node,thisNodeIsSelected,xIndent,yIndent,size,minCorr,
+				maxCorr,startIndex,endIndex);
 	
 			return(returnStack);
 		}
@@ -537,8 +569,20 @@ public class TreePainter extends TreeDrawer {
 			drawRightBranch(node,hoverIndex,isNodeHovered,isSelected);
 		}
 
+		/**
+		 * Export a single node and it's extending branches
+		 * @author rleach
+		 * @param node - node being exported
+		 * @param isSelected - Whether the node is selected
+		 * @param xIndent - where to start drawing the (entire) tree
+		 * @param yIndent - where to start drawing the (entire) tree
+		 * @param size - The size of an edge of a tile in the matrix
+		 * @param minCorr - minimum correlation value
+		 * @param maxCorr - maximum correlation value
+		 * @param startIndex - The data index where the drawing starts
+		 * @param endIndex - The data index where the drawing ends
+		 */
 		private void exportSingle(final TreeDrawerNode node,
-			final int hoverIndex,final boolean isNodeHovered,
 			final boolean isSelected,final int xIndent,final int yIndent,
 			final int size,final double minCorr,final double maxCorr,
 			final int startIndex,final int endIndex) {
@@ -556,23 +600,15 @@ public class TreePainter extends TreeDrawer {
 			}
 	
 			// draw our (flipped) polyline...
-			if(isNodeHovered) {
-				graphics.setColor(Color.red);
-			} else {
-				graphics.setColor(node.getColor());
-			}
+			graphics.setColor(node.getColor());
 	
-			exportLeftBranch(node,hoverIndex,isNodeHovered,isSelected,xIndent,
-				yIndent,size,minCorr,maxCorr,startIndex,endIndex);
+			exportLeftBranch(node,isSelected,xIndent,yIndent,size,minCorr,
+				maxCorr,startIndex,endIndex);
 	
-			if(isNodeHovered) {
-				graphics.setColor(Color.red);
-			} else {
-				graphics.setColor(node.getColor());
-			}
+			graphics.setColor(node.getColor());
 	
-			exportRightBranch(node,hoverIndex,isNodeHovered,isSelected,xIndent,
-				yIndent,size,minCorr,maxCorr,startIndex,endIndex);
+			exportRightBranch(node,isSelected,xIndent,yIndent,size,minCorr,
+				maxCorr,startIndex,endIndex);
 		}
 
 		/**
@@ -745,8 +781,20 @@ public class TreePainter extends TreeDrawer {
 			}
 		}
 
+		/**
+		 * Export the left branch of a node
+		 * @author rleach
+		 * @param node - node being exported
+		 * @param isSelected - Whether the node is selected
+		 * @param xIndent - where to start drawing the (entire) tree
+		 * @param yIndent - where to start drawing the (entire) tree
+		 * @param size - The size of an edge of a tile in the matrix
+		 * @param minCorr - minimum correlation value
+		 * @param maxCorr - maximum correlation value
+		 * @param startIndex - The data index where the drawing starts
+		 * @param endIndex - The data index where the drawing ends
+		 */
 		public void exportLeftBranch(final TreeDrawerNode node,
-			final int hoverIndex,final boolean isHovered,
 			final boolean isSelected,final int xIndent,final int yIndent,
 			final int size,final double minCorr,final double maxCorr,
 			final int startIndex,final int endIndex) {
@@ -1149,8 +1197,20 @@ public class TreePainter extends TreeDrawer {
 			}
 		}
 
+		/**
+		 * Export the right branch of a node
+		 * @author rleach
+		 * @param node - node being exported
+		 * @param isSelected - Whether the node is selected
+		 * @param xIndent - where to start drawing the (entire) tree
+		 * @param yIndent - where to start drawing the (entire) tree
+		 * @param size - The size of an edge of a tile in the matrix
+		 * @param minCorr - minimum correlation value
+		 * @param maxCorr - maximum correlation value
+		 * @param startIndex - The data index where the drawing starts
+		 * @param endIndex - The data index where the drawing ends
+		 */
 		public void exportRightBranch(final TreeDrawerNode node,
-			final int hoverIndex,final boolean isHovered,
 			final boolean isSelected,final int xIndent,final int yIndent,
 			final int size,final double minCorr,final double maxCorr,
 			final int startIndex,final int endIndex) {

@@ -59,6 +59,17 @@ public class ExportHandler {
 	protected int treeMatrixGapMin = 5; //Min number of "points" bet tree/matrix
 	protected int treeMatrixGapSize = 20; //Number of "points" bet tree/matrix
 
+	/**
+	 * Constructor.  All the parameters are necessary unless you are not
+	 * exporting a selected area, in which case the last 2 parameters are
+	 * unnecessary and you may use the other constructor.
+	 * @author rleach
+	 * @param dendroView
+	 * @param interactiveXmap
+	 * @param interactiveYmap
+	 * @param colSelection
+	 * @param rowSelection
+	 */
 	public ExportHandler(final DendroView dendroView,
 		final MapContainer interactiveXmap,final MapContainer interactiveYmap,
 		final TreeSelectionI colSelection,final TreeSelectionI rowSelection) {
@@ -70,6 +81,13 @@ public class ExportHandler {
 		this.rowSelection = rowSelection;
 	}
 
+	/**
+	 * Constructor.  All parameters are required.
+	 * @author rleach
+	 * @param dendroView
+	 * @param interactiveXmap
+	 * @param interactiveYmap
+	 */
 	public ExportHandler(final DendroView dendroView,
 		final MapContainer interactiveXmap,final MapContainer interactiveYmap) {
 	
@@ -78,30 +96,47 @@ public class ExportHandler {
 		this.interactiveYmap = interactiveYmap;
 	}
 
+	/**
+	 * Allows one to set the page size that is given to freehep.
+	 * @author rleach
+	 * @param dps - default page size
+	 */
 	public void setDefaultPageSize(String dps) {
 		this.defPageSize = dps;
 	}
 
+	/**
+	 * Uses stored tileWidth, treesHeight, & treeMatrixGapSize to determine the
+	 * width of the output image.
+	 * @author rleach
+	 * @param region
+	 * @return int
+	 */
 	public int getXDim(final Region region) {
-		LogBuffer.println("getXDim calculation: getNumXExportIndexes(region) * tileWidth + (dendroView.getRowTreeView().TreeExists() ? treesHeight + treeMatrixGapSize : 0) -> " +
-			getNumXExportIndexes(region) + " * " + tileWidth + " + (" + dendroView.getRowTreeView().TreeExists() + " ? " + treesHeight + " + " + treeMatrixGapSize + " : 0)");
-		LogBuffer.println("Row trees " + (dendroView.getRowTreeView().TreeExists() ? "exist" : "") + ".  So XDim is [" + (getNumXExportIndexes(region) * tileWidth +
-		      			(dendroView.getRowTreeView().TreeExists() ? treesHeight +
-		      				treeMatrixGapSize : 0)) + "]");
 		return(getNumXExportIndexes(region) * tileWidth +
 			(dendroView.getRowTreeView().TreeExists() ? treesHeight +
 				treeMatrixGapSize : 0));
 	}
 
+	/**
+	 * Uses stored tileHeight, treesHeight, & treeMatrixGapSize to determine the
+	 * height of the output image.
+	 * @author rleach
+	 * @param region
+	 * @return int
+	 */
 	public int getYDim(final Region region) {
-		LogBuffer.println("Column trees " + (dendroView.getColumnTreeView().TreeExists() ? "exist" : "") + ".  So YDim is [" + (getNumYExportIndexes(region) * tileHeight +
-			(dendroView.getColumnTreeView().TreeExists() ? treesHeight +
-				treeMatrixGapSize : 0)) + "]");
 		return(getNumYExportIndexes(region) * tileHeight +
 			(dendroView.getColumnTreeView().TreeExists() ? treesHeight +
 				treeMatrixGapSize : 0));
 	}
 
+	/**
+	 * Determines the number of x axis data indexes that will be exported
+	 * @author rleach
+	 * @param region
+	 * @return int
+	 */
 	public int getNumXExportIndexes(final Region region) {
 		if(region == Region.ALL) {
 			return(interactiveXmap.getTotalTileNum());
@@ -115,11 +150,18 @@ public class ExportHandler {
 			}
 			return(colSelection.getFullSelectionRange());
 		} else {
-			LogBuffer.println("ERROR: Invalid export region: [" + region + "].");
+			LogBuffer.println("ERROR: Invalid export region: [" + region +
+				"].");
 			return(0);
 		}
 	}
 
+	/**
+	 * Determines the number of y axis data indexes that will be exported
+	 * @author rleach
+	 * @param region
+	 * @return int
+	 */
 	public int getNumYExportIndexes(final Region region) {
 		if(region == Region.ALL) {
 			return(interactiveYmap.getTotalTileNum());
@@ -133,22 +175,33 @@ public class ExportHandler {
 			}
 			return(rowSelection.getFullSelectionRange());
 		} else {
-			LogBuffer.println("ERROR: Invalid export region: [" + region + "].");
+			LogBuffer.println("ERROR: Invalid export region: [" + region +
+				"].");
 			return(0);
 		}
 	}
 
+	/**
+	 * Sets the aspectRatio of a tile
+	 * @author rleach
+	 * @param aR - aspect ratio
+	 */
 	public void setTileAspectRatio(final double aR) {
 		this.aspectRatio = aR;
 	}
 
+	/**
+	 * Calculates the aspect ratio in the user's window and sets the result
+	 * @author rleach
+	 * @param region
+	 */
 	public void setTileAspectRatioToScreen(final Region region) {
 		int screenWidth = dendroView.getInteractiveMatrixView().getWidth();
 		int screenHeight = dendroView.getInteractiveMatrixView().getHeight();
 		int numCols = getNumXExportIndexes(region);
 		int numRows = getNumYExportIndexes(region);
-		this.aspectRatio = ((double) screenWidth / (double) numCols) / ((double) screenHeight / (double) numRows);
-		LogBuffer.println("Set aspect ratio to: [" + aspectRatio + "] using: [screenWidth / numCols / screenHeight / numRows -> " + screenWidth + " / " + numCols + " / " + screenHeight + " / " + numRows + "]");
+		this.aspectRatio = ((double) screenWidth / (double) numCols) /
+			((double) screenHeight / (double) numRows);
 	}
 
 	/**
@@ -162,6 +215,8 @@ public class ExportHandler {
 	/* TODO: I should look for the smallest branch height, so that I can set the
 	 * min tree height to 1/(smallest branch height/3) */
 	/**
+	 * Sets the treeRatio, which is the fraction of the longest final edge of
+	 * the image (when the tree(s) are included)
 	 * @author rleach
 	 * @param treeRatio the treeRatio to set
 	 */
@@ -170,6 +225,8 @@ public class ExportHandler {
 	}
 
 	/**
+	 * Returns the fraction of the longest edge of the image that is reserved
+	 * for the gap between the tree and the matrix
 	 * @author rleach
 	 * @return the treeMatrixGapRatio
 	 */
@@ -178,6 +235,8 @@ public class ExportHandler {
 	}
 
 	/**
+	 * Sets the fraction of the longest edge of the image that is reserved
+	 * for the gap between the tree and the matrix
 	 * @author rleach
 	 * @param treeMatrixGapRatio the treeMatrixGapRatio to set
 	 */
@@ -185,6 +244,16 @@ public class ExportHandler {
 		this.treeMatrixGapRatio = treeMatrixGapRatio;
 	}
 
+	/**
+	 * Calculates the points in size of the tile dimensions and trees height
+	 * that will meet all the minimum dimension requirements.  E.g. If there are
+	 * very few or small tiles in the larger image dimension and the treeRatio
+	 * dictates that the treesHeight works out to be smaller than the
+	 * minTreesHeight, then the tile dimensions are scaled up to meet the
+	 * minimum tree height requirement or vice versa.
+	 * @author rleach
+	 * @param region
+	 */
 	public void calculateDimensions(final Region region) {
 		//Calculates: treesHeight,treeMatrixGapSize,tileHeight, and tileWidth
 		//Using: treeMatrixGapRatio,aspectRatio,treeRatio
@@ -198,27 +267,37 @@ public class ExportHandler {
 			tileWidth = minTileDim;
 			tileHeight = (int) Math.round((double) minTileDim / aspectRatio);
 		}
-		LogBuffer.println("Calculating region dimensions. Set tile width to: [" + tileWidth + "] and tileHeight to: [" + tileHeight + "]");
 
-		//Now we can calculate the trees height based on the shorter matrix dimension
+		//Now we can calculate the trees height based on the shorter matrix
+		//dimension
 		int maxImageDim = calculateMaxFinalImageDim(region);
-		treeMatrixGapSize = (int) Math.round(treeMatrixGapRatio * (double) maxImageDim);
+		treeMatrixGapSize =
+			(int) Math.round(treeMatrixGapRatio * (double) maxImageDim);
 		if(treeMatrixGapSize < treeMatrixGapMin) {
 			treeMatrixGapSize = treeMatrixGapMin;
 		}
-		treesHeight = (int) Math.round(treeRatio * (double) maxImageDim) - treeMatrixGapSize;
+		treesHeight = (int) Math.round(treeRatio * (double) maxImageDim) -
+			treeMatrixGapSize;
 		if(treesHeight < minTreeHeight) {
-			double scaleUpFactor = (double) minTreeHeight / (double) treesHeight;
+			double scaleUpFactor =
+				(double) minTreeHeight / (double) treesHeight;
 			tileWidth = (int) Math.ceil(scaleUpFactor * (double) tileWidth);
-			tileHeight = (int) Math.round(tileWidth / aspectRatio); //Stay close to AR
+			tileHeight = (int) Math.round(tileWidth / aspectRatio);
 			maxImageDim = calculateMaxFinalImageDim(region);
-			treeMatrixGapSize = (int) Math.round(treeMatrixGapRatio * (double) maxImageDim);
+			treeMatrixGapSize =
+				(int) Math.round(treeMatrixGapRatio * (double) maxImageDim);
 			if(treeMatrixGapSize < treeMatrixGapMin) {
 				treeMatrixGapSize = treeMatrixGapMin;
 			}
-			treesHeight = (int) Math.round(treeRatio * (double) maxImageDim) - treeMatrixGapSize;
+			treesHeight = (int) Math.round(treeRatio * (double) maxImageDim) -
+				treeMatrixGapSize;
 			if(treesHeight < minTreeHeight) {
-				LogBuffer.println("ERROR: Something is wrong with the calculation of the export dimensions using scaleupFactor: [" + scaleUpFactor + "] to create tiledims: [" + tileWidth + "/" + tileHeight + "].  treesHeight: [" + treesHeight + "] turned out smaller than the minimum: [" + minTreeHeight + "].");
+				LogBuffer.println("ERROR: Something is wrong with the " +
+					"calculation of the export dimensions using " +
+					"scaleupFactor: [" + scaleUpFactor +
+					"] to create tiledims: [" + tileWidth + "/" + tileHeight +
+					"].  treesHeight: [" + treesHeight + "] turned out " +
+					"smaller than the minimum: [" + minTreeHeight + "].");
 				treesHeight = minTreeHeight;
 			}
 		}
@@ -247,19 +326,27 @@ public class ExportHandler {
 	public int calculateMaxFinalImageDim(final Region region) {
 		int matrixWidth = getNumXExportIndexes(region) * tileWidth;
 		int matrixHeight = getNumYExportIndexes(region) * tileHeight;
-		int maxMatrixDim = (matrixWidth > matrixHeight ? matrixWidth : matrixHeight);
+		int maxMatrixDim =
+			(matrixWidth > matrixHeight ? matrixWidth : matrixHeight);
 		if(dendroView.getRowTreeView().TreeExists() &&
 			dendroView.getColumnTreeView().TreeExists()) {
-			return((int) Math.round((double) maxMatrixDim / (1.0 - treeRatio)));
+			return((int) Math.round((double) maxMatrixDim /
+				(1.0 - treeRatio)));
 		} else if(dendroView.getRowTreeView().TreeExists()) {
-			if((int) Math.round(matrixWidth / (1.0 - treeRatio)) > matrixHeight) {
-				return((int) Math.round((double) matrixWidth / (1.0 - treeRatio)));
+			if((int) Math.round(matrixWidth / (1.0 - treeRatio)) >
+				matrixHeight) {
+
+				return((int) Math.round((double) matrixWidth /
+					(1.0 - treeRatio)));
 			} else {
 				return(matrixHeight);
 			}
 		} else if(dendroView.getColumnTreeView().TreeExists()) {
-			if((int) Math.round(matrixHeight / (1.0 - treeRatio)) > matrixWidth) {
-				return((int) Math.round((double) matrixHeight / (1.0 - treeRatio)));
+			if((int) Math.round(matrixHeight / (1.0 - treeRatio)) >
+				matrixWidth) {
+
+				return((int) Math.round((double) matrixHeight /
+					(1.0 - treeRatio)));
 			} else {
 				return(matrixWidth);
 			}
@@ -281,20 +368,33 @@ public class ExportHandler {
 		final Region region) { //E.g. Format.PNG,"Output.pdf",Region.VISIBLE
 
 		if(!isExportValid(region)) {
-			LogBuffer.println("ERROR: Invalid export region: [" + region + "].");
+			LogBuffer.println("ERROR: Invalid export region: [" + region +
+				"].");
 			return;
 		}
 
-		if(format == Format.PDF || format == Format.SVG || format == Format.PS) {
+		if(format == Format.PDF || format == Format.SVG ||
+			format == Format.PS) {
+
 			exportDocument(format,defPageSize,fileName,region);
 		} else {
 			exportImage(format,fileName,region);
 		}
 	}
 
-	public void exportImage(final Format format,final String fileName,final Region region) { //E.g. Format.PNG,"A5","Output.pdf"
+	/**
+	 * Export an image file (not on a "page")
+	 * @author rleach
+	 * @param format
+	 * @param fileName
+	 * @param region
+	 */
+	public void exportImage(final Format format,final String fileName,
+		final Region region) { //E.g. Format.PNG,"A5","Output.pdf"
+
 		if(!isExportValid(region)) {
-			LogBuffer.println("ERROR: Invalid export region: [" + region + "].");
+			LogBuffer.println("ERROR: Invalid export region: [" + region +
+				"].");
 			return;
 		}
 
@@ -327,6 +427,12 @@ public class ExportHandler {
 		}
 	}
 
+	/**
+	 * Determines whether the exported region selection should work or not
+	 * @author rleach
+	 * @param region
+	 * @return boolean
+	 */
 	public boolean isExportValid(final Region region) {
 		if(region == Region.ALL) {
 			return(interactiveXmap.getTotalTileNum() > 0);
@@ -340,11 +446,20 @@ public class ExportHandler {
 		return(false);
 	}
 
+	/**
+	 * Export an image file as a part of a document in a vector format
+	 * @author rleach
+	 * @param format
+	 * @param pageSize
+	 * @param fileName
+	 * @param region
+	 */
 	public void exportDocument(final Format format,final String pageSize,
-		String fileName,final Region region) { //E.g. Format.PDF,"A5","Output.pdf"
+		String fileName,final Region region) {
 
 		if(!isExportValid(region)) {
-			LogBuffer.println("ERROR: Invalid export region: [" + region + "].");
+			LogBuffer.println("ERROR: Invalid export region: [" + region +
+				"].");
 			return;
 		}
 
@@ -392,6 +507,13 @@ public class ExportHandler {
 		}
 	}
 
+	/**
+	 * This calls the export functions of the various components of the total
+	 * image, arranged in an aligned fashion together
+	 * @author rleach
+	 * @param g2d
+	 * @param region
+	 */
 	public void createContent(Graphics2D g2d,final Region region) {
 		dendroView.getInteractiveMatrixView().export(g2d,
 			(dendroView.getRowTreeView().TreeExists() ?

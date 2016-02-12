@@ -647,71 +647,16 @@ public class DendroController implements ConfigNodePersistent, Observer,
 					dendroView.getInteractiveMatrixView()
 							.smoothAnimatedZoomOut();
 				}
-			} else if (e.getSource() == dendroView.getExportButton()) {
-
-				//The following uses the forked freehep 2.4 project, compiled by
-				//maven 2, along with 2 jar files from the original freehep
-				//2.1.1 project
-				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
-					interactiveYmap,colSelection,rowSelection);
-//				eh.setTreeRatio(0.8);
-				eh.setTileAspectRatioToScreen(Region.VISIBLE);
-				eh.export(Format.PNG,"Output.png",Region.SELECTION);
-//				try {
-//					int indent = 500; //This is the height for the trees on both axes
-//					int tileDim = 20;
-//					int gap     = (int) (0.005 *
-//						((interactiveXmap.getTotalTileNum() >
-//						interactiveYmap.getTotalTileNum() ?
-//							interactiveXmap.getTotalTileNum() :
-//								interactiveYmap.getTotalTileNum()) * tileDim +
-//								indent));
-//					if(gap == 0) {
-//						gap = 1;
-//					}
+				/* TODO: This needs to be better integrated into the interface */
+//			} else if (e.getSource() == dendroView.getExportButton()) {
 //
-//					final BufferedImage im = new BufferedImage(
-//						interactiveXmap.getTotalTileNum() * tileDim + indent + gap,
-//						interactiveYmap.getTotalTileNum() * tileDim + indent + gap,
-//						BufferedImage.TYPE_INT_ARGB);
-//
-//					Graphics2D g2d = (Graphics2D) im.getGraphics();
-//					// panel.paint(im.getGraphics());
-//					getInteractiveMatrixView().exportPixels(g2d,indent + gap,indent + gap,tileDim);
-//					dendroView.getColumnTreeView().exportTree(g2d,indent + gap,indent,tileDim);
-//					dendroView.getRowTreeView().exportTree(g2d,indent,indent + gap,tileDim);
-//					File saveFile = new File("Output.png");
-//					ImageIO.write(im,"PNG",saveFile);
-//
-//
-//					Properties p = new Properties();
-//					p.setProperty("PageSize","A5");
-//					/* TODO: This needs to supply a size of an export region */
-//					VectorGraphics g =
-//						new PDFGraphics2D(new File("Output.pdf"),
-//							new Dimension(interactiveXmap.getTotalTileNum() * tileDim + indent + gap,
-//								interactiveYmap.getTotalTileNum() * tileDim + indent + gap));
-//					/* TODO: Create an interface that allows the user to select
-//					 * the export format among those provided here */
-//					//VectorGraphics g =
-//					//	new PSGraphics2D(new File("Output.ps"),
-//					//		new Dimension(interactiveXmap.getMaxIndex() + 1,
-//					//			interactiveYmap.getMaxIndex() + 1));
-//					//VectorGraphics g = new SVGGraphics2D(new File("Output.svg"),
-//					//	new Dimension(interactiveXmap.getMaxIndex() + 1,
-//					//			interactiveYmap.getMaxIndex() + 1)); 
-//					g.setProperties(p); 
-//					g.startExport();
-//					/* TODO: This needs to supply a start end end index for each
-//					 * dimension fining the export region */
-//					dendroView.getInteractiveMatrixView().exportPixels(g,indent + gap,indent + gap,tileDim);
-//					dendroView.getColumnTreeView().exportTree(g,indent + gap,indent,tileDim);
-//					dendroView.getRowTreeView().exportTree(g,indent,indent + gap,tileDim);
-//					g.endExport();
-//				}
-//				catch(Exception exc) {
-//					exc.printStackTrace();
-//				}
+//				//The following uses the forked freehep 2.4 project, compiled by
+//				//maven 2, along with 2 jar files from the original freehep
+//				//2.1.1 project
+//				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
+//					interactiveYmap,colSelection,rowSelection);
+//				eh.setTileAspectRatioToScreen(Region.VISIBLE);
+//				eh.export(Format.PNG,"Output.png",Region.SELECTION);
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
 						+ "in DendroController ScaleListener.");
@@ -720,25 +665,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			notifyAllMapObservers();
 		}
 	}
-
-//	public static PdfPTable createTable() throws DocumentException {
-//		PdfPTable table = new PdfPTable(3);
-//		table.setWidthPercentage(100);
-//		table.setWidths(new int[]{1,3,7});
-//		PdfPCell cell;
-//		cell = new PdfPCell(new Phrase("Table 1"));
-//		table.addCell(cell);
-//		cell = new PdfPCell(new Phrase("Cell 2"));
-//		table.addCell(cell);
-//		table.addCell("cell 3");
-//		table.addCell("cell 4");
-//		table.addCell("cell 5");
-//		table.addCell("cell 6");
-//		table.addCell("cell 7");
-//		table.addCell("cell 8");
-//		table.addCell("cell 9");
-//		return table;
-//	}
 
 	/**
 	 * Defines what happens when component properties of the two JSplitPanes
@@ -884,34 +810,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		globalYmap.setToMinScale();
 
 		saveSettings();
-	}
-
-	public void saveImage(final JPanel panel) throws IOException {
-
-		// File saveFile = new File("savedImage.png");
-		//
-		// final JFileChooser fc = new JFileChooser();
-		//
-		// fc.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
-		// fc.setSelectedFile(saveFile);
-		// final int returnVal = fc.showSaveDialog(dendroView.getDendroPane());
-		//
-		// if (returnVal == JFileChooser.APPROVE_OPTION) {
-		// saveFile = fc.getSelectedFile();
-		//
-		// String fileName = saveFile.toString();
-		//
-		// if (!fileName.endsWith(".png")) {
-		// fileName += ".png";
-		// saveFile = new File(fileName);
-		// }
-		//
-		// final BufferedImage im = new BufferedImage(panel.getWidth(),
-		// panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		//
-		// panel.paint(im.getGraphics());
-		// ImageIO.write(im, "PNG", saveFile);
-		// }
 	}
 
 	/**

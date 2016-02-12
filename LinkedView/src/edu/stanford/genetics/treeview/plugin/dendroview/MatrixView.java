@@ -159,6 +159,15 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 	}
 
+	/**
+	 * Export the entire matrix to a file
+	 * @author rleach
+	 * @param g
+	 * @param xIndent
+	 * @param yIndent
+	 * @param tileXsize
+	 * @param tileYsize
+	 */
 	public void exportAll(final Graphics g,final int xIndent,final int yIndent,
 		final int tileXsize,final int tileYsize) {
 

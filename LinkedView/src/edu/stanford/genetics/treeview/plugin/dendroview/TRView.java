@@ -455,6 +455,15 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		}
 	}
 
+	/**
+	 * Exports a tree to a file
+	 * @author rleach
+	 * @param g - graphics object
+	 * @param xIndent - size of the indent where to start drawing the tree
+	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param size - size of a matrix tile in this tree's dimension
+	 * @param region - what portion of the tree to export
+	 */
 	public void export(final Graphics g,final int xIndent,final int yIndent,
 		final int size,final Region region) {
 
@@ -470,6 +479,14 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		}
 	}
 
+	/**
+	 * Exports the entire tree
+	 * @author rleach
+	 * @param g - graphics object
+	 * @param xIndent - size of the indent where to start drawing the tree
+	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param size - size of a matrix tile in this tree's dimension
+	 */
 	public void exportAll(final Graphics g,final int xIndent,final int yIndent,
 		final int size) {
 	
@@ -477,6 +494,15 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			xIndent,yIndent,size,0,map.getMaxIndex());
 	}
 
+	/**
+	 * Exports the portion of the tree corresponding to the visible portion of
+	 * the matrix
+	 * @author rleach
+	 * @param g - graphics object
+	 * @param xIndent - size of the indent where to start drawing the tree
+	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param size - size of a matrix tile in this tree's dimension
+	 */
 	public void exportVisible(final Graphics g,final int xIndent,
 		final int yIndent,final int size) {
 	
@@ -484,6 +510,15 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			xIndent,yIndent,size,map.getFirstVisible(),map.getLastVisible());
 	}
 
+	/**
+	 * Exports the portion of the tree corresponding to the minimum and maximum
+	 * selected portions of the matrix/tree
+	 * @author rleach
+	 * @param g - graphics object
+	 * @param xIndent - size of the indent where to start drawing the tree
+	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param size - size of a matrix tile in this tree's dimension
+	 */
 	public void exportSelection(final Graphics g,final int xIndent,
 		final int yIndent,final int size) {
 	
@@ -964,6 +999,11 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		map.unsetHoverIndex();
 	}
 
+	/**
+	 * Determines whether the tree exists or not
+	 * @author rleach
+	 * @return boolean
+	 */
 	public boolean TreeExists() {
 		return(treePainter != null && treePainter.getRootNode() != null);
 	}
