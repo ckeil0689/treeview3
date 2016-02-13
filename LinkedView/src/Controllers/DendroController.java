@@ -919,10 +919,10 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		if (arrayIndex != null) {
 			setColumnSelection(new ReorderedTreeSelection(
-					tvFrame.getColumnSelection(), arrayIndex));
+					tvFrame.getColSelection(), arrayIndex));
 
 		} else {
-			setColumnSelection(tvFrame.getColumnSelection());
+			setColumnSelection(tvFrame.getColSelection());
 		}
 		
 		setupMapContainers();

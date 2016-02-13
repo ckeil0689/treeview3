@@ -960,12 +960,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void setArraySelection(final TreeSelection aSelect) {
 
-		this.arraySelection = aSelect;
+		this.colSelection = aSelect;
 	}
 
 	public void setGeneSelection(final TreeSelection aSelect) {
 
-		this.geneSelection = aSelect;
+		this.rowSelection = aSelect;
 	}
 
 	// Getters

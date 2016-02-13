@@ -14,10 +14,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -30,9 +26,6 @@ import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.Timer;
-//import javax.swing.WindowConstants;
-import javax.swing.WindowConstants;
 
 import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
@@ -90,16 +83,9 @@ public abstract class ViewFrame extends Observable implements Observer,
 		final int height = configNode.getInt("frame_height", init_height);
 
 		appFrame.setBounds(left, top, width, height);
-
-		// //Not sure if the following actually works - The app quits, but it
-		// was quitting before I added this line of code (but it wasn't quitting
-		// sometimes and when it quits, it quits after a confirm popup and a
-		// delay. It still has the confirm & delay.
-		// appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setupWindowListener();
-
-		setupWindowPosListener();
 	}
 
 	/**
@@ -228,21 +214,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	private void setupWindowListener() {
 
-		// JFrame.EXIT_ON_CLOSE works much more reliably than what was being
-		// done before. I replaced WindowConstants.DO_NOTHING_ON_CLOSE and
-		// confirmed that saveSettings is called by the window listener before
-		// exiting...
-		// appFrame
-		// .setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		// appFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		// THIS WORKS BUT, it could present problems either current, in the
-		// future (when we support multiple windows) or both.
-		// Take a look at bitBucket issue #74 if you decide to re-open this
-		// issue and solve it properly.
-		// Note, the no-exit bug when dispose is used can be reproduced by
-		// performing a search and then closing the main window.
-		appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		appFrame.addWindowListener(new WindowAdapter() {
 
 			@Override
@@ -263,57 +234,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 				setWindowActive(false);
 			}
 		});
-	}
-
-	/**
-	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
-	 * as a result.
-	 *
-	 * @author CKeil
-	 *
-	 */
-	private class AppWindowPosListener extends ComponentAdapter {
-
-		// Timer to prevent repeatedly saving window dimensions upon resize
-		private final int saveResizeDelay = 1000;
-		private javax.swing.Timer saveResizeTimer;
-		ActionListener saveWindowAttrs = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				if (evt.getSource() == saveResizeTimer) {
-					/* Stop timer */
-					saveResizeTimer.stop();
-					saveResizeTimer = null;
-					LogBuffer.println("Saving window dimensions & position.");
-
-					saveSettings();
-				}
-			}
-		};
-
-		public void componentMoved(ComponentEvent e) {
-			// Save the new dimensions/position if it's done changing
-			if (this.saveResizeTimer == null) {
-				/*
-				 * Start waiting for saveResizeDelay millis to elapse and then
-				 * call actionPerformed of the ActionListener "saveWindowAttrs".
-				 */
-				this.saveResizeTimer = new Timer(this.saveResizeDelay,
-						saveWindowAttrs);
-				this.saveResizeTimer.start();
-			} else {
-				/* Event came too soon, swallow it by resetting the timer.. */
-				this.saveResizeTimer.restart();
-			}
-		}
-	}
-
-	public void addAppWindowPosListener() {
-
-		appFrame.addComponentListener(new AppWindowPosListener());
-	}
-
-	private void setupWindowPosListener() {
-		addAppWindowPosListener();
 	}
 
 	/**
@@ -406,11 +326,11 @@ public abstract class ViewFrame extends Observable implements Observer,
 			saveSettings();
 			appFrame.dispose();
 			LogBuffer.println("Will this print, and when?.");
+			System.exit(0);
 			break;
 
 		case JOptionPane.NO_OPTION:
-			appFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-			break;
+			return;
 
 		default:
 			return;
@@ -426,12 +346,12 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public TreeSelectionI getRowSelection() {
 
-		return geneSelection;
+		return rowSelection;
 	}
 
 	protected void setGeneSelection(final TreeSelectionI newSelection) {
 
-		this.geneSelection = newSelection;
+		this.rowSelection = newSelection;
 	}
 
 	/**
@@ -439,14 +359,14 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 *
 	 * @return The shared TreeSelection object for arrays.
 	 */
-	public TreeSelectionI getColumnSelection() {
+	public TreeSelectionI getColSelection() {
 
-		return arraySelection;
+		return colSelection;
 	}
 
-	protected void setArraySelection(final TreeSelectionI newSelection) {
+	protected void setColSelection(final TreeSelectionI newSelection) {
 
-		this.arraySelection = newSelection;
+		this.colSelection = newSelection;
 	}
 
 	/**
@@ -518,13 +438,13 @@ public abstract class ViewFrame extends Observable implements Observer,
 	/**
 	 * The shared selection objects
 	 */
-	TreeSelectionI geneSelection = null;
-	TreeSelectionI arraySelection = null;
+	TreeSelectionI rowSelection = null;
+	TreeSelectionI colSelection = null;
 
 	public void deselectAll() {
 
-		geneSelection.deselectAllIndexes();
-		arraySelection.deselectAllIndexes();
+		rowSelection.deselectAllIndexes();
+		colSelection.deselectAllIndexes();
 	}
 
 	/**
@@ -533,9 +453,9 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public void seekGene(final int i) {
 
-		geneSelection.deselectAllIndexes();
-		geneSelection.setIndexSelection(i, true);
-		geneSelection.notifyObservers();
+		rowSelection.deselectAllIndexes();
+		rowSelection.setIndexSelection(i, true);
+		rowSelection.notifyObservers();
 		// scrollToGene(i);
 	}
 
@@ -545,9 +465,9 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public void seekArray(final int i) {
 
-		arraySelection.deselectAllIndexes();
-		arraySelection.setIndexSelection(i, true);
-		arraySelection.notifyObservers();
+		colSelection.deselectAllIndexes();
+		colSelection.setIndexSelection(i, true);
+		colSelection.notifyObservers();
 	}
 
 	/**
@@ -555,12 +475,12 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public void extendRange(final int i) {
 
-		if (geneSelection.getMinIndex() == -1) {
+		if (rowSelection.getMinIndex() == -1) {
 			seekGene(i);
 		}
 
-		geneSelection.setIndexSelection(i, true);
-		geneSelection.notifyObservers();
+		rowSelection.setIndexSelection(i, true);
+		rowSelection.notifyObservers();
 	}
 
 	public boolean geneIsSelected(final int i) {

@@ -140,7 +140,7 @@ public class MenubarController {
 	private void showSubData() {
 
 		controller.showSubDataModel(tvFrame.getRowSelection()
-				.getSelectedIndexes(), tvFrame.getColumnSelection()
+				.getSelectedIndexes(), tvFrame.getColSelection()
 				.getSelectedIndexes(), null, null);
 	}
 
