@@ -107,13 +107,13 @@ public class TVController implements Observer {
 			switch (option) {
 
 			case JOptionPane.YES_OPTION:
-				tvFrame.saveSettings();
 				tvFrame.getConfigNode().parent().removeNode();
 				tvFrame.getAppFrame().dispose();
+				System.exit(0);
 				break;
 
 			case JOptionPane.NO_OPTION:
-				break;
+				return;
 
 			default:
 				return;
