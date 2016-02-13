@@ -477,6 +477,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	protected abstract void drawWhizBackground(final Graphics g);
 	protected abstract void drawFittedWhizBackground(final Graphics g,
 		LinearTransformation scaleEq);
+	protected abstract void setExportScale(final Rectangle dest);
 
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
@@ -925,26 +926,25 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		map.unsetHoverIndex();
 	}
 	
-	public abstract BufferedImage getSnapshot(final int width, final int height); 
-//	{
-//		
-//		BufferedImage img = new BufferedImage(width, height,
-//				BufferedImage.TYPE_INT_ARGB);
-//		Rectangle dest = new Rectangle(width, height);
-//		
-//		BufferedImage scaled = new BufferedImage(width, height,
-//				BufferedImage.TYPE_INT_ARGB);
-//		
-//		/* Draw trees to first image, original size */
-//		treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
-//				isLeft, -1, treeSelection, null);
-//		
-//		/* Draw a scaled version of the old image to a new image */
-//		Graphics g = scaled.getGraphics();
-//		g.drawImage(img, 0, 0, width, height, null);
-//		
-////		paint(img.getGraphics());
-//		
-//		return scaled;
-//	}
+	public BufferedImage getSnapshot(final int width, final int height) {
+	
+		BufferedImage img = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
+		Rectangle dest = new Rectangle(width, height);
+		
+		BufferedImage scaled = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
+		
+		setExportScale(dest);
+		
+		/* Draw trees to first image, original size */
+		treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
+				isLeft, -1, null, null);
+		
+		/* Draw a scaled version of the old image to a new image */
+		Graphics g = scaled.getGraphics();
+		g.drawImage(img, 0, 0, width, height, null);
+		
+		return scaled;
+	}
 }
