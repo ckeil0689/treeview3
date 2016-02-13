@@ -123,9 +123,18 @@ public class ExportDialog extends CustomDialog {
 		
 		JPanel filler = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		
-		previewComp.add(filler, "w 100!, h 100!");
-		previewComp.add(colTrees, "growx, pushx, h 100!, wrap");
-		previewComp.add(rowTrees, "growy, pushy, w 100!");
+		if(rowTrees != null && colTrees != null) {
+			previewComp.add(filler, "w 80!, h 80!");
+		}
+		
+		if(colTrees != null) {
+			previewComp.add(colTrees, "growx, pushx, h 80!, wrap");
+		}
+		
+		if(rowTrees != null) {
+			previewComp.add(rowTrees, "growy, pushy, w 80!");
+		}
+		
 		previewComp.add(matrix, "push, grow");
 	}
 	

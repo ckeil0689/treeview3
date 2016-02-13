@@ -9,12 +9,10 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
-
-import javax.swing.SwingUtilities;
+import java.awt.image.BufferedImage;
 
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LinearTransformation;
@@ -224,5 +222,45 @@ public class RowTreeView extends TRView {
 	protected boolean isAPrimaryScroll(final MouseWheelEvent e) {
 		
 		return(!e.isShiftDown());
+	}
+	
+	@Override
+	public BufferedImage getSnapshot(final int width, final int height) {
+		
+		BufferedImage img = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
+		
+		Rectangle dest = new Rectangle(width, height);
+		
+		BufferedImage scaled = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
+		
+		/* Scale trees for complete painting */
+		int firstVisIndex = map.getIndex(getFittedDestRectStart());
+		int lastVisIndex  = map.getIndex(getFittedDestRectEnd());
+
+		setPrimaryScaleEq(new LinearTransformation(
+			firstVisIndex,
+			dest.y,
+			lastVisIndex,
+			dest.y + dest.height));
+		
+		setSecondaryScaleEq(new LinearTransformation(
+				treePainter.getCorrMin(),
+				dest.x,
+				treePainter.getCorrMax(),
+				dest.x + width));
+		
+		/* Draw trees to first image, original size */
+		treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
+				isLeft, -1, treeSelection, null);
+		
+		/* Draw a scaled version of the old image to a new image */
+		Graphics g = scaled.getGraphics();
+		g.drawImage(img, 0, 0, width, height, null);
+		
+//		paint(img.getGraphics());
+		
+		return scaled;
 	}
 }

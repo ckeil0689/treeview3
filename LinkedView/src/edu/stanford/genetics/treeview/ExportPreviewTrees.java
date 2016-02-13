@@ -18,7 +18,7 @@ public class ExportPreviewTrees extends JPanel {
 	
 	private final Image paintImage;
 	public static final int WIDTH = 400;
-	public static final int HEIGHT = 100;
+	public static final int HEIGHT = 80;
 	
 	private int x; 
 	private int y;

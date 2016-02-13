@@ -58,6 +58,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
 //import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 //=======
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
+import edu.stanford.genetics.treeview.plugin.dendroview.TRView;
 //>>>>>>> colorUpdate
 
 /**
@@ -984,18 +985,22 @@ public class TVController implements Observer {
 	 */
 	public void openExportMenu() {
 
-		BufferedImage rowTrees = tvFrame.getDendroView()
-				.getRowTreeView().getSnapshot(ExportPreviewTrees.HEIGHT, 
-						ExportPreviewTrees.WIDTH);
-		BufferedImage colTrees = tvFrame.getDendroView()
-				.getColumnTreeView().getSnapshot(ExportPreviewTrees.WIDTH, 
-						ExportPreviewTrees.HEIGHT);
+		if(tvFrame.getDendroView() == null) {
+			LogBuffer.println("DendroView is not instantiated. "
+					+ "Nothing to export.");
+			return;
+		}
+		
+		/* Set up tree images */
+		ExportPreviewTrees expRowTrees = getTreeSnapshot(
+				tvFrame.getDendroView().getRowTreeView(), true);
+		ExportPreviewTrees expColTrees = getTreeSnapshot(
+				tvFrame.getDendroView().getColumnTreeView(), false);
+		
+		/* Set up matrix image */
 		BufferedImage matrix = tvFrame.getDendroView()
 				.getInteractiveMatrixView().getVisibleImage();
-		
 		ExportPreviewMatrix expMatrix = new ExportPreviewMatrix(matrix);
-		ExportPreviewTrees expRowTrees = new ExportPreviewTrees(rowTrees, true);
-		ExportPreviewTrees expColTrees = new ExportPreviewTrees(colTrees, false);
 		
 		ExportDialog exportDialog = new ExportDialog();
 		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
@@ -1003,6 +1008,30 @@ public class TVController implements Observer {
 		new ExportDialogController(exportDialog, tvFrame.getDendroView());
 		
 		exportDialog.setVisible(true);
+	}
+	
+	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView, 
+			final boolean isRows) {
+		
+		int width;
+		int height;
+		if(isRows) {
+			width = ExportPreviewTrees.HEIGHT;
+			height = ExportPreviewTrees.WIDTH;
+		} else {
+			width = ExportPreviewTrees.WIDTH;
+			height = ExportPreviewTrees.HEIGHT;
+		}
+		
+		/* Set up column tree image */
+		BufferedImage treeSnapshot = null;
+		ExportPreviewTrees expTrees = null;
+		if(treeAxisView.isEnabled()) {
+			treeSnapshot = treeAxisView.getSnapshot(width, height);
+			expTrees = new ExportPreviewTrees(treeSnapshot, isRows);
+		}
+		
+		return expTrees;
 	}
 
 	/*
