@@ -56,8 +56,9 @@ public class BoundaryBox extends ThumbBox {
 		String value_s = Double.toString(value);
 		int stringWidth = fm.stringWidth(value_s);
 		
-		int x = t.getX() - (stringWidth / 2);
-		int y = (int) ((boundaryRect.getHeight() / 3) + boundaryRect.getMinY());
+		int x = (int) Math.round(t.getX() - (stringWidth/ 2.0));
+		int y = (int) Math.round((boundaryRect.getHeight()/ 3.0) 
+				+ boundaryRect.getMinY());
 
 		g2.setColor(Color.black);
 		g2.setFont(GUIFactory.FONTS);
