@@ -189,7 +189,8 @@ public class ClusterView {
 		rowIterationsSettr = setupSpinner(ITERATION_START);
 		colIterationsSettr = setupSpinner(ITERATION_START);
 
-		ignoreZeroes = new JCheckBox("Ignore zeroes?");
+		ignoreZeroes = new JCheckBox("Ignore zeroes");
+		ignoreZeroes.setFont(GUIFactory.FONTS);
 	}
 
 	/* Layout setups for main UI elements */
@@ -246,38 +247,32 @@ public class ClusterView {
 
 		// Components for choosing Cluster type
 		final JLabel type = GUIFactory.createLabel("Cluster Type",
-				GUIFactory.FONTL);
-		final JLabel switchLabel = GUIFactory.createLabel("Switch: ",
-				GUIFactory.FONTS);
+				GUIFactory.FONTM);
 
-		choicePanel.add(type, "pushx, alignx 0%, span, wrap");
-		choicePanel.add(switchLabel, "pushx, alignx 0%, w 20%");
-		choicePanel.add(clusterChooser, "pushx, alignx 0%, w 80%, wrap 20px");
+		choicePanel.add(type, "label, pushx, alignx 0%");
+		choicePanel.add(clusterChooser, "pushx, w 80%, wrap 20px");
 
 		// Components for similarity measure options
 		final JLabel similarity = GUIFactory.createLabel("Similarity "
-				+ "Metric", GUIFactory.FONTL);
+				+ "Metric", GUIFactory.FONTM);
 		final JLabel rowLabel = GUIFactory.createLabel("Rows: ",
 				GUIFactory.FONTS);
 		final JLabel colLabel = GUIFactory.createLabel("Columns: ",
 				GUIFactory.FONTS);
 
 		choicePanel.add(similarity, "pushx, alignx 0%, span, wrap");
-		choicePanel.add(rowLabel, "pushx, alignx 0%, w 20%");
+		choicePanel.add(rowLabel, "label, pushx, alignx 0%, w 20%");
 		choicePanel.add(rowDistChooser, "w 80%, wrap");
-		choicePanel.add(colLabel, "pushx, alignx 0%, w 20%");
+		choicePanel.add(colLabel, "label, pushx, alignx 0%, w 20%");
 		choicePanel.add(colDistChooser, "w 80%, wrap 20px");
 
 		/* Components for hierarchical linkage choice */
 		if (clusterChooser.getSelectedIndex() == 0) {
 			final JLabel method = GUIFactory.createLabel("Linkage Method",
-					GUIFactory.FONTL);
-			final JLabel choose = GUIFactory.createLabel("Choose: ",
-					GUIFactory.FONTS);
+					GUIFactory.FONTM);
 
-			choicePanel.add(method, "pushx, alignx 0%, span, wrap");
-			choicePanel.add(choose, "pushx, alignx 0%, w 20%");
-			choicePanel.add(linkageChooser, "pushx, alignx 0%, w 80%, wrap");
+			choicePanel.add(method, "label, pushx, alignx 0%");
+			choicePanel.add(linkageChooser, "pushx, w 80%, wrap");
 
 			/* k-means */
 		} else {
@@ -312,7 +307,7 @@ public class ClusterView {
 			choicePanel.add(req, "wrap");
 		}
 
-		choicePanel.add(ignoreZeroes);
+		choicePanel.add(ignoreZeroes, "push");
 
 		return choicePanel;
 	}
