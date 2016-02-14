@@ -61,7 +61,7 @@ public class ExportDialog extends CustomDialog {
 		optionsPanel.add(paper, "label");
 		optionsPanel.add(paperBox, "growx, wrap");
 		
-		contentPanel.add(previewPanel, "w 400!, h 400!");
+		contentPanel.add(previewPanel, "grow");//w 500!, h 500!");
 		contentPanel.add(optionsPanel, "aligny 0%, growx, push");
 		
 		this.exportBtn = GUIFactory.createBtn("Export");
@@ -114,6 +114,13 @@ public class ExportDialog extends CustomDialog {
 		return options;
 	}
 	
+	/**
+	 * Arranges the trees and the matrix on the preview panel, depending on
+	 * which trees are active.
+	 * @param rowTrees - The panel containing the row trees drawing.
+	 * @param colTrees - The panel containing the column trees drawing.
+	 * @param matrix - The panel containing the matrix drawing.
+	 */
 	public void setPreview(JPanel rowTrees, JPanel colTrees, JPanel matrix) {
 		
 		if(previewComp == null) {
@@ -128,14 +135,14 @@ public class ExportDialog extends CustomDialog {
 		}
 		
 		if(colTrees != null) {
-			previewComp.add(colTrees, "growx, pushx, h 80!, wrap");
+			previewComp.add(colTrees, "growx, pushx, h 80!, w 400!, wrap");
 		}
 		
 		if(rowTrees != null) {
-			previewComp.add(rowTrees, "growy, pushy, w 80!");
+			previewComp.add(rowTrees, "growy, pushy, h 400!, w 80!");
 		}
 		
-		previewComp.add(matrix, "push, grow");
+		previewComp.add(matrix, "h 400!, w 400!, push, grow");
 	}
 	
 	/**

@@ -35,7 +35,7 @@ public class ExportPreviewTrees extends JPanel {
 		} else {
 			x = WIDTH;
 			y = HEIGHT;
-		}
+		}		
 	}
 	
 	/*
