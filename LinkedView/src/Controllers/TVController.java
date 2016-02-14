@@ -525,13 +525,10 @@ public class TVController implements Observer {
 				getDataInfoAndLoad(fileSet, false);
 
 			} else {
-				message = "No file was selected. Cannot begin "
-						+ "loading data.";
-				showWarning(message);
 				return;
 			}
 		} catch (final LoadException e) {
-			message = "Loading the file was interrupted";
+			message = "Loading the file was interrupted.";
 			showWarning(message);
 			LogBuffer.logException(e);
 			return;
