@@ -5,15 +5,18 @@ import java.awt.event.ActionListener;
 
 import Controllers.TVController;
 import Utilities.StringRes;
+import edu.stanford.genetics.treeview.CopyType;
 
 public class LabelContextMenuController {
 
+	private boolean isRows;
 	private LabelContextMenu lCMenu;
 	private TVController tvController;
 
 	public LabelContextMenuController(LabelContextMenu lCMenu,
-			TVController tvController) {
+			TVController tvController, boolean isRows) {
 
+		this.isRows = isRows;
 		this.lCMenu = lCMenu;
 		this.tvController = tvController;
 
@@ -46,7 +49,7 @@ public class LabelContextMenuController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			tvController.copyLabels();
+			tvController.copyLabels(CopyType.ALL, isRows);
 		}
 	}
 }

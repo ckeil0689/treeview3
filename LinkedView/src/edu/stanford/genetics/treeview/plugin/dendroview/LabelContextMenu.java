@@ -13,13 +13,16 @@ public class LabelContextMenu extends JPopupMenu {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private final boolean isRowMenu;
+	
 	private final JMenuItem labelStyles;
 	private final JMenu clipboardMenu;
 	private final JMenuItem copyAll;
 
-	public LabelContextMenu() {
+	public LabelContextMenu(final boolean isRows) {
 
 		super();
+		this.isRowMenu = isRows;
 		this.labelStyles = new JMenuItem("Label settings...");
 		this.clipboardMenu = new JMenu("Copy labels");
 		this.copyAll = new JMenuItem("All");

@@ -31,11 +31,14 @@ import Views.ClusterView;
 import Views.DataImportController;
 import Views.DataImportDialog;
 import edu.stanford.genetics.treeview.CdtFilter;
+import edu.stanford.genetics.treeview.CopyType;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GeneListMaker;
+import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PreferencesMenu;
@@ -1050,11 +1053,54 @@ public class TVController implements Observer {
 
 	}
 	
-	public void copyLabels() {
+	/**
+	 * Copies labels to clipboard.
+	 * @param copyType
+	 * @param isRows
+	 */
+	public void copyLabels(final CopyType copyType, final boolean isRows) {
 		
-		String myString = "Test copy text";
+		String myString = "Sorry, no labels could be copied.";
+		
+		if(tvFrame.isLoaded() && tvFrame.getRunning() != null) {
+			HeaderSummary axisSummary;
+			HeaderInfo axisInfo;
+			if(isRows) {
+				axisSummary = tvFrame.getDendroView().getRowLabelView()
+						.getHeaderSummary();
+				axisInfo = model.getRowHeaderInfo();
+			} else {
+				axisSummary = tvFrame.getDendroView().getRowLabelView()
+						.getHeaderSummary();
+				axisInfo = model.getColumnHeaderInfo();
+			}
+			
+			myString = constructLabelString(axisSummary, axisInfo, isRows);
+		}
+		
+		
 		StringSelection stringSelection = new StringSelection(myString);
 		Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
 		clpbrd.setContents(stringSelection, null);
+	}
+	
+	private String constructLabelString(final HeaderSummary axisSummary, 
+			final HeaderInfo axisInfo, final boolean isRows) {
+		
+		String seperator = "\t";
+		int labelNum = axisInfo.getNumHeaders();
+		final StringBuilder sb = new StringBuilder();
+		
+		if(isRows) {
+			seperator = "\n";
+		}
+
+		for (int i = 0; i < labelNum; i++) {
+
+			sb.append(axisSummary.getSummary(axisInfo, i));
+			sb.append(seperator);
+		}
+
+		return sb.toString();
 	}
 }
