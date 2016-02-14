@@ -1,6 +1,5 @@
 package Views;
 
-import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -11,10 +10,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 import javax.swing.event.ChangeListener;
 
 import Utilities.CustomDialog;
@@ -37,12 +34,9 @@ public class DataImportDialog extends CustomDialog {
 
 	private JButton proceedBtn;
 	private JButton findDataBtn;
-	private JLabel statusIndicator;
 
 	private JSpinner rowDataStart;
 	private JSpinner columnDataStart;
-
-	private JCheckBox noLabelCheckBox;
 
 	private final List<JCheckBox> delimiters;
 
@@ -54,7 +48,7 @@ public class DataImportDialog extends CustomDialog {
 	public DataImportDialog(String filename) {
 
 		super("Data Import - [" + filename + "]");
-
+		
 		this.delimiters = new ArrayList<JCheckBox>();
 		
 		// "Cancel" makes more sense here than "Close" - functionality remains
@@ -78,23 +72,23 @@ public class DataImportDialog extends CustomDialog {
 		JPanel indexPanel;
 		JPanel buttonPanel;
 
-		final String delimText = "1) Select delimiters for your dataset:";
+		final String delimText = "Step 1. Select delimiters for your dataset:";
 		final JLabel preDelimiterLine = GUIFactory.createLabel(delimText,
 				GUIFactory.FONTM_B);
 
 		/* Delimiter panel */
 		delimPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
-		checkboxPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		checkboxPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 
 		checkboxPanel.add(tabDelimCheckBox, "push");
 		checkboxPanel.add(commaDelimCheckBox, "push");
 		checkboxPanel.add(semicolonDelimCheckBox, "push");
 		checkboxPanel.add(spaceDelimCheckBox, "push");
 
-		delimPanel.add(preDelimiterLine, "wrap");
 		delimPanel.add(checkboxPanel);
 
-		final String findDataStartText = "2) Select indices of first data cell:";
+		final String findDataStartText = "Step 2. Select indices of first "
+				+ "data cell:";
 		JLabel findDataStartLabel = GUIFactory.createLabel(findDataStartText,
 				GUIFactory.FONTM_B);
 
@@ -112,20 +106,14 @@ public class DataImportDialog extends CustomDialog {
 				GUIFactory.FONTS);
 		columnDataStart = new JSpinner(indexModel2);
 
-		String note = "(Note: This may sometimes be inaccurate, "
-				+ "especially if labels are numeric!)";
-		JLabel noteLabel = GUIFactory.createLabel(note, GUIFactory.FONTS);
+		findDataBtn = GUIFactory.createBtn("Auto-detect labels");
 
-		findDataBtn = GUIFactory.createBtn("Auto-find labels!");
-
-		indexPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		indexPanel = GUIFactory.createJPanel(false, GUIFactory.DEBUG);
 		indexPanel.add(rowSpinnerLabel);
-		indexPanel.add(rowDataStart);
+		indexPanel.add(rowDataStart, "al left, pushx");
 		indexPanel.add(columnSpinnerLabel, "al right");
-		indexPanel.add(columnDataStart);
-		indexPanel.add(noLabelCheckBox, "al right, pushx, wrap");
-		indexPanel.add(findDataBtn, "span 2 1, align left, pushx");
-		indexPanel.add(noteLabel, "pushx, span 3 1");
+		indexPanel.add(columnDataStart, "wrap");
+		indexPanel.add(findDataBtn, "span 2 1, align left, push");
 
 		final String previewText = "Preview (25x25):";
 		final JLabel preTableLine = GUIFactory.createLabel(previewText,
@@ -133,29 +121,20 @@ public class DataImportDialog extends CustomDialog {
 
 		final JScrollPane scrollPane = new JScrollPane(dataTable);
 
-		statusIndicator = new JLabel();
-		setStatus(DataImportDialog.LABELS_HINT);
-
 		proceedBtn = GUIFactory.createBtn("Proceed >");
 		proceedBtn.requestFocus();
 
 		buttonPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
-		buttonPanel.add(statusIndicator, "align left, pushx");
-		buttonPanel.add(closeBtn);
+		buttonPanel.add(closeBtn, "pushx, align right");
 		buttonPanel.add(proceedBtn, "align right");
 
 		getRootPane().setDefaultButton(findDataBtn);
 
-		mainPanel.add(delimPanel, "h :80:, push, wrap");
-
-		mainPanel.add(new JSeparator(SwingConstants.HORIZONTAL), "push, growx,"
-				+ " wrap");
+		mainPanel.add(preDelimiterLine, "push, wrap");
+		mainPanel.add(delimPanel, "grow, push, wrap");
 
 		mainPanel.add(findDataStartLabel, "push, wrap");
 		mainPanel.add(indexPanel, "push, wrap");
-
-		mainPanel.add(new JSeparator(SwingConstants.HORIZONTAL), "push, growx,"
-				+ " wrap");
 
 		mainPanel.add(preTableLine, "wrap");
 		mainPanel.add(scrollPane, "w :800:800, h :400:400, span, wrap");
@@ -177,8 +156,6 @@ public class DataImportDialog extends CustomDialog {
 	 * loading.
 	 */
 	private void setupCheckBoxes() {
-
-		noLabelCheckBox = new JCheckBox("No Labels");
 
 		tabDelimCheckBox = new JCheckBox("Tab");
 		delimiters.add(tabDelimCheckBox);
@@ -258,11 +235,6 @@ public class DataImportDialog extends CustomDialog {
 		columnDataStart.addChangeListener(l);
 	}
 
-	public void addNoLabelListener(ItemListener l) {
-
-		noLabelCheckBox.addItemListener(l);
-	}
-
 	public void addDelimCheckBoxesListener(ItemListener l) {
 
 		tabDelimCheckBox.addItemListener(l);
@@ -271,71 +243,9 @@ public class DataImportDialog extends CustomDialog {
 		semicolonDelimCheckBox.addItemListener(l);
 	}
 
-	public void setNoLabelSpinnerStatus() {
-
-		boolean allowSpinners = !noLabelCheckBox.isSelected();
-
-		if (allowSpinners) {
-			rowDataStart.setEnabled(true);
-			columnDataStart.setEnabled(true);
-			int rowCount = (int) rowDataStart.getValue();
-			int colCount = (int) columnDataStart.getValue();
-			updateTableLabels(rowCount, colCount);
-
-		} else {
-			rowDataStart.setEnabled(false);
-			columnDataStart.setEnabled(false);
-			updateTableLabels(0, 0);
-		}
-	}
-
-	public boolean allowsProceed() {
-
-		boolean hasIdentifiedLabels = (int) rowDataStart.getValue() > 0
-				|| (int) columnDataStart.getValue() > 0;
-		boolean hasLabels = !noLabelCheckBox.isSelected();
-
-		return (hasIdentifiedLabels && hasLabels) || !hasLabels;
-	}
-
-	public void setStatus(final int status) {
-
-		String message;
-		Color color;
-
-		switch (status) {
-		case DataImportDialog.LABELS_READY:
-			message = "Ready.";
-			color = new Color(65, 173, 73); // dark green
-			break;
-		case DataImportDialog.LABELS_WARNING:
-			message = "Please identify labels first!";
-			color = Color.RED;
-			break;
-		default:
-			message = "Identify your data's labels before proceeding.";
-			color = Color.BLACK;
-		}
-
-		statusIndicator.setText(message);
-		statusIndicator.setForeground(color);
-	}
-
 	public void setPreviewStatus() {
 
-		int message;
-		JButton defaultBtn;
-
-		if (allowsProceed()) {
-			message = DataImportDialog.LABELS_READY;
-			defaultBtn = proceedBtn;
-		} else {
-			message = DataImportDialog.LABELS_HINT;
-			defaultBtn = findDataBtn;
-		}
-
-		setStatus(message);
-		getRootPane().setDefaultButton(defaultBtn);
+		getRootPane().setDefaultButton(proceedBtn);
 	}
 
 	public void setSpinnerValues(final int rowCount, final int columnCount) {
