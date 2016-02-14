@@ -350,8 +350,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		}
 		
 		/* Replacing empty or whitespace-only labels */
-		replaceEmptyLabels(readGPrefixes);
-		replaceEmptyLabels(readAPrefixes);
+		replaceEmptyLabels(readGPrefixes, "ROW");
+		replaceEmptyLabels(readAPrefixes, "COLUMN");
 		
 		/* set the prefixes */
 		targetModel.setGenePrefix(readGPrefixes);
@@ -362,7 +362,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.setGweightFound(hasGWeight);
 	}
 	
-	private String[] replaceEmptyLabels(String[] original) {
+	private String[] replaceEmptyLabels(String[] original, final String axis) {
 		
 		Pattern p = Pattern.compile("(^\\s+$|^$)", 
 				Pattern.UNICODE_CHARACTER_CLASS);
@@ -371,7 +371,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			Matcher m = p.matcher(original[i]);
 			if(m.find()) {
 				int idx = i + 1;
-				original[i] = "LABELS " + idx;
+				original[i] = axis + " LABELS " + idx;
 			}
 		}
 		
