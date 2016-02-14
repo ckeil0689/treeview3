@@ -364,7 +364,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	
 	private String[] replaceEmptyLabels(String[] original, final String axis) {
 		
-		Pattern p = Pattern.compile("(^\\s+$|^$)", 
+		Pattern p = Pattern.compile("(^\\s*$)", 
 				Pattern.UNICODE_CHARACTER_CLASS);
 		
 		for(int i = 0; i < original.length; i++) {
