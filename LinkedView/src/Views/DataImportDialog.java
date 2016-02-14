@@ -108,7 +108,7 @@ public class DataImportDialog extends CustomDialog {
 
 		findDataBtn = GUIFactory.createBtn("Auto-detect labels");
 
-		indexPanel = GUIFactory.createJPanel(false, GUIFactory.DEBUG);
+		indexPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		indexPanel.add(rowSpinnerLabel);
 		indexPanel.add(rowDataStart, "al left, pushx");
 		indexPanel.add(columnSpinnerLabel, "al right");
