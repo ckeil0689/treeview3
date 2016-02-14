@@ -2,6 +2,8 @@ package Controllers;
 
 import java.awt.Frame;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -1046,5 +1048,13 @@ public class TVController implements Observer {
 			addMenuListeners();
 		}
 
+	}
+	
+	public void copyLabels() {
+		
+		String myString = "Test copy text";
+		StringSelection stringSelection = new StringSelection(myString);
+		Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clpbrd.setContents(stringSelection, null);
 	}
 }

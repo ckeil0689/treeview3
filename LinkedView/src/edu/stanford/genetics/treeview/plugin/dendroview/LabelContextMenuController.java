@@ -23,6 +23,7 @@ public class LabelContextMenuController {
 	private void addAllListeners() {
 
 		lCMenu.addStyleListener(new StyleMenuListener());
+		lCMenu.addCopyAllListener(new CopyAllListener());
 	}
 
 	/**
@@ -37,7 +38,15 @@ public class LabelContextMenuController {
 		public void actionPerformed(ActionEvent e) {
 
 			tvController.openPrefMenu(StringRes.menu_RowAndCol);
-			;
+		}
+	}
+	
+	private class CopyAllListener implements ActionListener {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			tvController.copyLabels();
 		}
 	}
 }
