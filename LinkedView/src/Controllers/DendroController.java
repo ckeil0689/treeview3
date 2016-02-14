@@ -938,8 +938,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		bindTrees();
 
 		// Set context menu for LabelViews
-		LabelContextMenu rowLabelContext = new LabelContextMenu(true);
-		LabelContextMenu colLabelContext = new LabelContextMenu(false);
+		LabelContextMenu rowLabelContext = new LabelContextMenu();
+		LabelContextMenu colLabelContext = new LabelContextMenu();
 		
 		new LabelContextMenuController(rowLabelContext, tvController, true);
 		new LabelContextMenuController(colLabelContext, tvController, false);

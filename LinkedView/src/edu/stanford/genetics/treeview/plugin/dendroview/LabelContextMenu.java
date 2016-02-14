@@ -12,22 +12,23 @@ public class LabelContextMenu extends JPopupMenu {
 	 * Default serial version ID to keep Eclipse happy...
 	 */
 	private static final long serialVersionUID = 1L;
-
-	private final boolean isRowMenu;
 	
 	private final JMenuItem labelStyles;
 	private final JMenu clipboardMenu;
 	private final JMenuItem copyAll;
+	private final JMenuItem copySelected;
 
-	public LabelContextMenu(final boolean isRows) {
+	public LabelContextMenu() {
 
 		super();
-		this.isRowMenu = isRows;
 		this.labelStyles = new JMenuItem("Label settings...");
 		this.clipboardMenu = new JMenu("Copy labels");
 		this.copyAll = new JMenuItem("All");
+		this.copySelected = new JMenuItem("Selected");
 		
 		clipboardMenu.add(copyAll);
+		clipboardMenu.add(copySelected);
+		
 		this.add(labelStyles);
 		this.addSeparator();
 		this.add(clipboardMenu);
@@ -41,6 +42,11 @@ public class LabelContextMenu extends JPopupMenu {
 	protected void addCopyAllListener(ActionListener l) {
 
 		copyAll.addActionListener(l);
+	}
+	
+	protected void addCopySelectedListener(ActionListener l) {
+
+		copySelected.addActionListener(l);
 	}
 
 }

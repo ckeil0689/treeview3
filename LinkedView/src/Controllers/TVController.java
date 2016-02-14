@@ -1060,24 +1060,30 @@ public class TVController implements Observer {
 	 */
 	public void copyLabels(final CopyType copyType, final boolean isRows) {
 		
-		String myString = "Sorry, no labels could be copied.";
-		
-		if(tvFrame.isLoaded() && tvFrame.getRunning() != null) {
-			HeaderSummary axisSummary;
-			HeaderInfo axisInfo;
-			if(isRows) {
-				axisSummary = tvFrame.getDendroView().getRowLabelView()
-						.getHeaderSummary();
-				axisInfo = model.getRowHeaderInfo();
-			} else {
-				axisSummary = tvFrame.getDendroView().getRowLabelView()
-						.getHeaderSummary();
-				axisInfo = model.getColumnHeaderInfo();
-			}
-			
-			myString = constructLabelString(axisSummary, axisInfo, isRows);
+		if(!tvFrame.isLoaded() || tvFrame.getRunning() == null) {
+			return;
 		}
 		
+		String myString = "";
+		HeaderSummary axisSummary;
+		HeaderInfo axisInfo;
+		TreeSelectionI treeSelection;
+		
+		if(isRows) {
+			axisSummary = tvFrame.getDendroView().getRowLabelView()
+					.getHeaderSummary();
+			axisInfo = model.getRowHeaderInfo();
+			treeSelection = tvFrame.getRowSelection();
+			
+		} else {
+			axisSummary = tvFrame.getDendroView().getRowLabelView()
+					.getHeaderSummary();
+			axisInfo = model.getColumnHeaderInfo();
+			treeSelection = tvFrame.getColSelection();
+		}
+		
+		myString = constructLabelString(axisSummary, axisInfo, 
+				treeSelection, copyType, isRows);
 		
 		StringSelection stringSelection = new StringSelection(myString);
 		Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -1085,7 +1091,8 @@ public class TVController implements Observer {
 	}
 	
 	private String constructLabelString(final HeaderSummary axisSummary, 
-			final HeaderInfo axisInfo, final boolean isRows) {
+			final HeaderInfo axisInfo, final TreeSelectionI treeSelection, 
+			final CopyType copyType, final boolean isRows) {
 		
 		String seperator = "\t";
 		int labelNum = axisInfo.getNumHeaders();
@@ -1095,10 +1102,22 @@ public class TVController implements Observer {
 			seperator = "\n";
 		}
 
-		for (int i = 0; i < labelNum; i++) {
-
-			sb.append(axisSummary.getSummary(axisInfo, i));
-			sb.append(seperator);
+		if(copyType == CopyType.ALL) {
+			for (int i = 0; i < labelNum; i++) {
+				sb.append(axisSummary.getSummary(axisInfo, i));
+				sb.append(seperator);
+			}
+			
+		} else if(copyType == CopyType.SELECTION && treeSelection != null) {
+			for (int i = 0; i < labelNum; i++) {
+				if(treeSelection.isIndexSelected(i)) {
+					sb.append(axisSummary.getSummary(axisInfo, i));
+					sb.append(seperator);
+				}
+			}
+			
+		} else if(copyType == CopyType.VISIBLE) {
+			
 		}
 
 		return sb.toString();
