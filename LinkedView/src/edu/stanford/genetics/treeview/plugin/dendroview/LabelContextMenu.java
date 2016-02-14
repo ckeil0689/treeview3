@@ -17,6 +17,7 @@ public class LabelContextMenu extends JPopupMenu {
 	private final JMenu clipboardMenu;
 	private final JMenuItem copyAll;
 	private final JMenuItem copySelected;
+	private final JMenuItem copyVisible;
 
 	public LabelContextMenu() {
 
@@ -25,9 +26,11 @@ public class LabelContextMenu extends JPopupMenu {
 		this.clipboardMenu = new JMenu("Copy labels");
 		this.copyAll = new JMenuItem("All");
 		this.copySelected = new JMenuItem("Selected");
+		this.copyVisible = new JMenuItem("Visible");
 		
 		clipboardMenu.add(copyAll);
 		clipboardMenu.add(copySelected);
+		clipboardMenu.add(copyVisible);
 		
 		this.add(labelStyles);
 		this.addSeparator();
@@ -47,6 +50,11 @@ public class LabelContextMenu extends JPopupMenu {
 	protected void addCopySelectedListener(ActionListener l) {
 
 		copySelected.addActionListener(l);
+	}
+	
+	protected void addCopyVisibleListener(ActionListener l) {
+
+		copyVisible.addActionListener(l);
 	}
 
 }

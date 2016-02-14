@@ -2,8 +2,6 @@ package Controllers;
 
 import java.awt.Frame;
 import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -37,8 +35,6 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GeneListMaker;
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PreferencesMenu;
@@ -1054,72 +1050,12 @@ public class TVController implements Observer {
 	}
 	
 	/**
-	 * Copies labels to clipboard.
+	 * Relays copy call to dendroController.
 	 * @param copyType
 	 * @param isRows
 	 */
 	public void copyLabels(final CopyType copyType, final boolean isRows) {
 		
-		if(!tvFrame.isLoaded() || tvFrame.getRunning() == null) {
-			return;
-		}
-		
-		String myString = "";
-		HeaderSummary axisSummary;
-		HeaderInfo axisInfo;
-		TreeSelectionI treeSelection;
-		
-		if(isRows) {
-			axisSummary = tvFrame.getDendroView().getRowLabelView()
-					.getHeaderSummary();
-			axisInfo = model.getRowHeaderInfo();
-			treeSelection = tvFrame.getRowSelection();
-			
-		} else {
-			axisSummary = tvFrame.getDendroView().getRowLabelView()
-					.getHeaderSummary();
-			axisInfo = model.getColumnHeaderInfo();
-			treeSelection = tvFrame.getColSelection();
-		}
-		
-		myString = constructLabelString(axisSummary, axisInfo, 
-				treeSelection, copyType, isRows);
-		
-		StringSelection stringSelection = new StringSelection(myString);
-		Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-		clpbrd.setContents(stringSelection, null);
-	}
-	
-	private String constructLabelString(final HeaderSummary axisSummary, 
-			final HeaderInfo axisInfo, final TreeSelectionI treeSelection, 
-			final CopyType copyType, final boolean isRows) {
-		
-		String seperator = "\t";
-		int labelNum = axisInfo.getNumHeaders();
-		final StringBuilder sb = new StringBuilder();
-		
-		if(isRows) {
-			seperator = "\n";
-		}
-
-		if(copyType == CopyType.ALL) {
-			for (int i = 0; i < labelNum; i++) {
-				sb.append(axisSummary.getSummary(axisInfo, i));
-				sb.append(seperator);
-			}
-			
-		} else if(copyType == CopyType.SELECTION && treeSelection != null) {
-			for (int i = 0; i < labelNum; i++) {
-				if(treeSelection.isIndexSelected(i)) {
-					sb.append(axisSummary.getSummary(axisInfo, i));
-					sb.append(seperator);
-				}
-			}
-			
-		} else if(copyType == CopyType.VISIBLE) {
-			
-		}
-
-		return sb.toString();
+		dendroController.copyLabels(copyType, isRows);
 	}
 }

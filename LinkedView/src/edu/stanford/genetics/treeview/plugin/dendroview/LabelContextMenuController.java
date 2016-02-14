@@ -28,6 +28,7 @@ public class LabelContextMenuController {
 		lCMenu.addStyleListener(new StyleMenuListener());
 		lCMenu.addCopyAllListener(new CopyAllListener());
 		lCMenu.addCopySelectedListener(new CopySelectedListener());
+		lCMenu.addCopyVisibleListener(new CopyVisibleListener());
 	}
 
 	/**
@@ -60,6 +61,15 @@ public class LabelContextMenuController {
 		public void actionPerformed(ActionEvent e) {
 
 			tvController.copyLabels(CopyType.SELECTION, isRows);
+		}
+	}
+	
+	private class CopyVisibleListener implements ActionListener {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			tvController.copyLabels(CopyType.VISIBLE, isRows);
 		}
 	}
 }
