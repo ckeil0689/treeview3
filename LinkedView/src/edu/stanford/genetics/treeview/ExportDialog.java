@@ -51,7 +51,7 @@ public class ExportDialog extends CustomDialog {
 		JLabel paper = GUIFactory.createLabel("Paper Size:", GUIFactory.FONTS);
 		
 		formatBox = new JComboBox<Object>(EXP_FORMATS.values());
-		paperBox = new JComboBox<Object>(PAPER_TYPE.values());
+		paperBox = new JComboBox<Object>(PaperType.values());
 		
 		previewPanel.add(previewComp, "grow, push");
 		
