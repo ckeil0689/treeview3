@@ -243,7 +243,7 @@ public class ClusterView {
 	public JPanel setupChoicePanel() {
 
 		final JPanel choicePanel = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT, null);
+				GUIFactory.DEFAULT);
 
 		// Components for choosing Cluster type
 		final JLabel type = GUIFactory.createLabel("Cluster Type",
@@ -264,7 +264,9 @@ public class ClusterView {
 		choicePanel.add(rowLabel, "label, pushx, alignx 0%, w 20%");
 		choicePanel.add(rowDistChooser, "w 80%, wrap");
 		choicePanel.add(colLabel, "label, pushx, alignx 0%, w 20%");
-		choicePanel.add(colDistChooser, "w 80%, wrap 20px");
+		choicePanel.add(colDistChooser, "w 80%, wrap");
+		
+		choicePanel.add(ignoreZeroes, "push, span, wrap 20px");
 
 		/* Components for hierarchical linkage choice */
 		if (clusterChooser.getSelectedIndex() == 0) {
@@ -306,8 +308,6 @@ public class ClusterView {
 			choicePanel.add(colIterationsSettr, "wrap");
 			choicePanel.add(req, "wrap");
 		}
-
-		choicePanel.add(ignoreZeroes, "push");
 
 		return choicePanel;
 	}
