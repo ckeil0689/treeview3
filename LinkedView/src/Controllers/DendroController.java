@@ -1,8 +1,8 @@
 package Controllers;
 
-import java.awt.Component;
-import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -11,7 +11,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
@@ -40,6 +39,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
+import edu.stanford.genetics.treeview.CopyType;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.HeaderInfo;
@@ -66,8 +66,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
-
-import java.awt.event.MouseListener;
 
 /* 
  * NOTES: 
@@ -943,11 +941,14 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		bindTrees();
 
 		// Set context menu for LabelViews
-		LabelContextMenu lCMenu = new LabelContextMenu();
-		LabelContextMenuController lCMenuController = new LabelContextMenuController(
-				lCMenu, tvController);
-		dendroView.getRowLabelView().setComponentPopupMenu(lCMenu);
-		dendroView.getColumnLabelView().setComponentPopupMenu(lCMenu);
+		LabelContextMenu rowLabelContext = new LabelContextMenu();
+		LabelContextMenu colLabelContext = new LabelContextMenu();
+		
+		new LabelContextMenuController(rowLabelContext, tvController, true);
+		new LabelContextMenuController(colLabelContext, tvController, false);
+		
+		dendroView.getRowLabelView().setComponentPopupMenu(rowLabelContext);
+		dendroView.getColumnLabelView().setComponentPopupMenu(colLabelContext);
 
 		// perhaps I could remember this stuff in the MapContainer...
 		interactiveXmap.setIndexRange(0,
@@ -1687,5 +1688,97 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		dendroView.getXYPlusButton().setEnabled(
 				(xTilesVisible != 1) || (yTilesVisible != 1));
 		dendroView.getZoomButton().setEnabled(!isSelectionZoomed);
+	}
+	
+	/**
+	 * Copies labels to clipboard.
+	 * @param copyType - The CopyType chosen by the user.
+	 * @param isRows - A flag identifying the axis.
+	 */
+	public void copyLabels(final CopyType copyType, final boolean isRows) {
+		
+		if(!tvFrame.isLoaded() || tvFrame.getRunning() == null) {
+			return;
+		}
+		
+		String labels = "";
+		HeaderSummary axisSummary;
+		HeaderInfo axisInfo;
+		TreeSelectionI treeSelection;
+		MapContainer map;
+		
+		if(isRows) {
+			axisSummary = tvFrame.getDendroView().getRowLabelView()
+					.getHeaderSummary();
+			axisInfo = tvModel.getRowHeaderInfo();
+			treeSelection = tvFrame.getRowSelection();
+			map = interactiveYmap;
+			
+		} else {
+			axisSummary = tvFrame.getDendroView().getRowLabelView()
+					.getHeaderSummary();
+			axisInfo = tvModel.getColumnHeaderInfo();
+			treeSelection = tvFrame.getColSelection();
+			map = interactiveXmap;
+		}
+		
+		labels = constructLabelString(axisSummary, axisInfo, 
+				treeSelection, map, copyType, isRows);
+		
+		StringSelection stringSelection = new StringSelection(labels);
+		Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clpbrd.setContents(stringSelection, null);
+	}
+	
+	/**
+	 * Construct a clipboard string from the labels according to the 
+	 * CopyType and axis.
+	 * @param axisSummary - Has the included labels.
+	 * @param axisInfo - Needed to retrieve labels from HeaderSummary.
+	 * @param treeSelection - Needed for copying selected labels.
+	 * @param map - The IMV map for the specific axis. Needed to find out
+	 * which range of indices is visible.
+	 * @param copyType - The type of clipboard copying chosen by the user.
+	 * @param isRows - A flag which indicates the target axis.
+	 * @return A constructed string for the clipboard.
+	 */
+	private String constructLabelString(final HeaderSummary axisSummary, 
+			final HeaderInfo axisInfo, final TreeSelectionI treeSelection, 
+			final MapContainer map, final CopyType copyType, 
+			final boolean isRows) {
+		
+		String seperator = "\t";
+		int labelNum = axisInfo.getNumHeaders();
+		final StringBuilder sb = new StringBuilder();
+		
+		if(isRows) {
+			seperator = "\n";
+		}
+
+		if(copyType == CopyType.ALL) {
+			for (int i = 0; i < labelNum; i++) {
+				sb.append(axisSummary.getSummary(axisInfo, i));
+				sb.append(seperator);
+			}
+			
+		} else if(copyType == CopyType.SELECTION && treeSelection != null) {
+			for (int i = 0; i < labelNum; i++) {
+				if(treeSelection.isIndexSelected(i)) {
+					sb.append(axisSummary.getSummary(axisInfo, i));
+					sb.append(seperator);
+				}
+			}
+			
+		} else if(copyType == CopyType.VISIBLE) {
+			int start = map.getFirstVisible();
+			int end = start + map.getNumVisible();
+			
+			for (int i = start; i < end; i++) {
+				sb.append(axisSummary.getSummary(axisInfo, i));
+				sb.append(seperator);
+			}
+		}
+
+		return sb.toString();
 	}
 }

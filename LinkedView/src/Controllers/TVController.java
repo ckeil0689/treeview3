@@ -29,6 +29,7 @@ import Views.ClusterView;
 import Views.DataImportController;
 import Views.DataImportDialog;
 import edu.stanford.genetics.treeview.CdtFilter;
+import edu.stanford.genetics.treeview.CopyType;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
@@ -1043,5 +1044,15 @@ public class TVController implements Observer {
 			addMenuListeners();
 		}
 
+	}
+	
+	/**
+	 * Relays copy call to dendroController.
+	 * @param copyType
+	 * @param isRows
+	 */
+	public void copyLabels(final CopyType copyType, final boolean isRows) {
+		
+		dendroController.copyLabels(copyType, isRows);
 	}
 }
