@@ -42,7 +42,7 @@ public class StringRes {
 	public static final String main_cols = "Columns";
 
 	// Title Screen
-	public static final String title_Hello = "Hello, how are you Gentlepeople?";
+	public static final String title_Hello = "Hello! How are you, Gentlepeople?";
 	public static final String title_Welcome = "Welcome to ";
 
 	// Loading
