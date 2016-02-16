@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
@@ -336,7 +338,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		/* read array prefixes */
 		for (int i = 0; i < nExprPrefix; i++) {
-
 			readAPrefixes[i] = stringLabels[i][0];
 		}
 
@@ -345,10 +346,13 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		 * inconsistent and we wanna keep backwards compatibility.
 		 */
 		if (readAPrefixes[0].equalsIgnoreCase("GID")) {
-
 			readAPrefixes[0] = assurePrefixNames(readGPrefixes);
 		}
-
+		
+		/* Replacing empty or whitespace-only labels */
+		replaceEmptyLabels(readGPrefixes, "ROW");
+		replaceEmptyLabels(readAPrefixes, "COLUMN");
+		
 		/* set the prefixes */
 		targetModel.setGenePrefix(readGPrefixes);
 		targetModel.setArrayPrefix(readAPrefixes);
@@ -356,6 +360,22 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		/* set weight status */
 		targetModel.setEweightFound(hasEWeight);
 		targetModel.setGweightFound(hasGWeight);
+	}
+	
+	private String[] replaceEmptyLabels(String[] original, final String axis) {
+		
+		Pattern p = Pattern.compile("(^\\s*$)", 
+				Pattern.UNICODE_CHARACTER_CLASS);
+		
+		for(int i = 0; i < original.length; i++) {
+			Matcher m = p.matcher(original[i]);
+			if(m.find()) {
+				int idx = i + 1;
+				original[i] = axis + " LABELS " + idx;
+			}
+		}
+		
+		return original;
 	}
 
 	/**
