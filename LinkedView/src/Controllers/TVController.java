@@ -37,7 +37,7 @@ import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GeneListMaker;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.PreferencesMenu;
+import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -950,7 +950,7 @@ public class TVController implements Observer {
 	public void openPrefMenu(final String menu) {
 
 		// View
-		final PreferencesMenu preferences = new PreferencesMenu(tvFrame);
+		final LabelSettings preferences = new LabelSettings(tvFrame);
 
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 			preferences.setHeaderInfo(model.getRowHeaderInfo(),
@@ -988,11 +988,7 @@ public class TVController implements Observer {
 		final double median = model.getDataMatrix().getMedian();
 
 		/* View */
-		// TODO get colorExtractor instance from dendroController...
 		ColorExtractor colorExtractor = dendroController.getColorExtractor();
-		
-//		ColorExtractor drawer = ((DoubleArrayDrawer) dendroController
-//				.getArrayDrawer()).getColorExtractor();
 
 		final ColorChooserUI gradientPick = new ColorChooserUI(colorExtractor, 
 				min, max, mean, median);
