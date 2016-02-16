@@ -51,7 +51,7 @@ public class MenubarController {
 		switch (name) {
 
 		case StringRes.menu_Open:
-			controller.openFile();
+			controller.openFile(null);
 			break;
 		// case StringRes.menu_Save:
 		// controller.doModelSave(true);
