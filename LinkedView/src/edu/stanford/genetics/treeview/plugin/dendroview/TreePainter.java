@@ -374,7 +374,9 @@ public class TreePainter extends TreeDrawer {
 			final int endIndex) {
 	
 			Stack<TreeDrawerNode> returnStack = new Stack<TreeDrawerNode>();
-	
+
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //			// just return if no subkids visible.
 //			if((node.getMaxIndex() < minInd) ||
 //				(node.getMinIndex() > maxInd)) {
@@ -398,6 +400,8 @@ public class TreePainter extends TreeDrawer {
 				leftDotNodeStack = exportDFS(node.getLeft(),treeSelection,
 					xIndent,yIndent,size,minCorr,maxCorr,startIndex,endIndex);
 			}
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //			//We do not recurse down to the leaves, so add them to the stack
 //			//here
 //			else if(treeSelection.isIndexSelected(
@@ -411,6 +415,8 @@ public class TreePainter extends TreeDrawer {
 				rightDotNodeStack = exportDFS(node.getRight(),treeSelection,
 					xIndent,yIndent,size,minCorr,maxCorr,startIndex,endIndex);
 			}
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //			//We do not recurse down to the leaves, so add them to the stack
 //			//here
 //			else if(treeSelection.isIndexSelected(
@@ -421,6 +427,8 @@ public class TreePainter extends TreeDrawer {
 	
 			boolean thisNodeIsSelected = false;
 	
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //			//If the stack returned from each child contains 1 selected
 //			//node and that node is the child of this node, then we're not going
 //			//to draw dots for those nodes and just draw a dot for this node.
@@ -587,26 +595,34 @@ public class TreePainter extends TreeDrawer {
 			final int size,final double minCorr,final double maxCorr,
 			final int startIndex,final int endIndex) {
 	
-			if (xT == null) {
-				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
+//			if (xT == null) {
+//				LogBuffer.println("xt in drawSingle in InvertedTreeDrawer "
+//						+ "was null.");
+//				return;
+//			}
+
+			if (node == null) {
+				LogBuffer.println("node in drawSingle in InvertedTreeDrawer "
 						+ "was null.");
 				return;
 			}
-	
+
 			if (node.getRight() == null) {
 				LogBuffer.println("right in drawSingle in InvertedTreeDrawer "
 						+ "was null.");
 				return;
 			}
-	
+
 			// draw our (flipped) polyline...
 			graphics.setColor(node.getColor());
-	
+
 			exportLeftBranch(node,isSelected,xIndent,yIndent,size,minCorr,
 				maxCorr,startIndex,endIndex);
-	
+
 			graphics.setColor(node.getColor());
-	
+
 			exportRightBranch(node,isSelected,xIndent,yIndent,size,minCorr,
 				maxCorr,startIndex,endIndex);
 		}
@@ -798,22 +814,29 @@ public class TreePainter extends TreeDrawer {
 			final boolean isSelected,final int xIndent,final int yIndent,
 			final int size,final double minCorr,final double maxCorr,
 			final int startIndex,final int endIndex) {
-	
-			final TreeDrawerNode left = node.getLeft();
-//			final boolean hovered = (node.getLeft().getIndex() == hoverIndex);
-	
-			if (xT == null) {
-				LogBuffer.println("xt in drawLeftBranch in InvertedTreeDrawer "
+
+			if (node == null) {
+				LogBuffer.println("node in drawSingle in InvertedTreeDrawer "
 						+ "was null.");
 				return;
 			}
-	
+
+			final TreeDrawerNode left = node.getLeft();
+
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
+//			if (xT == null) {
+//				LogBuffer.println("xt in drawLeftBranch in InvertedTreeDrawer "
+//						+ "was null.");
+//				return;
+//			}
+
 			if (left == null) {
 				LogBuffer.println("left in drawSingle in InvertedTreeDrawer "
 						+ "was null.");
 				return;
 			}
-	
+
 			int lx = 0;
 			int tx = 0;
 	
@@ -822,6 +845,8 @@ public class TreePainter extends TreeDrawer {
 	
 			int c = 0;
 	
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //			int pointerBaseOffset = (left.isLeaf() ? 2 : 1);
 			int minCoord = 0;
 			int maxCoord = 0;
@@ -829,11 +854,15 @@ public class TreePainter extends TreeDrawer {
 
 			// GTRView
 			if (isLeft) {
-				lx = (int) Math.round((left.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
-				tx = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
+				lx = (int) Math.round((left.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (xIndent - 1));
+				tx = (int) Math.round((node.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (xIndent - 1));
 
-				ly = yIndent + (int) Math.round(left.getIndex() * size + (size / 2)) - startIndex * size;
-				c = yIndent + (int) Math.round(node.getIndex() * size + (size / 2)) - startIndex * size;
+				ly = yIndent + (int) Math.round(left.getIndex() * size +
+					(size / 2)) - startIndex * size;
+				c = yIndent + (int) Math.round(node.getIndex() * size +
+					(size / 2)) - startIndex * size;
 	
 				//These values define the "horizontal" drawing area
 				minCoord = yIndent;// + startIndex * size;
@@ -861,17 +890,23 @@ public class TreePainter extends TreeDrawer {
 					c = maxCoord;
 				}
 
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //				if(Math.abs(lx - tx) < 3) {
 //					pointerBaseOffset = 0;
 //				}
 				// ATRView
 			} else {
-				ly = (int) Math.round((left.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
-				ty = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
+				ly = (int) Math.round((left.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (yIndent - 1));
+				ty = (int) Math.round((node.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (yIndent - 1));
 	
-				lx = xIndent + (int) Math.round(left.getIndex() * size + (size / 2)) - startIndex * size;
-				c = xIndent + (int) Math.round(node.getIndex() * size + (size / 2)) - startIndex * size;
-	
+				lx = xIndent + (int) Math.round(left.getIndex() * size +
+					(size / 2)) - startIndex * size;
+				c = xIndent + (int) Math.round(node.getIndex() * size +
+					(size / 2)) - startIndex * size;
+
 				//These values define the "horizontal" drawing area
 				minCoord = xIndent;// + startIndex * size;
 				maxCoord = xIndent + endIndex * size - startIndex * size + size;
@@ -898,31 +933,23 @@ public class TreePainter extends TreeDrawer {
 					c = maxCoord;
 				}
 
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //				if(Math.abs(ly - ty) < 3) {
 //					pointerBaseOffset = 0;
 //				}
 			}
 	
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //			if(hovered || isHovered) {
 //				graphics.setColor(Color.red);
 //			}
 	
 			// draw our (flipped) polyline...
 			if(isLeft) {
-//				graphics.drawPolyline(
-//					new int[] {
-//						tx,
-//						tx,
-//						lx
-//					},
-//					new int[] {
-//						c,
-//						ly,
-//						ly
-//					},
-//					3);
 				//The VectorGraphics2D library messes up the drawPolyline call
-				//above sometimes and skips the center point, so drawing two-
+				//sometimes and skips the center point, so drawing two-
 				//separate lines (while less attractively drawn) is more
 				//reliable
 				graphics.drawLine(tx,c,tx,ly);
@@ -930,6 +957,8 @@ public class TreePainter extends TreeDrawer {
 					graphics.drawLine(tx,ly,lx,ly);
 				}
 
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //				//Draw an outline around the line to either bold a hovered
 //				//branch or highlight a selected branch
 //				if(hovered || isSelected) {
@@ -966,22 +995,8 @@ public class TreePainter extends TreeDrawer {
 //						3);
 //				}
 			} else {
-//				graphics.drawPolyline(
-//					new int[] {
-//						//Horizontal coordinates
-//						c,                                //center
-//						lx,                               //left leaf corner
-//						lx                                //left leaf end
-//					},
-//					new int[] {
-//						//Vertical coordinates
-//						ty,                               //center
-//						ty,                               //left leaf corner
-//						ly                                //left leaf end
-//					},
-//					3);
 				//The VectorGraphics2D library messes up the drawPolyline call
-				//above sometimes and skips the center point, so drawing two-
+				//sometimes and skips the center point, so drawing two-
 				//separate lines (while less attractively drawn) is more
 				//reliable
 				graphics.drawLine(c,ty,lx,ty);
@@ -989,6 +1004,8 @@ public class TreePainter extends TreeDrawer {
 					graphics.drawLine(lx,ty,lx,ly);
 				}
 
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //				//Draw an outline around the line to either bold a hovered
 //				//branch or highlight a selected branch
 //				if(hovered || isSelected) {
@@ -1215,14 +1232,21 @@ public class TreePainter extends TreeDrawer {
 			final int size,final double minCorr,final double maxCorr,
 			final int startIndex,final int endIndex) {
 
-			final TreeDrawerNode right = node.getRight();
-//			final boolean hovered = (node.getRight().getIndex() == hoverIndex);
-
-			if (xT == null) {
-				LogBuffer.println("xt in drawRightBranch in InvertedTreeDrawer "
+			if (node == null) {
+				LogBuffer.println("node in drawSingle in InvertedTreeDrawer "
 						+ "was null.");
 				return;
 			}
+
+			final TreeDrawerNode right = node.getRight();
+
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
+//			if (xT == null) {
+//				LogBuffer.println("xt in drawRightBranch in InvertedTreeDrawer "
+//						+ "was null.");
+//				return;
+//			}
 
 			if (right == null) {
 				LogBuffer.println("right in drawSingle in InvertedTreeDrawer "
@@ -1238,6 +1262,8 @@ public class TreePainter extends TreeDrawer {
 
 			int c = 0;
 
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //			int pointerBaseOffset = (right.isLeaf() ? 2 : 0);
 			int minCoord = 0;
 			int maxCoord = 0;
@@ -1245,11 +1271,15 @@ public class TreePainter extends TreeDrawer {
 
 			// GTRView
 			if (isLeft) {
-				rx = (int) Math.round((right.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
-				tx = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (xIndent - 1));
+				rx = (int) Math.round((right.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (xIndent - 1));
+				tx = (int) Math.round((node.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (xIndent - 1));
 
-				ry = yIndent + (int) Math.round(right.getIndex() * size + (size / 2)) - startIndex * size;
-				c = yIndent + (int) Math.round(node.getIndex() * size + (size / 2)) - startIndex * size;
+				ry = yIndent + (int) Math.round(right.getIndex() * size +
+					(size / 2)) - startIndex * size;
+				c = yIndent + (int) Math.round(node.getIndex() * size +
+					(size / 2)) - startIndex * size;
 
 				//These values define the "horizontal" drawing area
 				minCoord = yIndent;// + startIndex * size;
@@ -1277,6 +1307,8 @@ public class TreePainter extends TreeDrawer {
 					ry = maxCoord;
 				}
 
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //				if(Math.abs(rx - tx) < 3) {
 //					pointerBaseOffset = 0;
 //				}
@@ -1284,11 +1316,15 @@ public class TreePainter extends TreeDrawer {
 			}
 			// ATRView
 			else {
-				ry = (int) Math.round((right.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
-				ty = (int) Math.round((node.getCorr() - minCorr) / (maxCorr - minCorr) * (yIndent - 1));
+				ry = (int) Math.round((right.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (yIndent - 1));
+				ty = (int) Math.round((node.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (yIndent - 1));
 
-				rx = xIndent + (int) Math.round(right.getIndex() * size + (size / 2)) - startIndex * size;
-				c = xIndent + (int) Math.round(node.getIndex() * size + (size / 2)) - startIndex * size;
+				rx = xIndent + (int) Math.round(right.getIndex() * size +
+					(size / 2)) - startIndex * size;
+				c = xIndent + (int) Math.round(node.getIndex() * size +
+					(size / 2)) - startIndex * size;
 
 				//These values define the "horizontal" drawing area
 				minCoord = xIndent;// + startIndex * size;
@@ -1316,31 +1352,23 @@ public class TreePainter extends TreeDrawer {
 					rx = maxCoord;
 				}
 
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //				if(Math.abs(ry - ty) < 3) {
 //					pointerBaseOffset = 0;
 //				}
 			}
 
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //			// draw our (flipped) polyline...
 //			if(hovered || isHovered) {
 //				graphics.setColor(Color.red);
 //			}
 
 			if (isLeft) {
-//				graphics.drawPolyline(
-//					new int[] {
-//						rx,
-//						tx,
-//						tx
-//					},
-//					new int[] {
-//						ry,
-//						ry,
-//						c
-//					},
-//					3);
 				//The VectorGraphics2D library messes up the drawPolyline call
-				//above sometimes and skips the center point, so drawing two-
+				//sometimes and skips the center point, so drawing two-
 				//separate lines (while less attractively drawn) is more
 				//reliable
 				if(!shoulderOnly) {
@@ -1348,6 +1376,8 @@ public class TreePainter extends TreeDrawer {
 				}
 				graphics.drawLine(tx,ry,tx,c);
 
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //				//If this is the hovered leaf, make it bold
 //				if(hovered || isSelected) {
 //					if(!hovered) {
@@ -1383,22 +1413,8 @@ public class TreePainter extends TreeDrawer {
 //						3);
 //				}
 			} else {
-//				graphics.drawPolyline(
-//					new int[] {
-//						//Horizontal coordinates
-//						rx,                               //right leaf end
-//						rx,                               //right leaf corner
-//						c                                 //center
-//					},
-//					new int[] {
-//						//Vertical coordinates
-//						ry,                               //right leaf end
-//						ty,                               //right leaf corner
-//						ty                                //center
-//					},
-//					3);
 				//The VectorGraphics2D library messes up the drawPolyline call
-				//above sometimes and skips the center point, so drawing two-
+				//sometimes and skips the center point, so drawing two-
 				//separate lines (while less attractively drawn) is more
 				//reliable
 				if(!shoulderOnly) {
@@ -1406,6 +1422,8 @@ public class TreePainter extends TreeDrawer {
 				}
 				graphics.drawLine(rx,ty,c,ty);
 
+/* Commented temporarily until all optional export features are fully
+ * implemented (e.g. drawing selections) */
 //				//If this is the hovered leaf, make it bold
 //				if(hovered || isSelected) {
 //					if(!hovered) {

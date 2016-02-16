@@ -132,7 +132,7 @@ public abstract class MatrixView extends ModelViewProduced {
 	public void exportPixels(Graphics g) {
 		if (drawer != null) {
 			/* Set new offscreenPixels (pixel colors) */
-			drawer.paint(g,xmap.getMaxIndex() + 1,ymap.getMaxIndex() + 1);
+			drawer.paint(g,xmap.getTotalTileNum(),ymap.getTotalTileNum());
 		}
 	}
 
@@ -226,7 +226,7 @@ public abstract class MatrixView extends ModelViewProduced {
 				xmap.getUsedPixels(), ymap.getUsedPixels());
 		
 		final Rectangle sourceRect = new Rectangle(0, 0, 
-				xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
+				xmap.getTotalTileNum(), ymap.getTotalTileNum());
 
 		if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 			/* Set new offscreenPixels (pixel colors) */
@@ -250,7 +250,7 @@ public abstract class MatrixView extends ModelViewProduced {
 						xmap.getUsedPixels(), ymap.getUsedPixels());
 				
 				final Rectangle sourceRect = new Rectangle(0, 0, 
-						xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
+						xmap.getTotalTileNum(), ymap.getTotalTileNum());
 
 				if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 					/* Set new offscreenPixels (pixel colors) */
@@ -448,8 +448,8 @@ public abstract class MatrixView extends ModelViewProduced {
 		 * This avoids unnecessary updates to the BufferedImage pixel raster. 
 		 */
 		if (offscreenImage == null) {
-			int x_tiles = xmap.getMaxIndex() + 1;
-			int y_tiles = ymap.getMaxIndex() + 1;
+			int x_tiles = xmap.getTotalTileNum();
+			int y_tiles = ymap.getTotalTileNum();
 			createNewBuffer(x_tiles, y_tiles);
 		}
 	}

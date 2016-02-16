@@ -31,11 +31,11 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
  */
 public class ExportHandler {
 
-	protected DendroView dendroView = null;
-	protected MapContainer interactiveXmap = null;
-	protected MapContainer interactiveYmap = null;
-	protected TreeSelectionI colSelection = null;
-	protected TreeSelectionI rowSelection = null;
+	final protected DendroView dendroView;
+	final protected MapContainer interactiveXmap;
+	final protected MapContainer interactiveYmap;
+	final protected TreeSelectionI colSelection;
+	final protected TreeSelectionI rowSelection;
 
 	protected String defPageSize = "A5"; //See freehep manual for options
 
@@ -94,6 +94,8 @@ public class ExportHandler {
 		this.dendroView = dendroView;
 		this.interactiveXmap = interactiveXmap;
 		this.interactiveYmap = interactiveYmap;
+		this.colSelection = null;
+		this.rowSelection = null;
 	}
 
 	/**
@@ -114,7 +116,7 @@ public class ExportHandler {
 	 */
 	public int getXDim(final Region region) {
 		return(getNumXExportIndexes(region) * tileWidth +
-			(dendroView.getRowTreeView().TreeExists() ? treesHeight +
+			(dendroView.getRowTreeView().treeExists() ? treesHeight +
 				treeMatrixGapSize : 0));
 	}
 
@@ -127,7 +129,7 @@ public class ExportHandler {
 	 */
 	public int getYDim(final Region region) {
 		return(getNumYExportIndexes(region) * tileHeight +
-			(dendroView.getColumnTreeView().TreeExists() ? treesHeight +
+			(dendroView.getColumnTreeView().treeExists() ? treesHeight +
 				treeMatrixGapSize : 0));
 	}
 
@@ -196,12 +198,12 @@ public class ExportHandler {
 	 * @param region
 	 */
 	public void setTileAspectRatioToScreen(final Region region) {
-		int screenWidth = dendroView.getInteractiveMatrixView().getWidth();
-		int screenHeight = dendroView.getInteractiveMatrixView().getHeight();
+		int matrixPxWidth = dendroView.getInteractiveMatrixView().getWidth();
+		int matrixPxHeight = dendroView.getInteractiveMatrixView().getHeight();
 		int numCols = getNumXExportIndexes(region);
 		int numRows = getNumYExportIndexes(region);
-		this.aspectRatio = ((double) screenWidth / (double) numCols) /
-			((double) screenHeight / (double) numRows);
+		this.aspectRatio = ((double) matrixPxWidth / (double) numCols) /
+			((double) matrixPxHeight / (double) numRows);
 	}
 
 	/**
@@ -328,11 +330,11 @@ public class ExportHandler {
 		int matrixHeight = getNumYExportIndexes(region) * tileHeight;
 		int maxMatrixDim =
 			(matrixWidth > matrixHeight ? matrixWidth : matrixHeight);
-		if(dendroView.getRowTreeView().TreeExists() &&
-			dendroView.getColumnTreeView().TreeExists()) {
+		if(dendroView.getRowTreeView().treeExists() &&
+			dendroView.getColumnTreeView().treeExists()) {
 			return((int) Math.round((double) maxMatrixDim /
 				(1.0 - treeRatio)));
-		} else if(dendroView.getRowTreeView().TreeExists()) {
+		} else if(dendroView.getRowTreeView().treeExists()) {
 			if((int) Math.round(matrixWidth / (1.0 - treeRatio)) >
 				matrixHeight) {
 
@@ -341,7 +343,7 @@ public class ExportHandler {
 			} else {
 				return(matrixHeight);
 			}
-		} else if(dendroView.getColumnTreeView().TreeExists()) {
+		} else if(dendroView.getColumnTreeView().treeExists()) {
 			if((int) Math.round(matrixHeight / (1.0 - treeRatio)) >
 				matrixWidth) {
 
@@ -423,7 +425,8 @@ public class ExportHandler {
 			}
 		}
 		catch(Exception exc) {
-			exc.printStackTrace();
+			LogBuffer.println("Unable to export image.");
+			LogBuffer.logException(exc);
 		}
 	}
 
@@ -503,7 +506,8 @@ public class ExportHandler {
 			g.endExport();
 		}
 		catch(Exception exc) {
-			exc.printStackTrace();
+			LogBuffer.println("Unable to export image.");
+			LogBuffer.logException(exc);
 		}
 	}
 
@@ -516,20 +520,20 @@ public class ExportHandler {
 	 */
 	public void createContent(Graphics2D g2d,final Region region) {
 		dendroView.getInteractiveMatrixView().export(g2d,
-			(dendroView.getRowTreeView().TreeExists() ?
+			(dendroView.getRowTreeView().treeExists() ?
 				treesHeight + treeMatrixGapSize : 0),
-			(dendroView.getColumnTreeView().TreeExists() ?
+			(dendroView.getColumnTreeView().treeExists() ?
 				treesHeight + treeMatrixGapSize : 0),
 			tileWidth,tileHeight,region);
-		if(dendroView.getColumnTreeView().TreeExists()) {
+		if(dendroView.getColumnTreeView().treeExists()) {
 			dendroView.getColumnTreeView().export(g2d,
-				(dendroView.getRowTreeView().TreeExists() ?
+				(dendroView.getRowTreeView().treeExists() ?
 					treesHeight + treeMatrixGapSize : 0),treesHeight,tileWidth,
 					region);
 		}
-		if(dendroView.getRowTreeView().TreeExists()) {
+		if(dendroView.getRowTreeView().treeExists()) {
 			dendroView.getRowTreeView().export(g2d,treesHeight,
-				(dendroView.getColumnTreeView().TreeExists() ?
+				(dendroView.getColumnTreeView().treeExists() ?
 					treesHeight + treeMatrixGapSize : 0),tileHeight,region);
 		}
 	}

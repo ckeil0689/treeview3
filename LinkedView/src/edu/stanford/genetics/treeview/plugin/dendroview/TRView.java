@@ -1004,7 +1004,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * @author rleach
 	 * @return boolean
 	 */
-	public boolean TreeExists() {
+	public boolean treeExists() {
 		return(treePainter != null && treePainter.getRootNode() != null);
 	}
 }
