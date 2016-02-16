@@ -533,7 +533,8 @@ public class TVController implements Observer {
 	 * @param isFromCluster Whether the loading happens as a result of 
 	 * clustering.
 	 */
-	public void getDataInfoAndLoad(FileSet newFileSet, boolean isFromCluster) {
+	public void getDataInfoAndLoad(final FileSet newFileSet, 
+			boolean isFromCluster) {
 		
 		Preferences node;
 		/* Transfer settings to clustered file */

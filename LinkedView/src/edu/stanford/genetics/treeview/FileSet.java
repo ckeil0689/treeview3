@@ -98,16 +98,16 @@ public class FileSet {
 	 */
 	public FileSet(final String cdt, final String dir) {
 
-		node = Preferences.userRoot().node(StringRes.pnode_globalMain)
+		this.node = Preferences.userRoot().node(StringRes.pnode_globalMain)
 				.node("FileSet");
-		// this.getClass().getName());
 		setCdt(cdt);
 		setDir(dir);
 	}
 
 	public FileSet(final String dir) {
 
-		node = Preferences.userRoot().node(this.getClass().getName());
+		this.node = Preferences.userRoot().node(StringRes.pnode_globalMain)
+				.node("FileSet");
 		setDir(dir);
 	}
 
@@ -232,8 +232,10 @@ public class FileSet {
 	public void setCdt(final String string1) {
 
 		if (string1 != null) {
-			setRoot(string1.substring(0, string1.length() - 4));
-			setExt(string1.substring(string1.length() - 4, string1.length()));
+			int i = string1.lastIndexOf('.');
+			
+			setRoot(string1.substring(0, i));
+			setExt(string1.substring(i, string1.length()));
 		}
 	}
 
