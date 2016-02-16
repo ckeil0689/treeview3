@@ -971,10 +971,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		dendroView.getRowLabelView().setConfigNode(configNode);
 		dendroView.getColLabelView().setConfigNode(configNode);
-		dendroView.getColumnTreeView().getHeaderSummary()
-				.setConfigNode(configNode);
-		dendroView.getRowTreeView().getHeaderSummary()
-				.setConfigNode(configNode);
 	}
 
 	/**

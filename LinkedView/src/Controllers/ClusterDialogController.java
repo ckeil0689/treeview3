@@ -282,6 +282,10 @@ public class ClusterDialogController {
 
 			boolean shouldSave = true;
 
+			/* 
+			 * Checked again here in case doInBackground() terminates before
+			 * first check (not via cancel).
+			 */
 			if(!isReorderingValid(clusterCheck)) {
 				LogBuffer.println("Something occurred during reordering.");
 				shouldSave = false;

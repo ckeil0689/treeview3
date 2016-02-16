@@ -34,8 +34,6 @@ import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.text.JTextComponent;
 
-import net.miginfocom.swing.MigLayout;
-
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import Utilities.GUIFactory;
@@ -45,6 +43,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.WideComboBox;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This class allows users to look for row or column elements by choosing them
@@ -236,7 +235,8 @@ public abstract class HeaderFinderBox {
 	}
 
 	public void updateSearchIndexes() {
-		if(searchDataList == null || searchDataList.length == 0) {
+		if(searchDataList == null || searchDataList.length == 0
+				|| headerSummary.getIncluded().length == 0) {
 			setEmptySearchTermBox();
 			primarySearchIndex = -1;
 			maxSearchIndex = -1;

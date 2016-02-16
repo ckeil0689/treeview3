@@ -22,13 +22,11 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import Utilities.GUIFactory;
-import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
+import net.miginfocom.swing.MigLayout;
 
 public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	MouseListener,MouseMotionListener,MouseWheelListener {
@@ -37,7 +35,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	private final Color whiz_bg_color = new Color(215,234,251); //light pale blue
 	protected TreeSelectionI treeSelection;
-	protected HeaderSummary headerSummary;
 	protected LinearTransformation xScaleEq, yScaleEq;
 	protected MapContainer map;
 
@@ -65,9 +62,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		super();
 
 		setLayout(new MigLayout());
-
-		final String summary = (isGeneTree) ? "GtrSummary" : "AtrSummary";
-		this.headerSummary = new HeaderSummary(summary);
 
 		addMouseWheelListener(this);
 
@@ -193,16 +187,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		this.treeSelection = treeSelection;
 		this.treeSelection.addObserver(this);
-	}
-
-	public void setHeaderSummary(final HeaderSummary headerSummary) {
-
-		this.headerSummary = headerSummary;
-	}
-
-	public HeaderSummary getHeaderSummary() {
-
-		return headerSummary;
 	}
 
 	/**

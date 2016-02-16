@@ -166,7 +166,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		setLayout(new MigLayout());
 
 		headerSummary = new HeaderSummary(getSummary());
-
 		//this.urlExtractor = uExtractor;
 
 		addMouseMotionListener(this);
@@ -363,7 +362,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	public void setHeaderInfo(final HeaderInfo headerInfo) {
+		
 		this.headerInfo = headerInfo;
+		
+		if(headerSummary == null) {
+			LogBuffer.println("Could not update headers for headerSummary"
+					+ " in " + getName());
+		}
+		
+		headerSummary.setHeaders(headerInfo.getNames());
 	}
 
 	public HeaderInfo getHeaderInfo() {

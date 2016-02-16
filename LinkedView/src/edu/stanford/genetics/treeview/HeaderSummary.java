@@ -6,6 +6,7 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -18,6 +19,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 	private Preferences configNode;
 	private int[] included = new int[] { 0 };
 	private final String type;
+	private String[] headers;
 
 	public HeaderSummary(final String type) {
 
@@ -34,13 +36,22 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		} else {
 			LogBuffer.println("Could not find or create " + type
 					+ " node because parentNode was null.");
+			return;
 		}
 		synchronizeFrom();
 	}
 
 	public void setIncluded(final int[] newIncluded) {
 
-		included = newIncluded;
+		this.included = newIncluded;
+		synchronizeTo();
+		setChanged();
+		notifyObservers();
+	}
+	
+	public void setHeaders(final String[] headers) {
+		
+		this.headers = headers;
 		synchronizeTo();
 		setChanged();
 		notifyObservers();
@@ -152,44 +163,120 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 
 		if (nodeHasAttribute("included")) {
-			final String incString = configNode.get("included", "0");
-			if (incString.equals("")) {
+//			final String incString = configNode.get("included", "0");
+			final String incString = configNode.get("included", "[0]");
+			if (incString.equals("[]")) {
 				setIncluded(new int[0]);
 
 			} else {
-				int numComma = 0;
-				for (int i = 0; i < incString.length(); i++) {
-					if (incString.charAt(i) == ',') {
-						numComma++;
-					}
-				}
-
-				final int[] array = new int[numComma + 1];
-				numComma = 0;
-				int last = 0;
-				for (int i = 0; i < incString.length(); i++) {
-					if (incString.charAt(i) == ',') {
-						final Integer x = new Integer(incString.substring(last,
-								i));
-						array[numComma++] = x.intValue();
-						last = i + 1;
-					}
-				}
+//				int numComma = 0;
+//				for (int i = 0; i < incString.length(); i++) {
+//					if (incString.charAt(i) == ',') {
+//						numComma++;
+//					}
+//				}
+//
+//				int[] array = new int[numComma + 1];
+//				numComma = 0;
+//				int last = 0;
+//				for (int i = 0; i < incString.length(); i++) {
+//					if (incString.charAt(i) == ',') {
+//						final Integer x = new Integer(incString.substring(last,
+//								i));
+//						array[numComma++] = x.intValue();
+//						last = i + 1;
+//					}
+//				}
+				String[] inclArray = incString
+						.replaceAll(" ", "")
+						.replaceAll("\\[", "")
+						.replaceAll("\\]", "")
+						.split(",");
+				
+				int[] array = new int[inclArray.length];
 				try {
-					array[numComma] = Integer.parseInt(incString
-							.substring(last));
+//					array[numComma] = Integer.parseInt(incString
+//							.substring(last));
+					for(int i = 0; i < inclArray.length; i++) {
+						String elem = inclArray[i];
+						array[i] = Integer.parseInt(elem);
+					}
 
 				} catch (final NumberFormatException e) {
 					LogBuffer.println("HeaderSummary has trouble "
-							+ "restoring included list from " + incString);
+							+ "restoring included list from " 
+							+ Arrays.toString(inclArray));
 					LogBuffer.println("NumberFormatException in "
 							+ "synchronizeFrom() in " + "HeaderSummary: "
 							+ e.getMessage());
 					return;
 				}
+				
+				array = adjustIncludedHeaders(array);
 				setIncluded(array);
 			}
+		} else if(headers != null && headers.length > 0) {
+			setIncluded(new int[]{0});
+		} else {
+			setIncluded(new int[0]);
 		}
+	}
+	
+	/**
+	 * Checks if the included indices match with the stored header Strings.
+	 * During clustering or reworking a file, actual header names may shift in
+	 * their position and the stored index alone may not be representative
+	 * for the last selected header.
+	 * @param included The included indices.
+	 */
+	private int[] adjustIncludedHeaders(int[] included) {
+		
+		if(headers == null) {
+			LogBuffer.println("headers are null in " + type);
+			return included;
+		}
+		
+		int[] newIncluded = included;
+		
+		if (nodeHasAttribute("includedNames")) {
+			String names = configNode.get("includedNames", "");
+			String[] nameArray = names
+					.replaceAll(" ", "")
+					.replaceAll("\\[", "")
+					.replaceAll("\\]", "")
+					.split(",");
+			
+			newIncluded = new int[names.length()];
+			
+			for(int i = 0; i < nameArray.length; i++) {
+				String name = nameArray[i];
+				for(int j = 0; j < headers.length; j++) {
+					if(name.equals(headers[j])) {
+						newIncluded[i] = j;
+						break;
+					}
+				}
+			}
+		/* At least ensure that included[] is not out of bounds */
+		} else {
+	        int maxSize = 0;
+	        /* Shrink if necessary */
+			for(int i = 0; i < included.length; i++) {
+				if(included[i] >= headers.length) {
+					maxSize = i + 1;
+					break;
+				}
+			}
+			
+			/* Create adjusted array */
+			newIncluded = new int[maxSize];
+			
+			for(int i = 0; i < newIncluded.length; i++) {
+				newIncluded[i] = included[i];
+			}
+		}
+		
+		return newIncluded;
 	}
 
 	/**
@@ -202,17 +289,26 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 
 		final int[] vec = getIncluded();
-		final StringBuffer temp = new StringBuffer();
-		if (vec.length > 0) {
-			temp.append(vec[0]);
-		}
-
-		for (int i = 1; i < vec.length; i++) {
-			temp.append(',');
-			temp.append(vec[i]);
-		}
 		
-		configNode.put("included", temp.toString());
+		final String[] names = new String[vec.length];
+		for(int i = 0; i < names.length; i++) {
+			int idx = vec[i];
+			if(idx < headers.length) {
+				names[i] = headers[idx];
+			}
+		}
+//		final StringBuffer temp = new StringBuffer();
+//		if (vec.length > 0) {
+//			temp.append(vec[0]);
+//		}
+//
+//		for (int i = 1; i < vec.length; i++) {
+//			temp.append(',');
+//			temp.append(vec[i]);
+//		}
+		
+		configNode.put("included", Arrays.toString(vec));//temp.toString());
+		configNode.put("includedNames", Arrays.toString(names));
 	}
 
 	/**
