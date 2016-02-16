@@ -92,11 +92,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				}
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 				LogBuffer.logException(e);
-				// out.append(strings[1]);
-				// LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-				// "getSummary() in HeaderSummary: " + e.getMessage());
-				// LogBuffer.println("strings[]: " + Arrays.toString(strings));
-				// LogBuffer.println("included[i]: " + included[i]);
+				break;
 			}
 		}
 
@@ -118,11 +114,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			strings = headerInfo.getHeader(index);
 
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-			// LogBuffer.println("index " + index +
-			// " out of bounds on headers, "
-			// + "continuing");
-			// LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-			// "getSummaryArray() in HeaderSummary: " + e.getMessage());
+			LogBuffer.logException(e);
 			return null;
 		}
 
@@ -142,10 +134,8 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				out[count] = test;
 				count++;
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-				// out.append(strings[1]);
-				// LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-				// "getSummaryArray() in HeaderSummary: "
-				// + e.getMessage());
+				LogBuffer.logException(e);
+				break;
 			}
 		}
 		return out;
@@ -195,6 +185,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 					LogBuffer.println("NumberFormatException in "
 							+ "synchronizeFrom() in " + "HeaderSummary: "
 							+ e.getMessage());
+					return;
 				}
 				setIncluded(array);
 			}

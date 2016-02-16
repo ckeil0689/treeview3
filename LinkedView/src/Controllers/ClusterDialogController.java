@@ -164,6 +164,8 @@ public class ClusterDialogController {
 		/* The finished reordered axes */
 		private ClusteredAxisData rowClusterData;
 		private ClusteredAxisData colClusterData;
+		
+		private boolean[] clusterCheck;
 
 		private String oldFileName;
 
@@ -221,8 +223,7 @@ public class ClusterDialogController {
 			final boolean isRowReady = isReady(rowSimilarity, ROW);
 			final boolean isColReady = isReady(colSimilarity, COL);
 			
-			boolean[] clusterCheck = reaffirmClusterChoice(isRowReady, 
-					isColReady);
+			this.clusterCheck = reaffirmClusterChoice(isRowReady, isColReady);
 			
 			if(!clusterCheck[ROW_IDX] && !clusterCheck[COL_IDX]) {
 				this.cancel(true);
@@ -280,8 +281,8 @@ public class ClusterDialogController {
 		public void done() {
 
 			boolean shouldSave = true;
-			if(rowClusterData.getReorderedIDs().length == 0 
-					|| colClusterData.getReorderedIDs().length == 0) {
+
+			if(!isReorderingValid(clusterCheck)) {
 				LogBuffer.println("Something occurred during reordering.");
 				shouldSave = false;
 			}
