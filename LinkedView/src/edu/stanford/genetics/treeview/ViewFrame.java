@@ -271,41 +271,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public void closeWindow() {
 
-		// try {
-		// // final DataModel dataModel = getDataModel();
-		//
-		// if (dataModel != null) {
-		// if (dataModel.getModified()) {
-		// final int option = JOptionPane.showConfirmDialog(
-		// applicationFrame,
-		// "DataModel is modified. Do you wish to save?");
-		//
-		// switch (option) {
-		//
-		// case JOptionPane.YES_OPTION:
-		// final DataModelWriter writer = new DataModelWriter(
-		// getDataModel());
-		// writer.writeIncremental(getDataModel().getFileSet());
-		// break;
-		//
-		// case JOptionPane.CANCEL_OPTION:
-		// return;
-		//
-		// case JOptionPane.NO_OPTION:
-		// break;
-		// }
-		// }
-		//
-		// final Preferences documentConfig = dataModel
-		// .getDocumentConfigRoot();
-		// if (documentConfig != null) {
-		// // documentConfig.store();
-		// }
-		// }
-		// } catch (final Exception e) {
-		// LogBuffer.println("ViewFrame.closeWindow() Got exception: " + e);
-		// }
-
 		/* Confirm user's intent to exit the application. */
 		final int option = JOptionPane.showConfirmDialog(appFrame,
 				"Are you sure you want to close TreeView?", "Exit TreeView?",
@@ -315,7 +280,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 
 		case JOptionPane.YES_OPTION:
 			LogBuffer.println("Saving settings before window close.");
-			appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			// Not sure a call to saveSettings is necessary anymore because
 			// added
 			// calls upon window resize and winow move in DendroController and

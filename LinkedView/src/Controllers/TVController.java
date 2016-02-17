@@ -526,9 +526,6 @@ public class TVController implements Observer {
 					fileSet = tvFrame.getFileSet(file);
 	
 				} else {
-					message = "No file was selected. Cannot begin "
-							+ "loading data.";
-					showWarning(message);
 					return;
 				}
 			}
