@@ -1715,7 +1715,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			map = interactiveYmap;
 			
 		} else {
-			axisSummary = tvFrame.getDendroView().getRowLabelView()
+			axisSummary = tvFrame.getDendroView().getColumnLabelView()
 					.getHeaderSummary();
 			axisInfo = tvModel.getColumnHeaderInfo();
 			treeSelection = tvFrame.getColSelection();
