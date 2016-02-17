@@ -334,7 +334,14 @@ public class PreferencesController {
 			// Refresh labels
 			preferences.synchronizeAnnotation();
 
-			preferences.setupLayout(StringRes.menu_RowAndCol);
+			/* TODO commented out due to issue 354 which changed the way the
+			 * layout creation for the label menu works. The entire preference
+			 * menu controller needs some refactoring (mostly naming) because
+			 * it is now label specific. The GUI components for LabelWorker are
+			 * not active atm due to the feature being excluded until it is
+			 * specifically tackled again and properly implemented.
+			 */
+//			preferences.setupLayout(StringRes.menu_RowAndCol);
 			addListeners();
 		}
 	}

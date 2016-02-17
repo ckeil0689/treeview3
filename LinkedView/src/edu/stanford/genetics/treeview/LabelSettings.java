@@ -36,6 +36,7 @@ public class LabelSettings extends CustomDialog implements
 	private static final long serialVersionUID = 1L;
 
 	private final TreeViewFrame tvFrame;
+	private String menu;
 	private HeaderInfo rowHI;
 	private HeaderInfo colHI;
 	private Preferences configNode;
@@ -56,14 +57,18 @@ public class LabelSettings extends CustomDialog implements
 		super(StringRes.dlg_Labels);
 		this.tvFrame = tvFrame;
 		this.dendroView = tvFrame.getDendroView();
-
-		getContentPane().add(mainPanel);
 	}
 
 	public void setHeaderInfo(final HeaderInfo rowHI, final HeaderInfo colHI) {
 
 		this.rowHI = rowHI;
 		this.colHI = colHI;
+	}
+	
+	public void setMenu(final String menu) {
+		
+		this.menu = menu;
+		setupLayout();
 	}
 
 	/**
@@ -369,7 +374,8 @@ public class LabelSettings extends CustomDialog implements
 	 *
 	 * @param title
 	 */
-	public void setupLayout(final String menu) {
+	@Override
+	protected void setupLayout() {
 
 		mainPanel.removeAll();
 
@@ -401,9 +407,6 @@ public class LabelSettings extends CustomDialog implements
 
 		mainPanel.revalidate();
 		mainPanel.repaint();
-
-		// dialog.pack();
-		// dialog.setLocationRelativeTo(tvFrame.getAppFrame());
 	}
 
 	/**

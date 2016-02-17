@@ -71,6 +71,9 @@ public class MenubarController {
 		case StringRes.menu_QuitWindow:
 			tvFrame.closeWindow();
 			break;
+		case StringRes.menu_Export:
+			controller.openExportMenu();
+			break;
 		case StringRes.menu_RowAndCol:
 			controller.openPrefMenu(name);
 			break;

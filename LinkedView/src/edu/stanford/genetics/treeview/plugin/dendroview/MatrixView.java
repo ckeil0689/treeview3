@@ -13,13 +13,13 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import net.miginfocom.swing.MigLayout;
 import ColorChooser.ColorChooserController;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * Basic skeleton for a MatrixView. Can be used as a basis for the interactive
@@ -400,6 +400,11 @@ public abstract class MatrixView extends ModelViewProduced {
 	public void setDataChanged() {
 		
 		this.dataChanged = true;
+	}
+	
+	public BufferedImage getVisibleImage() {
+		
+		return (BufferedImage) paintImage;
 	}
 
 }
