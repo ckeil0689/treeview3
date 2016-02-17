@@ -1328,13 +1328,13 @@ public class DendroView implements Observer, DendroPanel {
 		rowFinderBox.setHeaderSummary(getRowLabelView().getHeaderSummary());
 		rowFinderBox.setMapContainers(ymap, xmap);
 		rowFinderBox.setSelection(tvFrame.getRowSelection(),
-				tvFrame.getColumnSelection());
+				tvFrame.getColSelection());
 		rowFinderBox.setNewSearchTermBox();
 
 		colFinderBox.setHeaderInfo(columnHI);
 		colFinderBox.setHeaderSummary(getColumnLabelView().getHeaderSummary());
 		colFinderBox.setMapContainers(xmap, ymap);
-		colFinderBox.setSelection(tvFrame.getColumnSelection(),
+		colFinderBox.setSelection(tvFrame.getColSelection(),
 				tvFrame.getRowSelection());
 		colFinderBox.setNewSearchTermBox();
 

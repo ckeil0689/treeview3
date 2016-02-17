@@ -22,7 +22,7 @@ import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.PreferencesMenu;
+import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.CustomLabelLoader;
 
@@ -36,14 +36,14 @@ import edu.stanford.genetics.treeview.model.CustomLabelLoader;
 public class PreferencesController {
 
 	private final TreeViewFrame tvFrame;
-	private final PreferencesMenu preferences;
+	private final LabelSettings preferences;
 	private final DataModel model;
 	private SwingWorker<Void, Integer> labelWorker;
 	private LabelLoadDialog dialog;
 	private File customFile;
 
 	public PreferencesController(final TreeViewFrame tvFrame,
-			final DataModel model, final PreferencesMenu preferences) {
+			final DataModel model, final LabelSettings preferences) {
 
 		this.tvFrame = tvFrame;
 		this.model = model;

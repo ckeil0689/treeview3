@@ -61,6 +61,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 		setChanged();
 		final int subNodeIndex = getRootChildrenNodes().length + 1;
+		LogBuffer.println("Creating subNode File" + subNodeIndex);
 		return configNode.node("File" + subNodeIndex);
 	}
 
@@ -215,6 +216,15 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		final String lastNode = configNode.get("last_node", "no_last");
 
 		if (lastNode.equalsIgnoreCase("no_last")) {
+			return null;
+		}
+		
+		try {
+			if(configNode.node(lastNode).keys().length == 0) {
+				return null;
+			}
+		} catch (BackingStoreException e) {
+			LogBuffer.logException(e);
 			return null;
 		}
 

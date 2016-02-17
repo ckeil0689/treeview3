@@ -42,7 +42,6 @@ public class DataImportController {
 		previewDialog.addProceedBtnListener(new ProceedListener());
 		previewDialog.addDelimCheckBoxesListener(new DelimiterListener());
 		previewDialog.addSpinnerListeners(new LabelIncludeListener());
-		previewDialog.addNoLabelListener(new NoLabelListener());
 		previewDialog.addDataDetectListener(new DataDetectionListener());
 	}
 
@@ -117,13 +116,9 @@ public class DataImportController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			if (previewDialog.allowsProceed()) {
-				previewDialog.setResult(selectedDelimiter);
-				previewDialog.setVisible(false);
-				previewDialog.dispose();
-			}
-
-			previewDialog.setStatus(DataImportDialog.LABELS_WARNING);
+			previewDialog.setResult(selectedDelimiter);
+			previewDialog.setVisible(false);
+			previewDialog.dispose();
 		}
 	}
 
@@ -181,16 +176,6 @@ public class DataImportController {
 					.getValue();
 
 			previewDialog.updateTableLabels(maxRow, maxCol);
-			previewDialog.setPreviewStatus();
-		}
-	}
-
-	private class NoLabelListener implements ItemListener {
-
-		@Override
-		public void itemStateChanged(ItemEvent e) {
-
-			previewDialog.setNoLabelSpinnerStatus();
 			previewDialog.setPreviewStatus();
 		}
 	}

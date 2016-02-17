@@ -51,7 +51,7 @@ public class MenubarController {
 		switch (name) {
 
 		case StringRes.menu_Open:
-			controller.openFile();
+			controller.openFile(null);
 			break;
 		// case StringRes.menu_Save:
 		// controller.doModelSave(true);
@@ -78,12 +78,8 @@ public class MenubarController {
 			controller.openPrefMenu(name);
 			break;
 		case StringRes.menu_Color:
-			// controller.openPrefMenu(name);
 			controller.openColorMenu();
 			break;
-		// case StringRes.menu_Font:
-		// controller.openPrefMenu(name);
-		// break;
 		case StringRes.menu_URL:
 			controller.openPrefMenu(name);
 			break;
@@ -143,7 +139,7 @@ public class MenubarController {
 	private void showSubData() {
 
 		controller.showSubDataModel(tvFrame.getRowSelection()
-				.getSelectedIndexes(), tvFrame.getColumnSelection()
+				.getSelectedIndexes(), tvFrame.getColSelection()
 				.getSelectedIndexes(), null, null);
 	}
 

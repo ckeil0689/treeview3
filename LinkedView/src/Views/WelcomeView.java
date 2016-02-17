@@ -161,7 +161,7 @@ public class WelcomeView {
 
 		loadButton = GUIFactory.createLargeBtn("Open...");
 		loadButton.requestFocusInWindow();
-		loadLastButton = GUIFactory.createBtn("Load last file");
+		loadLastButton = GUIFactory.createBtn("Open Last File");
 
 		String filename;
 		if (fs != null) {

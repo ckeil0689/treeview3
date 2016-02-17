@@ -171,7 +171,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		switch (view_choice) {
 
 		case WELCOME_VIEW:
-			view = welcomeView.makeWelcome(getFileMRU().getLast());
+			FileSet mruLast = getFileMRU().getLast();
+			view = welcomeView.makeWelcome(mruLast);
 			break;
 
 		case PROGRESS_VIEW:
@@ -972,12 +973,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public void setArraySelection(final TreeSelection aSelect) {
 
-		this.arraySelection = aSelect;
+		this.colSelection = aSelect;
 	}
 
 	public void setGeneSelection(final TreeSelection aSelect) {
 
-		this.geneSelection = aSelect;
+		this.rowSelection = aSelect;
 	}
 
 	// Getters
