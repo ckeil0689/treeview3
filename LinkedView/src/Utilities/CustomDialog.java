@@ -3,11 +3,16 @@ package Utilities;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 /**
@@ -41,6 +46,8 @@ public abstract class CustomDialog extends JDialog {
 		setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setResizable(false);
+		
+		setupCloseOnEsc();
 
 		this.closeBtn = GUIFactory.createBtn("Close");
 		closeBtn.addActionListener(new CloseListener());
@@ -48,6 +55,28 @@ public abstract class CustomDialog extends JDialog {
 		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		getContentPane().add(mainPanel);
+	}
+	
+	private void setupCloseOnEsc() {
+		
+		KeyStroke escapeKeyStroke = 
+				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+		String closeByEsc = "closeByEsc";
+		
+		Action closeDialog = new AbstractAction() {
+			
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+
+				dispose();
+			}
+		};
+		
+		JRootPane root = getRootPane();
+		root.getInputMap().put(escapeKeyStroke, closeByEsc);
+		root.getActionMap().put(closeByEsc, closeDialog);
 	}
 
 	private class CloseListener implements ActionListener {
