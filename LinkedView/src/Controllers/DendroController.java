@@ -1769,7 +1769,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				}
 			}
 			
-		} else if(copyType == CopyType.VISIBLE) {
+		} else if(copyType == CopyType.VISIBLE_MATRIX) {
 			int start = map.getFirstVisible();
 			int end = start + map.getNumVisible();
 			

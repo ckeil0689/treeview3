@@ -69,7 +69,7 @@ public class LabelContextMenuController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			tvController.copyLabels(CopyType.VISIBLE, isRows);
+			tvController.copyLabels(CopyType.VISIBLE_MATRIX, isRows);
 		}
 	}
 }

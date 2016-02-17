@@ -1,5 +1,5 @@
 package edu.stanford.genetics.treeview;
 
 public enum CopyType {
-	ALL, SELECTION, VISIBLE
+	ALL, SELECTION, VISIBLE_MATRIX
 }
