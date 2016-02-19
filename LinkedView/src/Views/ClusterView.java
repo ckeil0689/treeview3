@@ -158,7 +158,7 @@ public class ClusterView {
 
 		clusterChooser.setSelectedIndex(clusterType);
 
-		final String[] measurements = { StringRes.cluster_DoNot,
+		final String[] measurements = { StringRes.cluster_LeaveUnchanged,
 				StringRes.cluster_pearsonUn, StringRes.cluster_pearsonCtrd,
 				StringRes.cluster_absCorrUn, StringRes.cluster_absCorrCtrd,
 				StringRes.cluster_spearman, StringRes.cluster_euclidean,
