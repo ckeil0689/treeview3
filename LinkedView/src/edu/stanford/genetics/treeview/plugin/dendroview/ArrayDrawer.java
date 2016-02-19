@@ -10,9 +10,13 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
+
+import edu.stanford.genetics.treeview.TreeSelectionI;
 
 /**
  * Class for Drawing A Colored Grid Representation of a Matrix.
@@ -214,9 +218,11 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 */
 	public void paint(final Graphics g,final int width,final int height,
 		final int xIndent,final int yIndent,final int tileXsize,
-		final int tileYsize) {
+		final int tileYsize,final boolean showSelections,
+		final TreeSelectionI colSelection,final TreeSelectionI rowSelection) {
 
-		paint(g,width - 1,height - 1,xIndent,yIndent,tileXsize,tileYsize,0,0);
+		paint(g,width - 1,height - 1,xIndent,yIndent,tileXsize,tileYsize,0,0,
+			showSelections,colSelection,rowSelection);
 	}
 
 	/**
@@ -233,7 +239,9 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 */
 	public void paint(final Graphics g,final int xend,final int yend,
 		final int xIndent,final int yIndent,final int tileXsize,
-		final int tileYsize,final int xstart,final int ystart) {
+		final int tileYsize,final int xstart,final int ystart,
+		final boolean showSelections,
+		final TreeSelectionI colSelection,final TreeSelectionI rowSelection) {
 	
 		for (int j = ystart; j <= yend; j++) {
 			for (int i = xstart; i <= xend; i++) {
@@ -252,6 +260,86 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 					yIndent + (j - ystart) * tileYsize,tileXsize,tileYsize);
 			}
 		}
+
+		//Draw the selection rectangles
+		if(showSelections && (rowSelection != null) && (colSelection != null) &&
+			rowSelection.getNSelectedIndexes() > 0 &&
+			colSelection.getNSelectedIndexes() > 0) {
+
+			g.setColor(Color.yellow);
+
+			final int[] selectedArrayIndexes =
+				colSelection.getSelectedIndexes();
+			final int[] selectedGeneIndexes =
+				rowSelection.getSelectedIndexes();
+	
+			if (selectedArrayIndexes.length > 0) {
+				List<List<Integer>> arrayBoundaryList;
+				List<List<Integer>> geneBoundaryList;
+	
+				arrayBoundaryList =
+					findRectBoundaries(selectedArrayIndexes);
+				geneBoundaryList =
+					findRectBoundaries(selectedGeneIndexes);
+	
+				for(final List<Integer> xBoundaries : arrayBoundaryList) {
+					for(final List<Integer> yBoundaries : geneBoundaryList){
+
+						int xStartPixel =
+							xIndent + (xBoundaries.get(0) - xstart) * tileXsize;
+						int xPixelSize =
+							(xBoundaries.get(1) - xBoundaries.get(0) + 1) *
+							tileXsize - 1;
+						int yStartPixel =
+							yIndent + (yBoundaries.get(0) - ystart) * tileYsize;
+						int yPixelSize =
+							(yBoundaries.get(1) - yBoundaries.get(0) + 1) *
+							tileYsize - 1;
+						g.drawRect(xStartPixel,yStartPixel,xPixelSize,
+							yPixelSize);
+					}
+				}
+			}
+		}
+	}
+
+	protected List<List<Integer>> findRectBoundaries(
+		final int[] selectedIndexes) {
+
+		final List<List<Integer>> boundaryList = new ArrayList<List<Integer>>();
+	
+		/*
+		 * If array is bigger than 1, check how many consecutive labels are
+		 * selected by finding out which elements are only 1 apart. Store
+		 * consecutive indexes separately to make separate rectangles later.
+		 */
+		int firstindex = 0;
+		int lastval;
+		while(firstindex < selectedIndexes.length) {
+
+			lastval = selectedIndexes[firstindex];
+			List<Integer> boundaries = new ArrayList<Integer>();
+			boundaries.add(lastval);
+
+			firstindex++;
+
+			for(int i = firstindex; i < selectedIndexes.length; i++) {
+	
+				final int currentval = selectedIndexes[i];
+
+				if(lastval == currentval - 1) {
+					lastval = currentval;
+					firstindex = i + 1;
+				} else {
+					break;
+				}
+			}
+
+			boundaries.add(lastval);
+			boundaryList.add(boundaries);
+		}
+
+		return(boundaryList);
 	}
 
 	/**

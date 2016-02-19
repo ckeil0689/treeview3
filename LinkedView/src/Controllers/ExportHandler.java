@@ -367,7 +367,7 @@ public class ExportHandler {
 	 *                 selection
 	 */
 	public void export(final Format format,final String fileName,
-		final Region region) { //E.g. Format.PNG,"Output.pdf",Region.VISIBLE
+		final Region region,final boolean showSelections) { //E.g. Format.PNG,"Output.pdf",Region.VISIBLE
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -378,9 +378,9 @@ public class ExportHandler {
 		if(format == Format.PDF || format == Format.SVG ||
 			format == Format.PS) {
 
-			exportDocument(format,defPageSize,fileName,region);
+			exportDocument(format,defPageSize,fileName,region,showSelections);
 		} else {
-			exportImage(format,fileName,region);
+			exportImage(format,fileName,region,showSelections);
 		}
 	}
 
@@ -392,7 +392,7 @@ public class ExportHandler {
 	 * @param region
 	 */
 	public void exportImage(final Format format,final String fileName,
-		final Region region) { //E.g. Format.PNG,"A5","Output.pdf"
+		final Region region,final boolean showSelections) { //E.g. Format.PNG,"A5","Output.pdf"
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -407,7 +407,7 @@ public class ExportHandler {
 				getXDim(region),getYDim(region),BufferedImage.TYPE_INT_ARGB);
 	
 			Graphics2D g2d = (Graphics2D) im.getGraphics();
-			createContent(g2d,region);
+			createContent(g2d,region,showSelections);
 
 			File exportFile = new File(fileName);
 			if(format == Format.PNG) {
@@ -458,7 +458,7 @@ public class ExportHandler {
 	 * @param region
 	 */
 	public void exportDocument(final Format format,final String pageSize,
-		String fileName,final Region region) {
+		String fileName,final Region region,final boolean showSelections) {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -502,7 +502,7 @@ public class ExportHandler {
 			g.setProperties(p); 
 
 			g.startExport();
-			createContent(g,region);
+			createContent(g,region,showSelections);
 			g.endExport();
 		}
 		catch(Exception exc) {
@@ -518,23 +518,28 @@ public class ExportHandler {
 	 * @param g2d
 	 * @param region
 	 */
-	public void createContent(Graphics2D g2d,final Region region) {
+	public void createContent(Graphics2D g2d,final Region region,
+		final boolean showSelections) {
+
 		dendroView.getInteractiveMatrixView().export(g2d,
 			(dendroView.getRowTreeView().treeExists() ?
 				treesHeight + treeMatrixGapSize : 0),
 			(dendroView.getColumnTreeView().treeExists() ?
 				treesHeight + treeMatrixGapSize : 0),
-			tileWidth,tileHeight,region);
+			tileWidth,tileHeight,region,showSelections);
+
 		if(dendroView.getColumnTreeView().treeExists()) {
 			dendroView.getColumnTreeView().export(g2d,
 				(dendroView.getRowTreeView().treeExists() ?
 					treesHeight + treeMatrixGapSize : 0),treesHeight,tileWidth,
-					region);
+					region,showSelections);
 		}
+
 		if(dendroView.getRowTreeView().treeExists()) {
 			dendroView.getRowTreeView().export(g2d,treesHeight,
 				(dendroView.getColumnTreeView().treeExists() ?
-					treesHeight + treeMatrixGapSize : 0),tileHeight,region);
+					treesHeight + treeMatrixGapSize : 0),tileHeight,region,
+					showSelections);
 		}
 	}
 }

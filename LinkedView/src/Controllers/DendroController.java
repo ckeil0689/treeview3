@@ -656,7 +656,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 //				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
 //					interactiveYmap,colSelection,rowSelection);
 //				eh.setTileAspectRatioToScreen(Region.VISIBLE);
-//				eh.export(Format.PNG,"Output.png",Region.SELECTION);
+//				eh.export(Format.PDF,"Output.pdf",Region.SELECTION,true);
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
 						+ "in DendroController ScaleListener.");

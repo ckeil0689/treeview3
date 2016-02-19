@@ -465,14 +465,14 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * @param region - what portion of the tree to export
 	 */
 	public void export(final Graphics g,final int xIndent,final int yIndent,
-		final int size,final Region region) {
+		final int size,final Region region,final boolean showSelections) {
 
 		if(region == Region.ALL) {
-			exportAll(g,xIndent,yIndent,size);
+			exportAll(g,xIndent,yIndent,size,showSelections);
 		} else if(region == Region.VISIBLE) {
-			exportVisible(g,xIndent,yIndent,size);
+			exportVisible(g,xIndent,yIndent,size,showSelections);
 		} else if(region == Region.SELECTION) {
-			exportSelection(g,xIndent,yIndent,size);
+			exportSelection(g,xIndent,yIndent,size,showSelections);
 		} else {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
 				"].");
@@ -488,10 +488,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * @param size - size of a matrix tile in this tree's dimension
 	 */
 	public void exportAll(final Graphics g,final int xIndent,final int yIndent,
-		final int size) {
+		final int size,final boolean showSelections) {
 	
 		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,
-			xIndent,yIndent,size,0,map.getMaxIndex());
+			xIndent,yIndent,size,0,map.getMaxIndex(),showSelections);
 	}
 
 	/**
@@ -504,10 +504,11 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * @param size - size of a matrix tile in this tree's dimension
 	 */
 	public void exportVisible(final Graphics g,final int xIndent,
-		final int yIndent,final int size) {
+		final int yIndent,final int size,final boolean showSelections) {
 	
 		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,
-			xIndent,yIndent,size,map.getFirstVisible(),map.getLastVisible());
+			xIndent,yIndent,size,map.getFirstVisible(),map.getLastVisible(),
+			showSelections);
 	}
 
 	/**
@@ -520,11 +521,11 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * @param size - size of a matrix tile in this tree's dimension
 	 */
 	public void exportSelection(final Graphics g,final int xIndent,
-		final int yIndent,final int size) {
+		final int yIndent,final int size,final boolean showSelections) {
 	
 		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,
 			xIndent,yIndent,size,treeSelection.getMinIndex(),
-			treeSelection.getMaxIndex());
+			treeSelection.getMaxIndex(),showSelections);
 	}
 
 	/* Abstract methods */

@@ -145,14 +145,16 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * @param size - The number of points in each dimension of a square tile
 	 */
 	public void export(final Graphics g,final int xIndent,final int yIndent,
-		final int tileXsize,final int tileYsize,final Region region) {
+		final int tileXsize,final int tileYsize,final Region region,
+		final boolean showSelections) {
 
 		if(region == Region.ALL) {
-			exportAll(g,xIndent,yIndent,tileXsize,tileYsize);
+			exportAll(g,xIndent,yIndent,tileXsize,tileYsize,showSelections);
 		} else if(region == Region.VISIBLE) {
-			exportVisible(g,xIndent,yIndent,tileXsize,tileYsize);
+			exportVisible(g,xIndent,yIndent,tileXsize,tileYsize,showSelections);
 		} else if(region == Region.SELECTION) {
-			exportSelection(g,xIndent,yIndent,tileXsize,tileYsize);
+			exportSelection(g,xIndent,yIndent,tileXsize,tileYsize,
+				showSelections);
 		} else {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
 				"].");
@@ -169,11 +171,12 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * @param tileYsize
 	 */
 	public void exportAll(final Graphics g,final int xIndent,final int yIndent,
-		final int tileXsize,final int tileYsize) {
+		final int tileXsize,final int tileYsize,final boolean showSelections) {
 
 		if(drawer != null) {
 			drawer.paint(g,xmap.getTotalTileNum(),ymap.getTotalTileNum(),
-				xIndent,yIndent,tileXsize,tileYsize);
+				xIndent,yIndent,tileXsize,tileYsize,showSelections,colSelection,
+				rowSelection);
 		}
 	}
 
@@ -186,12 +189,14 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * @param size - The number of points in each dimension of a square tile
 	 */
 	public void exportVisible(final Graphics g,final int xIndent,
-		final int yIndent,final int tileXsize,final int tileYsize) {
+		final int yIndent,final int tileXsize,final int tileYsize,
+		final boolean showSelections) {
 
 		if(drawer != null) {
 			drawer.paint(g,xmap.getLastVisible(),ymap.getLastVisible(),
 				xIndent,yIndent,tileXsize,tileYsize,xmap.getFirstVisible(),
-				ymap.getFirstVisible());
+				ymap.getFirstVisible(),showSelections,colSelection,
+				rowSelection);
 		}
 	}
 
@@ -204,14 +209,16 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * @param size - The number of points in each dimension of a square tile
 	 */
 	public void exportSelection(final Graphics g,final int xIndent,
-		final int yIndent,final int tileXsize,final int tileYsize) {
+		final int yIndent,final int tileXsize,final int tileYsize,
+		final boolean showSelections) {
 
 		if(drawer != null) {
 			if(colSelection != null && colSelection.getNSelectedIndexes() > 0) {
 				drawer.paint(g,
 					colSelection.getMaxIndex(),rowSelection.getMaxIndex(),
 					xIndent,yIndent,tileXsize,tileYsize,
-					colSelection.getMinIndex(),rowSelection.getMinIndex());
+					colSelection.getMinIndex(),rowSelection.getMinIndex(),
+					showSelections,colSelection,rowSelection);
 			} else {
 				LogBuffer.println("ERROR: No selection exists.");
 			}
