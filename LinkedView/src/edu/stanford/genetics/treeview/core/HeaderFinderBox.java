@@ -21,6 +21,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -647,9 +649,11 @@ public abstract class HeaderFinderBox {
 		pattern = pattern.replaceAll("\\?", ".");
 		pattern = pattern.replaceAll("\\*", ".*");
 
-		// Check if generated regex matches, store result in boolean.
+		//This code allows the pattern match to be case insensitive.
+		Pattern p = Pattern.compile(pattern,Pattern.CASE_INSENSITIVE);
+		Matcher m = p.matcher(text);
 		boolean isMatch = false;
-		if (text.matches(pattern)) {
+		if(m.find()) {
 			isMatch = true;
 		}
 
