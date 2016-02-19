@@ -7,28 +7,24 @@
 
 package edu.stanford.genetics.treeview;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;
+import net.miginfocom.swing.MigLayout;
 
 public class DataTicker {
 
 	private final JPanel tickerPanel;
-	private final List<JTextArea> textList;
+	private final JTextArea valTextArea;
 
 	/**
 	 * Creates a new DataTicker instance.
 	 */
 	public DataTicker() {
 
-		this.textList = new ArrayList<JTextArea>();
+		this.valTextArea = GUIFactory.createWrappableTextArea();
 		this.tickerPanel = new TickerPanel();
 	}
 
@@ -50,57 +46,30 @@ public class DataTicker {
 
 			setLayout(new MigLayout());
 			setOpaque(false);
-			setBorder(BorderFactory.createTitledBorder("Data Ticker"));
+//			setBorder(BorderFactory.createTitledBorder("Tile Value"));
 
 			setupDataTicker();
 		}
 
 		private void setupDataTicker() {
 
-			final JLabel row = GUIFactory.createLabel("Row:", GUIFactory.FONTS);
-			add(row, "w 10%");
-
-			final JTextArea rowText = GUIFactory.createWrappableTextArea();
-			add(rowText, "w 90%, growx, wrap");
-
-			final JLabel col = GUIFactory.createLabel("Column:",
-					GUIFactory.FONTS);
-			add(col, "w 10%");
-
-			final JTextArea colText = GUIFactory.createWrappableTextArea();
-			add(colText, "w 90%, growx, wrap");
-
-			final JLabel val = GUIFactory.createLabel("Value:",
+			final JLabel val = GUIFactory.createLabel("Tile value:",
 					GUIFactory.FONTS);
 			add(val, "w 10%");
-
-			final JTextArea valText = GUIFactory.createWrappableTextArea();
-			add(valText, "w 90%, growx, wrap");
-
-			textList.add(rowText);
-			textList.add(colText);
-			textList.add(valText);
+			add(valTextArea, "w 90%, growx, wrap");
 
 			revalidate();
 			repaint();
 		}
 	}
 
-	public void setMessages(final String[] m) {
-
-		for (int i = 0; i < m.length; i++) {
-
-			if (i >= textList.size()) {
-				break;
-			}
-
-			String message = m[i];
-
-			if (message == null || message.length() == 0) {
-				message = "-";
-			}
-
-			textList.get(i).setText(message);
-		}
+	/**
+	 * Updates the JTextArea which displays the value as a String.
+	 * @param val - The value to be displayed as String.
+	 */
+	public void setValue(final double val) {
+		
+		String val_s = Double.toString(val);
+		valTextArea.setText(val_s);
 	}
 }

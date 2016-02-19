@@ -23,7 +23,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -34,6 +33,7 @@ import javax.swing.KeyStroke;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
+import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.ModelView;
@@ -73,6 +73,7 @@ public class DendroView implements Observer, DendroPanel {
 	// Main containers
 	private final JPanel dendroPane;
 	private final JPanel searchPanel;
+	private final DataTicker ticker;
 
 	// Matrix views
 	private final GlobalMatrixView globalMatrixView;
@@ -183,6 +184,8 @@ public class DendroView implements Observer, DendroPanel {
 		// Set up column dendrogram
 		colTreeView = new ColumnTreeView();
 		colTreeView.getHeaderSummary().setIncluded(new int[] { 0, 3 });
+		
+		ticker = new DataTicker();
 
 		setupScaleButtons();
 	}
@@ -280,24 +283,15 @@ public class DendroView implements Observer, DendroPanel {
 	}
 	
 	/**
+	 * TODO currently only a DataTicker placeholder is realized.
 	 * Creates a panel which contains the color-value indicator. This is
 	 * used to display the data value of the currently hovered matrix pixel.
 	 * @return JPanel containing the olor-value indicator.
 	 */
-	private static JPanel createColorValIndicatorPanel() {
+	private JPanel createColorValIndicatorPanel() {
 		
-		JPanel indicatorPanel;
-		
-		// until implementation of color-value indicator
-		String hint = ">>>> Placeholder <<<<";
-		JLabel indicatorPlaceHolder = GUIFactory.createLabel(hint, 
-				GUIFactory.FONTM);
-		
-		indicatorPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.DEFAULT);
-		indicatorPanel.add(indicatorPlaceHolder);
-		
-		return indicatorPanel;
+		// TODO currently just a data ticker displaying a tile's data value
+		return ticker.getTickerPanel();
 	}
 	
 	/**
@@ -1489,6 +1483,15 @@ public class DendroView implements Observer, DendroPanel {
 	public ActionMap getActionMap() {
 
 		return dendroPane.getActionMap();
+	}
+	
+	/**
+	 * Get a reference to the data ticker object. 
+	 * @return The DataTicker object for the active DendroView.
+	 */
+	public DataTicker getDataTicker() {
+		
+		return ticker;
 	}
 
 	/**
