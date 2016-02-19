@@ -53,7 +53,7 @@ public class DataTicker {
 
 		private void setupDataTicker() {
 
-			final JLabel val = GUIFactory.createLabel("Tile value:",
+			final JLabel val = GUIFactory.createLabel("Data value:",
 					GUIFactory.FONTS);
 			add(val, "w 10%");
 			add(valTextArea, "w 90%, growx, wrap");
