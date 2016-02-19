@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import java.util.Observable;
 
 import javax.swing.JScrollBar;
@@ -23,14 +24,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import Controllers.Region;
-import Utilities.GUIFactory;
-import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
+import net.miginfocom.swing.MigLayout;
 
 public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	MouseListener,MouseMotionListener,MouseWheelListener {
@@ -552,6 +552,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	protected abstract void drawWhizBackground(final Graphics g);
 	protected abstract void drawFittedWhizBackground(final Graphics g,
 		LinearTransformation scaleEq);
+	protected abstract void setExportPreviewScale(final Rectangle dest);
 
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
@@ -1007,5 +1008,27 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 */
 	public boolean treeExists() {
 		return(treePainter != null && treePainter.getRootNode() != null);
+	}
+	
+	public BufferedImage getSnapshot(final int width, final int height) {
+	
+		BufferedImage img = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
+		Rectangle dest = new Rectangle(width, height);
+		
+		BufferedImage scaled = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_ARGB);
+		
+		setExportPreviewScale(dest);
+		
+		/* Draw trees to first image, original size */
+		treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
+				isLeft, -1, null, null);
+		
+		/* Draw a scaled version of the old image to a new image */
+		Graphics g = scaled.getGraphics();
+		g.drawImage(img, 0, 0, width, height, null);
+		
+		return scaled;
 	}
 }

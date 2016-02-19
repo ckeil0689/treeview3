@@ -22,16 +22,20 @@ public class EditThumbDialog extends CustomDialog {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private final Thumb t;
+	private final int index;
+	private final int thumbIndex;
+	private final double mean;
+	private final double median;
+	
 	/* GUI components */
 	private JLabel enterPrompt;
-	private final JTextField inputField;
-	private final JButton colorButton;
-	private final ColorIcon colorIcon;
+	private JTextField inputField;
+	private JButton colorButton;
+	private ColorIcon colorIcon;
 
 	private ThumbBox thumbBox;
 	private List<Color> colorList;
-	private final Thumb t;
-	private final int index;
 
 	private Color newColor;
 
@@ -61,50 +65,15 @@ public class EditThumbDialog extends CustomDialog {
 		super("Edit Color");
 
 		this.t = thumb;
+		this.thumbIndex = thumbIndex;
 		this.thumbBox = thumbBox;
 		this.colorList = colorList;
 		this.index = thumbIndex;
 
-		enterPrompt = GUIFactory.createLabel("Set data value: ",
-				GUIFactory.FONTS);
-
-		/* default */
-		startX = thumbBox.getThumbDataVal(thumbIndex);
-		finalX = startX;
-
-		newColor = t.getColor();
-
-		inputField = new JTextField();
-		inputField.setEditable(true);
-
-		/* Initially display thumb position */
-		inputField
-				.setText(Double.toString(thumbBox.getThumbDataVal(thumbIndex)));
-		inputField.addActionListener(new SetValueListener());
-
-		colorIcon = new ColorIcon(thumb.getColor());
-		colorButton = GUIFactory.createColorIconBtn("Change Color", colorIcon);
-		colorButton.addActionListener(new SetColorListener());
+		this.mean = mean;
+		this.median = median;
 		
-		final JLabel meanLabel = GUIFactory.createLabel("Mean: " + mean, 
-				GUIFactory.FONTS);
-		final JLabel medianLabel = GUIFactory.createLabel("Median: " + median, 
-				GUIFactory.FONTS);
-		
-		final JButton okButton = GUIFactory.createBtn("OK");
-		okButton.addActionListener(new SetValueListener());
-
-		final JPanel panel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
-				null);
-
-		panel.add(colorButton, "push, alignx 0%, wrap");
-		panel.add(enterPrompt, "align left");
-		panel.add(inputField, "growx, wrap");
-		panel.add(meanLabel, "pushx");
-		panel.add(medianLabel, "pushx, wrap");
-		panel.add(okButton, "pushx, span, alignx 50%");
-
-		mainPanel.add(panel, "w 200::, h 150::");
+		setupLayout();
 	}
 
 	protected double showDialog(JPanel parent) {
@@ -200,5 +169,50 @@ public class EditThumbDialog extends CustomDialog {
 				colorChanged = true;
 			}
 		}
+	}
+
+	@Override
+	protected void setupLayout() {
+		
+		enterPrompt = GUIFactory.createLabel("Set data value: ", 
+				GUIFactory.FONTS);
+
+		/* default */
+		startX = thumbBox.getThumbDataVal(thumbIndex);
+		finalX = startX;
+
+		newColor = t.getColor();
+
+		inputField = new JTextField();
+		inputField.setEditable(true);
+
+		/* Initially display thumb position */
+		inputField
+				.setText(Double.toString(thumbBox.getThumbDataVal(thumbIndex)));
+		inputField.addActionListener(new SetValueListener());
+
+		colorIcon = new ColorIcon(t.getColor());
+		colorButton = GUIFactory.createColorIconBtn("Change Color", colorIcon);
+		colorButton.addActionListener(new SetColorListener());
+		
+		final JLabel meanLabel = GUIFactory.createLabel("Mean: " + mean, 
+				GUIFactory.FONTS);
+		final JLabel medianLabel = GUIFactory.createLabel("Median: " + median, 
+				GUIFactory.FONTS);
+		
+		final JButton okButton = GUIFactory.createBtn("OK");
+		okButton.addActionListener(new SetValueListener());
+
+		final JPanel panel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
+				null);
+
+		panel.add(colorButton, "push, alignx 0%, wrap");
+		panel.add(enterPrompt, "align left");
+		panel.add(inputField, "growx, wrap");
+		panel.add(meanLabel, "pushx");
+		panel.add(medianLabel, "pushx, wrap");
+		panel.add(okButton, "pushx, span, alignx 50%");
+
+		mainPanel.add(panel, "w 200::, h 150::");
 	}
 }

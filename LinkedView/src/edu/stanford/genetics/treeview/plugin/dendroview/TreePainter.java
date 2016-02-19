@@ -311,7 +311,7 @@ public class TreePainter extends TreeDrawer {
 			}
 			//We do not recurse down to the leaves, so add them to the stack
 			//here
-			else if(treeSelection.isIndexSelected(
+			else if(treeSelection != null && treeSelection.isIndexSelected(
 				(int) node.getLeft().getIndex())) {
 
 				leftDotNodeStack.push(node.getLeft());
@@ -324,7 +324,7 @@ public class TreePainter extends TreeDrawer {
 			}
 			//We do not recurse down to the leaves, so add them to the stack
 			//here
-			else if(treeSelection.isIndexSelected(
+			else if(treeSelection != null && treeSelection.isIndexSelected(
 				(int) node.getRight().getIndex())) {
 
 				rightDotNodeStack.push(node.getRight());
@@ -472,6 +472,11 @@ public class TreePainter extends TreeDrawer {
 		 */
 		private boolean isNodeSelected(TreeDrawerNode node,
 			TreeSelectionI treeSelection) {
+			
+			if(treeSelection == null) {
+				return false;
+			}
+			
 			boolean selected = true;
 			for(int i = (int) node.getLeftLeaf().getIndex();
 				i <= (int) node.getRightLeaf().getIndex();i++) {

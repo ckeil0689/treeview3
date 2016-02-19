@@ -36,13 +36,12 @@ public class AboutDialog extends CustomDialog {
 		this.tvFrame = tvFrame;
 
 		setupLayout();
-
 	}
 
 	/**
 	 * Setup the layout and content of the mainPanel and add it to the dialog.
 	 */
-	private void setupLayout() {
+	protected void setupLayout() {
 
 		/*
 		 * TextArea because JLabel cannot properly line break without manual

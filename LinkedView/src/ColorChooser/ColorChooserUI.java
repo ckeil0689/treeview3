@@ -6,7 +6,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -15,6 +14,7 @@ import javax.swing.JPanel;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 
 /**
@@ -66,28 +66,22 @@ public class ColorChooserUI extends CustomDialog {
 	public ColorChooserUI(final ColorExtractor drawer, final double minVal,
 			final double maxVal, final double mean, final double median) {
 
-		super("Choose matrix colors");
+		super(StringRes.dlg_Colors);
 		this.colorPicker = new ColorPicker(drawer, minVal, maxVal, 
 				mean, median);
 		this.gradientPanel = colorPicker.getContainerPanel();
 
-		setLayout();
-
-		add(mainPanel);
-
-		pack();
-		setLocationRelativeTo(JFrame.getFrames()[0]);
+		setupLayout();
 	}
 
 	/**
 	 * Sets up the GUI layout of the ColorChooser object.
 	 */
-	private void setLayout() {
+	@Override
+	protected void setupLayout() {
 
-		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-
-		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-		contentPanel.setBorder(BorderFactory.createEtchedBorder());
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		addBtn = GUIFactory.createBtn("Add New Color");
 		editBtn = GUIFactory.createBtn("Edit Selected Color");
@@ -107,16 +101,15 @@ public class ColorChooserUI extends CustomDialog {
 		final JPanel presetChoicePanel = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT, null);
 
-		final JLabel colorHint = GUIFactory.createLabel("Choose a Color "
-				+ "Scheme: ", GUIFactory.FONTS);
-
-		presetChoicePanel.add(colorHint, "span, wrap");
 		presetChoicePanel.add(presetChoice, "pushx");
 		presetChoicePanel.add(missingBtn, "pushx");
 
+		final JLabel colorHint = GUIFactory.createLabel("Choose a color "
+				+ "scheme: ", GUIFactory.FONTS);
 		final JLabel hint = GUIFactory.createLabel("Move, add or edit sliders "
 				+ "to adjust color scheme.", GUIFactory.FONTS);
 
+		contentPanel.add(colorHint, "span, wrap");
 		contentPanel.add(presetChoicePanel, "span, pushx, wrap");
 		contentPanel.add(hint, "span, wrap");
 		contentPanel.add(gradientPanel, "h 150:150:, w 650:650:, pushx, "
@@ -125,10 +118,15 @@ public class ColorChooserUI extends CustomDialog {
 		contentPanel.add(removeBtn, "pushx");
 		contentPanel.add(editBtn, "pushx");
 
-		mainPanel.add(contentPanel, "push, grow, wrap");
+		mainPanel.add(contentPanel, "push, grow, span, wrap");
 
 		mainPanel.add(applyBtn, "al right, pushx");
-		mainPanel.add(closeBtn, "al right, pushx");
+		mainPanel.add(closeBtn, "al right");
+		
+		getContentPane().add(mainPanel);
+
+		pack();
+		setLocationRelativeTo(JFrame.getFrames()[0]);
 	}
 
 	/**

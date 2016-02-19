@@ -9,6 +9,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
@@ -234,5 +235,25 @@ public class ColumnTreeView extends TRView {
 	@Override
 	protected boolean isAPrimaryScroll(final MouseWheelEvent e) {
 		return(e.isShiftDown());
+	}
+	
+	@Override
+	protected void setExportPreviewScale(Rectangle dest) {
+		
+		/* Scale trees for complete painting */
+		int firstVisIndex = map.getIndex(getFittedDestRectStart());
+		int lastVisIndex  = map.getIndex(getFittedDestRectEnd());
+
+		setPrimaryScaleEq(new LinearTransformation(
+			firstVisIndex,
+			dest.x,
+			lastVisIndex,
+			dest.x + dest.width));
+		
+		setSecondaryScaleEq(new LinearTransformation(
+				treePainter.getCorrMin(),
+				dest.y,
+				treePainter.getCorrMax(),
+				dest.y + dest.height));
 	}
 }

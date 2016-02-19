@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
@@ -29,14 +30,19 @@ import Views.ClusterView;
 import Views.DataImportController;
 import Views.DataImportDialog;
 import edu.stanford.genetics.treeview.CdtFilter;
+import edu.stanford.genetics.treeview.CopyType;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
+import edu.stanford.genetics.treeview.ExportDialog;
+import edu.stanford.genetics.treeview.ExportDialogController;
+import edu.stanford.genetics.treeview.ExportPreviewMatrix;
+import edu.stanford.genetics.treeview.ExportPreviewTrees;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GeneListMaker;
+import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.PreferencesMenu;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -53,6 +59,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
 //import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 //=======
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
+import edu.stanford.genetics.treeview.plugin.dendroview.TRView;
 //>>>>>>> colorUpdate
 
 /**
@@ -107,13 +114,13 @@ public class TVController implements Observer {
 			switch (option) {
 
 			case JOptionPane.YES_OPTION:
-				tvFrame.saveSettings();
 				tvFrame.getConfigNode().parent().removeNode();
 				tvFrame.getAppFrame().dispose();
+				System.exit(0);
 				break;
 
 			case JOptionPane.NO_OPTION:
-				break;
+				return;
 
 			default:
 				return;
@@ -193,7 +200,7 @@ public class TVController implements Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			openFile();
+			openFile(null);
 		}
 	}
 
@@ -208,7 +215,7 @@ public class TVController implements Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			final FileSet last = tvFrame.getFileMRU().getLast();
-			getDataInfoAndLoad(last, false);
+			openFile(last);
 		}
 	}
 
@@ -513,25 +520,26 @@ public class TVController implements Observer {
 	 *
 	 * @throws LoadException
 	 */
-	public void openFile() {
+	public void openFile(FileSet fileSet) {
 
 		String message;
 		try {
-			file = tvFrame.selectFile();
-
-			/* Only run loader, if JFileChooser wasn't canceled. */
-			if (file != null) {
-				FileSet fileSet = tvFrame.getFileSet(file);
-				getDataInfoAndLoad(fileSet, false);
-
-			} else {
-				message = "No file was selected. Cannot begin "
-						+ "loading data.";
-				showWarning(message);
-				return;
+			if(fileSet == null) {
+				file = tvFrame.selectFile();
+	
+				/* Only run loader, if JFileChooser wasn't canceled. */
+				if (file != null) {
+					fileSet = tvFrame.getFileSet(file);
+	
+				} else {
+					return;
+				}
 			}
+			
+			getDataInfoAndLoad(fileSet, false);
+			
 		} catch (final LoadException e) {
-			message = "Loading the file was interrupted";
+			message = "Loading the file was interrupted.";
 			showWarning(message);
 			LogBuffer.logException(e);
 			return;
@@ -554,7 +562,7 @@ public class TVController implements Observer {
 				fileSet.getExt());
 
 		DataLoadInfo dataInfo;
-		if ((FileSet.TRV).equalsIgnoreCase(fileSet.getExt()) && node != null) { // better way?
+		if ((FileSet.TRV).equalsIgnoreCase(fileSet.getExt()) && node != null) {
 			dataInfo = getDataLoadInfo(fileSet);
 			
 		} else {
@@ -937,9 +945,7 @@ public class TVController implements Observer {
 			fileMenuSet = tvFrame.findFileSet((JMenuItem) actionEvent
 					.getSource());// tvFrame.getFileMenuSet();
 
-			tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
-
-			getDataInfoAndLoad(fileMenuSet, false);
+			openFile(fileMenuSet);
 		}
 	}
 
@@ -952,22 +958,78 @@ public class TVController implements Observer {
 	public void openPrefMenu(final String menu) {
 
 		// View
-		final PreferencesMenu preferences = new PreferencesMenu(tvFrame);
+		final LabelSettings preferences = new LabelSettings(tvFrame);
 
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 			preferences.setHeaderInfo(model.getRowHeaderInfo(),
 					model.getColumnHeaderInfo());
 		}
 
-		preferences.setupLayout(menu);
-
 		preferences.setConfigNode(tvFrame.getConfigNode().node(
 				StringRes.pnode_Preferences));
+		preferences.setMenu(menu);
 
 		// Controller
 		new PreferencesController(tvFrame, model, preferences);
 
 		preferences.setVisible(true);
+	}
+	
+	/**
+	 * Opens the preferences menu and sets the displayed menu to the specified
+	 * option using a string as identification.
+	 *
+	 * @param menu
+	 */
+	public void openExportMenu() {
+
+		if(tvFrame.getDendroView() == null) {
+			LogBuffer.println("DendroView is not instantiated. "
+					+ "Nothing to export.");
+			return;
+		}
+		
+		/* Set up tree images */
+		ExportPreviewTrees expRowTrees = getTreeSnapshot(
+				tvFrame.getDendroView().getRowTreeView(), true);
+		ExportPreviewTrees expColTrees = getTreeSnapshot(
+				tvFrame.getDendroView().getColumnTreeView(), false);
+		
+		/* Set up matrix image */
+		BufferedImage matrix = tvFrame.getDendroView()
+				.getInteractiveMatrixView().getVisibleImage();
+		ExportPreviewMatrix expMatrix = new ExportPreviewMatrix(matrix);
+		
+		ExportDialog exportDialog = new ExportDialog();
+		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
+		
+		new ExportDialogController(exportDialog, tvFrame.getDendroView());
+		
+		exportDialog.setVisible(true);
+	}
+	
+	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView, 
+			final boolean isRows) {
+		
+		int width;
+		int height;
+		if(isRows) {
+			width = ExportPreviewTrees.HEIGHT;
+			height = ExportPreviewTrees.WIDTH;
+		} else {
+			width = ExportPreviewTrees.WIDTH;
+			height = ExportPreviewTrees.HEIGHT;
+		}
+		
+		/* Set up column tree image */
+		BufferedImage treeSnapshot = null;
+		ExportPreviewTrees expTrees = null;
+		if(treeAxisView.isEnabled()) {
+			treeSnapshot = treeAxisView.getSnapshot(width, height);
+			expTrees = new ExportPreviewTrees(treeSnapshot, isRows);
+		}
+		
+		return expTrees;
 	}
 
 	/*
@@ -990,11 +1052,7 @@ public class TVController implements Observer {
 		final double median = model.getDataMatrix().getMedian();
 
 		/* View */
-		// TODO get colorExtractor instance from dendroController...
 		ColorExtractor colorExtractor = dendroController.getColorExtractor();
-		
-//		ColorExtractor drawer = ((DoubleArrayDrawer) dendroController
-//				.getArrayDrawer()).getColorExtractor();
 
 		final ColorChooserUI gradientPick = new ColorChooserUI(colorExtractor, 
 				min, max, mean, median);
@@ -1046,5 +1104,15 @@ public class TVController implements Observer {
 			addMenuListeners();
 		}
 
+	}
+	
+	/**
+	 * Relays copy call to dendroController.
+	 * @param copyType
+	 * @param isRows
+	 */
+	public void copyLabels(final CopyType copyType, final boolean isRows) {
+		
+		dendroController.copyLabels(copyType, isRows);
 	}
 }

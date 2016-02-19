@@ -10,19 +10,18 @@ import Utilities.GUIFactory;
 public class ShortcutDialog extends CustomDialog {
 
 	/**
-	 * Defualt serial version ID to keep Eclipse happy...
+	 * Default serial version ID to keep Eclipse happy...
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private JTable table;
+	
 	public ShortcutDialog() {
 
 		super("Keyboard Shortcuts");
 
 		setupData();
-
-		add(mainPanel);
-		// dialog.pack();
-		// dialog.setLocationRelativeTo(Frame.getFrames()[0]);
+		setupLayout();
 	}
 
 	private void setupData() {
@@ -32,11 +31,6 @@ public class ShortcutDialog extends CustomDialog {
 
 		final String mod_key = (isMac) ? "CMD" : "CTRL";
 		final String[] col_names = { "Shortcut", "Function" };
-
-		/* General Table */
-		final JLabel generalLabel = GUIFactory.createLabel("General Functions",
-				GUIFactory.FONTM);
-		mainPanel.add(generalLabel, "pushx, span, wrap");
 
 		final String[][] data = { { mod_key + " + O", "Open new file" },
 				{ mod_key + " + W", "Close window" },
@@ -54,11 +48,6 @@ public class ShortcutDialog extends CustomDialog {
 
 		setupTable(col_names, data);
 
-		/* Scroll Table */
-		final JLabel scrollLabel = GUIFactory.createLabel("Matrix Scrolling",
-				GUIFactory.FONTM);
-		mainPanel.add(scrollLabel, "pushx, span, wrap");
-
 		final String[][] scrollData = {
 				{ mod_key + " + HOME", "X-axis to start" },
 				{ mod_key + " + END", "X-axis to end" },
@@ -72,16 +61,34 @@ public class ShortcutDialog extends CustomDialog {
 
 	private void setupTable(final String[] col_names, final String[][] data) {
 
-		final JTable table = new JTable(data, col_names);
+		table = new JTable(data, col_names);
 		table.setFocusable(false);
 		table.setFont(GUIFactory.FONTS);
 		table.setOpaque(false);
 		table.setGridColor(GUIFactory.DEFAULT_BG);
+	}
 
+	@Override
+	protected void setupLayout() {
+		
+		if(table == null) {
+			return;
+		}
+		
+		/* General Table */
+		final JLabel generalLabel = GUIFactory.createLabel("General Functions",
+				GUIFactory.FONTM);
+		mainPanel.add(generalLabel, "pushx, span, wrap");
+		
+		/* Scroll Table */
+		final JLabel scrollLabel = GUIFactory.createLabel("Matrix Scrolling",
+				GUIFactory.FONTM);
+		mainPanel.add(scrollLabel, "pushx, span, wrap");
+		
 		final JScrollPane scrollPane = new JScrollPane(table);
 		table.setFillsViewportHeight(true);
-
 		mainPanel.add(scrollPane, "pushx, growx, wrap");
-
+		
+		getContentPane().add(mainPanel);
 	}
 }

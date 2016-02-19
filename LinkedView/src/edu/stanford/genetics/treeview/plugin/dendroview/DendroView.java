@@ -36,7 +36,6 @@ import Utilities.Helper;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
@@ -1341,13 +1340,13 @@ public class DendroView implements Observer, DendroPanel {
 		rowFinderBox.setHeaderSummary(getRowLabelView().getHeaderSummary());
 		rowFinderBox.setMapContainers(ymap, xmap);
 		rowFinderBox.setSelection(tvFrame.getRowSelection(),
-				tvFrame.getColumnSelection());
+				tvFrame.getColSelection());
 		rowFinderBox.setNewSearchTermBox();
 
 		colFinderBox.setHeaderInfo(columnHI);
 		colFinderBox.setHeaderSummary(getColumnLabelView().getHeaderSummary());
 		colFinderBox.setMapContainers(xmap, ymap);
-		colFinderBox.setSelection(tvFrame.getColumnSelection(),
+		colFinderBox.setSelection(tvFrame.getColSelection(),
 				tvFrame.getRowSelection());
 		colFinderBox.setNewSearchTermBox();
 
