@@ -69,9 +69,6 @@ public class TVController implements Observer {
 	private File file;
 	private FileSet fileMenuSet;
 
-//	private Preferences oldNode;
-	//private String[] clusterNodeSourceKeys;
-
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
 		this.model = model;
@@ -418,27 +415,18 @@ public class TVController implements Observer {
 
 		if (loadedNode == null) {
 			LogBuffer.println("No old node was found when trying to copy old"
-					+ " preferences.");
+					+ " preferences. Aborting import attempt.");
 			return;
 		}
 
 		try {
 			dendroController.importLabelPreferences(loadedNode);
-
-			if (loadedNode.nodeExists("ColorPresets")) {
-				dendroController.importColorPreferences(loadedNode);
-
-				// set node here? maybe it disappears because it's a local var
-			} else {
-				LogBuffer.println("ColorPresets node not found when trying" 
-						+ " to import previous color settings.");
-			}
+			dendroController.importColorPreferences(loadedNode);
 
 		} catch (BackingStoreException e) {
 			LogBuffer.logException(e);
+			return;
 		}
-
-//		oldNode = null;
 	}
 
 	/**

@@ -59,6 +59,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.IntegerMap;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenu;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenuController;
+import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
@@ -1483,18 +1484,35 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		LogBuffer.println("Importing labels...");
 		
-		Preferences rowLabelNode = parent.node("RowLabelView");
-		Preferences colLabelNode = parent.node("ColLabelView");
+		try {
+			if(!parent.nodeExists("RowLabelView")) {
+				LogBuffer.println("Missing node in parent. Could not import "
+						+ "row label settings.");
+			} else {
+				importLabelNode(dendroView.getRowLabelView(), 
+						parent.node("RowLabelView"));
+			}
 		
-		/* Label views for font, orientation, etc. */
-		dendroView.getRowLabelView().importSettingsFromNode(rowLabelNode);
-		dendroView.getColLabelView().importSettingsFromNode(colLabelNode);
+			if(!parent.nodeExists("ColLabelView")) {
+				LogBuffer.println("Missing node in parent. Could not import "
+						+ "column label settings.");
+			} else {
+				importLabelNode(dendroView.getColLabelView(), 
+						parent.node("ColLabelView"));
+			}
+		} catch (BackingStoreException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Problem when trying to import label settings."
+					+ " Could not complete import.");
+			return;
+		}
+	}
+	
+	private void importLabelNode(final LabelView labelView, 
+			final Preferences labelViewNode) {
 		
-		HeaderSummary rowHS = dendroView.getRowLabelView().getHeaderSummary();
-		HeaderSummary colHS = dendroView.getColLabelView().getHeaderSummary();
-		
-		rowHS.setConfigNode(rowLabelNode.node("RowSummary"));
-		colHS.setConfigNode(colLabelNode.node("ColSummary"));
+		labelView.importSettingsFromNode(labelViewNode);
+		labelView.getHeaderSummary().setConfigNode(labelViewNode);
 	}
 
 	// /**

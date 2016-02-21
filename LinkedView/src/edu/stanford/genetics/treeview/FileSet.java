@@ -84,7 +84,7 @@ public class FileSet {
 	 */
 	public FileSet(final Preferences configNode) {
 
-		node = configNode;
+		this.node = configNode;
 	}
 
 	/**

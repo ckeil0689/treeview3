@@ -150,6 +150,13 @@ ConfigNodePersistent, Controller {
 
 		LogBuffer.println("Importing color settings...");
 
+		if (!oldNode.nodeExists("ColorPresets")) {
+			LogBuffer.println("ColorPresets node not found when trying" 
+					+ " to import previous color settings. Aborting import"
+					+ "attempt.");
+			return;
+		}
+
 		colorExtractor.importPreferences(oldNode);
 
 		/* Update GradientChooser node */

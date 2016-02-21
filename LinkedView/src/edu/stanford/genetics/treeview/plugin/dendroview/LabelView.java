@@ -425,6 +425,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		LogBuffer.println("Setting new label configNode");
 		importSettingsFromNode(configNode);
+		
+		LogBuffer.println("Setting HeaderSummary node from: " + this.getName());
+		getHeaderSummary().setConfigNode(configNode);
 	}
 
 	public void importSettingsFromNode(Preferences node) {
@@ -439,8 +442,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Signal that the secondary scroll position should be reset the next
 		//time it is needed
 		resetSecondaryScroll();
-
-		getHeaderSummary().setConfigNode(node);
 	}
 
 	@Override

@@ -32,6 +32,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 		if (parentNode != null) {
 			this.configNode = parentNode.node(type);
+			LogBuffer.println("Set up configNode for " + type);
 
 		} else {
 			LogBuffer.println("Could not find or create " + type
@@ -43,6 +44,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 	public void setIncluded(final int[] newIncluded) {
 
+		LogBuffer.println("Setting new included member.(" + type + ")");
 		this.included = newIncluded;
 		synchronizeTo();
 		setChanged();
@@ -51,6 +53,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 	
 	public void setHeaders(final String[] headers) {
 		
+		LogBuffer.println("Setting new headers.(" + type + ")");
 		this.headers = headers;
 		synchronizeTo();
 		setChanged();
@@ -163,40 +166,16 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 
 		if (nodeHasAttribute("included")) {
-//			final String incString = configNode.get("included", "0");
 			final String incString = configNode.get("included", "[0]");
 			if (incString.equals("[]")) {
+				LogBuffer.println("The included key has no values stored. Including nothing. (" + type + ")");
 				setIncluded(new int[0]);
 
 			} else {
-//				int numComma = 0;
-//				for (int i = 0; i < incString.length(); i++) {
-//					if (incString.charAt(i) == ',') {
-//						numComma++;
-//					}
-//				}
-//
-//				int[] array = new int[numComma + 1];
-//				numComma = 0;
-//				int last = 0;
-//				for (int i = 0; i < incString.length(); i++) {
-//					if (incString.charAt(i) == ',') {
-//						final Integer x = new Integer(incString.substring(last,
-//								i));
-//						array[numComma++] = x.intValue();
-//						last = i + 1;
-//					}
-//				}
-				String[] inclArray = incString
-						.replaceAll(" ", "")
-						.replaceAll("\\[", "")
-						.replaceAll("\\]", "")
-						.split(",");
+				String[] inclArray = getValuesFromStoredString(incString);
 				
 				int[] array = new int[inclArray.length];
 				try {
-//					array[numComma] = Integer.parseInt(incString
-//							.substring(last));
 					for(int i = 0; i < inclArray.length; i++) {
 						String elem = inclArray[i];
 						array[i] = Integer.parseInt(elem);
@@ -216,10 +195,23 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				setIncluded(array);
 			}
 		} else if(headers != null && headers.length > 0) {
+			LogBuffer.println("There are headers defined but no key stored for included indices. Setting a default. (" + type + ")");
 			setIncluded(new int[]{0});
 		} else {
+			LogBuffer.println("There are no headers defined. Including nothing. (" + type + ")");
 			setIncluded(new int[0]);
 		}
+	}
+	
+	private String[] getValuesFromStoredString(String storedVal) {
+		
+		String[] storedVals = storedVal
+				.replaceAll(" ", "")
+				.replaceAll("\\[", "")
+				.replaceAll("\\]", "")
+				.split(",");
+		
+		return storedVals;
 	}
 	
 	/**
@@ -240,13 +232,9 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		
 		if (nodeHasAttribute("includedNames")) {
 			String names = configNode.get("includedNames", "");
-			String[] nameArray = names
-					.replaceAll(" ", "")
-					.replaceAll("\\[", "")
-					.replaceAll("\\]", "")
-					.split(",");
+			String[] nameArray = getValuesFromStoredString(names);
 			
-			newIncluded = new int[names.length()];
+			newIncluded = new int[nameArray.length];
 			
 			for(int i = 0; i < nameArray.length; i++) {
 				String name = nameArray[i];
@@ -297,15 +285,9 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				names[i] = headers[idx];
 			}
 		}
-//		final StringBuffer temp = new StringBuffer();
-//		if (vec.length > 0) {
-//			temp.append(vec[0]);
-//		}
-//
-//		for (int i = 1; i < vec.length; i++) {
-//			temp.append(',');
-//			temp.append(vec[i]);
-//		}
+		
+		LogBuffer.println("Storing new included labels indices: (" + type + ")" + Arrays.toString(vec));
+		LogBuffer.println("Storing new included labels names: (" + type + ")" + Arrays.toString(names));
 		
 		configNode.put("included", Arrays.toString(vec));//temp.toString());
 		configNode.put("includedNames", Arrays.toString(names));
