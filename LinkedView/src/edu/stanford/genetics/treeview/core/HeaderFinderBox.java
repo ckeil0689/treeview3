@@ -745,18 +745,13 @@ public abstract class HeaderFinderBox {
 			}
 
 			final int selStartRel = editor.getSelectionStart(); // Selection
-			// start before
-			// having typed
+			//text selection start before having typed
 			int selEndRel = editor.getSelectionEnd(); // Selection end
-			// before having
-			// typed
+			//text selection end before having typed
 			int lenRel = editor.getText().length(); // Length before
-			// having typed
+			//text selection length before having typed
 			int selIndexRel = searchTermBox.getSelectedIndex(); // Selected
-			// index
-			// before
-			// having
-			// typed
+			//selected index before having typed
 
 			//Skip the first item in the dropdown list (which contains the
 			//defaultText) if the cursor position is greater than 0 (i.e. text
@@ -815,9 +810,10 @@ public abstract class HeaderFinderBox {
 
 			// If the contents of the text field have changed and nothing in the
 			// select list is selected
-			if ((changed || lenPressed != lenRel)
-					&& searchTermBox.getSelectedIndex() == -1) {
-				if ((e.getKeyChar()) == 127 || // Delete (forward)
+			if((changed || lenPressed != lenRel) &&
+				searchTermBox.getSelectedIndex() == -1) {
+
+				if((e.getKeyChar()) == 127 || // Delete (forward)
 						(e.getKeyChar()) == 8) { // Backspace
 					editor.setSelectionStart(selStartTyped);
 					editor.setSelectionEnd(selStartTyped);
@@ -829,14 +825,14 @@ public abstract class HeaderFinderBox {
 			}
 			// Else if no text changed, there was selected text, and a left or
 			// right arrow was pressed without modifiers
-			else if (!changed && lenPressed == lenRel) {
-				if (selStartPressed != selEndPressed
+			else if(!changed && lenPressed == lenRel) {
+				if(selStartPressed != selEndPressed
 						&& (e.getKeyCode() == KeyEvent.VK_RIGHT || e
 								.getKeyCode() == KeyEvent.VK_LEFT)
 						&& e.getModifiers() == 0) {
-					if (debug) {
-						LogBuffer
-								.println("Positioning cursor at edge of selection...");
+					if(debug) {
+						LogBuffer.println("Positioning cursor at edge of " +
+							"selection...");
 					}
 					if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 						editor.setSelectionStart(selEndPressed);
@@ -1072,7 +1068,7 @@ public abstract class HeaderFinderBox {
 							// (but apparently we need to delete the selected
 							// text manually)
 							editor.setText(/* e.getKeyChar() + */editor
-									.getText().substring(selEndTyped, lenTyped));
+									.getText().substring(selEndTyped,lenTyped));
 							if (searchTermBox.getSelectedIndex() == -1) {
 								editor.setSelectionStart(selStartTyped);
 								editor.setSelectionEnd(selStartTyped);
@@ -1299,7 +1295,8 @@ public abstract class HeaderFinderBox {
 
 				final JDialog dialog = new JDialog();
 				dialog.setTitle("WildCard Search Test");
-				dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				dialog.setDefaultCloseOperation(
+					WindowConstants.DISPOSE_ON_CLOSE);
 				dialog.setSize(new Dimension(400, 150));
 
 				final JPanel container = new JPanel();
