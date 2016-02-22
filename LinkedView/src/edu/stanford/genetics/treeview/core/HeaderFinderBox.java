@@ -85,7 +85,7 @@ public abstract class HeaderFinderBox {
 	protected HeaderFinderBox companionBox;
 
 	//defaultText is what's in the finder box before a term is entered.
-	protected String defaultText;
+	protected static String defaultText;
 
 //	boolean dropdownclicked = false;
 
@@ -522,8 +522,9 @@ public abstract class HeaderFinderBox {
 		// At least part of the found min/max selected area is not visible
 		// This assumes that min is less than max and that the visible area is a
 		// contiguous block of visible indexes
-				(minIndex < globalSmap.getFirstVisible() || maxIndex > (globalSmap
-						.getFirstVisible() + globalSmap.getNumVisible() - 1))) {
+				(minIndex < globalSmap.getFirstVisible() ||
+					maxIndex > (globalSmap.getFirstVisible() +
+						globalSmap.getNumVisible() - 1))) {
 
 			globalSmap.setToMinScale();
 		}
@@ -680,7 +681,7 @@ public abstract class HeaderFinderBox {
 		private int selEndTyped = 0;
 		private int lenTyped = 0;
 		private int selIndexTyped = -1;
-		private final boolean debug = false;
+		private final boolean debug = true;
 		private boolean changed = false;
 		JTextComponent editor = ((JTextField) searchTermBox.getEditor()
 				.getEditorComponent());
@@ -691,6 +692,7 @@ public abstract class HeaderFinderBox {
 
 		@Override
 		public void keyPressed(final KeyEvent e) {
+
 			selStartPressed = editor.getSelectionStart();
 			selEndPressed = editor.getSelectionEnd();
 			lenPressed = editor.getText().length();
@@ -734,16 +736,60 @@ public abstract class HeaderFinderBox {
 			final int selStartRel = editor.getSelectionStart(); // Selection
 			// start before
 			// having typed
-			final int selEndRel = editor.getSelectionEnd(); // Selection end
+			int selEndRel = editor.getSelectionEnd(); // Selection end
 			// before having
 			// typed
-			final int lenRel = editor.getText().length(); // Length before
+			int lenRel = editor.getText().length(); // Length before
 			// having typed
-			final int selIndexRel = searchTermBox.getSelectedIndex(); // Selected
+			int selIndexRel = searchTermBox.getSelectedIndex(); // Selected
 			// index
 			// before
 			// having
 			// typed
+
+			//Skip the first item in the dropdown list (which contains the
+			//defaultText) if the cursor position is greater than 0 (i.e. text
+			//has been typed/entered) and select the first matching item after
+			//it.
+			if(searchTermBox.getSelectedIndex() == 0 &&
+				editor.getSelectionStart() > 0) {
+
+				//Get the editor text which the combobox has autofilled and
+				//lower-case it so we can do a case-insensitive search
+				String lcprefix = editor.getText().toLowerCase();
+
+				//If the text is as long as the substring position we intend to
+				//extract (i.e. the typed portion = which it should be)
+				if(lcprefix != null &&
+					lcprefix.length() >= editor.getSelectionStart()) {
+
+					//Capture the actual typed text
+					lcprefix = lcprefix.substring(0,editor.getSelectionStart());
+
+					//Search the dropdown list for a matching item
+					for(int i = 1;i < searchTermBox.getItemCount();i++) {
+						String item =
+							(String) searchTermBox.getModel().getElementAt(i);
+
+						if(item != null &&
+							item.toLowerCase().startsWith(lcprefix)) {
+
+							//Update all the necessary values used to correct
+							//the editor later.  This should update the editor's
+							//string content.
+							searchTermBox.setSelectedIndex(i);
+
+							//Now update the length and the selection end
+							selIndexRel = i;
+							editor.setSelectionStart(selStartRel);
+							lenRel = item.length();
+							selEndRel = lenRel;
+							editor.setSelectionEnd(selEndRel);
+							break;
+						}
+					}
+				}
+			}
 
 			if (debug) {
 				LogBuffer.println("  Relsd - Selection start: [" + selStartRel
@@ -788,9 +834,10 @@ public abstract class HeaderFinderBox {
 						editor.setSelectionStart(selStartPressed);
 						editor.setSelectionEnd(selStartPressed);
 					}
-				} else if ((e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN)
-						&& e.getModifiers() == 1
-						&& e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK) {
+				} else if ((e.getKeyCode() == KeyEvent.VK_UP ||
+					e.getKeyCode() == KeyEvent.VK_DOWN) && e.getModifiers() == 1
+					&& e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK) {
+
 					if (debug) {
 						LogBuffer.println("Expanding selection to end...");
 					}
@@ -958,8 +1005,8 @@ public abstract class HeaderFinderBox {
 				if (searchTermBox.getSelectedIndex() == -1) {
 					if (debug) {
 						LogBuffer
-								.println("Trying to force editing manually selected "
-										+ "text to work");
+								.println("Trying to force editing manually " +
+									"selected text to work");
 					}
 
 					if (lenTyped > 0) {
@@ -1041,9 +1088,8 @@ public abstract class HeaderFinderBox {
 					final String content = editor.getText();
 
 					if (debug) {
-						LogBuffer
-								.println("Trying to force a selection to be made 1.  "
-										+ "Current text: [" + content + "].");
+						LogBuffer.println("Trying to force a selection to be " +
+							"made 1.  Current text: [" + content + "].");
 					}
 
 					// searchTermBox.setKeySelectionManager(
@@ -1130,8 +1176,9 @@ public abstract class HeaderFinderBox {
 										.length());
 
 								String content = "";
-								if (editor.getText().length() >= (selStartTyped - 1)
-										&& selStartTyped > 1) {
+								if (editor.getText().length() >=
+									(selStartTyped - 1) && selStartTyped > 1) {
+
 									if (debug) {
 										LogBuffer.println("Remaining text "
 												+ "length: ["
@@ -1241,7 +1288,8 @@ public abstract class HeaderFinderBox {
 
 				final JDialog dialog = new JDialog();
 				dialog.setTitle("WildCard Search Test");
-				dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				dialog.setDefaultCloseOperation(
+					WindowConstants.DISPOSE_ON_CLOSE);
 				dialog.setSize(new Dimension(400, 150));
 
 				final JPanel container = new JPanel();
