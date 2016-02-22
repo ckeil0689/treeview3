@@ -711,6 +711,18 @@ public abstract class HeaderFinderBox {
 						+ (int) e.getKeyChar() + "].");
 			}
 
+			//If a modifier is pressed, the popup is visible, and the modifier
+			//is the command key and the field hasn't changed
+			if(e.getModifiers() > 0 && searchTermBox.isPopupVisible() &&
+				e.getKeyChar() == 65535 && !changed) {
+
+				//Set the popup to invisible because it's disconcerting for the
+				//popup to show up when you are entering a command like
+				//command-o to open a file, command-t to show/hide the trees, or
+				//even to quit the app
+				searchTermBox.setPopupVisible(false);
+			}
+
 			//Commented this out so that the background would possibly remain
 			//red until good results are found.
 //			LogBuffer.println("Color reset to found color");
@@ -1288,8 +1300,7 @@ public abstract class HeaderFinderBox {
 
 				final JDialog dialog = new JDialog();
 				dialog.setTitle("WildCard Search Test");
-				dialog.setDefaultCloseOperation(
-					WindowConstants.DISPOSE_ON_CLOSE);
+				dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 				dialog.setSize(new Dimension(400, 150));
 
 				final JPanel container = new JPanel();
