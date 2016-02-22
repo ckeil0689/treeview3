@@ -18,6 +18,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.lang.reflect.Field;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -318,8 +319,8 @@ public abstract class HeaderFinderBox {
 
 			searchDataHeaders = getHeaders(hA,i);
 
-			Arrays.sort(searchDataHeaders);
-	
+			Arrays.sort(searchDataHeaders,Collator.getInstance());
+
 			System.arraycopy(searchDataHeaders, 0, labeledHeaders, startIndex,
 					searchDataHeaders.length);
 

@@ -76,7 +76,7 @@ public class IntHeaderInfo extends Observable implements HeaderInfo {
 			return getHeaderArray()[gene];
 			
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-			LogBuffer.println("error: tried to retrieve header for  index "
+			LogBuffer.println("error: tried to retrieve header for index "
 					+ gene + " but max is " + getHeaderArray().length);
 			LogBuffer.logException(e);
 			return new String[0];
