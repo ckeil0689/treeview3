@@ -682,7 +682,7 @@ public abstract class HeaderFinderBox {
 		private int selEndTyped = 0;
 		private int lenTyped = 0;
 		private int selIndexTyped = -1;
-		private final boolean debug = true;
+		private final boolean debug = false;
 		private boolean changed = false;
 		JTextComponent editor = ((JTextField) searchTermBox.getEditor()
 				.getEditorComponent());
