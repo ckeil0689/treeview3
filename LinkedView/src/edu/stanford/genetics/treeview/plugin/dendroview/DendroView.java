@@ -121,6 +121,9 @@ public class DendroView implements Observer, DendroPanel {
 	private JButton scaleDecXY;
 	private JButton scaleDefaultAll;
 
+	/* TODO: This needs to be better integrated into the interface */
+//	private JButton exportBtn;
+
 	private HeaderFinderBox rowFinderBox;
 	private HeaderFinderBox colFinderBox;
 
@@ -306,6 +309,8 @@ public class DendroView implements Observer, DendroPanel {
 		navBtnPanel.add(scaleDecXY);
 		navBtnPanel.add(zoomBtn);
 		navBtnPanel.add(scaleDefaultAll);
+		/* TODO: This needs to be better integrated into the interface */
+//		navBtnPanel.add(exportBtn);
 		
 		return navBtnPanel;
 	}
@@ -669,6 +674,10 @@ public class DendroView implements Observer, DendroPanel {
 		/* Reset zoom */
 		zoomBtn = GUIFactory.createIconBtn(StringRes.icon_zoomAll);
 		zoomBtn.setToolTipText(StringRes.tt_home);
+
+		/* TODO: This needs to be better integrated into the interface */
+//		exportBtn = GUIFactory.createSquareBtn("X",39);
+//		exportBtn.setToolTipText("Export image to file");
 	}
 
 	/**
@@ -713,6 +722,9 @@ public class DendroView implements Observer, DendroPanel {
 		scaleIncXY.addActionListener(l);
 		scaleDecXY.addActionListener(l);
 		scaleDefaultAll.addActionListener(l);
+
+		/* TODO: This needs to be better integrated into the interface */
+//		exportBtn.addActionListener(l);
 	}
 
 	/**
@@ -1401,6 +1413,12 @@ public class DendroView implements Observer, DendroPanel {
 
 		return scaleDefaultAll;
 	}
+
+	/* TODO: This needs to be better integrated into the interface */
+//	public JButton getExportButton() {
+//
+//		return exportBtn;
+//	}
 
 	public JButton getZoomButton() {
 

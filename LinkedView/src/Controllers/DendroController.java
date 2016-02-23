@@ -1,5 +1,6 @@
 package Controllers;
 
+import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -22,6 +23,7 @@ import java.util.Observer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.Box;
@@ -66,6 +68,17 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
+
+import java.awt.image.BufferedImage;
+import java.awt.Dimension;
+import java.util.Properties;
+
+import org.freehep.graphics2d.VectorGraphics;
+import org.freehep.graphicsio.pdf.PDFGraphics2D;
+import org.freehep.graphicsio.ps.PSGraphics2D;
+import org.freehep.graphicsio.svg.SVGGraphics2D;
+
+
 
 /* 
  * NOTES: 
@@ -636,6 +649,16 @@ public class DendroController implements ConfigNodePersistent, Observer,
 					dendroView.getInteractiveMatrixView()
 							.smoothAnimatedZoomOut();
 				}
+				/* TODO: This needs to be better integrated into the interface */
+//			} else if (e.getSource() == dendroView.getExportButton()) {
+//
+//				//The following uses the forked freehep 2.4 project, compiled by
+//				//maven 2, along with 2 jar files from the original freehep
+//				//2.1.1 project
+//				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
+//					interactiveYmap,colSelection,rowSelection);
+//				eh.setTileAspectRatioToScreen(Region.VISIBLE);
+//				eh.export(Format.PDF,"Output.pdf",Region.SELECTION,true);
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
 						+ "in DendroController ScaleListener.");
@@ -789,34 +812,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		globalYmap.setToMinScale();
 
 		saveSettings();
-	}
-
-	public void saveImage(final JPanel panel) throws IOException {
-
-		// File saveFile = new File("savedImage.png");
-		//
-		// final JFileChooser fc = new JFileChooser();
-		//
-		// fc.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
-		// fc.setSelectedFile(saveFile);
-		// final int returnVal = fc.showSaveDialog(dendroView.getDendroPane());
-		//
-		// if (returnVal == JFileChooser.APPROVE_OPTION) {
-		// saveFile = fc.getSelectedFile();
-		//
-		// String fileName = saveFile.toString();
-		//
-		// if (!fileName.endsWith(".png")) {
-		// fileName += ".png";
-		// saveFile = new File(fileName);
-		// }
-		//
-		// final BufferedImage im = new BufferedImage(panel.getWidth(),
-		// panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		//
-		// panel.paint(im.getGraphics());
-		// ImageIO.write(im, "PNG", saveFile);
-		// }
 	}
 
 	/**

@@ -10,9 +10,13 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
+
+import edu.stanford.genetics.treeview.TreeSelectionI;
 
 /**
  * Class for Drawing A Colored Grid Representation of a Matrix.
@@ -172,6 +176,170 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				}
 			}
 		}
+	}
+
+	/**
+	 * This method is intended to be used for drawing the matrix using vector
+	 * graphics (freehep's VectorGraphics2D object), thus there are no resizing
+	 * calculations.
+	 * @author rleach
+	 * @param g - Graphics or Graphics2D or VectorGraphics2D object
+	 * @param width - This should be the size of xmap
+	 * @param height - This should be the size of ymap
+	 */
+	/* TODO: This needs to take a start end end index for each dimension fining
+	 * the export region */
+	public void paint(final Graphics g,final int width,final int height) {
+		for (int j = height - 1; j >= 0; j--) {
+			for (int i = width - 1; i >= 0; i--) {
+				//setPaintMode seems to help color overlapping (affecting the
+				//colors) a little, but doesn't fix it altogether. Probably
+				//useless. Note there appears to be an alpha channel in the
+				//output PDF.
+				g.setPaintMode();
+				g.setColor(getColor(i,j));
+				//drawRect is better than fillRect because there're no gaps, but
+				//still some color bleed for some reason at some zoom levels - I
+				//think that's due to the reader's poor rendering
+				g.drawRect(i,j,1,1);
+			}
+		}
+	}
+
+	/**
+	 * A wrapper for exporting the entire matrix.
+	 * @author rleach
+	 * @param g - A graphics2D-compatible object
+	 * @param width - The number of columns of data
+	 * @param height - The number of rows of data
+	 * @param xIndent - The x start position of the image
+	 * @param yIndent - The y start position of the image
+	 * @param size - The number of "pixels" high/wide each tile is to be drawn
+	 */
+	public void paint(final Graphics g,final int width,final int height,
+		final int xIndent,final int yIndent,final int tileXsize,
+		final int tileYsize,final boolean showSelections,
+		final TreeSelectionI colSelection,final TreeSelectionI rowSelection) {
+
+		paint(g,width - 1,height - 1,xIndent,yIndent,tileXsize,tileYsize,0,0,
+			showSelections,colSelection,rowSelection);
+	}
+
+	/**
+	 * A method to export a portion of the matrix
+	 * @author rleach
+	 * @param g - A graphics2D-compatible object
+	 * @param xend - The index of the last column of data to be included
+	 * @param yend - The index of the last row of data to be included
+	 * @param xIndent - The x start position of the image
+	 * @param yIndent - The y start position of the image
+	 * @param size - The number of "pixels" high/wide each tile is to be drawn
+	 * @param xstart - The index of the first column of data to be included
+	 * @param ystart - The index of the first row of data to be included
+	 */
+	public void paint(final Graphics g,final int xend,final int yend,
+		final int xIndent,final int yIndent,final int tileXsize,
+		final int tileYsize,final int xstart,final int ystart,
+		final boolean showSelections,
+		final TreeSelectionI colSelection,final TreeSelectionI rowSelection) {
+	
+		for (int j = ystart; j <= yend; j++) {
+			for (int i = xstart; i <= xend; i++) {
+				//setPaintMode seems to help color overlapping (affecting the
+				//colors) a little, but doesn't fix it altogether. Probably
+				//useless. Note there appears to be an alpha channel in the
+				//output PDF.
+				g.setPaintMode();
+				g.setColor(getColor(i,j));
+				//drawRect is better than fillRect because there're no gaps, but
+				//still some color bleed for some reason at some zoom levels - I
+				//think that's due to the reader's poor rendering
+				g.drawRect(xIndent + (i - xstart) * tileXsize,
+					yIndent + (j - ystart) * tileYsize,tileXsize,tileYsize);
+				g.fillRect(xIndent + (i - xstart) * tileXsize,
+					yIndent + (j - ystart) * tileYsize,tileXsize,tileYsize);
+			}
+		}
+
+		//Draw the selection rectangles
+		if(showSelections && (rowSelection != null) && (colSelection != null) &&
+			rowSelection.getNSelectedIndexes() > 0 &&
+			colSelection.getNSelectedIndexes() > 0) {
+
+			g.setColor(Color.yellow);
+
+			final int[] selectedArrayIndexes =
+				colSelection.getSelectedIndexes();
+			final int[] selectedGeneIndexes =
+				rowSelection.getSelectedIndexes();
+	
+			if (selectedArrayIndexes.length > 0) {
+				List<List<Integer>> arrayBoundaryList;
+				List<List<Integer>> geneBoundaryList;
+	
+				arrayBoundaryList =
+					findRectBoundaries(selectedArrayIndexes);
+				geneBoundaryList =
+					findRectBoundaries(selectedGeneIndexes);
+	
+				for(final List<Integer> xBoundaries : arrayBoundaryList) {
+					for(final List<Integer> yBoundaries : geneBoundaryList){
+
+						int xStartPixel =
+							xIndent + (xBoundaries.get(0) - xstart) * tileXsize;
+						int xPixelSize =
+							(xBoundaries.get(1) - xBoundaries.get(0) + 1) *
+							tileXsize - 1;
+						int yStartPixel =
+							yIndent + (yBoundaries.get(0) - ystart) * tileYsize;
+						int yPixelSize =
+							(yBoundaries.get(1) - yBoundaries.get(0) + 1) *
+							tileYsize - 1;
+						g.drawRect(xStartPixel,yStartPixel,xPixelSize,
+							yPixelSize);
+					}
+				}
+			}
+		}
+	}
+
+	protected List<List<Integer>> findRectBoundaries(
+		final int[] selectedIndexes) {
+
+		final List<List<Integer>> boundaryList = new ArrayList<List<Integer>>();
+	
+		/*
+		 * If array is bigger than 1, check how many consecutive labels are
+		 * selected by finding out which elements are only 1 apart. Store
+		 * consecutive indexes separately to make separate rectangles later.
+		 */
+		int firstindex = 0;
+		int lastval;
+		while(firstindex < selectedIndexes.length) {
+
+			lastval = selectedIndexes[firstindex];
+			List<Integer> boundaries = new ArrayList<Integer>();
+			boundaries.add(lastval);
+
+			firstindex++;
+
+			for(int i = firstindex; i < selectedIndexes.length; i++) {
+	
+				final int currentval = selectedIndexes[i];
+
+				if(lastval == currentval - 1) {
+					lastval = currentval;
+					firstindex = i + 1;
+				} else {
+					break;
+				}
+			}
+
+			boundaries.add(lastval);
+			boundaryList.add(boundaries);
+		}
+
+		return(boundaryList);
 	}
 
 	/**

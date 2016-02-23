@@ -23,8 +23,10 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import Controllers.Region;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -453,6 +455,79 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		}
 	}
 
+	/**
+	 * Exports a tree to a file
+	 * @author rleach
+	 * @param g - graphics object
+	 * @param xIndent - size of the indent where to start drawing the tree
+	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param size - size of a matrix tile in this tree's dimension
+	 * @param region - what portion of the tree to export
+	 */
+	public void export(final Graphics g,final int xIndent,final int yIndent,
+		final int size,final Region region,final boolean showSelections) {
+
+		if(region == Region.ALL) {
+			exportAll(g,xIndent,yIndent,size,showSelections);
+		} else if(region == Region.VISIBLE) {
+			exportVisible(g,xIndent,yIndent,size,showSelections);
+		} else if(region == Region.SELECTION) {
+			exportSelection(g,xIndent,yIndent,size,showSelections);
+		} else {
+			LogBuffer.println("ERROR: Invalid export region: [" + region +
+				"].");
+		}
+	}
+
+	/**
+	 * Exports the entire tree
+	 * @author rleach
+	 * @param g - graphics object
+	 * @param xIndent - size of the indent where to start drawing the tree
+	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param size - size of a matrix tile in this tree's dimension
+	 */
+	public void exportAll(final Graphics g,final int xIndent,final int yIndent,
+		final int size,final boolean showSelections) {
+	
+		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,
+			xIndent,yIndent,size,0,map.getMaxIndex(),showSelections);
+	}
+
+	/**
+	 * Exports the portion of the tree corresponding to the visible portion of
+	 * the matrix
+	 * @author rleach
+	 * @param g - graphics object
+	 * @param xIndent - size of the indent where to start drawing the tree
+	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param size - size of a matrix tile in this tree's dimension
+	 */
+	public void exportVisible(final Graphics g,final int xIndent,
+		final int yIndent,final int size,final boolean showSelections) {
+	
+		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,
+			xIndent,yIndent,size,map.getFirstVisible(),map.getLastVisible(),
+			showSelections);
+	}
+
+	/**
+	 * Exports the portion of the tree corresponding to the minimum and maximum
+	 * selected portions of the matrix/tree
+	 * @author rleach
+	 * @param g - graphics object
+	 * @param xIndent - size of the indent where to start drawing the tree
+	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param size - size of a matrix tile in this tree's dimension
+	 */
+	public void exportSelection(final Graphics g,final int xIndent,
+		final int yIndent,final int size,final boolean showSelections) {
+	
+		treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,treeSelection,
+			xIndent,yIndent,size,treeSelection.getMinIndex(),
+			treeSelection.getMaxIndex(),showSelections);
+	}
+
 	/* Abstract methods */
 	protected abstract int  getSecondaryPaneSize(final Dimension dims);
 	protected abstract int  getPrimaryPaneSize(final Dimension dims);
@@ -477,7 +552,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	protected abstract void drawWhizBackground(final Graphics g);
 	protected abstract void drawFittedWhizBackground(final Graphics g,
 		LinearTransformation scaleEq);
-	protected abstract void setExportScale(final Rectangle dest);
+	protected abstract void setExportPreviewScale(final Rectangle dest);
 
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
@@ -925,6 +1000,15 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	public void unsetPrimaryHoverIndex() {
 		map.unsetHoverIndex();
 	}
+
+	/**
+	 * Determines whether the tree exists or not
+	 * @author rleach
+	 * @return boolean
+	 */
+	public boolean treeExists() {
+		return(treePainter != null && treePainter.getRootNode() != null);
+	}
 	
 	public BufferedImage getSnapshot(final int width, final int height) {
 	
@@ -935,7 +1019,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		BufferedImage scaled = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
 		
-		setExportScale(dest);
+		setExportPreviewScale(dest);
 		
 		/* Draw trees to first image, original size */
 		treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 

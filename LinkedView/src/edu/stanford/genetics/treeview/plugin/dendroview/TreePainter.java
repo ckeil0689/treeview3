@@ -59,6 +59,42 @@ public class TreePainter extends TreeDrawer {
 	}
 
 	/**
+	 * Export to file method which paints a portion of a tree in a position
+	 * aligned with the matrix and the other tree.
+	 * @author rleach
+	 * @param graphics - the graphics object with which to paint
+	 * @param xScaleEq - X coord calculations object
+	 * @param yScaleEq - Y coord calculations object
+	 * @param dest - The coords where to draw the tree
+	 * @param isLeft - left tree or top tree
+	 * @param treeSelection - contains the selected indexes
+	 * @param xIndent - where to start drawing the (entire) tree
+	 * @param yIndent - where to start drawing the (entire) tree
+	 * @param size - The size of an edge of a tile in the matrix
+	 * @param startIndex - The data index where the drawing starts
+	 * @param endIndex - The data index where the drawing ends
+	 */
+	public void paint(final Graphics graphics,
+		final LinearTransformation xScaleEq,
+		final LinearTransformation yScaleEq,final Rectangle dest,
+		final boolean isLeft,final TreeSelectionI treeSelection,
+		final int xIndent,final int yIndent,final int size,
+		final int startIndex,final int endIndex,final boolean showSelections) {
+	
+		if ((getRootNode() == null) || (getRootNode().isLeaf())) {
+			LogBuffer.println("Root node is null or leaf in paint() "
+					+ "in InvertedTreeDrawer!");
+		} else {
+			this.isLeft = isLeft;
+			// recursively drawtree...
+			final NodeDrawer nd =
+				new NodeDrawer(graphics,xScaleEq,yScaleEq,dest,null);
+			nd.draw(getRootNode(),treeSelection,xIndent,yIndent,size,
+				startIndex,endIndex,showSelections);
+		}
+	}
+
+	/**
 	 * Paints a subtree
 	 * @author rleach
 	 * @param graphics - the graphics object with which to paint
@@ -132,16 +168,18 @@ public class TreePainter extends TreeDrawer {
 			xT = xScaleEq;
 			yT = yScaleEq;
 			setHoveredNode(hoveredNode);
-			dest = d; // TODO if d is NULL this will crash and burn in else clause
+			dest = d; // TODO if d is NULL this will crash & burn in else clause
 
 			// GTRView
 			if (isLeft && dest != null) {
 				minInd = (int) yScaleEq.inverseTransform(dest.y);
-				maxInd = (int) yScaleEq.inverseTransform(dest.y + dest.height) + 1;
-				// ATRView
+				maxInd = (int) yScaleEq.inverseTransform(dest.y + dest.height) +
+					1;
+			// ATRView
 			} else {
 				minInd = (int) xScaleEq.inverseTransform(dest.x);
-				maxInd = (int) xScaleEq.inverseTransform(dest.x + dest.width) + 1;
+				maxInd = (int) xScaleEq.inverseTransform(dest.x + dest.width) +
+					1;
 			}
 		}
 
@@ -159,7 +197,7 @@ public class TreePainter extends TreeDrawer {
 		 * @param treeSelection - contains the selected data indexes
 		 */
 		public void draw(final TreeDrawerNode node,final int hoverIndex,
- 			final TreeSelectionI treeSelection) {
+			final TreeSelectionI treeSelection) {
 
 			Stack<TreeDrawerNode> selectedNodeStack =
 				drawDFS(node,hoverIndex,false,treeSelection);
@@ -169,6 +207,34 @@ public class TreePainter extends TreeDrawer {
 			if(aNodeIsHovered()) {
 				graphics.setColor(Color.RED);
 				drawNodeDot(getHoveredNode());
+			}
+		}
+
+		/**
+		 * Export a portion of the tree
+		 * @author rleach
+		 * @param node - root node of the tree
+		 * @param treeSelection - selection object
+		 * @param xIndent - where to start drawing the (entire) tree
+		 * @param yIndent - where to start drawing the (entire) tree
+		 * @param size - The size of an edge of a tile in the matrix
+		 * @param startIndex - The data index where the drawing starts
+		 * @param endIndex - The data index where the drawing ends
+		 */
+		public void draw(final TreeDrawerNode node,
+			final TreeSelectionI treeSelection,final int xIndent,
+			final int yIndent,final int size,final int startIndex,
+			final int endIndex,final boolean showSelections) {
+
+			Stack<TreeDrawerNode> selectedNodeStack =
+				exportDFS(node,treeSelection,xIndent,yIndent,size,
+					node.getMinCorr(),node.getMaxCorr(),startIndex,endIndex,
+					showSelections);
+
+			if(showSelections) {
+				graphics.setColor(new Color(197,181,66));//dark yellow
+				exportNodeDots(selectedNodeStack,xIndent,yIndent,size,
+					node.getMinCorr(),node.getMaxCorr(),startIndex,endIndex);
 			}
 		}
 
@@ -295,6 +361,108 @@ public class TreePainter extends TreeDrawer {
 		}
 
 		/**
+		 * Exports a portion of a tree to a file in a position aligned with the
+		 * matrix and other tree
+		 * @author rleach
+		 * @param node - root node of the tree
+		 * @param hoverIndex - 
+		 * @param isNodeHovered
+		 * @param treeSelection - selection object
+		 * @param xIndent - where to start drawing the (entire) tree
+		 * @param yIndent - where to start drawing the (entire) tree
+		 * @param size - The size of an edge of a tile in the matrix
+		 * @param minCorr - minimum correlation value
+		 * @param maxCorr - maximum correlation value
+		 * @param startIndex - The data index where the drawing starts
+		 * @param endIndex - The data index where the drawing ends
+		 * @return
+		 */
+		public Stack<TreeDrawerNode> exportDFS(final TreeDrawerNode node,
+			final TreeSelectionI treeSelection,
+			final int xIndent,final int yIndent,final int size,
+			final double minCorr,final double maxCorr,final int startIndex,
+			final int endIndex,boolean showSelections) {
+	
+			Stack<TreeDrawerNode> returnStack = new Stack<TreeDrawerNode>();
+
+			// just return if no subkids visible.
+			if((node.getMaxIndex() < startIndex) ||
+				(node.getMinIndex() > endIndex)) {
+				if(isNodeSelected(node,treeSelection)) {
+					returnStack.push(node);
+				}
+				return(returnStack);
+			}
+	
+			//These will keep track of the selected nodes so that the dots can
+			//be drawn on top and the branch colors can be determined
+			Stack<TreeDrawerNode> leftDotNodeStack  =
+				new Stack<TreeDrawerNode>();
+			Stack<TreeDrawerNode> rightDotNodeStack =
+				new Stack<TreeDrawerNode>();
+	
+			/* Recursive calls (leaves will be drawn first) */
+	
+			//Do the left side
+			if(!node.getLeft().isLeaf()) {
+				leftDotNodeStack = exportDFS(node.getLeft(),treeSelection,
+					xIndent,yIndent,size,minCorr,maxCorr,startIndex,endIndex,
+					showSelections);
+			}
+			//We do not recurse down to the leaves, so add them to the stack
+			//here
+			else if(treeSelection.isIndexSelected(
+				(int) node.getLeft().getIndex())) {
+	
+				leftDotNodeStack.push(node.getLeft());
+			}
+	
+			//Do the right side
+			if(!node.getRight().isLeaf()) {
+				rightDotNodeStack = exportDFS(node.getRight(),treeSelection,
+					xIndent,yIndent,size,minCorr,maxCorr,startIndex,endIndex,
+					showSelections);
+			}
+			//We do not recurse down to the leaves, so add them to the stack
+			//here
+			else if(treeSelection.isIndexSelected(
+				(int) node.getRight().getIndex())) {
+	
+				rightDotNodeStack.push(node.getRight());
+			}
+	
+			boolean thisNodeIsSelected = false;
+	
+			//If the stack returned from each child contains 1 selected
+			//node and that node is the child of this node, then we're not going
+			//to draw dots for those nodes and just draw a dot for this node.
+			//Ignore the child nodes and push this node onto a new stack to
+			//return.  Otherwise, all all the selected subtrees & leaves on top
+			//of which to draw dots.
+			if(!leftDotNodeStack.isEmpty()   && !rightDotNodeStack.isEmpty()  &&
+				leftDotNodeStack.size() == 1 && rightDotNodeStack.size() == 1 &&
+				leftDotNodeStack.peek().getId()  == node.getLeft().getId()    &&
+				rightDotNodeStack.peek().getId() == node.getRight().getId()) {
+	
+				thisNodeIsSelected = true;
+				returnStack.push(node);
+			} else {
+				if(!leftDotNodeStack.isEmpty()) {
+					returnStack.addAll(leftDotNodeStack);
+				}
+				if(!rightDotNodeStack.isEmpty()) {
+					returnStack.addAll(rightDotNodeStack);
+				}
+			}
+	
+			// finally draw
+			exportSingle(node,thisNodeIsSelected,xIndent,yIndent,size,minCorr,
+				maxCorr,startIndex,endIndex,showSelections);
+	
+			return(returnStack);
+		}
+
+		/**
 		 * Determines whether all the leaves under a given node have indexes
 		 * that are selected
 		 * @author rleach
@@ -361,6 +529,28 @@ public class TreePainter extends TreeDrawer {
 			graphics.fillRect(x,y,5,5);
 		}
 
+		public void exportNodeDot(final TreeDrawerNode node,final int xIndent,
+			final int yIndent,final int size,final double minCorr,
+			final double maxCorr,final int startIndex,final int endIndex) {
+
+			int x = 0;
+			int y = 0;
+
+			if(isLeft) {
+				x = (int) Math.round((node.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (xIndent - 1)) - 2;
+				y = yIndent + (int) Math.round(node.getIndex() * size +
+					(size / 2)) - startIndex * size - 2;
+			} else {
+				y = (int) Math.round((node.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (yIndent - 1)) - 2;
+				x = xIndent + (int) Math.round(node.getIndex() * size +
+					(size / 2)) - startIndex * size - 2;
+			}
+
+			graphics.fillRect(x,y,5,5);
+		}
+
 		/**
 		 * Draws all the tree node dots in a stack of nodes
 		 * @author rleach
@@ -373,6 +563,21 @@ public class TreePainter extends TreeDrawer {
 			while(!nodeStack.isEmpty()) {
 				TreeDrawerNode node = nodeStack.pop();
 				drawNodeDot(node);
+			}
+		}
+
+		public void exportNodeDots(final Stack<TreeDrawerNode> nodeStack,
+			final int xIndent,final int yIndent,final int size,
+			final double minCorr,final double maxCorr,final int startIndex,
+			final int endIndex) {
+
+			if(nodeStack == null || nodeStack.isEmpty()) {
+				return;
+			}
+			while(!nodeStack.isEmpty()) {
+				TreeDrawerNode node = nodeStack.pop();
+				exportNodeDot(node,xIndent,yIndent,size,minCorr,maxCorr,
+					startIndex,endIndex);
 			}
 		}
 
@@ -419,6 +624,49 @@ public class TreePainter extends TreeDrawer {
 		}
 
 		/**
+		 * Export a single node and it's extending branches
+		 * @author rleach
+		 * @param node - node being exported
+		 * @param isSelected - Whether the node is selected
+		 * @param xIndent - where to start drawing the (entire) tree
+		 * @param yIndent - where to start drawing the (entire) tree
+		 * @param size - The size of an edge of a tile in the matrix
+		 * @param minCorr - minimum correlation value
+		 * @param maxCorr - maximum correlation value
+		 * @param startIndex - The data index where the drawing starts
+		 * @param endIndex - The data index where the drawing ends
+		 */
+		private void exportSingle(final TreeDrawerNode node,
+			final boolean isSelected,final int xIndent,final int yIndent,
+			final int size,final double minCorr,final double maxCorr,
+			final int startIndex,final int endIndex,
+			final boolean showSelections) {
+
+			if (node == null) {
+				LogBuffer.println("node in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			if (node.getRight() == null) {
+				LogBuffer.println("right in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			// draw our (flipped) polyline...
+			graphics.setColor(node.getColor());
+
+			exportLeftBranch(node,isSelected,xIndent,yIndent,size,minCorr,
+				maxCorr,startIndex,endIndex,showSelections);
+
+			graphics.setColor(node.getColor());
+
+			exportRightBranch(node,isSelected,xIndent,yIndent,size,minCorr,
+				maxCorr,startIndex,endIndex,showSelections);
+		}
+
+		/**
 		 * Draws the left branch stemming from a given node
 		 * @author rleach
 		 * @param node - the node from which to draw the branches
@@ -445,37 +693,33 @@ public class TreePainter extends TreeDrawer {
 				return;
 			}
 
-			int lx = 0;
-			int tx = 0;
-
-			int ly = 0;
-			int ty = 0;
-
-			int c = 0;
+			int leftChildXCoord = 0;
+			int leftChildYCoord = 0;
+			int parentXCoord = 0;
+			int parentYCoord = 0;
 
 			int pointerBaseOffset = (left.isLeaf() ? 2 : 1);
 
 			// GTRView
 			if (isLeft) {
-				lx = (int) xT.transform(left.getCorr());
-				tx = (int) xT.transform(node.getCorr());
+				leftChildXCoord = (int) xT.transform(left.getCorr());
+				parentXCoord = (int) xT.transform(node.getCorr());
 
-				ly = (int) yT.transform(left.getIndex() + .5);
-				c = (int) yT.transform(node.getIndex() + .5);
+				leftChildYCoord = (int) yT.transform(left.getIndex() + .5);
+				parentYCoord = (int) yT.transform(node.getIndex() + .5);
 
-				if(Math.abs(lx - tx) < 3) {
+				if(Math.abs(leftChildXCoord - parentXCoord) < 3) {
 					pointerBaseOffset = 0;
 				}
-				// ATRView
+			// ATRView
 			} else {
-				ly = (int) yT.transform(left.getCorr());
-				ty = (int) yT.transform(node.getCorr());
+				leftChildYCoord = (int) yT.transform(left.getCorr());
+				parentYCoord = (int) yT.transform(node.getCorr());
 
-				lx = (int) xT.transform(left.getIndex() + .5);
-				c = (int) xT.transform(node.getIndex() + .5);
-				// int tx = (int) xT.transform(node.getIndex() + .5);
+				leftChildXCoord = (int) xT.transform(left.getIndex() + .5);
+				parentXCoord = (int) xT.transform(node.getIndex() + .5);
 
-				if(Math.abs(ly - ty) < 3) {
+				if(Math.abs(leftChildYCoord - parentYCoord) < 3) {
 					pointerBaseOffset = 0;
 				}
 			}
@@ -488,14 +732,14 @@ public class TreePainter extends TreeDrawer {
 			if(isLeft) {
 				graphics.drawPolyline(
 					new int[] {
-						tx,
-						tx,
-						lx
+						parentXCoord,
+						parentXCoord,
+						leftChildXCoord
 					},
 					new int[] {
-						c,
-						ly,
-						ly
+						parentYCoord,
+						leftChildYCoord,
+						leftChildYCoord
 					},
 					3);
 
@@ -507,46 +751,40 @@ public class TreePainter extends TreeDrawer {
 					}
 					graphics.drawPolyline(
 						new int[] {
-							//Horizontal coordinates
-							tx + 1,
-							tx + 1,
-							lx - pointerBaseOffset
+							parentXCoord + 1,
+							parentXCoord + 1,
+							leftChildXCoord - pointerBaseOffset
 						},
 						new int[] {
-							//Vertical coordinates
-							c,
-							ly + 1,
-							ly + 1
+							parentYCoord,
+							leftChildYCoord + 1,
+							leftChildYCoord + 1
 						},
 						3);
 					graphics.drawPolyline(
 						new int[] {
-							//Horizontal coordinates
-							tx - 1,
-							tx - 1,
-							lx - pointerBaseOffset
+							parentXCoord - 1,
+							parentXCoord - 1,
+							leftChildXCoord - pointerBaseOffset
 						},
 						new int[] {
-							//Vertical coordinates
-							c,
-							ly - 1,
-							ly - 1
+							parentYCoord,
+							leftChildYCoord - 1,
+							leftChildYCoord - 1
 						},
 						3);
 				}
 			} else {
 				graphics.drawPolyline(
 					new int[] {
-						//Horizontal coordinates
-						c,                                //center
-						lx,                               //left leaf corner
-						lx                                //left leaf end
+						parentXCoord,
+						leftChildXCoord,
+						leftChildXCoord
 					},
 					new int[] {
-						//Vertical coordinates
-						ty,                               //center
-						ty,                               //left leaf corner
-						ly                                //left leaf end
+						parentYCoord,
+						parentYCoord,
+						leftChildYCoord
 					},
 					3);
 
@@ -558,30 +796,252 @@ public class TreePainter extends TreeDrawer {
 					}
 					graphics.drawPolyline(
 						new int[] {
-							//Horizontal coordinates
-							c,                            //center
-							lx + 1,                       //left leaf corner
-							lx + 1                        //left leaf end
+							parentXCoord,
+							leftChildXCoord + 1,
+							leftChildXCoord + 1
 						},
 						new int[] {
-							//Vertical coordinates
-							ty + 1,                       //center
-							ty + 1,                       //left leaf corner
-							ly - pointerBaseOffset        //left leaf end
+							parentYCoord + 1,
+							parentYCoord + 1,
+							leftChildYCoord - pointerBaseOffset
 						},
 						3);
 					graphics.drawPolyline(
 						new int[] {
-							//Horizontal coordinates
-							c,                            //center
-							lx - 1,                       //left leaf corner
-							lx - 1                        //left leaf end
+							parentXCoord,
+							leftChildXCoord - 1,
+							leftChildXCoord - 1
+						},
+						new int[] {
+							parentYCoord - 1,
+							parentYCoord - 1,
+							leftChildYCoord - pointerBaseOffset
+						},
+						3);
+				}
+			}
+		}
+
+		/**
+		 * Export the left branch of a node
+		 * @author rleach
+		 * @param node - node being exported
+		 * @param isSelected - Whether the node is selected
+		 * @param xIndent - where to start drawing the (entire) tree
+		 * @param yIndent - where to start drawing the (entire) tree
+		 * @param size - The size of an edge of a tile in the matrix
+		 * @param minCorr - minimum correlation value
+		 * @param maxCorr - maximum correlation value
+		 * @param startIndex - The data index where the drawing starts
+		 * @param endIndex - The data index where the drawing ends
+		 */
+		public void exportLeftBranch(final TreeDrawerNode node,
+			final boolean isSelected,final int xIndent,final int yIndent,
+			final int size,final double minCorr,final double maxCorr,
+			final int startIndex,final int endIndex,
+			final boolean showSelections) {
+
+			if (node == null) {
+				LogBuffer.println("node in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			final TreeDrawerNode left = node.getLeft();
+
+			if (left == null) {
+				LogBuffer.println("left in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			int leftChildXCoord = 0;
+			int leftChildYCoord = 0;
+			int parentXCoord = 0;
+			int parentYCoord = 0;
+
+			int pointerBaseOffset = (left.isLeaf() ? 2 : 1);
+			int minCoord = 0;
+			int maxCoord = 0;
+			boolean shoulderOnly = false;
+
+			// GTRView
+			if (isLeft) {
+				leftChildXCoord = (int) Math.round((left.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (xIndent - 1));
+				parentXCoord = (int) Math.round((node.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (xIndent - 1));
+
+				leftChildYCoord =
+					yIndent + (int) Math.round(left.getIndex() * size +
+					(size / 2)) - startIndex * size;
+				parentYCoord =
+					yIndent + (int) Math.round(node.getIndex() * size +
+					(size / 2)) - startIndex * size;
+
+				//These values define the "horizontal" drawing area
+				minCoord = yIndent;// + startIndex * size;
+				maxCoord = yIndent + endIndex * size - startIndex * size + size;
+
+				//This conditional adjusts coordinates to not overrun the min/
+				//max boundaries and either sets a boolean that prevents
+				//"vertical" lines which are completely outside the drawing area
+				//from drawing or returns if both lines to be drawn are outside
+				//the drawing area
+				if((leftChildYCoord < minCoord && parentYCoord < minCoord) ||
+					(leftChildYCoord > maxCoord && parentYCoord > maxCoord)) {
+
+					return;
+				} else if(leftChildYCoord >= minCoord &&
+					parentYCoord >= minCoord &&
+					leftChildYCoord <= maxCoord && parentYCoord <= maxCoord) {
+
+					//Do nothing
+				} else if(leftChildYCoord < minCoord &&
+					parentYCoord > maxCoord) {
+
+					shoulderOnly = true;
+					parentYCoord = maxCoord;
+					leftChildYCoord = minCoord;
+				} else if(leftChildYCoord < minCoord) {
+					shoulderOnly = true;
+					leftChildYCoord = minCoord;
+				} else if(parentYCoord > maxCoord) {
+					parentYCoord = maxCoord;
+				}
+
+				if(Math.abs(leftChildXCoord - parentXCoord) < 3) {
+					pointerBaseOffset = 0;
+				}
+			// ATRView
+			} else {
+				leftChildYCoord = (int) Math.round((left.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (yIndent - 1));
+				parentYCoord = (int) Math.round((node.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (yIndent - 1));
+	
+				leftChildXCoord =
+					xIndent + (int) Math.round(left.getIndex() * size +
+					(size / 2)) - startIndex * size;
+				parentXCoord =
+					xIndent + (int) Math.round(node.getIndex() * size +
+					(size / 2)) - startIndex * size;
+
+				//These values define the "horizontal" drawing area
+				minCoord = xIndent;// + startIndex * size;
+				maxCoord = xIndent + endIndex * size - startIndex * size + size;
+
+				//This conditional adjusts coordinates to not overrun the min/
+				//max boundaries and either sets a boolean that prevents
+				//"vertical" lines which are completely outside the drawing area
+				//from drawing or returns if both lines to be drawn are outside
+				//the drawing area
+				if((leftChildXCoord < minCoord && parentXCoord < minCoord) ||
+					(leftChildXCoord > maxCoord && parentXCoord > maxCoord)) {
+
+					return;
+				} else if(leftChildXCoord >= minCoord &&
+					parentXCoord >= minCoord &&
+					leftChildXCoord <= maxCoord && parentXCoord <= maxCoord) {
+
+					//Do nothing
+				} else if(leftChildXCoord < minCoord &&
+					parentXCoord > maxCoord) {
+
+					shoulderOnly = true;
+					parentXCoord = maxCoord;
+					leftChildXCoord = minCoord;
+				} else if(leftChildXCoord < minCoord) {
+					shoulderOnly = true;
+					leftChildXCoord = minCoord;
+				} else if(parentXCoord > maxCoord) {
+					parentXCoord = maxCoord;
+				}
+
+				if(Math.abs(leftChildYCoord - parentYCoord) < 3) {
+					pointerBaseOffset = 0;
+				}
+			}
+
+			// draw our (flipped) polyline...
+			if(isLeft) {
+				//The VectorGraphics2D library messes up the drawPolyline call
+				//sometimes and skips the center point, so drawing two-
+				//separate lines (while less attractively drawn) is more
+				//reliable
+				graphics.drawLine(parentXCoord,parentYCoord,
+					parentXCoord,leftChildYCoord);
+				if(!shoulderOnly) {
+					graphics.drawLine(parentXCoord,leftChildYCoord,
+						leftChildXCoord,leftChildYCoord);
+				}
+
+				//Draw an outline around the line to highlight a selected branch
+				if(showSelections && isSelected) {
+					graphics.setColor(new Color(249,238,160));//yellow
+					graphics.drawPolyline(
+						new int[] {
+							parentXCoord + 1,
+							parentXCoord + 1,
+							leftChildXCoord - pointerBaseOffset
+						},
+						new int[] {
+							parentYCoord,
+							leftChildYCoord + 1,
+							leftChildYCoord + 1
+						},
+						3);
+					graphics.drawPolyline(
+						new int[] {
+							parentXCoord - 1,
+							parentXCoord - 1,
+							leftChildXCoord - pointerBaseOffset
+						},
+						new int[] {
+							parentYCoord,
+							leftChildYCoord - 1,
+							leftChildYCoord - 1
+						},
+						3);
+				}
+			} else {
+				//The VectorGraphics2D library messes up the drawPolyline call
+				//sometimes and skips the center point, so drawing two-
+				//separate lines (while less attractively drawn) is more
+				//reliable
+				graphics.drawLine(parentXCoord,parentYCoord,
+					leftChildXCoord,parentYCoord);
+				if(!shoulderOnly) {
+					graphics.drawLine(leftChildXCoord,parentYCoord,
+						leftChildXCoord,leftChildYCoord);
+				}
+
+				//Draw an outline around the line to highlight a selected branch
+				if(showSelections && isSelected) {
+					graphics.setColor(new Color(249,238,160));//yellow
+					graphics.drawPolyline(
+						new int[] {
+							parentXCoord,
+							leftChildXCoord + 1,
+							leftChildXCoord + 1
+						},
+						new int[] {
+							parentYCoord + 1,
+							parentYCoord + 1,
+							leftChildYCoord - pointerBaseOffset
+						},
+						3);
+					graphics.drawPolyline(
+						new int[] {
+							parentXCoord,
+							leftChildXCoord - 1,
+							leftChildXCoord - 1
 						},
 						new int[] {
 							//Vertical coordinates
-							ty - 1,                       //center
-							ty - 1,                       //left leaf corner
-							ly - pointerBaseOffset        //left leaf end
+							parentYCoord - 1,
+							parentYCoord - 1,
+							leftChildYCoord - pointerBaseOffset
 						},
 						3);
 				}
@@ -615,39 +1075,35 @@ public class TreePainter extends TreeDrawer {
 				return;
 			}
 
-			int rx = 0;
-			int tx = 0;
-
-			int ry = 0;
-			int ty = 0;
-
-			int c = 0;
+			int rightChildXCoord = 0;
+			int rightChildYCoord = 0;
+			int parentXCoord = 0;
+			int parentYCoord = 0;
 
 			int pointerBaseOffset = (right.isLeaf() ? 2 : 0);
 
 			// GTRView
 			if (isLeft) {
-				rx = (int) xT.transform(right.getCorr());
-				tx = (int) xT.transform(node.getCorr());
+				rightChildXCoord = (int) xT.transform(right.getCorr());
+				parentXCoord = (int) xT.transform(node.getCorr());
 
-				ry = (int) yT.transform(right.getIndex() + .5);
-				c = (int) yT.transform(node.getIndex() + .5);
+				rightChildYCoord = (int) yT.transform(right.getIndex() + .5);
+				parentYCoord = (int) yT.transform(node.getIndex() + .5);
 
-				if(Math.abs(rx - tx) < 3) {
+				if(Math.abs(rightChildXCoord - parentXCoord) < 3) {
 					pointerBaseOffset = 0;
 				}
 
 			}
 			// ATRView
 			else {
-				ry = (int) yT.transform(right.getCorr());
-				ty = (int) yT.transform(node.getCorr());
+				rightChildYCoord = (int) yT.transform(right.getCorr());
+				parentYCoord = (int) yT.transform(node.getCorr());
 
-				rx = (int) xT.transform(right.getIndex() + .5);
-				c = (int) xT.transform(node.getIndex() + .5);
-				// int tx = (int) xT.transform(node.getIndex() + .5);
+				rightChildXCoord = (int) xT.transform(right.getIndex() + .5);
+				parentXCoord = (int) xT.transform(node.getIndex() + .5);
 
-				if(Math.abs(ry - ty) < 3) {
+				if(Math.abs(rightChildYCoord - parentYCoord) < 3) {
 					pointerBaseOffset = 0;
 				}
 			}
@@ -657,17 +1113,17 @@ public class TreePainter extends TreeDrawer {
 				graphics.setColor(Color.red);
 			}
 
-			if (isLeft) {
+			if(isLeft) {
 				graphics.drawPolyline(
 					new int[] {
-						rx,
-						tx,
-						tx
+						rightChildXCoord,
+						parentXCoord,
+						parentXCoord
 					},
 					new int[] {
-						ry,
-						ry,
-						c
+						rightChildYCoord,
+						rightChildYCoord,
+						parentYCoord
 					},
 					3);
 
@@ -678,46 +1134,40 @@ public class TreePainter extends TreeDrawer {
 					}
 					graphics.drawPolyline(
 						new int[] {
-							//Horizontal coordinates
-							rx - pointerBaseOffset,       //right leaf end
-							tx + 1,                       //right leaf corner
-							tx + 1                        //center
+							rightChildXCoord - pointerBaseOffset,
+							parentXCoord + 1,
+							parentXCoord + 1
 						},
 						new int[] {
-							//Vertical coordinates
-							ry - 1,                       //right leaf end
-							ry - 1,                       //right leaf corner
-							c                             //center
+							rightChildYCoord - 1,
+							rightChildYCoord - 1,
+							parentYCoord
 						},
 						3);
 					graphics.drawPolyline(
 						new int[] {
-							//Horizontal coordinates
-							rx - pointerBaseOffset,       //right leaf end
-							tx - 1,                       //right leaf corner
-							tx - 1                        //center
+							rightChildXCoord - pointerBaseOffset,
+							parentXCoord - 1,
+							parentXCoord - 1
 						},
 						new int[] {
-							//Vertical coordinates
-							ry + 1,                       //right leaf end
-							ry + 1,                       //right leaf corner
-							c                             //center
+							rightChildYCoord + 1,
+							rightChildYCoord + 1,
+							parentYCoord
 						},
 						3);
 				}
 			} else {
 				graphics.drawPolyline(
 					new int[] {
-						//Horizontal coordinates
-						rx,                               //right leaf end
-						rx,                               //right leaf corner
-						c                                 //center
+						rightChildXCoord,
+						rightChildXCoord,
+						parentXCoord
 					},
 					new int[] {
-						//Vertical coordinates
-						ry,                               //right leaf end
-						ty,                               //right leaf corner
-						ty                                //center
+						rightChildYCoord,
+						parentYCoord,
+						parentYCoord
 					},
 					3);
 
@@ -728,30 +1178,254 @@ public class TreePainter extends TreeDrawer {
 					}
 					graphics.drawPolyline(
 						new int[] {
-							//Horizontal coordinates
-							rx + 1,                       //right leaf end
-							rx + 1,                       //right leaf corner
-							c                             //center
+							rightChildXCoord + 1,
+							rightChildXCoord + 1,
+							parentXCoord
 						},
 						new int[] {
-							//Vertical coordinates
-							ry - pointerBaseOffset,       //right leaf end
-							ty - 1,                       //right leaf corner
-							ty - 1                        //center
+							rightChildYCoord - pointerBaseOffset,
+							parentYCoord - 1,
+							parentYCoord - 1
 						},
 						3);
 					graphics.drawPolyline(
 						new int[] {
-							//Horizontal coordinates
-							rx - 1,                       //right leaf end
-							rx - 1,                       //right leaf corner
-							c                             //center
+							rightChildXCoord - 1,
+							rightChildXCoord - 1,
+							parentXCoord
 						},
 						new int[] {
-							//Vertical coordinates
-							ry - pointerBaseOffset,       //right leaf end
-							ty + 1,                       //right leaf corner
-							ty + 1                        //center
+							rightChildYCoord - pointerBaseOffset,
+							parentYCoord + 1,
+							parentYCoord + 1
+						},
+						3);
+				}
+			}
+		}
+
+		/**
+		 * Export the right branch of a node
+		 * @author rleach
+		 * @param node - node being exported
+		 * @param isSelected - Whether the node is selected
+		 * @param xIndent - where to start drawing the (entire) tree
+		 * @param yIndent - where to start drawing the (entire) tree
+		 * @param size - The size of an edge of a tile in the matrix
+		 * @param minCorr - minimum correlation value
+		 * @param maxCorr - maximum correlation value
+		 * @param startIndex - The data index where the drawing starts
+		 * @param endIndex - The data index where the drawing ends
+		 */
+		public void exportRightBranch(final TreeDrawerNode node,
+			final boolean isSelected,final int xIndent,final int yIndent,
+			final int size,final double minCorr,final double maxCorr,
+			final int startIndex,final int endIndex,
+			final boolean showSelections) {
+
+			if (node == null) {
+				LogBuffer.println("node in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			final TreeDrawerNode right = node.getRight();
+
+			if (right == null) {
+				LogBuffer.println("right in drawSingle in InvertedTreeDrawer "
+						+ "was null.");
+				return;
+			}
+
+			int rightChildXCoord = 0;
+			int rightChildYCoord = 0;
+			int parentXCoord = 0;
+			int parentYCoord = 0;
+
+			int pointerBaseOffset = (right.isLeaf() ? 2 : 0);
+			int minCoord = 0;
+			int maxCoord = 0;
+			boolean shoulderOnly = false;
+
+			// GTRView
+			if (isLeft) {
+				rightChildXCoord =
+					(int) Math.round((right.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (xIndent - 1));
+				parentXCoord = (int) Math.round((node.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (xIndent - 1));
+
+				rightChildYCoord =
+					yIndent + (int) Math.round(right.getIndex() * size +
+					(size / 2)) - startIndex * size;
+				parentYCoord =
+					yIndent + (int) Math.round(node.getIndex() * size +
+					(size / 2)) - startIndex * size;
+
+				//These values define the "horizontal" drawing area
+				minCoord = yIndent;// + startIndex * size;
+				maxCoord = yIndent + endIndex * size - startIndex * size + size;
+
+				//This conditional adjusts coordinates to not overrun the min/
+				//max boundaries and either sets a boolean that prevents
+				//"vertical" lines which are completely outside the drawing area
+				//from drawing or returns if both lines to be drawn are outside
+				//the drawing area
+				if((rightChildYCoord < minCoord && parentYCoord < minCoord) ||
+					(rightChildYCoord > maxCoord && parentYCoord > maxCoord)) {
+
+					return;
+				} else if(rightChildYCoord >= minCoord &&
+					parentYCoord >= minCoord &&
+					rightChildYCoord <= maxCoord && parentYCoord <= maxCoord) {
+
+					//Do nothing
+				} else if(rightChildYCoord > maxCoord &&
+					parentYCoord < minCoord) {
+
+					shoulderOnly = true;
+					parentYCoord = minCoord;
+					rightChildYCoord = maxCoord;
+				} else if(parentYCoord < minCoord) {
+					parentYCoord = minCoord;
+				} else if(rightChildYCoord > maxCoord) {
+					shoulderOnly = true;
+					rightChildYCoord = maxCoord;
+				}
+
+				if(Math.abs(rightChildXCoord - parentXCoord) < 3) {
+					pointerBaseOffset = 0;
+				}
+
+			}
+			// ATRView
+			else {
+				rightChildYCoord =
+					(int) Math.round((right.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (yIndent - 1));
+				parentYCoord = (int) Math.round((node.getCorr() - minCorr) /
+					(maxCorr - minCorr) * (yIndent - 1));
+
+				rightChildXCoord =
+					xIndent + (int) Math.round(right.getIndex() * size +
+					(size / 2)) - startIndex * size;
+				parentXCoord =
+					xIndent + (int) Math.round(node.getIndex() * size +
+					(size / 2)) - startIndex * size;
+
+				//These values define the "horizontal" drawing area
+				minCoord = xIndent;// + startIndex * size;
+				maxCoord = xIndent + endIndex * size - startIndex * size + size;
+
+				//This conditional adjusts coordinates to not overrun the min/
+				//max boundaries and either sets a boolean that prevents
+				//"vertical" lines which are completely outside the drawing area
+				//from drawing or returns if both lines to be drawn are outside
+				//the drawing area
+				if((rightChildXCoord < minCoord && parentXCoord < minCoord) ||
+					(rightChildXCoord > maxCoord && parentXCoord > maxCoord)) {
+
+					return;
+				} else if(rightChildXCoord >= minCoord &&
+					parentXCoord >= minCoord &&
+					rightChildXCoord <= maxCoord && parentXCoord <= maxCoord) {
+
+					//Do nothing
+				} else if(rightChildXCoord > maxCoord &&
+					parentXCoord < minCoord) {
+
+					shoulderOnly = true;
+					parentXCoord = minCoord;
+					rightChildXCoord = maxCoord;
+				} else if(parentXCoord < minCoord) {
+					parentXCoord = minCoord;
+				} else if(rightChildXCoord > maxCoord) {
+					shoulderOnly = true;
+					rightChildXCoord = maxCoord;
+				}
+
+				if(Math.abs(rightChildYCoord - parentYCoord) < 3) {
+					pointerBaseOffset = 0;
+				}
+			}
+
+			if (isLeft) {
+				//The VectorGraphics2D library messes up the drawPolyline call
+				//sometimes and skips the center point, so drawing two-
+				//separate lines (while less attractively drawn) is more
+				//reliable
+				if(!shoulderOnly) {
+					graphics.drawLine(rightChildXCoord,rightChildYCoord,
+						parentXCoord,rightChildYCoord);
+				}
+				graphics.drawLine(parentXCoord,rightChildYCoord,
+					parentXCoord,parentYCoord);
+
+				//If this is selected, outline it
+				if(showSelections && isSelected) {
+					graphics.setColor(new Color(249,238,160));//yellow
+					graphics.drawPolyline(
+						new int[] {
+							rightChildXCoord - pointerBaseOffset,
+							parentXCoord + 1,
+							parentXCoord + 1
+						},
+						new int[] {
+							rightChildYCoord - 1,
+							rightChildYCoord - 1,
+							parentYCoord
+						},
+						3);
+					graphics.drawPolyline(
+						new int[] {
+							rightChildXCoord - pointerBaseOffset,
+							parentXCoord - 1,
+							parentXCoord - 1
+						},
+						new int[] {
+							rightChildYCoord + 1,
+							rightChildYCoord + 1,
+							parentYCoord
+						},
+						3);
+				}
+			} else {
+				//The VectorGraphics2D library messes up the drawPolyline call
+				//sometimes and skips the center point, so drawing two-
+				//separate lines (while less attractiveleftChildYCoord drawn) is
+				//more reliable
+				if(!shoulderOnly) {
+					graphics.drawLine(rightChildXCoord,rightChildYCoord,
+						rightChildXCoord,parentYCoord);
+				}
+				graphics.drawLine(rightChildXCoord,parentYCoord,
+					parentXCoord,parentYCoord);
+
+				//If this is selected, outline it
+				if(showSelections && isSelected) {
+					graphics.setColor(new Color(249,238,160));//yellow
+					graphics.drawPolyline(
+						new int[] {
+							rightChildXCoord + 1,
+							rightChildXCoord + 1,
+							parentXCoord
+						},
+						new int[] {
+							rightChildYCoord - pointerBaseOffset,
+							parentYCoord - 1,
+							parentYCoord - 1
+						},
+						3);
+					graphics.drawPolyline(
+						new int[] {
+							rightChildXCoord - 1,
+							rightChildXCoord - 1,
+							parentXCoord
+						},
+						new int[] {
+							rightChildYCoord - pointerBaseOffset,
+							parentYCoord + 1,
+							parentYCoord + 1
 						},
 						3);
 				}

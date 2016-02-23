@@ -226,7 +226,7 @@ public class RowTreeView extends TRView {
 	}
 	
 	@Override
-	protected void setExportScale(Rectangle dest) {
+	protected void setExportPreviewScale(Rectangle dest) {
 		
 		/* Scale trees for complete painting */
 		int firstVisIndex = map.getIndex(getFittedDestRectStart());
