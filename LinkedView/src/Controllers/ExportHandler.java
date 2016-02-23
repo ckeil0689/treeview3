@@ -5,7 +5,9 @@ package Controllers;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.awt.image.BufferedImage;
 import java.awt.Dimension;
@@ -505,8 +507,12 @@ public class ExportHandler {
 			createContent(g,region,showSelections);
 			g.endExport();
 		}
-		catch(Exception exc) {
-			LogBuffer.println("Unable to export image.");
+		catch(FileNotFoundException exc) {
+			LogBuffer.println("File not be written to.");
+			LogBuffer.logException(exc);
+		}
+		catch(IOException exc) {
+			LogBuffer.println("File not be written to.");
 			LogBuffer.logException(exc);
 		}
 	}
