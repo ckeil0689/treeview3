@@ -47,8 +47,7 @@ public class ColorChooserUI extends CustomDialog {
 	private ColorIcon missingColorIcon;
 
 	/* ColorSet choices */
-	private JComboBox<String> presetChoice;
-	private final String[] presets = { "RedGreen", "YellowBlue", "Custom" };
+	private JComboBox<ColorSchemeType> presetChoice;
 
 	/* Stores whether custom ColorSet is selected or not */
 	private boolean isCustomSelected;
@@ -80,26 +79,27 @@ public class ColorChooserUI extends CustomDialog {
 	@Override
 	protected void setupLayout() {
 
-		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
-		contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		this.contentPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
-		addBtn = GUIFactory.createBtn("Add New Color");
-		editBtn = GUIFactory.createBtn("Edit Selected Color");
-		removeBtn = GUIFactory.createBtn("Remove Selected Color");
-		applyBtn = GUIFactory.createBtn("Apply");
+		this.addBtn = GUIFactory.createBtn("Add New Color");
+		this.editBtn = GUIFactory.createBtn("Edit Selected Color");
+		this.removeBtn = GUIFactory.createBtn("Remove Selected Color");
+		this.applyBtn = GUIFactory.createBtn("Apply");
 		getRootPane().setDefaultButton(applyBtn);
 
 		setSelectionDependentBtnStatus(false, false);
 
-		missingColorIcon = new ColorIcon();
-		missingBtn = GUIFactory.createColorIconBtn("Missing Data",
+		this.missingColorIcon = new ColorIcon();
+		this.missingBtn = GUIFactory.createColorIconBtn("Missing Data",
 				missingColorIcon);
 
-		presetChoice = new JComboBox<String>(presets);
+		this.presetChoice = new JComboBox<ColorSchemeType>(
+				ColorSchemeType.values());
 
 		/* Preset choice panel */
 		final JPanel presetChoicePanel = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT, null);
+				GUIFactory.DEFAULT);
 
 		presetChoicePanel.add(presetChoice, "pushx");
 		presetChoicePanel.add(missingBtn, "pushx");
@@ -127,6 +127,9 @@ public class ColorChooserUI extends CustomDialog {
 
 		pack();
 		setLocationRelativeTo(JFrame.getFrames()[0]);
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
 	}
 
 	/**
@@ -170,7 +173,7 @@ public class ColorChooserUI extends CustomDialog {
 		return contentPanel;
 	}
 
-	protected JComboBox<String> getPresetChoices() {
+	protected JComboBox<ColorSchemeType> getPresetChoices() {
 
 		return presetChoice;
 	}

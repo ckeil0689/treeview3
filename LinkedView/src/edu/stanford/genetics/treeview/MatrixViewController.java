@@ -222,7 +222,7 @@ ConfigNodePersistent, Controller {
 	private void setupDrawingComponents() {
 		
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
-		colorPresets.setConfigNode(configNode);
+//		colorPresets.setConfigNode(configNode);
 		this.colorExtractor = new ColorExtractor(
 				model.getDataMatrix().getMinVal(), model.getDataMatrix()
 						.getMaxVal());

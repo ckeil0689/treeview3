@@ -59,6 +59,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.IntegerMap;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenu;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenuController;
@@ -986,6 +987,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		dendroView.getRowLabelView().setConfigNode(configNode);
 		dendroView.getColLabelView().setConfigNode(configNode);
+		
+		DendrogramFactory.getColorPresets().setConfigNode(configNode);
 	}
 
 	/**

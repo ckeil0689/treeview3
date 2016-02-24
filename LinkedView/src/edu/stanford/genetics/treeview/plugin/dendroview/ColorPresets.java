@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import ColorChooser.ColorSchemeType;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -39,10 +40,12 @@ public class ColorPresets implements ConfigNodePersistent {
 		// sysBack = sysBack.substring(2, sysBack.length());
 
 		defaultColorSets = new ColorSet[2];
-		defaultColorSets[0] = new ColorSet("RedGreen", new String[] {
-				"#FF0000", "#000000", "#00FF00" }, "#8E8E8E", "#FFFFFF");
-		defaultColorSets[1] = new ColorSet("YellowBlue", new String[] {
-				"#FEFF00", "#000000", "#1BB7E5" }, "#8E8E8E", "#FFFFFF");
+		defaultColorSets[0] = new ColorSet(ColorSchemeType.REDGREEN.toString(), 
+				new String[] {"#FF0000", "#000000", "#00FF00" }, 
+				"#8E8E8E", "#FFFFFF");
+		defaultColorSets[1] = new ColorSet(ColorSchemeType.YELLOWBLUE.toString(), 
+				new String[] {"#FEFF00", "#000000", "#1BB7E5" }, 
+				"#8E8E8E", "#FFFFFF");
 	}
 
 	private Preferences configNode;
@@ -66,7 +69,7 @@ public class ColorPresets implements ConfigNodePersistent {
 		//
 		// defaultColorSets[0].setMissing(UIManager.getColor("Panel.background"));
 
-		setConfigNode(parent);
+//		setConfigNode(parent);
 	}
 
 	/** Constructor for the ColorPresets object */
@@ -75,7 +78,7 @@ public class ColorPresets implements ConfigNodePersistent {
 		super();
 
 		// Get the global configNode
-		this.configNode = Preferences.userRoot().node("TreeViewApp");
+//		this.configNode = Preferences.userRoot().node("TreeViewApp");
 	}
 
 	/* inherit description */
@@ -89,7 +92,6 @@ public class ColorPresets implements ConfigNodePersistent {
 		}
 		
 		this.configNode = parentNode.node("ColorPresets");
-
 	}
 
 	/**
@@ -98,7 +100,7 @@ public class ColorPresets implements ConfigNodePersistent {
 	 */
 	public int getDefaultIndex() {
 
-		return configNode.getInt("default", dIndex);
+		return dIndex;//configNode.getInt("default", dIndex);
 	}
 
 	/**

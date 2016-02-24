@@ -14,6 +14,7 @@ import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import ColorChooser.ColorSchemeType;
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.ContrastSelectable;
@@ -141,7 +142,8 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 		setNewParams(colorSet.getFractions(), cList);
 
-		if ("Custom".equalsIgnoreCase(colorSet.getName())) {
+		if ((ColorSchemeType.CUSTOM.toString()).equalsIgnoreCase(
+				colorSet.getName())) {
 			setMin(colorSet.getMin());
 			setMax(colorSet.getMax());
 		}
@@ -160,11 +162,11 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * @param node
 	 * @return The last active colorset or a default in case it cannot be found.
 	 */
-	private ColorSet findColorSetFromNode(Preferences node) {
+	private ColorSet findColorSetFromNode(final Preferences node) {
 
 		ColorSet nodeColorSet = defaultColorSet;
 
-		String lastActive = "RedGreen";
+		String lastActive = ColorSchemeType.REDGREEN.toString();
 		try {
 			/* Check old Preferences for data */
 			if (node.nodeExists("GradientChooser")) {
@@ -178,6 +180,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 				if (defaultColorSet2.getName().equalsIgnoreCase(lastActive)) {
 					nodeColorSet = new ColorSet(defaultColorSet2);
 					foundColorSet = true;
+					break;
 				}
 			}
 

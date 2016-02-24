@@ -157,8 +157,10 @@ public class ColorPicker {
 		colorExtractor.setMissingColor(activeColorSet.getMissing());
 
 		/* Only load non-dataset min/max if custom colorset is loaded */
-		if (!("RedGreen".equalsIgnoreCase(activeColorSet.getName()) || "YellowBlue"
-				.equalsIgnoreCase(activeColorSet.getName()))) {
+		String rg = ColorSchemeType.REDGREEN.toString();
+		String yb = ColorSchemeType.YELLOWBLUE.toString();
+		if (!(rg.equalsIgnoreCase(activeColorSet.getName()) 
+				|| yb.equalsIgnoreCase(activeColorSet.getName()))) {
 			setMinVal(activeColorSet.getMin());
 			setMaxVal(activeColorSet.getMax());
 		}
@@ -166,7 +168,6 @@ public class ColorPicker {
 		final String[] colors = activeColorSet.getColors();
 
 		for (final String color : colors) {
-
 			colorList.add(Color.decode(color));
 		}
 
