@@ -98,7 +98,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 		// appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setupWindowListener();
-
 		setupWindowPosListener();
 	}
 
@@ -681,7 +680,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 
 	// abstract public HeaderFinder getGeneFinder();
 
-	abstract public void generateView(final int view);
+	abstract public void generateView(final ViewType view);
 
 	/**
 	 * Decides which dialog option to use for opening files, depending on the

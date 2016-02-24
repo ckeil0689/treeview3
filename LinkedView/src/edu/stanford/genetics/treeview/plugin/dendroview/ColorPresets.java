@@ -75,21 +75,21 @@ public class ColorPresets implements ConfigNodePersistent {
 		super();
 
 		// Get the global configNode
-		configNode = Preferences.userRoot().node("TreeViewApp");
+		this.configNode = Preferences.userRoot().node("TreeViewApp");
 	}
 
 	/* inherit description */
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			this.configNode = parentNode.node("ColorPresets");
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create ColorPresets "
 					+ "node because parentNode was null.");
 			return;
 		}
+		
+		this.configNode = parentNode.node("ColorPresets");
+
 	}
 
 	/**
@@ -338,5 +338,17 @@ public class ColorPresets implements ConfigNodePersistent {
 	public Preferences getConfigNode() {
 
 		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -124,27 +124,55 @@ public class MapContainer extends Observable implements Observer,
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			this.configNode = parentNode.node(mapName);
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create MapContainer "
 					+ "node because parentNode was null.");
 			return;
 		}
+		
+		this.configNode = parentNode.node(mapName);
 
-		// first bind subordinate maps...
-		fixedMap.setType(IntegerMap.FIXED);
-		fixedMap.setConfigNode(configNode);
+		setupMaps();
+		requestStoredState();
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
 
-		fillMap.setType(IntegerMap.FILL);
-		fillMap.setConfigNode(configNode);
+		return configNode;
+	}
 
-		nullMap.setType(IntegerMap.NULL);
-		nullMap.setConfigNode(configNode);
-
-		// then, fix self up...
+	@Override
+	public void requestStoredState() {
+		
 		setMap(configNode.getInt("current", default_map));
+		setScale(configNode.getDouble("scale", default_scale));
+	}
+
+	@Override
+	public void storeState() {
+		
+		if (configNode == null) {
+			LogBuffer.println("Unable to store MapContainer state. ConfigNode"
+					+ " was null.");
+			return;
+		}
+		
+		configNode.putInt("current", current.type());
+		configNode.putDouble("scale", current.getScale());
+	}
+	
+	private void setupMaps() {
+		
+		// first bind subordinate maps...
+		fixedMap.setConfigNode(configNode);
+		fixedMap.setType(IntegerMap.FIXED);
+
+		fillMap.setConfigNode(configNode);
+		fillMap.setType(IntegerMap.FILL);
+
+		nullMap.setConfigNode(configNode);
+		nullMap.setType(IntegerMap.NULL);
 	}
 
 	/**
@@ -1828,9 +1856,6 @@ public class MapContainer extends Observable implements Observer,
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();
-
-			configNode.putDouble("scale", d);
-			configNode.putDouble("minScale", minScale);
 		}
 	}
 
@@ -1852,7 +1877,7 @@ public class MapContainer extends Observable implements Observer,
 			numVisible = getTotalTileNum();
 			
 		} else {
-			numVisible = i;
+			this.numVisible = i;
 		}
 //		//If the number of visible squares has dipped below the number of
 //		//visible labels
@@ -1975,9 +2000,6 @@ public class MapContainer extends Observable implements Observer,
 	private void switchMap(final IntegerMap integerMap) {
 
 		if (current != integerMap) {
-			if (configNode != null) {
-				configNode.putInt("current", integerMap.type());
-			}
 			integerMap.setAvailablePixels(current.getAvailablePixels());
 			integerMap.setIndexRange(current.getMinIndex(),
 					current.getMaxIndex());
@@ -1990,6 +2012,7 @@ public class MapContainer extends Observable implements Observer,
 			// not sure if this one is an explicit change of the viewed data by
 			// the user...
 			// setFirstVisible(current.getMinIndex());
+			storeState();
 			setChanged();
 		}
 	}

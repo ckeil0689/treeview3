@@ -22,27 +22,48 @@ public class UrlPresets implements ConfigNodePersistent {
 	// confignode?
 	private final String type;
 
-	// /**
-	// * creates a new UrlPresets object and binds it to the node
-	// *
-	// * adds default Gene Presets if none are currently set.
-	// */
-	// public UrlPresets(final Preferences parent) {
-	//
-	// super();
-	//
-	// setConfigNode(null);
-	//
-	// if (getPresetNames().length == 0) {
-	// addDefaultGenePresets();
-	// }
-	//
-	// }
-
 	public UrlPresets(final String type) {
 
 		super();
 		this.type = type;
+	}
+	
+	@Override
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode != null) {
+			this.configNode = parentNode.node(type);
+
+		} else if (parentNode == null && configNode == null) {
+			// Unrelated dummy node for testing
+			configNode = Preferences.userRoot().node(type);
+
+		} else {
+			LogBuffer.println("There was a problem with UrlPresets node "
+					+ "setting.");
+		}
+
+		if (getPresetNames().length == 0) {
+			addDefaultGenePresets();
+		}
+	}
+
+	@Override
+	public Preferences getConfigNode() {
+
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -385,36 +406,5 @@ public class UrlPresets implements ConfigNodePersistent {
 		} else {
 			preset.put("enabled", "false");// , null);
 		}
-	}
-
-	// @Override
-	// public void bindConfig(Preferences configNode) {
-	//
-	// this.root = configNode;
-	// }
-
-	@Override
-	public void setConfigNode(final Preferences parentNode) {
-
-		if (parentNode != null) {
-			this.configNode = parentNode.node(type);
-
-		} else if (parentNode == null && configNode == null) {
-			// Unrelated dummy node for testing
-			configNode = Preferences.userRoot().node(type);
-
-		} else {
-			LogBuffer.println("There was a problem with UrlPresets node "
-					+ "setting.");
-		}
-
-		if (getPresetNames().length == 0) {
-			addDefaultGenePresets();
-		}
-	}
-
-	public Preferences getConfigNode() {
-
-		return configNode;
 	}
 }

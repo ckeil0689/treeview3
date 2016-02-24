@@ -113,11 +113,11 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		this.tvFrame = tvFrame;
 		this.tvController = tvController;
 
-		interactiveXmap = new MapContainer(IntegerMap.FIXED, "GlobalXMap");
-		interactiveYmap = new MapContainer(IntegerMap.FIXED, "GlobalYMap");
+		this.interactiveXmap = new MapContainer(IntegerMap.FIXED, "GlobalXMap");
+		this.interactiveYmap = new MapContainer(IntegerMap.FIXED, "GlobalYMap");
 
-		globalXmap = new MapContainer(IntegerMap.FIXED, "OverviewXMap");
-		globalYmap = new MapContainer(IntegerMap.FIXED, "OverviewYMap");
+		this.globalXmap = new MapContainer(IntegerMap.FIXED, "OverviewXMap");
+		this.globalYmap = new MapContainer(IntegerMap.FIXED, "OverviewYMap");
 	}
 	
 	/**
@@ -129,17 +129,17 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			if (tvModel.getDocumentConfigRoot() != null) {
-				configNode = ((TVModel) tvModel).getDocumentConfig();
-
-			} else {
-				configNode = Preferences.userRoot().node("DendroView");
-			}
-		} else {
-			// TODO handle null parentNode beyond logging
+		if (parentNode == null) {
 			LogBuffer.println("parentNode in " + this.getClass().getName() 
 					+ " was null.");
+			return;
+		}
+		
+		if (tvModel.getDocumentConfigRoot() != null) {
+			this.configNode = ((TVModel) tvModel).getDocumentConfig();
+
+		} else {
+			this.configNode = Preferences.userRoot().node("DendroView");
 		}
 	}
 
@@ -156,13 +156,19 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;
 
+		setMatrixController();
+		
 		/* Get the saved settings */
 		setConfigNode(tvFrame.getConfigNode());
+		setComponentPresets();
 
-		setMatrixController();
+//		setMatrixController();
 		updateHeaderInfo();
 		bindComponentFunctions();
 
+		dendroView.resetModelViewDefaults();
+		dendroView.loadModelViewStoredStates();
+		
 		dendroView.setupSearch(tvModel.getRowHeaderInfo(),
 						tvModel.getColHeaderInfo(), interactiveXmap,
 						interactiveYmap);
@@ -202,7 +208,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				dendroView.getInteractiveMatrixView(), 
 				dendroView.getGlobalMatrixView(), tvModel);
 		
-		mvController.setConfigNode(configNode);
+//		mvController.setConfigNode(configNode);
 		mvController.setup();
 	}
 
@@ -933,7 +939,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		invertedTreeDrawer = new TreePainter();
 		dendroView.getColumnTreeView().setTreeDrawer(invertedTreeDrawer);
 
-		setPresets();
+//		setPresets();
 
 		// this is here because my only subclass shares this code.
 		bindTrees();
@@ -959,7 +965,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Connects all sub components with DendroView's configuration node, so that
 	 * the hierarchical structure of Java's Preferences API can be followed.
 	 */
-	private void setPresets() {
+	private void setComponentPresets() {
 
 		interactiveXmap.setConfigNode(configNode);
 		interactiveYmap.setConfigNode(configNode);
@@ -968,7 +974,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		globalYmap.setConfigNode(configNode);
 
 		// URLs
-		mvController.getColorExtractor().setConfigNode(configNode);
+		mvController.setConfigNode(configNode);
 
 		dendroView.getRowLabelView().setConfigNode(configNode);
 		dendroView.getColLabelView().setConfigNode(configNode);
@@ -1511,7 +1517,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	private void importLabelNode(final LabelView labelView, 
 			final Preferences labelViewNode) {
 		
-		labelView.importSettingsFromNode(labelViewNode);
+		labelView.importStateFromNode(labelViewNode);
 		labelView.getHeaderSummary().setConfigNode(labelViewNode);
 	}
 
@@ -1704,5 +1710,17 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		dendroView.getXYPlusButton().setEnabled(
 				(xTilesVisible != 1) || (yTilesVisible != 1));
 		dendroView.getZoomButton().setEnabled(!isSelectionZoomed);
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
 	}
 }

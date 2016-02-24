@@ -153,32 +153,32 @@ public class DendroView implements Observer, DendroPanel {
 		this.name = "DendroView";
 
 		/* Main panel to which all components are added */
-		dendroPane = GUIFactory.createJPanel(false, 
+		this.dendroPane = GUIFactory.createJPanel(false, 
 				GUIFactory.TINY_GAPS_AND_INSETS);
 		
 		/* Search panel containing the search bars */
-		searchPanel = GUIFactory.createJPanel(false, 
+		this.searchPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_GAPS_OR_INSETS);
 
 		/* The two matrix views (big, interactive & small, overview) */
-		globalMatrixView = new GlobalMatrixView();
-		interactiveMatrixView = new InteractiveMatrixView();
+		this.globalMatrixView = new GlobalMatrixView();
+		this.interactiveMatrixView = new InteractiveMatrixView();
 
 		/* Main matrix JScrollbars */
-		matrixXscrollbar = interactiveMatrixView.getXMapScroll();
-		matrixYscrollbar = interactiveMatrixView.getYMapScroll();
+		this.matrixXscrollbar = interactiveMatrixView.getXMapScroll();
+		this.matrixYscrollbar = interactiveMatrixView.getYMapScroll();
 
 		/* Label views */
-		rowLabelView = new RowLabelView();
-		colLabelView = new ColumnLabelView();
+		this.rowLabelView = new RowLabelView();
+		this.colLabelView = new ColumnLabelView();
 		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
 
-		colLabelScroll = colLabelView.getSecondaryScrollBar();
-		rowLabelScroll = rowLabelView.getSecondaryScrollBar();
+		this.rowLabelScroll = rowLabelView.getSecondaryScrollBar();
+		this.colLabelScroll = colLabelView.getSecondaryScrollBar();
 
 		/* Dendrograms */
-		rowTreeView = new RowTreeView();
-		colTreeView = new ColumnTreeView();
+		this.rowTreeView = new RowTreeView();
+		this.colTreeView = new ColumnTreeView();
 
 		setupScaleButtons();
 	}
@@ -190,18 +190,25 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public JPanel makeDendro() {
 
-		colLabelView.generateView(tvFrame.getUrlExtractor());
-		rowLabelView.generateView(tvFrame.getUrlExtractor());
+		colLabelView.setUrlExtractor(tvFrame.getUrlExtractor());
+		rowLabelView.setUrlExtractor(tvFrame.getUrlExtractor());
 
-		// Register Views
+		registerViews();
+
+		return dendroPane;
+	}
+	
+	/**
+	 * Registers all ModelViews with the ViewFrame.
+	 */
+	private void registerViews() {
+		
 		registerView(globalMatrixView);
 		registerView(interactiveMatrixView);
 		registerView(colTreeView);
 		registerView(colLabelView);
 		registerView(rowLabelView);
 		registerView(rowTreeView);
-
-		return dendroPane;
 	}
 
 	/**
@@ -275,6 +282,25 @@ public class DendroView implements Observer, DendroPanel {
 		
 		dendroPane.revalidate();
 		dendroPane.repaint();
+	}
+	
+	/**
+	 * Reset default state for all model views.
+	 */
+	public void resetModelViewDefaults() {
+		
+		rowLabelView.resetDefaults();
+		colLabelView.resetDefaults();
+		rowTreeView.resetDefaults();
+		colTreeView.resetDefaults();
+		interactiveMatrixView.resetDefaults();
+		globalMatrixView.resetDefaults();
+	}
+	
+	public void loadModelViewStoredStates() {
+		
+		rowLabelView.requestStoredState();
+		colLabelView.requestStoredState();
 	}
 	
 	/**

@@ -116,6 +116,8 @@ public abstract class ModelViewBuffered extends ModelView {
 	@Override
 	public synchronized void paintComponent(final Graphics g) {
 
+		super.paintComponent(g);
+		
 		final Rectangle clip = g.getClipBounds();
 		// System.out.println("Entering " + viewName() + " to clip " + clip );
 

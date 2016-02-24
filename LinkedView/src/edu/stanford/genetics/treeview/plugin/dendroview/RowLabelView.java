@@ -148,7 +148,7 @@ public class RowLabelView extends LabelView {
 	}
 
 	@Override
-	protected String getSummary() {
+	protected String getSummaryName() {
 		return("RowSummary");
 	}
 

@@ -74,13 +74,36 @@ public class PreferencesMenu extends CustomDialog implements
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			this.configNode = parentNode.node(StringRes.pnode_Preferences);
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create PreferencesMenu "
 					+ "node because parentNode was null.");
+			return;
 		}
+		
+		this.configNode = parentNode.node(StringRes.pnode_Preferences);
+	}
+	
+	/**
+	 * Returns PreferencesMenu's configNode.
+	 *
+	 * @return
+	 */
+	@Override
+	public Preferences getConfigNode() {
+
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -401,15 +424,5 @@ public class PreferencesMenu extends CustomDialog implements
 
 		mainPanel.revalidate();
 		mainPanel.repaint();
-	}
-
-	/**
-	 * Returns PreferencesMenu's configNode.
-	 *
-	 * @return
-	 */
-	public Preferences getConfigNode() {
-
-		return configNode;
 	}
 }

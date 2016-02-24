@@ -70,18 +70,56 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		// defaultColorSet = new ColorSet();
 		// defaultColorSet.setMissing(ColorSet.decodeColor("#909090"));
 		// defaultColorSet.setEmpty(ColorSet.decodeColor("#FFFFFF"));
-		colorList_default = new ArrayList<Color>();
-		colorList_default.add(Color.red);
-		colorList_default.add(Color.black);
-		colorList_default.add(Color.green);
+		this.colorList_default = new ArrayList<Color>();
+		this.colorList_default.add(Color.red);
+		this.colorList_default.add(Color.black);
+		this.colorList_default.add(Color.green);
 
-		fractions_default = new float[3];
-		fractions_default[0] = 0.0f;
-		fractions_default[1] = 0.5f;
-		fractions_default[2] = 1.0f;
+		this.fractions_default = new float[3];
+		this.fractions_default[0] = 0.0f;
+		this.fractions_default[1] = 0.5f;
+		this.fractions_default[2] = 1.0f;
 
 		setDefaultColorSet(defaultColorSet);
 		setLogBase(2.0);
+	}
+	
+	/**
+	 * binds this ColorExtractor to a particular ConfigNode. This makes colors
+	 * persistent
+	 *
+	 * @param configNode
+	 *            confignode to bind to
+	 */
+	@Override
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode == null) {
+			LogBuffer.println("Could not find or create ColorExtractor "
+					+ "node because parentNode was null.");
+			return;
+		} 
+
+		this.configNode = parentNode.node("ColorExtractor");
+		importPreferences(parentNode);
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -191,8 +229,8 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 	public void setNewParams(final float[] frac, final List<Color> cl) {
 
-		fractions = frac;
-		colorList = cl;
+		this.fractions = frac;
+		this.colorList = cl;
 		setChanged();
 	}
 
@@ -203,29 +241,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 */
 	public void setDefaultColorSet(final ColorSet set) {
 
-		defaultColorSet = set;
-	}
-
-	/**
-	 * binds this ColorExtractor to a particular ConfigNode. This makes colors
-	 * persistent
-	 *
-	 * @param configNode
-	 *            confignode to bind to
-	 */
-	@Override
-	public void setConfigNode(final Preferences parentNode) {
-
-		if (parentNode != null) {
-			this.configNode = parentNode.node("ColorExtractor");
-
-		} else {
-			LogBuffer.println("Could not find or create ColorExtractor "
-					+ "node because parentNode was null.");
-			return;
-		}
-
-		importPreferences(parentNode);
+		this.defaultColorSet = set;
 	}
 
 	/**

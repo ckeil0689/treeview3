@@ -73,12 +73,6 @@ ConfigNodePersistent, Controller {
 	 */
 	public void setup() {
 		
-		if(configNode == null) {
-			LogBuffer.println("Could not set up IMVController. No configNode"
-					+ "was set!");
-			return;
-		}
-		
 		setupDrawingComponents();
 		addKeyBindings();
 	}
@@ -128,14 +122,33 @@ ConfigNodePersistent, Controller {
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			configNode = parentNode;
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create IMViewController "
 					+ "node because parentNode was null.");
 			return;
-		}
+		} 
+		
+		this.configNode = parentNode;
+		getColorExtractor().setConfigNode(configNode);
+		requestStoredState();
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+		
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		
+		return; // nothing stored yet.
+	}
+
+	@Override
+	public void storeState() {
+		
+		return; // nothing to store yet
 	}
 	
 	/**
@@ -145,7 +158,7 @@ ConfigNodePersistent, Controller {
 	 * @param node
 	 * @throws BackingStoreException
 	 */
-	public void importColorPreferences(Preferences oldNode)
+	public void importColorPreferences(final Preferences oldNode)
 			throws BackingStoreException {
 
 		LogBuffer.println("Importing color settings...");
@@ -210,7 +223,7 @@ ConfigNodePersistent, Controller {
 		
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		colorPresets.setConfigNode(configNode);
-		colorExtractor = new ColorExtractor(
+		this.colorExtractor = new ColorExtractor(
 				model.getDataMatrix().getMinVal(), model.getDataMatrix()
 						.getMaxVal());
 		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());

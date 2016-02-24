@@ -36,6 +36,7 @@ import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GeneListMaker;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.ViewType;
 import edu.stanford.genetics.treeview.PreferencesMenu;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -253,7 +254,7 @@ public class TVController implements Observer {
 	public void loadData(final FileSet fileSet, final DataLoadInfo dataInfo) {
 
 		/* Setting loading screen */
-		tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
+		tvFrame.generateView(ViewType.PROGRESS_VIEW);
 
 //		/* Loading TVModel */
 		final TVModel tvModel = (TVModel) model;
@@ -926,7 +927,7 @@ public class TVController implements Observer {
 			fileMenuSet = tvFrame.findFileSet((JMenuItem) actionEvent
 					.getSource());// tvFrame.getFileMenuSet();
 
-			tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
+			tvFrame.generateView(ViewType.PROGRESS_VIEW);
 
 			getDataInfoAndLoad(fileMenuSet, false);
 		}

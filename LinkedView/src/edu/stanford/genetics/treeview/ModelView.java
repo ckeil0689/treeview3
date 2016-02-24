@@ -80,6 +80,17 @@ public abstract class ModelView extends JPanel implements Observer,
 
 		return panel;
 	}
+	
+	/**
+	 * Reset all member variables to ensure a fresh starting point.
+	 */
+	public void resetDefaults() {
+	
+		this.hasMouse = false;
+		this.offscreenValid = false;
+		this.offscreenChanged = false;
+		this.offscreenSize = null;
+	}
 
 	/**
 	 * Update the double buffer, if buffered. Otherwise, just called by
@@ -185,6 +196,12 @@ public abstract class ModelView extends JPanel implements Observer,
 	@Override
 	public void mouseExited(final MouseEvent e) {
 
+		if (viewFrame == null) {
+			LogBuffer.println("viewFrame null in ModelView.mouseExited. "
+					+ "Instance " + this);
+			return;
+		}
+		
 		hasMouse = false;
 	}
 
@@ -208,7 +225,7 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	public void setLabelPortMode(boolean m) {
 		
-		labelPortMode = m;
+		this.labelPortMode = m;
 	}
 
 	public void debug(String msg, int level) {

@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.prefs.Preferences;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.SettingsPanel;
@@ -22,6 +23,11 @@ import edu.stanford.genetics.treeview.SettingsPanel;
  */
 public class PostscriptColorBarExportPanel extends ColorBarExportPanel
 		implements SettingsPanel {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	// I wish I could just inherit this...
 	public PostscriptColorBarExportPanel(final ColorExtractor colorExtractor) {
@@ -237,5 +243,23 @@ public class PostscriptColorBarExportPanel extends ColorBarExportPanel
 						.println("Some error occured during PostScript export");
 			}
 		}
+	}
+
+	@Override
+	public Preferences getConfigNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -55,11 +55,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		ConfigNodePersistent {
 
-	public static final int WELCOME_VIEW = 0;
-	public static final int LOADERROR_VIEW = 1;
-	public static final int PROGRESS_VIEW = 2;
-	public static final int DENDRO_VIEW = 3;
-
 	protected final JPanel viewPanel;
 	protected final JPanel mainPanel;
 	protected DendroPanel running;
@@ -112,16 +107,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		this.treeView = treeView;
 
 		/* Initialize main views */
-		welcomeView = new WelcomeView();
-		loadErrorView = new LoadErrorView();
-		dendroView = new DendroView(this);
+		this.welcomeView = new WelcomeView();
+		this.loadErrorView = new LoadErrorView();
+		this.dendroView = new DendroView(this);
 
 		setWindowActive(true);
 
-		mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS, null);
+		this.mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS);
 
 		/* Setting up main panels */
-		viewPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS, null);
+		this.viewPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS);
 
 		/* Add main background panel to the application frame's contentPane */
 		appFrame.add(mainPanel);
@@ -130,15 +125,37 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		setupFileMru();
 
 		/* Initial view */
-		generateView(WELCOME_VIEW);
+		generateView(ViewType.WELCOME_VIEW);
 	}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			configNode = parentNode.node(StringRes.pnode_TVFrame);
+		if (parentNode == null) {
+			LogBuffer.println("Could not set configNode in " 
+					+ this.getClass().toString() + " because parent was null.");
+			return;
 		}
+		
+		this.configNode = parentNode.node(StringRes.pnode_TVFrame);
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+
+		return configNode;
+	}
+	
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -164,7 +181,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 * Generates the appropriate view panel.
 	 */
 	@Override
-	public void generateView(final int view_choice) {
+	public void generateView(final ViewType view_choice) {
 
 		JPanel view;
 
@@ -442,18 +459,18 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		if (loaded) {
 			if (running == null) {
 				setTitleString(appFrame.getName());
-				generateView(WELCOME_VIEW);
+				generateView(ViewType.WELCOME_VIEW);
 				// JOptionPane.showMessageDialog(applicationFrame,
 				// "TreeViewFrame 253: No plugins to display");
 			} else {
 				setLoadedTitle();
-				generateView(DENDRO_VIEW);
+				generateView(ViewType.DENDRO_VIEW);
 			}
 
 		} else {
 			appFrame.setTitle(StringRes.appName);
 			setTitleString(appFrame.getName());
-			generateView(LOADERROR_VIEW);
+			generateView(ViewType.LOADERROR_VIEW);
 		}
 
 		buildMenuBar();
@@ -991,16 +1008,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public boolean isLoaded() {
 
 		return loaded;
-	}
-
-	/**
-	 * Returns TreeViewFrame's configNode.
-	 *
-	 * @return
-	 */
-	public Preferences getConfigNode() {
-
-		return configNode;
 	}
 
 	/**

@@ -28,20 +28,21 @@ implements ConfigNodePersistent {
 	public static final Integer DEFAULT_MULTI_CLICK_INTERVAL = 300;
 	private final ColorChooserUI colorChooserUI;
 	private final ColorPicker colorPicker;
-	
-//	private CustomDialog drawColorsDialog;
 
 	/* Node for saved data */
 	private Preferences configNode;
 
 	/* Holds all preset color data */
 	private final ColorPresets colorPresets;
+	private final ColorSchemeType d_colorScheme = ColorSchemeType.REDGREEN;
+	private ColorSchemeType colorScheme;
 
 	public ColorChooserController(final ColorChooserUI colorChooserUI) {
 
 		this.colorChooserUI = colorChooserUI;
 		this.colorPicker = colorChooserUI.getColorPicker();
 		this.colorPresets = DendrogramFactory.getColorPresets();
+		this.colorScheme = d_colorScheme;
 
 		addAllListeners();
 	}
@@ -67,15 +68,52 @@ implements ConfigNodePersistent {
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			this.configNode = parentNode.node("GradientChooser");
-			setPresets();
-			colorChooserUI.getColorPicker().loadPresets();
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create GradientChooser "
 					+ "node because parentNode was null.");
+			return;
 		}
+		
+		this.configNode = parentNode.node("GradientChooser");
+		requestStoredState();
+		setPresets();
+		colorChooserUI.getColorPicker().loadPresets();
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+
+		return configNode;
+	}
+
+	protected ColorSet getColorSet(final String name) {
+
+		return colorPresets.getColorSet(name);
+	}
+
+	@Override
+	public void requestStoredState() {
+		
+		if(configNode == null) {
+			LogBuffer.println("Could not restore saved state. " 
+					+ this.getClass().toString());
+			return;
+		}
+		
+		String colorSchemeKey = configNode.get("activeColors", d_colorScheme.toString());
+		this.colorScheme = ColorSchemeType.getMemberFromKey(colorSchemeKey);
+	}
+
+	@Override
+	public void storeState() {
+		
+		if(configNode == null) {
+			LogBuffer.println("Could not store state. " 
+					+ this.getClass().toString());
+			return;
+		}
+		
+		configNode.put("activeColors", colorScheme.toString());
 	}
 
 	/**
@@ -83,33 +121,26 @@ implements ConfigNodePersistent {
 	 */
 	protected void setPresets() {
 
-		final String defaultColors = "RedGreen";
-
-		/* Get the active ColorSet name */
-		String colorScheme = defaultColors;
-		if (configNode != null) {
-			colorScheme = configNode.get("activeColors", defaultColors);
-		}
-
 		/* Choose ColorSet according to name */
 		final ColorSet selectedColorSet;
-		if (colorScheme.equalsIgnoreCase("Custom")) {
+		if (colorScheme == ColorSchemeType.CUSTOM) {
 			colorChooserUI.getPresetChoices().setSelectedItem("Custom");
-			selectedColorSet = colorPresets.getColorSet(colorScheme);
+			selectedColorSet = colorPresets.getColorSet(colorScheme.toString());
 
-		} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
+		} else if (colorScheme == ColorSchemeType.REDGREEN) {
 			colorChooserUI.getPresetChoices().setSelectedItem("RedGreen");
-			selectedColorSet = colorPresets.getColorSet(colorScheme);
+			selectedColorSet = colorPresets.getColorSet(colorScheme.toString());
 
-		} else if (colorScheme.equalsIgnoreCase("YellowBlue")) {
+		} else if (colorScheme == ColorSchemeType.YELLOWBLUE) {
 			colorChooserUI.getPresetChoices().setSelectedItem("YellowBlue");
-			selectedColorSet = colorPresets.getColorSet("YellowBlue");
+			selectedColorSet = colorPresets.getColorSet(colorScheme.toString());
 
 		} else {
 			/* Should never get here */
 			selectedColorSet = null;
 			LogBuffer.println("No matching ColorSet found in "
 					+ "ColorGradientChooser.setPresets()");
+			return;
 		}
 
 		colorChooserUI.getColorPicker().setActiveColorSet(selectedColorSet);
@@ -132,8 +163,13 @@ implements ConfigNodePersistent {
 		if ("Custom".equals(name)) {
 			colorChooserUI.getPresetChoices().setSelectedItem("Custom");
 		}
-
-		configNode.put("activeColors", name);
+		
+		setColorScheme(name);
+	}
+	
+	private void setColorScheme(final String colorScheme) {
+		
+		this.colorScheme = ColorSchemeType.getMemberFromKey(colorScheme);
 	}
 
 	/**
@@ -442,15 +478,5 @@ implements ConfigNodePersistent {
 				colorChooserUI.updateMissingColorIcon(missing);
 			}
 		}
-	}
-
-	protected Preferences getConfigNode() {
-
-		return configNode;
-	}
-
-	protected ColorSet getColorSet(final String name) {
-
-		return colorPresets.getColorSet(name);
 	}
 }

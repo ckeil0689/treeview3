@@ -113,4 +113,22 @@ public class BitmapColorBarExportPanel extends ColorBarExportPanel implements
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public Preferences getConfigNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
+	}
 }

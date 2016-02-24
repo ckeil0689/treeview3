@@ -95,6 +95,8 @@ public abstract class ModelViewProduced extends ModelView {
 	@Override
 	public synchronized void paintComponent(final Graphics g) {
 
+		super.paintComponent(g);
+		
 		Graphics2D g2d = (Graphics2D) g;
 
 		final Dimension newsize = getSize();

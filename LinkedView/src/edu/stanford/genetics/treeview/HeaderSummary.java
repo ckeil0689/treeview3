@@ -30,32 +30,120 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			this.configNode = parentNode.node(type);
-			LogBuffer.println("Set up configNode for " + type);
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create " + type
 					+ " node because parentNode was null.");
 			return;
 		}
-		synchronizeFrom();
+		
+		this.configNode = parentNode.node(type);
+		requestStoredState();
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		
+		if (configNode == null) {
+			return;
+		}
+
+		if (nodeHasAttribute("included")) {
+			final String incString = configNode.get("included", "[0]");
+			if (incString.equals("[]")) {
+				LogBuffer.println("The included key has no values stored. "
+						+ "Including nothing. (" + type + ")");
+				setIncluded(new int[0]);
+
+			} else {
+				String[] inclArray = getValuesFromStoredString(incString);
+				int[] array = new int[inclArray.length];
+				
+				try {
+					for(int i = 0; i < inclArray.length; i++) {
+						String elem = inclArray[i];
+						array[i] = Integer.parseInt(elem);
+					}
+
+				} catch (final NumberFormatException e) {
+					LogBuffer.logException(e);
+					LogBuffer.println("HeaderSummary has trouble "
+							+ "restoring included list from " 
+							+ Arrays.toString(inclArray));
+					setIncluded(new int[0]);
+					return;
+				}
+				
+//				array = adjustIncludedHeaders(array);
+				setIncluded(array);
+			}
+		} else if(headers != null && headers.length > 0) {
+			LogBuffer.println("There are headers defined but no key stored "
+					+ "for included indices. Setting a default. "
+					+ "(" + type + ")");
+			setIncluded(new int[]{0});
+			
+		} else {
+			LogBuffer.println("There are no headers defined. "
+					+ "Including nothing. (" + type + ")");
+			setIncluded(new int[0]);
+		}
+	}
+
+	@Override
+	public void storeState() {
+		
+		if (configNode == null) {
+			LogBuffer.println("Could not store state for " + type 
+					+ " because configNode was null.");
+			return;
+		}
+
+		final int[] vec = getIncluded();
+		LogBuffer.println("Stored included: (" + type + ")" 
+		+ Arrays.toString(vec));
+		configNode.put("included", Arrays.toString(vec));//temp.toString());
+		
+		if(headers == null) {
+			LogBuffer.println("Could not store headers. "
+					+ "No headers defined yet.");
+			return;
+		}
+		
+		final String[] names = new String[vec.length];
+		for(int i = 0; i < names.length; i++) {
+			int idx = vec[i];
+			if(idx < headers.length) {
+				names[i] = headers[idx];
+			}
+		}
+		LogBuffer.println("Stored includedNames: (" 
+				+ type + ")" + Arrays.toString(names));
+		configNode.put("includedNames", Arrays.toString(names));
 	}
 
 	public void setIncluded(final int[] newIncluded) {
 
-		LogBuffer.println("Setting new included member.(" + type + ")");
-		this.included = newIncluded;
-		synchronizeTo();
+		LogBuffer.println("Set new included (" + type + "): " 
+				+ Arrays.toString(newIncluded));
+		this.included = adjustIncludedHeaders(newIncluded);//newIncluded;
+		storeState();
 		setChanged();
 		notifyObservers();
 	}
 	
 	public void setHeaders(final String[] headers) {
 		
-		LogBuffer.println("Setting new headers.(" + type + ")");
+		LogBuffer.println("Set new headers.(" + type + "): " 
+		+ Arrays.toString(headers));
 		this.headers = headers;
-		synchronizeTo();
+		setIncluded(adjustIncludedHeaders(getIncluded()));
+		storeState();
 		setChanged();
 		notifyObservers();
 	}
@@ -154,54 +242,6 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 		return out;
 	}
-
-	/**
-	 * Checks the included-key of the Preferences node and sets the stored
-	 * values as the new included index array.
-	 */
-	private void synchronizeFrom() {
-
-		if (configNode == null) {
-			return;
-		}
-
-		if (nodeHasAttribute("included")) {
-			final String incString = configNode.get("included", "[0]");
-			if (incString.equals("[]")) {
-				LogBuffer.println("The included key has no values stored. Including nothing. (" + type + ")");
-				setIncluded(new int[0]);
-
-			} else {
-				String[] inclArray = getValuesFromStoredString(incString);
-				
-				int[] array = new int[inclArray.length];
-				try {
-					for(int i = 0; i < inclArray.length; i++) {
-						String elem = inclArray[i];
-						array[i] = Integer.parseInt(elem);
-					}
-
-				} catch (final NumberFormatException e) {
-					LogBuffer.println("HeaderSummary has trouble "
-							+ "restoring included list from " 
-							+ Arrays.toString(inclArray));
-					LogBuffer.println("NumberFormatException in "
-							+ "synchronizeFrom() in " + "HeaderSummary: "
-							+ e.getMessage());
-					return;
-				}
-				
-				array = adjustIncludedHeaders(array);
-				setIncluded(array);
-			}
-		} else if(headers != null && headers.length > 0) {
-			LogBuffer.println("There are headers defined but no key stored for included indices. Setting a default. (" + type + ")");
-			setIncluded(new int[]{0});
-		} else {
-			LogBuffer.println("There are no headers defined. Including nothing. (" + type + ")");
-			setIncluded(new int[0]);
-		}
-	}
 	
 	private String[] getValuesFromStoredString(String storedVal) {
 		
@@ -225,8 +265,12 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		
 		if(headers == null) {
 			LogBuffer.println("headers are null in " + type);
-			return included;
+			return new int[0];
 		}
+		
+		LogBuffer.println("---------------------");
+		LogBuffer.println("Adjusting included: " + Arrays.toString(included));
+		LogBuffer.println("Headers: " + Arrays.toString(headers));
 		
 		int[] newIncluded = included;
 		
@@ -264,33 +308,12 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			}
 		}
 		
+		/* Make sure to display first header if nothing was restored. */
+		if(headers.length > 0 && newIncluded.length == 0) {
+			newIncluded = new int[]{0};
+		}
+		
 		return newIncluded;
-	}
-
-	/**
-	 * Stores included indices as a String in the Preferences node. 
-	 */
-	private void synchronizeTo() {
-
-		if (configNode == null) {
-			return;
-		}
-
-		final int[] vec = getIncluded();
-		
-		final String[] names = new String[vec.length];
-		for(int i = 0; i < names.length; i++) {
-			int idx = vec[i];
-			if(idx < headers.length) {
-				names[i] = headers[idx];
-			}
-		}
-		
-		LogBuffer.println("Storing new included labels indices: (" + type + ")" + Arrays.toString(vec));
-		LogBuffer.println("Storing new included labels names: (" + type + ")" + Arrays.toString(names));
-		
-		configNode.put("included", Arrays.toString(vec));//temp.toString());
-		configNode.put("includedNames", Arrays.toString(names));
 	}
 
 	/**

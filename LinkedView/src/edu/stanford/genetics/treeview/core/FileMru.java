@@ -32,7 +32,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class FileMru extends Observable implements ConfigNodePersistent {
 
 	private Preferences configNode;
-
+	
 	/**
 	 * Binds FileMru to a ConfigNode
 	 *
@@ -42,14 +42,32 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	@Override
 	public synchronized void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			this.configNode = parentNode.node(StringRes.pnode_FileMRU);
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create FileMRU Preferences"
 					+ "node because parentNode was null.");
+			return;
 		}
+		
+		this.configNode = parentNode.node(StringRes.pnode_FileMRU);
 		setChanged();
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+		
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -345,5 +363,4 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 			return new String[0];
 		}
 	}
-
 }
