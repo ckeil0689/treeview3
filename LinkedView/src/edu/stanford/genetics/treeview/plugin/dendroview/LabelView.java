@@ -1992,9 +1992,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			/* TODO: Handle the temporary outlining of the matrix
 			 * NOT SURE HOW TO DO THIS YET - CANNOT TALK TO IMV */
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-			drawSelection.deselectAllIndexes();
-			otherSelection.deselectAllIndexes();
 		}
 
 		drawSelection.notifyObservers();

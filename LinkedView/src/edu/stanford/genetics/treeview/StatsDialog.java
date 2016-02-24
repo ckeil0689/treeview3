@@ -14,24 +14,32 @@ public class StatsDialog extends CustomDialog {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private final String source;
+	private final int rowNum;
+	private final int colNum;
+	
 	/**
 	 * Constructor
 	 *
 	 * @param viewFrame
 	 */
-	public StatsDialog(final String source, final int rowNum, final int colNum) {
+	public StatsDialog(final String source, final int rowNum, 
+			final int colNum) {
 
 		super("Stats");
-		setupLayout(source, rowNum, colNum);
-
-		closeBtn.requestFocusInWindow();
+		
+		this.source = source;
+		this.rowNum = rowNum;
+		this.colNum = colNum;
+		
+		setupLayout();
 	}
 
 	/**
 	 * Sets up layout and content of this window.
 	 */
-	public void setupLayout(final String source, final int rowNum,
-			final int colNum) {
+	@Override
+	protected void setupLayout() {
 
 		final JPanel contentPanel = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT, null);
@@ -73,5 +81,7 @@ public class StatsDialog extends CustomDialog {
 
 		mainPanel.add(contentPanel, "push, grow, wrap");
 		mainPanel.add(closeBtn, "span, al right");
+		
+		closeBtn.requestFocusInWindow();
 	}
 }

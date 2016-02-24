@@ -27,7 +27,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
  * @author CKeil
  *
  */
-public class PreferencesMenu extends CustomDialog implements
+public class LabelSettings extends CustomDialog implements
 		ConfigNodePersistent {
 
 	/**
@@ -36,8 +36,9 @@ public class PreferencesMenu extends CustomDialog implements
 	private static final long serialVersionUID = 1L;
 
 	private final TreeViewFrame tvFrame;
-	private HeaderInfo geneHI;
-	private HeaderInfo arrayHI;
+	private String menu;
+	private HeaderInfo rowHI;
+	private HeaderInfo colHI;
 	private Preferences configNode;
 
 	private final DendroView dendroView;
@@ -51,19 +52,23 @@ public class PreferencesMenu extends CustomDialog implements
 	 *
 	 * @param tvFrame
 	 */
-	public PreferencesMenu(final TreeViewFrame tvFrame) {
+	public LabelSettings(final TreeViewFrame tvFrame) {
 
-		super(StringRes.dlg_prefs);
+		super(StringRes.dlg_Labels);
 		this.tvFrame = tvFrame;
 		this.dendroView = tvFrame.getDendroView();
-
-		getContentPane().add(mainPanel);
 	}
 
-	public void setHeaderInfo(final HeaderInfo geneHI, final HeaderInfo arrayHI) {
+	public void setHeaderInfo(final HeaderInfo rowHI, final HeaderInfo colHI) {
 
-		this.geneHI = geneHI;
-		this.arrayHI = arrayHI;
+		this.rowHI = rowHI;
+		this.colHI = colHI;
+	}
+	
+	public void setMenu(final String menu) {
+		
+		this.menu = menu;
+		setupLayout();
 	}
 
 	/**
@@ -273,10 +278,10 @@ public class PreferencesMenu extends CustomDialog implements
 			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS,
 					null);
 
-			genePanel = new HeaderSummaryPanel(geneHI, dendroView
+			genePanel = new HeaderSummaryPanel(rowHI, dendroView
 					.getRowLabelView().getHeaderSummary());
 
-			arrayPanel = new HeaderSummaryPanel(arrayHI, dendroView
+			arrayPanel = new HeaderSummaryPanel(colHI, dendroView
 					.getColLabelView().getHeaderSummary());
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,
@@ -392,7 +397,8 @@ public class PreferencesMenu extends CustomDialog implements
 	 *
 	 * @param title
 	 */
-	public void setupLayout(final String menu) {
+	@Override
+	protected void setupLayout() {
 
 		mainPanel.removeAll();
 

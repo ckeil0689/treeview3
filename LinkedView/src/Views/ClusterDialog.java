@@ -21,15 +21,16 @@ public class ClusterDialog extends CustomDialog {
 	private static final long serialVersionUID = 1L;
 
 	private final ClusterView clusterView;
+	private final int clusterType;
 
 	public ClusterDialog(final int clusterType) {
 
 		super(StringRes.dlg_Cluster);
 
-		clusterView = new ClusterView();
+		this.clusterView = new ClusterView();
+		this.clusterType = clusterType;
 
-		mainPanel.add(clusterView.makeClusterPanel(clusterType));
-		getContentPane().add(mainPanel);
+		setupLayout();
 	}
 
 	/**
@@ -61,5 +62,12 @@ public class ClusterDialog extends CustomDialog {
 	public ClusterView getClusterView() {
 
 		return clusterView;
+	}
+
+	@Override
+	protected void setupLayout() {
+		
+		mainPanel.add(clusterView.makeClusterPanel(clusterType));
+		getContentPane().add(mainPanel);
 	}
 }
