@@ -508,11 +508,13 @@ public class ExportHandler {
 			g.endExport();
 		}
 		catch(FileNotFoundException exc) {
-			LogBuffer.println("File not be written to.");
+			LogBuffer.println("File [" + fileName + "] could not be written " +
+				"to.");
 			LogBuffer.logException(exc);
 		}
 		catch(IOException exc) {
-			LogBuffer.println("File not be written to.");
+			LogBuffer.println("File [" + fileName + "] could not be written " +
+				"to.");
 			LogBuffer.logException(exc);
 		}
 	}
