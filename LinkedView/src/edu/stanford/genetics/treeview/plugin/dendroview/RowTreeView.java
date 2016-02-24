@@ -77,7 +77,9 @@ public class RowTreeView extends TRView {
 	protected void drawFittedWhizBackground(final Graphics g,
 		LinearTransformation scaleEq) {
 
-		if(map.getFirstVisibleLabel() < 0) {
+		if(map == null || map.getFirstVisibleLabel() < 0 ||
+			map.getNumVisibleLabels() < 1) {
+
 			return;
 		}
 		g.fillRect(0,(int) scaleEq.transform((double) map.getFirstVisibleLabel()),

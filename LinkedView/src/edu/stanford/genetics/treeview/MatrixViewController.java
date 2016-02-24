@@ -59,6 +59,9 @@ ConfigNodePersistent, Controller {
 	private DataModel model;
 	protected Preferences configNode;
 	
+	/* Data ticker reference, so it can be updated by the MouseAdapter */ 
+	private DataTicker ticker;
+	
 	public MatrixViewController(final InteractiveMatrixView imView,
 			final GlobalMatrixView gmView, final DataModel model) {
 		
@@ -705,6 +708,25 @@ ConfigNodePersistent, Controller {
 										- rowSelection.getMinIndex() + 1));
 			}
 		}
+	}
+	
+	public void setDataTicker(final DataTicker ticker) {
+		
+		this.ticker = ticker;
+	}
+	
+	/**
+	 * A wrapper for retrieving a data value from the data model. Used by 
+	 * IMVMouseAdapter to update the DataTicker in DendroView when hovering
+	 * over the InteractiveMatrixView. 
+	 * @param rowIdx Row index of the data value in the model's data matrix.
+	 * @param colIdx Col index of the data value in the model's data matrix.
+	 * @return The data value at the specified indices, if it exists. 
+	 * DataModel.NAN otherwise.
+	 */
+	public void setDataValueAt(final int rowIdx, final int colIdx) {
+		
+		ticker.setValue(model.getDataMatrix().getValue(colIdx, rowIdx));
 	}
 	
 	/**

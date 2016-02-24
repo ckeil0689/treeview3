@@ -218,6 +218,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				dendroView.getGlobalMatrixView(), tvModel);
 		
 		mvController.setConfigNode(configNode);
+		mvController.setDataTicker(dendroView.getDataTicker());
 		mvController.setup();
 	}
 
