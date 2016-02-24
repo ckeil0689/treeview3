@@ -174,13 +174,15 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		setupMatrixController();
 		
-		/* Get the saved settings */
+		/* Assign Preferences nodes to components */
 		setConfigNode(tvFrame.getConfigNode());
 		setComponentPresets();
 
 		updateHeaderInfo();
 		bindComponentFunctions();
 
+		resetMapContainerDefaults();
+		
 		dendroView.resetModelViewDefaults();
 		dendroView.loadModelViewStoredStates();
 		
@@ -216,6 +218,15 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				dendroView.getGlobalMatrixView(), tvModel);
 
 		mvController.setup();
+	}
+	
+	private void resetMapContainerDefaults() {
+		
+		interactiveXmap.resetDefaultState();
+		interactiveYmap.resetDefaultState();
+		
+		globalXmap.resetDefaultState();
+		globalYmap.resetDefaultState();
 	}
 
 	@Override

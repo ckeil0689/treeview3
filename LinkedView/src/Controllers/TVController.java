@@ -336,8 +336,6 @@ public class TVController implements Observer {
 				 * Implement a nicer solution one day...
 				 */
 				Preferences loadedNode = dataInfo.getOldNode();
-//						getOldPreferences(
-//						fileMenuSet.getRoot(), fileMenuSet.getExt());
 				
 				if(loadedNode != null) { 
 					copyOldPreferencesTo(loadedNode);
@@ -384,7 +382,7 @@ public class TVController implements Observer {
 	 * @param srcExtension
 	 * @return The target Preferences node, if it exists. Otherwise null.
 	 */
-	private Preferences getOldPreferences(String srcName, String srcExtension) {
+	public Preferences getOldPreferences(String srcName, String srcExtension) {
 
 		try {
 			/* First, get the relevant old node... */
@@ -507,7 +505,7 @@ public class TVController implements Observer {
 				}
 			}
 			
-			getDataInfoAndLoad(fileSet, false);
+			getDataInfoAndLoad(fileSet, null, false);
 			
 		} catch (final LoadException e) {
 			message = "Loading the file was interrupted.";
@@ -527,23 +525,22 @@ public class TVController implements Observer {
 	 * clustering.
 	 */
 	public void getDataInfoAndLoad(final FileSet newFileSet, 
-			boolean isFromCluster) {
+			final FileSet oldFileSet, boolean isFromCluster) {
 		
-		Preferences node;
+		Preferences oldNode;
 		/* Transfer settings to clustered file */
-		if(isFromCluster) {
-		    FileSet preClusterFS = ((TVModel) model).getFileSet();
-			node = getOldPreferences(preClusterFS.getRoot(), 
-					preClusterFS.getExt());
+		if(isFromCluster && oldFileSet != null) {
+			oldNode = getOldPreferences(oldFileSet.getRoot(), 
+					oldFileSet.getExt());
 		/* Check if file was loaded before */
 		} else {
-			node = getOldPreferences(newFileSet.getRoot(), newFileSet.getExt());
+			oldNode = getOldPreferences(newFileSet.getRoot(), 
+					newFileSet.getExt());
 		}
 
-//		boolean isFileTRV = (FileSet.TRV).equalsIgnoreCase(fileSet.getExt());
 		DataLoadInfo dataInfo;
-		if (node != null) {
-			dataInfo = getDataLoadInfo(newFileSet, node);
+		if (oldNode != null) {
+			dataInfo = getDataLoadInfo(newFileSet, oldNode);
 			
 		} else {
 			dataInfo = useImportDialog(newFileSet);
@@ -688,13 +685,6 @@ public class TVController implements Observer {
 	 */
 	public void setupClusterView(final int clusterType) {
 
-		/*
-		 * To quickly find Preferences node of pre-cluster file to carry over
-		 * settings like color and font.
-		 */
-//		FileSet fs = ((TVModel) model).getFileSet();
-//		this.clusterNodeSourceKeys = new String[] { fs.getRoot(), fs.getExt() };
-
 		/* Erase selection */
 		dendroController.deselectAll();
 
@@ -702,8 +692,8 @@ public class TVController implements Observer {
 		final ClusterDialog clusterView = new ClusterDialog(clusterType);
 
 		/* Creating the Controller for this view. */
-		ClusterDialogController cController = new ClusterDialogController(clusterView,
-				TVController.this);
+		ClusterDialogController cController = 
+				new ClusterDialogController(clusterView, TVController.this);
 
 		cController.displayView();
 	}

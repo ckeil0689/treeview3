@@ -162,6 +162,40 @@ public class MapContainer extends Observable implements Observer,
 		configNode.putDouble("scale", current.getScale());
 	}
 	
+	/**
+	 * Reset the MapContainer state to a default.
+	 */
+	public void resetDefaultState() {
+		
+		this.tileNumVisible = -1;
+		this.numVisible = -1;
+		this.firstVisible = -1;
+		this.firstVisibleLabel = -1;
+		this.lastVisibleLabel = -1;
+		this.firstVisibleLabelOffset = -1;
+		this.lastVisibleLabelOffset = -1;
+		this.overLabels            = false;
+		this.overLabelsScrollbar   = false;
+		this.overInteractiveMatrix = false;
+		this.overTree              = false;
+		this.overDivider           = false;
+		this.draggingDivider       = false;
+		this.labelsBeingScrolled   = false;
+		this.lastTreeModeGlobal    = true;
+		this.keepTreeGlobal        = true;
+		this.hoverPixel            = -1;
+		this.hoverIndex            = -1;
+		this.hoverTreeMinIndex     = -1;
+		this.hoverTreeMaxIndex     = -1;
+		this.hoverChanged          = false;
+		this.selecting             = false;
+		this.toggling              = false;
+		this.deselecting           = false;
+		this.selectingStart        = -1;
+		this.whizMode              = false;
+		
+	}
+	
 	private void setupMaps() {
 		
 		// first bind subordinate maps...

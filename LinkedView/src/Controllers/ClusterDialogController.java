@@ -915,17 +915,13 @@ public class ClusterDialogController {
 		
 		if (newFilePath != null) {
 			file = new File(newFilePath);
-
-			LogBuffer.println("TVModel.fileSet in loadClustered 2"  + tvModel.getFileSet());
 			
-			// TODO instantiating a new local fileSet soemhow changes the fileset of TVModel... (???)
+			final FileSet oldFileSet = tvModel.getFileSet();
 			final FileSet newFileSet = new FileSet(file.getName(),
 					file.getParent() + File.separator);
-
-			LogBuffer.println("TVModel.fileSet in loadClustered 3"  + tvModel.getFileSet());
 			
 			clusterDialog.dispose();
-			tvController.getDataInfoAndLoad(newFileSet, true);
+			tvController.getDataInfoAndLoad(newFileSet, oldFileSet, true);
 
 		} else {
 			final String alert = "When trying to load the clustered file, no "
