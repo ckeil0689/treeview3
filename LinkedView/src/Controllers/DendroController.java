@@ -170,14 +170,13 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;
-
-		setMatrixController();
+		
+		setupMatrixController();
 		
 		/* Get the saved settings */
 		setConfigNode(tvFrame.getConfigNode());
 		setComponentPresets();
 
-//		setMatrixController();
 		updateHeaderInfo();
 		bindComponentFunctions();
 
@@ -190,14 +189,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		dendroView.setupLayout();
 		setObservables();
-
-		/*
-		 * TODO Find solution... doesn't work because of resetMapContainers
-		 * which needs to run to reset MapContainer scales in GlobalView for
-		 * potentially changed AppFrame size between closing TreeView and
-		 * loading a new matrix (changed availablePixels in GlobalView).
-		 */
-		// setSavedScale();
 
 		/**
 		 * make sure pixel colors are calculated after new model was loaded. 
@@ -217,13 +208,12 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	/**
 	 * Sets up all necessary components for the MatrixView controller.
 	 */
-	private void setMatrixController() {
+	private void setupMatrixController() {
 		
 		this.mvController = new MatrixViewController(
 				dendroView.getInteractiveMatrixView(), 
 				dendroView.getGlobalMatrixView(), tvModel);
-		
-//		mvController.setConfigNode(configNode);
+
 		mvController.setup();
 	}
 
@@ -1014,17 +1004,12 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	}
 
 	/**
-	 * Updates all headerInfo instances for all the view components.
+	 * Updates all headerInfo instances for all the label views.
 	 */
 	private void updateHeaderInfo() {
 
-		dendroView.getColumnTreeView().setATRHeaderInfo(
-				tvModel.getAtrHeaderInfo());
-		dendroView.getRowTreeView()
-				.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
-		dendroView.getColLabelView().setHeaderInfo(
-				tvModel.getColHeaderInfo());
 		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
+		dendroView.getColLabelView().setHeaderInfo(tvModel.getColHeaderInfo());
 	}
 
 	/**

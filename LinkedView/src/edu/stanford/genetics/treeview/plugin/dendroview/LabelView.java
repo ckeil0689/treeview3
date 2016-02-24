@@ -55,7 +55,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	//This is the space between labels in pixels
 	protected final static int SQUEEZE = 1;
-
+	
+	/* Selection of row/ column indices */
+	protected final Color textFGColor          = Color.black;
+	protected Color textBGColor;
+	protected final Color selectionBorderColor = Color.yellow;
+	protected final Color selectionTextBGColor = new Color(249,238,160);//yel
+	protected final Color selectionTextFGColor = Color.black;
+	protected final Color hoverTextFGColor     = Color.red;
+	protected final Color labelPortColor       = new Color(30,144,251); //blu
 
 	/* DataModel is an observer */
 	protected DataModel dataModel;
@@ -96,15 +104,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/* Alignment status */
 	protected boolean isRightJustified;
-
-	/* Selection of row/ column indices */
-	protected Color textFGColor          = Color.black;
-	protected Color textBGColor;
-	protected Color selectionBorderColor = Color.yellow;
-	protected Color selectionTextBGColor = new Color(249,238,160);//yel
-	protected Color selectionTextFGColor = Color.black;
-	protected Color hoverTextFGColor     = Color.red;
-	protected Color labelPortColor       = new Color(30,144,251); //blu
 
 	/*
 	 * Stores a reference to the TreeSelection relevant for drawing and the
@@ -334,6 +333,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		this.max = d_max;
 		this.isRightJustified = d_justified;
 		this.isFixed = d_fixed;
+		
+		this.longest_str_index = -1;
+		this.longest_str_length = -1;
+		
+		this.lastScrollEndGap      = -1;
+		this.lastScrollPos         = -1;
+		this.lastScrollEndPos      = -1;
+		this.secondaryPaneSize     = -1;
+		this.secondaryViewportSize = -1;
 	}
 
 	/**
@@ -1888,10 +1896,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	private void saveLastDrawnFontDetails(int maxStrLen) {
 		//Save the state to detect changes upon the next call of this method
-		lastDrawnFace      = face;
-		lastDrawnStyle     = style;
-		lastDrawnSize      = size;
-		longest_str_length = maxStrLen;
+		this.lastDrawnFace      = face;
+		this.lastDrawnStyle     = style;
+		this.lastDrawnSize      = size;
+		this.longest_str_length = maxStrLen;
 	}
 
 	/**

@@ -79,7 +79,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 					return;
 				}
 				
-//				array = adjustIncludedHeaders(array);
+				array = adjustIncludedHeaders(array);
 				setIncluded(array);
 			}
 		} else if(headers != null && headers.length > 0) {
@@ -131,7 +131,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 
 		LogBuffer.println("Set new included (" + type + "): " 
 				+ Arrays.toString(newIncluded));
-		this.included = adjustIncludedHeaders(newIncluded);//newIncluded;
+		this.included = newIncluded;
 		storeState();
 		setChanged();
 		notifyObservers();
@@ -313,6 +313,9 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			newIncluded = new int[]{0};
 		}
 		
+		LogBuffer.println("New included: " + Arrays.toString(newIncluded));
+		LogBuffer.println("-----------------");
+		
 		return newIncluded;
 	}
 
@@ -323,6 +326,10 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 	 */
 	public boolean nodeHasAttribute(final String name) {
 
+		if (configNode == null) {
+			return false;
+		}
+		
 		try {
 			final String[] keys = configNode.keys();
 

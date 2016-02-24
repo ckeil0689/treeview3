@@ -28,7 +28,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 	 */
 	public TreeSelection(final int nIndex) {
 
-		integerSelection = new IntegerSelection(nIndex);
+		this.integerSelection = new IntegerSelection(nIndex);
 	}
 
 	/*
@@ -51,7 +51,7 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 			}
 		}
 
-		integerSelection = temp;
+		this.integerSelection = temp;
 		setChanged();
 	}
 
@@ -392,5 +392,11 @@ public class TreeSelection extends Observable implements TreeSelectionI {
 
 			return max;
 		}
+	}
+
+	@Override
+	public boolean hasSelection() {
+		
+		return getNSelectedIndexes() > 0;
 	}
 }

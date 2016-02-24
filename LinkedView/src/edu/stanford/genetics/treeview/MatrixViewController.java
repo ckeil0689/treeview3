@@ -897,21 +897,20 @@ ConfigNodePersistent, Controller {
 		int xTilesVisible = interactiveXmap.getNumVisible();
 		int yTilesVisible = interactiveYmap.getNumVisible();
 
-		final boolean genesSelected = rowSelection.getNSelectedIndexes() > 0;
-		final boolean arraysSelected = colSelection.getNSelectedIndexes() > 0;
+		final boolean rowsSelected = rowSelection.hasSelection();
+		final boolean colsSelected = colSelection.hasSelection();
 
 		// Note: A selection is "fully zoomed" if there is no selection - this
 		// will disable the zoom selection button
-		boolean isSelectionZoomed = (!genesSelected && !arraysSelected)
-				|| (genesSelected
+		boolean isSelectionZoomed = (!rowsSelected && !colsSelected)
+				|| (rowsSelected
 						&& rowSelection.getMinIndex() == interactiveYmap
 								.getFirstVisible()
-						&& (rowSelection.getMaxIndex()
-								- rowSelection.getMinIndex() + 1) == yTilesVisible
-						&& arraysSelected
+						&& (rowSelection.getFullSelectionRange()) == yTilesVisible
+						&& colsSelected
 						&& colSelection.getMinIndex() == interactiveXmap
-								.getFirstVisible() && (colSelection
-						.getMaxIndex() - colSelection.getMinIndex() + 1) == xTilesVisible);
+								.getFirstVisible() 
+						&& (colSelection.getFullSelectionRange()) == xTilesVisible);
 		
 		zoomStatus = new boolean[]{isXMin, isYMin, atRight, atLeft, atTop, 
 				atBottom, isSelectionZoomed};

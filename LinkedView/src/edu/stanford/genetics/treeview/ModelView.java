@@ -17,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.util.Observer;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
@@ -32,14 +31,13 @@ public abstract class ModelView extends JPanel implements Observer,
 	private static final long serialVersionUID = 1L;
 
 	protected ViewFrame viewFrame = null;
-	protected JFrame applicationFrame = null;
 
-	protected boolean hasMouse = false;
+	protected boolean hasMouse;
 
 	/* here so that subclass will work with BufferedModelView too */
-	protected boolean offscreenValid = false;
-	protected boolean offscreenChanged = false;
-	protected Dimension offscreenSize = null;
+	protected boolean offscreenValid;
+	protected boolean offscreenChanged;
+	protected Dimension offscreenSize;
 
 	/**
 	 * holds actual thing to be displayed...
@@ -55,6 +53,8 @@ public abstract class ModelView extends JPanel implements Observer,
 	protected ModelView() {
 
 		super(false);
+		
+		resetDefaults();
 	}
 
 	/**
@@ -67,8 +67,7 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	public void setViewFrame(final ViewFrame m) {
 
-		viewFrame = m;
-		applicationFrame = m.getAppFrame();
+		this.viewFrame = m;
 	}
 
 	public ViewFrame getViewFrame() {
@@ -89,7 +88,7 @@ public abstract class ModelView extends JPanel implements Observer,
 		this.hasMouse = false;
 		this.offscreenValid = false;
 		this.offscreenChanged = false;
-		this.offscreenSize = null;
+		this.offscreenSize = new Dimension(0, 0);
 	}
 
 	/**

@@ -250,10 +250,10 @@ public abstract class HeaderFinderBox {
 		//you had a file open with a bunch of header labels and the last one
 		//was selected, and then you open a new file with fewer header
 		//labels), revert the saved index to 0
-		if(primarySearchIndex >= searchDataList[0].length) {
-			primarySearchIndex = 0;
-			headerSummary.setIncluded(new int[] { 0 });
-		}
+//		if(primarySearchIndex >= searchDataList[0].length) {
+//			primarySearchIndex = 0;
+//			headerSummary.setIncluded(new int[] { 0 });
+//		}
 
 		maxSearchIndex = searchDataList[0].length - 1;
 	}

@@ -13,7 +13,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 
@@ -31,13 +30,10 @@ public class RowTreeView extends TRView {
 
 		super(true);
 
-		isLeft = true;
+		this.isLeft = true;
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
-	}
-
-	public void setGTRHeaderInfo(final HeaderInfo gtrHI) {
 	}
 
 	@Override
