@@ -1,18 +1,18 @@
 /**
  * 
  */
-package Controllers;
+package edu.stanford.genetics.treeview;
 
 /**
  * The region of the matrix to export to a file
  * @author rleach
  */
-public enum Region {
-	ALL("All"),VISIBLE("Visible"),SELECTION("Selection");
+public enum ExportAspect {
+	ONETOONE("1:1"),ASSEEN("As seen on screen");
 
 	private final String toString;
 	
-	private Region(String toString) {
+	private ExportAspect(String toString) {
 		this.toString = toString;
 	}
 	

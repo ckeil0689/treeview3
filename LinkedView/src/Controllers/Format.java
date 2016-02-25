@@ -8,5 +8,16 @@ package Controllers;
  * @author rleach
  */
 public enum Format {
-	PDF,SVG,PS,PNG,JPG,PPM;
+	PDF("PDF"),SVG("SVG"),PS("PS"),PNG("PNG"),JPG("JPG"),PPM("PPM");
+
+	private final String toString;
+	
+	private Format(String toString) {
+		this.toString = toString;
+	}
+	
+	@Override
+	public String toString() {
+		return toString;
+	}
 }

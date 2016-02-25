@@ -21,7 +21,9 @@ import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.freehep.graphicsio.svg.SVGGraphics2D;
 
+import edu.stanford.genetics.treeview.ExportAspect;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.PaperType;
 import edu.stanford.genetics.treeview.PpmWriter;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
@@ -109,6 +111,10 @@ public class ExportHandler {
 		this.defPageSize = dps;
 	}
 
+	public void setDefaultPageSize(PaperType pT) {
+		this.defPageSize = pT.toString();
+	}
+
 	/**
 	 * Uses stored tileWidth, treesHeight, & treeMatrixGapSize to determine the
 	 * width of the output image.
@@ -192,6 +198,23 @@ public class ExportHandler {
 	 */
 	public void setTileAspectRatio(final double aR) {
 		this.aspectRatio = aR;
+	}
+
+	/**
+	 * Sets the aspectRatio of a tile
+	 * @author rleach
+	 * @param aR - aspect ratio
+	 */
+	public void setTileAspectRatio(final ExportAspect eAsp) {
+		if(eAsp == ExportAspect.ASSEEN) {
+			setTileAspectRatioToScreen(Region.VISIBLE);
+		} else {
+			setTileAspectRatio(1.0);
+			if(eAsp != ExportAspect.ONETOONE) {
+				LogBuffer.println("Warning: Invalid or unselected aspect " +
+					"ratio type submitted.  Defaulting to 1:1.");
+			}
+		}
 	}
 
 	/**
@@ -394,7 +417,7 @@ public class ExportHandler {
 	 * @param region
 	 */
 	public void exportImage(final Format format,final String fileName,
-		final Region region,final boolean showSelections) { //E.g. Format.PNG,"A5","Output.pdf"
+		final Region region,final boolean showSelections) { //E.g. Format.PNG,"Output.pdf",Region.VISIBLE,true
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
