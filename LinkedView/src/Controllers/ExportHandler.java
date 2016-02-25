@@ -392,7 +392,7 @@ public class ExportHandler {
 	 *                 selection
 	 */
 	public void export(final Format format,final String fileName,
-		final Region region,final boolean showSelections) { //E.g. Format.PNG,"Output.pdf",Region.VISIBLE
+		final Region region,final boolean showSelections) {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -417,7 +417,7 @@ public class ExportHandler {
 	 * @param region
 	 */
 	public void exportImage(final Format format,final String fileName,
-		final Region region,final boolean showSelections) { //E.g. Format.PNG,"Output.pdf",Region.VISIBLE,true
+		final Region region,final boolean showSelections) {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -446,7 +446,7 @@ public class ExportHandler {
 			if(format == Format.PNG) {
 				ImageIO.write(im,"png",exportFile);
 			} else if(format == Format.JPG) {
-				ImageIO.write(im,"JPG",exportFile);
+				ImageIO.write(im,"jpg",exportFile);
 			} else if(format == Format.PPM) { //ppm = bitmat
 				final OutputStream os = new BufferedOutputStream(
 					new FileOutputStream(exportFile));
