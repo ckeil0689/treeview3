@@ -69,6 +69,8 @@ public class ExportDialogController {
 			eh.setTileAspectRatio(selAspect);
 			eh.export(selFormat,"Output." + selFormat.toString(),selRegion,
 				showSelections);
+
+			exportDialog.dispose();
 		}
 	}
 	
