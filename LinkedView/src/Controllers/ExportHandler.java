@@ -428,9 +428,17 @@ public class ExportHandler {
 		try {
 			calculateDimensions(region);
 
-			final BufferedImage im = new BufferedImage(
-				getXDim(region),getYDim(region),BufferedImage.TYPE_INT_ARGB);
-	
+			BufferedImage im;
+			//JPG is the only format that doesn't support an alpha channel, so
+			//we must create a buffered image object without the ARGB type
+			if(format == Format.JPG) {
+				im = new BufferedImage(
+					getXDim(region),getYDim(region),BufferedImage.TYPE_INT_RGB);
+			} else {
+				im = new BufferedImage(getXDim(region),getYDim(region),
+					BufferedImage.TYPE_INT_ARGB);
+			}
+
 			Graphics2D g2d = (Graphics2D) im.getGraphics();
 			createContent(g2d,region,showSelections);
 
@@ -438,7 +446,7 @@ public class ExportHandler {
 			if(format == Format.PNG) {
 				ImageIO.write(im,"png",exportFile);
 			} else if(format == Format.JPG) {
-				ImageIO.write(im,"jpg",exportFile);
+				ImageIO.write(im,"JPG",exportFile);
 			} else if(format == Format.PPM) { //ppm = bitmat
 				final OutputStream os = new BufferedOutputStream(
 					new FileOutputStream(exportFile));

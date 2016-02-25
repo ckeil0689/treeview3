@@ -15,6 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import Controllers.Format;
+
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Controllers.Region;
@@ -68,7 +70,7 @@ public class ExportDialog extends CustomDialog {
 		JLabel selections = GUIFactory.createLabel("Show Selections",
 			GUIFactory.FONTS);
 
-		formatBox = new JComboBox<Object>(EXP_FORMATS.values());
+		formatBox = new JComboBox<Object>(Format.values());
 		paperBox = new JComboBox<Object>(PaperType.values());
 		regionRadioBtns = new ButtonGroup();
 		aspectRadioBtns = new ButtonGroup();
@@ -167,10 +169,10 @@ public class ExportDialog extends CustomDialog {
 		for(Enumeration<AbstractButton> buttons =
 			regionRadioBtns.getElements();buttons.hasMoreElements();) {
 			AbstractButton button = buttons.nextElement();
-			cnt++;
 			if(button.isSelected()) {
 				options[2] = cnt;
 			}
+			cnt++;
 		}
 
 		options[3] = -1;
@@ -178,10 +180,10 @@ public class ExportDialog extends CustomDialog {
 		for(Enumeration<AbstractButton> buttons =
 			aspectRadioBtns.getElements();buttons.hasMoreElements();) {
 			AbstractButton button = buttons.nextElement();
-			cnt++;
 			if(button.isSelected()) {
 				options[3] = cnt;
 			}
+			cnt++;
 		}
 
 		if(selectionsBox == null) {
@@ -192,7 +194,7 @@ public class ExportDialog extends CustomDialog {
 			options[4] = 0;
 		}
 
-		return options;
+		return(options);
 	}
 	
 	/**
