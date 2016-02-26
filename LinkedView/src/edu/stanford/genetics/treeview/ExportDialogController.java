@@ -3,6 +3,8 @@ package edu.stanford.genetics.treeview;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import org.freehep.graphicsio.PageConstants;
+
 import Controllers.ExportHandler;
 import Controllers.Format;
 import Controllers.Region;
@@ -54,6 +56,7 @@ public class ExportDialogController {
 			Format selFormat;
 			if(selectedOptions.length < 1 || selectedOptions[0] < 0 ||
 				selectedOptions[0] >= Format.values().length) {
+
 				selFormat = Format.getDefault();
 			} else {
 				selFormat = Format.values()[selectedOptions[0]];
@@ -62,6 +65,7 @@ public class ExportDialogController {
 			PaperType selPaper;
 			if(selectedOptions.length < 2 || selectedOptions[1] < 0 ||
 				selectedOptions[1] >= PaperType.values().length) {
+
 				selPaper = PaperType.getDefault();
 			} else {
 				selPaper = PaperType.values()[selectedOptions[1]];
@@ -70,6 +74,7 @@ public class ExportDialogController {
 			Region selRegion;
 			if(selectedOptions.length < 3 || selectedOptions[2] < 0 ||
 				selectedOptions[2] >= Region.values().length) {
+
 				selRegion = Region.getDefault();
 			} else {
 				selRegion = Region.values()[selectedOptions[2]];
@@ -78,6 +83,7 @@ public class ExportDialogController {
 			ExportAspect selAspect;
 			if(selectedOptions.length < 4 || selectedOptions[3] < 0 ||
 				selectedOptions[3] >= ExportAspect.values().length) {
+
 				selAspect = ExportAspect.getDefault();
 			} else {
 				selAspect = ExportAspect.values()[selectedOptions[3]];
@@ -88,6 +94,17 @@ public class ExportDialogController {
 				showSelections = false;
 			} else {
 				showSelections = (selectedOptions[4] == 1 ? true : false);
+			}
+
+			String selOrient;
+			if(selectedOptions.length < 6 || selectedOptions[5] < 0 ||
+				selectedOptions[5] >=
+				PageConstants.getOrientationList().length) {
+
+				selOrient = PageConstants.LANDSCAPE;
+			} else {
+				selOrient =
+					PageConstants.getOrientationList()[selectedOptions[5]];
 			}
 
 			String exportFilename = model.getSource();
@@ -102,6 +119,7 @@ public class ExportDialogController {
 			ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
 				interactiveYmap,colSelection,rowSelection);
 			eh.setDefaultPageSize(selPaper);
+			eh.setDefaultPageOrientation(selOrient);
 			eh.setTileAspectRatio(selAspect);
 			eh.export(selFormat,exportFilename,selRegion,showSelections);
 
@@ -129,6 +147,7 @@ public class ExportDialogController {
 			}
 
 			exportDialog.getPaperBox().setEnabled(selFormat.isDocumentFormat());
+			exportDialog.getOrientBox().setEnabled(selFormat.isDocumentFormat());
 		}
 	}
 }

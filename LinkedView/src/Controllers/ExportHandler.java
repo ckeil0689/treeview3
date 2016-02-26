@@ -17,6 +17,7 @@ import java.util.Properties;
 import javax.imageio.ImageIO;
 
 import org.freehep.graphics2d.VectorGraphics;
+import org.freehep.graphicsio.PageConstants;
 import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.freehep.graphicsio.svg.SVGGraphics2D;
@@ -42,6 +43,7 @@ public class ExportHandler {
 	final protected TreeSelectionI rowSelection;
 
 	protected String defPageSize = "A5"; //See freehep manual for options
+	protected String defPageOrientation = PageConstants.LANDSCAPE;
 
 	protected double aspectRatio = 1.0; //x / y
 	protected double treeRatio = 0.2; //fraction of the long content dimension
@@ -113,6 +115,22 @@ public class ExportHandler {
 
 	public void setDefaultPageSize(PaperType pT) {
 		this.defPageSize = pT.toString();
+	}
+
+	/**
+	 * @author rleach
+	 * @return the defPageOrientation
+	 */
+	public String getDefaultPageOrientation() {
+		return(defPageOrientation);
+	}
+
+	/**
+	 * @author rleach
+	 * @param defPageOrientation the defPageOrientation to set
+	 */
+	public void setDefaultPageOrientation(String defPageOrientation) {
+		this.defPageOrientation = defPageOrientation;
 	}
 
 	/**

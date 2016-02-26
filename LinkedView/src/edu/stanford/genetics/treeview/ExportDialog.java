@@ -14,8 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import Controllers.Format;
+import org.freehep.graphicsio.PageConstants;
 
+import Controllers.Format;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Controllers.Region;
@@ -27,6 +28,7 @@ public class ExportDialog extends CustomDialog {
 	private JPanel previewComp;
 	private JComboBox<Object> formatBox;
 	private JComboBox<Object> paperBox;
+	private JComboBox<Object> orientBox;
 	private ButtonGroup regionRadioBtns;
 	private ButtonGroup aspectRadioBtns;
 	private JCheckBox selectionsBox;
@@ -67,6 +69,7 @@ public class ExportDialog extends CustomDialog {
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
 		JLabel region = GUIFactory.createLabel("Export:",GUIFactory.FONTS);
 		JLabel aspect = GUIFactory.createLabel("Aspect:",GUIFactory.FONTS);
+		JLabel orient = GUIFactory.createLabel("Orientation:",GUIFactory.FONTS);
 
 		formatBox = new JComboBox<Object>(Format.values());
 		formatBox.setSelectedItem(Format.getDefault());
@@ -77,14 +80,20 @@ public class ExportDialog extends CustomDialog {
 		aspectRadioBtns = new ButtonGroup();
 		selectionsBox = new JCheckBox("Show Selections");
 		selectionsBox.setEnabled(selectionsExist);
+		orientBox = new JComboBox<Object>(PageConstants.getOrientationList());
+		orientBox.setSelectedItem(PageConstants.LANDSCAPE);
+		orientBox.setEnabled(Format.getDefault().isDocumentFormat());
 
 		previewPanel.add(previewComp, "grow, push");
-		
+
 		optionsPanel.add(format, "label, aligny 0");
 		optionsPanel.add(formatBox, "aligny 0, growx, wrap");
-		
+
 		optionsPanel.add(paper, "label");
 		optionsPanel.add(paperBox, "growx, wrap");
+
+		optionsPanel.add(orient, "label");
+		optionsPanel.add(orientBox, "growx, wrap");
 
 		optionsPanel.add(region,"label, aligny 0");
 		Region defReg = Region.getDefault();
@@ -208,13 +217,21 @@ public class ExportDialog extends CustomDialog {
 
 		return(options);
 	}
-	
+
 	/**
 	 * @author rleach
 	 * @return the paperBox
 	 */
 	public JComboBox<Object> getPaperBox() {
 		return(paperBox);
+	}
+
+	/**
+	 * @author rleach
+	 * @return the orientBox
+	 */
+	public JComboBox<Object> getOrientBox() {
+		return(orientBox);
 	}
 
 	/**
