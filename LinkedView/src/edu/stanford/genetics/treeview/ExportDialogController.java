@@ -3,8 +3,6 @@ package edu.stanford.genetics.treeview;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JComboBox;
-
 import Controllers.ExportHandler;
 import Controllers.Format;
 import Controllers.Region;
