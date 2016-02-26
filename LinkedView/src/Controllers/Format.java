@@ -20,4 +20,8 @@ public enum Format {
 	public String toString() {
 		return toString;
 	}
+
+	public static Format getDefault() {
+		return(Format.PNG);
+	}
 }

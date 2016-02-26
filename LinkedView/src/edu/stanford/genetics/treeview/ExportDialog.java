@@ -27,7 +27,7 @@ public class ExportDialog extends CustomDialog {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private JPanel previewComp;
 	private JComboBox<Object> formatBox;
 	private JComboBox<Object> paperBox;
@@ -35,15 +35,19 @@ public class ExportDialog extends CustomDialog {
 	private ButtonGroup aspectRadioBtns;
 	private JCheckBox selectionsBox;
 	private JButton exportBtn;
-	
-	public ExportDialog() {
+
+	public ExportDialog(final boolean selectionsExist) {
 		
 		super("Export");
-		setupLayout();
+		setupLayout(selectionsExist);
 	}
-	
+
 	@Override
 	protected void setupLayout() {
+		setupLayout(false);
+	}
+
+	protected void setupLayout(final boolean selectionsExist) {
 		
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		
@@ -71,10 +75,13 @@ public class ExportDialog extends CustomDialog {
 			GUIFactory.FONTS);
 
 		formatBox = new JComboBox<Object>(Format.values());
+		formatBox.setSelectedItem(Format.getDefault());
 		paperBox = new JComboBox<Object>(PaperType.values());
+		paperBox.setSelectedItem(PaperType.getDefault());
 		regionRadioBtns = new ButtonGroup();
 		aspectRadioBtns = new ButtonGroup();
 		selectionsBox = new JCheckBox("Show Selections");
+		selectionsBox.setEnabled(selectionsExist);
 
 		previewPanel.add(previewComp, "grow, push");
 		
@@ -85,11 +92,18 @@ public class ExportDialog extends CustomDialog {
 		optionsPanel.add(paperBox, "growx, wrap");
 
 		optionsPanel.add(region,"label, aligny 0");
+		Region defReg = Region.getDefault();
+		if(defReg == Region.SELECTION && !selectionsExist) {
+			defReg = Region.VISIBLE;
+		}
 		for (Region reg : Region.values()) {
 			JRadioButton option = new JRadioButton(reg.toString());
 			//Default region pre-selected
-			if(reg == Region.VISIBLE) {
+			if(reg == defReg) {
 				option.setSelected(true);
+			}
+			if(reg == Region.SELECTION) {
+				option.setEnabled(selectionsExist);
 			}
 			regionRadioBtns.add(option);
 			rangePanel.add(option,"alignx 0, aligny 0, wrap");
@@ -101,7 +115,7 @@ public class ExportDialog extends CustomDialog {
 		for(ExportAspect asp : ExportAspect.values()) {
 			JRadioButton option = new JRadioButton(asp.toString());
 			//Default region pre-selected
-			if(asp == ExportAspect.ONETOONE) {
+			if(asp == ExportAspect.getDefault()) {
 				option.setSelected(true);
 			}
 			aspectRadioBtns.add(option);
