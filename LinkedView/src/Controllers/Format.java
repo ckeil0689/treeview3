@@ -20,4 +20,28 @@ public enum Format {
 	public String toString() {
 		return toString;
 	}
+
+	public static Format getDefault() {
+		return(Format.PNG);
+	}
+
+	public static Format[] getDocumentFormats() {
+		Format[] docFormats = {PDF,SVG,PS};
+		return(docFormats);
+	}
+
+	public static Format[] getImageFormats() {
+		Format[] imgFormats = {PNG,JPG,PPM};
+		return(imgFormats);
+	}
+
+	public boolean isDocumentFormat() {
+		Format[] docFormats = Format.getDocumentFormats();
+		for(int i = 0;i < docFormats.length;i++) {
+			if(this == docFormats[i]) {
+				return(true);
+			}
+		}
+		return(false);
+	}
 }

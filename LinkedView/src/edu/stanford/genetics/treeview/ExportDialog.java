@@ -6,7 +6,6 @@ import java.util.Enumeration;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -23,11 +22,8 @@ import Controllers.Region;
 
 public class ExportDialog extends CustomDialog {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private JPanel previewComp;
 	private JComboBox<Object> formatBox;
 	private JComboBox<Object> paperBox;
@@ -35,15 +31,19 @@ public class ExportDialog extends CustomDialog {
 	private ButtonGroup aspectRadioBtns;
 	private JCheckBox selectionsBox;
 	private JButton exportBtn;
-	
-	public ExportDialog() {
+
+	public ExportDialog(final boolean selectionsExist) {
 		
 		super("Export");
-		setupLayout();
+		setupLayout(selectionsExist);
 	}
-	
+
 	@Override
 	protected void setupLayout() {
+		setupLayout(false);
+	}
+
+	protected void setupLayout(final boolean selectionsExist) {
 		
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		
@@ -67,14 +67,16 @@ public class ExportDialog extends CustomDialog {
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
 		JLabel region = GUIFactory.createLabel("Export:",GUIFactory.FONTS);
 		JLabel aspect = GUIFactory.createLabel("Aspect:",GUIFactory.FONTS);
-		JLabel selections = GUIFactory.createLabel("Show Selections",
-			GUIFactory.FONTS);
 
 		formatBox = new JComboBox<Object>(Format.values());
+		formatBox.setSelectedItem(Format.getDefault());
 		paperBox = new JComboBox<Object>(PaperType.values());
+		paperBox.setSelectedItem(PaperType.getDefault());
+		paperBox.setEnabled(Format.getDefault().isDocumentFormat());
 		regionRadioBtns = new ButtonGroup();
 		aspectRadioBtns = new ButtonGroup();
 		selectionsBox = new JCheckBox("Show Selections");
+		selectionsBox.setEnabled(selectionsExist);
 
 		previewPanel.add(previewComp, "grow, push");
 		
@@ -85,11 +87,18 @@ public class ExportDialog extends CustomDialog {
 		optionsPanel.add(paperBox, "growx, wrap");
 
 		optionsPanel.add(region,"label, aligny 0");
+		Region defReg = Region.getDefault();
+		if(defReg == Region.SELECTION && !selectionsExist) {
+			defReg = Region.VISIBLE;
+		}
 		for (Region reg : Region.values()) {
 			JRadioButton option = new JRadioButton(reg.toString());
 			//Default region pre-selected
-			if(reg == Region.VISIBLE) {
+			if(reg == defReg) {
 				option.setSelected(true);
+			}
+			if(reg == Region.SELECTION) {
+				option.setEnabled(selectionsExist);
 			}
 			regionRadioBtns.add(option);
 			rangePanel.add(option,"alignx 0, aligny 0, wrap");
@@ -101,7 +110,7 @@ public class ExportDialog extends CustomDialog {
 		for(ExportAspect asp : ExportAspect.values()) {
 			JRadioButton option = new JRadioButton(asp.toString());
 			//Default region pre-selected
-			if(asp == ExportAspect.ONETOONE) {
+			if(asp == ExportAspect.getDefault()) {
 				option.setSelected(true);
 			}
 			aspectRadioBtns.add(option);
@@ -134,10 +143,13 @@ public class ExportDialog extends CustomDialog {
 	 * @param l The ActionListener
 	 */
 	public void addExportListener(final ActionListener l) {
-		
 		exportBtn.addActionListener(l);
 	}
-	
+
+	public void addFormatListener(final ActionListener l) {
+		formatBox.addActionListener(l);
+	}
+
 	/**
 	 * @return an int array which contains 5 values: 0. the selected index of
 	 * the [Format] drop-down. 1. the selected index of the [PaperType] dropdown
@@ -197,6 +209,14 @@ public class ExportDialog extends CustomDialog {
 		return(options);
 	}
 	
+	/**
+	 * @author rleach
+	 * @return the paperBox
+	 */
+	public JComboBox<Object> getPaperBox() {
+		return(paperBox);
+	}
+
 	/**
 	 * Arranges the trees and the matrix on the preview panel, depending on
 	 * which trees are active.

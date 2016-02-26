@@ -20,4 +20,8 @@ public enum Region {
 	public String toString() {
 		return toString;
 	}
+
+	public static Region getDefault() {
+		return(Region.VISIBLE);
+	}
 }

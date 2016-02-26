@@ -3,6 +3,8 @@
  */
 package edu.stanford.genetics.treeview;
 
+import Controllers.Region;
+
 /**
  * The region of the matrix to export to a file
  * @author rleach
@@ -19,5 +21,9 @@ public enum ExportAspect {
 	@Override
 	public String toString() {
 		return toString;
+	}
+
+	public static ExportAspect getDefault() {
+		return(ExportAspect.ONETOONE);
 	}
 }
