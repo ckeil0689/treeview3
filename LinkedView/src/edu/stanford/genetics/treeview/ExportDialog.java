@@ -6,7 +6,6 @@ import java.util.Enumeration;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -23,9 +22,6 @@ import Controllers.Region;
 
 public class ExportDialog extends CustomDialog {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private JPanel previewComp;
@@ -71,13 +67,12 @@ public class ExportDialog extends CustomDialog {
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
 		JLabel region = GUIFactory.createLabel("Export:",GUIFactory.FONTS);
 		JLabel aspect = GUIFactory.createLabel("Aspect:",GUIFactory.FONTS);
-		JLabel selections = GUIFactory.createLabel("Show Selections",
-			GUIFactory.FONTS);
 
 		formatBox = new JComboBox<Object>(Format.values());
 		formatBox.setSelectedItem(Format.getDefault());
 		paperBox = new JComboBox<Object>(PaperType.values());
 		paperBox.setSelectedItem(PaperType.getDefault());
+		paperBox.setEnabled(Format.getDefault().isDocumentFormat());
 		regionRadioBtns = new ButtonGroup();
 		aspectRadioBtns = new ButtonGroup();
 		selectionsBox = new JCheckBox("Show Selections");
@@ -148,10 +143,13 @@ public class ExportDialog extends CustomDialog {
 	 * @param l The ActionListener
 	 */
 	public void addExportListener(final ActionListener l) {
-		
 		exportBtn.addActionListener(l);
 	}
-	
+
+	public void addFormatListener(final ActionListener l) {
+		formatBox.addActionListener(l);
+	}
+
 	/**
 	 * @return an int array which contains 5 values: 0. the selected index of
 	 * the [Format] drop-down. 1. the selected index of the [PaperType] dropdown
@@ -211,6 +209,14 @@ public class ExportDialog extends CustomDialog {
 		return(options);
 	}
 	
+	/**
+	 * @author rleach
+	 * @return the paperBox
+	 */
+	public JComboBox<Object> getPaperBox() {
+		return(paperBox);
+	}
+
 	/**
 	 * Arranges the trees and the matrix on the preview panel, depending on
 	 * which trees are active.

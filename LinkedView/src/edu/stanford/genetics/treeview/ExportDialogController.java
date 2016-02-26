@@ -3,6 +3,8 @@ package edu.stanford.genetics.treeview;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JComboBox;
+
 import Controllers.ExportHandler;
 import Controllers.Format;
 import Controllers.Region;
@@ -37,13 +39,14 @@ public class ExportDialogController {
 	private void addListeners() {
 		
 		exportDialog.addExportListener(new ExportListener());
+		exportDialog.addFormatListener(new FormatListener());
 	}
 	
 	private class ExportListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			
+
 			LogBuffer.println("Pressed export button!");
 			/* For now, the selected indices of the 2 JComboBoxes */
 			int[] selectedOptions = exportDialog.getSelectedOptions();
@@ -100,5 +103,25 @@ public class ExportDialogController {
 			exportDialog.dispose();
 		}
 	}
-	
+
+	private class FormatListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			LogBuffer.println("Format changed!");
+			/* For now, the selected indices of the 2 JComboBoxes */
+			int[] selectedOptions = exportDialog.getSelectedOptions();
+
+			Format selFormat;
+			if(selectedOptions.length < 1 || selectedOptions[0] < 0 ||
+				selectedOptions[0] >= Format.values().length) {
+				selFormat = Format.getDefault();
+			} else {
+				selFormat = Format.values()[selectedOptions[0]];
+			}
+
+			exportDialog.getPaperBox().setEnabled(selFormat.isDocumentFormat());
+		}
+	}
 }
