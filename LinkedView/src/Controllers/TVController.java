@@ -1008,7 +1008,7 @@ public class TVController implements Observer {
 		new ExportDialogController(exportDialog,tvFrame.getDendroView(),
 			dendroController.getInteractiveXMap(),
 			dendroController.getInteractiveYMap(),tvFrame.getColSelection(),
-			tvFrame.getRowSelection());
+			tvFrame.getRowSelection(),model);
 		
 		exportDialog.setVisible(true);
 	}

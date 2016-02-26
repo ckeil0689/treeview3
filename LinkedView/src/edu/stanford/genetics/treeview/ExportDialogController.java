@@ -17,12 +17,13 @@ public class ExportDialogController {
 	private final MapContainer interactiveYmap;
 	private final TreeSelectionI colSelection;
 	private final TreeSelectionI rowSelection;
+	private DataModel model;
 
 	public ExportDialogController(final ExportDialog expD, 
 			final DendroView dendroView,final MapContainer interactiveXmap,
 			final MapContainer interactiveYmap,
 			final TreeSelectionI colSelection,
-			final TreeSelectionI rowSelection) {
+			final TreeSelectionI rowSelection,final DataModel model) {
 		
 		this.exportDialog = expD;
 		this.dendroView = dendroView;
@@ -30,6 +31,7 @@ public class ExportDialogController {
 		this.interactiveYmap = interactiveYmap;
 		this.colSelection = colSelection;
 		this.rowSelection = rowSelection;
+		this.model = model;
 
 		addListeners();
 	}
@@ -88,6 +90,12 @@ public class ExportDialogController {
 				showSelections = (selectedOptions[4] == 1 ? true : false);
 			}
 
+			String exportFilename = model.getSource();
+			if(exportFilename == null || exportFilename.isEmpty()) {
+				exportFilename = "TreeView3_exported_file";
+			}
+			exportFilename += "." + selFormat.toString();
+
 			// TODO call to event handler here, work with selected indices
 			// and EXP_FORMATS / PAPER_TYPE enum classes
 
@@ -95,8 +103,9 @@ public class ExportDialogController {
 				interactiveYmap,colSelection,rowSelection);
 			eh.setDefaultPageSize(selPaper);
 			eh.setTileAspectRatio(selAspect);
-			eh.export(selFormat,"Output." + selFormat.toString(),selRegion,
-				showSelections);
+			eh.export(selFormat,exportFilename,selRegion,showSelections);
+
+			LogBuffer.println("Exported file: [" + exportFilename + "].");
 
 			exportDialog.dispose();
 		}
