@@ -80,9 +80,12 @@ public class ColumnTreeView extends TRView {
 	protected void drawFittedWhizBackground(final Graphics g,
 		LinearTransformation scaleEq) {
 
-		if(map.getFirstVisibleLabel() < 0) {
+		if(map == null || map.getFirstVisibleLabel() < 0 ||
+			map.getNumVisibleLabels() < 1 || scaleEq == null) {
+
 			return;
 		}
+
 		g.fillRect((int) scaleEq.transform((double) map.getFirstVisibleLabel()),
 			0,(int) scaleEq.transform((double) map.getFirstVisible() +
 				(double) map.getNumVisibleLabels()),

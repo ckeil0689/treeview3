@@ -7,6 +7,7 @@
 
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -36,6 +37,7 @@ import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
@@ -367,7 +369,7 @@ public class DendroView implements Observer, DendroPanel {
 				GUIFactory.NO_GAPS_OR_INSETS);
 		
 		rowTreePanel.add(rowTreeView, "w 100%, pushy, growy, wrap");
-		
+
 		// hidemode is a MigLayout trick! Very important to keep trees aligned.
 		rowTreePanel.add(rowTreeView.getHorizontalScrollBar(), "w 100%, "
 				+ "hidemode 0"); 
@@ -398,13 +400,18 @@ public class DendroView implements Observer, DendroPanel {
 	 * Sets up the JSplitPane used to show row dendrogram and labels.
 	 */
 	private void setupRowDataPane() {
-		
+
 		JPanel rowLabelPanel;
 		JPanel rowTreePanel;
-		
+
 		rowLabelPanel = createRowLabelPanel();
+		//Allow the user to drag the divider to completely hide the labels
+		rowLabelPanel.setMinimumSize(new Dimension(0,0));
+
 		rowTreePanel = createRowTreePanel();
-		
+		//Allow the user to drag the divider to completely hide the trees
+		rowTreePanel.setMinimumSize(new Dimension(0,0));
+
 		rowDataPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rowTreePanel,
 				rowLabelPanel);
 		rowDataPane.setResizeWeight(0.0);
@@ -468,13 +475,18 @@ public class DendroView implements Observer, DendroPanel {
 	 * Sets up the JSplitPane used to show column dendrogram and labels.
 	 */
 	private void setupColDataPane() {
-		
+
 		JPanel colTreePanel;
 		JPanel colLabelPanel;
-		
+
 		colTreePanel = createColTreePanel();
+		//Allow the user to drag the divider to completely hide the trees
+		colTreePanel.setMinimumSize(new Dimension(0,0));
+
 		colLabelPanel = createColLabelPanel();
-		
+		//Allow the user to drag the divider to completely hide the labels
+		colLabelPanel.setMinimumSize(new Dimension(0,0));
+
 		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreePanel,
 				colLabelPanel);
 		colDataPane.setResizeWeight(0.0);

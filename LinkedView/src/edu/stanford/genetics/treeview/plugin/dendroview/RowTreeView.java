@@ -78,10 +78,11 @@ public class RowTreeView extends TRView {
 		LinearTransformation scaleEq) {
 
 		if(map == null || map.getFirstVisibleLabel() < 0 ||
-			map.getNumVisibleLabels() < 1) {
+			map.getNumVisibleLabels() < 1 || scaleEq == null) {
 
 			return;
 		}
+
 		g.fillRect(0,(int) scaleEq.transform((double) map.getFirstVisibleLabel()),
 			getSecondaryPaneSize(offscreenSize),
 			(int) scaleEq.transform((double) map.getFirstVisible() +
