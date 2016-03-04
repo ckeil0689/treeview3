@@ -401,8 +401,9 @@ public class ThumbBox {
 	private void openThumbEditDialog(Thumb t, int thumbIndex) {
 
 		final EditThumbDialog posInputDialog = new EditThumbDialog(t,
-				thumbIndex, this, colorPicker.getColorList(),
-				colorPicker.getMean(), colorPicker.getMedian());
+			thumbIndex,this,colorPicker.getColorList(),colorPicker.getMean(),
+			colorPicker.getMedian(),colorPicker.getDataCenter(),
+			colorPicker.getDataMin(),colorPicker.getDataMax());
 
 		double dataVal = posInputDialog.showDialog(colorPicker
 				.getContainerPanel());

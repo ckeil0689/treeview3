@@ -61,6 +61,10 @@ public class ColorPicker {
 	private double maxVal;
 	private double range;
 
+	private final double dataMin;
+	private final double dataMax;
+	private final double dataCenter;
+
 	public ColorPicker(final ColorExtractor drawer, final double minVal,
 			final double maxVal, final double mean, final double median) {
 
@@ -68,6 +72,9 @@ public class ColorPicker {
 		
 		this.mean = mean;
 		this.median = median;
+		this.dataMin = minVal;
+		this.dataMax = maxVal;
+		this.dataCenter = minVal + (maxVal - minVal) / 2;
 		
 		this.thumbList = new ArrayList<Thumb>();
 		this.colorList = new ArrayList<Color>();
@@ -344,12 +351,10 @@ public class ColorPicker {
 	 * @param maxVal
 	 */
 	protected void setMaxVal(double maxVal) {
-
 		this.maxVal = maxVal;
 		colorExtractor.setMax(maxVal);
 		maxThumb.setDataValue(maxVal);
 		updateRange();
-
 		updateFractions();
 	}
 
@@ -357,7 +362,6 @@ public class ColorPicker {
 	 * Updates the range.
 	 */
 	private void updateRange() {
-
 		this.range = maxVal - minVal;
 	}
 
@@ -366,7 +370,6 @@ public class ColorPicker {
 	 * @return The currently defined minimum data value.
 	 */
 	protected double getMinVal() {
-
 		return minVal;
 	}
 
@@ -375,7 +378,6 @@ public class ColorPicker {
 	 * @return The currently defined maximum data value.
 	 */
 	protected double getMaxVal() {
-
 		return maxVal;
 	}
 	
@@ -384,7 +386,6 @@ public class ColorPicker {
 	 * @return The data's mean.
 	 */
 	protected double getMean() {
-
 		return mean;
 	}
 	
@@ -393,7 +394,6 @@ public class ColorPicker {
 	 * @return The data's median.
 	 */
 	protected double getMedian() {
-
 		return median;
 	}
 
@@ -413,6 +413,27 @@ public class ColorPicker {
 		}
 
 		return range;
+	}
+
+	/**
+	 * @return Returns the currently defined center of the dataset.
+	 */
+	protected double getDataCenter() {
+		return(dataCenter);
+	}
+
+	/**
+	 * @return Returns the currently defined min of the dataset.
+	 */
+	protected double getDataMin() {
+		return(dataMin);
+	}
+
+	/**
+	 * @return Returns the currently defined max of the dataset.
+	 */
+	protected double getDataMax() {
+		return(dataMax);
 	}
 
 	/**
