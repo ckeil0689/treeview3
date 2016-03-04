@@ -574,7 +574,7 @@ public class TVController implements Observer {
 			
 		} else {
 			String message = "Data loading was interrupted.";
-			showWarning(message);
+			LogBuffer.println(message);
 		}
 	}
 
