@@ -811,8 +811,8 @@ public abstract class HeaderFinderBox {
 			if((changed || lenPressed != lenRel) &&
 				searchTermBox.getSelectedIndex() == -1) {
 
-				if((e.getKeyChar()) == 127 || // Delete (forward)
-						(e.getKeyChar()) == 8) { // Backspace
+				if((e.getKeyChar()) == KeyEvent.VK_DELETE ||
+						(e.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
 					editor.setSelectionStart(selStartTyped);
 					editor.setSelectionEnd(selStartTyped);
 				} else {
@@ -903,8 +903,10 @@ public abstract class HeaderFinderBox {
 			// and the text will be incorrectly edited
 			// (a bug of the parent class - because they didn't anticipate text
 			// to be manipulated this way), so let's nip that in the bud
-			if ((e.getKeyChar()) == 8 && selStartPressed != selEndPressed
-					&& (selStartPressed - 1) == selStartTyped) {
+			if ((e.getKeyChar()) == KeyEvent.VK_BACK_SPACE &&
+				selStartPressed != selEndPressed &&
+				(selStartPressed - 1) == selStartTyped) {
+
 				selStartTyped = selStartPressed;
 				editor.setSelectionStart(selStartPressed);
 			}
@@ -917,11 +919,13 @@ public abstract class HeaderFinderBox {
 			// matching string
 			// and the current backspace inadvertently does nothing (a bug of
 			// the parent class as well), so let's nip that in the bud.
-			else if (selStartPressed == selStartTyped
-					&& selEndPressed == lenPressed
-					&& selEndPressed != selStartPressed
-					&& selEndTyped == selStartTyped && selIndexPressed > -1
-					&& selIndexTyped == -1 && (e.getKeyChar()) == 8) {
+			else if (selStartPressed == selStartTyped &&
+				selEndPressed == lenPressed &&
+				selEndPressed != selStartPressed &&
+				selEndTyped == selStartTyped && selIndexPressed > -1 &&
+				selIndexTyped == -1 &&
+				(e.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
+
 				editor.setText(fullTextPressed);
 				selStartTyped = selStartPressed;
 				editor.setSelectionStart(selStartPressed);
@@ -941,8 +945,9 @@ public abstract class HeaderFinderBox {
 			}
 			// If the delete or backspace is typed, set the new text content to
 			// force autocomplete to update
-			else if ((e.getKeyChar()) == 127 || // Delete (forward)
-					(e.getKeyChar()) == 8) { // Backspace
+			else if ((e.getKeyChar()) == KeyEvent.VK_DELETE ||
+				(e.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
+
 				// Only need to manipulate the edit action if there's a
 				// currently selected index
 				if (selIndexPressed > -1) {
@@ -1115,7 +1120,7 @@ public abstract class HeaderFinderBox {
 					// The above puts the cursor at the end of the total text
 					// Now put the cursor back where it was
 					// If the typed key was backspace or delete
-					if ((e.getKeyChar()) == 127) { // Delete (forward)
+					if ((e.getKeyChar()) == KeyEvent.VK_DELETE) {
 						// Put the cursor at the beginning of the previously
 						// selected text (because that text is now gone)
 						editor.setSelectionStart(selStartTyped);
@@ -1128,7 +1133,7 @@ public abstract class HeaderFinderBox {
 						if (searchTermBox.getSelectedIndex() > -1) {
 							editor.setSelectionEnd(editor.getText().length());
 						}
-					} else if ((e.getKeyChar()) == 8) { // Backspace
+					} else if ((e.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
 						// Put the cursor at 1 before the beginning of the
 						// previously selected text (because that text is now
 						// gone and the way this is set up to behave is that the
@@ -1159,7 +1164,7 @@ public abstract class HeaderFinderBox {
 						}
 					}
 				} else {
-					if ((e.getKeyChar()) == 8 && // Backspace
+					if ((e.getKeyChar()) == KeyEvent.VK_BACK_SPACE &&
 							searchTermBox.getSelectedIndex() > -1) {
 						if (selEndTyped == lenTyped) {
 							if (debug) {
@@ -1242,10 +1247,10 @@ public abstract class HeaderFinderBox {
 				// causes the end of the selection to decrement instead of the
 				// beginning of the selection to decrement and the character
 				// preceding the selStart isn't removed. So...
-				if (selIndexTyped == -1 && selIndexPressed > -1
-						&& (e.getKeyChar()) == 8
-						&& selStartTyped == selStartPressed
-						&& (selEndTyped + 1) == selEndPressed) {
+				if (selIndexTyped == -1 && selIndexPressed > -1 &&
+						(e.getKeyChar()) == KeyEvent.VK_DELETE &&
+							selStartTyped == selStartPressed &&
+							(selEndTyped + 1) == selEndPressed) {
 					if (debug) {
 						LogBuffer.println("Trying to force a selection to be " +
 							"made 3");
