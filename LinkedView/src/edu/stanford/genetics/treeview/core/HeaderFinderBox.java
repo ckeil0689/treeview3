@@ -758,41 +758,10 @@ public abstract class HeaderFinderBox {
 			if(searchTermBox.getSelectedIndex() == 0 &&
 				editor.getSelectionStart() > 0) {
 
-				//Get the editor text which the combobox has autofilled and
-				//lower-case it so we can do a case-insensitive search
-				String lcprefix = editor.getText().toLowerCase();
-
-				//If the text is as long as the substring position we intend to
-				//extract (i.e. the typed portion = which it should be)
-				if(lcprefix != null &&
-					lcprefix.length() >= editor.getSelectionStart()) {
-
-					//Capture the actual typed text
-					lcprefix = lcprefix.substring(0,editor.getSelectionStart());
-
-					//Search the dropdown list for a matching item
-					for(int i = 1;i < searchTermBox.getItemCount();i++) {
-						String item =
-							(String) searchTermBox.getModel().getElementAt(i);
-
-						if(item != null &&
-							item.toLowerCase().startsWith(lcprefix)) {
-
-							//Update all the necessary values used to correct
-							//the editor later.  This should update the editor's
-							//string content.
-							searchTermBox.setSelectedIndex(i);
-
-							//Now update the length and the selection end
-							selIndexRel = i;
-							editor.setSelectionStart(selStartRel);
-							lenRel = item.length();
-							selEndRel = lenRel;
-							editor.setSelectionEnd(selEndRel);
-							break;
-						}
-					}
-				}
+				int[] newRels = setNextDropDownMatch();
+				selEndRel     = newRels[0];
+				lenRel        = newRels[1];
+				selIndexRel   = newRels[2];
 			}
 
 			if (debug) {
@@ -1280,6 +1249,56 @@ public abstract class HeaderFinderBox {
 				}
 				changed = true;
 			}
+		}
+
+		private int[] setNextDropDownMatch() {
+			final int selStartRel = editor.getSelectionStart(); // Selection
+			//text selection start before having typed
+			int selEndRel = editor.getSelectionEnd(); // Selection end
+			//text selection end before having typed
+			int lenRel = editor.getText().length(); // Length before
+			//text selection length before having typed
+			int selIndexRel = searchTermBox.getSelectedIndex(); // Selected
+			//selected index before having typed
+
+			//Get the editor text which the combobox has autofilled and
+			//lower-case it so we can do a case-insensitive search
+			String lcprefix = editor.getText().toLowerCase();
+
+			//If the text is as long as the substring position we intend to
+			//extract (i.e. the typed portion = which it should be)
+			if(lcprefix != null &&
+				lcprefix.length() >= editor.getSelectionStart()) {
+
+				//Capture the actual typed text
+				lcprefix = lcprefix.substring(0,editor.getSelectionStart());
+
+				//Search the dropdown list for a matching item
+				for(int i = 1;i < searchTermBox.getItemCount();i++) {
+					String item =
+						(String) searchTermBox.getModel().getElementAt(i);
+
+					if(item != null &&
+						item.toLowerCase().startsWith(lcprefix)) {
+
+						//Update all the necessary values used to correct
+						//the editor later.  This should update the editor's
+						//string content.
+						searchTermBox.setSelectedIndex(i);
+
+						//Now update the length and the selection end
+						selIndexRel = i;
+						editor.setSelectionStart(selStartRel);
+						lenRel = item.length();
+						selEndRel = lenRel;
+						editor.setSelectionEnd(selEndRel);
+						break;
+					}
+				}
+			}
+
+			int[] newRels = {selEndRel,lenRel,selIndexRel};
+			return(newRels);
 		}
 	}
 
