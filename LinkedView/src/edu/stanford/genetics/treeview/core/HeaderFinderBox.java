@@ -524,16 +524,14 @@ public abstract class HeaderFinderBox {
 		// This assumes that min is less than max and that the visible area is a
 		// contiguous block of visible indexes
 				(minIndex < globalSmap.getFirstVisible() ||
-					maxIndex > (globalSmap.getFirstVisible() +
-						globalSmap.getNumVisible() - 1))) {
+					maxIndex > globalSmap.getLastVisible())) {
 
 			globalSmap.setToMinScale();
 		}
 
 		if ((otherSelection.getNSelectedIndexes() == 0 ||
 			otherMinIndex < globalOmap.getFirstVisible() ||
-			otherMaxIndex > (globalOmap.getFirstVisible() +
-				globalOmap.getNumVisible() - 1))) {
+			otherMaxIndex > globalOmap.getLastVisible())) {
 
 			globalOmap.setToMinScale();
 		}
