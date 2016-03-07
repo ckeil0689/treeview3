@@ -275,8 +275,7 @@ public class EditThumbDialog extends CustomDialog {
 		closeBtn.setText("Cancel");
 		closeBtn.addActionListener(new CloseListener());
 
-		final JPanel panel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
-			null);
+		final JPanel panel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		panel.add(colorPrompt, "align right, span 2");
 		panel.add(colorButton, "push, span, align left, wrap");
