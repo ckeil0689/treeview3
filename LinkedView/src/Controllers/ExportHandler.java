@@ -17,11 +17,14 @@ import java.util.Properties;
 import javax.imageio.ImageIO;
 
 import org.freehep.graphics2d.VectorGraphics;
+import org.freehep.graphicsio.PageConstants;
 import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.freehep.graphicsio.svg.SVGGraphics2D;
 
+import edu.stanford.genetics.treeview.ExportAspect;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.PaperType;
 import edu.stanford.genetics.treeview.PpmWriter;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
@@ -40,6 +43,7 @@ public class ExportHandler {
 	final protected TreeSelectionI rowSelection;
 
 	protected String defPageSize = "A5"; //See freehep manual for options
+	protected String defPageOrientation = PageConstants.LANDSCAPE;
 
 	protected double aspectRatio = 1.0; //x / y
 	protected double treeRatio = 0.2; //fraction of the long content dimension
@@ -107,6 +111,26 @@ public class ExportHandler {
 	 */
 	public void setDefaultPageSize(String dps) {
 		this.defPageSize = dps;
+	}
+
+	public void setDefaultPageSize(PaperType pT) {
+		this.defPageSize = pT.toString();
+	}
+
+	/**
+	 * @author rleach
+	 * @return the defPageOrientation
+	 */
+	public String getDefaultPageOrientation() {
+		return(defPageOrientation);
+	}
+
+	/**
+	 * @author rleach
+	 * @param defPageOrientation the defPageOrientation to set
+	 */
+	public void setDefaultPageOrientation(String defPageOrientation) {
+		this.defPageOrientation = defPageOrientation;
 	}
 
 	/**
@@ -192,6 +216,23 @@ public class ExportHandler {
 	 */
 	public void setTileAspectRatio(final double aR) {
 		this.aspectRatio = aR;
+	}
+
+	/**
+	 * Sets the aspectRatio of a tile
+	 * @author rleach
+	 * @param aR - aspect ratio
+	 */
+	public void setTileAspectRatio(final ExportAspect eAsp) {
+		if(eAsp == ExportAspect.ASSEEN) {
+			setTileAspectRatioToScreen(Region.VISIBLE);
+		} else {
+			setTileAspectRatio(1.0);
+			if(eAsp != ExportAspect.ONETOONE) {
+				LogBuffer.println("Warning: Invalid or unselected aspect " +
+					"ratio type submitted.  Defaulting to 1:1.");
+			}
+		}
 	}
 
 	/**
@@ -369,7 +410,7 @@ public class ExportHandler {
 	 *                 selection
 	 */
 	public void export(final Format format,final String fileName,
-		final Region region,final boolean showSelections) { //E.g. Format.PNG,"Output.pdf",Region.VISIBLE
+		final Region region,final boolean showSelections) {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -394,7 +435,7 @@ public class ExportHandler {
 	 * @param region
 	 */
 	public void exportImage(final Format format,final String fileName,
-		final Region region,final boolean showSelections) { //E.g. Format.PNG,"A5","Output.pdf"
+		final Region region,final boolean showSelections) {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -405,9 +446,17 @@ public class ExportHandler {
 		try {
 			calculateDimensions(region);
 
-			final BufferedImage im = new BufferedImage(
-				getXDim(region),getYDim(region),BufferedImage.TYPE_INT_ARGB);
-	
+			BufferedImage im;
+			//JPG is the only format that doesn't support an alpha channel, so
+			//we must create a buffered image object without the ARGB type
+			if(format == Format.JPG) {
+				im = new BufferedImage(
+					getXDim(region),getYDim(region),BufferedImage.TYPE_INT_RGB);
+			} else {
+				im = new BufferedImage(getXDim(region),getYDim(region),
+					BufferedImage.TYPE_INT_ARGB);
+			}
+
 			Graphics2D g2d = (Graphics2D) im.getGraphics();
 			createContent(g2d,region,showSelections);
 

@@ -8,5 +8,20 @@ package Controllers;
  * @author rleach
  */
 public enum Region {
-	ALL,VISIBLE,SELECTION;
+	ALL("All"),VISIBLE("Visible"),SELECTION("Selection");
+
+	private final String toString;
+	
+	private Region(String toString) {
+		this.toString = toString;
+	}
+	
+	@Override
+	public String toString() {
+		return toString;
+	}
+
+	public static Region getDefault() {
+		return(Region.VISIBLE);
+	}
 }

@@ -999,11 +999,16 @@ public class TVController implements Observer {
 		BufferedImage matrix = tvFrame.getDendroView()
 				.getInteractiveMatrixView().getVisibleImage();
 		ExportPreviewMatrix expMatrix = new ExportPreviewMatrix(matrix);
-		
-		ExportDialog exportDialog = new ExportDialog();
+
+		boolean selectionsExist = (tvFrame.getColSelection() != null &&
+			tvFrame.getColSelection().getNSelectedIndexes() > 0);
+		ExportDialog exportDialog = new ExportDialog(selectionsExist);
 		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
 		
-		new ExportDialogController(exportDialog, tvFrame.getDendroView());
+		new ExportDialogController(exportDialog,tvFrame.getDendroView(),
+			dendroController.getInteractiveXMap(),
+			dendroController.getInteractiveYMap(),tvFrame.getColSelection(),
+			tvFrame.getRowSelection(),model);
 		
 		exportDialog.setVisible(true);
 	}

@@ -1,37 +1,51 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
+import org.freehep.graphicsio.PageConstants;
+
+import Controllers.Format;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
+import Controllers.Region;
 
 public class ExportDialog extends CustomDialog {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private JPanel previewComp;
 	private JComboBox<Object> formatBox;
 	private JComboBox<Object> paperBox;
+	private JComboBox<Object> orientBox;
+	private ButtonGroup regionRadioBtns;
+	private ButtonGroup aspectRadioBtns;
+	private JCheckBox selectionsBox;
 	private JButton exportBtn;
-	
-	public ExportDialog() {
+
+	public ExportDialog(final boolean selectionsExist) {
 		
 		super("Export");
-		setupLayout();
+		setupLayout(selectionsExist);
 	}
-	
+
 	@Override
 	protected void setupLayout() {
+		setupLayout(false);
+	}
+
+	protected void setupLayout(final boolean selectionsExist) {
 		
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		
@@ -39,28 +53,80 @@ public class ExportDialog extends CustomDialog {
 				GUIFactory.DEFAULT);
 		JPanel optionsPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.DEFAULT);
-		
+		JPanel rangePanel = GUIFactory.createJPanel(false, 
+			GUIFactory.DEFAULT);
+		JPanel aspectPanel = GUIFactory.createJPanel(false, 
+			GUIFactory.DEFAULT);
+
 		/* Shows the preview */
 		JPanel previewPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_INSETS);
 		previewPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
 		this.previewComp = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_INSETS);
-		
-		JLabel format = GUIFactory.createLabel("Format:", GUIFactory.FONTS);
-		JLabel paper = GUIFactory.createLabel("Paper Size:", GUIFactory.FONTS);
-		
-		formatBox = new JComboBox<Object>(EXP_FORMATS.values());
+
+		JLabel format = GUIFactory.createLabel("Format:",GUIFactory.FONTS);
+		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
+		JLabel region = GUIFactory.createLabel("Export:",GUIFactory.FONTS);
+		JLabel aspect = GUIFactory.createLabel("Aspect:",GUIFactory.FONTS);
+		JLabel orient = GUIFactory.createLabel("Orientation:",GUIFactory.FONTS);
+
+		formatBox = new JComboBox<Object>(Format.values());
+		formatBox.setSelectedItem(Format.getDefault());
 		paperBox = new JComboBox<Object>(PaperType.values());
-		
+		paperBox.setSelectedItem(PaperType.getDefault());
+		paperBox.setEnabled(Format.getDefault().isDocumentFormat());
+		regionRadioBtns = new ButtonGroup();
+		aspectRadioBtns = new ButtonGroup();
+		selectionsBox = new JCheckBox("Show Selections");
+		selectionsBox.setEnabled(selectionsExist);
+		orientBox = new JComboBox<Object>(PageConstants.getOrientationList());
+		orientBox.setSelectedItem(PageConstants.LANDSCAPE);
+		orientBox.setEnabled(Format.getDefault().isDocumentFormat());
+
 		previewPanel.add(previewComp, "grow, push");
-		
+
 		optionsPanel.add(format, "label, aligny 0");
 		optionsPanel.add(formatBox, "aligny 0, growx, wrap");
-		
+
 		optionsPanel.add(paper, "label");
 		optionsPanel.add(paperBox, "growx, wrap");
-		
+
+		optionsPanel.add(orient, "label");
+		optionsPanel.add(orientBox, "growx, wrap");
+
+		optionsPanel.add(region,"label, aligny 0");
+		Region defReg = Region.getDefault();
+		if(defReg == Region.SELECTION && !selectionsExist) {
+			defReg = Region.VISIBLE;
+		}
+		for (Region reg : Region.values()) {
+			JRadioButton option = new JRadioButton(reg.toString());
+			//Default region pre-selected
+			if(reg == defReg) {
+				option.setSelected(true);
+			}
+			if(reg == Region.SELECTION) {
+				option.setEnabled(selectionsExist);
+			}
+			regionRadioBtns.add(option);
+			rangePanel.add(option,"alignx 0, aligny 0, wrap");
+		}
+		rangePanel.add(selectionsBox,"alignx 0, aligny 0");
+		optionsPanel.add(rangePanel,"growx, aligny 0, alignx 0, wrap");
+
+		optionsPanel.add(aspect, "label, aligny 0");
+		for(ExportAspect asp : ExportAspect.values()) {
+			JRadioButton option = new JRadioButton(asp.toString());
+			//Default region pre-selected
+			if(asp == ExportAspect.getDefault()) {
+				option.setSelected(true);
+			}
+			aspectRadioBtns.add(option);
+			aspectPanel.add(option, "alignx 0, aligny 0, wrap");
+		}
+		optionsPanel.add(aspectPanel, "growx, aligny 0, alignx 0, wrap");
+
 		contentPanel.add(previewPanel, "grow");//w 500!, h 500!");
 		contentPanel.add(optionsPanel, "aligny 0%, growx, push");
 		
@@ -86,34 +152,88 @@ public class ExportDialog extends CustomDialog {
 	 * @param l The ActionListener
 	 */
 	public void addExportListener(final ActionListener l) {
-		
 		exportBtn.addActionListener(l);
 	}
-	
+
+	public void addFormatListener(final ActionListener l) {
+		formatBox.addActionListener(l);
+	}
+
 	/**
-	 * @return an int array which contains 2 values. The first value is the 
-	 * selected index of the export type JComboBox. The second value is the
-	 * selected index of the paper size JComboBox.
+	 * @return an int array which contains 5 values: 0. the selected index of
+	 * the [Format] drop-down. 1. the selected index of the [PaperType] dropdown
+	 * 2. the selected index of the [Region] radio buttons 3. the selected index
+	 * of the [ExportAspect] radio buttons and 4. whether to [0] not show
+	 * selections or [1] show selections.  If any option was not selected, the
+	 * selected index returned is -1.  It is assumed that the loops used
+	 * encounter enumeration options in the same order in which they are defined
+	 * in the enum definitions.
 	 */
 	public int[] getSelectedOptions() {
-		
-		int[] options = new int[2];
-		
+
+		int[] options = new int[5];
+
 		if(formatBox == null) {
 			options[0] = -1;
 		} else {
 			options[0] = formatBox.getSelectedIndex();
 		}
-		
+
 		if(paperBox == null) {
 			options[1] = -1;
 		} else {
 			options[1] = paperBox.getSelectedIndex();
 		}
-	
-		return options;
+
+		options[2] = -1;
+		int cnt = 0;
+		for(Enumeration<AbstractButton> buttons =
+			regionRadioBtns.getElements();buttons.hasMoreElements();) {
+			AbstractButton button = buttons.nextElement();
+			if(button.isSelected()) {
+				options[2] = cnt;
+			}
+			cnt++;
+		}
+
+		options[3] = -1;
+		cnt = 0;
+		for(Enumeration<AbstractButton> buttons =
+			aspectRadioBtns.getElements();buttons.hasMoreElements();) {
+			AbstractButton button = buttons.nextElement();
+			if(button.isSelected()) {
+				options[3] = cnt;
+			}
+			cnt++;
+		}
+
+		if(selectionsBox == null) {
+			options[4] = -1;
+		} else if(selectionsBox.isSelected()) {
+			options[4] = 1;
+		} else {
+			options[4] = 0;
+		}
+
+		return(options);
 	}
-	
+
+	/**
+	 * @author rleach
+	 * @return the paperBox
+	 */
+	public JComboBox<Object> getPaperBox() {
+		return(paperBox);
+	}
+
+	/**
+	 * @author rleach
+	 * @return the orientBox
+	 */
+	public JComboBox<Object> getOrientBox() {
+		return(orientBox);
+	}
+
 	/**
 	 * Arranges the trees and the matrix on the preview panel, depending on
 	 * which trees are active.
