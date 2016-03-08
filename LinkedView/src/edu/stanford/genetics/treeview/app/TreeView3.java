@@ -26,8 +26,7 @@ public class TreeView3 {
 		final String os = System.getProperty("os.name").toLowerCase();
 		final boolean isMac = os.startsWith("mac os x");
 
-		if (!isMac)
-			return;
+		if (!isMac) return;
 
 		LogBuffer.println("Running on a Mac.");
 
