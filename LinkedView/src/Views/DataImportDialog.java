@@ -74,8 +74,7 @@ public class DataImportDialog extends CustomDialog {
 		JPanel buttonPanel;
 
 		final String delimText = "Column delimiter:";
-		final JLabel preDelimiterLine = GUIFactory.createLabel(delimText,
-				GUIFactory.FONTS);
+		final JLabel preDelimiterLine = GUIFactory.createBoldLabel(delimText);
 
 		/* Delimiter panel */
 		delimPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
@@ -89,21 +88,19 @@ public class DataImportDialog extends CustomDialog {
 		delimPanel.add(checkboxPanel);
 
 		final String findDataStartText = "First data cell:";
-		JLabel findDataStartLabel = GUIFactory.createLabel(findDataStartText,
-				GUIFactory.FONTS);
+		JLabel findDataStartLabel = 
+				GUIFactory.createBoldLabel(findDataStartText);
 
 		// must be ints for spinner listener
 		SpinnerNumberModel indexModel = new SpinnerNumberModel(0, 0, 10, 1);
 		SpinnerNumberModel indexModel2 = new SpinnerNumberModel(0, 0, 10, 1);
 
 		final String rowSpinnerText = "Row:";
-		JLabel rowSpinnerLabel = GUIFactory.createLabel(rowSpinnerText,
-				GUIFactory.FONTS);
+		JLabel rowSpinnerLabel = GUIFactory.createLabel(rowSpinnerText);
 		rowDataStart = new JSpinner(indexModel);
 
 		final String columnSpinnerText = "Column:";
-		JLabel columnSpinnerLabel = GUIFactory.createLabel(columnSpinnerText,
-				GUIFactory.FONTS);
+		JLabel columnSpinnerLabel = GUIFactory.createLabel(columnSpinnerText);
 		columnDataStart = new JSpinner(indexModel2);
 
 		findDataBtn = GUIFactory.createBtn("Auto-detect labels");
@@ -116,8 +113,7 @@ public class DataImportDialog extends CustomDialog {
 		indexPanel.add(findDataBtn, "pushx");
 
 		final String previewText = "Preview (25x25):";
-		final JLabel preTableLine = GUIFactory.createLabel(previewText,
-				GUIFactory.FONTS_B);
+		final JLabel preTableLine = GUIFactory.createBoldLabel(previewText);
 
 		final JScrollPane scrollPane = new JScrollPane(dataTable);
 
@@ -158,19 +154,19 @@ public class DataImportDialog extends CustomDialog {
 	private void setupCheckBoxes() {
 
 		tabDelimCheckBox = new JCheckBox("Tab");
-		tabDelimCheckBox.setFont(GUIFactory.FONTS);
+		//tabDelimCheckBox.setFont(GUIFactory.FONTS);
 		delimiters.add(tabDelimCheckBox);
 
 		commaDelimCheckBox = new JCheckBox("Comma");
-		commaDelimCheckBox.setFont(GUIFactory.FONTS);
+//		commaDelimCheckBox.setFont(GUIFactory.FONTS);
 		delimiters.add(commaDelimCheckBox);
 
 		semicolonDelimCheckBox = new JCheckBox("Semicolon");
-		semicolonDelimCheckBox.setFont(GUIFactory.FONTS);
+//		semicolonDelimCheckBox.setFont(GUIFactory.FONTS);
 		delimiters.add(semicolonDelimCheckBox);
 
 		spaceDelimCheckBox = new JCheckBox("Space");
-		spaceDelimCheckBox.setFont(GUIFactory.FONTS);
+//		spaceDelimCheckBox.setFont(GUIFactory.FONTS);
 		delimiters.add(spaceDelimCheckBox);
 	}
 
