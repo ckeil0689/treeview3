@@ -11,6 +11,8 @@ import java.util.List;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
+import edu.stanford.genetics.treeview.LogBuffer;
+
 /**
  * A special JPanel that represents a gradient colored box. It has a
  * MouseListener attached (via the controller class) which handles user input
@@ -44,17 +46,41 @@ public class GradientBox {
 		float[] fractions = colorPicker.getFractions();
 		Color[] colors = colorPicker.getColors();
 
-		// Generating Gradient to fill the rectangle with
-		final LinearGradientPaint gradient = new LinearGradientPaint(startX,
-				startY, endX, startY, fractions, colors, CycleMethod.NO_CYCLE);
+		try {
+			// Generating Gradient to fill the rectangle with
+			final LinearGradientPaint gradient = 
+					new LinearGradientPaint(startX, startY, endX, startY, 
+							fractions, colors, CycleMethod.NO_CYCLE);
 
-		/* Outline of gradient box */
-		g2.setColor(Color.black);
-		g2.drawRect((int) startX, (int) startY, width, height);
+			/* Outline of gradient box */
+			g2.setColor(Color.black);
+			g2.drawRect((int) startX, (int) startY, width, height);
+	
+			/* fill gradient box with gradient */
+			g2.setPaint(gradient);
+			g2.fillRect((int) startX, (int) startY, width, height);
+			
+		} catch(IllegalArgumentException e) {
+			LogBuffer.logException(e);
+			fractions = new float[] {0.0f, 0.5f, 1.0f};
+			colors = new Color[]{Color.BLACK, Color.BLACK, Color.BLACK};
+			
+			final LinearGradientPaint gradient = 
+					new LinearGradientPaint(startX, startY, endX, startY, 
+							fractions, colors, CycleMethod.NO_CYCLE);
 
-		/* fill gradient box with gradient */
-		g2.setPaint(gradient);
-		g2.fillRect((int) startX, (int) startY, width, height);
+			/* Outline of gradient box */
+			g2.setColor(Color.black);
+			g2.drawRect((int) startX, (int) startY, width, height);
+	
+			/* fill gradient box with gradient */
+			g2.setPaint(gradient);
+			g2.fillRect((int) startX, (int) startY, width, height);
+			
+			String problem = "Problem! Try to adjust the thumbs.";
+			g2.setPaint(Color.white);
+			g2.drawString(problem, startX + (endX / 2), startY + (height / 2));
+		}
 	}
 
 	/**
