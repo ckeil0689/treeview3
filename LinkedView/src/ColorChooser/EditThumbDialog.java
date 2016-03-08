@@ -1,6 +1,8 @@
 package ColorChooser;
 
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -10,6 +12,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
@@ -27,7 +30,10 @@ public class EditThumbDialog extends CustomDialog {
 	private final int thumbIndex;
 	private final double mean;
 	private final double median;
-	
+	private final double center;
+	private final double min;
+	private final double max;
+
 	/* GUI components */
 	private JLabel enterPrompt;
 	private JTextField inputField;
@@ -59,8 +65,9 @@ public class EditThumbDialog extends CustomDialog {
 	 *            List of colors which may be updated by this dialog.
 	 *            
 	 */
-	public EditThumbDialog(Thumb thumb, int thumbIndex, ThumbBox thumbBox,
-			List<Color> colorList, final double mean, final double median) {
+	public EditThumbDialog(Thumb thumb,int thumbIndex,ThumbBox thumbBox,
+		List<Color> colorList,final double mean,final double median,
+		final double center,final double min,final double max) {
 
 		super("Edit Color");
 
@@ -72,7 +79,10 @@ public class EditThumbDialog extends CustomDialog {
 
 		this.mean = mean;
 		this.median = median;
-		
+		this.center = center;
+		this.min = min;
+		this.max = max;
+
 		setupLayout();
 	}
 
@@ -161,7 +171,7 @@ public class EditThumbDialog extends CustomDialog {
 		public void actionPerformed(ActionEvent e) {
 
 			final Color newCol = JColorChooser.showDialog(mainPanel.getParent(),
-					"Pick Color for Missing", t.getColor());
+					"Pick Color", t.getColor());
 
 			if (newCol != null) {
 				newColor = newCol;
@@ -171,11 +181,52 @@ public class EditThumbDialog extends CustomDialog {
 		}
 	}
 
+	private class SetToMeanListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			inputField.setText(Double.toString(mean));
+		}
+	}
+	private class SetToMedianListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			inputField.setText(Double.toString(median));
+		}
+	}
+	private class SetToCenterListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			inputField.setText(Double.toString(center));
+		}
+	}
+	private class SetToMinListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			inputField.setText(Double.toString(min));
+		}
+	}
+	private class SetToMaxListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			inputField.setText(Double.toString(max));
+		}
+	}
+
+	private class CloseListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			dispose();
+		}
+	}
+
 	@Override
 	protected void setupLayout() {
-		
-		enterPrompt = GUIFactory.createLabel("Set data value: ", 
-				GUIFactory.FONTS);
+
+		final JLabel colorPrompt = GUIFactory.createLabel("Set color:", 
+			GUIFactory.FONTS);
+		enterPrompt = GUIFactory.createLabel("Set data value:", 
+			GUIFactory.FONTS);
 
 		/* default */
 		startX = thumbBox.getThumbDataVal(thumbIndex);
@@ -192,27 +243,77 @@ public class EditThumbDialog extends CustomDialog {
 		inputField.addActionListener(new SetValueListener());
 
 		colorIcon = new ColorIcon(t.getColor());
-		colorButton = GUIFactory.createColorIconBtn("Change Color", colorIcon);
+		colorButton = GUIFactory.createColorIconBtn("",colorIcon);
 		colorButton.addActionListener(new SetColorListener());
-		
-		final JLabel meanLabel = GUIFactory.createLabel("Mean: " + mean, 
-				GUIFactory.FONTS);
-		final JLabel medianLabel = GUIFactory.createLabel("Median: " + median, 
-				GUIFactory.FONTS);
-		
+
+		final JButton meanBtn = getTextButton(String.valueOf(mean));
+		meanBtn.addActionListener(new SetToMeanListener());
+		final JButton medianBtn = getTextButton(String.valueOf(median));
+		medianBtn.addActionListener(new SetToMedianListener());
+		final JButton centerBtn = getTextButton(String.valueOf(center));
+		centerBtn.addActionListener(new SetToCenterListener());
+		final JButton minBtn = getTextButton(String.valueOf(min));
+		minBtn.addActionListener(new SetToMinListener());
+		final JButton maxBtn = getTextButton(String.valueOf(max));
+		maxBtn.addActionListener(new SetToMaxListener());
+
+		final JLabel meanLabel = GUIFactory.createLabel("Mean:",
+			GUIFactory.FONTS_B);
+		final JLabel medianLabel = GUIFactory.createLabel("Median:",
+			GUIFactory.FONTS_B);
+		final JLabel centerLabel = GUIFactory.createLabel("Center:",
+			GUIFactory.FONTS_B);
+		final JLabel minLabel = GUIFactory.createLabel("Min:",
+			GUIFactory.FONTS_B);
+		final JLabel maxLabel = GUIFactory.createLabel("Max:",
+			GUIFactory.FONTS_B);
+
 		final JButton okButton = GUIFactory.createBtn("OK");
 		okButton.addActionListener(new SetValueListener());
 
-		final JPanel panel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT,
-				null);
+		final JButton closeBtn = GUIFactory.createBtn("Close");
+		closeBtn.setText("Cancel");
+		closeBtn.addActionListener(new CloseListener());
 
-		panel.add(colorButton, "push, alignx 0%, wrap");
-		panel.add(enterPrompt, "align left");
-		panel.add(inputField, "growx, wrap");
-		panel.add(meanLabel, "pushx");
-		panel.add(medianLabel, "pushx, wrap");
-		panel.add(okButton, "pushx, span, alignx 50%");
+		final JPanel panel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+
+		panel.add(colorPrompt, "align right, span 2");
+		panel.add(colorButton, "push, span, align left, wrap");
+		panel.add(enterPrompt, "align right, span 2");
+		panel.add(inputField, "growx, span 2, align left, wrap");
+
+		panel.add(GUIFactory.createLabel(" ",GUIFactory.FONTS),"wrap");
+
+		panel.add(meanLabel, "pushx, align right");
+		panel.add(meanBtn, "pushx, align left, gapright 8px");
+		panel.add(minLabel, "pushx, align right, gapleft 8px");
+		panel.add(minBtn, "pushx, align left, wrap");
+		panel.add(medianLabel, "pushx, align right");
+		panel.add(medianBtn, "pushx, align left, gapright 8px");
+		panel.add(centerLabel, "pushx, align right, gapleft 8px");
+		panel.add(centerBtn, "pushx, align left, wrap");
+		panel.add(GUIFactory.createLabel("",GUIFactory.FONTS));
+		panel.add(GUIFactory.createLabel("",GUIFactory.FONTS));
+		panel.add(maxLabel, "pushx, align right, gapleft 8px");
+		panel.add(maxBtn, "pushx, align left, wrap");
+
+		panel.add(GUIFactory.createLabel(" ",GUIFactory.FONTS),"wrap");
+
+		panel.add(closeBtn, "pushx, span 2, align right");
+		panel.add(okButton, "pushx, span 2, align left");
 
 		mainPanel.add(panel, "w 200::, h 150::");
+	}
+
+	protected JButton getTextButton(String text) {
+		final JButton btn = new JButton(text);
+		btn.setFocusPainted(false);
+		btn.setMargin(new Insets(0,0,0,0));
+		btn.setContentAreaFilled(false);
+		btn.setBorderPainted(false);
+		btn.setOpaque(false);
+		btn.setBorder(new EmptyBorder(0,0,0,0));
+		btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		return(btn);
 	}
 }
