@@ -171,7 +171,7 @@ public class EditThumbDialog extends CustomDialog {
 		public void actionPerformed(ActionEvent e) {
 
 			final Color newCol = JColorChooser.showDialog(mainPanel.getParent(),
-					"Pick Color for Missing", t.getColor());
+					"Pick Color", t.getColor());
 
 			if (newCol != null) {
 				newColor = newCol;
@@ -246,15 +246,15 @@ public class EditThumbDialog extends CustomDialog {
 		colorButton = GUIFactory.createColorIconBtn("",colorIcon);
 		colorButton.addActionListener(new SetColorListener());
 
-		final JButton meanBtn = getTextButton(mean + "  ");
+		final JButton meanBtn = getTextButton(String.valueOf(mean));
 		meanBtn.addActionListener(new SetToMeanListener());
-		final JButton medianBtn = getTextButton(median + "  ");
+		final JButton medianBtn = getTextButton(String.valueOf(median));
 		medianBtn.addActionListener(new SetToMedianListener());
-		final JButton centerBtn = getTextButton(center + "  ");
+		final JButton centerBtn = getTextButton(String.valueOf(center));
 		centerBtn.addActionListener(new SetToCenterListener());
-		final JButton minBtn = getTextButton(min + "  ");
+		final JButton minBtn = getTextButton(String.valueOf(min));
 		minBtn.addActionListener(new SetToMinListener());
-		final JButton maxBtn = getTextButton(max + "  ");
+		final JButton maxBtn = getTextButton(String.valueOf(max));
 		maxBtn.addActionListener(new SetToMaxListener());
 
 		final JLabel meanLabel = GUIFactory.createLabel("Mean:",
@@ -285,16 +285,16 @@ public class EditThumbDialog extends CustomDialog {
 		panel.add(GUIFactory.createLabel(" ",GUIFactory.FONTS),"wrap");
 
 		panel.add(meanLabel, "pushx, align right");
-		panel.add(meanBtn, "pushx, align left");
-		panel.add(minLabel, "pushx, align right");
+		panel.add(meanBtn, "pushx, align left, gapright 8px");
+		panel.add(minLabel, "pushx, align right, gapleft 8px");
 		panel.add(minBtn, "pushx, align left, wrap");
 		panel.add(medianLabel, "pushx, align right");
-		panel.add(medianBtn, "pushx, align left");
-		panel.add(centerLabel, "pushx, align right");
+		panel.add(medianBtn, "pushx, align left, gapright 8px");
+		panel.add(centerLabel, "pushx, align right, gapleft 8px");
 		panel.add(centerBtn, "pushx, align left, wrap");
 		panel.add(GUIFactory.createLabel("",GUIFactory.FONTS));
 		panel.add(GUIFactory.createLabel("",GUIFactory.FONTS));
-		panel.add(maxLabel, "pushx, align right");
+		panel.add(maxLabel, "pushx, align right, gapleft 8px");
 		panel.add(maxBtn, "pushx, align left, wrap");
 
 		panel.add(GUIFactory.createLabel(" ",GUIFactory.FONTS),"wrap");
@@ -306,7 +306,7 @@ public class EditThumbDialog extends CustomDialog {
 	}
 
 	protected JButton getTextButton(String text) {
-		final JButton btn = new JButton(text + "  ");
+		final JButton btn = new JButton(text);
 		btn.setFocusPainted(false);
 		btn.setMargin(new Insets(0,0,0,0));
 		btn.setContentAreaFilled(false);
