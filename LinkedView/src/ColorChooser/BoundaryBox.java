@@ -55,12 +55,13 @@ public class BoundaryBox extends ThumbBox {
 
 	private void paintString(Graphics2D g2, double value, Thumb t) {
 
-		NumberFormat formatter = new DecimalFormat("##0.00#");
+		NumberFormat formatter = new DecimalFormat("##0.0##");
 		String value_s = formatter.format(value);
 		int stringWidth = fm.stringWidth(value_s);
+		final double nonSciLimit = 0.0001;
 		
 		// adapt to scientific notation if String still too long...
-		if(stringWidth > boundaryRect.getWidth()) {
+		if(stringWidth > boundaryRect.getWidth() || value < nonSciLimit) {
 			formatter = new DecimalFormat("##0.##E0");
 			value_s = formatter.format(value);
 			stringWidth = fm.stringWidth(value_s);

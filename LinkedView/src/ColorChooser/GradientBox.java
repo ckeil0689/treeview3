@@ -61,6 +61,15 @@ public class GradientBox {
 			g2.fillRect((int) startX, (int) startY, width, height);
 			
 		} catch(IllegalArgumentException e) {
+			/* 
+			 * The LinearGradientPaint class needs an ascending list of 
+			 * fractions to generate the gradient.
+			 * If the list gets corrupted and values are not in a strictly
+			 * ascending order, an IllegalArgumentException will be thrown.
+			 * Rather than crashing the paint code, a black box with a small
+			 * hint will be displayed and the user can still move sliders to 
+			 * bring the fractions back into a working order.
+			 */
 			LogBuffer.logException(e);
 			fractions = new float[] {0.0f, 0.5f, 1.0f};
 			colors = new Color[]{Color.BLACK, Color.BLACK, Color.BLACK};
@@ -77,7 +86,7 @@ public class GradientBox {
 			g2.setPaint(gradient);
 			g2.fillRect((int) startX, (int) startY, width, height);
 			
-			String problem = "Problem! Try to adjust the thumbs.";
+			String problem = "Problem! Try to move sliders.";
 			g2.setPaint(Color.white);
 			g2.drawString(problem, startX + (endX / 4), startY + (height / 2));
 		}
