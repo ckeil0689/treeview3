@@ -154,19 +154,15 @@ public class DataImportDialog extends CustomDialog {
 	private void setupCheckBoxes() {
 
 		tabDelimCheckBox = new JCheckBox("Tab");
-		//tabDelimCheckBox.setFont(GUIFactory.FONTS);
 		delimiters.add(tabDelimCheckBox);
 
 		commaDelimCheckBox = new JCheckBox("Comma");
-//		commaDelimCheckBox.setFont(GUIFactory.FONTS);
 		delimiters.add(commaDelimCheckBox);
 
 		semicolonDelimCheckBox = new JCheckBox("Semicolon");
-//		semicolonDelimCheckBox.setFont(GUIFactory.FONTS);
 		delimiters.add(semicolonDelimCheckBox);
 
 		spaceDelimCheckBox = new JCheckBox("Space");
-//		spaceDelimCheckBox.setFont(GUIFactory.FONTS);
 		delimiters.add(spaceDelimCheckBox);
 	}
 
