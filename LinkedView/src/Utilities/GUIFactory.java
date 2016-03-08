@@ -24,9 +24,9 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
-import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.WideComboBox;
+import net.miginfocom.swing.MigLayout;
 
 public class GUIFactory {
 
@@ -178,16 +178,46 @@ public class GUIFactory {
 	}
 
 	/**
-	 * Creates and returns a JLabel with the appropriate text color and a small
+	 * Creates and returns a JLabel with the appropriate text and a given 
 	 * font size.
 	 *
-	 * @param text
+	 * @param text The text o the label.
+	 * @param font The intended font of the label to be created.
 	 * @return
 	 */
 	public static JLabel createLabel(final String text, final Font font) {
 
 		final JLabel label = new JLabel(text);
 		label.setFont(font);
+
+		return label;
+	}
+	
+	/**
+	 * Creates and returns a JLabel with the appropriate text.
+	 *
+	 * @param text The text of the label.
+	 * @return A JLabel object.
+	 */
+	public static JLabel createLabel(final String text) {
+
+		final JLabel label = new JLabel(text);
+
+		return label;
+	}
+	
+	/**
+	 * Creates and returns a JLabel with the appropriate text.
+	 *
+	 * @param text The text of the label.
+	 * @return A JLabel object.
+	 */
+	public static JLabel createBoldLabel(final String text) {
+
+		final JLabel label = new JLabel(text);
+		Font font = label.getFont();
+		Font bold = new Font(font.getName(), Font.BOLD, font.getSize());
+		label.setFont(bold);
 
 		return label;
 	}

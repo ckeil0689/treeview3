@@ -73,9 +73,8 @@ public class DataImportDialog extends CustomDialog {
 		JPanel indexPanel;
 		JPanel buttonPanel;
 
-		final String delimText = "Step 1. Select delimiters for your dataset:";
-		final JLabel preDelimiterLine = GUIFactory.createLabel(delimText,
-				GUIFactory.FONTM_B);
+		final String delimText = "Column delimiter:";
+		final JLabel preDelimiterLine = GUIFactory.createBoldLabel(delimText);
 
 		/* Delimiter panel */
 		delimPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
@@ -88,41 +87,37 @@ public class DataImportDialog extends CustomDialog {
 
 		delimPanel.add(checkboxPanel);
 
-		final String findDataStartText = "Step 2. Select indices of first "
-				+ "data cell:";
-		JLabel findDataStartLabel = GUIFactory.createLabel(findDataStartText,
-				GUIFactory.FONTM_B);
+		final String findDataStartText = "First data cell:";
+		JLabel findDataStartLabel = 
+				GUIFactory.createBoldLabel(findDataStartText);
 
 		// must be ints for spinner listener
 		SpinnerNumberModel indexModel = new SpinnerNumberModel(0, 0, 10, 1);
 		SpinnerNumberModel indexModel2 = new SpinnerNumberModel(0, 0, 10, 1);
 
-		final String rowSpinnerText = "Row #:";
-		JLabel rowSpinnerLabel = GUIFactory.createLabel(rowSpinnerText,
-				GUIFactory.FONTS);
+		final String rowSpinnerText = "Row:";
+		JLabel rowSpinnerLabel = GUIFactory.createLabel(rowSpinnerText);
 		rowDataStart = new JSpinner(indexModel);
 
-		final String columnSpinnerText = "Column #:";
-		JLabel columnSpinnerLabel = GUIFactory.createLabel(columnSpinnerText,
-				GUIFactory.FONTS);
+		final String columnSpinnerText = "Column:";
+		JLabel columnSpinnerLabel = GUIFactory.createLabel(columnSpinnerText);
 		columnDataStart = new JSpinner(indexModel2);
 
 		findDataBtn = GUIFactory.createBtn("Auto-detect labels");
 
 		indexPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		indexPanel.add(rowSpinnerLabel);
-		indexPanel.add(rowDataStart, "al left, pushx");
+		indexPanel.add(rowDataStart, "al left, pushx 5");
 		indexPanel.add(columnSpinnerLabel, "al right");
-		indexPanel.add(columnDataStart, "wrap");
-		indexPanel.add(findDataBtn, "span 2 1, align left, push");
+		indexPanel.add(columnDataStart, "pushx 5");
+		indexPanel.add(findDataBtn, "pushx");
 
 		final String previewText = "Preview (25x25):";
-		final JLabel preTableLine = GUIFactory.createLabel(previewText,
-				GUIFactory.FONTS_B);
+		final JLabel preTableLine = GUIFactory.createBoldLabel(previewText);
 
 		final JScrollPane scrollPane = new JScrollPane(dataTable);
 
-		proceedBtn = GUIFactory.createBtn("Proceed >");
+		proceedBtn = GUIFactory.createBtn("Continue");
 		proceedBtn.requestFocus();
 
 		buttonPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
@@ -131,16 +126,16 @@ public class DataImportDialog extends CustomDialog {
 
 		getRootPane().setDefaultButton(findDataBtn);
 
-		mainPanel.add(preDelimiterLine, "push, wrap");
-		mainPanel.add(delimPanel, "grow, push, wrap");
+		mainPanel.add(preDelimiterLine);
+		mainPanel.add(delimPanel, "al left, w 80%, wrap");
 
-		mainPanel.add(findDataStartLabel, "push, wrap");
-		mainPanel.add(indexPanel, "push, wrap");
+		mainPanel.add(findDataStartLabel);
+		mainPanel.add(indexPanel, "al left, w 80%, wrap");
 
 		mainPanel.add(preTableLine, "wrap");
 		mainPanel.add(scrollPane, "w :800:800, h :400:400, span, wrap");
 
-		mainPanel.add(buttonPanel, "growx, push");
+		mainPanel.add(buttonPanel, "al right, span, push");
 
 		mainPanel.revalidate();
 		mainPanel.repaint();
