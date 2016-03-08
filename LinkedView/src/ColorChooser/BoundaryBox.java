@@ -61,7 +61,8 @@ public class BoundaryBox extends ThumbBox {
 		final double nonSciLimit = 0.0001;
 		
 		// adapt to scientific notation if String still too long...
-		if(stringWidth > boundaryRect.getWidth() || value < nonSciLimit) {
+		if(stringWidth > boundaryRect.getWidth() 
+				|| Math.abs(value) < nonSciLimit) {
 			formatter = new DecimalFormat("##0.##E0");
 			value_s = formatter.format(value);
 			stringWidth = fm.stringWidth(value_s);
