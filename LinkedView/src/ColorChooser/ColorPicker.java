@@ -226,8 +226,6 @@ public class ColorPicker {
 		updateBoundaryColors();
 		updateColorArray();
 		
-//		setGradientColors();
-		
 		containerPanel.repaint();
 	}
 

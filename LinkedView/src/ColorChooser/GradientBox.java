@@ -79,7 +79,7 @@ public class GradientBox {
 			
 			String problem = "Problem! Try to adjust the thumbs.";
 			g2.setPaint(Color.white);
-			g2.drawString(problem, startX + (endX / 2), startY + (height / 2));
+			g2.drawString(problem, startX + (endX / 4), startY + (height / 2));
 		}
 	}
 
