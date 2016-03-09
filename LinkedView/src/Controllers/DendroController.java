@@ -649,16 +649,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 					dendroView.getInteractiveMatrixView()
 							.smoothAnimatedZoomOut();
 				}
-				/* TODO: This needs to be better integrated into the interface */
-//			} else if (e.getSource() == dendroView.getExportButton()) {
-//
-//				//The following uses the forked freehep 2.4 project, compiled by
-//				//maven 2, along with 2 jar files from the original freehep
-//				//2.1.1 project
-//				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
-//					interactiveYmap,colSelection,rowSelection);
-//				eh.setTileAspectRatioToScreen(Region.VISIBLE);
-//				eh.export(Format.PDF,"Output.pdf",Region.SELECTION,true);
 			} else {
 				LogBuffer.println("Got weird source for actionPerformed() "
 						+ "in DendroController ScaleListener.");
