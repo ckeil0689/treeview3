@@ -945,6 +945,11 @@ public class MapContainer extends Observable implements Observer,
 					newFirstVisible--;
 				}
 
+				//Make sure we're not past what is possible to scroll to
+				if((newFirstVisible + numVisible - 1) > getMaxIndex()) {
+					newFirstVisible = getMaxIndex() - numVisible + 1;
+				}
+
 				//If the left/top side is closer than or equal to half the
 				//difference in area sizes
 				if(newFirstVisible > firstIndex) {
@@ -970,6 +975,12 @@ public class MapContainer extends Observable implements Observer,
 		   !((newFirstVisible + numVisible - 1) > getMaxIndex()) &&
 		   correction > 0) {
 			newFirstVisible += correction;
+
+			//Make sure we're not past what is possible to scroll to
+			if((newFirstVisible + numVisible - 1) > getMaxIndex()) {
+				newFirstVisible = getMaxIndex() - numVisible + 1;
+			}
+
 			LogBuffer.println("WARNING: The data cell hovered over has " +
 				"shifted. It was over [" + dotOver + "].  Now it is over: [" +
 				getIndex(pixelPos) + "].  Previous dotOver calculation: " +
