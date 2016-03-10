@@ -5,6 +5,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import Utilities.GUIFactory;
 
@@ -53,8 +55,18 @@ public class BoundaryBox extends ThumbBox {
 
 	private void paintString(Graphics2D g2, double value, Thumb t) {
 
-		String value_s = Double.toString(value);
+		NumberFormat formatter = new DecimalFormat("##0.0##");
+		String value_s = formatter.format(value);
 		int stringWidth = fm.stringWidth(value_s);
+		final double nonSciLimit = 0.0001;
+		
+		// adapt to scientific notation if String still too long...
+		if(stringWidth > boundaryRect.getWidth() 
+				|| Math.abs(value) < nonSciLimit) {
+			formatter = new DecimalFormat("##0.##E0");
+			value_s = formatter.format(value);
+			stringWidth = fm.stringWidth(value_s);
+		}
 		
 		int x = (int) Math.round(t.getX() - (stringWidth/ 2.0));
 		int y = (int) Math.round((boundaryRect.getHeight()/ 3.0) 
