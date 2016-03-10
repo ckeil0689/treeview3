@@ -1551,12 +1551,17 @@ public class MapContainer extends Observable implements Observer,
 		// called.
 		// scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
 
-		scrollbar.setValue(i - getNumVisible() / 2);
+		int scrollVal = i - getNumVisible() / 2;
+		if(scrollVal > (getTotalTileNum() - getNumVisible())) {
+			scrollVal = getTotalTileNum() - getNumVisible();
+		}
+
+		scrollbar.setValue(scrollVal);
 
 		// Keep track of the first visible index
 		// This used to be set using scrollbar.getVisibleAmount, but that can
 		// change implicitly when the window is resized.
-		setFirstVisible(i - getNumVisible() / 2);
+		setFirstVisible(scrollVal);
 
 		//Image needs to be updated if either scroll position changes (because a
 		//scroll of the labels changes the blue box)
@@ -1565,11 +1570,15 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
-	public void scrollToFirstIndex(final int i) {
+	public void scrollToFirstIndex(int i) {
 
 		if(i < getMinIndex() || i > getMaxIndex()) {
-			LogBuffer.println("Cannot set first index to " + i);
-			return;
+			if(i < 0) {
+				i = 0;
+			} else {
+				LogBuffer.println("Cannot set first index to " + i);
+				return;
+			}
 		}
 		
 		final int j = scrollbar.getValue();
@@ -1636,7 +1645,7 @@ public class MapContainer extends Observable implements Observer,
 	@Override
 	public void adjustmentValueChanged(final AdjustmentEvent adjustmentEvent) {
 
-		setFirstVisible(adjustmentEvent.getValue());
+		setFirstVisibleStrictly(adjustmentEvent.getValue());
 		setChanged();
 		notifyObservers(scrollbar);
 	}
@@ -1884,6 +1893,16 @@ public class MapContainer extends Observable implements Observer,
 			return;
 		} else {
 			LogBuffer.println("Did not set firstVisible for [" + mapName + "] because the value was out of range: [" + i + "]");
+		}
+	}
+
+	public void setFirstVisibleStrictly(final int i) {
+		if (i < 0) {
+			firstVisible = 0;
+		} else if(i > (getTotalTileNum() - getNumVisible())) {
+			firstVisible = getTotalTileNum() - getNumVisible();
+		} else {
+			firstVisible = i;
 		}
 	}
 
