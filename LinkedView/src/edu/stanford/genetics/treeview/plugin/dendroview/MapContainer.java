@@ -437,8 +437,6 @@ public class MapContainer extends Observable implements Observer,
 		int zoomVal;
 
 		tileNumVisible = Math.round(getAvailablePixels() / getScale());
-		// LogBuffer.println("zoomIn: tileNumVisible has been set to [" +
-		// tileNumVisible + "].");
 		if(tileNumVisible > (getTotalTileNum())) {
 			tileNumVisible = getTotalTileNum();
 		}
@@ -979,14 +977,15 @@ public class MapContainer extends Observable implements Observer,
 			//Make sure we're not past what is possible to scroll to
 			if((newFirstVisible + numVisible - 1) > getMaxIndex()) {
 				newFirstVisible = getMaxIndex() - numVisible + 1;
+			} else {
+				LogBuffer.println("WARNING: The data cell hovered over has " +
+					"shifted. It was over [" + dotOver + "].  Now it is over: [" +
+					getIndex(pixelPos) + "].  Previous dotOver calculation: " +
+					"[firstVisible + (int) ((double) pixelPos / newScale))] = [" +
+					firstVisible + " + (int) ((double) " + pixelPos + " / " +
+					newScale + "))].  Correcting this retroactively...");
 			}
 
-			LogBuffer.println("WARNING: The data cell hovered over has " +
-				"shifted. It was over [" + dotOver + "].  Now it is over: [" +
-				getIndex(pixelPos) + "].  Previous dotOver calculation: " +
-				"[firstVisible + (int) ((double) pixelPos / newScale))] = [" +
-				firstVisible + " + (int) ((double) " + pixelPos + " / " +
-				newScale + "))].  Correcting this retroactively...");
 			scrollToFirstIndex(newFirstVisible/*,true*/);
 			updateAspectRatio = 1;
 		}
@@ -1576,7 +1575,7 @@ public class MapContainer extends Observable implements Observer,
 			if(i < 0) {
 				i = 0;
 			} else {
-				LogBuffer.println("Cannot set first index to " + i);
+				LogBuffer.println("ERROR: Index out of range: " + i);
 				return;
 			}
 		}
@@ -1871,28 +1870,16 @@ public class MapContainer extends Observable implements Observer,
 
 		if(i > getTotalTileNum()) {
 			numVisible = getTotalTileNum();
-			LogBuffer.println("Setting numVisible for [" + mapName + "] to max [" + numVisible + "] because i was too big: [" + i + "]");
 		} else if(i < 1) {
 			numVisible = 1;
-			LogBuffer.println("Setting numVisible for [" + mapName + "] to [" + numVisible + "]");
 		} else {
 			numVisible = i;
-			LogBuffer.println("Setting numVisible for [" + mapName + "] to [" + numVisible + "]");
 		}
-//		//If the number of visible squares has dipped below the number of
-//		//visible labels
-//		if(i < getNumVisibleLabels()) {
-//			setNumVisibleLabels(i);
-//		}
 	}
 
 	public void setFirstVisible(final int i) {
 		if (i >= 0 && i < getTotalTileNum()) {
 			firstVisible = i;
-			LogBuffer.println("Setting firstVisible for [" + mapName + "] to [" + firstVisible + "]");
-			return;
-		} else {
-			LogBuffer.println("Did not set firstVisible for [" + mapName + "] because the value was out of range: [" + i + "]");
 		}
 	}
 
