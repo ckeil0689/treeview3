@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -1005,7 +1006,10 @@ public class TVController implements Observer {
 			dendroController.getInteractiveXMap(),
 			dendroController.getInteractiveYMap(),tvFrame.getColSelection(),
 			tvFrame.getRowSelection());
-		List<Region> tooBigs = eh.getRegionsThatAreTooBig();
+		List<Region> tooBigs = new ArrayList<Region>();
+		if(!Format.getDefault().isDocumentFormat()) {
+			tooBigs = eh.getRegionsThatAreTooBig();
+		}
 		boolean selectionsExist = (tvFrame.getColSelection() != null &&
 			tvFrame.getColSelection().getNSelectedIndexes() > 0);
 		ExportDialog exportDialog = new ExportDialog(selectionsExist,tooBigs);
