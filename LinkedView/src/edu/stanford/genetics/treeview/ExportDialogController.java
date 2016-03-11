@@ -126,16 +126,16 @@ public class ExportDialogController {
 				eh.setTileAspectRatio(selAspect);
 				eh.export(selFormat,exportFilename,selRegion,showSelections);
 
-				LogBuffer.println("Exported file: [" + exportFilename + "].");
+				String msg = "Exported file: [" + exportFilename + "].";
+				LogBuffer.println(msg);
+				showDialog(msg);
 
 				exportDialog.dispose();
 			} catch(OutOfMemoryError oome) {
 				showWarning("ERROR: Out of memory.  Note, you may be able to " +
 					"export a smaller portion of the matrix.");
-			} catch(IllegalArgumentException iae) {
-				showWarning("ERROR: Matrix too big for export to this file " +
-					"type.  Note, you may be able to export a smaller " +
-					"portion of the matrix.");
+			} catch(Exception iae) {
+				showWarning(iae.getLocalizedMessage());
 			}
 		}
 	}
@@ -144,6 +144,13 @@ public class ExportDialogController {
 
 		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), 
 				message, "Warning", JOptionPane.WARNING_MESSAGE);
+		LogBuffer.println(message);
+	}
+
+	private void showDialog(final String message) {
+
+		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), 
+				message, "Note", JOptionPane.INFORMATION_MESSAGE);
 		LogBuffer.println(message);
 	}
 

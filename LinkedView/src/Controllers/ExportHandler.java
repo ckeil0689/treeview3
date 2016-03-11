@@ -9,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.awt.image.BufferedImage;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -58,9 +60,9 @@ public class ExportHandler {
 	
 	/* Note: The line width of the tree is 1, so the more points thicker the
 	 * tile is, the relatively more narrow the tree lines are */
-	protected int minTileDim = 11; //Min number of "points" for a tile's edge
-	protected int tileHeight = 11; //Number of "points" for a tile's height
-	protected int tileWidth  = 11; //Number of "points" for a tile's width
+	protected int minTileDim = 5; //Min number of "points" for a tile's edge
+	protected int tileHeight = 5; //Number of "points" for a tile's height
+	protected int tileWidth  = 5; //Number of "points" for a tile's width
 
 	protected int treeMatrixGapMin = 5; //Min number of "points" bet tree/matrix
 	protected int treeMatrixGapSize = 20; //Number of "points" bet tree/matrix
@@ -410,7 +412,7 @@ public class ExportHandler {
 	 *                 selection
 	 */
 	public void export(final Format format,final String fileName,
-		final Region region,final boolean showSelections) {
+		final Region region,final boolean showSelections) throws Exception {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -423,7 +425,11 @@ public class ExportHandler {
 
 			exportDocument(format,defPageSize,fileName,region,showSelections);
 		} else {
-			exportImage(format,fileName,region,showSelections);
+			try {
+				exportImage(format,fileName,region,showSelections);
+			} catch(Exception e) {
+				throw new Exception(e.getLocalizedMessage(),e);
+			}
 		}
 	}
 
@@ -435,7 +441,7 @@ public class ExportHandler {
 	 * @param region
 	 */
 	public void exportImage(final Format format,final String fileName,
-		final Region region,final boolean showSelections) {
+		final Region region,final boolean showSelections) throws Exception {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -475,10 +481,21 @@ public class ExportHandler {
 				return;
 			}
 		}
+		catch(IllegalArgumentException iae) {
+			double tooBig = (double) getXDim(region) /
+				(double) Integer.MAX_VALUE * (double) getYDim(region);
+			BigDecimal bd = new BigDecimal(tooBig);
+			bd = bd.round(new MathContext(4));
+			double rounded = bd.doubleValue();
+			throw new Exception("Error: Unable to export image.\n\nExported " +
+				"region [" + region.toString() + ": " +
+				getNumXExportIndexes(region) + "cols x " +
+				getNumYExportIndexes(region) + "rows] is about [" + rounded +
+				"] times too big to export.\n\nPlease zoom to a smaller area " +
+				"and try exporting only that visible portion.",iae);
+		}
 		catch(Exception exc) {
-			LogBuffer.println("Unable to export image.");
-			exc.printStackTrace();
-			LogBuffer.logException(exc);
+			throw new Exception("Unknown Error: Unable to export image.",exc);
 		}
 	}
 
