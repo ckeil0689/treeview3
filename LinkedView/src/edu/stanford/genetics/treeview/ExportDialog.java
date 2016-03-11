@@ -1,7 +1,9 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -34,19 +36,21 @@ public class ExportDialog extends CustomDialog {
 	private JCheckBox selectionsBox;
 	private JButton exportBtn;
 
-	public ExportDialog(final boolean selectionsExist) {
+	public ExportDialog(final boolean selectionsExist,
+		final List<Region> bigRegs) {
 		
 		super("Export");
-		setupLayout(selectionsExist);
+		setupLayout(selectionsExist,bigRegs);
 	}
 
 	@Override
 	protected void setupLayout() {
-		setupLayout(false);
+		setupLayout(false,new ArrayList<Region>());
 	}
 
-	protected void setupLayout(final boolean selectionsExist) {
-		
+	protected void setupLayout(final boolean selectionsExist,
+		final List<Region> bigRegs) {
+
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		
 		JPanel contentPanel = GUIFactory.createJPanel(false, 
@@ -80,6 +84,9 @@ public class ExportDialog extends CustomDialog {
 		aspectRadioBtns = new ButtonGroup();
 		selectionsBox = new JCheckBox("Show Selections");
 		selectionsBox.setEnabled(selectionsExist);
+		if(!selectionsExist) {
+			selectionsBox.setToolTipText("No data selected");
+		}
 		orientBox = new JComboBox<Object>(PageConstants.getOrientationList());
 		orientBox.setSelectedItem(PageConstants.LANDSCAPE);
 		orientBox.setEnabled(Format.getDefault().isDocumentFormat());
@@ -102,12 +109,19 @@ public class ExportDialog extends CustomDialog {
 		}
 		for (Region reg : Region.values()) {
 			JRadioButton option = new JRadioButton(reg.toString());
+			if(bigRegs.contains(reg)) {
+				option.setEnabled(false);
+				option.setToolTipText("Too big for export");
+			}
 			//Default region pre-selected
-			if(reg == defReg) {
+			if(reg == defReg && !bigRegs.contains(reg)) {
 				option.setSelected(true);
 			}
-			if(reg == Region.SELECTION) {
+			if(reg == Region.SELECTION && !bigRegs.contains(reg)) {
 				option.setEnabled(selectionsExist);
+				if(!selectionsExist) {
+					option.setToolTipText("No data selected");
+				}
 			}
 			regionRadioBtns.add(option);
 			rangePanel.add(option,"alignx 0, aligny 0, wrap");

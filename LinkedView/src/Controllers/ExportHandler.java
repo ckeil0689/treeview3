@@ -14,6 +14,9 @@ import java.math.MathContext;
 import java.awt.image.BufferedImage;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+//import java.awt.List;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -60,9 +63,9 @@ public class ExportHandler {
 	
 	/* Note: The line width of the tree is 1, so the more points thicker the
 	 * tile is, the relatively more narrow the tree lines are */
-	protected int minTileDim = 3; //Min number of "points" for a tile's edge
-	protected int tileHeight = 3; //Number of "points" for a tile's height
-	protected int tileWidth  = 3; //Number of "points" for a tile's width
+	protected int minTileDim = 11; //Min number of "points" for a tile's edge
+	protected int tileHeight = 11; //Number of "points" for a tile's height
+	protected int tileWidth  = 11; //Number of "points" for a tile's width
 
 	protected int treeMatrixGapMin = 5; //Min number of "points" bet tree/matrix
 	protected int treeMatrixGapSize = 20; //Number of "points" bet tree/matrix
@@ -584,6 +587,22 @@ public class ExportHandler {
 				"to.");
 			LogBuffer.logException(exc);
 		}
+	}
+
+	public List<Region> getRegionsThatAreTooBig() {
+		List<Region> regs = new ArrayList<Region>();
+		for(int i = 0;i < Region.values().length;i++) {
+
+			//If this region is valid for export and it is too big
+			if(isExportValid(Region.values()[i]) &&
+				((double) getXDim(Region.values()[i]) /
+				(double) Integer.MAX_VALUE *
+				(double) getYDim(Region.values()[i]) > 1.0)) {
+
+				regs.add(Region.values()[i]);
+			}
+		}
+		return(regs);
 	}
 
 	/**
