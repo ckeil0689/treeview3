@@ -3,6 +3,8 @@ package edu.stanford.genetics.treeview;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JOptionPane;
+
 import org.freehep.graphicsio.PageConstants;
 
 import Controllers.ExportHandler;
@@ -14,6 +16,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 public class ExportDialogController {
 
 	private final ExportDialog exportDialog;
+	private final TreeViewFrame tvFrame;
 	private final DendroView dendroView;
 	private final MapContainer interactiveXmap;
 	private final MapContainer interactiveYmap;
@@ -22,17 +25,16 @@ public class ExportDialogController {
 	private DataModel model;
 
 	public ExportDialogController(final ExportDialog expD, 
-			final DendroView dendroView,final MapContainer interactiveXmap,
-			final MapContainer interactiveYmap,
-			final TreeSelectionI colSelection,
-			final TreeSelectionI rowSelection,final DataModel model) {
+			final TreeViewFrame tvFrame,final MapContainer interactiveXmap,
+			final MapContainer interactiveYmap,final DataModel model) {
 		
 		this.exportDialog = expD;
-		this.dendroView = dendroView;
+		this.tvFrame = tvFrame;
+		this.dendroView = tvFrame.getDendroView();
 		this.interactiveXmap = interactiveXmap;
 		this.interactiveYmap = interactiveYmap;
-		this.colSelection = colSelection;
-		this.rowSelection = rowSelection;
+		this.colSelection = tvFrame.getColSelection();
+		this.rowSelection = tvFrame.getRowSelection();
 		this.model = model;
 
 		addListeners();
@@ -116,17 +118,33 @@ public class ExportDialogController {
 			// TODO call to event handler here, work with selected indices
 			// and EXP_FORMATS / PAPER_TYPE enum classes
 
-			ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
-				interactiveYmap,colSelection,rowSelection);
-			eh.setDefaultPageSize(selPaper);
-			eh.setDefaultPageOrientation(selOrient);
-			eh.setTileAspectRatio(selAspect);
-			eh.export(selFormat,exportFilename,selRegion,showSelections);
+			try {
+				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
+					interactiveYmap,colSelection,rowSelection);
+				eh.setDefaultPageSize(selPaper);
+				eh.setDefaultPageOrientation(selOrient);
+				eh.setTileAspectRatio(selAspect);
+				eh.export(selFormat,exportFilename,selRegion,showSelections);
 
-			LogBuffer.println("Exported file: [" + exportFilename + "].");
+				LogBuffer.println("Exported file: [" + exportFilename + "].");
 
-			exportDialog.dispose();
+				exportDialog.dispose();
+			} catch(OutOfMemoryError oome) {
+				showWarning("ERROR: Out of memory.  Note, you may be able to " +
+					"export a smaller portion of the matrix.");
+			} catch(IllegalArgumentException iae) {
+				showWarning("ERROR: Matrix too big for export to this file " +
+					"type.  Note, you may be able to export a smaller " +
+					"portion of the matrix.");
+			}
 		}
+	}
+
+	private void showWarning(final String message) {
+
+		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), 
+				message, "Warning", JOptionPane.WARNING_MESSAGE);
+		LogBuffer.println(message);
 	}
 
 	private class FormatListener implements ActionListener {

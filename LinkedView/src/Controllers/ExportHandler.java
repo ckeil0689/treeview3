@@ -477,6 +477,7 @@ public class ExportHandler {
 		}
 		catch(Exception exc) {
 			LogBuffer.println("Unable to export image.");
+			exc.printStackTrace();
 			LogBuffer.logException(exc);
 		}
 	}
