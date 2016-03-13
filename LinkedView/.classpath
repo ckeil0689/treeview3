@@ -4,20 +4,39 @@
 	<classpathentry kind="src" path="testsuite"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="compile_lib/jarbundler-1.8.1.jar"/>
-	<classpathentry kind="lib" path="compile_lib/miglayout-4.0-swing.jar"/>
-	<classpathentry kind="lib" path="compile_lib/swingx-core-1.6.2-AutoCompletition.jar"/>
-	<classpathentry kind="lib" path="compile_lib/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="compile_lib/freehep-graphics2d-2.4.jar"/>
-	<classpathentry kind="lib" path="compile_lib/freehep-graphicsbase-2.4.jar"/>
-	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-2.4.jar"/>
-	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-java-2.4.jar"/>
-	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-pdf-2.4.jar"/>
-	<classpathentry kind="lib" path="compile_lib/freehep-io-2.0.2.jar"/>
-	<classpathentry kind="lib" path="compile_lib/freehep-util-2.0.2.jar"/>
-	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-svg-2.4.jar"/>
-	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-ps-2.4.jar"/>
-	<classpathentry kind="lib" path="compile_lib/xmlworker-5.5.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/jarbundler-1.8.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/miglayout-4.0-swing.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/swingx-core-1.6.2-AutoCompletition.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/xercesImpl.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/freehep-graphics2d-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/freehep-graphicsbase-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/freehep-graphicsio-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/freehep-graphicsio-java-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/freehep-graphicsio-pdf-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/freehep-io-2.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/freehep-util-2.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/freehep-graphicsio-svg-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/freehep-graphicsio-ps-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="compile_lib/xmlworker-5.5.8.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-graphics2d-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-graphicsbase-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-graphicsio-emf-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-graphicsio-java-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-graphicsio-pdf-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-graphicsio-ps-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-graphicsio-svg-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-graphicsio-swf-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-io-2.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-util-2.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/jarbundler-1.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
+	<classpathentry kind="lib" path="lib/xmlworker-5.5.8.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="lib/swingx-core-1.6.2-AutoCompletition.jar"/>
+	<classpathentry kind="lib" path="lib/nanoxml-2.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/miglayout-4.0-swing.jar"/>
+	<classpathentry kind="lib" path="lib/freehep-graphicsio-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/appbundler-1.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

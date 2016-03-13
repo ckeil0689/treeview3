@@ -35,21 +35,22 @@ public class ExportDialog extends CustomDialog {
 	private ButtonGroup aspectRadioBtns;
 	private JCheckBox selectionsBox;
 	private JButton exportBtn;
+	private List<Region> bigRegs; //List of regions that are too big for image export (doc export is OK)
 
 	public ExportDialog(final boolean selectionsExist,
 		final List<Region> bigRegs) {
 		
 		super("Export");
-		setupLayout(selectionsExist,bigRegs);
+		this.bigRegs = bigRegs;
+		setupLayout(selectionsExist);
 	}
 
 	@Override
 	protected void setupLayout() {
-		setupLayout(false,new ArrayList<Region>());
+		setupLayout(false);
 	}
 
-	protected void setupLayout(final boolean selectionsExist,
-		final List<Region> bigRegs) {
+	protected void setupLayout(final boolean selectionsExist) {
 
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		
@@ -111,7 +112,7 @@ public class ExportDialog extends CustomDialog {
 			JRadioButton option = new JRadioButton(reg.toString());
 			if(bigRegs.contains(reg)) {
 				option.setEnabled(false);
-				option.setToolTipText("Too big for export");
+				option.setToolTipText("Too big for PNG/JPG/PPM export");
 			}
 			//Default region pre-selected
 			if(reg == defReg && !bigRegs.contains(reg)) {
@@ -289,5 +290,26 @@ public class ExportDialog extends CustomDialog {
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
+	}
+
+	public List<Region> getBigRegs() {
+		return bigRegs;
+	}
+
+	public void updateRegionRadioBtns(final boolean isDocFormat) {
+		if(bigRegs.size() > 0) {
+			Enumeration<AbstractButton> rBtns = regionRadioBtns.getElements();
+			while(rBtns.hasMoreElements()) {
+				AbstractButton option = rBtns.nextElement();
+				final boolean isEnabled = isDocFormat ||
+						!bigRegs.contains(Region.getRegion(option.getText()));
+				option.setEnabled(isEnabled);
+				if(isEnabled) {
+					option.setToolTipText(null);
+				} else {
+					option.setToolTipText("Too big for PNG/JPG/PPM export");
+				}
+			}
+		}
 	}
 }

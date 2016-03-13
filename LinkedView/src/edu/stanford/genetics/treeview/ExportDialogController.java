@@ -173,6 +173,7 @@ public class ExportDialogController {
 
 			exportDialog.getPaperBox().setEnabled(selFormat.isDocumentFormat());
 			exportDialog.getOrientBox().setEnabled(selFormat.isDocumentFormat());
+			exportDialog.updateRegionRadioBtns(selFormat.isDocumentFormat());
 		}
 	}
 }

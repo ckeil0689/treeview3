@@ -24,4 +24,13 @@ public enum Region {
 	public static Region getDefault() {
 		return(Region.VISIBLE);
 	}
+
+	public static Region getRegion(String regName) {
+		for(Region reg : Region.values()) {
+			if(reg.toString().equals(regName)) {
+				return(reg);
+			}
+		}
+		return(null);
+	}
 }
