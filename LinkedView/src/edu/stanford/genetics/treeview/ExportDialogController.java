@@ -2,6 +2,8 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -44,6 +46,7 @@ public class ExportDialogController {
 		
 		exportDialog.addExportListener(new ExportListener());
 		exportDialog.addFormatListener(new FormatListener());
+		exportDialog.addAspectListener(new AspectListener());
 	}
 	
 	private class ExportListener implements ActionListener {
@@ -171,8 +174,64 @@ public class ExportDialogController {
 				selFormat = Format.values()[selectedOptions[0]];
 			}
 
+			ExportAspect selAspect;
+			if(selectedOptions.length < 4 || selectedOptions[3] < 0 ||
+				selectedOptions[3] >= ExportAspect.values().length) {
+				selAspect = ExportAspect.getDefault();
+			} else {
+				selAspect = ExportAspect.values()[selectedOptions[3]];
+			}
+
 			exportDialog.getPaperBox().setEnabled(selFormat.isDocumentFormat());
 			exportDialog.getOrientBox().setEnabled(selFormat.isDocumentFormat());
+
+			ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
+				interactiveXmap,interactiveYmap,tvFrame.getColSelection(),
+				tvFrame.getRowSelection());
+			eh.setTileAspectRatio(selAspect);
+			List<Region> tooBigs = new ArrayList<Region>();
+			if(!selFormat.isDocumentFormat()) {
+				tooBigs = eh.getRegionsThatAreTooBig();
+			}
+			exportDialog.setBigRegs(tooBigs);
+			exportDialog.updateRegionRadioBtns(selFormat.isDocumentFormat());
+		}
+	}
+
+	private class AspectListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			LogBuffer.println("Aspect changed!");
+			/* For now, the selected indices of the 2 JComboBoxes */
+			int[] selectedOptions = exportDialog.getSelectedOptions();
+
+			Format selFormat;
+			if(selectedOptions.length < 1 || selectedOptions[0] < 0 ||
+				selectedOptions[0] >= Format.values().length) {
+				selFormat = Format.getDefault();
+			} else {
+				selFormat = Format.values()[selectedOptions[0]];
+			}
+
+			ExportAspect selAspect;
+			if(selectedOptions.length < 4 || selectedOptions[3] < 0 ||
+				selectedOptions[3] >= ExportAspect.values().length) {
+				selAspect = ExportAspect.getDefault();
+			} else {
+				selAspect = ExportAspect.values()[selectedOptions[3]];
+			}
+
+			ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
+				interactiveXmap,interactiveYmap,tvFrame.getColSelection(),
+				tvFrame.getRowSelection());
+			eh.setTileAspectRatio(selAspect);
+			List<Region> tooBigs = new ArrayList<Region>();
+			if(!selFormat.isDocumentFormat()) {
+				tooBigs = eh.getRegionsThatAreTooBig();
+			}
+			exportDialog.setBigRegs(tooBigs);
 			exportDialog.updateRegionRadioBtns(selFormat.isDocumentFormat());
 		}
 	}

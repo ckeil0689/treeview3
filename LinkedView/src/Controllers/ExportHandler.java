@@ -63,9 +63,9 @@ public class ExportHandler {
 	
 	/* Note: The line width of the tree is 1, so the more points thicker the
 	 * tile is, the relatively more narrow the tree lines are */
-	protected int minTileDim = 11; //Min number of "points" for a tile's edge
-	protected int tileHeight = 11; //Number of "points" for a tile's height
-	protected int tileWidth  = 11; //Number of "points" for a tile's width
+	protected int minTileDim = 5; //Min number of "points" for a tile's edge
+	protected int tileHeight = 5; //Number of "points" for a tile's height
+	protected int tileWidth  = 5; //Number of "points" for a tile's width
 
 	protected int treeMatrixGapMin = 5; //Min number of "points" bet tree/matrix
 	protected int treeMatrixGapSize = 20; //Number of "points" bet tree/matrix

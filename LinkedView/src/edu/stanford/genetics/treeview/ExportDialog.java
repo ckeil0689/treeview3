@@ -1,7 +1,6 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -36,12 +35,14 @@ public class ExportDialog extends CustomDialog {
 	private JCheckBox selectionsBox;
 	private JButton exportBtn;
 	private List<Region> bigRegs; //List of regions that are too big for image export (doc export is OK)
+	private boolean selectionsExist;
 
 	public ExportDialog(final boolean selectionsExist,
 		final List<Region> bigRegs) {
 		
 		super("Export");
 		this.bigRegs = bigRegs;
+		this.selectionsExist = selectionsExist;
 		setupLayout(selectionsExist);
 	}
 
@@ -174,6 +175,14 @@ public class ExportDialog extends CustomDialog {
 		formatBox.addActionListener(l);
 	}
 
+	public void addAspectListener(final ActionListener l) {
+		Enumeration<AbstractButton> eab = aspectRadioBtns.getElements();
+		while(eab.hasMoreElements()) {
+			AbstractButton btn = eab.nextElement();
+			btn.addActionListener(l);
+		}
+	}
+
 	/**
 	 * @return an int array which contains 5 values: 0. the selected index of
 	 * the [Format] drop-down. 1. the selected index of the [PaperType] dropdown
@@ -296,13 +305,18 @@ public class ExportDialog extends CustomDialog {
 		return bigRegs;
 	}
 
+	public void setBigRegs(List<Region> bigRegs) {
+		this.bigRegs = bigRegs;
+	}
+
 	public void updateRegionRadioBtns(final boolean isDocFormat) {
-		if(bigRegs.size() > 0) {
-			Enumeration<AbstractButton> rBtns = regionRadioBtns.getElements();
-			while(rBtns.hasMoreElements()) {
-				AbstractButton option = rBtns.nextElement();
-				final boolean isEnabled = isDocFormat ||
-						!bigRegs.contains(Region.getRegion(option.getText()));
+		Enumeration<AbstractButton> rBtns = regionRadioBtns.getElements();
+		while(rBtns.hasMoreElements()) {
+			AbstractButton option = rBtns.nextElement();
+			final boolean isEnabled = isDocFormat ||
+					!bigRegs.contains(Region.getRegion(option.getText()));
+			if(Region.getRegion(option.getText()) != Region.SELECTION ||
+				selectionsExist) {
 				option.setEnabled(isEnabled);
 				if(isEnabled) {
 					option.setToolTipText(null);
