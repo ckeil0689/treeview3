@@ -42,8 +42,9 @@ public abstract class ModelViewBuffered extends ModelView {
 	 */
 	public Image ensureCapacity(final Image i, final Dimension req) {
 
-		if (i == null)
+		if (i == null) {
 			return createImage(req.width, req.height);
+		}
 
 		int w = i.getWidth(null);
 		int h = i.getHeight(null);
@@ -116,14 +117,9 @@ public abstract class ModelViewBuffered extends ModelView {
 	@Override
 	public synchronized void paintComponent(final Graphics g) {
 
-		super.paintComponent(g);
-		
 		final Rectangle clip = g.getClipBounds();
-		// System.out.println("Entering " + viewName() + " to clip " + clip );
-
 		final Dimension newsize = getSize();
-		if (newsize == null)
-			return;
+		if (newsize == null) return;
 
 		Dimension reqSize;
 		reqSize = newsize;
@@ -160,7 +156,6 @@ public abstract class ModelViewBuffered extends ModelView {
 				offscreenValid = true;
 			}
 		} else {
-			// System.out.println(viewName() + " not enabled");
 			final Graphics tg = offscreenBuffer.getGraphics();
 			tg.setColor(GUIFactory.DEFAULT_BG);
 			tg.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
@@ -169,8 +164,6 @@ public abstract class ModelViewBuffered extends ModelView {
 		if (g != offscreenGraphics) { // sometimes paint directly
 			g.drawImage(offscreenBuffer, 0, 0, this);
 		}
-		paintComposite(g);
-		// System.out.println("Exiting " + viewName() + " to clip " + clip );
 	}
 
 }

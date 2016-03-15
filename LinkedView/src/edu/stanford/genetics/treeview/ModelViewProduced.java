@@ -104,7 +104,7 @@ public abstract class ModelViewProduced extends ModelView {
 		if ((offscreenImage == null) || (reqSize.width != offscreenSize.width)
 				|| (reqSize.height != offscreenSize.height)) {
 			offscreenSize = reqSize;
-			ensureCapacity();//offscreenSize); 
+			ensureCapacity();
 			offscreenChanged = true;
 			offscreenValid = false;
 

@@ -53,7 +53,6 @@ public abstract class ModelView extends JPanel implements Observer,
 	protected ModelView() {
 
 		super(false);
-		
 		resetDefaults();
 	}
 
