@@ -167,13 +167,14 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void resetDefaultState() {
 		
-		this.tileNumVisible = -1;
-		this.numVisible = -1;
-		this.firstVisible = -1;
-		this.firstVisibleLabel = -1;
-		this.lastVisibleLabel = -1;
+		this.tileNumVisible = getTotalTileNum();
+		this.numVisible = getTotalTileNum();
+		this.firstVisible = getMinIndex();
+		this.firstVisibleLabel = getMinIndex();
+		this.lastVisibleLabel = getMaxIndex();
 		this.firstVisibleLabelOffset = -1;
 		this.lastVisibleLabelOffset = -1;
+		
 		this.overLabels            = false;
 		this.overLabelsScrollbar   = false;
 		this.overInteractiveMatrix = false;
@@ -224,13 +225,6 @@ public class MapContainer extends Observable implements Observer,
 	 * Resets the MapContainer so that it completely fills out the available
 	 * screen space.
 	 */
-	public void setToMinScale() {
-		
-		setMinScale();
-		setScale(minScale);
-		notifyObservers();
-	}
-
 	public void setMinScale() {
 
 		this.tileNumVisible = getTotalTileNum();
@@ -1524,6 +1518,10 @@ public class MapContainer extends Observable implements Observer,
 				return;
 			}
 		}
+		
+		if(numVisible < 1) {
+			return;
+		}
 
 		// The divisor here was previously calculated by:
 		// getMaxIndex() - getMinIndex() + 1, which inadvertently resulted
@@ -1617,13 +1615,16 @@ public class MapContainer extends Observable implements Observer,
 
 	public void scrollToFirstIndex(final int i) {
 
+		if(scrollbar == null) {
+			return;
+		}
+		
 		if(i < getMinIndex() || i > getMaxIndex()) {
 			LogBuffer.println("Cannot set first index to " + i);
 			return;
 		}
 		
 		final int j = scrollbar.getValue();
-
 		scrollbar.setValue(i);
 
 		// Keep track of the first visible index

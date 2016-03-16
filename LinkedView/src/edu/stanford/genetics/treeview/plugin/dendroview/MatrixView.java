@@ -15,7 +15,6 @@ import javax.swing.SwingWorker;
 
 import ColorChooser.ColorChooserController;
 import Utilities.GUIFactory;
-import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
@@ -241,10 +240,11 @@ public abstract class MatrixView extends ModelViewProduced {
 	 */
 	public void resetView() {
 
-		xmap.setToMinScale();
-		ymap.setToMinScale();
+		xmap.setMinScale();
+		ymap.setMinScale();
 
 		revalidateScreen();
+		repaint();
 	}
 
 	/**
@@ -357,8 +357,8 @@ public abstract class MatrixView extends ModelViewProduced {
 		 * This avoids unnecessary updates to the BufferedImage pixel raster. 
 		 */
 		if (offscreenImage == null) {
-			int x_tiles = xmap.getMaxIndex() + 1;
-			int y_tiles = ymap.getMaxIndex() + 1;
+			int x_tiles = xmap.getTotalTileNum();
+			int y_tiles = ymap.getTotalTileNum();
 			createNewBuffer(x_tiles, y_tiles);
 		}
 	}

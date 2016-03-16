@@ -558,7 +558,7 @@ ConfigNodePersistent, Controller {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			resetMatrixViews();
-			imView.setAspectRatio(
+			imView.setAspectRatio( //TODO move into matrixview.resetView
 					interactiveXmap.getTotalTileNum(),
 					interactiveYmap.getTotalTileNum());
 		}
@@ -578,10 +578,7 @@ ConfigNodePersistent, Controller {
 			public void run() {
 
 				imView.resetView();
-				imView.repaint();
-
 				gmView.resetView();
-				gmView.repaint();
 			}
 		});
 	}

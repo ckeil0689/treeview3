@@ -61,7 +61,7 @@ public class MapContainerTest {
 		assertFalse("Not all tiles visible.", mpContainer.showsAllTiles());
 		
 		// Case 3: Zoomed out again
-		mpContainer.setToMinScale();
+		mpContainer.setMinScale();
 		assertTrue("All tiles visible.", mpContainer.showsAllTiles());
 	}
 

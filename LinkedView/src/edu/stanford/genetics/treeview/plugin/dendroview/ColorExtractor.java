@@ -210,7 +210,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 			if (!foundColorSet) {
 				nodeColorSet = new ColorSet(ColorPresets.defaultColorSets[0]);
 				LogBuffer.println("Unable to find last used colorset: "
-						+ lastActive + "; using " + colorSet.getName());
+						+ lastActive + "; using " + nodeColorSet.getName());
 			}
 		} catch (final BackingStoreException e) {
 			LogBuffer.logException(e);

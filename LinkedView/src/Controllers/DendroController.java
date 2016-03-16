@@ -805,8 +805,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		interactiveXmap.adjustToScreenChange();
 		interactiveYmap.adjustToScreenChange();
 
-		globalXmap.setToMinScale();
-		globalYmap.setToMinScale();
+		globalXmap.setMinScale();
+		globalYmap.setMinScale();
 
 		saveSettings();
 	}

@@ -523,7 +523,7 @@ public abstract class HeaderFinderBox {
 				(minIndex < globalSmap.getFirstVisible() || maxIndex > (globalSmap
 						.getFirstVisible() + globalSmap.getNumVisible() - 1))) {
 
-			globalSmap.setToMinScale();
+			globalSmap.setMinScale();
 		}
 
 		if ((otherSelection.getNSelectedIndexes() == 0 ||
@@ -531,7 +531,7 @@ public abstract class HeaderFinderBox {
 			otherMaxIndex > (globalOmap.getFirstVisible() +
 				globalOmap.getNumVisible() - 1))) {
 
-			globalOmap.setToMinScale();
+			globalOmap.setMinScale();
 		}
 
 		if(indexList.size() > 0) {
