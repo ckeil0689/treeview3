@@ -1491,7 +1491,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * @param node
 	 * @throws BackingStoreException
 	 */
-	public void importColorPreferences(Preferences oldNode)
+	public void importColorPreferences(final Preferences oldNode)
 			throws BackingStoreException {
 		
 		mvController.importColorPreferences(oldNode);
@@ -1501,27 +1501,27 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Update the state of label views to reflect settings from an imported
 	 * node.
 	 * 
-	 * @param parent
+	 * @param oldNode
 	 */
-	public void importLabelPreferences(Preferences parent) {
+	public void importLabelPreferences(final Preferences oldNode) {
 
 		LogBuffer.println("Importing labels...");
 		
 		try {
-			if(!parent.nodeExists("RowLabelView")) {
+			if(!oldNode.nodeExists("RowLabelView")) {
 				LogBuffer.println("Missing node in parent. Could not import "
 						+ "row label settings.");
 			} else {
 				importLabelNode(dendroView.getRowLabelView(), 
-						parent.node("RowLabelView"));
+						oldNode.node("RowLabelView"));
 			}
 		
-			if(!parent.nodeExists("ColLabelView")) {
+			if(!oldNode.nodeExists("ColLabelView")) {
 				LogBuffer.println("Missing node in parent. Could not import "
 						+ "column label settings.");
 			} else {
 				importLabelNode(dendroView.getColLabelView(), 
-						parent.node("ColLabelView"));
+						oldNode.node("ColLabelView"));
 			}
 		} catch (BackingStoreException e) {
 			LogBuffer.logException(e);

@@ -916,12 +916,15 @@ public class ClusterDialogController {
 		if (newFilePath != null) {
 			file = new File(newFilePath);
 			
-			final FileSet oldFileSet = tvModel.getFileSet();
+			/* Later used to import preferences */
+			final String oldRoot = tvModel.getFileSet().getRoot();
+			final String oldExt = tvModel.getFileSet().getExt();
+			
 			final FileSet newFileSet = new FileSet(file.getName(),
 					file.getParent() + File.separator);
 			
 			clusterDialog.dispose();
-			tvController.getDataInfoAndLoad(newFileSet, oldFileSet, true);
+			tvController.getDataInfoAndLoad(newFileSet, oldRoot, oldExt, true);
 
 		} else {
 			final String alert = "When trying to load the clustered file, no "

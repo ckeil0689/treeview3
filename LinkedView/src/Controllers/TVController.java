@@ -338,7 +338,7 @@ public class TVController implements Observer {
 				Preferences loadedNode = dataInfo.getOldNode();
 				
 				if(loadedNode != null) { 
-					copyOldPreferencesTo(loadedNode);
+					copyOldPreferencesFrom(loadedNode);
 					
 				} else {
 					LogBuffer.println("No old preferences could be loaded. "
@@ -382,7 +382,8 @@ public class TVController implements Observer {
 	 * @param srcExtension
 	 * @return The target Preferences node, if it exists. Otherwise null.
 	 */
-	public Preferences getOldPreferences(String srcName, String srcExtension) {
+	private Preferences getOldPreferences(final String srcName, 
+			final String srcExtension) {
 
 		try {
 			/* First, get the relevant old node... */
@@ -408,12 +409,9 @@ public class TVController implements Observer {
 	 * Copies label and color data from the pre-clustered file to the
 	 * Preferences node of the post-clustered file.
 	 * 
-	 * @param srcName
-	 *            Source name of the post-clustered file.
-	 * @param srcExtension
-	 *            Source file extension of the post-clustered file.
+	 * @param oldNode A node from which to import preferences settings.
 	 */
-	private void copyOldPreferencesTo(final Preferences loadedNode) {
+	private void copyOldPreferencesFrom(final Preferences loadedNode) {
 
 		if (loadedNode == null) {
 			LogBuffer.println("No old node was found when trying to copy old"
@@ -441,8 +439,9 @@ public class TVController implements Observer {
 	 * @return The target Preferences node.
 	 * @throws BackingStoreException
 	 */
-	private static Preferences getTargetNode(Preferences root, String srcName,
-			String srcExtension) throws BackingStoreException {
+	private static Preferences getTargetNode(final Preferences root, 
+			final String srcName, final String srcExtension) 
+					throws BackingStoreException {
 
 		String[] fileNodes = root.childrenNames();
 
@@ -505,7 +504,7 @@ public class TVController implements Observer {
 				}
 			}
 			
-			getDataInfoAndLoad(fileSet, null, false);
+			getDataInfoAndLoad(fileSet, null, null, false);
 			
 		} catch (final LoadException e) {
 			message = "Loading the file was interrupted.";
@@ -517,32 +516,42 @@ public class TVController implements Observer {
 
 	/**
 	 * Used to transfer information to ModelLoader about the data 
-	 * for proper loading. 
+	 * for proper loading and import of settings from old Preferences.
 	 * Either through saved information (stored preferences) or by offering
 	 * a dialog to the user in which they can specify parameters.
+	 * The identifiers for the old FileSet are passed as Strings because 
+	 * passing another FileSet object does not work. They self-update their
+	 * state to the 'active' FileSet using a Preferences node, overwriting
+	 * their old data.
 	 * @param newFileSet File name + directory information object.
+	 * @param oldRoot The root name of the old FileSet (FileSet.getRoot())
+	 * @param oldExt The extension of the old FileSet (FileSet.getExt()) 
 	 * @param isFromCluster Whether the loading happens as a result of 
 	 * clustering.
 	 */
 	public void getDataInfoAndLoad(final FileSet newFileSet, 
-			final FileSet oldFileSet, boolean isFromCluster) {
+			final String oldRoot, final String oldExt, boolean isFromCluster) {
 		
 		Preferences oldNode;
+		
 		/* Transfer settings to clustered file */
-		if(isFromCluster && oldFileSet != null) {
-			oldNode = getOldPreferences(oldFileSet.getRoot(), 
-					oldFileSet.getExt());
+		if(isFromCluster && oldRoot != null && oldExt != null) {
+			LogBuffer.println("Loading clustered file.");
+			oldNode = getOldPreferences(oldRoot, oldExt);
 		/* Check if file was loaded before */
 		} else {
+			LogBuffer.println("Loading normal file.");
 			oldNode = getOldPreferences(newFileSet.getRoot(), 
 					newFileSet.getExt());
 		}
 
 		DataLoadInfo dataInfo;
 		if (oldNode != null) {
+			LogBuffer.println(">>>>>>>> Loading with old node.");
 			dataInfo = getDataLoadInfo(newFileSet, oldNode);
 			
 		} else {
+			LogBuffer.println(">>>>>>>> No old node found. Import.");
 			dataInfo = useImportDialog(newFileSet);
 		}
 

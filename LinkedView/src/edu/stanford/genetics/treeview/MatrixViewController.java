@@ -22,6 +22,7 @@ import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import ColorChooser.ColorSchemeType;
 import Controllers.Controller;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
@@ -170,11 +171,12 @@ ConfigNodePersistent, Controller {
 			return;
 		}
 
+		LogBuffer.println("OldNode: " + oldNode.toString());
 		colorExtractor.importPreferences(oldNode);
 
 		/* Update GradientChooser node */
 		String lastActive = oldNode.node("GradientChooser").get("activeColors",
-				"RedGreen");
+				ColorSchemeType.REDGREEN.toString());
 		configNode.node("GradientChooser").put("activeColors", lastActive);
 
 		/* Store copied node in new ColorPresets node */

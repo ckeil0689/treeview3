@@ -130,9 +130,11 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * @param node
 	 *            Preferences node which contains stored color settings.
 	 */
-	public void importPreferences(Preferences node) {
+	public void importPreferences(final Preferences node) {
 
 		this.colorSet = findColorSetFromNode(node);
+		
+		LogBuffer.println("Importing colorSet: " + colorSet.getName());
 
 		final String[] colors = colorSet.getColors();
 		final List<Color> cList = new ArrayList<Color>(colors.length);
