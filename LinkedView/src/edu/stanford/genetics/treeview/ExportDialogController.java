@@ -54,7 +54,6 @@ public class ExportDialogController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			LogBuffer.println("Pressed export button!");
 			/* For now, the selected indices of the 2 JComboBoxes */
 			int[] selectedOptions = exportDialog.getSelectedOptions();
 
@@ -118,9 +117,6 @@ public class ExportDialogController {
 			}
 			exportFilename += "." + selFormat.toString();
 
-			// TODO call to event handler here, work with selected indices
-			// and EXP_FORMATS / PAPER_TYPE enum classes
-
 			try {
 				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
 					interactiveYmap,colSelection,rowSelection);
@@ -162,7 +158,6 @@ public class ExportDialogController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			LogBuffer.println("Format changed!");
 			/* For now, the selected indices of the 2 JComboBoxes */
 			int[] selectedOptions = exportDialog.getSelectedOptions();
 
@@ -174,16 +169,9 @@ public class ExportDialogController {
 				selFormat = Format.values()[selectedOptions[0]];
 			}
 
-			ExportAspect selAspect;
-			if(selectedOptions.length < 4 || selectedOptions[3] < 0 ||
-				selectedOptions[3] >= ExportAspect.values().length) {
-				selAspect = ExportAspect.getDefault();
-			} else {
-				selAspect = ExportAspect.values()[selectedOptions[3]];
-			}
-
 			exportDialog.getPaperBox().setEnabled(selFormat.isDocumentFormat());
-			exportDialog.getOrientBox().setEnabled(selFormat.isDocumentFormat());
+			exportDialog.getOrientBox().setEnabled(
+				selFormat.isDocumentFormat());
 
 			ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
 				interactiveXmap,interactiveYmap,tvFrame.getColSelection(),
@@ -203,7 +191,6 @@ public class ExportDialogController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			LogBuffer.println("Region changed!");
 			/* For now, the selected indices of the 2 JComboBoxes */
 			int[] selectedOptions = exportDialog.getSelectedOptions();
 

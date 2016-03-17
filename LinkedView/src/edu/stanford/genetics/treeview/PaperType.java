@@ -1,7 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import Controllers.Format;
-
 public enum PaperType {
 	A3("A3"), A$("A4"), A5("A5"), A6("A6"), SMALL("Small"), 
 	MEDIUM("Medium"), LARGE("LARGE"), BEST_FIT("Best fit");

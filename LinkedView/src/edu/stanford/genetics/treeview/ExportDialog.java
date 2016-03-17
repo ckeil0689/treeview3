@@ -146,11 +146,8 @@ public class ExportDialog extends CustomDialog {
 				option.setSelected(true);
 			}
 			if(tooBigs.contains(asp)) {
-				LogBuffer.println("Aspect [" + asp.toString() + "] is too big.");
 				option.setEnabled(false);
 				option.setToolTipText("Too big for PNG/JPG/PPM export");
-			} else {
-				LogBuffer.println("Aspect [" + asp.toString() + "] is not too big.");
 			}
 			aspectRadioBtns.add(option);
 			aspectPanel.add(option, "alignx 0, aligny 0, wrap");
@@ -185,10 +182,20 @@ public class ExportDialog extends CustomDialog {
 		exportBtn.addActionListener(l);
 	}
 
+	/**
+	 * Add format action to format dropdown. Determines what region radio
+	 * buttons are valid when a format is selected.
+	 * @param l The ActionListener
+	 */
 	public void addFormatListener(final ActionListener l) {
 		formatBox.addActionListener(l);
 	}
 
+	/**
+	 * Add region action to region radio buttons. Determines what aspect radio
+	 * buttons are valid when a region is clicked.
+	 * @param l The ActionListener
+	 */
 	public void addRegionListener(final ActionListener l) {
 		Enumeration<AbstractButton> rab = regionRadioBtns.getElements();
 		while(rab.hasMoreElements()) {
@@ -335,6 +342,9 @@ public class ExportDialog extends CustomDialog {
 		Enumeration<AbstractButton> rBtns = regionRadioBtns.getElements();
 		boolean changeSelected = false;
 		Region selectedRegion = null;
+
+		//Check if region radio buttons need to be disabled/enabled based on
+		//selected region
 		while(rBtns.hasMoreElements()) {
 			AbstractButton option = rBtns.nextElement();
 			final boolean isEnabled = isDocFormat ||
@@ -361,6 +371,8 @@ public class ExportDialog extends CustomDialog {
 				option.setToolTipText("No selection has been made");
 			}
 		}
+
+		//If the selected option was disabled, select a new default
 		if(changeSelected) {
 			rBtns = regionRadioBtns.getElements();
 
@@ -382,6 +394,8 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 
+		//The aspect radio buttons should be updated based on the selected
+		//region
 		updateAspectRadioBtns(isDocFormat,selectedRegion);
 	}
 
@@ -399,23 +413,22 @@ public class ExportDialog extends CustomDialog {
 		boolean changeSelected = false;
 		List<ExportAspect> bigAsps = new ArrayList<ExportAspect>();
 
-		LogBuffer.println("Checking if aspect radio buttons need to be " +
-			"disabled/enabled based on region [" + selectedRegion + "].");
-
+		//Check if aspect radio buttons need to be disabled/enabled based on
+		//selected region
 		while(aBtns.hasMoreElements()) {
 			AbstractButton option = aBtns.nextElement();
 			ExportAspect asp = ExportAspect.getAspect(option.getText());
 			eh.setTileAspectRatio(asp);
-			eh.calculateDimensions(selectedRegion);
-			if(eh.isTooBig(selectedRegion)) {
+			eh.setCalculatedDimensions(selectedRegion);
+			final boolean tooBig = eh.isTooBig(selectedRegion);
+			if(tooBig) {
 				bigAsps.add(asp);
 			}
-			final boolean enabled = isDocFormat || !eh.isTooBig(selectedRegion);
+			final boolean enabled = isDocFormat || !tooBig;
 			if(!enabled && option.isSelected()) {
 				option.setSelected(false);
 				changeSelected = true;
 			}
-			LogBuffer.println("Setting aspect [" + asp + "] to [" + (enabled ? "enabled" : "disabled") + "].");
 			option.setEnabled(enabled);
 			if(enabled) {
 				option.setToolTipText(null);
@@ -424,6 +437,7 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 
+		//If the selected option was disabled, select a new default
 		if(changeSelected) {
 			ExportAspect defAsp;
 			if(isDocFormat) {

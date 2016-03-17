@@ -3,10 +3,7 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import Controllers.Region;
 
 /**
  * The region of the matrix to export to a file
