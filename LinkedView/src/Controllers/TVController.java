@@ -1006,13 +1006,9 @@ public class TVController implements Observer {
 			dendroController.getInteractiveXMap(),
 			dendroController.getInteractiveYMap(),tvFrame.getColSelection(),
 			tvFrame.getRowSelection());
-		List<Region> tooBigs = new ArrayList<Region>();
-		if(!Format.getDefault().isDocumentFormat()) {
-			tooBigs = eh.getRegionsThatAreTooBig();
-		}
 		boolean selectionsExist = (tvFrame.getColSelection() != null &&
 			tvFrame.getColSelection().getNSelectedIndexes() > 0);
-		ExportDialog exportDialog = new ExportDialog(selectionsExist,tooBigs);
+		ExportDialog exportDialog = new ExportDialog(selectionsExist,eh);
 		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
 		
 		new ExportDialogController(exportDialog,tvFrame,

@@ -46,7 +46,7 @@ public class ExportDialogController {
 		
 		exportDialog.addExportListener(new ExportListener());
 		exportDialog.addFormatListener(new FormatListener());
-		exportDialog.addAspectListener(new AspectListener());
+		exportDialog.addRegionListener(new RegionListener());
 	}
 	
 	private class ExportListener implements ActionListener {
@@ -188,22 +188,22 @@ public class ExportDialogController {
 			ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
 				interactiveXmap,interactiveYmap,tvFrame.getColSelection(),
 				tvFrame.getRowSelection());
-			eh.setTileAspectRatio(selAspect);
 			List<Region> tooBigs = new ArrayList<Region>();
 			if(!selFormat.isDocumentFormat()) {
-				tooBigs = eh.getRegionsThatAreTooBig();
+				final boolean useMinimums = true;
+				tooBigs = eh.getRegionsThatAreTooBig(useMinimums);
 			}
 			exportDialog.setBigRegs(tooBigs);
 			exportDialog.updateRegionRadioBtns(selFormat.isDocumentFormat());
 		}
 	}
 
-	private class AspectListener implements ActionListener {
+	private class RegionListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			LogBuffer.println("Aspect changed!");
+			LogBuffer.println("Region changed!");
 			/* For now, the selected indices of the 2 JComboBoxes */
 			int[] selectedOptions = exportDialog.getSelectedOptions();
 
@@ -215,24 +215,17 @@ public class ExportDialogController {
 				selFormat = Format.values()[selectedOptions[0]];
 			}
 
-			ExportAspect selAspect;
-			if(selectedOptions.length < 4 || selectedOptions[3] < 0 ||
-				selectedOptions[3] >= ExportAspect.values().length) {
-				selAspect = ExportAspect.getDefault();
+			Region selRegion;
+			if(selectedOptions.length < 3 || selectedOptions[2] < 0 ||
+				selectedOptions[2] >= Region.values().length) {
+
+				selRegion = Region.getDefault();
 			} else {
-				selAspect = ExportAspect.values()[selectedOptions[3]];
+				selRegion = Region.values()[selectedOptions[2]];
 			}
 
-			ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
-				interactiveXmap,interactiveYmap,tvFrame.getColSelection(),
-				tvFrame.getRowSelection());
-			eh.setTileAspectRatio(selAspect);
-			List<Region> tooBigs = new ArrayList<Region>();
-			if(!selFormat.isDocumentFormat()) {
-				tooBigs = eh.getRegionsThatAreTooBig();
-			}
-			exportDialog.setBigRegs(tooBigs);
-			exportDialog.updateRegionRadioBtns(selFormat.isDocumentFormat());
+			exportDialog.updateAspectRadioBtns(selFormat.isDocumentFormat(),
+				selRegion);
 		}
 	}
 }

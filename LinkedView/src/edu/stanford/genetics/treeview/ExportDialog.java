@@ -1,6 +1,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import javax.swing.JRadioButton;
 
 import org.freehep.graphicsio.PageConstants;
 
+import Controllers.ExportHandler;
 import Controllers.Format;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
@@ -36,12 +38,13 @@ public class ExportDialog extends CustomDialog {
 	private JButton exportBtn;
 	private List<Region> bigRegs; //List of regions that are too big for image export (doc export is OK)
 	private boolean selectionsExist;
+	private ExportHandler eh;
 
-	public ExportDialog(final boolean selectionsExist,
-		final List<Region> bigRegs) {
-		
+	public ExportDialog(final boolean selectionsExist,final ExportHandler eh) {
 		super("Export");
-		this.bigRegs = bigRegs;
+		this.eh = eh;
+		final boolean useMinimums = true;
+		this.bigRegs = eh.getRegionsThatAreTooBig(useMinimums);
 		this.selectionsExist = selectionsExist;
 		setupLayout(selectionsExist);
 	}
@@ -54,7 +57,7 @@ public class ExportDialog extends CustomDialog {
 	protected void setupLayout(final boolean selectionsExist) {
 
 		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
-		
+
 		JPanel contentPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.DEFAULT);
 		JPanel optionsPanel = GUIFactory.createJPanel(false, 
@@ -106,6 +109,7 @@ public class ExportDialog extends CustomDialog {
 
 		optionsPanel.add(region,"label, aligny 0");
 		Region defReg = Region.getDefault();
+		Region selectedRegion = null;
 		if(defReg == Region.SELECTION && !selectionsExist) {
 			defReg = Region.VISIBLE;
 		}
@@ -118,6 +122,7 @@ public class ExportDialog extends CustomDialog {
 			//Default region pre-selected
 			if(reg == defReg && !bigRegs.contains(reg)) {
 				option.setSelected(true);
+				selectedRegion = reg;
 			}
 			if(reg == Region.SELECTION && !bigRegs.contains(reg)) {
 				option.setEnabled(selectionsExist);
@@ -134,9 +139,18 @@ public class ExportDialog extends CustomDialog {
 		optionsPanel.add(aspect, "label, aligny 0");
 		for(ExportAspect asp : ExportAspect.values()) {
 			JRadioButton option = new JRadioButton(asp.toString());
+			List<ExportAspect> tooBigs =
+				eh.getAspectsThatAreTooBig(selectedRegion);
 			//Default region pre-selected
-			if(asp == ExportAspect.getDefault()) {
+			if(asp == ExportAspect.getDefault(tooBigs)) {
 				option.setSelected(true);
+			}
+			if(tooBigs.contains(asp)) {
+				LogBuffer.println("Aspect [" + asp.toString() + "] is too big.");
+				option.setEnabled(false);
+				option.setToolTipText("Too big for PNG/JPG/PPM export");
+			} else {
+				LogBuffer.println("Aspect [" + asp.toString() + "] is not too big.");
 			}
 			aspectRadioBtns.add(option);
 			aspectPanel.add(option, "alignx 0, aligny 0, wrap");
@@ -152,12 +166,12 @@ public class ExportDialog extends CustomDialog {
 		JPanel btnPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		btnPanel.add(closeBtn, "tag cancel, pushx, al right");
 		btnPanel.add(exportBtn, "al right");
-		
+
 		mainPanel.add(contentPanel, "push, grow, w 800!, wrap");
 		mainPanel.add(btnPanel, "bottom, pushx, growx, span");
-		
+
 		getContentPane().add(mainPanel);
-		
+
 		mainPanel.revalidate();
 		mainPanel.repaint();
 	}
@@ -175,10 +189,10 @@ public class ExportDialog extends CustomDialog {
 		formatBox.addActionListener(l);
 	}
 
-	public void addAspectListener(final ActionListener l) {
-		Enumeration<AbstractButton> eab = aspectRadioBtns.getElements();
-		while(eab.hasMoreElements()) {
-			AbstractButton btn = eab.nextElement();
+	public void addRegionListener(final ActionListener l) {
+		Enumeration<AbstractButton> rab = regionRadioBtns.getElements();
+		while(rab.hasMoreElements()) {
+			AbstractButton btn = rab.nextElement();
 			btn.addActionListener(l);
 		}
 	}
@@ -309,19 +323,123 @@ public class ExportDialog extends CustomDialog {
 		this.bigRegs = bigRegs;
 	}
 
+	/**
+	 * Updates the availability and the selection of the region radio buttons
+	 * based on the selected file format, whether a selection exists, and on
+	 * whether the 1:1 size of the region is exportable (in an image format).
+	 * Calls updateAspectRadioBtns.
+	 * @param isDocFormat
+	 */
 	public void updateRegionRadioBtns(final boolean isDocFormat) {
+
 		Enumeration<AbstractButton> rBtns = regionRadioBtns.getElements();
+		boolean changeSelected = false;
+		Region selectedRegion = null;
 		while(rBtns.hasMoreElements()) {
 			AbstractButton option = rBtns.nextElement();
 			final boolean isEnabled = isDocFormat ||
 					!bigRegs.contains(Region.getRegion(option.getText()));
+			if(option.isSelected()) {
+				selectedRegion = Region.getRegion(option.getText());
+			}
 			if(Region.getRegion(option.getText()) != Region.SELECTION ||
 				selectionsExist) {
+
 				option.setEnabled(isEnabled);
 				if(isEnabled) {
 					option.setToolTipText(null);
 				} else {
 					option.setToolTipText("Too big for PNG/JPG/PPM export");
+					if(option.isSelected()) {
+						option.setSelected(false);
+						selectedRegion = null;
+						changeSelected = true;
+					}
+				}
+			} else {
+				option.setEnabled(false);
+				option.setToolTipText("No selection has been made");
+			}
+		}
+		if(changeSelected) {
+			rBtns = regionRadioBtns.getElements();
+
+			Region defReg;
+			if(isDocFormat) {
+				defReg = Region.getDefault();
+			} else {
+				defReg = Region.getDefault(bigRegs,selectionsExist);
+			}
+
+			if(defReg != null) {
+				while(rBtns.hasMoreElements()) {
+					AbstractButton option = rBtns.nextElement();
+					if(Region.getRegion(option.getText()) == defReg) {
+						selectedRegion = Region.getRegion(option.getText());
+						option.setSelected(true);
+					}
+				}
+			}
+		}
+
+		updateAspectRadioBtns(isDocFormat,selectedRegion);
+	}
+
+	/**
+	 * Updates the availability and the selection of the aspect radio buttons
+	 * based on the selected file format, and on whether the size of the
+	 * selected region is exportable (in an image format).
+	 * @param isDocFormat
+	 * @param selectedRegion
+	 */
+	public void updateAspectRadioBtns(final boolean isDocFormat,
+		final Region selectedRegion) {
+
+		Enumeration<AbstractButton> aBtns = aspectRadioBtns.getElements();
+		boolean changeSelected = false;
+		List<ExportAspect> bigAsps = new ArrayList<ExportAspect>();
+
+		LogBuffer.println("Checking if aspect radio buttons need to be " +
+			"disabled/enabled based on region [" + selectedRegion + "].");
+
+		while(aBtns.hasMoreElements()) {
+			AbstractButton option = aBtns.nextElement();
+			ExportAspect asp = ExportAspect.getAspect(option.getText());
+			eh.setTileAspectRatio(asp);
+			eh.calculateDimensions(selectedRegion);
+			if(eh.isTooBig(selectedRegion)) {
+				bigAsps.add(asp);
+			}
+			final boolean enabled = isDocFormat || !eh.isTooBig(selectedRegion);
+			if(!enabled && option.isSelected()) {
+				option.setSelected(false);
+				changeSelected = true;
+			}
+			LogBuffer.println("Setting aspect [" + asp + "] to [" + (enabled ? "enabled" : "disabled") + "].");
+			option.setEnabled(enabled);
+			if(enabled) {
+				option.setToolTipText(null);
+			} else {
+				option.setToolTipText("Too big for PNG/JPG/PPM export");
+			}
+		}
+
+		if(changeSelected) {
+			ExportAspect defAsp;
+			if(isDocFormat) {
+				defAsp = ExportAspect.getDefault();
+			} else {
+				defAsp = ExportAspect.getDefault(bigAsps);
+			}
+
+			if(defAsp != null) {
+				aBtns = aspectRadioBtns.getElements();
+				while(aBtns.hasMoreElements()) {
+					AbstractButton option = aBtns.nextElement();
+					ExportAspect asp = ExportAspect.getAspect(option.getText());
+					if(asp == defAsp) {
+						option.setSelected(true);
+					}
 				}
 			}
 		}

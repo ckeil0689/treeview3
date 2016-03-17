@@ -3,6 +3,9 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import Controllers.Region;
 
 /**
@@ -25,5 +28,24 @@ public enum ExportAspect {
 
 	public static ExportAspect getDefault() {
 		return(ExportAspect.ONETOONE);
+	}
+
+	public static ExportAspect getDefault(final List<ExportAspect> bigAsps) {
+		ExportAspect[] priority = {ExportAspect.ONETOONE,ExportAspect.ASSEEN};
+		for(ExportAspect asp : priority) {
+			if(!bigAsps.contains(asp)) {
+				return(asp);
+			}
+		}
+		return(null);
+	}
+
+	public static ExportAspect getAspect(String aspName) {
+		for(ExportAspect asp : ExportAspect.values()) {
+			if(asp.toString().equals(aspName)) {
+				return(asp);
+			}
+		}
+		return(null);
 	}
 }
