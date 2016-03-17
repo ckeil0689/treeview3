@@ -568,7 +568,10 @@ public class ExportHandler {
 	}
 
 	/**
-	 * Determines whether the exported region selection should work or not
+	 * Determines whether the given region is properly defined or not.  It does
+	 * not check whether a region is too big for export.  Refer to these methods
+	 * for that: getRegionsThatAreTooBig, getAspectsThatAreTooBig, and isTooBig.
+	 * 
 	 * @author rleach
 	 * @param region
 	 * @return boolean
@@ -588,6 +591,7 @@ public class ExportHandler {
 
 	/**
 	 * Export an image file as a part of a document in a vector format
+	 * 
 	 * @author rleach
 	 * @param format
 	 * @param pageSize
@@ -634,7 +638,8 @@ public class ExportHandler {
 			}
 
 			Properties p = new Properties();
-			p.setProperty("PageSize",pageSize);
+			p.setProperty(PDFGraphics2D.PAGE_SIZE,pageSize);
+			p.setProperty(PDFGraphics2D.ORIENTATION,defPageOrientation);
 			g.setProperties(p); 
 
 			g.startExport();
@@ -657,6 +662,7 @@ public class ExportHandler {
 	 * Returns a list of regions that are too big to be exported in an image
 	 * format (png/jpg/ppm) at the smallest (1:1) aspect ratio, regardless of
 	 * current the aspect ratio datamember's value
+	 * 
 	 * @param minimum - whether to determine if the minimum size is too big or
 	 *                  if the current size is too big
 	 * @return
@@ -666,9 +672,40 @@ public class ExportHandler {
 	}
 
 	/**
+	 * Returns a list of regions that are at least possible to be exported at
+	 * the minimum size (i.e. aspect ratio is 1:1)
+	 * 
+	 * @return
+	 */
+	public List<Region> getMinumumAvailableRegions() {
+		List<Region> regs = new ArrayList<Region>();
+		for(int i = 0;i < Region.values().length;i++) {
+			//If this region is valid for export and it is not too big
+			if(isExportValid(Region.values()[i]) &&
+				((double) getMinXDim(Region.values()[i]) /
+					(double) MAX_IMAGE_SIZE *
+					(double) getMinYDim(Region.values()[i])) <= 1.0) {
+
+				regs.add(Region.values()[i]);
+			}
+		}
+		return(regs);
+	}
+
+	/**
+	 * Determines whether an region can be exported as a PNG/JPG/PPM
+	 * 
+	 * @return
+	 */
+	public boolean isImageExportPossible() {
+		return(getMinumumAvailableRegions().size() > 0);
+	}
+
+	/**
 	 * Returns a list of regions that are too big to be exported in an image
 	 * format (png/jpg/ppm) at either the minimum or the current aspect ratio,
 	 * given the minimum boolean.
+	 * 
 	 * @param minimum - whether to determine if the minimum size is too big or
 	 *                  if the current size is too big
 	 * @return
@@ -693,6 +730,7 @@ public class ExportHandler {
 	/**
 	 * Returns a list of Aspects that are too big to be exported in an image
 	 * format (png/jpg/ppm) for the given region.
+	 * 
 	 * @param selectedRegion - The region to apply the aspect to, to get the
 	 *                         predicted size
 	 * @return
@@ -751,6 +789,7 @@ public class ExportHandler {
 	/**
 	 * This calls the export functions of the various components of the total
 	 * image, arranged in an aligned fashion together
+	 * 
 	 * @author rleach
 	 * @param g2d
 	 * @param region

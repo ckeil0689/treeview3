@@ -25,6 +25,10 @@ public enum Format {
 		return(Format.PNG);
 	}
 
+	public static Format getDefaultDocumentFormat() {
+		return(Format.PDF);
+	}
+
 	public static Format[] getDocumentFormats() {
 		Format[] docFormats = {PDF,SVG,PS};
 		return(docFormats);

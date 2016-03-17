@@ -23,12 +23,29 @@ public enum Region {
 		return toString;
 	}
 
+	/**
+	 * Get the default when all options are valid
+	 * 
+	 * @return
+	 */
 	public static Region getDefault() {
 		return(Region.VISIBLE);
 	}
 
 	/**
-	 * Returns the first region not in a list of regions that are too big, based on a list ordered by priority
+	 * Get the default when only selections may be invalid
+	 * 
+	 * @param selectionsExist
+	 * @return
+	 */
+	public static Region getDefault(final boolean selectionsExist) {
+		return(getDefault() == Region.SELECTION && !selectionsExist ?
+			Region.VISIBLE : Region.SELECTION);
+	}
+
+	/**
+	 * Returns the first region not in a list of regions that are too big, based
+	 * on a list ordered by priority and whether or not selections exist
 	 * 
 	 * @param bigRegs
 	 * @return
@@ -48,6 +65,12 @@ public enum Region {
 		return(null);
 	}
 
+	/**
+	 * Convert a region string to Region type.
+	 * 
+	 * @param regName
+	 * @return
+	 */
 	public static Region getRegion(String regName) {
 		for(Region reg : Region.values()) {
 			if(reg.toString().equals(regName)) {

@@ -80,11 +80,20 @@ public class ExportDialog extends CustomDialog {
 		JLabel aspect = GUIFactory.createLabel("Aspect:",GUIFactory.FONTS);
 		JLabel orient = GUIFactory.createLabel("Orientation:",GUIFactory.FONTS);
 
-		formatBox = new JComboBox<Object>(Format.values());
-		formatBox.setSelectedItem(Format.getDefault());
+		Format selectedFormat = Format.getDefault();
+		if(eh.isImageExportPossible()) {
+			formatBox = new JComboBox<Object>(Format.values());
+			formatBox.setSelectedItem(Format.getDefault());
+		} else {
+			selectedFormat = Format.getDefaultDocumentFormat();
+			formatBox = new JComboBox<Object>(Format.getDocumentFormats());
+			formatBox.setSelectedItem(Format.getDefaultDocumentFormat());
+			formatBox.setToolTipText("All regions too big for PNG/JPG/PPM " +
+				"export");
+		}
 		paperBox = new JComboBox<Object>(PaperType.values());
 		paperBox.setSelectedItem(PaperType.getDefault());
-		paperBox.setEnabled(Format.getDefault().isDocumentFormat());
+		paperBox.setEnabled(selectedFormat.isDocumentFormat());
 		regionRadioBtns = new ButtonGroup();
 		aspectRadioBtns = new ButtonGroup();
 		selectionsBox = new JCheckBox("Show Selections");
@@ -94,7 +103,7 @@ public class ExportDialog extends CustomDialog {
 		}
 		orientBox = new JComboBox<Object>(PageConstants.getOrientationList());
 		orientBox.setSelectedItem(PageConstants.LANDSCAPE);
-		orientBox.setEnabled(Format.getDefault().isDocumentFormat());
+		orientBox.setEnabled(selectedFormat.isDocumentFormat());
 
 		previewPanel.add(previewComp, "grow, push");
 
@@ -108,50 +117,13 @@ public class ExportDialog extends CustomDialog {
 		optionsPanel.add(orientBox, "growx, wrap");
 
 		optionsPanel.add(region,"label, aligny 0");
-		Region defReg = Region.getDefault();
-		Region selectedRegion = null;
-		if(defReg == Region.SELECTION && !selectionsExist) {
-			defReg = Region.VISIBLE;
-		}
-		for (Region reg : Region.values()) {
-			JRadioButton option = new JRadioButton(reg.toString());
-			if(bigRegs.contains(reg)) {
-				option.setEnabled(false);
-				option.setToolTipText("Too big for PNG/JPG/PPM export");
-			}
-			//Default region pre-selected
-			if(reg == defReg && !bigRegs.contains(reg)) {
-				option.setSelected(true);
-				selectedRegion = reg;
-			}
-			if(reg == Region.SELECTION && !bigRegs.contains(reg)) {
-				option.setEnabled(selectionsExist);
-				if(!selectionsExist) {
-					option.setToolTipText("No data selected");
-				}
-			}
-			regionRadioBtns.add(option);
-			rangePanel.add(option,"alignx 0, aligny 0, wrap");
-		}
+		Region selectedRegion = addRegionRadioButtons(rangePanel,
+			selectedFormat);
 		rangePanel.add(selectionsBox,"alignx 0, aligny 0");
 		optionsPanel.add(rangePanel,"growx, aligny 0, alignx 0, wrap");
 
 		optionsPanel.add(aspect, "label, aligny 0");
-		for(ExportAspect asp : ExportAspect.values()) {
-			JRadioButton option = new JRadioButton(asp.toString());
-			List<ExportAspect> tooBigs =
-				eh.getAspectsThatAreTooBig(selectedRegion);
-			//Default region pre-selected
-			if(asp == ExportAspect.getDefault(tooBigs)) {
-				option.setSelected(true);
-			}
-			if(tooBigs.contains(asp)) {
-				option.setEnabled(false);
-				option.setToolTipText("Too big for PNG/JPG/PPM export");
-			}
-			aspectRadioBtns.add(option);
-			aspectPanel.add(option, "alignx 0, aligny 0, wrap");
-		}
+		addAspectRadioButtons(aspectPanel,selectedRegion,selectedFormat);
 		optionsPanel.add(aspectPanel, "growx, aligny 0, alignx 0, wrap");
 
 		contentPanel.add(previewPanel, "grow");//w 500!, h 500!");
@@ -172,7 +144,80 @@ public class ExportDialog extends CustomDialog {
 		mainPanel.revalidate();
 		mainPanel.repaint();
 	}
-	
+
+	/**
+	 * Adds radio buttons to regionRadioBtns and to the supplied rangePanel and
+	 * also disables invalid regions with a tooltip explaining why based on
+	 * bigRegs and selectionsExist.  The default region is pre-selected.
+	 * 
+	 * @param rangePanel
+	 * @return
+	 */
+	public Region addRegionRadioButtons(final JPanel rangePanel,
+		final Format selectedFormat) {
+
+		Region selectedRegion = null;
+		Region defReg = (selectedFormat.isDocumentFormat() ?
+			Region.getDefault(selectionsExist) :
+			Region.getDefault(bigRegs,selectionsExist));
+		for (Region reg : Region.values()) {
+			JRadioButton option = new JRadioButton(reg.toString());
+			if(!selectedFormat.isDocumentFormat() && bigRegs.contains(reg)) {
+				option.setEnabled(false);
+				option.setToolTipText("Too big for PNG/JPG/PPM export");
+			}
+			//Default region pre-selected
+			if(reg == defReg && (selectedFormat.isDocumentFormat() ||
+				!bigRegs.contains(reg))) {
+
+				option.setSelected(true);
+				selectedRegion = reg;
+			}
+			//If this is the selection region and it's valid
+			if(reg == Region.SELECTION && (selectedFormat.isDocumentFormat() ||
+				!bigRegs.contains(reg))) {
+
+				option.setEnabled(selectionsExist);
+				if(!selectionsExist) {
+					option.setToolTipText("No data selected");
+				}
+			}
+			regionRadioBtns.add(option);
+			rangePanel.add(option,"alignx 0, aligny 0, wrap");
+		}
+		return(selectedRegion);
+	}
+
+	/**
+	 * Adds radio buttons to aspectRadioBtns and to the supplied aspectPanel and
+	 * also disables invalid aspects with a tooltip explaining why based on
+	 * bigRegs.  The default aspect is pre-selected.
+	 * 
+	 * @param aspectPanel
+	 * @param selectedRegion
+	 */
+	public void addAspectRadioButtons(final JPanel aspectPanel,
+		final Region selectedRegion,final Format selectedFormat) {
+
+		for(ExportAspect asp : ExportAspect.values()) {
+			JRadioButton option = new JRadioButton(asp.toString());
+			List<ExportAspect> tooBigs =
+				eh.getAspectsThatAreTooBig(selectedRegion);
+			//Default region pre-selected
+			ExportAspect defAsp = (selectedFormat.isDocumentFormat() ?
+				ExportAspect.getDefault() : ExportAspect.getDefault(tooBigs));
+			if(asp == defAsp) {
+				option.setSelected(true);
+			}
+			if(!selectedFormat.isDocumentFormat() && tooBigs.contains(asp)) {
+				option.setEnabled(false);
+				option.setToolTipText("Too big for PNG/JPG/PPM export");
+			}
+			aspectRadioBtns.add(option);
+			aspectPanel.add(option, "alignx 0, aligny 0, wrap");
+		}
+	}
+
 	/**
 	 * Add export action to export button. Determines what happens, when
 	 * the export button is clicked.
@@ -287,26 +332,26 @@ public class ExportDialog extends CustomDialog {
 	 * @param matrix - The panel containing the matrix drawing.
 	 */
 	public void setPreview(JPanel rowTrees, JPanel colTrees, JPanel matrix) {
-		
+
 		if(previewComp == null) {
 			LogBuffer.println("Cannot set preview for Export.");
 			return;
 		}
-		
+
 		JPanel filler = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
-		
+
 		if(rowTrees != null && colTrees != null) {
 			previewComp.add(filler, "w 80!, h 80!");
 		}
-		
+
 		if(colTrees != null) {
 			previewComp.add(colTrees, "growx, pushx, h 80!, w 400!, wrap");
 		}
-		
+
 		if(rowTrees != null) {
 			previewComp.add(rowTrees, "growy, pushy, h 400!, w 80!");
 		}
-		
+
 		previewComp.add(matrix, "h 400!, w 400!, push, grow");
 	}
 	
@@ -315,7 +360,7 @@ public class ExportDialog extends CustomDialog {
 	 * @param comp The component to be added.
 	 */
 	public void addToPreviewPanel(final JComponent comp) {
-		
+
 		previewComp.add(comp, "push, grow");
 		
 		mainPanel.revalidate();
