@@ -51,7 +51,7 @@ public class ExportHandler {
 	final protected TreeSelectionI colSelection;
 	final protected TreeSelectionI rowSelection;
 
-	protected String defPageSize = "A5"; //See freehep manual for options
+	protected PaperType defPageSize = PaperType.getDefault();
 	protected String defPageOrientation = PageConstants.LANDSCAPE;
 
 	protected double aspectRatio = 1.0; //x / y
@@ -119,11 +119,11 @@ public class ExportHandler {
 	 * @param dps - default page size
 	 */
 	public void setDefaultPageSize(String dps) {
-		this.defPageSize = dps;
+		this.defPageSize = PaperType.getPaperType(dps);
 	}
 
 	public void setDefaultPageSize(PaperType pT) {
-		this.defPageSize = pT.toString();
+		this.defPageSize = pT;
 	}
 
 	/**
@@ -602,7 +602,7 @@ public class ExportHandler {
 	 * @param fileName
 	 * @param region
 	 */
-	public void exportDocument(final Format format,final String pageSize,
+	public void exportDocument(final Format format,final PaperType pageSize,
 		String fileName,final Region region,final boolean showSelections) {
 
 		if(!isExportValid(region)) {
@@ -642,7 +642,7 @@ public class ExportHandler {
 			}
 
 			Properties p = new Properties();
-			p.setProperty(PDFGraphics2D.PAGE_SIZE,pageSize);
+			p.setProperty(PDFGraphics2D.PAGE_SIZE,pageSize.toString());
 			p.setProperty(PDFGraphics2D.ORIENTATION,defPageOrientation);
 			g.setProperties(p); 
 
