@@ -681,7 +681,7 @@ public class ExportHandler {
 	 * 
 	 * @return
 	 */
-	public List<Region> getMinumumAvailableRegions() {
+	public List<Region> getMinimumAvailableRegions() {
 		List<Region> regs = new ArrayList<Region>();
 		for(int i = 0;i < Region.values().length;i++) {
 			//If this region is valid for export and it is not too big
@@ -702,7 +702,7 @@ public class ExportHandler {
 	 * @return
 	 */
 	public boolean isImageExportPossible() {
-		return(getMinumumAvailableRegions().size() > 0);
+		return(getMinimumAvailableRegions().size() > 0);
 	}
 
 	/**
