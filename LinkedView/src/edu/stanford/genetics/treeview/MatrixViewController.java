@@ -131,7 +131,7 @@ ConfigNodePersistent, Controller {
 		
 		this.configNode = parentNode;
 		getColorExtractor().setConfigNode(configNode);
-		requestStoredState();
+//		requestStoredState();
 	}
 	
 	@Override

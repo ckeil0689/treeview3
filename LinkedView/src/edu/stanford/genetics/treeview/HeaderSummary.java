@@ -37,7 +37,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 		
 		this.configNode = parentNode.node(type);
-		requestStoredState();
+//		requestStoredState();
 	}
 	
 	@Override
@@ -49,7 +49,10 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 	@Override
 	public void requestStoredState() {
 		
+		LogBuffer.println("Attempting to restore HeaderSummary state.");
+		
 		if (configNode == null) {
+			LogBuffer.println("ConfigNode was null.");
 			return;
 		}
 
@@ -78,7 +81,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 					setIncluded(new int[0]);
 					return;
 				}
-				
+			
 				array = adjustIncludedHeaders(array);
 				setIncluded(array);
 			}
@@ -105,8 +108,6 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 
 		final int[] vec = getIncluded();
-		LogBuffer.println("Stored included: (" + type + ")" 
-		+ Arrays.toString(vec));
 		configNode.put("included", Arrays.toString(vec));//temp.toString());
 		
 		if(headers == null) {
@@ -122,8 +123,6 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				names[i] = headers[idx];
 			}
 		}
-		LogBuffer.println("Stored includedNames: (" 
-				+ type + ")" + Arrays.toString(names));
 		configNode.put("includedNames", Arrays.toString(names));
 	}
 
@@ -142,7 +141,8 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		LogBuffer.println("Set new headers.(" + type + "): " 
 		+ Arrays.toString(headers));
 		this.headers = headers;
-		setIncluded(adjustIncludedHeaders(getIncluded()));
+		int[] adjustedIncluded = adjustIncludedHeaders(getIncluded());
+		setIncluded(adjustedIncluded);
 		storeState();
 		setChanged();
 		notifyObservers();
@@ -276,6 +276,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		
 		if (nodeHasAttribute("includedNames")) {
 			String names = configNode.get("includedNames", "");
+			LogBuffer.println("Included header names: " + names);
 			String[] nameArray = getValuesFromStoredString(names);
 			
 			newIncluded = new int[nameArray.length];
@@ -291,6 +292,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			}
 		/* At least ensure that included[] is not out of bounds */
 		} else {
+			LogBuffer.println("No included header names stored.");
 	        int maxSize = 0;
 	        /* Shrink if necessary */
 			for(int i = 0; i < included.length; i++) {

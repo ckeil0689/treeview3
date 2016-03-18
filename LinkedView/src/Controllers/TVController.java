@@ -259,34 +259,8 @@ public class TVController implements Observer {
 		/* Setting loading screen */
 		tvFrame.generateView(ViewType.PROGRESS_VIEW);
 
-//		/* Loading TVModel */
+		/* Loading TVModel */
 		final TVModel tvModel = (TVModel) model;
-//
-////		/* 
-//		 * If data is loaded after clustering, transfer the Preferences from
-//		 * the last loaded file.
-//		 */
-//		String srcName;
-//		String srcExtension;
-//		if (dataInfo.isClusteredFile()) {
-//			srcName = oldFileSet.getRoot();
-//			srcExtension = oldFileSet.getExt();
-//
-//		/*
-//		 * If it this isn't post-cluster, check if any Preferences exist for 
-//		 * the file to be loaded.	
-//		 */
-//		} else {
-//			srcName = fileSet.getRoot();
-//			srcExtension = fileSet.getExt();
-//		}
-//		
-//		this.oldNode = getOldPreferences(srcName, srcExtension);
-//
-//		if(oldNode == null) {
-//			LogBuffer.println("Found no old preferences settings. File should "
-//					+ "be loaded with default settings.");
-//		}
 		
 		setFileMenuSet(fileSet);
 
@@ -320,7 +294,6 @@ public class TVController implements Observer {
 	public void finishLoading(final DataLoadInfo dataInfo) {
 
 		if (model.getDataMatrix().getNumRow() > 0) {
-
 			tvFrame.setTitleString(model.getSource());
 
 			/* Will notify view of successful loading. */
@@ -330,22 +303,14 @@ public class TVController implements Observer {
 
 			if (fileMenuSet != null) {
 				/*
-				 * TODO Needs to happen after setNewMatrix because a new
+				 * Needs to happen after setNewMatrix because a new
 				 * ColorExtractor object is created, which would void the 
 				 * updated ColorExtractor state if copying happens before. 
 				 * Implement a nicer solution one day...
 				 */
-				Preferences loadedNode = dataInfo.getOldNode();
-				
-				if(loadedNode != null) { 
-					copyOldPreferencesFrom(loadedNode);
-					
-				} else {
-					LogBuffer.println("No old preferences could be loaded. "
-							+ "Cannot set preferences for current file.");
-				}
-
-				fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
+				importOldPreferencesFrom(dataInfo.getOldNode());
+	
+				this.fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
 				tvFrame.getFileMRU().setLast(fileMenuSet);
 				fileMenuSet = null;
 
@@ -354,8 +319,7 @@ public class TVController implements Observer {
 						+ "preferences and add last file to recent file list.");
 			}
 
-			/* set the selected label type to the old one */
-			//resetLabelSelection();
+			dendroController.restoreComponentStates();
 
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
@@ -411,7 +375,7 @@ public class TVController implements Observer {
 	 * 
 	 * @param oldNode A node from which to import preferences settings.
 	 */
-	private void copyOldPreferencesFrom(final Preferences loadedNode) {
+	private void importOldPreferencesFrom(final Preferences loadedNode) {
 
 		if (loadedNode == null) {
 			LogBuffer.println("No old node was found when trying to copy old"

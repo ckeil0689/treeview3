@@ -448,8 +448,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 		
 		this.configNode = parentNode;
-
-		requestStoredState();
 		getHeaderSummary().setConfigNode(configNode);
 	}
 	
@@ -477,6 +475,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		setFixed(configNode.getBoolean("isFixed",d_fixed));
 		
 		resetSecondaryScroll();
+		
+		if(headerSummary == null) {
+			LogBuffer.println("Could not restore headerSummary state.");
+			return;
+		}
+		
+		headerSummary.requestStoredState();
 	}
 	
 	@Override

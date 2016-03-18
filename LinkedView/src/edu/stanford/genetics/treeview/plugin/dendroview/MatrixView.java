@@ -111,7 +111,6 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 		
 		if (!offscreenValid) {
-
 			adjustPixelsToMaps();
 			revalidateScreen();
 			setSubImage();

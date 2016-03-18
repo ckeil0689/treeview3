@@ -131,9 +131,7 @@ public class MapContainer extends Observable implements Observer,
 		}
 		
 		this.configNode = parentNode.node(mapName);
-
 		setupMaps();
-		requestStoredState();
 	}
 	
 	@Override
@@ -1876,7 +1874,10 @@ public class MapContainer extends Observable implements Observer,
 		if (current.getMinIndex() != i || current.getMaxIndex() != j) {
 			current.setIndexRange(i, j);
 			setupScrollbar();
+			setFirstVisible(i);
+			setFirstVisibleLabel(i);
 			setNumVisible(j + 1);
+			setLastVisibleLabel(j);
 			setChanged();
 		}
 	}

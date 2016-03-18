@@ -172,6 +172,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;
 		
+		resetComponentDefaults();
+		
 		setupMatrixController();
 		
 		/* Assign Preferences nodes to components */
@@ -180,11 +182,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		updateHeaderInfo();
 		bindComponentFunctions();
-
-		resetMapContainerDefaults();
-		
-		dendroView.resetModelViewDefaults();
-		dendroView.loadModelViewStoredStates();
 		
 		dendroView.setupSearch(tvModel.getRowHeaderInfo(),
 						tvModel.getColHeaderInfo(), interactiveXmap,
@@ -197,15 +194,20 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		 * make sure pixel colors are calculated after new model was loaded. 
 		 */
 		mvController.updateMatrixPixels();
-		/*
-		 * Needs to wait for repaint() called from resetMapContainer() and
-		 * component listener. TODO implement resetMapContainer/ setSavedScale
-		 * differently...
-		 */
 		mvController.resetMatrixViews();
 
 		addKeyBindings();
 		addListeners();
+	}
+	
+	/**
+	 * Makes all relevant components reset to a default state in order to
+	 * create a clean slate for loading a new model.
+	 */
+	private void resetComponentDefaults() {
+		
+		resetMapContainerDefaults();
+		dendroView.resetModelViewDefaults();
 	}
 	
 	/**
@@ -956,8 +958,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		invertedTreeDrawer = new TreePainter();
 		dendroView.getColumnTreeView().setTreeDrawer(invertedTreeDrawer);
 
-//		setPresets();
-
 		// this is here because my only subclass shares this code.
 		bindTrees();
 
@@ -1001,6 +1001,23 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		DendrogramFactory.getColorPresets().setConfigNode(configNode);
 	}
+	
+	public void restoreComponentStates() {
+		
+		LogBuffer.println("Restoring components states...");
+		
+		interactiveXmap.requestStoredState();
+		interactiveYmap.requestStoredState();
+		
+		globalXmap.requestStoredState();
+		globalYmap.requestStoredState();
+		
+		mvController.requestStoredState();
+		
+		dendroView.loadModelViewStoredStates();
+		
+		DendrogramFactory.getColorPresets().requestStoredState();
+	}
 
 	/**
 	 * Assigns the MapContainers to classes which need to know about them.
@@ -1022,6 +1039,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	private void updateHeaderInfo() {
 
+		LogBuffer.println("Updating HeaderInfo.");
 		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
 		dendroView.getColLabelView().setHeaderInfo(tvModel.getColHeaderInfo());
 	}
