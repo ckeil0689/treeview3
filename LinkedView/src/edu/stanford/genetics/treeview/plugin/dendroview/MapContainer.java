@@ -118,7 +118,7 @@ public class MapContainer extends Observable implements Observer,
 		 * TODO Initial numVisible currently set in setIndexRange() Default
 		 * should NOT be zero, but max value!
 		 */
-		this.firstVisible = 0;
+		setFirstVisible(0);
 	}
 
 	@Override
@@ -173,8 +173,8 @@ public class MapContainer extends Observable implements Observer,
 
 		this.tileNumVisible = getTotalTileNum();
 		this.minScale = getCalculatedMinScale();
-		this.firstVisible = 0;
-		this.numVisible = getTotalTileNum();
+		setFirstVisible(0);
+		setNumVisible(getTotalTileNum());
 		
 		setScale(minScale);
 		notifyObservers();
@@ -299,13 +299,13 @@ public class MapContainer extends Observable implements Observer,
 		// Keep track of explicit changes, by the user, to the amount of
 		// visible data
 		int prevNumVisible = numVisible;
-		numVisible = (int) tileNumVisible;
+		setNumVisible((int) tileNumVisible);
 
 		//Ensure that the difference between the previous number visible and the
 		//new number visible is even
 		if((numVisible - prevNumVisible) % 2 == 1 &&
 		   numVisible < (getTotalTileNum())) {
-			numVisible++;
+			setNumVisible(numVisible + 1);
 			tileNumVisible += 1;
 		}
 
@@ -377,7 +377,8 @@ public class MapContainer extends Observable implements Observer,
 			if(hardFixed) {
 				if(beginFixed) {
 					if(zoomVal > ((getTotalTileNum()) -
-					              (firstVisible + numVisible))) {
+						(firstVisible + numVisible))) {
+
 						zoomVal = (getTotalTileNum()) -
 							(firstVisible + numVisible);
 						if(zoomVal <= 0) {
@@ -401,7 +402,7 @@ public class MapContainer extends Observable implements Observer,
 
 		// Keep track of explicit changes, by the user, to the amount of
 		// visible data
-		numVisible = (int) tileNumVisible;
+		setNumVisible((int) tileNumVisible);
 
 		newScale = getAvailablePixels() / tileNumVisible;
 
@@ -436,8 +437,6 @@ public class MapContainer extends Observable implements Observer,
 		int zoomVal;
 
 		tileNumVisible = Math.round(getAvailablePixels() / getScale());
-		// LogBuffer.println("zoomIn: tileNumVisible has been set to [" +
-		// tileNumVisible + "].");
 		if(tileNumVisible > (getTotalTileNum())) {
 			tileNumVisible = getTotalTileNum();
 		}
@@ -472,12 +471,12 @@ public class MapContainer extends Observable implements Observer,
 		// Keep track of explicit changes, by the user, to the amount of
 		// visible data
 		int prevNumVisible = numVisible;
-		numVisible = (int) tileNumVisible;
+		setNumVisible((int) tileNumVisible);
 
 		//Ensure that the difference between the previous number visible and the
 		//new number visible is even
 		if((prevNumVisible - numVisible) % 2 == 1 && numVisible > 1) {
-			numVisible--;
+			setNumVisible(numVisible - 1);
 			tileNumVisible -= 1;
 		}
 
@@ -540,18 +539,18 @@ public class MapContainer extends Observable implements Observer,
 		// Keep track of explicit changes, by the user, to the amount of
 		// visible data
 		int prevNumVisible = numVisible;
-		numVisible = (int) tileNumVisible;
+		setNumVisible((int) tileNumVisible);
 
 		//Ensure that the difference between the previous number visible and the
 		//new number visible is even
 		if((prevNumVisible - numVisible) % 2 == 1 && numVisible > 1) {
-			numVisible--;
+			setNumVisible(numVisible - 1);
 			tileNumVisible -= 1;
 		}
 
 		if (tileNumVisible < numIndexes) {
 			tileNumVisible = numIndexes;
-			numVisible = numIndexes;
+			setNumVisible(numIndexes);
 		}
 
 		// Recalculating scale
@@ -575,7 +574,7 @@ public class MapContainer extends Observable implements Observer,
 			//shift things early on by 1 to correct it so it's centered as soon
 			//as possible
 			if(diff % 2 == 1 && diff > 2) {
-				numVisible--;
+				setNumVisible(numVisible - 1);
 				tileNumVisible -= 1;
 				numIndexes--;
 				newScale = getAvailablePixels() / tileNumVisible;
@@ -685,7 +684,7 @@ public class MapContainer extends Observable implements Observer,
 		// Keep track of explicit changes, by the user, to the amount of
 		// visible data
 		int prevNumVisible = numVisible;
-		numVisible = (int) tileNumVisible;
+		setNumVisible((int) tileNumVisible);
 
 		// Recalculating scale
 		newScale = pxAvail / tileNumVisible;
@@ -908,7 +907,7 @@ public class MapContainer extends Observable implements Observer,
 		//Keep track of explicit changes, by the user, to the amount of visible
 		//data
 		int prevNumVisible = numVisible;
-		numVisible = (int) tileNumVisible;
+		setNumVisible((int) tileNumVisible);
 
 		newScale = pxAvail / tileNumVisible;
 
@@ -944,6 +943,11 @@ public class MapContainer extends Observable implements Observer,
 					newFirstVisible--;
 				}
 
+				//Make sure we're not past what is possible to scroll to
+				if((newFirstVisible + numVisible - 1) > getMaxIndex()) {
+					newFirstVisible = getMaxIndex() - numVisible + 1;
+				}
+
 				//If the left/top side is closer than or equal to half the
 				//difference in area sizes
 				if(newFirstVisible > firstIndex) {
@@ -969,12 +973,19 @@ public class MapContainer extends Observable implements Observer,
 		   !((newFirstVisible + numVisible - 1) > getMaxIndex()) &&
 		   correction > 0) {
 			newFirstVisible += correction;
-			LogBuffer.println("WARNING: The data cell hovered over has " +
-				"shifted. It was over [" + dotOver + "].  Now it is over: [" +
-				getIndex(pixelPos) + "].  Previous dotOver calculation: " +
-				"[firstVisible + (int) ((double) pixelPos / newScale))] = [" +
-				firstVisible + " + (int) ((double) " + pixelPos + " / " +
-				newScale + "))].  Correcting this retroactively...");
+
+			//Make sure we're not past what is possible to scroll to
+			if((newFirstVisible + numVisible - 1) > getMaxIndex()) {
+				newFirstVisible = getMaxIndex() - numVisible + 1;
+			} else {
+				LogBuffer.println("WARNING: The data cell hovered over has " +
+					"shifted. It was over [" + dotOver + "].  Now it is over: [" +
+					getIndex(pixelPos) + "].  Previous dotOver calculation: " +
+					"[firstVisible + (int) ((double) pixelPos / newScale))] = [" +
+					firstVisible + " + (int) ((double) " + pixelPos + " / " +
+					newScale + "))].  Correcting this retroactively...");
+			}
+
 			scrollToFirstIndex(newFirstVisible/*,true*/);
 			updateAspectRatio = 1;
 		}
@@ -1539,12 +1550,17 @@ public class MapContainer extends Observable implements Observer,
 		// called.
 		// scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
 
-		scrollbar.setValue(i - getNumVisible() / 2);
+		int scrollVal = i - getNumVisible() / 2;
+		if(scrollVal > (getTotalTileNum() - getNumVisible())) {
+			scrollVal = getTotalTileNum() - getNumVisible();
+		}
+
+		scrollbar.setValue(scrollVal);
 
 		// Keep track of the first visible index
 		// This used to be set using scrollbar.getVisibleAmount, but that can
 		// change implicitly when the window is resized.
-		setFirstVisible(i - getNumVisible() / 2);
+		setFirstVisible(scrollVal);
 
 		//Image needs to be updated if either scroll position changes (because a
 		//scroll of the labels changes the blue box)
@@ -1553,11 +1569,15 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
-	public void scrollToFirstIndex(final int i) {
+	public void scrollToFirstIndex(int i) {
 
 		if(i < getMinIndex() || i > getMaxIndex()) {
-			LogBuffer.println("Cannot set first index to " + i);
-			return;
+			if(i < 0) {
+				i = 0;
+			} else {
+				LogBuffer.println("ERROR: Index out of range: " + i);
+				return;
+			}
 		}
 		
 		final int j = scrollbar.getValue();
@@ -1624,7 +1644,7 @@ public class MapContainer extends Observable implements Observer,
 	@Override
 	public void adjustmentValueChanged(final AdjustmentEvent adjustmentEvent) {
 
-		setFirstVisible(adjustmentEvent.getValue());
+		setFirstVisibleStrictly(adjustmentEvent.getValue());
 		setChanged();
 		notifyObservers(scrollbar);
 	}
@@ -1850,19 +1870,25 @@ public class MapContainer extends Observable implements Observer,
 
 		if(i > getTotalTileNum()) {
 			numVisible = getTotalTileNum();
-			
+		} else if(i < 1) {
+			numVisible = 1;
 		} else {
 			numVisible = i;
 		}
-//		//If the number of visible squares has dipped below the number of
-//		//visible labels
-//		if(i < getNumVisibleLabels()) {
-//			setNumVisibleLabels(i);
-//		}
 	}
 
 	public void setFirstVisible(final int i) {
-		if (i >= 0) {
+		if (i >= 0 && i < getTotalTileNum()) {
+			firstVisible = i;
+		}
+	}
+
+	public void setFirstVisibleStrictly(final int i) {
+		if (i < 0) {
+			firstVisible = 0;
+		} else if(i > (getTotalTileNum() - getNumVisible())) {
+			firstVisible = getTotalTileNum() - getNumVisible();
+		} else {
 			firstVisible = i;
 		}
 	}
@@ -1952,11 +1978,11 @@ public class MapContainer extends Observable implements Observer,
 	 * spots they are looking at.
 	 */
 	public int getNumVisible() {
-		return numVisible;
+		return(numVisible);
 	}
 
 	public int getFirstVisible() {
-		return firstVisible;
+		return(firstVisible);
 	}
 
 	public int getLastVisible() {

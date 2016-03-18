@@ -572,8 +572,8 @@ ConfigNodePersistent, Controller {
 	private class MatrixMouseWheelListener implements MouseWheelListener {
 		
 		/**
-		 * Zooming when the mouse wheel is used in conjunction with the alt/option
-		 * key.  Vertical scrolling if the shift key is not pressed.
+		 * Zooming when the mouse wheel is used in conjunction with the alt/
+		 * option key.  Vertical scrolling if the shift key is not pressed.
 		 */
 		@Override
 		public void mouseWheelMoved(final MouseWheelEvent e) {
@@ -585,12 +585,12 @@ ConfigNodePersistent, Controller {
 			final int notches = e.getWheelRotation();
 			final int shift = (notches < 0) ? -3 : 3;
 
-			//On macs' magic mouse, horizontal scroll comes in as if the shift was
-			//down
+			//On macs' magic mouse, horizontal scroll comes in as if the shift
+			//was down
 			if (e.isAltDown()) {
 				if (notches < 0) {
-					//This ensures we only zoom toward the cursor when the cursor is
-					//over the map
+					//This ensures we only zoom toward the cursor when the
+					//cursor is over the map
 					if (imView.hasMouse()) {
 						imView.smoothZoomTowardPixel(e.getX(), e.getY());
 					}
