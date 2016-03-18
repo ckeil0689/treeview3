@@ -44,7 +44,7 @@ public class ExportDialog extends CustomDialog {
 		super("Export");
 		this.eh = eh;
 		final boolean useMinimums = true;
-		this.bigRegs = eh.getRegionsThatAreTooBig(useMinimums);
+		this.bigRegs = eh.getOversizedRegions(useMinimums);
 		this.selectionsExist = selectionsExist;
 		setupLayout(selectionsExist);
 	}
@@ -202,7 +202,7 @@ public class ExportDialog extends CustomDialog {
 		for(ExportAspect asp : ExportAspect.values()) {
 			JRadioButton option = new JRadioButton(asp.toString());
 			List<ExportAspect> tooBigs =
-				eh.getAspectsThatAreTooBig(selectedRegion);
+				eh.getOversizedAspects(selectedRegion);
 			//Default region pre-selected
 			ExportAspect defAsp = (selectedFormat.isDocumentFormat() ?
 				ExportAspect.getDefault() : ExportAspect.getDefault(tooBigs));
@@ -465,7 +465,7 @@ public class ExportDialog extends CustomDialog {
 			ExportAspect asp = ExportAspect.getAspect(option.getText());
 			eh.setTileAspectRatio(asp);
 			eh.setCalculatedDimensions(selectedRegion);
-			final boolean tooBig = eh.isTooBig(selectedRegion);
+			final boolean tooBig = eh.isOversized(selectedRegion);
 			if(tooBig) {
 				bigAsps.add(asp);
 			}

@@ -179,7 +179,7 @@ public class ExportDialogController {
 			List<Region> tooBigs = new ArrayList<Region>();
 			if(!selFormat.isDocumentFormat()) {
 				final boolean useMinimums = true;
-				tooBigs = eh.getRegionsThatAreTooBig(useMinimums);
+				tooBigs = eh.getOversizedRegions(useMinimums);
 			}
 			exportDialog.setBigRegs(tooBigs);
 			exportDialog.updateRegionRadioBtns(selFormat.isDocumentFormat());

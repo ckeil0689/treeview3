@@ -574,7 +574,7 @@ public class ExportHandler {
 	/**
 	 * Determines whether the given region is properly defined or not.  It does
 	 * not check whether a region is too big for export.  Refer to these methods
-	 * for that: getRegionsThatAreTooBig, getAspectsThatAreTooBig, and isTooBig.
+	 * for that: getOversizedRegions, getOversizedAspects, and isOversized.
 	 * 
 	 * @author rleach
 	 * @param region
@@ -671,8 +671,8 @@ public class ExportHandler {
 	 *                  if the current size is too big
 	 * @return
 	 */
-	public List<Region> getMinRegionsThatAreTooBig() {
-		return(getRegionsThatAreTooBig(true));
+	public List<Region> getOversizedMinimumRegions() {
+		return(getOversizedRegions(true));
 	}
 
 	/**
@@ -714,7 +714,7 @@ public class ExportHandler {
 	 *                  if the current size is too big
 	 * @return
 	 */
-	public List<Region> getRegionsThatAreTooBig(final boolean minimum) {
+	public List<Region> getOversizedRegions(final boolean minimum) {
 		List<Region> regs = new ArrayList<Region>();
 		for(int i = 0;i < Region.values().length;i++) {
 			//If this region is valid for export and it is too big
@@ -739,7 +739,7 @@ public class ExportHandler {
 	 *                         predicted size
 	 * @return
 	 */
-	public List<ExportAspect> getAspectsThatAreTooBig(
+	public List<ExportAspect> getOversizedAspects(
 		final Region selectedRegion) {
 
 		//Save the current dimension values
@@ -780,7 +780,7 @@ public class ExportHandler {
 	 * @param reg
 	 * @return
 	 */
-	public boolean isTooBig(Region reg) {
+	public boolean isOversized(Region reg) {
 		//If this region is too big
 		if(((double) getXDim(reg) / (double) MAX_IMAGE_SIZE *
 			(double) getYDim(reg)) > 1.0) {
