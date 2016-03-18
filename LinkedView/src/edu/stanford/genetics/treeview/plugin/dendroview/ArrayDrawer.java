@@ -186,14 +186,16 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 * @param xstart - The index of the first column of data to be included
 	 * @param ystart - The index of the first row of data to be included
 	 */
-	public void paint(final Graphics g,final int xend,final int yend,
-		final int xIndent,final int yIndent,final int tileXsize,
-		final int tileYsize,final int xstart,final int ystart,
+	public void paint(final Graphics g,
+		final int xDataStart,final int yDataStart,
+		final int xDataEnd,final int yDataEnd,
+		final int xImageStart,final int yImageStart,
+		final int xTileSize,final int yTileSize,
 		final boolean showSelections,
 		final TreeSelectionI colSelection,final TreeSelectionI rowSelection) {
 	
-		for (int j = ystart; j <= yend; j++) {
-			for (int i = xstart; i <= xend; i++) {
+		for (int j = yDataStart; j <= yDataEnd; j++) {
+			for (int i = xDataStart; i <= xDataEnd; i++) {
 				//setPaintMode seems to help color overlapping (affecting the
 				//colors) a little, but doesn't fix it altogether. Probably
 				//useless. Note there appears to be an alpha channel in the
@@ -203,10 +205,10 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				//drawRect is better than fillRect because there're no gaps, but
 				//still some color bleed for some reason at some zoom levels - I
 				//think that's due to the reader's poor rendering
-				g.drawRect(xIndent + (i - xstart) * tileXsize,
-					yIndent + (j - ystart) * tileYsize,tileXsize,tileYsize);
-				g.fillRect(xIndent + (i - xstart) * tileXsize,
-					yIndent + (j - ystart) * tileYsize,tileXsize,tileYsize);
+				g.drawRect(xImageStart + (i - xDataStart) * xTileSize,
+					yImageStart + (j - yDataStart) * yTileSize,xTileSize,yTileSize);
+				g.fillRect(xImageStart + (i - xDataStart) * xTileSize,
+					yImageStart + (j - yDataStart) * yTileSize,xTileSize,yTileSize);
 			}
 		}
 
@@ -234,17 +236,17 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				for(final List<Integer> xBoundaries : arrayBoundaryList) {
 					for(final List<Integer> yBoundaries : geneBoundaryList){
 
-						int xStartPixel =
-							xIndent + (xBoundaries.get(0) - xstart) * tileXsize;
+						int xSelectionPixel = xImageStart +
+							(xBoundaries.get(0) - xDataStart) * xTileSize;
 						int xPixelSize =
 							(xBoundaries.get(1) - xBoundaries.get(0) + 1) *
-							tileXsize - 1;
-						int yStartPixel =
-							yIndent + (yBoundaries.get(0) - ystart) * tileYsize;
+							xTileSize - 1;
+						int yStartPixel = yImageStart +
+							(yBoundaries.get(0) - yDataStart) * yTileSize;
 						int yPixelSize =
 							(yBoundaries.get(1) - yBoundaries.get(0) + 1) *
-							tileYsize - 1;
-						g.drawRect(xStartPixel,yStartPixel,xPixelSize,
+							yTileSize - 1;
+						g.drawRect(xSelectionPixel,yStartPixel,xPixelSize,
 							yPixelSize);
 					}
 				}
