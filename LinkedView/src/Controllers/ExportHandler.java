@@ -150,9 +150,10 @@ public class ExportHandler {
 	 * @return int
 	 */
 	public int getXDim(final Region region) {
-		return(getNumXExportIndexes(region) * tileWidth +
+		int xDim = getNumXExportIndexes(region) * tileWidth +
 			(dendroView.getRowTreeView().treeExists() ? treesHeight +
-				treeMatrixGapSize : 0));
+				treeMatrixGapSize : 0);
+		return(xDim);
 	}
 
 	/**
@@ -163,9 +164,10 @@ public class ExportHandler {
 	 * @return
 	 */
 	public int getMinXDim(final Region region) {
-		return(getNumXExportIndexes(region) * minTileDim +
+		int minXDim = getNumXExportIndexes(region) * minTileDim +
 			(dendroView.getRowTreeView().treeExists() ? treesHeight +
-				treeMatrixGapSize : 0));
+				treeMatrixGapSize : 0);
+		return(minXDim);
 	}
 
 	/**
@@ -176,9 +178,10 @@ public class ExportHandler {
 	 * @return int
 	 */
 	public int getYDim(final Region region) {
-		return(getNumYExportIndexes(region) * tileHeight +
+		int yDim = getNumYExportIndexes(region) * tileHeight +
 			(dendroView.getColumnTreeView().treeExists() ? treesHeight +
-				treeMatrixGapSize : 0));
+				treeMatrixGapSize : 0);
+		return(yDim);
 	}
 
 	/**
@@ -189,9 +192,10 @@ public class ExportHandler {
 	 * @return
 	 */
 	public int getMinYDim(final Region region) {
-		return(getNumYExportIndexes(region) * minTileDim +
+		int minYDim = getNumYExportIndexes(region) * minTileDim +
 			(dendroView.getColumnTreeView().treeExists() ? treesHeight +
-				treeMatrixGapSize : 0));
+				treeMatrixGapSize : 0);
+		return(minYDim);
 	}
 
 	/**
