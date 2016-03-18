@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -1000,15 +1002,18 @@ public class TVController implements Observer {
 				.getInteractiveMatrixView().getVisibleImage();
 		ExportPreviewMatrix expMatrix = new ExportPreviewMatrix(matrix);
 
-		boolean selectionsExist = (tvFrame.getColSelection() != null &&
-			tvFrame.getColSelection().getNSelectedIndexes() > 0);
-		ExportDialog exportDialog = new ExportDialog(selectionsExist);
-		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
-		
-		new ExportDialogController(exportDialog,tvFrame.getDendroView(),
+		ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
 			dendroController.getInteractiveXMap(),
 			dendroController.getInteractiveYMap(),tvFrame.getColSelection(),
-			tvFrame.getRowSelection(),model);
+			tvFrame.getRowSelection());
+		boolean selectionsExist = (tvFrame.getColSelection() != null &&
+			tvFrame.getColSelection().getNSelectedIndexes() > 0);
+		ExportDialog exportDialog = new ExportDialog(selectionsExist,eh);
+		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
+		
+		new ExportDialogController(exportDialog,tvFrame,
+			dendroController.getInteractiveXMap(),
+			dendroController.getInteractiveYMap(),model);
 		
 		exportDialog.setVisible(true);
 	}

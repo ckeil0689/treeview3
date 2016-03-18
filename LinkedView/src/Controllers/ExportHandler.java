@@ -9,9 +9,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.awt.image.BufferedImage;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -36,6 +40,11 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
  */
 public class ExportHandler {
 
+	//This is the maximum size for an exported image format imposed by the fact
+	//that the ImageIO class for writing PNG/JPG/PPM uses BufferedImage which
+	//uses this maximum
+	static final Integer MAX_IMAGE_SIZE = Integer.MAX_VALUE;
+
 	final protected DendroView dendroView;
 	final protected MapContainer interactiveXmap;
 	final protected MapContainer interactiveYmap;
@@ -58,9 +67,9 @@ public class ExportHandler {
 	
 	/* Note: The line width of the tree is 1, so the more points thicker the
 	 * tile is, the relatively more narrow the tree lines are */
-	protected int minTileDim = 11; //Min number of "points" for a tile's edge
-	protected int tileHeight = 11; //Number of "points" for a tile's height
-	protected int tileWidth  = 11; //Number of "points" for a tile's width
+	protected int minTileDim = 3; //Min number of "points" for a tile's edge
+	protected int tileHeight = 3; //Number of "points" for a tile's height
+	protected int tileWidth  = 3; //Number of "points" for a tile's width
 
 	protected int treeMatrixGapMin = 5; //Min number of "points" bet tree/matrix
 	protected int treeMatrixGapSize = 20; //Number of "points" bet tree/matrix
@@ -141,9 +150,24 @@ public class ExportHandler {
 	 * @return int
 	 */
 	public int getXDim(final Region region) {
-		return(getNumXExportIndexes(region) * tileWidth +
+		int xDim = getNumXExportIndexes(region) * tileWidth +
 			(dendroView.getRowTreeView().treeExists() ? treesHeight +
-				treeMatrixGapSize : 0));
+				treeMatrixGapSize : 0);
+		return(xDim);
+	}
+
+	/**
+	 * Gets the minimum possible x dimension size (bases on a 1:1 aspect ratio).
+	 * All other aspect ratios increase the overall size.
+	 * 
+	 * @param region
+	 * @return
+	 */
+	public int getMinXDim(final Region region) {
+		int minXDim = getNumXExportIndexes(region) * minTileDim +
+			(dendroView.getRowTreeView().treeExists() ? treesHeight +
+				treeMatrixGapSize : 0);
+		return(minXDim);
 	}
 
 	/**
@@ -154,9 +178,24 @@ public class ExportHandler {
 	 * @return int
 	 */
 	public int getYDim(final Region region) {
-		return(getNumYExportIndexes(region) * tileHeight +
+		int yDim = getNumYExportIndexes(region) * tileHeight +
 			(dendroView.getColumnTreeView().treeExists() ? treesHeight +
-				treeMatrixGapSize : 0));
+				treeMatrixGapSize : 0);
+		return(yDim);
+	}
+
+	/**
+	 * Gets the minimum possible y dimension size (bases on a 1:1 aspect ratio).
+	 * All other aspect ratios increase the overall size.
+	 * 
+	 * @param region
+	 * @return
+	 */
+	public int getMinYDim(final Region region) {
+		int minYDim = getNumYExportIndexes(region) * minTileDim +
+			(dendroView.getColumnTreeView().treeExists() ? treesHeight +
+				treeMatrixGapSize : 0);
+		return(minYDim);
 	}
 
 	/**
@@ -289,6 +328,22 @@ public class ExportHandler {
 		this.treeMatrixGapRatio = treeMatrixGapRatio;
 	}
 
+	public void setCalculatedDimensions(final Region region,
+		final ExportAspect aspect) {
+
+		setTileAspectRatio(aspect);
+		setCalculatedDimensions(region,aspectRatio);
+	}
+
+	/**
+	 * Uses the currently set aspect ratio to calculate and set the dimensions/
+	 * 
+	 * @param region
+	 */
+	public void setCalculatedDimensions(final Region region) {
+		setCalculatedDimensions(region,aspectRatio);
+	}
+
 	/**
 	 * Calculates the points in size of the tile dimensions and trees height
 	 * that will meet all the minimum dimension requirements.  E.g. If there are
@@ -299,7 +354,9 @@ public class ExportHandler {
 	 * @author rleach
 	 * @param region
 	 */
-	public void calculateDimensions(final Region region) {
+	public void setCalculatedDimensions(final Region region,
+		final double aspectRatio) {
+
 		//Calculates: treesHeight,treeMatrixGapSize,tileHeight, and tileWidth
 		//Using: treeMatrixGapRatio,aspectRatio,treeRatio
 		//And adjusting using: treeMatrixGapMin,minTileDim,minTreeHeight
@@ -410,7 +467,7 @@ public class ExportHandler {
 	 *                 selection
 	 */
 	public void export(final Format format,final String fileName,
-		final Region region,final boolean showSelections) {
+		final Region region,final boolean showSelections) throws Exception {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -423,7 +480,11 @@ public class ExportHandler {
 
 			exportDocument(format,defPageSize,fileName,region,showSelections);
 		} else {
-			exportImage(format,fileName,region,showSelections);
+			try {
+				exportImage(format,fileName,region,showSelections);
+			} catch(Exception e) {
+				throw new Exception(e.getLocalizedMessage(),e);
+			}
 		}
 	}
 
@@ -435,7 +496,7 @@ public class ExportHandler {
 	 * @param region
 	 */
 	public void exportImage(final Format format,final String fileName,
-		final Region region,final boolean showSelections) {
+		final Region region,final boolean showSelections) throws Exception {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -444,7 +505,7 @@ public class ExportHandler {
 		}
 
 		try {
-			calculateDimensions(region);
+			setCalculatedDimensions(region);
 
 			BufferedImage im;
 			//JPG is the only format that doesn't support an alpha channel, so
@@ -475,14 +536,46 @@ public class ExportHandler {
 				return;
 			}
 		}
+		catch(IllegalArgumentException iae) {
+			double tooBig = (double) getXDim(region) /
+				(double) MAX_IMAGE_SIZE * (double) getYDim(region);
+			BigDecimal bd = new BigDecimal(tooBig);
+			bd = bd.round(new MathContext(4));
+			double rounded = bd.doubleValue();
+			throw new Exception("Error: Unable to export image.\n\nExported " +
+				"region [" + region.toString() + ": " +
+				getNumXExportIndexes(region) + "cols x " +
+				getNumYExportIndexes(region) + "rows] is about [" + rounded +
+				"] times too big to export.\n\nPlease zoom to a smaller area " +
+				"and try exporting only that visible portion.",iae);
+		}
 		catch(Exception exc) {
-			LogBuffer.println("Unable to export image.");
-			LogBuffer.logException(exc);
+			double tooBig = (double) getXDim(region) /
+				(double) MAX_IMAGE_SIZE * (double) getYDim(region);
+			if(tooBig > 1.0) {
+				BigDecimal bd = new BigDecimal(tooBig);
+				bd = bd.round(new MathContext(4));
+				double rounded = bd.doubleValue();
+				throw new Exception("Error: Unable to export image.\n\n" +
+					"Exported region [" + region.toString() + ": " +
+					getNumXExportIndexes(region) + "cols x " +
+					getNumYExportIndexes(region) + "rows] is about [" +
+					rounded + "] times too big to export.\n\nPlease zoom to " +
+					"a smaller area and try exporting only that visible " +
+					"portion.",exc);
+			} else {
+				exc.printStackTrace();
+				throw new Exception("Unknown Error: Unable to export image.\n" +
+					"Try exporting a smaller area.",exc);
+			}
 		}
 	}
 
 	/**
-	 * Determines whether the exported region selection should work or not
+	 * Determines whether the given region is properly defined or not.  It does
+	 * not check whether a region is too big for export.  Refer to these methods
+	 * for that: getOversizedRegions, getOversizedAspects, and isOversized.
+	 * 
 	 * @author rleach
 	 * @param region
 	 * @return boolean
@@ -502,6 +595,7 @@ public class ExportHandler {
 
 	/**
 	 * Export an image file as a part of a document in a vector format
+	 * 
 	 * @author rleach
 	 * @param format
 	 * @param pageSize
@@ -518,14 +612,13 @@ public class ExportHandler {
 		}
 
 		try {
-			calculateDimensions(region);
+			setCalculatedDimensions(region);
 
 			Dimension dims =
 				new Dimension(getXDim(region),getYDim(region));
 			File exportFile = new File(fileName);
 
 			VectorGraphics g;
-			/* TODO: This needs to supply a size of an export region */
 			if(format == Format.PDF) {
 				if (!fileName.endsWith(".pdf")) {
 					fileName += ".pdf";
@@ -549,7 +642,8 @@ public class ExportHandler {
 			}
 
 			Properties p = new Properties();
-			p.setProperty("PageSize",pageSize);
+			p.setProperty(PDFGraphics2D.PAGE_SIZE,pageSize);
+			p.setProperty(PDFGraphics2D.ORIENTATION,defPageOrientation);
 			g.setProperties(p); 
 
 			g.startExport();
@@ -569,8 +663,137 @@ public class ExportHandler {
 	}
 
 	/**
+	 * Returns a list of regions that are too big to be exported in an image
+	 * format (png/jpg/ppm) at the smallest (1:1) aspect ratio, regardless of
+	 * current the aspect ratio datamember's value
+	 * 
+	 * @param minimum - whether to determine if the minimum size is too big or
+	 *                  if the current size is too big
+	 * @return
+	 */
+	public List<Region> getOversizedMinimumRegions() {
+		return(getOversizedRegions(true));
+	}
+
+	/**
+	 * Returns a list of regions that are at least possible to be exported at
+	 * the minimum size (i.e. aspect ratio is 1:1)
+	 * 
+	 * @return
+	 */
+	public List<Region> getMinimumAvailableRegions() {
+		List<Region> regs = new ArrayList<Region>();
+		for(int i = 0;i < Region.values().length;i++) {
+			//If this region is valid for export and it is not too big
+			if(isExportValid(Region.values()[i]) &&
+				((double) getMinXDim(Region.values()[i]) /
+					(double) MAX_IMAGE_SIZE *
+					(double) getMinYDim(Region.values()[i])) <= 1.0) {
+
+				regs.add(Region.values()[i]);
+			}
+		}
+		return(regs);
+	}
+
+	/**
+	 * Determines whether an region can be exported as a PNG/JPG/PPM
+	 * 
+	 * @return
+	 */
+	public boolean isImageExportPossible() {
+		return(getMinimumAvailableRegions().size() > 0);
+	}
+
+	/**
+	 * Returns a list of regions that are too big to be exported in an image
+	 * format (png/jpg/ppm) at either the minimum or the current aspect ratio,
+	 * given the minimum boolean.
+	 * 
+	 * @param minimum - whether to determine if the minimum size is too big or
+	 *                  if the current size is too big
+	 * @return
+	 */
+	public List<Region> getOversizedRegions(final boolean minimum) {
+		List<Region> regs = new ArrayList<Region>();
+		for(int i = 0;i < Region.values().length;i++) {
+			//If this region is valid for export and it is too big
+			if(isExportValid(Region.values()[i]) &&
+				((double) (minimum ? getMinXDim(Region.values()[i]) :
+					getXDim(Region.values()[i])) / (double) MAX_IMAGE_SIZE *
+					(double) (minimum ? getMinYDim(Region.values()[i]) :
+						getYDim(Region.values()[i])) > 1.0)) {
+
+				regs.add(Region.values()[i]);
+			}
+		}
+		return(regs);
+	}
+
+
+	/**
+	 * Returns a list of Aspects that are too big to be exported in an image
+	 * format (png/jpg/ppm) for the given region.
+	 * 
+	 * @param selectedRegion - The region to apply the aspect to, to get the
+	 *                         predicted size
+	 * @return
+	 */
+	public List<ExportAspect> getOversizedAspects(
+		final Region selectedRegion) {
+
+		//Save the current dimension values
+		double saveAspect   = aspectRatio;
+		int saveTreesHeight = treesHeight;
+		int saveTileHeight  = tileHeight;
+		int saveTileWidth   = tileWidth;
+		int saveGapSize     = treeMatrixGapSize;
+
+		List<ExportAspect> asps = new ArrayList<ExportAspect>();
+		for(int i = 0;i < ExportAspect.values().length;i++) {
+			ExportAspect aspect = ExportAspect.values()[i];
+			setCalculatedDimensions(selectedRegion,aspect);
+			//If this aspect results in an image that is too big
+			if(((double) getXDim(selectedRegion) /
+				(double) MAX_IMAGE_SIZE *
+				(double) getYDim(selectedRegion)) > 1.0) {
+
+				asps.add(aspect);
+			}
+		}
+
+		//Restore the dimensions to what they were previously so that there are
+		//no side-effects to running this method
+		aspectRatio       = saveAspect;
+		treesHeight       = saveTreesHeight ;
+		tileHeight        = saveTileHeight;
+		tileWidth         = saveTileWidth;
+		treeMatrixGapSize = saveGapSize;
+
+		return(asps);
+	}
+
+	/**
+	 * Given current settings for aspect ratio, will the supplied region end up
+	 * too big?
+	 * 
+	 * @param reg
+	 * @return
+	 */
+	public boolean isOversized(Region reg) {
+		//If this region is too big
+		if(((double) getXDim(reg) / (double) MAX_IMAGE_SIZE *
+			(double) getYDim(reg)) > 1.0) {
+
+			return(true);
+		}
+		return(false);
+	}
+
+	/**
 	 * This calls the export functions of the various components of the total
 	 * image, arranged in an aligned fashion together
+	 * 
 	 * @author rleach
 	 * @param g2d
 	 * @param region
