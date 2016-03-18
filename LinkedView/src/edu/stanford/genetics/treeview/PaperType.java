@@ -24,7 +24,7 @@ public enum PaperType {
 	/**
 	 * Convert a paper type string to PaperType type.
 	 * 
-	 * @param regName
+	 * @param typeName
 	 * @return
 	 */
 	public static PaperType getPaperType(String typeName) {
