@@ -146,7 +146,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 *            order from cdt.
 	 */
 	public void paint(final Graphics g, final Rectangle source,
-			final Rectangle dest, final int[] geneOrder) {
+			final Rectangle dest) {
 
 		int ynext = dest.y;
 		for (int j = 0; j < source.height; j++) {
@@ -162,13 +162,9 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				if ((width > 0) && (height > 0)) {
 					try {
 						int actualGene = source.y + j;
-						if (geneOrder != null) {
-							actualGene = geneOrder[actualGene];
-						}
 						final Color t_color = getColor(i + source.x, actualGene);
 						g.setColor(t_color);
 						g.fillRect(xstart, ystart, width, height);
-
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						// System.out.println("out of bounds, " + (i + source.x)
 						// + ", " + (j + source.y));
@@ -176,53 +172,6 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				}
 			}
 		}
-	}
-
-	/**
-	 * This method is intended to be used for drawing the matrix using vector
-	 * graphics (freehep's VectorGraphics2D object), thus there are no resizing
-	 * calculations.
-	 * @author rleach
-	 * @param g - Graphics or Graphics2D or VectorGraphics2D object
-	 * @param width - This should be the size of xmap
-	 * @param height - This should be the size of ymap
-	 */
-	/* TODO: This needs to take a start end end index for each dimension fining
-	 * the export region */
-	public void paint(final Graphics g,final int width,final int height) {
-		for (int j = height - 1; j >= 0; j--) {
-			for (int i = width - 1; i >= 0; i--) {
-				//setPaintMode seems to help color overlapping (affecting the
-				//colors) a little, but doesn't fix it altogether. Probably
-				//useless. Note there appears to be an alpha channel in the
-				//output PDF.
-				g.setPaintMode();
-				g.setColor(getColor(i,j));
-				//drawRect is better than fillRect because there're no gaps, but
-				//still some color bleed for some reason at some zoom levels - I
-				//think that's due to the reader's poor rendering
-				g.drawRect(i,j,1,1);
-			}
-		}
-	}
-
-	/**
-	 * A wrapper for exporting the entire matrix.
-	 * @author rleach
-	 * @param g - A graphics2D-compatible object
-	 * @param width - The number of columns of data
-	 * @param height - The number of rows of data
-	 * @param xIndent - The x start position of the image
-	 * @param yIndent - The y start position of the image
-	 * @param size - The number of "pixels" high/wide each tile is to be drawn
-	 */
-	public void paint(final Graphics g,final int width,final int height,
-		final int xIndent,final int yIndent,final int tileXsize,
-		final int tileYsize,final boolean showSelections,
-		final TreeSelectionI colSelection,final TreeSelectionI rowSelection) {
-
-		paint(g,width - 1,height - 1,xIndent,yIndent,tileXsize,tileYsize,0,0,
-			showSelections,colSelection,rowSelection);
 	}
 
 	/**
@@ -363,7 +312,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	}
 
 	/**
-	 * Method to draw a single point (x,y) on grapics g using xmap and ymap
+	 * Method to draw a single point (x,y) on graphics g using xmap and ymap
 	 *
 	 * @param g
 	 *            Graphics to draw to

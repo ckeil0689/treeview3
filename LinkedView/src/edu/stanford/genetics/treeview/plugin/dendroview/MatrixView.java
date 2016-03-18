@@ -127,15 +127,6 @@ public abstract class MatrixView extends ModelViewProduced {
 		ymap.notifyObservers();
 	}
 
-	/* TODO: This needs to take a start end end index for each dimension
-	 * defining the export region */
-	public void exportPixels(Graphics g) {
-		if (drawer != null) {
-			/* Set new offscreenPixels (pixel colors) */
-			drawer.paint(g,xmap.getTotalTileNum(),ymap.getTotalTileNum());
-		}
-	}
-
 	/**
 	 * Export all data to a file
 	 * @author rleach
@@ -174,9 +165,9 @@ public abstract class MatrixView extends ModelViewProduced {
 		final int tileXsize,final int tileYsize,final boolean showSelections) {
 
 		if(drawer != null) {
-			drawer.paint(g,xmap.getTotalTileNum(),ymap.getTotalTileNum(),
-				xIndent,yIndent,tileXsize,tileYsize,showSelections,colSelection,
-				rowSelection);
+			drawer.paint(g,xmap.getMaxIndex(),ymap.getMaxIndex(),
+				xIndent,yIndent,tileXsize,tileYsize,0,0,
+				showSelections,colSelection,rowSelection);
 		}
 	}
 

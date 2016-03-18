@@ -146,7 +146,7 @@ public class InteractiveMatrixView extends MatrixView {
 							- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-				drawer.paint(g2d, sourceRect, destRect, null);
+				drawer.paint(g2d, sourceRect, destRect);
 			}
 		}
 	}
