@@ -297,7 +297,11 @@ public class DendroView implements Observer, DendroPanel {
 		globalMatrixView.resetDefaults();
 	}
 	
-	public void loadModelViewStoredStates() {
+	/**
+	 * Restore the state of RowLabelView and ColumnLabelView to the stored
+	 * values in their respective Preferences nodes.
+	 */
+	public void restoreLabelViewStates() {
 		
 		rowLabelView.requestStoredState();
 		colLabelView.requestStoredState();

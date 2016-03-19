@@ -65,6 +65,12 @@ public class UrlPresets implements ConfigNodePersistent {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	/**
 	 * returns default preset, for use when opening a new file which has no url

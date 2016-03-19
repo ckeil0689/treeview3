@@ -28,6 +28,11 @@ import edu.stanford.genetics.treeview.SettingsPanel;
 public class GifColorBarExportPanel extends ColorBarExportPanel implements
 		SettingsPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	// I wish I could just inherit this...
 	public GifColorBarExportPanel(final ColorExtractor colorExtractor) {
 
@@ -117,6 +122,12 @@ public class GifColorBarExportPanel extends ColorBarExportPanel implements
 
 	@Override
 	public void storeState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void importStateFrom(Preferences oldNode) {
 		// TODO Auto-generated method stub
 		
 	}

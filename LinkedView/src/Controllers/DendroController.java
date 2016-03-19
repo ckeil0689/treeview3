@@ -149,14 +149,17 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	
 	@Override
 	public void requestStoredState() {
-		// TODO Auto-generated method stub
-		
+		return; // no stored state yet
 	}
 
 	@Override
 	public void storeState() {
-		// TODO Auto-generated method stub
-		
+		return; // nothing to store yet
+	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		return; // no stored state, so nothing to import yet
 	}
 
 	/**
@@ -171,13 +174,16 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;
+		this.mvController = new MatrixViewController(
+				dendroView.getInteractiveMatrixView(), 
+				dendroView.getGlobalMatrixView(), tvModel);
 		
 		resetComponentDefaults();
 		
-		setupMatrixController();
+//		createMatrixController();
 		
 		/* Assign Preferences nodes to components */
-		setConfigNode(tvFrame.getConfigNode());
+//		setConfigNode(tvFrame.getConfigNode());
 		setComponentPresets();
 
 		updateHeaderInfo();
@@ -193,6 +199,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		/**
 		 * make sure pixel colors are calculated after new model was loaded. 
 		 */
+		mvController.setup();
 		mvController.updateMatrixPixels();
 		mvController.resetMatrixViews();
 
@@ -213,11 +220,9 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	/**
 	 * Sets up all necessary components for the MatrixView controller.
 	 */
-	private void setupMatrixController() {
+	private void createMatrixController() {
 		
-		this.mvController = new MatrixViewController(
-				dendroView.getInteractiveMatrixView(), 
-				dendroView.getGlobalMatrixView(), tvModel);
+		
 
 		mvController.setup();
 	}
@@ -690,6 +695,11 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	}
 
 	/**
+	 * TODO - in my opinion obsolete because this only needs to be saved upon 
+	 * application quit (already happens) but discuss before removal - Chris
+	 * Also, this would belong in TVController since it handles the application 
+	 * window / frame.
+	 * 
 	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
 	 * as a result.
 	 */
@@ -707,7 +717,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 					saveResizeTimer.stop();
 					saveResizeTimer = null;
 
-					tvFrame.saveSettings();
+					tvFrame.storeState();
 				}
 			}
 		};
@@ -929,7 +939,25 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	private void bindComponentFunctions() {
 
-		// Handle selection
+		setupSelectionHandlers();
+		setupMapContainers();
+
+		// TODO replace with IMVController method
+		interactiveXmap.setScrollbar(dendroView.getMatrixXScroll());
+		interactiveYmap.setScrollbar(dendroView.getMatrixYScroll());
+
+		createTreePainters();
+		bindTrees();
+		addLabelViewContextMenu();
+		defineMapContainerRanges();
+	}
+	
+	/**
+	 * Sets up the selection handlers which track details of selected indices
+	 * in LabelView, the matrices, and the trees. 
+	 */
+	private void setupSelectionHandlers() {
+		
 		if (geneIndex != null) {
 			setRowSelection(new ReorderedTreeSelection(
 					tvFrame.getRowSelection(), geneIndex));
@@ -945,22 +973,26 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		} else {
 			setColumnSelection(tvFrame.getColSelection());
 		}
+	}
+	
+	/**
+	 * Create tree painter objects and link them to the TRView objects for each
+	 * axis.
+	 */
+	private void createTreePainters() {
 		
-		setupMapContainers();
-
-		// TODO replace with IMVController method
-		interactiveXmap.setScrollbar(dendroView.getMatrixXScroll());
-		interactiveYmap.setScrollbar(dendroView.getMatrixYScroll());
-
-		leftTreeDrawer = new TreePainter();
+		this.leftTreeDrawer = new TreePainter();
 		dendroView.getRowTreeView().setTreeDrawer(leftTreeDrawer);
 
-		invertedTreeDrawer = new TreePainter();
+		this.invertedTreeDrawer = new TreePainter();
 		dendroView.getColumnTreeView().setTreeDrawer(invertedTreeDrawer);
-
-		// this is here because my only subclass shares this code.
-		bindTrees();
-
+	}
+	
+	/**
+	 * Adds a separate right-click context menu object to each LabelView.
+	 */
+	private void addLabelViewContextMenu() {
+		
 		// Set context menu for LabelViews
 		LabelContextMenu rowLabelContext = new LabelContextMenu();
 		LabelContextMenu colLabelContext = new LabelContextMenu();
@@ -970,8 +1002,13 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		dendroView.getRowLabelView().setComponentPopupMenu(rowLabelContext);
 		dendroView.getColLabelView().setComponentPopupMenu(colLabelContext);
-
-		// perhaps I could remember this stuff in the MapContainer...
+	}
+	
+	/**
+	 * Let the MapContainers know their index range to work with. 
+	 */
+	private void defineMapContainerRanges() {
+		
 		interactiveXmap.setIndexRange(0,
 				tvModel.getDataMatrix().getNumCol() - 1);
 		interactiveYmap.setIndexRange(0,
@@ -987,6 +1024,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	private void setComponentPresets() {
 
+		setConfigNode(tvFrame.getConfigNode());
+		
 		interactiveXmap.setConfigNode(configNode);
 		interactiveYmap.setConfigNode(configNode);
 
@@ -1002,6 +1041,13 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		DendrogramFactory.getColorPresets().setConfigNode(configNode);
 	}
 	
+	/**
+	 * Requests all main components of the GUI to restore their states to
+	 * saved preferences stored in their active Preferences node (configNode).
+	 * This is especially useful after performing a reset to default state for
+	 * those components to get a clean slate, for example when a new model is 
+	 * loaded.
+	 */
 	public void restoreComponentStates() {
 		
 		LogBuffer.println("Restoring components states...");
@@ -1014,7 +1060,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		mvController.requestStoredState();
 		
-		dendroView.loadModelViewStoredStates();
+		dendroView.restoreLabelViewStates();
 		
 		DendrogramFactory.getColorPresets().requestStoredState();
 	}
@@ -1519,7 +1565,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Update the state of label views to reflect settings from an imported
 	 * node.
 	 * 
-	 * @param oldNode
+	 * @param oldNode - The old Preferences node from which to import label
+	 * preferences for both LabelViews (rows & columns).
 	 */
 	public void importLabelPreferences(final Preferences oldNode) {
 
@@ -1549,10 +1596,19 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		}
 	}
 	
+	/**
+	 * Delegate the import of a Preferences node to a LabelView object
+	 * by passing the node to the LabelView object and replacing the 
+	 * configNode of the LabelView's HeaderSummary object with the node to be
+	 * imported.
+	 * @param labelView - The LabelView object for which to import preferences.
+	 * @param labelViewNode - The Preferences node from which to import stored
+	 * label settings.
+	 */
 	private void importLabelNode(final LabelView labelView, 
 			final Preferences labelViewNode) {
 		
-		labelView.importStateFromNode(labelViewNode);
+		labelView.importStateFrom(labelViewNode);
 		labelView.getHeaderSummary().setConfigNode(labelViewNode);
 	}
 

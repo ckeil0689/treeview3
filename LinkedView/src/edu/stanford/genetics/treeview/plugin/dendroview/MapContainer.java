@@ -143,8 +143,7 @@ public class MapContainer extends Observable implements Observer,
 	@Override
 	public void requestStoredState() {
 		
-		setMap(configNode.getInt("current", default_map));
-		setScale(configNode.getDouble("scale", default_scale));
+		importStateFrom(configNode);
 	}
 
 	@Override
@@ -158,6 +157,13 @@ public class MapContainer extends Observable implements Observer,
 		
 		configNode.putInt("current", current.type());
 		configNode.putDouble("scale", current.getScale());
+	}
+	
+	@Override
+	public void importStateFrom(final Preferences oldNode) {
+		
+		setMap(oldNode.getInt("current", default_map));
+		setScale(oldNode.getDouble("scale", default_scale));
 	}
 	
 	/**

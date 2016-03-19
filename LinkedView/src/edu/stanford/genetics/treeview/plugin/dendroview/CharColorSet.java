@@ -38,6 +38,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 * Constructor for the ColorSet object, uses default values
 	 */
 	public CharColorSet() {
+		
 		super();
 		setAADefaults();
 	}
@@ -54,6 +55,7 @@ public class CharColorSet implements ConfigNodePersistent {
 	 */
 	public CharColorSet(final String name, final String missing,
 			final String empty) {
+		
 		this();
 		setName(name);
 		setMissing(missing);
@@ -275,8 +277,8 @@ public class CharColorSet implements ConfigNodePersistent {
 
 	@Override
 	public Preferences getConfigNode() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return root;
 	}
 
 	@Override
@@ -287,6 +289,12 @@ public class CharColorSet implements ConfigNodePersistent {
 
 	@Override
 	public void storeState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void importStateFrom(Preferences oldNode) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -60,7 +60,7 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 	@Override
 	public void requestStoredState() {
 		
-		this.type = configNode.getInt("type", IntegerMap.FIXED);
+		importStateFrom(configNode);
 	}
 	
 	@Override
@@ -71,7 +71,14 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 					+ " was null.");
 			return;
 		}
+		
 		configNode.putInt("type", type);
+	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		
+		this.type = oldNode.getInt("type", IntegerMap.FIXED);
 	}
 
 	/**

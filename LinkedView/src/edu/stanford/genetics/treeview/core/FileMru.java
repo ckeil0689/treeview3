@@ -60,14 +60,17 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 	@Override
 	public void requestStoredState() {
-		// TODO Auto-generated method stub
-		
+		return;
 	}
 
 	@Override
 	public void storeState() {
-		// TODO Auto-generated method stub
-		
+		return;
+	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		return;
 	}
 
 	/**
@@ -79,7 +82,6 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 		setChanged();
 		final int subNodeIndex = getRootChildrenNodes().length + 1;
-		LogBuffer.println("Creating subNode File" + subNodeIndex);
 		return configNode.node("File" + subNodeIndex);
 	}
 

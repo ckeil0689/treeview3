@@ -914,8 +914,8 @@ public class TVController implements Observer {
 					model.getColHeaderInfo());
 		}
 
-		preferences.setConfigNode(tvFrame.getConfigNode().node(
-				StringRes.pnode_Preferences));
+//		preferences.setConfigNode(tvFrame.getConfigNode().node(
+//				StringRes.pnode_Preferences));
 		preferences.setMenu(menu);
 
 		// Controller

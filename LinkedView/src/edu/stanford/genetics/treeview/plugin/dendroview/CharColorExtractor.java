@@ -280,4 +280,10 @@ public class CharColorExtractor extends Observable implements
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		// TODO Auto-generated method stub
+		
+	}
 }

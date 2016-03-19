@@ -1056,6 +1056,12 @@ class TestColorBarExportPanel extends ColorBarExportPanel {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		// TODO Auto-generated method stub
+		
+	}
 }
 
 class SimpleDataMatrix implements DataMatrix {

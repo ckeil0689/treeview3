@@ -262,4 +262,10 @@ public class PostscriptColorBarExportPanel extends ColorBarExportPanel
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		// TODO Auto-generated method stub
+		
+	}
 }

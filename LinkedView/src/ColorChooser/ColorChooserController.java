@@ -85,25 +85,11 @@ implements ConfigNodePersistent {
 
 		return configNode;
 	}
-
-	protected ColorSet getColorSet(final String name) {
-
-		return colorPresets.getColorSet(name);
-	}
-
+	
 	@Override
 	public void requestStoredState() {
 		
-		if(configNode == null) {
-			LogBuffer.println("Could not restore saved state. " 
-					+ this.getClass().toString());
-			return;
-		}
-		
-		String colorSchemeKey = configNode.get("activeColors", 
-				d_colorScheme.toString());
-		
-		this.colorScheme = ColorSchemeType.getMemberFromKey(colorSchemeKey);
+		importStateFrom(configNode);
 	}
 
 	@Override
@@ -116,6 +102,26 @@ implements ConfigNodePersistent {
 		}
 		
 		configNode.put("activeColors", colorScheme.toString());
+	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		
+		if(oldNode == null) {
+			LogBuffer.println("Could not restore saved state. " 
+					+ this.getClass().toString());
+			return;
+		}
+		
+		String colorSchemeKey = oldNode.get("activeColors", 
+				d_colorScheme.toString());
+		
+		this.colorScheme = ColorSchemeType.getMemberFromKey(colorSchemeKey);
+	}
+
+	protected ColorSet getColorSet(final String name) {
+
+		return colorPresets.getColorSet(name);
 	}
 
 	/**

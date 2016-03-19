@@ -125,7 +125,21 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 		configNode.put("includedNames", Arrays.toString(names));
 	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		// TODO Auto-generated method stub
+		
+	}
 
+	/**
+	 * Setter for the list of indices describing which labels should be 
+	 * included when returning a "summary" string. For LabelView this would
+	 * mean that a summary of labels at a certain index will be returned based
+	 * on which label headers the user selected.
+	 * @param newIncluded - An array of indices describing the selected label 
+	 * headers.
+	 */
 	public void setIncluded(final int[] newIncluded) {
 
 		LogBuffer.println("Set new included (" + type + "): " 
@@ -136,6 +150,13 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		notifyObservers();
 	}
 	
+	/**
+	 * Setter for the current available headers in a loaded file. Setting the
+	 * headers is vital for ensuring label header selection consistency because
+	 * a purely index-based approach does not account for headers that moved
+	 * their position in the header list, for example after clustering.
+	 * @param headers - The current headers of a loaded file.
+	 */
 	public void setHeaders(final String[] headers) {
 		
 		LogBuffer.println("Set new headers.(" + type + "): " 
@@ -148,14 +169,16 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		notifyObservers();
 	}
 
+	/**
+	 * @return included - A list of included label header indices.
+	 */
 	public int[] getIncluded() {
 
 		return included;
 	}
 
 	/**
-	 * returns the best possible summary for the specified index.
-	 *
+	 * @return the best possible summary for the specified index.
 	 * If no headers are applicable, will return the empty string.
 	 */
 	public String getSummary(final HeaderInfo headerInfo, final int index) {
@@ -204,16 +227,15 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 	/**
 	 * Retrieves a String array containing the labels for all included 
 	 * headers at a certain index.
-	 * @param headerInfo The HeaderInfo object from which to take the labels.
-	 * @param index The axis index of the label to be returned. 
+	 * @param hI The HeaderInfo object from which to take the labels.
+	 * @param idx The axis index of the label to be returned. 
 	 * @return A String array of labels at a defined index.
 	 */
-	public String[] getSummaryArray(final HeaderInfo headerInfo, 
-			final int index) {
+	public String[] getSummaryArray(final HeaderInfo hI, final int idx) {
 
 		String[] strings = null;
 		try {
-			strings = headerInfo.getHeader(index);
+			strings = hI.getHeader(idx);
 
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			LogBuffer.logException(e);
@@ -243,7 +265,15 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		return out;
 	}
 	
-	private String[] getValuesFromStoredString(String storedVal) {
+	/**
+	 * Preferences nodes store can only store String arrays as a single string.
+	 * This method is a helper used to convert such strings back to an array
+	 * by removing brackets, spaces, and splitting the String up at commas.
+	 * @param storedVal - A String object, should be a single String 
+	 * representing comma-separated String array.
+	 * @return An array of Strings
+	 */
+	private String[] getValuesFromStoredString(final String storedVal) {
 		
 		String[] storedVals = storedVal
 				.replaceAll(" ", "")

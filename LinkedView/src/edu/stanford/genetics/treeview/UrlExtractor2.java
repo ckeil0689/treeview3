@@ -43,8 +43,8 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 	
 	@Override
 	public Preferences getConfigNode() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return configNode;
 	}
 
 	@Override
@@ -60,6 +60,12 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 
 	@Override
 	public void storeState() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -33,6 +33,13 @@ public interface ConfigNodePersistent {
 	 * ConfigNodePersistent.
 	 */
 	public void storeState();
+	
+	/**
+	 * Import a class's state from another node.
+	 * @param oldNode - A node containing keys which can be used to import 
+	 * a saved state to the class implementing this interface. 
+	 */
+	public void importStateFrom(final Preferences oldNode);
 
 	/**
 	 * If a configuration node is needed to store preferences, use this method.
@@ -40,5 +47,5 @@ public interface ConfigNodePersistent {
 	 * exisiting hierarchy of Preferences nodes. The node will be a child of the
 	 * supplied parent node.
 	 */
-	public void setConfigNode(Preferences parentNode);
+	public void setConfigNode(final Preferences parentNode);
 }

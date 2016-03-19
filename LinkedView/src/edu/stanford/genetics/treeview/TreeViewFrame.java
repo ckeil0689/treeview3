@@ -148,19 +148,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	
 	@Override
 	public void requestStoredState() {
-		// TODO Auto-generated method stub
 		
+		importStateFrom(configNode);
 	}
 
 	@Override
 	public void storeState() {
-		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void saveSettings() {
-
 		/* store screen size and position */
 		final int left = appFrame.getX();
 		final int top = appFrame.getY();
@@ -171,10 +165,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		configNode.putInt("frame_top", top);
 		configNode.putInt("frame_width", width);
 		configNode.putInt("frame_height", height);
-
-		if (isLoaded()) {
-			// dendroController.saveSettings();
-		}
+	}
+	
+	@Override
+	public void importStateFrom(final Preferences oldNode) {
+		return; // nothing to import yet
 	}
 
 	/**

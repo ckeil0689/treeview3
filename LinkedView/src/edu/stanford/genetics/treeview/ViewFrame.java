@@ -36,6 +36,8 @@ import edu.stanford.genetics.treeview.core.FileMru;
 *
 * END_HEADER 
 */
+// TODO Lots of methods here and in TreeViewFrame which really belong in the
+// controller class
 public abstract class ViewFrame extends Observable implements Observer,
 		ConfigNodePersistent {
 	// extends JFrame implements Observer {
@@ -56,6 +58,18 @@ public abstract class ViewFrame extends Observable implements Observer,
 
 	// url extractor for arrays
 	private UrlExtractor arrayUrlExtractor;
+	
+	/*
+	 * The shared selection objects
+	 */
+	TreeSelectionI rowSelection = null;
+	TreeSelectionI colSelection = null;
+	
+	/*
+	 * Keep track of when active, so that clicks don't get passed through too
+	 * much.
+	 */
+	private boolean windowActive;
 
 	// menubar for the application
 	// protected TreeviewMenuBarI menubar;
@@ -94,7 +108,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 	public ViewFrame() {
 
 		this.appFrame = new JFrame();
-
 		setupWindowListener();
 	}
 
@@ -190,7 +203,8 @@ public abstract class ViewFrame extends Observable implements Observer,
 	}
 
 	/**
-	 * To maximize the application on startup, considering taskbar.
+	 * Maximizes the application on startup, considers taskbar for 
+	 * Windows and OSX.
 	 */
 	public void setupFrameSize() {
 
@@ -207,7 +221,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 				screenSize.height * 2 / 3));
 	}
 
-	// MOVE to TVFrame controller
 	/**
 	 * Sets a listener on self, so that we can grab focus when activated, and
 	 * close ourselves when closed.
@@ -260,12 +273,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 	}
 
 	/**
-	 * Keep track of when active, so that clicks don't get passed through too
-	 * much.
-	 */
-	private boolean windowActive;
-
-	/**
 	 * checks if DataModel has been modified. Stores a configFile when closing
 	 * the window.
 	 */
@@ -287,7 +294,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 			// those two things, then sure, there's reason to keep it. However,
 			// note that resizing the window without data loaded does not save
 			// settings because it's tied to the matrix jpanel
-			saveSettings();
+			storeState();
 			appFrame.dispose();
 			LogBuffer.println("Will this print, and when?.");
 			System.exit(0);
@@ -300,8 +307,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 			return;
 		}
 	}
-
-	public abstract void saveSettings();
 
 	/**
 	 * required by all <code>ModelPanel</code>s
@@ -399,12 +404,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 	//
 	// public abstract void scrollToArray(int i);
 
-	/**
-	 * The shared selection objects
-	 */
-	TreeSelectionI rowSelection = null;
-	TreeSelectionI colSelection = null;
-
 	public void deselectAll() {
 
 		rowSelection.deselectAllIndexes();
@@ -472,8 +471,10 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public String getUrl(final int i) {
 
-		if (urlExtractor == null)
+		if (urlExtractor == null) {
 			return null;
+		}
+		
 		return urlExtractor.getUrl(i);
 	}
 
@@ -486,8 +487,10 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public String getArrayUrl(final int i) {
 
-		if (arrayUrlExtractor == null)
+		if (arrayUrlExtractor == null) {
 			return null;
+		}
+		
 		return arrayUrlExtractor.getUrl(i);
 	}
 
@@ -499,8 +502,10 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public void displayURL(final String string) {
 
-		if (string == null)
+		if (string == null) {
 			return;
+		}
+		
 		try {
 			if (browserControl == null) {
 				browserControl = BrowserControl.getBrowserControl();
@@ -750,16 +755,14 @@ public abstract class ViewFrame extends Observable implements Observer,
 		final ClusterFileFilter ff = new ClusterFileFilter();
 
 		try {
-
 			fileDialog.addChoosableFileFilter(ff);
 			// will fail on pre-1.3 swings
 			fileDialog.setAcceptAllFileFilterUsed(true);
 
 		} catch (final Exception e) {
-
 			// hmm... I'll just assume that there's no accept all.
-			fileDialog
-					.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
+			fileDialog.addChoosableFileFilter(
+					new javax.swing.filechooser.FileFilter() {
 
 						@Override
 						public boolean accept(final File f) {

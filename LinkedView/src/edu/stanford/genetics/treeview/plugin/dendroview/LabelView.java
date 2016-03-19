@@ -509,7 +509,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @param node - the Preferences node from which to import the 
 	 * current state.
 	 */
-	public void importStateFromNode(final Preferences node) {
+	public void importStateFrom(final Preferences node) {
 		
 		resetDefaults();
 		

@@ -131,7 +131,6 @@ ConfigNodePersistent, Controller {
 		
 		this.configNode = parentNode;
 		getColorExtractor().setConfigNode(configNode);
-//		requestStoredState();
 	}
 	
 	@Override
@@ -150,6 +149,12 @@ ConfigNodePersistent, Controller {
 	public void storeState() {
 		
 		return; // nothing to store yet
+	}
+	
+	@Override
+	public void importStateFrom(final Preferences oldNode) {
+		
+		return; // nothing to import yet
 	}
 	
 	/**
@@ -172,7 +177,7 @@ ConfigNodePersistent, Controller {
 		}
 
 		LogBuffer.println("OldNode: " + oldNode.toString());
-		colorExtractor.importPreferences(oldNode);
+		colorExtractor.importStateFrom(oldNode);
 
 		/* Update GradientChooser node */
 		String lastActive = oldNode.node("GradientChooser").get("activeColors",

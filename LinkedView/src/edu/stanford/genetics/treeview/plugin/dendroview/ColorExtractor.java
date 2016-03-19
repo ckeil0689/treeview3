@@ -33,9 +33,8 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 	private ColorSet defaultColorSet;
 	private final double default_contrast = 3.0;
-	private ColorSet colorSet = null;// new ColorSet();// Will be backed by
-	// confignode when we
-	// get one...
+	private ColorSet colorSet = null;
+	
 	private boolean m_logTranform = false;
 	private double m_logCenter = 1.0;
 	private double m_logBaseDivisor;
@@ -102,39 +101,40 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		} 
 
 		this.configNode = parentNode.node("ColorExtractor");
-		importPreferences(parentNode);
+		requestStoredState();
 	}
 	
 	@Override
 	public Preferences getConfigNode() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return configNode;
 	}
 
 	@Override
 	public void requestStoredState() {
-		// TODO Auto-generated method stub
-		
+
+		importStateFrom(configNode);
 	}
 
 	@Override
 	public void storeState() {
-		// TODO Auto-generated method stub
 		
+		if(configNode == null) {
+			LogBuffer.println("Could not store the state of "  
+					+ this.getClass() + " because configNode was null.");
+			return;
+		}
+		
+		configNode.putDouble("contrast", contrast);
+		configNode.putBoolean("logtransform", m_logTranform);
+		configNode.putDouble("logcenter", m_logCenter);
+		configNode.putDouble("logbase", m_logBase);
 	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
 
-	/**
-	 * Updates the state of the ColorExtractor instance to reflect the stored
-	 * settings from the supplied node.
-	 * 
-	 * @param node
-	 *            Preferences node which contains stored color settings.
-	 */
-	public void importPreferences(final Preferences node) {
-
-		this.colorSet = findColorSetFromNode(node);
-		
-		LogBuffer.println("Importing colorSet: " + colorSet.getName());
+		this.colorSet = findColorSetFromNode(oldNode);
 
 		final String[] colors = colorSet.getColors();
 		final List<Color> cList = new ArrayList<Color>(colors.length);
@@ -151,10 +151,10 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		}
 
 		synchFloats(); /* sets initial missing/ empty data colors */
-		contrast = node.getDouble("contrast", getContrast());
-		setLogCenter(node.getDouble("logcenter", 1.0));
-		setLogBase(node.getDouble("logbase", 2.0));
-		m_logTranform = (node.getInt("logtransform", 0) == 1);
+		this.contrast = oldNode.getDouble("contrast", getContrast());
+		setLogCenter(oldNode.getDouble("logcenter", 1.0));
+		setLogBase(oldNode.getDouble("logbase", 2.0));
+		this.m_logTranform = (oldNode.getBoolean("logtransform", false));
 		setChanged();
 	}
 
@@ -275,7 +275,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 			m_logTranform = transform;
 
 			if (configNode != null) {
-				configNode.putInt("logtransform", transform ? 1 : 0);
+				configNode.putBoolean("logtransform", transform);
 			}
 			setChanged();
 		}
