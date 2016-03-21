@@ -26,7 +26,6 @@ import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.freehep.graphicsio.svg.SVGGraphics2D;
 
-//import com.sun.prism.paint.Color;
 import java.awt.Color;
 
 import edu.stanford.genetics.treeview.ExportAspect;
