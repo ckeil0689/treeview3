@@ -1978,10 +1978,32 @@ public class MapContainer extends Observable implements Observer,
 	 * spots they are looking at.
 	 */
 	public int getNumVisible() {
+		/** TODO: For some undetermined reason, the above sometimes yields an
+		 * out of bounds number. I suspect that it has something to do with
+		 * multiple cells under a single pixel, but I'm not sure. For now, this
+		 * work-around will prevent exceptions. Figure this out & fix it
+		 * eventually. */
+		if(numVisible > getMaxIndex() + 1) {
+			numVisible = getMaxIndex() + 1;
+		}
+		if(numVisible < 1) {
+			numVisible = 1;
+		}
 		return(numVisible);
 	}
 
 	public int getFirstVisible() {
+		/** TODO: For some undetermined reason, the above sometimes yields an
+		 * out of bounds number. I suspect that it has something to do with
+		 * multiple cells under a single pixel, but I'm not sure. For now, this
+		 * work-around will prevent exceptions. Figure this out & fix it
+		 * eventually. */
+		if(firstVisible + numVisible - 1 > getMaxIndex()) {
+			firstVisible = getMaxIndex() - numVisible;
+		}
+		if(firstVisible < 0) {
+			firstVisible = 0;
+		}
 		return(firstVisible);
 	}
 
