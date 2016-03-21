@@ -96,7 +96,7 @@ public class MapContainer extends Observable implements Observer,
 	private int     selectingStart        = -1;
 	private boolean whizMode              = false;
 
-	int debug = 0;
+	int debug = 1;
 	//1 = debug the state of the variables in overALabelPortLinkedView
 	//18 = debug tree hover highlighting of labels
 
