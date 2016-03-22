@@ -1978,10 +1978,40 @@ public class MapContainer extends Observable implements Observer,
 	 * spots they are looking at.
 	 */
 	public int getNumVisible() {
+		/** TODO: For some undetermined reason, the above sometimes yields an
+		 * out of bounds number. I suspect that it has something to do with
+		 * multiple cells under a single pixel, but I'm not sure. For now, this
+		 * work-around will prevent exceptions. Figure this out & fix it
+		 * eventually. */
+		if(numVisible > getMaxIndex() + 1) {
+			LogBuffer.println("Warning: Encountered invalid/too-large " +
+				"numVisible value: [" + numVisible + "].  Resetting.");
+			numVisible = getMaxIndex() + 1;
+		}
+		if(numVisible < 1) {
+			LogBuffer.println("Warning: Encountered invalid/too-small " +
+				"numVisible value: [" + numVisible + "].  Resetting.");
+			numVisible = 1;
+		}
 		return(numVisible);
 	}
 
 	public int getFirstVisible() {
+		/** TODO: For some undetermined reason, the above sometimes yields an
+		 * out of bounds number. I suspect that it has something to do with
+		 * multiple cells under a single pixel, but I'm not sure. For now, this
+		 * work-around will prevent exceptions. Figure this out & fix it
+		 * eventually. */
+		if(firstVisible + numVisible - 1 > getMaxIndex()) {
+			LogBuffer.println("Warning: Encountered invalid/too-large " +
+				"firstVisible value: [" + firstVisible + "].  Resetting.");
+			firstVisible = getMaxIndex() - numVisible;
+		}
+		if(firstVisible < 0) {
+			LogBuffer.println("Warning: Encountered invalid/negative " +
+				"firstVisible value: [" + firstVisible + "].  Resetting.");
+			firstVisible = 0;
+		}
 		return(firstVisible);
 	}
 
@@ -1993,6 +2023,8 @@ public class MapContainer extends Observable implements Observer,
 		 * work-around will prevent exceptions. Figure this out & fix it
 		 * eventually. */
 		if(lastVisible > getMaxIndex()) {
+			LogBuffer.println("Warning: Encountered invalid/too-large " +
+				"lastVisible value: [" + lastVisible + "].  Resetting.");
 			lastVisible = getMaxIndex();
 		}
 		return(lastVisible);
