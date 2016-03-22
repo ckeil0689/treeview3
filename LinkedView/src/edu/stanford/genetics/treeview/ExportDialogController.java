@@ -133,7 +133,6 @@ public class ExportDialogController {
 
 				String msg = "Exported file: [" + exportFilename + "].";
 				LogBuffer.println(msg);
-				showDialog(msg);
 
 				exportDialog.dispose();
 			} catch(OutOfMemoryError oome) {
@@ -156,8 +155,9 @@ public class ExportDialogController {
 		//Set the default initial output file name and location to that of the
 		//input file
 		try {
+			File inFile = new File(model.getSource());
 			File outFile = new File(getInitialExportFileString(selFormat));
-			fileDialog.setDirectory(outFile.getCanonicalPath());
+			fileDialog.setDirectory(inFile.getCanonicalPath());
 			fileDialog.setFile(outFile.getName());
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -188,13 +188,6 @@ public class ExportDialogController {
 
 		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), 
 				message, "Warning", JOptionPane.WARNING_MESSAGE);
-		LogBuffer.println(message);
-	}
-
-	private void showDialog(final String message) {
-
-		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), 
-				message, "Note", JOptionPane.INFORMATION_MESSAGE);
 		LogBuffer.println(message);
 	}
 
