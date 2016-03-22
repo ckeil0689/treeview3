@@ -1,7 +1,9 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,12 +113,16 @@ public class ExportDialogController {
 					PageConstants.getOrientationList()[selectedOptions[5]];
 			}
 
-			String exportFilename = model.getSource();
-			if(exportFilename == null || exportFilename.isEmpty()) {
-				exportFilename = "TreeView3_exported_file";
-			}
-			exportFilename += "." + selFormat.toString();
+			//This will open a file chooser dialog
+			String exportFilename = chooseSaveFile(selFormat);
 
+			//If the returned string is null or empty, they either canceled or
+			//there was an error
+			if(exportFilename == null || exportFilename.isEmpty()) {
+				return;
+			}
+
+			//Now export the file
 			try {
 				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
 					interactiveYmap,colSelection,rowSelection);
@@ -137,6 +143,45 @@ public class ExportDialogController {
 				showWarning(iae.getLocalizedMessage());
 			}
 		}
+	}
+
+	public String chooseSaveFile(Format selFormat) {
+
+		String chosen = null;
+
+		final FileDialog fileDialog = new FileDialog(exportDialog,
+			"Save Exported File",
+			FileDialog.SAVE);
+
+		//Set the default initial output file name and location to that of the
+		//input file
+		try {
+			File outFile = new File(getInitialExportFileString(selFormat));
+			fileDialog.setDirectory(outFile.getCanonicalPath());
+			fileDialog.setFile(outFile.getName());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+
+		fileDialog.setVisible(true);
+
+		//Retrieve the chosen output file
+		final String outdir = fileDialog.getDirectory();
+		final String filename = fileDialog.getFile();
+		if(outdir != null && filename != null) {
+			chosen = outdir + filename;
+		}
+
+		return(chosen);
+	}
+
+	public String getInitialExportFileString(Format selFormat) {
+		String exportFilename = model.getSource();
+		if(exportFilename == null || exportFilename.isEmpty()) {
+			exportFilename = "TreeView3_exported_file";
+		}
+		exportFilename += "." + selFormat.toString();
+		return(exportFilename);
 	}
 
 	private void showWarning(final String message) {
