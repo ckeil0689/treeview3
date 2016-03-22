@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Desktop;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -135,6 +136,9 @@ public class ExportDialogController {
 				LogBuffer.println(msg);
 
 				exportDialog.dispose();
+
+				//Open the file in the default system app
+				Desktop.getDesktop().open(new File(exportFilename));
 			} catch(OutOfMemoryError oome) {
 				showWarning("ERROR: Out of memory.  Note, you may be able to " +
 					"export a smaller portion of the matrix.");
