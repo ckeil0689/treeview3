@@ -101,6 +101,9 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		} 
 
 		this.configNode = parentNode.node("ColorExtractor");
+		
+		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+		setDefaultColorSet(colorPresets.getDefaultColorSet());
 		requestStoredState();
 	}
 	

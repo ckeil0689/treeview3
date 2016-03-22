@@ -87,12 +87,12 @@ public class ClusteredAxisData {
 		return axisLabels;
 	}
 	
-	public int getAxisLabelNum() {
+	public int getNumLabels() {
 		
 		return axisLabels.length;
 	}
 	
-	public String[][] getOrderedAxisLabels() {
+	public String[][] getOrderedLabels() {
 		
 		return orderedAxisLabels;
 	}

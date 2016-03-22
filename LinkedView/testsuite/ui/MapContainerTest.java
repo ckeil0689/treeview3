@@ -1,3 +1,4 @@
+package ui;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -33,11 +34,10 @@ public class MapContainerTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		mpContainer = new MapContainer(IntegerMap.FIXED, "TestMap");
+		this.mpContainer = new MapContainer(IntegerMap.FIXED, "TestMap");
+		this.scrollbar = new JScrollBar();
 		
-		scrollbar = new JScrollBar();
 		mpContainer.setScrollbar(scrollbar);
-		
 		mpContainer.setIndexRange(MIN_IDX, MAX_IDX);
 	}
 

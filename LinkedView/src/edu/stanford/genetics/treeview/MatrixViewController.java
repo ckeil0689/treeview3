@@ -228,12 +228,11 @@ ConfigNodePersistent, Controller {
 	
 	private void setupDrawingComponents() {
 		
-		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+//		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 //		colorPresets.setConfigNode(configNode);
 		this.colorExtractor = new ColorExtractor(
 				model.getDataMatrix().getMinVal(), model.getDataMatrix()
 						.getMaxVal());
-		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NAN, DataModel.EMPTY);
 
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();

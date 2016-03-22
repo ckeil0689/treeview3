@@ -181,6 +181,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		resetComponentDefaults();
 		
 //		createMatrixController();
+		mvController.setup();
 		
 		/* Assign Preferences nodes to components */
 //		setConfigNode(tvFrame.getConfigNode());
@@ -199,7 +200,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		/**
 		 * make sure pixel colors are calculated after new model was loaded. 
 		 */
-		mvController.setup();
 		mvController.updateMatrixPixels();
 		mvController.resetMatrixViews();
 
@@ -1032,13 +1032,11 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		globalXmap.setConfigNode(configNode);
 		globalYmap.setConfigNode(configNode);
 
-		// URLs
+		DendrogramFactory.getColorPresets().setConfigNode(configNode);
 		mvController.setConfigNode(configNode);
 
 		dendroView.getRowLabelView().setConfigNode(configNode);
 		dendroView.getColLabelView().setConfigNode(configNode);
-		
-		DendrogramFactory.getColorPresets().setConfigNode(configNode);
 	}
 	
 	/**
@@ -1050,7 +1048,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	public void restoreComponentStates() {
 		
-		LogBuffer.println("Restoring components states...");
+		LogBuffer.println("Restoring components states.");
 		
 		interactiveXmap.requestStoredState();
 		interactiveYmap.requestStoredState();
@@ -1085,7 +1083,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	private void updateHeaderInfo() {
 
-		LogBuffer.println("Updating HeaderInfo.");
 		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
 		dendroView.getColLabelView().setHeaderInfo(tvModel.getColHeaderInfo());
 	}
@@ -1609,7 +1606,26 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			final Preferences labelViewNode) {
 		
 		labelView.importStateFrom(labelViewNode);
-		labelView.getHeaderSummary().setConfigNode(labelViewNode);
+		
+		try {
+			Preferences summaryNode;
+			if(labelViewNode.nodeExists("RowSummary")) {
+				summaryNode = labelViewNode.node("RowSummary");
+				
+			} else if(labelViewNode.nodeExists("ColSummary")) {
+				summaryNode = labelViewNode.node("ColSummary");
+				
+			} else {
+				summaryNode = null;
+			}
+			
+			labelView.getHeaderSummary().importStateFrom(summaryNode);
+			
+		} catch (BackingStoreException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Skipping import of selected headers.");
+			return;
+		}
 	}
 
 	// /**
