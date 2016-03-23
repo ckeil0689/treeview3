@@ -181,7 +181,7 @@ public class InteractiveMatrixView extends MatrixView {
 			}
 
 			/*
-			 * draw white selection circle if only 1 tile is selected and small
+			 * draw yellow selection circle if only 1 tile is selected and small
 			 * enough.
 			 */
 			if (indicatorCircleList != null) {

@@ -105,7 +105,7 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 	 */
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
-			final Rectangle dest, final int scanSize, final int[] geneOrder) {
+			final Rectangle dest, final int scanSize) {
 
 		/* Selection dimming */
 		// ,int[] geneSelections, int[] arraySelections) {
@@ -150,9 +150,6 @@ public class KnnArrayDrawer extends DoubleArrayDrawer {
 						for (int j = arrayFirst; j <= array; j++) {
 
 							int actualGene = source.y + i;
-							if (geneOrder != null) {
-								actualGene = geneOrder[actualGene];
-							}
 							final double thisVal = dataMatrix.getValue(j
 									+ source.x, actualGene);
 							if (Helper.nearlyEqual(val, DataModel.EMPTY)) {

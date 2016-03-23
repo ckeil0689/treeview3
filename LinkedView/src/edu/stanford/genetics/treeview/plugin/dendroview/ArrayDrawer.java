@@ -94,7 +94,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 *            matrix.
 	 */
 	public abstract void paint(int[] pixels, Rectangle source, Rectangle dest,
-			int scanSize, int[] geneOrder);
+			int scanSize);
 
 	/* Code for selection dimming */
 	// , int[] geneSelections, int[] arraySelections);
@@ -291,61 +291,6 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 		}
 
 		return(boundaryList);
-	}
-
-	/**
-	 * Paint the array values onto pixels. This method will do averaging if
-	 * multiple values map to the same pixel.
-	 *
-	 * @param pixels
-	 *            The pixel buffer to draw to.
-	 * @param source
-	 *            Specifies Rectangle of values to draw from
-	 * @param dest
-	 *            Specifies Rectangle of pixels to draw to
-	 * @param scanSize
-	 *            The scansize for the pixels array (in other words, the width
-	 *            of the image)
-	 */
-	public void paint(final int[] pixels, final Rectangle source,
-			final Rectangle dest, final int scanSize) {
-
-		paint(pixels, source, dest, scanSize, null);
-	}
-
-	/**
-	 * Method to draw a single point (x,y) on graphics g using xmap and ymap
-	 *
-	 * @param g
-	 *            Graphics to draw to
-	 * @param xmap
-	 *            Mapping from indexes to pixels
-	 * @param ymap
-	 *            Mapping from indexes to pixels
-	 * @param x
-	 *            x coordinate of data in array
-	 * @param y
-	 *            y coordinate of data in array
-	 * @param geneOrder
-	 *            a desired reordered subset of the genes, or null if you want
-	 *            order from cdt.
-	 */
-	public void paintPixel(final Graphics g, final MapContainer xmap,
-			final MapContainer ymap, final int x, final int y,
-			final int[] geneOrder) {
-
-		try {
-			int actualGene = ymap.getIndex(y);
-			if (geneOrder != null) {
-				actualGene = geneOrder[actualGene];
-			}
-
-			final Color t_color = getColor(xmap.getIndex(x), actualGene);
-			g.setColor(t_color);
-			g.fillRect(x, y, 1, 1);
-
-		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-		}
 	}
 
 	/**
