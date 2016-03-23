@@ -213,6 +213,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	private void resetComponentDefaults() {
 		
 		LogBuffer.println("Resetting MapContainers and DendroView components.");
+		
 		resetMapContainerDefaults();
 		dendroView.resetModelViewDefaults();
 	}

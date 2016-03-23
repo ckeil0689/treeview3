@@ -914,8 +914,6 @@ public class TVController implements Observer {
 					model.getColHeaderInfo());
 		}
 
-//		preferences.setConfigNode(tvFrame.getConfigNode().node(
-//				StringRes.pnode_Preferences));
 		preferences.setMenu(menu);
 
 		// Controller
@@ -1047,7 +1045,6 @@ public class TVController implements Observer {
 	@Override
 	public void update(final Observable o, final Object arg) {
 
-		LogBuffer.println("Updating TVController");
 		/* when tvFrame rebuilds its menu */
 		if (o instanceof ViewFrame) {
 			addMenuListeners();

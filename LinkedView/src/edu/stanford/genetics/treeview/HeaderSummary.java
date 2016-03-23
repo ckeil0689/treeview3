@@ -73,7 +73,6 @@ implements ConfigNodePersistent, ModelLoadReset {
 		}
 
 		final int[] vec = getIncluded();
-		LogBuffer.println("(Store) included: " + Arrays.toString(vec) + " " + type);
 		configNode.put("included", Arrays.toString(vec));
 		
 		if(headers == null) {
@@ -89,8 +88,6 @@ implements ConfigNodePersistent, ModelLoadReset {
 				names[i] = headers[idx];
 			}
 		}
-		LogBuffer.println("Headers (" + type + "): " + Arrays.toString(headers));
-		LogBuffer.println("(Store) includedNames: " + Arrays.toString(names) + " " + type);
 		configNode.put("includedNames", Arrays.toString(names));
 	}
 	
@@ -104,7 +101,6 @@ implements ConfigNodePersistent, ModelLoadReset {
 		
 		if(nodeHasAttribute("includedNames", oldNode)) {
 			String importNames = oldNode.get("includedNames", "[0]");
-			LogBuffer.println("(Import) includedNames: " + importNames);
 			configNode.put("includedNames", importNames);
 		}
 
@@ -134,9 +130,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 					return;
 				}
 
-				LogBuffer.println("(Import) included: " + Arrays.toString(array));
 				array = adjustIncl(array);
-				LogBuffer.println("(Import) adjIncluded: " + Arrays.toString(array));
 				setIncluded(array);
 			}
 		} else if(headers != null && headers.length > 0) {
@@ -331,7 +325,6 @@ implements ConfigNodePersistent, ModelLoadReset {
 		
 		if (nodeHasAttribute("includedNames", configNode)) {
 			String names = configNode.get("includedNames", "[0]");
-			LogBuffer.println("Included header names: " + names);
 			inclNames = getValuesFromStoredString(names);
 			
 			int inclSize = inclNames.length;
@@ -410,7 +403,8 @@ implements ConfigNodePersistent, ModelLoadReset {
 	@Override
 	public String toString() {
 		
-		String str = "included_class (" + Arrays.toString(included) + "/ "
+		String str = super.toString();
+		str += "// included_class (" + Arrays.toString(included) + "/ "
 				+ "included_stored (" + configNode.get("included", "default") 
 				+ ")/ includedNames_stored (" + configNode.get("includedNames", 
 						"default") + ")/ headers_class (" 
