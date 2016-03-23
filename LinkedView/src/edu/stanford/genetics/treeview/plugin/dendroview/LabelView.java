@@ -342,6 +342,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		this.lastScrollEndPos      = -1;
 		this.secondaryPaneSize     = -1;
 		this.secondaryViewportSize = -1;
+		
+		if(headerSummary != null) {
+			headerSummary.resetDefaults();
+		}
 	}
 
 	/**
@@ -511,7 +515,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	public void importStateFrom(final Preferences node) {
 		
-		resetDefaults();
+//		resetDefaults();
 		
 		setMin(node.getInt("min", d_min));
 		setMax(node.getInt("max", d_max));

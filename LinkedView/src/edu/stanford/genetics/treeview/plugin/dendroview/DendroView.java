@@ -291,8 +291,10 @@ public class DendroView implements Observer, DendroPanel {
 		
 		rowLabelView.resetDefaults();
 		colLabelView.resetDefaults();
+		
 		rowTreeView.resetDefaults();
 		colTreeView.resetDefaults();
+		
 		interactiveMatrixView.resetDefaults();
 		globalMatrixView.resetDefaults();
 	}

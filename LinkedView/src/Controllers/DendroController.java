@@ -149,7 +149,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	
 	@Override
 	public void requestStoredState() {
-		return; // no stored state yet
+		
+		importStateFrom(configNode);
 	}
 
 	@Override
@@ -180,12 +181,10 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		resetComponentDefaults();
 		
-//		createMatrixController();
 		mvController.setup();
 		
 		/* Assign Preferences nodes to components */
-//		setConfigNode(tvFrame.getConfigNode());
-		setComponentPresets();
+		setComponentPreferences();
 
 		updateHeaderInfo();
 		bindComponentFunctions();
@@ -213,18 +212,9 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	private void resetComponentDefaults() {
 		
+		LogBuffer.println("Resetting MapContainers and DendroView components.");
 		resetMapContainerDefaults();
 		dendroView.resetModelViewDefaults();
-	}
-	
-	/**
-	 * Sets up all necessary components for the MatrixView controller.
-	 */
-	private void createMatrixController() {
-		
-		
-
-		mvController.setup();
 	}
 	
 	private void resetMapContainerDefaults() {
@@ -1022,7 +1012,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Connects all sub components with DendroView's configuration node, so that
 	 * the hierarchical structure of Java's Preferences API can be followed.
 	 */
-	private void setComponentPresets() {
+	private void setComponentPreferences() {
 
 		setConfigNode(tvFrame.getConfigNode());
 		

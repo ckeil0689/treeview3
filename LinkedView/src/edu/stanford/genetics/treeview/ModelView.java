@@ -26,7 +26,7 @@ import javax.swing.JPanel;
  * Interestingly, but necessarily, it has no dependency on any models.
  */
 public abstract class ModelView extends JPanel implements Observer,
-		MouseListener {
+		MouseListener, ModelLoadReset {
 
 	private static final long serialVersionUID = 1L;
 
@@ -82,6 +82,7 @@ public abstract class ModelView extends JPanel implements Observer,
 	/**
 	 * Reset all member variables to ensure a fresh starting point.
 	 */
+	@Override
 	public void resetDefaults() {
 	
 		this.hasMouse = false;

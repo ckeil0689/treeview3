@@ -14,17 +14,29 @@ import java.util.prefs.Preferences;
 /**
  * this class generates a single string summary of a HeaderInfo.
  */
-public class HeaderSummary extends Observable implements ConfigNodePersistent {
+public class HeaderSummary extends Observable 
+implements ConfigNodePersistent, ModelLoadReset {
 
-	private Preferences configNode;
-	private int[] included = new int[] { 0 };
+	private final int[] d_included = new int[] { 0 };
+	private final String[] d_headers = new String[]{"default"};
 	private final String type;
+	
+	private Preferences configNode;
 	private String[] headers;
+	private int[] included;
 
 	public HeaderSummary(final String type) {
 
 		super();
 		this.type = type;
+		this.included = d_included;
+	}
+	
+	@Override
+	public void resetDefaults() {
+		
+		this.included = d_included;
+		this.headers = d_headers;
 	}
 	
 	@Override
@@ -77,6 +89,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				names[i] = headers[idx];
 			}
 		}
+		LogBuffer.println("Headers (" + type + "): " + Arrays.toString(headers));
 		LogBuffer.println("(Store) includedNames: " + Arrays.toString(names) + " " + type);
 		configNode.put("includedNames", Arrays.toString(names));
 	}
