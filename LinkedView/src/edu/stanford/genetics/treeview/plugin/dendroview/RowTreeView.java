@@ -73,9 +73,12 @@ public class RowTreeView extends TRView {
 	protected void drawFittedWhizBackground(final Graphics g,
 		LinearTransformation scaleEq) {
 
-		if(map.getFirstVisibleLabel() < 0) {
+		if(map == null || map.getFirstVisibleLabel() < 0 ||
+			map.getNumVisibleLabels() < 1 || scaleEq == null) {
+
 			return;
 		}
+
 		g.fillRect(0,(int) scaleEq.transform((double) map.getFirstVisibleLabel()),
 			getSecondaryPaneSize(offscreenSize),
 			(int) scaleEq.transform((double) map.getFirstVisible() +
@@ -220,7 +223,7 @@ public class RowTreeView extends TRView {
 	}
 	
 	@Override
-	protected void setExportScale(Rectangle dest) {
+	protected void setExportPreviewScale(Rectangle dest) {
 		
 		/* Scale trees for complete painting */
 		int firstVisIndex = map.getIndex(getFittedDestRectStart());

@@ -1824,49 +1824,58 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		int maxStrLen = 0;
 		String maxStr = "";
 
-		/* TODO: Check whether any of the string data has changed if the
-		 * user changes labels OR when such a change is made, set the
-		 * lastDrawn* etc. variables to initial values again. */
+		//If we detect that the data has changed, re-initialize the last drawn
+		//longest string variables.  Note, this can be thwarted in the rare case
+		//that 2 different data files happen to have the same label in the same
+		//position and there exists a longer label elsewhere
+		if((longest_str_index > -1 && longest_str_index > map.getMaxIndex()) ||
+			longest_str == null ||
+			!longest_str.equals(headerSummary.getSummary(headerInfo,
+				longest_str_index))) {
+
+			longest_str_index = -1;
+			longest_str = "";
+		}
 
 		//If nothing about the font has changed, calculate the length of the
 		//longest string
 		if(lastDrawnFace == face  && lastDrawnStyle == style &&
-		   longest_str_index > -1 && lastDrawnSize  == size &&
+			longest_str_index > -1 && lastDrawnSize == size &&
 			longest_str.equals(headerSummary.getSummary(headerInfo,
-			                                            longest_str_index))) {
+				longest_str_index))) {
+
 			debug("Regurgitating maxstrlen",1);
 			maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
 			maxStrLen = longest_str_length;
 			debug("Everything fontwise is the same, including size [" + size +
-			      "]. returning saved maxStrLen [" + maxStrLen + "]",18);
+				"]. returning saved maxStrLen [" + maxStrLen + "]",18);
 		}
 		//Else if the font size only has changed, recalculate the longest
 		//string's length
 		else if(lastDrawnFace == face && lastDrawnStyle == style &&
-		        longest_str_index > -1 &&
-		        lastDrawnSize != size &&
-		        longest_str.equals(headerSummary.getSummary(headerInfo,
-		                                                    longest_str_index))
-		       ) {
+			longest_str_index > -1 && lastDrawnSize != size &&
+			longest_str.equals(headerSummary.getSummary(headerInfo,
+				longest_str_index))) {
+
 			debug("Refining maxstrlen",1);
 			maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
 			maxStrLen = metrics.stringWidth(maxStr);
 			debug("Font size only changed. Recalculating length of longest " +
-			      "string [" + maxStr + "] & returning maxStrLen [" +
-			      maxStrLen + "]",18);
+				"string [" + maxStr + "] & returning maxStrLen [" +
+				maxStrLen + "]",18);
 		}
 		//Else find the longest string and return its length
 		else {
 			debug("Calculating maxstrlen because not [lastDrawnFace == face " +
-			      "&& lastDrawnStyle == style && longest_str_index > -1 && " +
-			      "lastDrawnSize != size && longest_str.equals(headerSummary." +
-			      "getSummary(headerInfo,longest_str_index))]",18);
+				"&& lastDrawnStyle == style && longest_str_index > -1 && " +
+				"lastDrawnSize != size && longest_str.equals(headerSummary." +
+				"getSummary(headerInfo,longest_str_index))]",18);
 			debug("Calculating maxstrlen because not [" + lastDrawnFace +
-			      " == " + face + " && " + lastDrawnStyle + " == " + style +
-			      " && " + longest_str_index + " > -1 && " + lastDrawnSize +
-			      " != " + size + " && " + longest_str +
-			      ".equals(headerSummary.getSummary(headerInfo," +
-			      longest_str_index + "))]",18);
+				" == " + face + " && " + lastDrawnStyle + " == " + style +
+				" && " + longest_str_index + " > -1 && " + lastDrawnSize +
+				" != " + size + " && " + longest_str +
+				".equals(headerSummary.getSummary(headerInfo," +
+				longest_str_index + "))]",18);
 			for(int j = 0;j <= end;j++) {
 				try {
 					String out = headerSummary.getSummary(headerInfo,j);
@@ -1891,16 +1900,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			longest_str = maxStr;
 
 			debug("Full-on recalculating [" + maxStr + "] maxStrLen [" +
-			      maxStrLen + "] at face [" + face + "] style [" + style +
-			      "] size [" + size + "]",12);
+				maxStrLen + "] at face [" + face + "] style [" + style +
+				"] size [" + size + "]",12);
 		}
 
 		debug(getPaneType() + ": MaxStrLen: [" + maxStrLen +
-		      "] MaxStr: [" + maxStr + "] Start Index: [" + 0 +
-		      "] End Index: [" + end + "] height [" + offscreenSize.height +
-		      "] width [" + offscreenSize.width + "]",1);
+			"] MaxStr: [" + maxStr + "] Start Index: [" + 0 +
+			"] End Index: [" + end + "] height [" + offscreenSize.height +
+			"] width [" + offscreenSize.width + "]",1);
 
-		return maxStrLen;
+		return(maxStrLen);
 	}
 
 	private void saveLastDrawnFontDetails(int maxStrLen) {

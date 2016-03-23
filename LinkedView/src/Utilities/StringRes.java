@@ -140,7 +140,7 @@ public class StringRes {
 			+ "font size to see labels";
 
 	/* Distance Measures */
-	public static final String cluster_DoNot = "Do not cluster";
+	public static final String cluster_LeaveUnchanged = "Leave unchanged";
 	public static final String cluster_pearsonUn = "Pearson Correlation "
 			+ "(uncentered)";
 	public static final String cluster_pearsonCtrd = "Pearson Correlation "

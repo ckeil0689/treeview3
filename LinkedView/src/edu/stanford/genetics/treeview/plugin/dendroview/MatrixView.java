@@ -14,6 +14,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import ColorChooser.ColorChooserController;
+import Controllers.Region;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -124,16 +125,114 @@ public abstract class MatrixView extends ModelViewProduced {
 		xmap.notifyObservers();
 		ymap.notifyObservers();
 	}
-	
+
+	/* TODO: This needs to take a start end end index for each dimension
+	 * defining the export region */
+	public void exportPixels(Graphics g) {
+		if (drawer != null) {
+			/* Set new offscreenPixels (pixel colors) */
+			drawer.paint(g,xmap.getTotalTileNum(),ymap.getTotalTileNum());
+		}
+	}
+
+	/**
+	 * Export all data to a file
+	 * @author rleach
+	 * @param g - Graphics object
+	 * @param xIndent - The number of points to indent the image on the x axis
+	 * @param yIndent - The number of points to indent the image on the y axis
+	 * @param size - The number of points in each dimension of a square tile
+	 */
+	public void export(final Graphics g,final int xIndent,final int yIndent,
+		final int tileXsize,final int tileYsize,final Region region,
+		final boolean showSelections) {
+
+		if(region == Region.ALL) {
+			exportAll(g,xIndent,yIndent,tileXsize,tileYsize,showSelections);
+		} else if(region == Region.VISIBLE) {
+			exportVisible(g,xIndent,yIndent,tileXsize,tileYsize,showSelections);
+		} else if(region == Region.SELECTION) {
+			exportSelection(g,xIndent,yIndent,tileXsize,tileYsize,
+				showSelections);
+		} else {
+			LogBuffer.println("ERROR: Invalid export region: [" + region +
+				"].");
+		}
+	}
+
+	/**
+	 * Export the entire matrix to a file
+	 * @author rleach
+	 * @param g
+	 * @param xIndent
+	 * @param yIndent
+	 * @param tileXsize
+	 * @param tileYsize
+	 */
+	public void exportAll(final Graphics g,final int xIndent,final int yIndent,
+		final int tileXsize,final int tileYsize,final boolean showSelections) {
+
+		if(drawer != null) {
+			drawer.paint(g,xmap.getTotalTileNum(),ymap.getTotalTileNum(),
+				xIndent,yIndent,tileXsize,tileYsize,showSelections,colSelection,
+				rowSelection);
+		}
+	}
+
+	/**
+	 * Export the currently visible data to a file
+	 * @author rleach
+	 * @param g - Graphics object
+	 * @param xIndent - The number of points to indent the image on the x axis
+	 * @param yIndent - The number of points to indent the image on the y axis
+	 * @param size - The number of points in each dimension of a square tile
+	 */
+	public void exportVisible(final Graphics g,final int xIndent,
+		final int yIndent,final int tileXsize,final int tileYsize,
+		final boolean showSelections) {
+
+		if(drawer != null) {
+			drawer.paint(g,xmap.getLastVisible(),ymap.getLastVisible(),
+				xIndent,yIndent,tileXsize,tileYsize,xmap.getFirstVisible(),
+				ymap.getFirstVisible(),showSelections,colSelection,
+				rowSelection);
+		}
+	}
+
+	/**
+	 * Export the currently selected (and intervening) data to a file
+	 * @author rleach
+	 * @param g - Graphics object
+	 * @param xIndent - The number of points to indent the image on the x axis
+	 * @param yIndent - The number of points to indent the image on the y axis
+	 * @param size - The number of points in each dimension of a square tile
+	 */
+	public void exportSelection(final Graphics g,final int xIndent,
+		final int yIndent,final int tileXsize,final int tileYsize,
+		final boolean showSelections) {
+
+		if(drawer != null) {
+			if(colSelection != null && colSelection.getNSelectedIndexes() > 0) {
+				drawer.paint(g,
+					colSelection.getMaxIndex(),rowSelection.getMaxIndex(),
+					xIndent,yIndent,tileXsize,tileYsize,
+					colSelection.getMinIndex(),rowSelection.getMinIndex(),
+					showSelections,colSelection,rowSelection);
+			} else {
+				LogBuffer.println("ERROR: No selection exists.");
+			}
+		}
+	}
+
 	@Override
 	protected void updatePixels() {
-		
+
 		/* TODO remove rectangle dependency of drawer. not needed. */
 		final Rectangle destRect = new Rectangle(0, 0,
 				xmap.getUsedPixels(), ymap.getUsedPixels());
 		
 		final Rectangle sourceRect = new Rectangle(0, 0, 
-				xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
+				xmap.getTotalTileNum(), ymap.getTotalTileNum());
 
 		if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 			/* Set new offscreenPixels (pixel colors) */
@@ -157,7 +256,7 @@ public abstract class MatrixView extends ModelViewProduced {
 						xmap.getUsedPixels(), ymap.getUsedPixels());
 				
 				final Rectangle sourceRect = new Rectangle(0, 0, 
-						xmap.getMaxIndex() + 1, ymap.getMaxIndex() + 1);
+						xmap.getTotalTileNum(), ymap.getTotalTileNum());
 
 				if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
 					/* Set new offscreenPixels (pixel colors) */
@@ -343,7 +442,7 @@ public abstract class MatrixView extends ModelViewProduced {
 			createNewBuffer(x_tiles, y_tiles);
 		}
 	}
-	
+
 	/**
 	 * If an image does not exist yet, it will be created here. Its dimensions
 	 * in pixels directly correspond to the axis dimensions of the loaded model.
@@ -406,5 +505,4 @@ public abstract class MatrixView extends ModelViewProduced {
 		
 		return (BufferedImage) paintImage;
 	}
-
 }

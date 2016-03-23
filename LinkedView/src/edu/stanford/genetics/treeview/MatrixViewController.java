@@ -60,6 +60,9 @@ ConfigNodePersistent, Controller {
 	private DataModel model;
 	protected Preferences configNode;
 	
+	/* Data ticker reference, so it can be updated by the MouseAdapter */ 
+	private DataTicker ticker;
+	
 	public MatrixViewController(final InteractiveMatrixView imView,
 			final GlobalMatrixView gmView, final DataModel model) {
 		
@@ -592,8 +595,8 @@ ConfigNodePersistent, Controller {
 	private class MatrixMouseWheelListener implements MouseWheelListener {
 		
 		/**
-		 * Zooming when the mouse wheel is used in conjunction with the alt/option
-		 * key.  Vertical scrolling if the shift key is not pressed.
+		 * Zooming when the mouse wheel is used in conjunction with the alt/
+		 * option key.  Vertical scrolling if the shift key is not pressed.
 		 */
 		@Override
 		public void mouseWheelMoved(final MouseWheelEvent e) {
@@ -605,12 +608,12 @@ ConfigNodePersistent, Controller {
 			final int notches = e.getWheelRotation();
 			final int shift = (notches < 0) ? -3 : 3;
 
-			//On macs' magic mouse, horizontal scroll comes in as if the shift was
-			//down
+			//On macs' magic mouse, horizontal scroll comes in as if the shift
+			//was down
 			if (e.isAltDown()) {
 				if (notches < 0) {
-					//This ensures we only zoom toward the cursor when the cursor is
-					//over the map
+					//This ensures we only zoom toward the cursor when the
+					//cursor is over the map
 					if (imView.hasMouse()) {
 						imView.smoothZoomTowardPixel(e.getX(), e.getY());
 					}
@@ -728,6 +731,25 @@ ConfigNodePersistent, Controller {
 										- rowSelection.getMinIndex() + 1));
 			}
 		}
+	}
+	
+	public void setDataTicker(final DataTicker ticker) {
+		
+		this.ticker = ticker;
+	}
+	
+	/**
+	 * A wrapper for retrieving a data value from the data model. Used by 
+	 * IMVMouseAdapter to update the DataTicker in DendroView when hovering
+	 * over the InteractiveMatrixView. 
+	 * @param rowIdx Row index of the data value in the model's data matrix.
+	 * @param colIdx Col index of the data value in the model's data matrix.
+	 * @return The data value at the specified indices, if it exists. 
+	 * DataModel.NAN otherwise.
+	 */
+	public void setDataValueAt(final int rowIdx, final int colIdx) {
+		
+		ticker.setValue(model.getDataMatrix().getValue(colIdx, rowIdx));
 	}
 	
 	/**

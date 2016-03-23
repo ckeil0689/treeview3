@@ -76,19 +76,28 @@ public class IMVMouseAdapter extends MouseAdapter {
 		this.xmap = interactiveXmap;
 		this.ymap = interactiveYmap;
 
-		debug = 1;
+		debug = 0;
 		//1 = Debug the temporary band drawn for single-clicks
 	}
 	
 	@Override
 	public void mouseMoved(final MouseEvent e) {
 
+		if(!imView.enclosingWindow().isActive()) {
+			return;
+		}
+		
 		/* TODO passing index makes the most sense but an overloaded method 
 		 * that takes a pixel works well too. 
 		 * Reduces clutter in calling classes a little bit.
 		 */
-		xmap.setHoverIndex(xmap.getIndex(e.getX()));
-		ymap.setHoverIndex(ymap.getIndex(e.getY()));
+		int rowIdx = ymap.getIndex(e.getY());
+		int colIdx = xmap.getIndex(e.getX());
+		
+		xmap.setHoverIndex(colIdx);
+		ymap.setHoverIndex(rowIdx);
+		
+		mvController.setDataValueAt(rowIdx, colIdx);
 	}
 	
 	// Mouse Listener
@@ -350,6 +359,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 		}
 
 		imView.setHasMouse(false);
+		mvController.setDataValueAt(-1, -1);
 
 		xmap.setHoverIndex(-1);
 		ymap.setHoverIndex(-1);

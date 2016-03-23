@@ -7,6 +7,7 @@
 
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -23,7 +24,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -34,6 +34,7 @@ import javax.swing.KeyStroke;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
+import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -74,6 +75,7 @@ public class DendroView implements Observer, DendroPanel {
 	// Main containers
 	private final JPanel dendroPane;
 	private final JPanel searchPanel;
+	private final DataTicker ticker;
 
 	// Matrix views
 	private final GlobalMatrixView globalMatrixView;
@@ -120,6 +122,9 @@ public class DendroView implements Observer, DendroPanel {
 	private JButton scaleIncXY;
 	private JButton scaleDecXY;
 	private JButton scaleDefaultAll;
+
+	/* TODO: This needs to be better integrated into the interface */
+//	private JButton exportBtn;
 
 	private HeaderFinderBox rowFinderBox;
 	private HeaderFinderBox colFinderBox;
@@ -179,6 +184,8 @@ public class DendroView implements Observer, DendroPanel {
 		/* Dendrograms */
 		this.rowTreeView = new RowTreeView();
 		this.colTreeView = new ColumnTreeView();
+		
+		this.ticker = new DataTicker();
 
 		setupScaleButtons();
 	}
@@ -285,6 +292,7 @@ public class DendroView implements Observer, DendroPanel {
 	}
 	
 	/**
+<<<<<<< HEAD
 	 * Reset default state for all model views.
 	 */
 	public void resetModelViewDefaults() {
@@ -310,24 +318,17 @@ public class DendroView implements Observer, DendroPanel {
 	}
 	
 	/**
+=======
+	 * TODO currently only a DataTicker placeholder is realized.
+>>>>>>> master
 	 * Creates a panel which contains the color-value indicator. This is
 	 * used to display the data value of the currently hovered matrix pixel.
 	 * @return JPanel containing the olor-value indicator.
 	 */
-	private static JPanel createColorValIndicatorPanel() {
+	private JPanel createColorValIndicatorPanel() {
 		
-		JPanel indicatorPanel;
-		
-		// until implementation of color-value indicator
-		String hint = ">>>> Placeholder <<<<";
-		JLabel indicatorPlaceHolder = GUIFactory.createLabel(hint, 
-				GUIFactory.FONTM);
-		
-		indicatorPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.DEFAULT);
-		indicatorPanel.add(indicatorPlaceHolder);
-		
-		return indicatorPanel;
+		// TODO currently just a data ticker displaying a tile's data value
+		return ticker.getTickerPanel();
 	}
 	
 	/**
@@ -342,6 +343,8 @@ public class DendroView implements Observer, DendroPanel {
 		navBtnPanel.add(scaleDecXY);
 		navBtnPanel.add(zoomBtn);
 		navBtnPanel.add(scaleDefaultAll);
+		/* TODO: This needs to be better integrated into the interface */
+//		navBtnPanel.add(exportBtn);
 		
 		return navBtnPanel;
 	}
@@ -398,7 +401,7 @@ public class DendroView implements Observer, DendroPanel {
 				GUIFactory.NO_GAPS_OR_INSETS);
 		
 		rowTreePanel.add(rowTreeView, "w 100%, pushy, growy, wrap");
-		
+
 		// hidemode is a MigLayout trick! Very important to keep trees aligned.
 		rowTreePanel.add(rowTreeView.getHorizontalScrollBar(), "w 100%, "
 				+ "hidemode 0"); 
@@ -429,13 +432,18 @@ public class DendroView implements Observer, DendroPanel {
 	 * Sets up the JSplitPane used to show row dendrogram and labels.
 	 */
 	private void setupRowDataPane() {
-		
+
 		JPanel rowLabelPanel;
 		JPanel rowTreePanel;
-		
+
 		rowLabelPanel = createRowLabelPanel();
+		//Allow the user to drag the divider to completely hide the labels
+		rowLabelPanel.setMinimumSize(new Dimension(0,0));
+
 		rowTreePanel = createRowTreePanel();
-		
+		//Allow the user to drag the divider to completely hide the trees
+		rowTreePanel.setMinimumSize(new Dimension(0,0));
+
 		rowDataPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rowTreePanel,
 				rowLabelPanel);
 		rowDataPane.setResizeWeight(0.0);
@@ -501,13 +509,18 @@ public class DendroView implements Observer, DendroPanel {
 	 * Sets up the JSplitPane used to show column dendrogram and labels.
 	 */
 	private void setupColDataPane() {
-		
+
 		JPanel colTreePanel;
 		JPanel colLabelPanel;
-		
+
 		colTreePanel = createColTreePanel();
+		//Allow the user to drag the divider to completely hide the trees
+		colTreePanel.setMinimumSize(new Dimension(0,0));
+
 		colLabelPanel = createColLabelPanel();
-		
+		//Allow the user to drag the divider to completely hide the labels
+		colLabelPanel.setMinimumSize(new Dimension(0,0));
+
 		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreePanel,
 				colLabelPanel);
 		colDataPane.setResizeWeight(0.0);
@@ -711,6 +724,10 @@ public class DendroView implements Observer, DendroPanel {
 		/* Reset zoom */
 		zoomBtn = GUIFactory.createIconBtn(StringRes.icon_zoomAll);
 		zoomBtn.setToolTipText(StringRes.tt_home);
+
+		/* TODO: This needs to be better integrated into the interface */
+//		exportBtn = GUIFactory.createSquareBtn("X",39);
+//		exportBtn.setToolTipText("Export image to file");
 	}
 
 	/**
@@ -755,6 +772,9 @@ public class DendroView implements Observer, DendroPanel {
 		scaleIncXY.addActionListener(l);
 		scaleDecXY.addActionListener(l);
 		scaleDefaultAll.addActionListener(l);
+
+		/* TODO: This needs to be better integrated into the interface */
+//		exportBtn.addActionListener(l);
 	}
 
 	/**
@@ -1476,6 +1496,12 @@ public class DendroView implements Observer, DendroPanel {
 		return scaleDefaultAll;
 	}
 
+	/* TODO: This needs to be better integrated into the interface */
+//	public JButton getExportButton() {
+//
+//		return exportBtn;
+//	}
+
 	public JButton getZoomButton() {
 
 		return zoomBtn;
@@ -1557,6 +1583,15 @@ public class DendroView implements Observer, DendroPanel {
 	public ActionMap getActionMap() {
 
 		return dendroPane.getActionMap();
+	}
+	
+	/**
+	 * Get a reference to the data ticker object. 
+	 * @return The DataTicker object for the active DendroView.
+	 */
+	public DataTicker getDataTicker() {
+		
+		return ticker;
 	}
 
 	/**

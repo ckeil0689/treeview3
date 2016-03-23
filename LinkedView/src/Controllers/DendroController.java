@@ -16,7 +16,6 @@ import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.BackingStoreException;
@@ -30,7 +29,6 @@ import javax.swing.InputMap;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -68,6 +66,8 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
+
+
 
 /* 
  * NOTES: 
@@ -201,6 +201,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		 */
 		mvController.updateMatrixPixels();
 		mvController.resetMatrixViews();
+		mvController.setDataTicker(dendroView.getDataTicker());
 
 		addKeyBindings();
 		addListeners();
@@ -812,34 +813,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		globalYmap.setMinScale();
 
 		saveSettings();
-	}
-
-	public void saveImage(final JPanel panel) throws IOException {
-
-		// File saveFile = new File("savedImage.png");
-		//
-		// final JFileChooser fc = new JFileChooser();
-		//
-		// fc.setFileFilter(new FileNameExtensionFilter("PNG", "png"));
-		// fc.setSelectedFile(saveFile);
-		// final int returnVal = fc.showSaveDialog(dendroView.getDendroPane());
-		//
-		// if (returnVal == JFileChooser.APPROVE_OPTION) {
-		// saveFile = fc.getSelectedFile();
-		//
-		// String fileName = saveFile.toString();
-		//
-		// if (!fileName.endsWith(".png")) {
-		// fileName += ".png";
-		// saveFile = new File(fileName);
-		// }
-		//
-		// final BufferedImage im = new BufferedImage(panel.getWidth(),
-		// panel.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		//
-		// panel.paint(im.getGraphics());
-		// ImageIO.write(im, "PNG", saveFile);
-		// }
 	}
 
 	/**

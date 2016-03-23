@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -525,7 +527,7 @@ public class TVController implements Observer {
 			
 		} else {
 			String message = "Data loading was interrupted.";
-			showWarning(message);
+			LogBuffer.println(message);
 		}
 	}
 
@@ -946,11 +948,19 @@ public class TVController implements Observer {
 		BufferedImage matrix = tvFrame.getDendroView()
 				.getInteractiveMatrixView().getVisibleImage();
 		ExportPreviewMatrix expMatrix = new ExportPreviewMatrix(matrix);
-		
-		ExportDialog exportDialog = new ExportDialog();
+
+		ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
+			dendroController.getInteractiveXMap(),
+			dendroController.getInteractiveYMap(),tvFrame.getColSelection(),
+			tvFrame.getRowSelection());
+		boolean selectionsExist = (tvFrame.getColSelection() != null &&
+			tvFrame.getColSelection().getNSelectedIndexes() > 0);
+		ExportDialog exportDialog = new ExportDialog(selectionsExist,eh);
 		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
 		
-		new ExportDialogController(exportDialog, tvFrame.getDendroView());
+		new ExportDialogController(exportDialog,tvFrame,
+			dendroController.getInteractiveXMap(),
+			dendroController.getInteractiveYMap(),model);
 		
 		exportDialog.setVisible(true);
 	}
