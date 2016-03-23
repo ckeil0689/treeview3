@@ -61,6 +61,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 
 		final int[] vec = getIncluded();
+		LogBuffer.println("(Store) included: " + Arrays.toString(vec) + " " + type);
 		configNode.put("included", Arrays.toString(vec));
 		
 		if(headers == null) {
@@ -76,6 +77,7 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				names[i] = headers[idx];
 			}
 		}
+		LogBuffer.println("(Store) includedNames: " + Arrays.toString(names) + " " + type);
 		configNode.put("includedNames", Arrays.toString(names));
 	}
 	
@@ -88,12 +90,13 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 		}
 		
 		if(nodeHasAttribute("includedNames", oldNode)) {
-			String importNames = oldNode.get("includedNames", "[]");
+			String importNames = oldNode.get("includedNames", "[0]");
+			LogBuffer.println("(Import) includedNames: " + importNames);
 			configNode.put("includedNames", importNames);
 		}
 
 		if (nodeHasAttribute("included", oldNode)) {
-			final String incString = oldNode.get("included", "[]");
+			final String incString = oldNode.get("included", "[0]");
 			if (incString.equals("[]")) {
 				LogBuffer.println("The included key has no values stored. "
 						+ "Including nothing. (" + type + ")");
@@ -117,8 +120,10 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 					setIncluded(new int[0]);
 					return;
 				}
-			
+
+				LogBuffer.println("(Import) included: " + Arrays.toString(array));
 				array = adjustIncl(array);
+				LogBuffer.println("(Import) adjIncluded: " + Arrays.toString(array));
 				setIncluded(array);
 			}
 		} else if(headers != null && headers.length > 0) {
@@ -278,6 +283,13 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 				.replaceAll("\\]", "")
 				.split(",");
 		
+		/* No stored values case. Previous code will create a String array of
+		 * size 1 (empty string) if "[]" was stored in Preferences node, but
+		 * we need an empty String array */
+		if(storedVals.length == 1 && storedVals[0].equals("")) {
+			return new String[0];
+		}
+		
 		/* Strings may have spaces within them, so extra trimming here. */
 		for(int i = 0; i < storedVals.length; i++) {
 			String s = storedVals[i];
@@ -301,17 +313,19 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			return new int[0];
 		}
 		
+		String[] inclNames;
 		int[] newIncluded = included;
 		
 		if (nodeHasAttribute("includedNames", configNode)) {
-			String names = configNode.get("includedNames", "");
+			String names = configNode.get("includedNames", "[0]");
 			LogBuffer.println("Included header names: " + names);
-			String[] nameArray = getValuesFromStoredString(names);
+			inclNames = getValuesFromStoredString(names);
 			
-			newIncluded = new int[nameArray.length];
+			int inclSize = inclNames.length;
+			newIncluded = new int[inclSize];
 			
-			for(int i = 0; i < nameArray.length; i++) {
-				String name = nameArray[i];
+			for(int i = 0; i < inclNames.length; i++) {
+				String name = inclNames[i];
 				for(int j = 0; j < headers.length; j++) {
 					if(name.equals(headers[j])) {
 						newIncluded[i] = j;
@@ -319,8 +333,10 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 					}
 				}
 			}
-		/* At least ensure that included[] is not out of bounds */
+		/* If no included headers were found, at least ensure 
+		 * that included[] is not out of bounds */
 		} else {
+			inclNames = null;
 	        int maxSize = 0;
 	        /* Shrink if necessary */
 			for(int i = 0; i < included.length; i++) {
@@ -333,16 +349,18 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			/* Create adjusted array */
 			newIncluded = new int[maxSize];
 			
+			/* Fill with pre-included values that may be included again */
 			for(int i = 0; i < newIncluded.length; i++) {
 				newIncluded[i] = included[i];
 			}
 		}
 		
-		/* Ensure ordering */
+		/* Ensure ascending order, just in case */
 		Arrays.sort(newIncluded);
 		
-		/* Make sure to display first header if nothing was restored. */
-		if(headers.length > 0 && newIncluded.length == 0) {
+		/* Make sure to display first header as default. Note, this must
+		 * still allow the user to explicitly included nothing. */
+		if(headers.length > 0 && newIncluded.length == 0 && inclNames == null) {
 			newIncluded = new int[]{0};
 		}
 		
@@ -374,5 +392,16 @@ public class HeaderSummary extends Observable implements ConfigNodePersistent {
 			LogBuffer.logException(e);
 			return false;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		
+		String str = "included_class (" + Arrays.toString(included) + "/ "
+				+ "included_stored (" + configNode.get("included", "default") 
+				+ ")/ includedNames_stored (" + configNode.get("includedNames", 
+						"default") + ")/ headers_class (" 
+				+ Arrays.toString(headers) + ")";
+		return str;
 	}
 }
