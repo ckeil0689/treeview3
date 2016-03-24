@@ -16,9 +16,11 @@ public class ExportPreviewTrees extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	public static final int D_LONG = 400;
+	public static final int SHORT = 80;
+	
 	private final Image paintImage;
-	public static final int WIDTH = 400;
-	public static final int HEIGHT = 80;
+	private final boolean isRows;
 	
 	private int x; 
 	private int y;
@@ -26,16 +28,28 @@ public class ExportPreviewTrees extends JPanel {
 	public ExportPreviewTrees(final BufferedImage trees, final boolean isRows) {
 		
 		this.paintImage = trees;
-		this.setLayout(new MigLayout());
+		this.isRows = isRows;
+		
+		setLayout(new MigLayout());
+		setLongSideSize(D_LONG);		
+	}
+	
+	/**
+	 * The tree panels can very in length but not in thickness. This method
+	 * can be used to adapt the length to retain the same size as the matrix
+	 * they belong to.
+	 * @param longSide - The size of the long side of the tree preview panel.
+	 */
+	public void setLongSideSize(final int longSide) {
 		
 		if(isRows) {
-			x = HEIGHT;
-			y = WIDTH;
+			this.x = SHORT;
+			this.y = longSide;
 			
 		} else {
-			x = WIDTH;
-			y = HEIGHT;
-		}		
+			this.x = longSide;
+			this.y = SHORT;
+		}
 	}
 	
 	/*

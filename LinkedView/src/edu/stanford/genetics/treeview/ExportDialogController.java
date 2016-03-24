@@ -5,6 +5,8 @@ import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,13 +47,20 @@ public class ExportDialogController {
 		addListeners();
 	}
 
+	/**
+	 * Adds listeners to the GUI components in ExportDialog.
+	 */
 	private void addListeners() {
 		
 		exportDialog.addExportListener(new ExportListener());
 		exportDialog.addFormatListener(new FormatListener());
 		exportDialog.addRegionListener(new RegionListener());
+		exportDialog.addItemStateListener(new ItemStateListener());
 	}
 	
+	/**
+	 * Describes the actions used to produce an export.
+	 */
 	private class ExportListener implements ActionListener {
 
 		@Override
@@ -142,7 +151,9 @@ public class ExportDialogController {
 			} catch(OutOfMemoryError oome) {
 				showWarning("ERROR: Out of memory.  Note, you may be able to " +
 					"export a smaller portion of the matrix.");
+				
 			} catch(Exception iae) {
+				LogBuffer.logException(iae);
 				showWarning(iae.getLocalizedMessage());
 			}
 		}
@@ -195,6 +206,10 @@ public class ExportDialogController {
 		LogBuffer.println(message);
 	}
 
+	/**
+	 * 
+	 *
+	 */
 	private class FormatListener implements ActionListener {
 
 		@Override
@@ -207,6 +222,7 @@ public class ExportDialogController {
 			if(selectedOptions.length < 1 || selectedOptions[0] < 0 ||
 				selectedOptions[0] >= Format.getHiResFormats().length) {
 				selFormat = Format.getDefault();
+				
 			} else {
 				selFormat = Format.getHiResFormats()[selectedOptions[0]];
 			}
@@ -218,11 +234,13 @@ public class ExportDialogController {
 			ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
 				interactiveXmap,interactiveYmap,tvFrame.getColSelection(),
 				tvFrame.getRowSelection());
+			
 			List<Region> tooBigs = new ArrayList<Region>();
 			if(!selFormat.isDocumentFormat()) {
 				final boolean useMinimums = true;
 				tooBigs = eh.getOversizedRegions(useMinimums);
 			}
+			
 			exportDialog.setBigRegs(tooBigs);
 			exportDialog.updateRegionRadioBtns(selFormat.isDocumentFormat());
 		}
@@ -256,5 +274,30 @@ public class ExportDialogController {
 			exportDialog.updateAspectRadioBtns(selFormat.isDocumentFormat(),
 				selRegion);
 		}
+	}
+	
+	/**
+	 * Whenever the selection state of any GUI component which has this listener
+	 * attached will be changed, it causes the export preview to update.
+	 * For example, if the user checks the 'Show selections' JCheckBox, 
+	 * the update will invoke the recreation of the preview components so
+	 * that selections will be drawn as well. 
+	 */
+	private class ItemStateListener implements ItemListener {
+
+		@Override
+		public void itemStateChanged(ItemEvent event) {
+			
+			if(exportDialog == null) {
+				LogBuffer.println("No exportDialog object defined. Could "
+						+ "not update preview components.");
+				return;
+			}
+			
+			if (event.getStateChange() == ItemEvent.SELECTED) {
+				exportDialog.updatePreviewComponents();
+			}
+		}
+		
 	}
 }

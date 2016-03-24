@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -56,13 +54,8 @@ import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
-//<<<<<<< HEAD
-//import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
-//import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
-//=======
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.TRView;
-//>>>>>>> colorUpdate
 
 /**
  * This class controls user interaction with TVFrame and its views.
@@ -1024,11 +1017,11 @@ public class TVController implements Observer {
 		int width;
 		int height;
 		if(isRows) {
-			width = ExportPreviewTrees.HEIGHT;
-			height = ExportPreviewTrees.WIDTH;
+			width = ExportPreviewTrees.SHORT;
+			height = ExportPreviewTrees.D_LONG;
 		} else {
-			width = ExportPreviewTrees.WIDTH;
-			height = ExportPreviewTrees.HEIGHT;
+			width = ExportPreviewTrees.D_LONG;
+			height = ExportPreviewTrees.SHORT;
 		}
 		
 		/* Set up column tree image */

@@ -1,6 +1,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -20,9 +21,9 @@ import org.freehep.graphicsio.PageConstants;
 
 import Controllers.ExportHandler;
 import Controllers.Format;
+import Controllers.Region;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
-import Controllers.Region;
 
 public class ExportDialog extends CustomDialog {
 
@@ -56,7 +57,7 @@ public class ExportDialog extends CustomDialog {
 
 	protected void setupLayout(final boolean selectionsExist) {
 
-		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		JPanel contentPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.DEFAULT);
@@ -71,6 +72,7 @@ public class ExportDialog extends CustomDialog {
 		JPanel previewPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_INSETS);
 		previewPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
+		
 		this.previewComp = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_INSETS);
 
@@ -84,6 +86,7 @@ public class ExportDialog extends CustomDialog {
 		if(eh.isImageExportPossible()) {
 			formatBox = new JComboBox<Object>(Format.getHiResFormats());
 			formatBox.setSelectedItem(Format.getDefault());
+			
 		} else {
 			selectedFormat = Format.getDefaultDocumentFormat();
 			formatBox = new JComboBox<Object>(Format.getDocumentFormats());
@@ -91,16 +94,20 @@ public class ExportDialog extends CustomDialog {
 			formatBox.setToolTipText("All regions too big for PNG/JPG/PPM " +
 				"export");
 		}
+		
 		paperBox = new JComboBox<Object>(PaperType.values());
 		paperBox.setSelectedItem(PaperType.getDefault());
 		paperBox.setEnabled(selectedFormat.isDocumentFormat());
+		
 		regionRadioBtns = new ButtonGroup();
 		aspectRadioBtns = new ButtonGroup();
+		
 		selectionsBox = new JCheckBox("Show Selections");
 		selectionsBox.setEnabled(selectionsExist);
 		if(!selectionsExist) {
 			selectionsBox.setToolTipText("No data selected");
 		}
+		
 		orientBox = new JComboBox<Object>(PageConstants.getOrientationList());
 		orientBox.setSelectedItem(PageConstants.LANDSCAPE);
 		orientBox.setEnabled(selectedFormat.isDocumentFormat());
@@ -248,6 +255,32 @@ public class ExportDialog extends CustomDialog {
 			btn.addActionListener(l);
 		}
 	}
+	
+	/**
+	 * An item listener that allows us to fire events upon selection changes
+	 * in the components that it has been added to.
+	 * @param l - The item listener.
+	 */
+	public void addItemStateListener(final ItemListener l) {
+		
+		formatBox.addItemListener(l);
+		paperBox.addItemListener(l);
+		orientBox.addItemListener(l);
+		
+		selectionsBox.addItemListener(l);
+		
+		Enumeration<AbstractButton> rab = regionRadioBtns.getElements();
+		while(rab.hasMoreElements()) {
+			AbstractButton btn = rab.nextElement();
+			btn.addItemListener(l);
+		}
+		
+		Enumeration<AbstractButton> asp = aspectRadioBtns.getElements();
+		while(asp.hasMoreElements()) {
+			AbstractButton btn = asp.nextElement();
+			btn.addItemListener(l);
+		}
+	}
 
 	/**
 	 * @return an int array which contains 5 values: 0. the selected index of
@@ -376,6 +409,15 @@ public class ExportDialog extends CustomDialog {
 	}
 
 	/**
+	 * Updates the preview components (matrix and trees) according to the
+	 * selected options in the dialog.
+	 */
+	public void updatePreviewComponents() {
+		
+		LogBuffer.println("Updating preview components");
+	}
+	
+	/**
 	 * Updates the availability and the selection of the region radio buttons
 	 * based on the selected file format, whether a selection exists, and on
 	 * whether the 1:1 size of the region is exportable (in an image format).
@@ -441,7 +483,7 @@ public class ExportDialog extends CustomDialog {
 
 		//The aspect radio buttons should be updated based on the selected
 		//region
-		updateAspectRadioBtns(isDocFormat,selectedRegion);
+		updateAspectRadioBtns(isDocFormat, selectedRegion);
 	}
 
 	/**
