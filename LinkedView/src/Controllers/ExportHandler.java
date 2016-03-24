@@ -26,6 +26,8 @@ import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.freehep.graphicsio.svg.SVGGraphics2D;
 
+import java.awt.Color;
+
 import edu.stanford.genetics.treeview.ExportAspect;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PaperType;
@@ -505,20 +507,32 @@ public class ExportHandler {
 		}
 
 		try {
-			setCalculatedDimensions(region);
-
-			BufferedImage im;
+			int colorProfile;
 			//JPG is the only format that doesn't support an alpha channel, so
 			//we must create a buffered image object without the ARGB type
 			if(format == Format.JPG) {
-				im = new BufferedImage(
-					getXDim(region),getYDim(region),BufferedImage.TYPE_INT_RGB);
+				colorProfile = BufferedImage.TYPE_INT_RGB;
+				LogBuffer.println("Exporting withOUT an alpha channel");
 			} else {
-				im = new BufferedImage(getXDim(region),getYDim(region),
-					BufferedImage.TYPE_INT_ARGB);
+				colorProfile = BufferedImage.TYPE_INT_ARGB;
+				LogBuffer.println("Exporting with an alpha channel");
 			}
 
+			setCalculatedDimensions(region);
+
+			BufferedImage im = new BufferedImage(getXDim(region),
+				getYDim(region),colorProfile);
 			Graphics2D g2d = (Graphics2D) im.getGraphics();
+
+			//Formats JPG and PPM default to a black background, so we need to
+			//draw a white canvas.  Note, setting the background color did not
+			//work
+			if(format == Format.JPG || format == Format.PPM) {
+				g2d.setBackground(Color.WHITE);
+				g2d.setColor(Color.WHITE);
+				g2d.fillRect(0,0,getXDim(region),getYDim(region));
+			}
+
 			createContent(g2d,region,showSelections);
 
 			File exportFile = new File(fileName);
