@@ -23,7 +23,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import Controllers.Region;
+import Controllers.RegionType;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -465,13 +465,13 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * @param region - what portion of the tree to export
 	 */
 	public void export(final Graphics g,final int xIndent,final int yIndent,
-		final int size,final Region region,final boolean showSelections) {
+		final int size,final RegionType region,final boolean showSelections) {
 
-		if(region == Region.ALL) {
+		if(region == RegionType.ALL) {
 			exportAll(g,xIndent,yIndent,size,showSelections);
-		} else if(region == Region.VISIBLE) {
+		} else if(region == RegionType.VISIBLE) {
 			exportVisible(g,xIndent,yIndent,size,showSelections);
-		} else if(region == Region.SELECTION) {
+		} else if(region == RegionType.SELECTION) {
 			exportSelection(g,xIndent,yIndent,size,showSelections);
 		} else {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +

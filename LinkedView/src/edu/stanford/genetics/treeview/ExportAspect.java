@@ -10,7 +10,7 @@ import java.util.List;
  * @author rleach
  */
 public enum ExportAspect {
-	ONETOONE("1:1"),ASSEEN("As seen on screen");
+	ONETOONE("1:1"), ASSEEN("As seen on screen");
 
 	private final String toString;
 	

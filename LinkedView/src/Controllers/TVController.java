@@ -999,8 +999,10 @@ public class TVController implements Observer {
 			dendroController.getInteractiveXMap(),
 			dendroController.getInteractiveYMap(),tvFrame.getColSelection(),
 			tvFrame.getRowSelection());
+		
 		boolean selectionsExist = (tvFrame.getColSelection() != null &&
 			tvFrame.getColSelection().getNSelectedIndexes() > 0);
+		
 		ExportDialog exportDialog = new ExportDialog(selectionsExist,eh);
 		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
 		

@@ -1,7 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import Controllers.Region;
-
 public enum PaperType {
 	INTERNATIONAL("International"),A4("A4"),LETTER("Letter"),A3("A3"),
 	LEGAL("Legal"),A5("A5"),A6("A6"),EXECUTIVE("Executive"),LEDGER("Ledger");
