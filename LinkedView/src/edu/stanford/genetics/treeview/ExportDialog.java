@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -30,6 +31,11 @@ public class ExportDialog extends CustomDialog {
 	private static final long serialVersionUID = 1L;
 
 	private JPanel previewComp;
+	
+	private ExportPreviewTrees rowTrees;
+	private ExportPreviewTrees colTrees;
+	private ExportPreviewMatrix matrix;
+	
 	private JComboBox<FormatType> formatBox;
 	private JComboBox<PaperType> paperBox;
 	private JComboBox<Object> orientBox;
@@ -41,21 +47,19 @@ public class ExportDialog extends CustomDialog {
 	private boolean selectionsExist;
 	private ExportHandler eh;
 
-	public ExportDialog(final boolean selectionsExist,final ExportHandler eh) {
+	public ExportDialog(final boolean selectionsExist, final ExportHandler eh) {
+		
 		super("Export");
 		this.eh = eh;
 		final boolean useMinimums = true;
 		this.bigRegs = eh.getOversizedRegions(useMinimums);
 		this.selectionsExist = selectionsExist;
-		setupLayout(selectionsExist);
+		
+		setupLayout();
 	}
 
 	@Override
 	protected void setupLayout() {
-		setupLayout(false);
-	}
-
-	protected void setupLayout(final boolean selectionsExist) {
 
 		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
@@ -63,28 +67,29 @@ public class ExportDialog extends CustomDialog {
 				GUIFactory.DEFAULT);
 		JPanel optionsPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.DEFAULT);
-		JPanel rangePanel = GUIFactory.createJPanel(false, 
-			GUIFactory.DEFAULT);
-		JPanel aspectPanel = GUIFactory.createJPanel(false, 
-			GUIFactory.DEFAULT);
+		JPanel radioPanel = GUIFactory.createJPanel(false, 
+			GUIFactory.NO_INSETS);
+//		JPanel aspectPanel = GUIFactory.createJPanel(false, 
+//			GUIFactory.DEFAULT);
 
 		/* Shows the preview */
 		JPanel previewPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_INSETS);
 		previewPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
 		
-		this.previewComp = GUIFactory.createJPanel(false, 
+		this.previewComp = GUIFactory.createJPanel(true, 
 				GUIFactory.NO_INSETS);
 
 		JLabel format = GUIFactory.createLabel("Format:",GUIFactory.FONTS);
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
+		JLabel matrix = GUIFactory.createLabel("Matrix:",GUIFactory.FONTS);
 		JLabel region = GUIFactory.createLabel("Export:",GUIFactory.FONTS);
 		JLabel aspect = GUIFactory.createLabel("Aspect:",GUIFactory.FONTS);
 		JLabel orient = GUIFactory.createLabel("Orientation:",GUIFactory.FONTS);
 
 		FormatType selectedFormat = FormatType.getDefault();
 		if(eh.isImageExportPossible()) {
-			formatBox = new JComboBox<FormatType>(FormatType.values());
+			this.formatBox = new JComboBox<FormatType>(FormatType.values());
 			formatBox.setSelectedItem(FormatType.getDefault());
 			
 		} else {
@@ -95,20 +100,20 @@ public class ExportDialog extends CustomDialog {
 				"export");
 		}
 		
-		paperBox = new JComboBox<PaperType>(PaperType.values());
+		this.paperBox = new JComboBox<PaperType>(PaperType.values());
 		paperBox.setSelectedItem(PaperType.getDefault());
 		paperBox.setEnabled(selectedFormat.isDocumentFormat());
 		
-		regionRadioBtns = new ButtonGroup();
-		aspectRadioBtns = new ButtonGroup();
+		this.regionRadioBtns = new ButtonGroup();
+		this.aspectRadioBtns = new ButtonGroup();
 		
-		selectionsBox = new JCheckBox("Show Selections");
+		this.selectionsBox = new JCheckBox("Show Selections");
 		selectionsBox.setEnabled(selectionsExist);
 		if(!selectionsExist) {
 			selectionsBox.setToolTipText("No data selected");
 		}
 		
-		orientBox = new JComboBox<Object>(PageConstants.getOrientationList());
+		this.orientBox = new JComboBox<Object>(PageConstants.getOrientationList());
 		orientBox.setSelectedItem(PageConstants.LANDSCAPE);
 		orientBox.setEnabled(selectedFormat.isDocumentFormat());
 
@@ -123,15 +128,20 @@ public class ExportDialog extends CustomDialog {
 		optionsPanel.add(orient, "label");
 		optionsPanel.add(orientBox, "growx, wrap");
 
-		optionsPanel.add(region,"label, aligny 0");
-		RegionType selectedRegion = addRegionRadioButtons(rangePanel,
+		optionsPanel.add(matrix, "label, aligny 0");
+		
+		// Add JRadioButton options & selection JCheckBox to a separate panel
+		radioPanel.add(region,"label, aligny 0");
+		RegionType selectedRegion = addRegionRadioButtons(radioPanel,
 			selectedFormat);
-		rangePanel.add(selectionsBox,"alignx 0, aligny 0");
-		optionsPanel.add(rangePanel,"growx, aligny 0, alignx 0, wrap");
 
-		optionsPanel.add(aspect, "label, aligny 0");
-		addAspectRadioButtons(aspectPanel,selectedRegion,selectedFormat);
-		optionsPanel.add(aspectPanel, "growx, aligny 0, alignx 0, wrap");
+		radioPanel.add(aspect, "label, aligny 0");
+		addAspectRadioButtons(radioPanel,selectedRegion,selectedFormat);
+		
+		radioPanel.add(selectionsBox,"span");
+		
+		// Add the separate panel
+		optionsPanel.add(radioPanel, "wrap");
 
 		contentPanel.add(previewPanel, "grow");//w 500!, h 500!");
 		contentPanel.add(optionsPanel, "aligny 0%, growx, push");
@@ -143,7 +153,7 @@ public class ExportDialog extends CustomDialog {
 		btnPanel.add(closeBtn, "tag cancel, pushx, al right");
 		btnPanel.add(exportBtn, "al right");
 
-		mainPanel.add(contentPanel, "push, grow, w 800!, wrap");
+		mainPanel.add(contentPanel, "push, grow, wrap");//w 800!, wrap");
 		mainPanel.add(btnPanel, "bottom, pushx, growx, span");
 
 		getContentPane().add(mainPanel);
@@ -160,15 +170,20 @@ public class ExportDialog extends CustomDialog {
 	 * @param rangePanel
 	 * @return
 	 */
-	public RegionType addRegionRadioButtons(final JPanel rangePanel,
+	public RegionType addRegionRadioButtons(final JPanel optionPanel,
 		final FormatType selectedFormat) {
 
 		RegionType selectedRegion = null;
 		RegionType defReg = (selectedFormat.isDocumentFormat() ?
 			RegionType.getDefault(selectionsExist) :
 			RegionType.getDefault(bigRegs,selectionsExist));
-		for (RegionType reg : RegionType.values()) {
+		
+		// Switched to normal for loop to handle last button via index
+		RegionType[] vals = RegionType.values(); 
+		for (int i = 0; i < vals.length; i++) {
+			RegionType reg = vals[i];
 			JRadioButton option = new JRadioButton(reg.toString());
+			
 			if(!selectedFormat.isDocumentFormat() && bigRegs.contains(reg)) {
 				option.setEnabled(false);
 				option.setToolTipText("Too big for PNG/JPG/PPM export");
@@ -190,7 +205,14 @@ public class ExportDialog extends CustomDialog {
 				}
 			}
 			regionRadioBtns.add(option);
-			rangePanel.add(option,"alignx 0, aligny 0, wrap");
+			
+			// Wrap after last button	
+			if(i == vals.length - 1) {
+				optionPanel.add(option, "wrap");
+				
+			} else {
+				optionPanel.add(option);
+			}
 		}
 		return(selectedRegion);
 	}
@@ -200,13 +222,16 @@ public class ExportDialog extends CustomDialog {
 	 * also disables invalid aspects with a tooltip explaining why based on
 	 * bigRegs.  The default aspect is pre-selected.
 	 * 
-	 * @param aspectPanel
+	 * @param optionsPanel
 	 * @param selectedRegion
 	 */
-	public void addAspectRadioButtons(final JPanel aspectPanel,
+	public void addAspectRadioButtons(final JPanel optionsPanel,
 		final RegionType selectedRegion,final FormatType selectedFormat) {
 
-		for(ExportAspect asp : ExportAspect.values()) {
+		// Switched to normal for loop to handle last button via index
+		ExportAspect[] vals = ExportAspect.values();
+		for(int i = 0; i < vals.length; i++) {
+			ExportAspect asp = vals[i];
 			JRadioButton option = new JRadioButton(asp.toString());
 			List<ExportAspect> tooBigs =
 				eh.getOversizedAspects(selectedRegion);
@@ -221,7 +246,14 @@ public class ExportDialog extends CustomDialog {
 				option.setToolTipText("Too big for PNG/JPG/PPM export");
 			}
 			aspectRadioBtns.add(option);
-			aspectPanel.add(option, "alignx 0, aligny 0, wrap");
+			
+			// Wrap after last button, also span because of long name	
+			if(i == vals.length - 1) {
+				optionsPanel.add(option, "span, wrap");
+				
+			} else {
+				optionsPanel.add(option);
+			}
 		}
 	}
 
@@ -358,14 +390,27 @@ public class ExportDialog extends CustomDialog {
 	}
 
 	/**
-	 * Arranges the trees and the matrix on the preview panel, depending on
-	 * which trees are active.
+	 * Sets the trees and the matrix for the preview panel.
 	 * @param rowTrees - The panel containing the row trees drawing.
 	 * @param colTrees - The panel containing the column trees drawing.
 	 * @param matrix - The panel containing the matrix drawing.
 	 */
-	public void setPreview(JPanel rowTrees, JPanel colTrees, JPanel matrix) {
+	public void setPreviewComponents(ExportPreviewTrees rowTrees, 
+			ExportPreviewTrees colTrees, ExportPreviewMatrix matrix) {
 
+		this.rowTrees = rowTrees;
+		this.colTrees = colTrees;
+		this.matrix = matrix;
+		
+		recalculatePreviewPanel();
+	}
+	
+	/**
+	 * Arranges the trees and the matrix on the preview panel, depending on
+	 *which trees are active.
+	 **/
+	public void recalculatePreviewPanel() {
+		
 		if(previewComp == null) {
 			LogBuffer.println("Cannot set preview for Export.");
 			return;
@@ -386,6 +431,9 @@ public class ExportDialog extends CustomDialog {
 		}
 
 		previewComp.add(matrix, "h 400!, w 400!, push, grow");
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
 	}
 	
 	/**
@@ -414,12 +462,24 @@ public class ExportDialog extends CustomDialog {
 	 */
 	public void updatePreviewComponents(final ExportOptions exportOptions) {
 		
-		LogBuffer.println("Updating preview components with following options:");
-		LogBuffer.println("FormatType: " + exportOptions.getFormatType().toString());
-		LogBuffer.println("PaperType: " + exportOptions.getPaperType().toString());
-		LogBuffer.println("AspectType: " + exportOptions.getAspectType().toString());
-		LogBuffer.println("RegionType: " + exportOptions.getRegionType().toString());
-		LogBuffer.println("showSelections: " + exportOptions.isShowSelections());
+		LogBuffer.println("Updating preview components");
+		
+		/* First, set the background color depending on document format */
+		final boolean isPaper = exportOptions.getFormatType().isDocumentFormat();
+		rowTrees.setPaperBackground(isPaper);
+		colTrees.setPaperBackground(isPaper);
+		
+		if(isPaper) {
+			previewComp.setBackground(Color.WHITE);
+			
+		} else {
+			previewComp.setBackground(mainPanel.getBackground());
+		}
+		
+		/* */
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
 		
 	}
 	

@@ -1004,7 +1004,7 @@ public class TVController implements Observer {
 			tvFrame.getColSelection().getNSelectedIndexes() > 0);
 		
 		ExportDialog exportDialog = new ExportDialog(selectionsExist,eh);
-		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
+		exportDialog.setPreviewComponents(expRowTrees, expColTrees, expMatrix);
 		
 		new ExportDialogController(exportDialog,tvFrame,
 			dendroController.getInteractiveXMap(),

@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -22,6 +23,8 @@ public class ExportPreviewTrees extends JPanel {
 	private final Image paintImage;
 	private final boolean isRows;
 	
+	private Color backgroundColor;
+	
 	private int x; 
 	private int y;
 	
@@ -31,7 +34,26 @@ public class ExportPreviewTrees extends JPanel {
 		this.isRows = isRows;
 		
 		setLayout(new MigLayout());
-		setLongSideSize(D_LONG);		
+		setLongSideSize(D_LONG);	
+		setPaperBackground(false);
+	}
+	
+	/**
+	 * Define the background color of the tree drawing. For paper type 
+	 * export formats this will turn the background white. For non-paper type
+	 * backgrounds the color will be the default of the application, making it
+	 * look transparent.
+	 * @param isPaper - Whether the export format type is belongs in the paper
+	 * category (for example A4)
+	 */
+	public void setPaperBackground(boolean isPaper) {
+		
+		if(isPaper) {
+			this.backgroundColor = Color.WHITE;
+			
+		} else {
+			this.backgroundColor = this.getBackground();
+		}
 	}
 	
 	/**
@@ -67,8 +89,7 @@ public class ExportPreviewTrees extends JPanel {
 		
 		Graphics2D g2d = (Graphics2D) g;
 
-		// update offscreenBuffer if necessary
-		g2d.setColor(this.getBackground());
+		g2d.setColor(backgroundColor);
 		g2d.fillRect(0, 0, x, y);
 
 		if(paintImage != null) {
