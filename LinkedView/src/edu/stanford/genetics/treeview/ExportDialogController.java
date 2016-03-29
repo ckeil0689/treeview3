@@ -50,7 +50,7 @@ public class ExportDialogController {
 
 		addListeners();		
 		
-		setNewPreviewComponents(exportDialog.hasSelections());
+		setNewPreviewComponents(false);
 		exportDialog.recalculatePreviewPanel();
 		
 		exportDialog.setVisible(true);

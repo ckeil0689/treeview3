@@ -1,5 +1,7 @@
 package edu.stanford.genetics.treeview;
 
+import org.freehep.graphicsio.PageConstants;
+
 import Controllers.FormatType;
 import Controllers.RegionType;
 
@@ -14,6 +16,7 @@ public class ExportOptions {
 	private PaperType paperType;
 	private RegionType regionType;
 	private ExportAspect aspectType;
+	private String orientation;
 	private boolean showSelections;
 	
 	public ExportOptions() {
@@ -22,43 +25,60 @@ public class ExportOptions {
 		this.paperType = PaperType.getDefault();
 		this.regionType = RegionType.getDefault();
 		this.aspectType = ExportAspect.getDefault();
+		this.orientation = PageConstants.A4;
 		this.showSelections = false;
 	}
 	
 	public FormatType getFormatType() {
 		return formatType;
 	}
-
-	public void setFormatType(FormatType formatType) {
-		this.formatType = formatType;
+	
+	public String getOrientation() {
+		return orientation;
 	}
 
 	public PaperType getPaperType() {
 		return paperType;
+	}
+	
+	public RegionType getRegionType() {
+		return regionType;
+	}
+	
+	public ExportAspect getAspectType() {
+		return aspectType;
+	}
+	
+	public boolean isShowSelections() {
+		return showSelections;
+	}
+	
+	public void setOrientation(String orientation) {
+		
+		/* Make sure no weird String can be set */
+		if(!orientation.equalsIgnoreCase(PageConstants.LANDSCAPE) 
+				&& !orientation.equalsIgnoreCase(PageConstants.PORTRAIT)) {
+			this.orientation = PageConstants.PORTRAIT;
+			return;
+		}
+		
+		this.orientation = orientation;
+	}
+	
+	public void setFormatType(FormatType formatType) {
+		this.formatType = formatType;
 	}
 
 	public void setPaperType(PaperType paperType) {
 		this.paperType = paperType;
 	}
 
-	public RegionType getRegionType() {
-		return regionType;
-	}
-
 	public void setRegionType(RegionType regionType) {
 		this.regionType = regionType;
 	}
 
-	public ExportAspect getAspectType() {
-		return aspectType;
-	}
-
 	public void setAspectType(ExportAspect aspectType) {
 		this.aspectType = aspectType;
-	}
-
-	public boolean isShowSelections() {
-		return showSelections;
 	}
 
 	public void setShowSelections(boolean showSelections) {

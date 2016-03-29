@@ -156,7 +156,6 @@ public class InteractiveMatrixView extends MatrixView {
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
 
-		LogBuffer.println("Paintcomposite called");
 		debug("paintComposite.  Temporary band change? [" + (isOverlayTempChange() ? "yes" : "no") + "]",14);
 
 		if(xmap.hoverChanged() || ymap.hoverChanged()) {
@@ -1978,7 +1977,8 @@ public class InteractiveMatrixView extends MatrixView {
 					new BufferedImage((int)offscreenSize.getWidth(), 
 							(int)offscreenSize.getHeight(), 
 							BufferedImage.TYPE_INT_RGB);
-			Graphics g = newImg.getGraphics();
+			Graphics2D g = (Graphics2D)newImg.getGraphics();
+			g.setStroke(new BasicStroke(15));
 			super.paintComponent(g);
 			this.paintComponent(g);
 			return (newImg);

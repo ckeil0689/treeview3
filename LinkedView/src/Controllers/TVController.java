@@ -974,7 +974,7 @@ public class TVController implements Observer {
 	 */
 	public void openExportMenu() {
 
-		if(tvFrame.getDendroView() == null) {
+		if(tvFrame.getDendroView() == null || !tvFrame.isLoaded()) {
 			LogBuffer.println("DendroView is not instantiated. "
 					+ "Nothing to export.");
 			return;
@@ -993,34 +993,7 @@ public class TVController implements Observer {
 		new ExportDialogController(exportDialog,tvFrame,
 			dendroController.getInteractiveXMap(),
 			dendroController.getInteractiveYMap(),model);
-		
-		exportDialog.setVisible(true);
 	}
-	
-//	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView, 
-//			final boolean withSelections, final boolean isRows) {
-//		
-//		int width;
-//		int height;
-//		if(isRows) {
-//			width = ExportPreviewTrees.SHORT;
-//			height = ExportPreviewTrees.D_LONG;
-//		} else {
-//			width = ExportPreviewTrees.D_LONG;
-//			height = ExportPreviewTrees.SHORT;
-//		}
-//		
-//		/* Set up column tree image */
-//		BufferedImage treeSnapshot = null;
-//		ExportPreviewTrees expTrees = null;
-//		if(treeAxisView.isEnabled()) {
-//			treeSnapshot = treeAxisView.getSnapshot(width, height, 
-//					withSelections);
-//			expTrees = new ExportPreviewTrees(treeSnapshot, isRows);
-//		}
-//		
-//		return expTrees;
-//	}
 
 	/*
 	 * TODO implement this and others to deprecate PreferencesMenu, which is a

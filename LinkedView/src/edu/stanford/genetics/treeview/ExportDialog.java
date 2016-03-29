@@ -31,8 +31,11 @@ public class ExportDialog extends CustomDialog {
 
 	private static final long serialVersionUID = 1L;
 
+	private final int d_bg_sidelen = 500;
 	private JPanel previewComp;
 	private JPanel background;
+	private int backgroundWidth;
+	private int backgroundHeight;
 	
 	private ExportPreviewTrees rowTrees;
 	private ExportPreviewTrees colTrees;
@@ -40,7 +43,7 @@ public class ExportDialog extends CustomDialog {
 	
 	private JComboBox<FormatType> formatBox;
 	private JComboBox<PaperType> paperBox;
-	private JComboBox<Object> orientBox;
+	private JComboBox<String> orientBox;
 	private ButtonGroup regionRadioBtns;
 	private ButtonGroup aspectRadioBtns;
 	private JCheckBox selectionsBox;
@@ -56,6 +59,9 @@ public class ExportDialog extends CustomDialog {
 		final boolean useMinimums = true;
 		this.bigRegs = eh.getOversizedRegions(useMinimums);
 		this.selectionsExist = selectionsExist;
+		
+		this.backgroundWidth = d_bg_sidelen;
+		this.backgroundHeight = d_bg_sidelen;
 		
 		setupLayout();
 	}
@@ -78,7 +84,7 @@ public class ExportDialog extends CustomDialog {
 		previewPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
 		
 		this.previewComp = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
-		this.background = GUIFactory.createJPanel(true, GUIFactory.DEBUG);
+		this.background = GUIFactory.createJPanel(true, GUIFactory.DEFAULT);
 
 		JLabel format = GUIFactory.createLabel("Format:",GUIFactory.FONTS);
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
@@ -113,7 +119,7 @@ public class ExportDialog extends CustomDialog {
 			selectionsBox.setToolTipText("No data selected");
 		}
 		
-		this.orientBox = new JComboBox<Object>(PageConstants.getOrientationList());
+		this.orientBox = new JComboBox<String>(PageConstants.getOrientationList());
 		orientBox.setSelectedItem(PageConstants.LANDSCAPE);
 		orientBox.setEnabled(selectedFormat.isDocumentFormat());
 
@@ -143,7 +149,7 @@ public class ExportDialog extends CustomDialog {
 		// Add the separate panel
 		optionsPanel.add(radioPanel, "wrap");
 
-		contentPanel.add(previewPanel, "grow");//w 500!, h 500!");
+		contentPanel.add(previewPanel, "grow, w 500!, h 500!");
 		contentPanel.add(optionsPanel, "aligny 0%, growx, push");
 		
 		this.exportBtn = GUIFactory.createBtn("Export");
@@ -393,7 +399,7 @@ public class ExportDialog extends CustomDialog {
 	 * @author rleach
 	 * @return the orientBox
 	 */
-	public JComboBox<Object> getOrientBox() {
+	public JComboBox<String> getOrientBox() {
 		return(orientBox);
 	}
 
@@ -445,7 +451,11 @@ public class ExportDialog extends CustomDialog {
 		background.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
 				+ matrix.getMatrixWidth() + "!, aligny 0, push, grow");
 		
-		previewComp.add(background, "grow, push");
+		LogBuffer.println("Background-Width: "  + backgroundWidth);
+		LogBuffer.println("Background-Height: "  + backgroundHeight);
+		
+		previewComp.add(background, "w " + backgroundWidth + "!, h " 
+				+ backgroundHeight + "!, grow, push, align 50%");
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
@@ -492,18 +502,52 @@ public class ExportDialog extends CustomDialog {
 		}
 		
 		if(isPaper) {
+			// set paper background
 			background.setBackground(Color.WHITE);
-			background.setBorder(BorderFactory.createMatteBorder(2, 4, 4, 2,
-					Color.LIGHT_GRAY));
+			background.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			
+			// default is portrait orientation
+			Dimension bgSize = 
+					PaperType.getDimension(exportOptions.getPaperType());
+			
+			// adjust background panel to paper orientation and size
+			String orientation = exportOptions.getOrientation();
+			if((PageConstants.LANDSCAPE).equalsIgnoreCase(orientation)) {
+				backgroundWidth = (int)bgSize.getHeight();
+				backgroundHeight = (int)bgSize.getWidth();
+				
+			} else {
+				backgroundWidth = (int)bgSize.getWidth();
+				backgroundHeight = (int)bgSize.getHeight();
+			}
 			
 		} else {
+			// set normal / transparent background
+			backgroundWidth = d_bg_sidelen;
+			backgroundHeight = d_bg_sidelen;
 			background.setBackground(mainPanel.getBackground());
 			background.setBorder(null);
 		}
 		
+		/* Define maximal side length of matrix to remain within background */
+		int maxSideLen;
+		int buffer = 20;
+		if(backgroundWidth < backgroundHeight) {
+			maxSideLen = backgroundWidth;
+		} else {
+			maxSideLen = backgroundHeight;
+		}
+		
+		//adjust for tree thickness
+		maxSideLen -= ExportPreviewTrees.SHORT;
+		//give a little additional space
+		maxSideLen -= buffer;
+		
 		/* */
 		if(exportOptions.getAspectType() == ExportAspect.ONETOONE) {
-			matrix.setDefaultSideLength();
+			// both sides need to be max. shortest paper side - tree thickness
+			matrix.setMatrixWidth(maxSideLen);
+			matrix.setMatrixHeight(maxSideLen);
 			
 		// calculate fitting size for preview matrix from full matrix size	
 		} else {
@@ -511,18 +555,14 @@ public class ExportDialog extends CustomDialog {
 			double h = matrixSize.getHeight();
 			double ratio = w / h;
 			
-			LogBuffer.println("Dim: " + matrixSize.toString());
-			LogBuffer.println("Ratio: " + ratio);
-			
 			int newWidth;
 			int newHeight;
-			int maxSize = 400;
-			if(w > h) {
-				newWidth = maxSize;
+			if(backgroundWidth < backgroundHeight) {
+				newWidth = maxSideLen;
 				newHeight = (int)(newWidth / ratio);
 				
 			} else {
-				newHeight = maxSize;
+				newHeight = maxSideLen;
 				newWidth = (int)(newHeight * ratio);
 			}
 			
@@ -674,7 +714,9 @@ public class ExportDialog extends CustomDialog {
 		
 		exportOptions.setFormatType((FormatType) formatBox.getSelectedItem());
 		exportOptions.setPaperType((PaperType) paperBox.getSelectedItem());
+		exportOptions.setOrientation((String)orientBox.getSelectedItem());
 		
+		/* Aspect ratio */
 		ExportAspect aspectType = ExportAspect.getDefault();
 		String buttonText = "default";
 		for(Enumeration<AbstractButton> buttons = aspectRadioBtns.getElements();
@@ -686,16 +728,15 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 		
-		/* Find which enum member corresponds to the button text */
 		for(ExportAspect eA : ExportAspect.values()) {
 			if(eA.toString().equalsIgnoreCase(buttonText)) {
 				aspectType = eA;
 				break;
 			}
 		}
-		
 		exportOptions.setAspectType(aspectType);
 		
+		/* Region to be exported */
 		RegionType regionType = RegionType.getDefault();
 		buttonText = "default";
 		for(Enumeration<AbstractButton> buttons = regionRadioBtns.getElements();
@@ -707,7 +748,6 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 		
-		/* Find which enum member corresponds to the button text */
 		for(RegionType rT : RegionType.values()) {
 			if(rT.toString().equalsIgnoreCase(buttonText)) {
 				regionType = rT;
@@ -715,11 +755,8 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 		exportOptions.setRegionType(regionType);
-		exportOptions.setShowSelections(selectionsBox.isSelected());
-	}
-	
-	public boolean hasSelections() {
 		
-		return selectionsExist;
+		/* Show selections */
+		exportOptions.setShowSelections(selectionsBox.isSelected());
 	}
 }
