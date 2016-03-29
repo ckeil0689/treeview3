@@ -2,6 +2,7 @@ package edu.stanford.genetics.treeview;
 
 import java.awt.Desktop;
 import java.awt.FileDialog;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -47,7 +48,12 @@ public class ExportDialogController {
 		
 		this.exportOptions = new ExportOptions();
 
-		addListeners();
+		addListeners();		
+		
+		setNewPreviewComponents(exportDialog.hasSelections());
+		exportDialog.recalculatePreviewPanel();
+		
+		exportDialog.setVisible(true);
 	}
 
 	/**
@@ -58,7 +64,25 @@ public class ExportDialogController {
 		exportDialog.addExportListener(new ExportListener());
 		exportDialog.addFormatListener(new FormatListener());
 		exportDialog.addRegionListener(new RegionListener());
-		exportDialog.addItemStateListener(new ItemStateListener());
+		exportDialog.addRadioItemStateListener(new RadioItemStateListener());
+		exportDialog.addCheckBoxItemStateListener(new CheckItemStateListener());
+	}
+	
+	/**
+	 * Set new components for displaying previews of trees and matrix in the
+	 * export dialog.
+	 * @param withSelections - whether to show selections or not
+	 */
+	private void setNewPreviewComponents(final boolean withSelections) {
+		
+		ExportPreviewTrees expRowTrees = 
+				tvFrame.getDendroView().getRowTreeSnapshot(withSelections);
+		ExportPreviewTrees expColTrees = 
+				tvFrame.getDendroView().getColTreeSnapshot(withSelections);
+		ExportPreviewMatrix expMatrix = 
+				tvFrame.getDendroView().getMatrixSnapshot(withSelections);
+		
+		exportDialog.setPreviewComponents(expRowTrees, expColTrees, expMatrix);
 	}
 	
 	/**
@@ -290,22 +314,56 @@ public class ExportDialogController {
 	 * the update will invoke the recreation of the preview components so
 	 * that selections will be drawn as well. 
 	 */
-	private class ItemStateListener implements ItemListener {
+	private class RadioItemStateListener implements ItemListener {
 
 		@Override
 		public void itemStateChanged(ItemEvent event) {
 			
-			if(exportDialog == null) {
-				LogBuffer.println("No exportDialog object defined. Could "
-						+ "not update preview components.");
-				return;
-			}
-			
+			// Don't update when deselected or highlighted...
 			if (event.getStateChange() == ItemEvent.SELECTED) {
-				exportDialog.retrieveOptions(exportOptions);
-				exportDialog.updatePreviewComponents(exportOptions);
+				updatePreview();
 			}
 		}
 		
+	}
+	
+	/**
+	 * Whenever the selection state of any GUI component which has this listener
+	 * attached will be changed, it causes the export preview to update.
+	 * For example, if the user checks the 'Show selections' JCheckBox, 
+	 * the update will invoke the recreation of the preview components so
+	 * that selections will be drawn as well. 
+	 */
+	private class CheckItemStateListener implements ItemListener {
+
+		@Override
+		public void itemStateChanged(ItemEvent event) {
+			
+			// Don't update when highlighted...
+			if (event.getStateChange() == ItemEvent.SELECTED
+					|| event.getStateChange() == ItemEvent.DESELECTED) {
+				updatePreview();
+			}
+		}
+		
+	}
+	
+	/**
+	 * Update the preview panel of the export dialog according to selected
+	 * options.
+	 */
+	private void updatePreview() {
+		
+		if(exportDialog == null) {
+			LogBuffer.println("No exportDialog object defined. Could "
+					+ "not update preview components.");
+			return;
+		}
+		
+		exportDialog.retrieveOptions(exportOptions);
+		setNewPreviewComponents(exportOptions.isShowSelections());
+		Dimension matrixSize = tvFrame.getDendroView()
+				.getInteractiveMatrixView().getSize();
+		exportDialog.updatePreviewComponents(exportOptions, matrixSize);
 	}
 }

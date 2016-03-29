@@ -11,9 +11,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -154,6 +156,7 @@ public class InteractiveMatrixView extends MatrixView {
 	@Override
 	public synchronized void paintComposite(final Graphics g) {
 
+		LogBuffer.println("Paintcomposite called");
 		debug("paintComposite.  Temporary band change? [" + (isOverlayTempChange() ? "yes" : "no") + "]",14);
 
 		if(xmap.hoverChanged() || ymap.hoverChanged()) {
@@ -1960,6 +1963,28 @@ public class InteractiveMatrixView extends MatrixView {
 			}
 			lastxb = xBoundaries.get(1);
 		}
+	}
+	
+	/**
+	 * 
+	 * @param withSelections
+	 * @return
+	 */
+	public Image getVisibleImage(boolean withSelections) {
+		
+		if(withSelections) {
+			// draw selection rectangles etc. on top of image
+			BufferedImage newImg = 
+					new BufferedImage((int)offscreenSize.getWidth(), 
+							(int)offscreenSize.getHeight(), 
+							BufferedImage.TYPE_INT_RGB);
+			Graphics g = newImg.getGraphics();
+			super.paintComponent(g);
+			this.paintComponent(g);
+			return (newImg);
+		}
+		
+		return super.getVisibleImage();
 	}
 
 	public TreeSelectionI getRowSelection() {

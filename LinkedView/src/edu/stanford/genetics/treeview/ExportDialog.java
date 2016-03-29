@@ -1,6 +1,7 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class ExportDialog extends CustomDialog {
 	private static final long serialVersionUID = 1L;
 
 	private JPanel previewComp;
+	private JPanel background;
 	
 	private ExportPreviewTrees rowTrees;
 	private ExportPreviewTrees colTrees;
@@ -69,16 +71,14 @@ public class ExportDialog extends CustomDialog {
 				GUIFactory.DEFAULT);
 		JPanel radioPanel = GUIFactory.createJPanel(false, 
 			GUIFactory.NO_INSETS);
-//		JPanel aspectPanel = GUIFactory.createJPanel(false, 
-//			GUIFactory.DEFAULT);
 
 		/* Shows the preview */
 		JPanel previewPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_INSETS);
 		previewPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
 		
-		this.previewComp = GUIFactory.createJPanel(true, 
-				GUIFactory.NO_INSETS);
+		this.previewComp = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
+		this.background = GUIFactory.createJPanel(true, GUIFactory.DEBUG);
 
 		JLabel format = GUIFactory.createLabel("Format:",GUIFactory.FONTS);
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
@@ -293,13 +293,11 @@ public class ExportDialog extends CustomDialog {
 	 * in the components that it has been added to.
 	 * @param l - The item listener.
 	 */
-	public void addItemStateListener(final ItemListener l) {
+	public void addRadioItemStateListener(final ItemListener l) {
 		
 		formatBox.addItemListener(l);
 		paperBox.addItemListener(l);
 		orientBox.addItemListener(l);
-		
-		selectionsBox.addItemListener(l);
 		
 		Enumeration<AbstractButton> rab = regionRadioBtns.getElements();
 		while(rab.hasMoreElements()) {
@@ -312,6 +310,16 @@ public class ExportDialog extends CustomDialog {
 			AbstractButton btn = asp.nextElement();
 			btn.addItemListener(l);
 		}
+	}
+	
+	/**
+	 * An item listener that allows us to fire events upon selection changes
+	 * in the components that it has been added to.
+	 * @param l - The item listener.
+	 */
+	public void addCheckBoxItemStateListener(final ItemListener l) {
+		
+		selectionsBox.addItemListener(l);
 	}
 
 	/**
@@ -401,8 +409,6 @@ public class ExportDialog extends CustomDialog {
 		this.rowTrees = rowTrees;
 		this.colTrees = colTrees;
 		this.matrix = matrix;
-		
-		recalculatePreviewPanel();
 	}
 	
 	/**
@@ -411,26 +417,35 @@ public class ExportDialog extends CustomDialog {
 	 **/
 	public void recalculatePreviewPanel() {
 		
-		if(previewComp == null) {
+		if(previewComp == null || background == null) {
 			LogBuffer.println("Cannot set preview for Export.");
 			return;
 		}
 
+		background.removeAll();
+		
+		/* Tree panels need to have the same size as the matrix */
 		JPanel filler = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
-
 		if(rowTrees != null && colTrees != null) {
-			previewComp.add(filler, "w 80!, h 80!");
+			background.add(filler, "w 80!, h 80!");
 		}
 
 		if(colTrees != null) {
-			previewComp.add(colTrees, "growx, pushx, h 80!, w 400!, wrap");
+			colTrees.setLongSide(matrix.getMatrixWidth());
+			background.add(colTrees, "growx, pushx, h 80!, w " 
+					+ matrix.getMatrixWidth() + "!, wrap");
 		}
 
 		if(rowTrees != null) {
-			previewComp.add(rowTrees, "growy, pushy, h 400!, w 80!");
+			rowTrees.setLongSide(matrix.getMatrixHeight());
+			background.add(rowTrees, "growy, aligny 0, pushy, h " 
+					+ matrix.getMatrixHeight() + "!, w 80!");
 		}
 
-		previewComp.add(matrix, "h 400!, w 400!, push, grow");
+		background.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
+				+ matrix.getMatrixWidth() + "!, aligny 0, push, grow");
+		
+		previewComp.add(background, "grow, push");
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
@@ -460,27 +475,65 @@ public class ExportDialog extends CustomDialog {
 	 * Updates the preview components (matrix and trees) according to the
 	 * selected options in the dialog.
 	 */
-	public void updatePreviewComponents(final ExportOptions exportOptions) {
+	public void updatePreviewComponents(final ExportOptions exportOptions, 
+			final Dimension matrixSize) {
 		
 		LogBuffer.println("Updating preview components");
 		
 		/* First, set the background color depending on document format */
 		final boolean isPaper = exportOptions.getFormatType().isDocumentFormat();
-		rowTrees.setPaperBackground(isPaper);
-		colTrees.setPaperBackground(isPaper);
+		
+		if(rowTrees != null) {
+			rowTrees.setPaperBackground(isPaper);
+		}
+		
+		if(colTrees != null) {
+			colTrees.setPaperBackground(isPaper);
+		}
 		
 		if(isPaper) {
-			previewComp.setBackground(Color.WHITE);
+			background.setBackground(Color.WHITE);
+			background.setBorder(BorderFactory.createMatteBorder(2, 4, 4, 2,
+					Color.LIGHT_GRAY));
 			
 		} else {
-			previewComp.setBackground(mainPanel.getBackground());
+			background.setBackground(mainPanel.getBackground());
+			background.setBorder(null);
 		}
 		
 		/* */
+		if(exportOptions.getAspectType() == ExportAspect.ONETOONE) {
+			matrix.setDefaultSideLength();
+			
+		// calculate fitting size for preview matrix from full matrix size	
+		} else {
+			double w = matrixSize.getWidth();
+			double h = matrixSize.getHeight();
+			double ratio = w / h;
+			
+			LogBuffer.println("Dim: " + matrixSize.toString());
+			LogBuffer.println("Ratio: " + ratio);
+			
+			int newWidth;
+			int newHeight;
+			int maxSize = 400;
+			if(w > h) {
+				newWidth = maxSize;
+				newHeight = (int)(newWidth / ratio);
+				
+			} else {
+				newHeight = maxSize;
+				newWidth = (int)(newHeight * ratio);
+			}
+			
+			matrix.setMatrixWidth(newWidth);
+			matrix.setMatrixHeight(newHeight);
+		}
+		
+		recalculatePreviewPanel();
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
-		
 	}
 	
 	/**
@@ -663,5 +716,10 @@ public class ExportDialog extends CustomDialog {
 		}
 		exportOptions.setRegionType(regionType);
 		exportOptions.setShowSelections(selectionsBox.isSelected());
+	}
+	
+	public boolean hasSelections() {
+		
+		return selectionsExist;
 	}
 }

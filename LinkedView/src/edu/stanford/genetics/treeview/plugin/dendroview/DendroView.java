@@ -8,6 +8,7 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -15,6 +16,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.util.Observable;
 import java.util.Observer;
@@ -36,6 +38,8 @@ import Utilities.Helper;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.DendroPanel;
+import edu.stanford.genetics.treeview.ExportPreviewMatrix;
+import edu.stanford.genetics.treeview.ExportPreviewTrees;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
@@ -1357,6 +1361,55 @@ public class DendroView implements Observer, DendroPanel {
 		colFinderBox.setNewSearchTermBox();
 
 		setSearchPanel();
+	}
+	
+	
+	public ExportPreviewMatrix getMatrixSnapshot(final boolean withSelections) {
+		
+		Image image = getInteractiveMatrixView()
+				.getVisibleImage(withSelections);
+		return new ExportPreviewMatrix(image);
+	}
+	
+	public ExportPreviewTrees getRowTreeSnapshot(final boolean withSelections) {
+		
+		return getTreeSnapshot(rowTreeView, withSelections, true);
+	}
+	
+	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections) {
+		
+		return getTreeSnapshot(colTreeView, withSelections, false);
+	}
+	
+	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView, 
+			final boolean withSelections, final boolean isRows) {
+		
+		if(treeAxisView == null) {
+			LogBuffer.println("Cannot generate tree snapshot. "
+					+ "TRView object is null.");
+			return new ExportPreviewTrees(null, isRows); // empty panel
+		}
+		
+		int width;
+		int height;
+		if(isRows) {
+			width = ExportPreviewTrees.SHORT;
+			height = ExportPreviewTrees.D_LONG;
+		} else {
+			width = ExportPreviewTrees.D_LONG;
+			height = ExportPreviewTrees.SHORT;
+		}
+		
+		/* Set up column tree image */
+		BufferedImage treeSnapshot = null;
+		ExportPreviewTrees expTrees = null;
+		if(treeAxisView.isEnabled()) {
+			treeSnapshot = treeAxisView.getSnapshot(width, height, 
+					withSelections);
+			expTrees = new ExportPreviewTrees(treeSnapshot, isRows);
+		}
+		
+		return expTrees;
 	}
 
 	@Override

@@ -25,8 +25,8 @@ public class ExportPreviewTrees extends JPanel {
 	
 	private Color backgroundColor;
 	
-	private int x; 
-	private int y;
+	private int xSide; 
+	private int ySide;
 	
 	public ExportPreviewTrees(final BufferedImage trees, final boolean isRows) {
 		
@@ -34,7 +34,7 @@ public class ExportPreviewTrees extends JPanel {
 		this.isRows = isRows;
 		
 		setLayout(new MigLayout());
-		setLongSideSize(D_LONG);	
+		setLongSide(D_LONG);	
 		setPaperBackground(false);
 	}
 	
@@ -62,15 +62,15 @@ public class ExportPreviewTrees extends JPanel {
 	 * they belong to.
 	 * @param longSide - The size of the long side of the tree preview panel.
 	 */
-	public void setLongSideSize(final int longSide) {
+	public void setLongSide(final int longSide) {
 		
 		if(isRows) {
-			this.x = SHORT;
-			this.y = longSide;
+			this.xSide = SHORT;
+			this.ySide = longSide;
 			
 		} else {
-			this.x = longSide;
-			this.y = SHORT;
+			this.xSide = longSide;
+			this.ySide = SHORT;
 		}
 	}
 	
@@ -90,15 +90,15 @@ public class ExportPreviewTrees extends JPanel {
 		Graphics2D g2d = (Graphics2D) g;
 
 		g2d.setColor(backgroundColor);
-		g2d.fillRect(0, 0, x, y);
+		g2d.fillRect(0, 0, xSide, ySide);
 
 		if(paintImage != null) {
-			g2d.drawImage(paintImage, 0, 0, x, y, this);
+			g2d.drawImage(paintImage, 0, 0, xSide, ySide, this);
 			
 		} else {
-			BufferedImage img = new BufferedImage(x, y, 
+			BufferedImage img = new BufferedImage(xSide, ySide, 
 					BufferedImage.TYPE_BYTE_GRAY);
-			g2d.drawImage(img, 0, 0, x, y, this);
+			g2d.drawImage(img, 0, 0, xSide, ySide, this);
 		}
 	}
 }

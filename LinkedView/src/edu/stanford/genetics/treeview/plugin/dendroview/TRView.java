@@ -1010,7 +1010,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		return(treePainter != null && treePainter.getRootNode() != null);
 	}
 	
-	public BufferedImage getSnapshot(final int width, final int height) {
+	public BufferedImage getSnapshot(final int width, final int height, 
+			final boolean withSelections) {
 	
 		BufferedImage img = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
@@ -1022,8 +1023,13 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		setExportPreviewScale(dest);
 		
 		/* Draw trees to first image, original size */
-		treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
-				isLeft, -1, null, null);
+		if(withSelections) {
+			treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
+					isLeft, -1, treeSelection, null);
+		} else {
+			treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
+					isLeft, -1, null, null);
+		}
 		
 		/* Draw a scaled version of the old image to a new image */
 		Graphics g = scaled.getGraphics();

@@ -5,7 +5,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
@@ -36,8 +35,6 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialogController;
-import edu.stanford.genetics.treeview.ExportPreviewMatrix;
-import edu.stanford.genetics.treeview.ExportPreviewTrees;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GeneListMaker;
 import edu.stanford.genetics.treeview.LabelSettings;
@@ -55,7 +52,6 @@ import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
-import edu.stanford.genetics.treeview.plugin.dendroview.TRView;
 
 /**
  * This class controls user interaction with TVFrame and its views.
@@ -983,17 +979,6 @@ public class TVController implements Observer {
 					+ "Nothing to export.");
 			return;
 		}
-		
-		/* Set up tree images */
-		ExportPreviewTrees expRowTrees = getTreeSnapshot(
-				tvFrame.getDendroView().getRowTreeView(), true);
-		ExportPreviewTrees expColTrees = getTreeSnapshot(
-				tvFrame.getDendroView().getColumnTreeView(), false);
-		
-		/* Set up matrix image */
-		BufferedImage matrix = tvFrame.getDendroView()
-				.getInteractiveMatrixView().getVisibleImage();
-		ExportPreviewMatrix expMatrix = new ExportPreviewMatrix(matrix);
 
 		ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
 			dendroController.getInteractiveXMap(),
@@ -1004,7 +989,6 @@ public class TVController implements Observer {
 			tvFrame.getColSelection().getNSelectedIndexes() > 0);
 		
 		ExportDialog exportDialog = new ExportDialog(selectionsExist,eh);
-		exportDialog.setPreviewComponents(expRowTrees, expColTrees, expMatrix);
 		
 		new ExportDialogController(exportDialog,tvFrame,
 			dendroController.getInteractiveXMap(),
@@ -1013,29 +997,30 @@ public class TVController implements Observer {
 		exportDialog.setVisible(true);
 	}
 	
-	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView, 
-			final boolean isRows) {
-		
-		int width;
-		int height;
-		if(isRows) {
-			width = ExportPreviewTrees.SHORT;
-			height = ExportPreviewTrees.D_LONG;
-		} else {
-			width = ExportPreviewTrees.D_LONG;
-			height = ExportPreviewTrees.SHORT;
-		}
-		
-		/* Set up column tree image */
-		BufferedImage treeSnapshot = null;
-		ExportPreviewTrees expTrees = null;
-		if(treeAxisView.isEnabled()) {
-			treeSnapshot = treeAxisView.getSnapshot(width, height);
-			expTrees = new ExportPreviewTrees(treeSnapshot, isRows);
-		}
-		
-		return expTrees;
-	}
+//	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView, 
+//			final boolean withSelections, final boolean isRows) {
+//		
+//		int width;
+//		int height;
+//		if(isRows) {
+//			width = ExportPreviewTrees.SHORT;
+//			height = ExportPreviewTrees.D_LONG;
+//		} else {
+//			width = ExportPreviewTrees.D_LONG;
+//			height = ExportPreviewTrees.SHORT;
+//		}
+//		
+//		/* Set up column tree image */
+//		BufferedImage treeSnapshot = null;
+//		ExportPreviewTrees expTrees = null;
+//		if(treeAxisView.isEnabled()) {
+//			treeSnapshot = treeAxisView.getSnapshot(width, height, 
+//					withSelections);
+//			expTrees = new ExportPreviewTrees(treeSnapshot, isRows);
+//		}
+//		
+//		return expTrees;
+//	}
 
 	/*
 	 * TODO implement this and others to deprecate PreferencesMenu, which is a
