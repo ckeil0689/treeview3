@@ -94,7 +94,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 *            matrix.
 	 */
 	public abstract void paint(int[] pixels, Rectangle source, Rectangle dest,
-			int scanSize, int[] geneOrder);
+			int scanSize);
 
 	/* Code for selection dimming */
 	// , int[] geneSelections, int[] arraySelections);
@@ -146,7 +146,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 *            order from cdt.
 	 */
 	public void paint(final Graphics g, final Rectangle source,
-			final Rectangle dest, final int[] geneOrder) {
+			final Rectangle dest) {
 
 		int ynext = dest.y;
 		for (int j = 0; j < source.height; j++) {
@@ -162,13 +162,9 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				if ((width > 0) && (height > 0)) {
 					try {
 						int actualGene = source.y + j;
-						if (geneOrder != null) {
-							actualGene = geneOrder[actualGene];
-						}
 						final Color t_color = getColor(i + source.x, actualGene);
 						g.setColor(t_color);
 						g.fillRect(xstart, ystart, width, height);
-
 					} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 						// System.out.println("out of bounds, " + (i + source.x)
 						// + ", " + (j + source.y));
@@ -176,53 +172,6 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				}
 			}
 		}
-	}
-
-	/**
-	 * This method is intended to be used for drawing the matrix using vector
-	 * graphics (freehep's VectorGraphics2D object), thus there are no resizing
-	 * calculations.
-	 * @author rleach
-	 * @param g - Graphics or Graphics2D or VectorGraphics2D object
-	 * @param width - This should be the size of xmap
-	 * @param height - This should be the size of ymap
-	 */
-	/* TODO: This needs to take a start end end index for each dimension fining
-	 * the export region */
-	public void paint(final Graphics g,final int width,final int height) {
-		for (int j = height - 1; j >= 0; j--) {
-			for (int i = width - 1; i >= 0; i--) {
-				//setPaintMode seems to help color overlapping (affecting the
-				//colors) a little, but doesn't fix it altogether. Probably
-				//useless. Note there appears to be an alpha channel in the
-				//output PDF.
-				g.setPaintMode();
-				g.setColor(getColor(i,j));
-				//drawRect is better than fillRect because there're no gaps, but
-				//still some color bleed for some reason at some zoom levels - I
-				//think that's due to the reader's poor rendering
-				g.drawRect(i,j,1,1);
-			}
-		}
-	}
-
-	/**
-	 * A wrapper for exporting the entire matrix.
-	 * @author rleach
-	 * @param g - A graphics2D-compatible object
-	 * @param width - The number of columns of data
-	 * @param height - The number of rows of data
-	 * @param xIndent - The x start position of the image
-	 * @param yIndent - The y start position of the image
-	 * @param size - The number of "pixels" high/wide each tile is to be drawn
-	 */
-	public void paint(final Graphics g,final int width,final int height,
-		final int xIndent,final int yIndent,final int tileXsize,
-		final int tileYsize,final boolean showSelections,
-		final TreeSelectionI colSelection,final TreeSelectionI rowSelection) {
-
-		paint(g,width - 1,height - 1,xIndent,yIndent,tileXsize,tileYsize,0,0,
-			showSelections,colSelection,rowSelection);
 	}
 
 	/**
@@ -237,14 +186,16 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 * @param xstart - The index of the first column of data to be included
 	 * @param ystart - The index of the first row of data to be included
 	 */
-	public void paint(final Graphics g,final int xend,final int yend,
-		final int xIndent,final int yIndent,final int tileXsize,
-		final int tileYsize,final int xstart,final int ystart,
+	public void paint(final Graphics g,
+		final int xDataStart,final int yDataStart,
+		final int xDataEnd,final int yDataEnd,
+		final int xImageStart,final int yImageStart,
+		final int xTileSize,final int yTileSize,
 		final boolean showSelections,
 		final TreeSelectionI colSelection,final TreeSelectionI rowSelection) {
 	
-		for (int j = ystart; j <= yend; j++) {
-			for (int i = xstart; i <= xend; i++) {
+		for (int j = yDataStart; j <= yDataEnd; j++) {
+			for (int i = xDataStart; i <= xDataEnd; i++) {
 				//setPaintMode seems to help color overlapping (affecting the
 				//colors) a little, but doesn't fix it altogether. Probably
 				//useless. Note there appears to be an alpha channel in the
@@ -254,10 +205,10 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				//drawRect is better than fillRect because there're no gaps, but
 				//still some color bleed for some reason at some zoom levels - I
 				//think that's due to the reader's poor rendering
-				g.drawRect(xIndent + (i - xstart) * tileXsize,
-					yIndent + (j - ystart) * tileYsize,tileXsize,tileYsize);
-				g.fillRect(xIndent + (i - xstart) * tileXsize,
-					yIndent + (j - ystart) * tileYsize,tileXsize,tileYsize);
+				g.drawRect(xImageStart + (i - xDataStart) * xTileSize,
+					yImageStart + (j - yDataStart) * yTileSize,xTileSize,yTileSize);
+				g.fillRect(xImageStart + (i - xDataStart) * xTileSize,
+					yImageStart + (j - yDataStart) * yTileSize,xTileSize,yTileSize);
 			}
 		}
 
@@ -285,17 +236,17 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 				for(final List<Integer> xBoundaries : arrayBoundaryList) {
 					for(final List<Integer> yBoundaries : geneBoundaryList){
 
-						int xStartPixel =
-							xIndent + (xBoundaries.get(0) - xstart) * tileXsize;
+						int xSelectionPixel = xImageStart +
+							(xBoundaries.get(0) - xDataStart) * xTileSize;
 						int xPixelSize =
 							(xBoundaries.get(1) - xBoundaries.get(0) + 1) *
-							tileXsize - 1;
-						int yStartPixel =
-							yIndent + (yBoundaries.get(0) - ystart) * tileYsize;
+							xTileSize - 1;
+						int yStartPixel = yImageStart +
+							(yBoundaries.get(0) - yDataStart) * yTileSize;
 						int yPixelSize =
 							(yBoundaries.get(1) - yBoundaries.get(0) + 1) *
-							tileYsize - 1;
-						g.drawRect(xStartPixel,yStartPixel,xPixelSize,
+							yTileSize - 1;
+						g.drawRect(xSelectionPixel,yStartPixel,xPixelSize,
 							yPixelSize);
 					}
 				}
@@ -340,61 +291,6 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 		}
 
 		return(boundaryList);
-	}
-
-	/**
-	 * Paint the array values onto pixels. This method will do averaging if
-	 * multiple values map to the same pixel.
-	 *
-	 * @param pixels
-	 *            The pixel buffer to draw to.
-	 * @param source
-	 *            Specifies Rectangle of values to draw from
-	 * @param dest
-	 *            Specifies Rectangle of pixels to draw to
-	 * @param scanSize
-	 *            The scansize for the pixels array (in other words, the width
-	 *            of the image)
-	 */
-	public void paint(final int[] pixels, final Rectangle source,
-			final Rectangle dest, final int scanSize) {
-
-		paint(pixels, source, dest, scanSize, null);
-	}
-
-	/**
-	 * Method to draw a single point (x,y) on grapics g using xmap and ymap
-	 *
-	 * @param g
-	 *            Graphics to draw to
-	 * @param xmap
-	 *            Mapping from indexes to pixels
-	 * @param ymap
-	 *            Mapping from indexes to pixels
-	 * @param x
-	 *            x coordinate of data in array
-	 * @param y
-	 *            y coordinate of data in array
-	 * @param geneOrder
-	 *            a desired reordered subset of the genes, or null if you want
-	 *            order from cdt.
-	 */
-	public void paintPixel(final Graphics g, final MapContainer xmap,
-			final MapContainer ymap, final int x, final int y,
-			final int[] geneOrder) {
-
-		try {
-			int actualGene = ymap.getIndex(y);
-			if (geneOrder != null) {
-				actualGene = geneOrder[actualGene];
-			}
-
-			final Color t_color = getColor(xmap.getIndex(x), actualGene);
-			g.setColor(t_color);
-			g.fillRect(x, y, 1, 1);
-
-		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-		}
 	}
 
 	/**

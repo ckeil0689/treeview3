@@ -163,7 +163,7 @@ public class DoubleArrayDrawer extends ArrayDrawer {
 	 */
 	@Override
 	public void paint(final int[] pixels, final Rectangle source,
-			final Rectangle dest, final int scanSize, final int[] geneOrder) {
+			final Rectangle dest, final int scanSize) {
 
 
 		if (dataMatrix == null) {

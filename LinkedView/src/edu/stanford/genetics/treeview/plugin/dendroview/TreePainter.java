@@ -113,9 +113,11 @@ public class TreePainter extends TreeDrawer {
 		final TreeDrawerNode root,final boolean isLeft,final int hoverIndex,
 		final TreeSelectionI treeSelection,final TreeDrawerNode hoveredNode) {
 
-		if ((root == null) || (root.isLeaf()) || (xScaleEq == null)
-				|| (yScaleEq == null))
+		if ((root == null) || (root.isLeaf()) || (xScaleEq == null) ||
+			(yScaleEq == null)) {
+
 			return;
+		}
 		this.isLeft = isLeft;
 		
 		// recursively drawtree...

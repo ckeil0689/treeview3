@@ -127,15 +127,6 @@ public abstract class MatrixView extends ModelViewProduced {
 		ymap.notifyObservers();
 	}
 
-	/* TODO: This needs to take a start end end index for each dimension
-	 * defining the export region */
-	public void exportPixels(Graphics g) {
-		if (drawer != null) {
-			/* Set new offscreenPixels (pixel colors) */
-			drawer.paint(g,xmap.getTotalTileNum(),ymap.getTotalTileNum());
-		}
-	}
-
 	/**
 	 * Export all data to a file
 	 * @author rleach
@@ -174,9 +165,9 @@ public abstract class MatrixView extends ModelViewProduced {
 		final int tileXsize,final int tileYsize,final boolean showSelections) {
 
 		if(drawer != null) {
-			drawer.paint(g,xmap.getTotalTileNum(),ymap.getTotalTileNum(),
-				xIndent,yIndent,tileXsize,tileYsize,showSelections,colSelection,
-				rowSelection);
+			drawer.paint(g,0,0,xmap.getMaxIndex(),ymap.getMaxIndex(),
+				xIndent,yIndent,tileXsize,tileYsize,
+				showSelections,colSelection,rowSelection);
 		}
 	}
 
@@ -193,10 +184,10 @@ public abstract class MatrixView extends ModelViewProduced {
 		final boolean showSelections) {
 
 		if(drawer != null) {
-			drawer.paint(g,xmap.getLastVisible(),ymap.getLastVisible(),
-				xIndent,yIndent,tileXsize,tileYsize,xmap.getFirstVisible(),
-				ymap.getFirstVisible(),showSelections,colSelection,
-				rowSelection);
+			drawer.paint(g,xmap.getFirstVisible(),ymap.getFirstVisible(),
+				xmap.getLastVisible(),ymap.getLastVisible(),
+				xIndent,yIndent,tileXsize,tileYsize,
+				showSelections,colSelection,rowSelection);
 		}
 	}
 
@@ -214,10 +205,10 @@ public abstract class MatrixView extends ModelViewProduced {
 
 		if(drawer != null) {
 			if(colSelection != null && colSelection.getNSelectedIndexes() > 0) {
-				drawer.paint(g,
-					colSelection.getMaxIndex(),rowSelection.getMaxIndex(),
+				drawer.paint(g,colSelection.getMinIndex(),
+					rowSelection.getMinIndex(),colSelection.getMaxIndex(),
+					rowSelection.getMaxIndex(),
 					xIndent,yIndent,tileXsize,tileYsize,
-					colSelection.getMinIndex(),rowSelection.getMinIndex(),
 					showSelections,colSelection,rowSelection);
 			} else {
 				LogBuffer.println("ERROR: No selection exists.");

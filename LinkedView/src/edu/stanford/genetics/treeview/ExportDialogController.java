@@ -1,7 +1,10 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Desktop;
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,12 +114,16 @@ public class ExportDialogController {
 					PageConstants.getOrientationList()[selectedOptions[5]];
 			}
 
-			String exportFilename = model.getSource();
-			if(exportFilename == null || exportFilename.isEmpty()) {
-				exportFilename = "TreeView3_exported_file";
-			}
-			exportFilename += "." + selFormat.toString();
+			//This will open a file chooser dialog
+			String exportFilename = chooseSaveFile(selFormat);
 
+			//If the returned string is null or empty, they either canceled or
+			//there was an error
+			if(exportFilename == null || exportFilename.isEmpty()) {
+				return;
+			}
+
+			//Now export the file
 			try {
 				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
 					interactiveYmap,colSelection,rowSelection);
@@ -127,9 +134,11 @@ public class ExportDialogController {
 
 				String msg = "Exported file: [" + exportFilename + "].";
 				LogBuffer.println(msg);
-				showDialog(msg);
 
 				exportDialog.dispose();
+
+				//Open the file in the default system app
+				Desktop.getDesktop().open(new File(exportFilename));
 			} catch(OutOfMemoryError oome) {
 				showWarning("ERROR: Out of memory.  Note, you may be able to " +
 					"export a smaller portion of the matrix.");
@@ -139,17 +148,50 @@ public class ExportDialogController {
 		}
 	}
 
+	public String chooseSaveFile(Format selFormat) {
+
+		String chosen = null;
+
+		final FileDialog fileDialog = new FileDialog(exportDialog,
+			"Save Exported File",
+			FileDialog.SAVE);
+
+		//Set the default initial output file name and location to that of the
+		//input file
+		try {
+			File inFile = new File(model.getSource());
+			File outFile = new File(getInitialExportFileString(selFormat));
+			fileDialog.setDirectory(inFile.getCanonicalPath());
+			fileDialog.setFile(outFile.getName());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+
+		fileDialog.setVisible(true);
+
+		//Retrieve the chosen output file
+		final String outdir = fileDialog.getDirectory();
+		final String filename = fileDialog.getFile();
+		if(outdir != null && filename != null) {
+			chosen = outdir + filename;
+		}
+
+		return(chosen);
+	}
+
+	public String getInitialExportFileString(Format selFormat) {
+		String exportFilename = model.getSource();
+		if(exportFilename == null || exportFilename.isEmpty()) {
+			exportFilename = "TreeView3_exported_file";
+		}
+		exportFilename += "." + selFormat.toString();
+		return(exportFilename);
+	}
+
 	private void showWarning(final String message) {
 
 		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), 
 				message, "Warning", JOptionPane.WARNING_MESSAGE);
-		LogBuffer.println(message);
-	}
-
-	private void showDialog(final String message) {
-
-		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), 
-				message, "Note", JOptionPane.INFORMATION_MESSAGE);
 		LogBuffer.println(message);
 	}
 
