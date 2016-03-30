@@ -553,6 +553,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	protected abstract void drawFittedWhizBackground(final Graphics g,
 		LinearTransformation scaleEq);
 	protected abstract void setExportPreviewScale(final Rectangle dest);
+	
+	protected abstract int  getSnapShotDestRectStart(final Rectangle dest);
+	protected abstract int  getSnapShotDestRectEnd(final Rectangle dest);
 
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
@@ -1010,8 +1013,17 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		return(treePainter != null && treePainter.getRootNode() != null);
 	}
 	
+	/**
+	 * Get a scaled snapshot of the trees. The snapshot will be taken in
+	 * the specified region.
+	 * @param width - The width of the scaled image to be returned.
+	 * @param height - The height of the scaled image to be returned.
+	 * @param region - The region from which to take a snapshot.
+	 * @param withSelections - Whether to include selections in the snapshot.
+	 * @return A scaled BufferedImage representing the trees.
+	 */
 	public BufferedImage getSnapshot(final int width, final int height, 
-			final boolean withSelections) {
+			final RegionType region, final boolean withSelections) {
 	
 		BufferedImage img = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
@@ -1022,7 +1034,46 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		
 		setExportPreviewScale(dest);
 		
-		/* Draw trees to first image, original size */
+		/* 
+		 * Temporarily update MapContainer for this TreeView to get user
+		 * selected region. Reset after drawing the image.
+		 */
+		int firstVisible = map.getFirstVisible();
+		int numVisible = map.getNumVisible();
+		
+		/* These depend on the selected region */
+		int tempFirstVisible;
+		int tempNumVisible;
+		int tempLastVisible;
+		
+		switch(region) {
+		case ALL:
+			tempFirstVisible = map.getMinIndex();
+			tempNumVisible = map.getTotalTileNum();
+			break;
+		case SELECTION:
+			tempFirstVisible = treeSelection.getMinIndex();
+			tempNumVisible = treeSelection.getNSelectedIndexes();
+			break;
+		/* Fall through, visible same as default */
+		case VISIBLE:
+		default:
+			tempFirstVisible = firstVisible;
+			tempNumVisible = numVisible;
+			break;
+		}
+		
+		tempLastVisible = tempFirstVisible + tempNumVisible;
+		
+		LinearTransformation primaryScaleEq = getPrimaryScaleEq();
+		/* temporarily update for snapshot drawing */
+		setPrimaryScaleEq(new LinearTransformation(
+				tempFirstVisible,
+				getSnapShotDestRectStart(dest),
+				tempLastVisible,
+				getSnapShotDestRectEnd(dest)));
+		
+		/* Now draw trees to first image, original size */
 		if(withSelections) {
 			treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
 					isLeft, -1, treeSelection, null);
@@ -1034,6 +1085,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		/* Draw a scaled version of the old image to a new image */
 		Graphics g = scaled.getGraphics();
 		g.drawImage(img, 0, 0, width, height, null);
+		
+		/* Reset scale tree so normal TreeViews continue as usual */
+		setPrimaryScaleEq(primaryScaleEq);
 		
 		return scaled;
 	}

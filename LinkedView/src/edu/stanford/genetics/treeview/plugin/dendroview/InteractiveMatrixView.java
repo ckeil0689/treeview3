@@ -1965,11 +1965,52 @@ public class InteractiveMatrixView extends MatrixView {
 	}
 	
 	/**
+	 * Get a snapshot that contains only the visible portions of the matrix.
+	 * @param withSelections - whether to draw selections
+	 * @return An image snapshot of the matrix
+	 */
+	public Image getVisibleImage(boolean withSelections) {
+		
+		// already sets the visible region
+		setSubImage();
+		
+		return getSnapShotImage(withSelections);
+	}
+	
+	/**
+	 * Get a snapshot that contains the full matrix.
+	 * @param withSelections - whether to draw selections
+	 * @return An image snapshot of the matrix
+	 */
+	public Image getFullImage(boolean withSelections) {
+		
+		// defines the matrix region
+		setBoundedSubImage(xmap.getMinIndex(), ymap.getMinIndex(), 
+				xmap.getTotalTileNum(), ymap.getTotalTileNum());
+		
+		return getSnapShotImage(withSelections);
+	}
+	
+	/**
+	 * Get a snapshot that contains only selected portions of the matrix.
+	 * @return An image snapshot of the matrix
+	 */
+	public Image getSelectionImage() {
+		
+		// defines the matrix region
+		setBoundedSubImage(colSelection.getMinIndex(), 
+				rowSelection.getMinIndex(), colSelection.getNSelectedIndexes(),
+				rowSelection.getNSelectedIndexes());
+		
+		return getSnapShotImage(false);
+	}
+	
+	/**
 	 * 
 	 * @param withSelections
 	 * @return
 	 */
-	public Image getVisibleImage(boolean withSelections) {
+	public Image getSnapShotImage(boolean withSelections) {
 		
 		if(withSelections) {
 			// draw selection rectangles etc. on top of image
@@ -1978,8 +2019,8 @@ public class InteractiveMatrixView extends MatrixView {
 							(int)offscreenSize.getHeight(), 
 							BufferedImage.TYPE_INT_RGB);
 			Graphics2D g = (Graphics2D)newImg.getGraphics();
-			g.setStroke(new BasicStroke(15));
 			super.paintComponent(g);
+			g.setStroke(new BasicStroke(10));
 			this.paintComponent(g);
 			return (newImg);
 		}

@@ -31,7 +31,6 @@ public class ExportDialog extends CustomDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	private final int d_bg_sidelen = 500;
 	private JPanel previewComp;
 	private JPanel background;
 	private int backgroundWidth;
@@ -60,8 +59,8 @@ public class ExportDialog extends CustomDialog {
 		this.bigRegs = eh.getOversizedRegions(useMinimums);
 		this.selectionsExist = selectionsExist;
 		
-		this.backgroundWidth = d_bg_sidelen;
-		this.backgroundHeight = d_bg_sidelen;
+		this.backgroundWidth = PaperType.LONGSIDE;
+		this.backgroundHeight = PaperType.LONGSIDE;
 		
 		setupLayout();
 	}
@@ -430,30 +429,30 @@ public class ExportDialog extends CustomDialog {
 
 		background.removeAll();
 		
+		JPanel previews = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
+		
 		/* Tree panels need to have the same size as the matrix */
 		JPanel filler = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowTrees != null && colTrees != null) {
-			background.add(filler, "w 80!, h 80!");
+			previews.add(filler, "w 80!, h 80!");
 		}
 
 		if(colTrees != null) {
 			colTrees.setLongSide(matrix.getMatrixWidth());
-			background.add(colTrees, "growx, pushx, h 80!, w " 
+			previews.add(colTrees, "growx, pushx, h 80!, w " 
 					+ matrix.getMatrixWidth() + "!, wrap");
 		}
 
 		if(rowTrees != null) {
 			rowTrees.setLongSide(matrix.getMatrixHeight());
-			background.add(rowTrees, "growy, aligny 0, pushy, h " 
+			previews.add(rowTrees, "growy, aligny 0, pushy, h " 
 					+ matrix.getMatrixHeight() + "!, w 80!");
 		}
 
-		background.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
+		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
 				+ matrix.getMatrixWidth() + "!, aligny 0, push, grow");
 		
-		LogBuffer.println("Background-Width: "  + backgroundWidth);
-		LogBuffer.println("Background-Height: "  + backgroundHeight);
-		
+		background.add(previews, "grow, push, align 50%");
 		previewComp.add(background, "w " + backgroundWidth + "!, h " 
 				+ backgroundHeight + "!, grow, push, align 50%");
 		
@@ -488,8 +487,6 @@ public class ExportDialog extends CustomDialog {
 	public void updatePreviewComponents(final ExportOptions exportOptions, 
 			final Dimension matrixSize) {
 		
-		LogBuffer.println("Updating preview components");
-		
 		/* First, set the background color depending on document format */
 		final boolean isPaper = exportOptions.getFormatType().isDocumentFormat();
 		
@@ -523,8 +520,9 @@ public class ExportDialog extends CustomDialog {
 			
 		} else {
 			// set normal / transparent background
-			backgroundWidth = d_bg_sidelen;
-			backgroundHeight = d_bg_sidelen;
+			backgroundWidth = PaperType.LONGSIDE;
+			backgroundHeight = PaperType.LONGSIDE;
+			
 			background.setBackground(mainPanel.getBackground());
 			background.setBorder(null);
 		}
@@ -533,8 +531,11 @@ public class ExportDialog extends CustomDialog {
 		int maxSideLen;
 		int buffer = 20;
 		if(backgroundWidth < backgroundHeight) {
+			// portrait
 			maxSideLen = backgroundWidth;
+			
 		} else {
+			// landscape
 			maxSideLen = backgroundHeight;
 		}
 		
@@ -558,13 +559,25 @@ public class ExportDialog extends CustomDialog {
 			int newWidth;
 			int newHeight;
 			if(backgroundWidth < backgroundHeight) {
+				// portrait
 				newWidth = maxSideLen;
 				newHeight = (int)(newWidth / ratio);
 				
 			} else {
-				newHeight = maxSideLen;
-				newWidth = (int)(newHeight * ratio);
+				// landscape
+				if(w < h) {
+					newHeight = maxSideLen;
+					newWidth = (int)(newHeight * ratio);
+				} else {
+					newWidth = maxSideLen;
+					newHeight = (int)(newWidth / ratio);
+				}
 			}
+			
+			LogBuffer.println("Matrix width: " + newWidth);
+			LogBuffer.println("Matrix height: " + newHeight);
+			LogBuffer.println("Bg-Height: " + backgroundHeight);
+			LogBuffer.println("Bg-Width: " + backgroundWidth);
 			
 			matrix.setMatrixWidth(newWidth);
 			matrix.setMatrixHeight(newHeight);

@@ -7,7 +7,7 @@ public enum PaperType {
 	LEGAL("Legal"),A5("A5"),A6("A6"),EXECUTIVE("Executive"),LEDGER("Ledger");
 	
 	private final String toString;
-	private final static int longSide = 500;
+	public final static int LONGSIDE = 450;
 	
 	private PaperType(String toString) {
 		this.toString = toString;
@@ -55,15 +55,15 @@ public enum PaperType {
 		double executiveRatio = 10.5 / 7.25;
 		
 		/* The aspect ratio of ISO A series paper is sqrt(2). */
-		int shortSideASeries = (int)(longSide / Math.sqrt(2.0));
+		int shortSideASeries = (int)(LONGSIDE / Math.sqrt(2.0));
 		
 		/* Long side is always 400 (max), short side adjusted accordingly. */
 		/* Not certain for international, default until it's cleared up */
-		int shortSideInterntl = (int)(longSide / interntlRatio);
-		int shortSideLegal = (int)(longSide / legalRatio);
-		int shortSideLetter = (int)(longSide / letterRatio);
-		int shortSideLedger = (int)(longSide / ledgerRatio);
-		int shortSideExecutive = (int)(longSide / executiveRatio);
+		int shortSideInterntl = (int)(LONGSIDE / interntlRatio);
+		int shortSideLegal = (int)(LONGSIDE / legalRatio);
+		int shortSideLetter = (int)(LONGSIDE / letterRatio);
+		int shortSideLedger = (int)(LONGSIDE / ledgerRatio);
+		int shortSideExecutive = (int)(LONGSIDE / executiveRatio);
 		
 		Dimension typeDim;
 		switch(type) {
@@ -72,25 +72,25 @@ public enum PaperType {
 		case A4:
 		case A5:
 		case A6:
-			typeDim = new Dimension(shortSideASeries, longSide);
+			typeDim = new Dimension(shortSideASeries, LONGSIDE);
 			break;
 		case INTERNATIONAL:
-			typeDim = new Dimension(shortSideInterntl, longSide);
+			typeDim = new Dimension(shortSideInterntl, LONGSIDE);
 			break;
 		case LETTER:
-			typeDim = new Dimension(shortSideLetter, longSide);
+			typeDim = new Dimension(shortSideLetter, LONGSIDE);
 			break;
 		case LEGAL:
-			typeDim = new Dimension(shortSideLegal, longSide);
+			typeDim = new Dimension(shortSideLegal, LONGSIDE);
 			break;
 		case EXECUTIVE:
-			typeDim = new Dimension(shortSideExecutive, longSide);
+			typeDim = new Dimension(shortSideExecutive, LONGSIDE);
 			break;
 		case LEDGER:
-			typeDim = new Dimension(shortSideLedger, longSide);
+			typeDim = new Dimension(shortSideLedger, LONGSIDE);
 			break;
 		default:
-			typeDim = new Dimension(longSide, longSide);
+			typeDim = new Dimension(LONGSIDE, LONGSIDE);
 			break;
 		}
 		return typeDim;

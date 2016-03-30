@@ -473,6 +473,18 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 	}
 	
+	protected void setBoundedSubImage(int x, int y, int w, int h) {
+		
+		try {
+			paintImage = ((BufferedImage)offscreenImage).getSubimage(x, y, w, h);
+			
+		} catch(RasterFormatException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("x: " + x + " y: " + y + " w: " + w + " h: " + h);
+			paintImage = null;
+		}
+	}
+	
 	public void setHasMouse(boolean hasMouse) {
 		
 		this.hasMouse = hasMouse;

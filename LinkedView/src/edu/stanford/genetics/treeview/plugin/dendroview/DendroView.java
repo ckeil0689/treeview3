@@ -33,6 +33,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
+import Controllers.RegionType;
 import Utilities.GUIFactory;
 import Utilities.Helper;
 import Utilities.StringRes;
@@ -1363,26 +1364,52 @@ public class DendroView implements Observer, DendroPanel {
 		setSearchPanel();
 	}
 	
-	
-	public ExportPreviewMatrix getMatrixSnapshot(final boolean withSelections) {
+	/**
+	 * Gets a snapshot of the matrix from InteractiveMatrixView depending on
+	 * the selected region type. Selections can be drawn as well.
+	 * @param withSelections - whether selections should be drawn onto 
+	 * the matrix
+	 * @param region - The RegionType defines which region of the matrix
+	 * will be shown.
+	 * @return A new ExportPreviewMatrix panel containing the matrix.
+	 */
+	public ExportPreviewMatrix getMatrixSnapshot(final boolean withSelections, 
+			RegionType region) {
 		
-		Image image = getInteractiveMatrixView()
-				.getVisibleImage(withSelections);
+		Image image;
+		
+		switch(region) {
+		case ALL:
+			image = getInteractiveMatrixView().getFullImage(withSelections);
+			break;
+		case VISIBLE:
+			image = getInteractiveMatrixView().getVisibleImage(withSelections);
+			break;
+		case SELECTION:
+			image = getInteractiveMatrixView().getSelectionImage();
+			break;
+		default:
+			image = getInteractiveMatrixView().getFullImage(withSelections);
+		}
+		
 		return new ExportPreviewMatrix(image);
 	}
 	
-	public ExportPreviewTrees getRowTreeSnapshot(final boolean withSelections) {
+	public ExportPreviewTrees getRowTreeSnapshot(final boolean withSelections, 
+			RegionType region) {
 		
-		return getTreeSnapshot(rowTreeView, withSelections, true);
+		return getTreeSnapshot(rowTreeView, region, withSelections, true);
 	}
 	
-	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections) {
+	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections, 
+			RegionType region) {
 		
-		return getTreeSnapshot(colTreeView, withSelections, false);
+		return getTreeSnapshot(colTreeView, region, withSelections, false);
 	}
 	
-	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView, 
-			final boolean withSelections, final boolean isRows) {
+	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
+			RegionType region, final boolean withSelections, 
+			final boolean isRows) {
 		
 		if(treeAxisView == null) {
 			LogBuffer.println("Cannot generate tree snapshot. "
@@ -1404,7 +1431,7 @@ public class DendroView implements Observer, DendroPanel {
 		BufferedImage treeSnapshot = null;
 		ExportPreviewTrees expTrees = null;
 		if(treeAxisView.isEnabled()) {
-			treeSnapshot = treeAxisView.getSnapshot(width, height, 
+			treeSnapshot = treeAxisView.getSnapshot(width, height, region,
 					withSelections);
 			expTrees = new ExportPreviewTrees(treeSnapshot, isRows);
 		}

@@ -50,7 +50,7 @@ public class ExportDialogController {
 
 		addListeners();		
 		
-		setNewPreviewComponents(false);
+		setNewPreviewComponents(exportOptions);
 		exportDialog.recalculatePreviewPanel();
 		
 		exportDialog.setVisible(true);
@@ -73,14 +73,17 @@ public class ExportDialogController {
 	 * export dialog.
 	 * @param withSelections - whether to show selections or not
 	 */
-	private void setNewPreviewComponents(final boolean withSelections) {
+	private void setNewPreviewComponents(final ExportOptions options) {
 		
 		ExportPreviewTrees expRowTrees = 
-				tvFrame.getDendroView().getRowTreeSnapshot(withSelections);
+				tvFrame.getDendroView().getRowTreeSnapshot(
+						options.isShowSelections(), options.getRegionType());
 		ExportPreviewTrees expColTrees = 
-				tvFrame.getDendroView().getColTreeSnapshot(withSelections);
+				tvFrame.getDendroView().getColTreeSnapshot(
+						options.isShowSelections(), options.getRegionType());
 		ExportPreviewMatrix expMatrix = 
-				tvFrame.getDendroView().getMatrixSnapshot(withSelections);
+				tvFrame.getDendroView().getMatrixSnapshot(
+						options.isShowSelections(), options.getRegionType());
 		
 		exportDialog.setPreviewComponents(expRowTrees, expColTrees, expMatrix);
 	}
@@ -361,7 +364,7 @@ public class ExportDialogController {
 		}
 		
 		exportDialog.retrieveOptions(exportOptions);
-		setNewPreviewComponents(exportOptions.isShowSelections());
+		setNewPreviewComponents(exportOptions);
 		Dimension matrixSize = tvFrame.getDendroView()
 				.getInteractiveMatrixView().getSize();
 		exportDialog.updatePreviewComponents(exportOptions, matrixSize);

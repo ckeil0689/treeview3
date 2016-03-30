@@ -17,7 +17,7 @@ public class ExportPreviewMatrix extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final int D_SIDE = 400;
+	public static final int D_SIDE = 350;
 	
 	private final Image paintImage;
 	private int matrixWidth;
