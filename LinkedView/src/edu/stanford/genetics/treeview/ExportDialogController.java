@@ -51,7 +51,7 @@ public class ExportDialogController {
 		addListeners();		
 		
 		setNewPreviewComponents(exportOptions);
-		exportDialog.recalculatePreviewPanel();
+		exportDialog.arrangePreviewPanel();
 		
 		exportDialog.setVisible(true);
 	}
@@ -365,8 +365,10 @@ public class ExportDialogController {
 		
 		exportDialog.retrieveOptions(exportOptions);
 		setNewPreviewComponents(exportOptions);
-		Dimension matrixSize = tvFrame.getDendroView()
-				.getInteractiveMatrixView().getSize();
+		
+		// One pixel = one axis element
+		Dimension matrixSize = new Dimension(model.getDataMatrix().getNumRow(), 
+				model.getDataMatrix().getNumCol());
 		exportDialog.updatePreviewComponents(exportOptions, matrixSize);
 	}
 }

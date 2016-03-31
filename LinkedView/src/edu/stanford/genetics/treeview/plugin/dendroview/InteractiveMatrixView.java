@@ -1990,7 +1990,7 @@ public class InteractiveMatrixView extends MatrixView {
 		 * rectangles depends on the 'scale' variable of the MapContainers.
 		 * The zoom methods already calculate it correctly, so they are reused.
 		 * This is a massive hack, but the dependence on the MapContainers for
-		 * creating selection rectangles makes it very laborous to circumvent.
+		 * creating selection rectangles makes it very difficult to circumvent.
 		 */
 		// Store for reset
 		int firstVisX = xmap.getFirstVisible();

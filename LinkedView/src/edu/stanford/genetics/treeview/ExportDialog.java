@@ -26,6 +26,7 @@ import Controllers.FormatType;
 import Controllers.RegionType;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
+import Utilities.Helper;
 
 public class ExportDialog extends CustomDialog {
 
@@ -420,7 +421,7 @@ public class ExportDialog extends CustomDialog {
 	 * Arranges the trees and the matrix on the preview panel, depending on
 	 *which trees are active.
 	 **/
-	public void recalculatePreviewPanel() {
+	public void arrangePreviewPanel() {
 		
 		if(previewComp == null || background == null) {
 			LogBuffer.println("Cannot set preview for Export.");
@@ -483,9 +484,30 @@ public class ExportDialog extends CustomDialog {
 	/**
 	 * Updates the preview components (matrix and trees) according to the
 	 * selected options in the dialog.
+	 * @param exportOptions - The user selected export options which are used
+	 * to adjust the preview components
+	 * @param dataMatrixSize - The size of the dataMatrix (rows x columns)
 	 */
 	public void updatePreviewComponents(final ExportOptions exportOptions, 
-			final Dimension matrixSize) {
+			final Dimension dataMatrixSize) {
+		
+		updateBackground(exportOptions);
+		updatePreviewMatrix(exportOptions, backgroundWidth, backgroundHeight, 
+				dataMatrixSize);
+		
+		arrangePreviewPanel();
+		
+		mainPanel.revalidate();
+		mainPanel.repaint();
+	}
+	
+	/**
+	 * Updates the background of the preview components.There are document
+	 * and image formats for export. The background can thus be paper like or
+	 * transparent. It also adjusts its size and orientation.
+	 * @param exportOptions - The user selected export options
+	 */
+	private void updateBackground(final ExportOptions exportOptions) {
 		
 		/* First, set the background color depending on document format */
 		final boolean isPaper = exportOptions.getFormatType().isDocumentFormat();
@@ -524,53 +546,84 @@ public class ExportDialog extends CustomDialog {
 			backgroundHeight = PaperType.LONGSIDE;
 			
 			background.setBackground(mainPanel.getBackground());
-			background.setBorder(null);
+			background.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 		}
+	}
+	
+	private void updatePreviewMatrix(final ExportOptions exportOptions, 
+			final int bgWidth, final int bgHeight, 
+			final Dimension dataMatrixSize) {
 		
 		/* Define maximal side length of matrix to remain within background */
 		int maxSideLen;
-		int buffer = 20;
-		if(backgroundWidth < backgroundHeight) {
+		int pixelBuffer = 20;
+		if(bgWidth < bgHeight) {
 			// portrait
-			maxSideLen = backgroundWidth;
+			maxSideLen = bgWidth;
 			
 		} else {
 			// landscape
-			maxSideLen = backgroundHeight;
+			maxSideLen = bgHeight;
 		}
 		
-		//adjust for tree thickness
-		maxSideLen -= ExportPreviewTrees.SHORT;
+		//adjust maximum matrix side length for tree thickness
+		if(rowTrees != null || colTrees != null) {
+			maxSideLen -= ExportPreviewTrees.SHORT;
+		}
 		//give a little additional space
-		maxSideLen -= buffer;
+		maxSideLen -= pixelBuffer;
 		
+		double w = dataMatrixSize.getWidth();
+		double h = dataMatrixSize.getHeight();
+		double matrixRatio = w / h;
+		
+		int newWidth;
+		int newHeight;
 		/* */
 		if(exportOptions.getAspectType() == ExportAspect.ONETOONE) {
+			// Square tiles
+			// maximize matrix depending on matrix aspect ratio
+			if(Helper.nearlyEqual(w, h)) {
+				// same row & column num
+				if(bgWidth < bgHeight) {
+					newWidth = bgWidth;
+					newHeight = bgWidth;
+					
+				} else {
+					newWidth = bgHeight;
+					newHeight = bgHeight;
+				}
+			} else if(matrixRatio < 1.0){
+				// bigger height
+				newWidth = (int) w;
+				newHeight = (int) h;
+				
+			} else {
+				// bigger width
+				newWidth = (int) w;
+				newHeight = (int) h;
+			}
+			
 			// both sides need to be max. shortest paper side - tree thickness
-			matrix.setMatrixWidth(maxSideLen);
-			matrix.setMatrixHeight(maxSideLen);
+			matrix.setMatrixWidth(newWidth);
+			matrix.setMatrixHeight(newHeight);
 			
 		// calculate fitting size for preview matrix from full matrix size	
 		} else {
-			double w = matrixSize.getWidth();
-			double h = matrixSize.getHeight();
-			double ratio = w / h;
-			
-			int newWidth;
-			int newHeight;
-			if(backgroundWidth < backgroundHeight) {
+			if(bgWidth < bgHeight) {
 				// portrait
 				newWidth = maxSideLen;
-				newHeight = (int)(newWidth / ratio);
+				newHeight = (int)(newWidth / matrixRatio);
 				
 			} else {
 				// landscape
 				if(w < h) {
 					newHeight = maxSideLen;
-					newWidth = (int)(newHeight * ratio);
+					newWidth = (int)(newHeight * matrixRatio);
+					
 				} else {
 					newWidth = maxSideLen;
-					newHeight = (int)(newWidth / ratio);
+					newHeight = (int)(newWidth / matrixRatio);
 				}
 			}
 			
@@ -582,11 +635,6 @@ public class ExportDialog extends CustomDialog {
 			matrix.setMatrixWidth(newWidth);
 			matrix.setMatrixHeight(newHeight);
 		}
-		
-		recalculatePreviewPanel();
-		
-		mainPanel.revalidate();
-		mainPanel.repaint();
 	}
 	
 	/**
