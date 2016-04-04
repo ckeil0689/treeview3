@@ -492,8 +492,8 @@ public class ExportDialog extends CustomDialog {
 			final Dimension dataMatrixSize) {
 		
 		updateBackground(exportOptions);
-		updatePreviewMatrix(exportOptions, backgroundWidth, backgroundHeight, 
-				dataMatrixSize);
+		Dimension bgSize = new Dimension(backgroundWidth, backgroundHeight);
+		updatePreviewMatrix(exportOptions, bgSize, dataMatrixSize);
 		
 		arrangePreviewPanel();
 		
@@ -550,91 +550,107 @@ public class ExportDialog extends CustomDialog {
 		}
 	}
 	
+	/**
+	 * Updates the size of the preview matrix based on available trees and 
+	 * the size of the background panel. The goal is to maximize the matrix 
+	 * on the page while respecting user selected export options. 
+	 * @param exportOptions - The user selected options
+	 * @param bgSize - The dimension of the background panel
+	 * @param dataMatrixSize - The dimension of the data matrix 
+	 * (1 element = 1px)
+	 */
 	private void updatePreviewMatrix(final ExportOptions exportOptions, 
-			final int bgWidth, final int bgHeight, 
-			final Dimension dataMatrixSize) {
+			final Dimension bgSize, final Dimension dataMatrixSize) {
+		
+		/* (!)
+		 * Using int casts throughout this method instead of Math methods,
+		 * because plain truncating is fine. 
+		 */
+		
+		int adjustedBgWidth = (int) bgSize.getWidth();
+		int adjustedBgHeight = (int) bgSize.getHeight();
 		
 		/* Define maximal side length of matrix to remain within background */
-		int maxSideLen;
+		int treeSize = ExportPreviewTrees.SHORT;
 		int pixelBuffer = 20;
-		if(bgWidth < bgHeight) {
-			// portrait
-			maxSideLen = bgWidth;
-			
-		} else {
-			// landscape
-			maxSideLen = bgHeight;
-		}
 		
 		//adjust maximum matrix side length for tree thickness
-		if(rowTrees != null || colTrees != null) {
-			maxSideLen -= ExportPreviewTrees.SHORT;
+		if(rowTrees != null) {
+			adjustedBgWidth -= treeSize;
 		}
+		
+		if(colTrees != null) {
+			adjustedBgHeight -= treeSize;
+		}
+		
 		//give a little additional space
-		maxSideLen -= pixelBuffer;
+		adjustedBgWidth -= pixelBuffer;
+		adjustedBgHeight -= pixelBuffer;
 		
 		double w = dataMatrixSize.getWidth();
 		double h = dataMatrixSize.getHeight();
 		double matrixRatio = w / h;
 		
-		int newWidth;
-		int newHeight;
-		/* */
+		double newWidth = w;
+		double newHeight = h;
+		
+		int matrixWidth;
+		int matrixHeight;
+		
+		/* Adapt matrix size depending on selected aspect ratio */
 		if(exportOptions.getAspectType() == ExportAspect.ONETOONE) {
-			// Square tiles
-			// maximize matrix depending on matrix aspect ratio
-			if(Helper.nearlyEqual(w, h)) {
-				// same row & column num
-				if(bgWidth < bgHeight) {
-					newWidth = bgWidth;
-					newHeight = bgWidth;
-					
-				} else {
-					newWidth = bgHeight;
-					newHeight = bgHeight;
+			// Square tiles			
+			if(newWidth > adjustedBgWidth || newHeight > adjustedBgHeight) {
+				// shrink until fit
+				double shrinkFactor = 0.99;
+				while(newWidth > adjustedBgWidth 
+						|| newHeight > adjustedBgHeight) {
+					newWidth = newWidth * shrinkFactor;
+					newHeight = newHeight * shrinkFactor;
 				}
-			} else if(matrixRatio < 1.0){
-				// bigger height
-				newWidth = (int) w;
-				newHeight = (int) h;
-				
 			} else {
-				// bigger width
-				newWidth = (int) w;
-				newHeight = (int) h;
+				// grow until fit
+				double growthFactor = 1.01;
+				while(newWidth < adjustedBgWidth 
+						&& newHeight < adjustedBgHeight) {
+					newWidth = newWidth * growthFactor;
+					newHeight = newHeight * growthFactor;
+				}
 			}
 			
-			// both sides need to be max. shortest paper side - tree thickness
-			matrix.setMatrixWidth(newWidth);
-			matrix.setMatrixHeight(newHeight);
-			
+			matrixWidth = (int) newWidth;
+			matrixHeight = (int) newHeight;
+						
 		// calculate fitting size for preview matrix from full matrix size	
 		} else {
-			if(bgWidth < bgHeight) {
+			if(adjustedBgWidth < adjustedBgHeight) {
 				// portrait
-				newWidth = maxSideLen;
+				newWidth = treeSize;
 				newHeight = (int)(newWidth / matrixRatio);
 				
 			} else {
 				// landscape
 				if(w < h) {
-					newHeight = maxSideLen;
+					newHeight = treeSize;
 					newWidth = (int)(newHeight * matrixRatio);
 					
 				} else {
-					newWidth = maxSideLen;
+					newWidth = treeSize;
 					newHeight = (int)(newWidth / matrixRatio);
 				}
 			}
+			
+			matrixWidth = (int) newWidth;
+			matrixHeight = (int) newHeight;
 			
 			LogBuffer.println("Matrix width: " + newWidth);
 			LogBuffer.println("Matrix height: " + newHeight);
 			LogBuffer.println("Bg-Height: " + backgroundHeight);
 			LogBuffer.println("Bg-Width: " + backgroundWidth);
-			
-			matrix.setMatrixWidth(newWidth);
-			matrix.setMatrixHeight(newHeight);
 		}
+		
+		matrix.setMatrixWidth(matrixWidth);
+		matrix.setMatrixHeight(matrixHeight);
 	}
 	
 	/**
