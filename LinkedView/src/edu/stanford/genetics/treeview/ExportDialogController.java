@@ -1,13 +1,13 @@
 package edu.stanford.genetics.treeview;
 
 import java.awt.Desktop;
-import java.awt.FileDialog;
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -192,7 +192,7 @@ public class ExportDialogController {
 		}
 	}
 
-	public String chooseSaveFile(Format selFormat) {
+	public String chooseSaveFile(FormatType selFormat) {
 
 		String chosen = null;
 
@@ -223,7 +223,7 @@ public class ExportDialogController {
 		return(chosen);
 	}
 
-	public String getInitialExportFileString(Format selFormat) {
+	public String getInitialExportFileString(FormatType selFormat) {
 		String exportFilename = model.getSource();
 		if(exportFilename == null || exportFilename.isEmpty()) {
 			exportFilename = "TreeView3_exported_file";
@@ -367,8 +367,8 @@ public class ExportDialogController {
 		setNewPreviewComponents(exportOptions);
 		
 		// One pixel = one axis element
-		Dimension matrixSize = new Dimension(model.getDataMatrix().getNumRow(), 
-				model.getDataMatrix().getNumCol());
+		Dimension matrixSize = new Dimension(model.getDataMatrix().getNumCol(), 
+				model.getDataMatrix().getNumRow());
 		Dimension imvSize = new Dimension(
 				dendroView.getInteractiveMatrixView().getWidth(), 
 				dendroView.getInteractiveMatrixView().getHeight());

@@ -26,7 +26,6 @@ import Controllers.FormatType;
 import Controllers.RegionType;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
-import Utilities.Helper;
 
 public class ExportDialog extends CustomDialog {
 
@@ -605,18 +604,27 @@ public class ExportDialog extends CustomDialog {
 			// Square tiles	
 			newWidth = dataMatrixSize.getWidth();
 			newHeight = dataMatrixSize.getHeight();
+			LogBuffer.println("Datamatrix ratio: " + (newWidth/newHeight));
 						
 		// calculate fitting size for preview matrix from full matrix size	
 		} else {
 			newWidth = imvSize.getWidth();
 			newHeight = imvSize.getHeight();
+			LogBuffer.println("IMVmatrix ratio: " + (newWidth/newHeight));
 		}
+		
+		LogBuffer.println("newWidth: " + newWidth);
+		LogBuffer.println("newHeight: " + newHeight);
 		
 		Dimension startDim = new Dimension((int) newWidth, (int) newHeight);
 		Dimension newDim = adjustDim(startDim, adjBgDim);
 		
 		matrixWidth = (int) newDim.getWidth();
 		matrixHeight = (int) newDim.getHeight();
+		
+		LogBuffer.println("Adjmatrix ratio: " + (matrixWidth/matrixHeight));
+		LogBuffer.println("matrixWidth: " + matrixWidth);
+		LogBuffer.println("matrixHeight: " + matrixHeight);
 		
 		matrix.setMatrixWidth(matrixWidth);
 		matrix.setMatrixHeight(matrixHeight);
