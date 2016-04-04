@@ -52,7 +52,7 @@ public class ExportDialogController {
 		
 		setNewPreviewComponents(exportOptions);
 		exportDialog.arrangePreviewPanel();
-		
+		updatePreview();
 		exportDialog.setVisible(true);
 	}
 

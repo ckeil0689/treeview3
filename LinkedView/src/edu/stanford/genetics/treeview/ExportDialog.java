@@ -605,23 +605,11 @@ public class ExportDialog extends CustomDialog {
 			// Square tiles	
 			newWidth = dataMatrixSize.getWidth();
 			newHeight = dataMatrixSize.getHeight();
-			
-//			Dimension startDim = new Dimension((int) newWidth, (int) newHeight);
-//			Dimension newDim = adjustDim(startDim, adjBgDim);
-//			
-//			matrixWidth = (int) newDim.getWidth();
-//			matrixHeight = (int) newDim.getHeight();
 						
 		// calculate fitting size for preview matrix from full matrix size	
 		} else {
 			newWidth = imvSize.getWidth();
 			newHeight = imvSize.getHeight();
-			
-//			Dimension startDim = new Dimension((int) newWidth, (int) newHeight);
-//			Dimension newDim = adjustDim(startDim, adjBgDim);
-//			
-//			matrixWidth = (int) newDim.getWidth();
-//			matrixHeight = (int) newDim.getHeight();
 		}
 		
 		Dimension startDim = new Dimension((int) newWidth, (int) newHeight);
