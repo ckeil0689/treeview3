@@ -489,11 +489,11 @@ public class ExportDialog extends CustomDialog {
 	 * @param dataMatrixSize - The size of the dataMatrix (rows x columns)
 	 */
 	public void updatePreviewComponents(final ExportOptions exportOptions, 
-			final Dimension dataMatrixSize) {
+			final Dimension imvSize, final Dimension dataMatrixSize) {
 		
 		updateBackground(exportOptions);
 		Dimension bgSize = new Dimension(backgroundWidth, backgroundHeight);
-		updatePreviewMatrix(exportOptions, bgSize, dataMatrixSize);
+		updatePreviewMatrix(exportOptions, bgSize, imvSize, dataMatrixSize);
 		
 		arrangePreviewPanel();
 		
@@ -556,11 +556,14 @@ public class ExportDialog extends CustomDialog {
 	 * on the page while respecting user selected export options. 
 	 * @param exportOptions - The user selected options
 	 * @param bgSize - The dimension of the background panel
+	 * @param imvSize - Size of the InteractiveMatrixView panel for adjusting
+	 * to 'as seen on screen' 
 	 * @param dataMatrixSize - The dimension of the data matrix 
 	 * (1 element = 1px)
 	 */
 	private void updatePreviewMatrix(final ExportOptions exportOptions, 
-			final Dimension bgSize, final Dimension dataMatrixSize) {
+			final Dimension bgSize, final Dimension imvSize, 
+			final Dimension dataMatrixSize) {
 		
 		/* (!)
 		 * Using int casts throughout this method instead of Math methods,
@@ -587,70 +590,78 @@ public class ExportDialog extends CustomDialog {
 		adjustedBgWidth -= pixelBuffer;
 		adjustedBgHeight -= pixelBuffer;
 		
-		double w = dataMatrixSize.getWidth();
-		double h = dataMatrixSize.getHeight();
-		double matrixRatio = w / h;
-		
-		double newWidth = w;
-		double newHeight = h;
+		double newWidth;
+		double newHeight;
 		
 		int matrixWidth;
 		int matrixHeight;
 		
-		/* Adapt matrix size depending on selected aspect ratio */
+		Dimension adjBgDim = new Dimension(adjustedBgWidth, adjustedBgHeight);
+		/* 
+		 * Adapt matrix size depending on selected aspect ratio 
+		 * concept: grow or shrink until the bigger side fits
+		 */
 		if(exportOptions.getAspectType() == ExportAspect.ONETOONE) {
-			// Square tiles			
-			if(newWidth > adjustedBgWidth || newHeight > adjustedBgHeight) {
-				// shrink until fit
-				double shrinkFactor = 0.99;
-				while(newWidth > adjustedBgWidth 
-						|| newHeight > adjustedBgHeight) {
-					newWidth = newWidth * shrinkFactor;
-					newHeight = newHeight * shrinkFactor;
-				}
-			} else {
-				// grow until fit
-				double growthFactor = 1.01;
-				while(newWidth < adjustedBgWidth 
-						&& newHeight < adjustedBgHeight) {
-					newWidth = newWidth * growthFactor;
-					newHeight = newHeight * growthFactor;
-				}
-			}
+			// Square tiles	
+			newWidth = dataMatrixSize.getWidth();
+			newHeight = dataMatrixSize.getHeight();
 			
-			matrixWidth = (int) newWidth;
-			matrixHeight = (int) newHeight;
+//			Dimension startDim = new Dimension((int) newWidth, (int) newHeight);
+//			Dimension newDim = adjustDim(startDim, adjBgDim);
+//			
+//			matrixWidth = (int) newDim.getWidth();
+//			matrixHeight = (int) newDim.getHeight();
 						
 		// calculate fitting size for preview matrix from full matrix size	
 		} else {
-			if(adjustedBgWidth < adjustedBgHeight) {
-				// portrait
-				newWidth = treeSize;
-				newHeight = (int)(newWidth / matrixRatio);
-				
-			} else {
-				// landscape
-				if(w < h) {
-					newHeight = treeSize;
-					newWidth = (int)(newHeight * matrixRatio);
-					
-				} else {
-					newWidth = treeSize;
-					newHeight = (int)(newWidth / matrixRatio);
-				}
-			}
+			newWidth = imvSize.getWidth();
+			newHeight = imvSize.getHeight();
 			
-			matrixWidth = (int) newWidth;
-			matrixHeight = (int) newHeight;
-			
-			LogBuffer.println("Matrix width: " + newWidth);
-			LogBuffer.println("Matrix height: " + newHeight);
-			LogBuffer.println("Bg-Height: " + backgroundHeight);
-			LogBuffer.println("Bg-Width: " + backgroundWidth);
+//			Dimension startDim = new Dimension((int) newWidth, (int) newHeight);
+//			Dimension newDim = adjustDim(startDim, adjBgDim);
+//			
+//			matrixWidth = (int) newDim.getWidth();
+//			matrixHeight = (int) newDim.getHeight();
 		}
+		
+		Dimension startDim = new Dimension((int) newWidth, (int) newHeight);
+		Dimension newDim = adjustDim(startDim, adjBgDim);
+		
+		matrixWidth = (int) newDim.getWidth();
+		matrixHeight = (int) newDim.getHeight();
 		
 		matrix.setMatrixWidth(matrixWidth);
 		matrix.setMatrixHeight(matrixHeight);
+	}
+	
+	private Dimension adjustDim(final Dimension startDim, 
+			final Dimension adjBgDim) {
+		
+		double adjWidth = startDim.getWidth();
+		double adjHeight = startDim.getHeight();
+		
+		double adjustedBgWidth = adjBgDim.getWidth();
+		double adjustedBgHeight = adjBgDim.getHeight();
+		
+		if(adjWidth > adjustedBgWidth || adjHeight > adjustedBgHeight) {
+			// shrink until fit
+			double shrinkFactor = 0.99;
+			while(adjWidth > adjustedBgWidth 
+					|| adjHeight > adjustedBgHeight) {
+				adjWidth = adjWidth * shrinkFactor;
+				adjHeight = adjHeight * shrinkFactor;
+			}
+		} else {
+			// grow until fit
+			double growthFactor = 1.01;
+			while(adjWidth < adjustedBgWidth 
+					&& adjHeight < adjustedBgHeight) {
+				adjWidth = adjWidth * growthFactor;
+				adjHeight = adjHeight * growthFactor;
+			}
+		}
+		
+		return new Dimension((int) adjWidth, (int) adjHeight);
 	}
 	
 	/**

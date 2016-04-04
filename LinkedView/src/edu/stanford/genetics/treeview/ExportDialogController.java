@@ -369,6 +369,10 @@ public class ExportDialogController {
 		// One pixel = one axis element
 		Dimension matrixSize = new Dimension(model.getDataMatrix().getNumRow(), 
 				model.getDataMatrix().getNumCol());
-		exportDialog.updatePreviewComponents(exportOptions, matrixSize);
+		Dimension imvSize = new Dimension(
+				dendroView.getInteractiveMatrixView().getWidth(), 
+				dendroView.getInteractiveMatrixView().getHeight());
+		
+		exportDialog.updatePreviewComponents(exportOptions, imvSize, matrixSize);
 	}
 }
