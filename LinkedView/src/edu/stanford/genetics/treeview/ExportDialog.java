@@ -14,7 +14,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -452,21 +451,9 @@ public class ExportDialog extends CustomDialog {
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
 				+ matrix.getMatrixWidth() + "!, aligny 0, push, grow");
 		
-		background.add(previews, "grow, push, align 50%");
+		background.add(previews, "push, align 50%");
 		previewComp.add(background, "w " + backgroundWidth + "!, h " 
 				+ backgroundHeight + "!, grow, push, align 50%");
-		
-		mainPanel.revalidate();
-		mainPanel.repaint();
-	}
-	
-	/**
-	 * Add a JComponent (e.g. JPanel) to the preview panel.
-	 * @param comp The component to be added.
-	 */
-	public void addToPreviewPanel(final JComponent comp) {
-
-		previewComp.add(comp, "push, grow");
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
@@ -604,27 +591,18 @@ public class ExportDialog extends CustomDialog {
 			// Square tiles	
 			newWidth = dataMatrixSize.getWidth();
 			newHeight = dataMatrixSize.getHeight();
-			LogBuffer.println("Datamatrix ratio: " + (newWidth/newHeight));
 						
 		// calculate fitting size for preview matrix from full matrix size	
 		} else {
 			newWidth = imvSize.getWidth();
 			newHeight = imvSize.getHeight();
-			LogBuffer.println("IMVmatrix ratio: " + (newWidth/newHeight));
 		}
-		
-		LogBuffer.println("newWidth: " + newWidth);
-		LogBuffer.println("newHeight: " + newHeight);
 		
 		Dimension startDim = new Dimension((int) newWidth, (int) newHeight);
 		Dimension newDim = adjustDim(startDim, adjBgDim);
 		
 		matrixWidth = (int) newDim.getWidth();
 		matrixHeight = (int) newDim.getHeight();
-		
-		LogBuffer.println("Adjmatrix ratio: " + (matrixWidth/matrixHeight));
-		LogBuffer.println("matrixWidth: " + matrixWidth);
-		LogBuffer.println("matrixHeight: " + matrixHeight);
 		
 		matrix.setMatrixWidth(matrixWidth);
 		matrix.setMatrixHeight(matrixHeight);
