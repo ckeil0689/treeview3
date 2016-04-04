@@ -367,12 +367,40 @@ public class ExportDialogController {
 		setNewPreviewComponents(exportOptions);
 		
 		// One pixel = one axis element
-		Dimension matrixSize = new Dimension(model.getDataMatrix().getNumCol(), 
-				model.getDataMatrix().getNumRow());
+		Dimension matrixSize = getDataMatrixSize(exportOptions.getRegionType());
 		Dimension imvSize = new Dimension(
 				dendroView.getInteractiveMatrixView().getWidth(), 
 				dendroView.getInteractiveMatrixView().getHeight());
 		
 		exportDialog.updatePreviewComponents(exportOptions, imvSize, matrixSize);
+	}
+	
+	/**
+	 * Returns a Dimension in which one data element is equal to one pixel. 
+	 * The size of the dimension is dependent on the user-selected region type.
+	 * @param region - The selected RegionType
+	 * @return A Dimension describing the size of the matrix to be displayed.
+	 */
+	private Dimension getDataMatrixSize(final RegionType region) {
+		
+		int width;
+		int height;
+		
+		switch(region) {
+		case VISIBLE:
+			width = interactiveXmap.getNumVisible();
+			height = interactiveYmap.getNumVisible();
+			break;
+		case SELECTION:
+			width = tvFrame.getColSelection().getNSelectedIndexes();
+			height = tvFrame.getRowSelection().getNSelectedIndexes();
+			break;
+		case ALL:
+		default:
+			width = model.getDataMatrix().getNumCol();
+			height = model.getDataMatrix().getNumRow();
+		}
+		
+		return new Dimension(width, height);
 	}
 }
