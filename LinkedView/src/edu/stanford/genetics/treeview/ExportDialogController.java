@@ -64,7 +64,7 @@ public class ExportDialogController {
 		exportDialog.addExportListener(new ExportListener());
 		exportDialog.addFormatListener(new FormatListener());
 		exportDialog.addRegionListener(new RegionListener());
-		exportDialog.addRadioItemStateListener(new RadioItemStateListener());
+		exportDialog.addItemStateListener(new RadioItemStateListener());
 		exportDialog.addCheckBoxItemStateListener(new CheckItemStateListener());
 	}
 	

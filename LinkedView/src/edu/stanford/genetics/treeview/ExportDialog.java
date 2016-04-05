@@ -297,7 +297,7 @@ public class ExportDialog extends CustomDialog {
 	 * in the components that it has been added to.
 	 * @param l - The item listener.
 	 */
-	public void addRadioItemStateListener(final ItemListener l) {
+	public void addItemStateListener(final ItemListener l) {
 		
 		formatBox.addItemListener(l);
 		paperBox.addItemListener(l);
