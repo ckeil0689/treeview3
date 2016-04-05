@@ -2,6 +2,7 @@ package edu.stanford.genetics.treeview;
 
 import org.freehep.graphicsio.PageConstants;
 
+import Controllers.ExportHandler;
 import Controllers.FormatType;
 import Controllers.RegionType;
 
@@ -25,7 +26,7 @@ public class ExportOptions {
 		this.paperType = PaperType.getDefault();
 		this.regionType = RegionType.getDefault();
 		this.aspectType = AspectType.getDefault();
-		this.orientation = PageConstants.A4;
+		this.orientation = ExportHandler.getDefaultPageOrientation();
 		this.showSelections = false;
 	}
 	

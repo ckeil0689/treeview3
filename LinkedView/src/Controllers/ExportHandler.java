@@ -59,7 +59,7 @@ public class ExportHandler {
 	final protected TreeSelectionI rowSelection;
 
 	protected PaperType defPageSize = PaperType.getDefault();
-	protected String defPageOrientation = PageConstants.LANDSCAPE;
+	protected static String defPageOrientation = PageConstants.LANDSCAPE;
 
 	protected double aspectRatio = 1.0; //x / y
 	protected double treeRatio = 0.2; //fraction of the long content dimension
@@ -137,7 +137,7 @@ public class ExportHandler {
 	 * @author rleach
 	 * @return the defPageOrientation
 	 */
-	public String getDefaultPageOrientation() {
+	public static String getDefaultPageOrientation() {
 		return(defPageOrientation);
 	}
 
@@ -146,7 +146,7 @@ public class ExportHandler {
 	 * @param defPageOrientation the defPageOrientation to set
 	 */
 	public void setDefaultPageOrientation(String defPageOrientation) {
-		this.defPageOrientation = defPageOrientation;
+		ExportHandler.defPageOrientation = defPageOrientation;
 	}
 
 	/**
