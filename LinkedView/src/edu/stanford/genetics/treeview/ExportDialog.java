@@ -532,7 +532,7 @@ public class ExportDialog extends CustomDialog {
 			backgroundHeight = PaperType.LONGSIDE;
 			
 			background.setBackground(mainPanel.getBackground());
-			background.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+			background.setBorder(null);
 		}
 	}
 	

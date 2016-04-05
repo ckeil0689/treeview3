@@ -2020,6 +2020,7 @@ public class InteractiveMatrixView extends MatrixView {
 		
 		/* Reset the paint image boundaries to normal MapContainer bounds */
 		setSubImage();
+		repaint();
 		
 		return img;
 	}
@@ -2030,12 +2031,16 @@ public class InteractiveMatrixView extends MatrixView {
 	 */
 	public Image getSelectionImage() {
 		
+		Image img;
 		// defines the matrix region
 		setBoundedSubImage(colSelection.getMinIndex(), 
 				rowSelection.getMinIndex(), colSelection.getNSelectedIndexes(),
 				rowSelection.getNSelectedIndexes());
 		
-		return getSnapShotImage(false);
+		img = getSnapShotImage(false);
+		setSubImage();
+		
+		return img;
 	}
 	
 	/**
