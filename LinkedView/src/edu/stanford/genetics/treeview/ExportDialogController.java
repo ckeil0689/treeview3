@@ -127,13 +127,13 @@ public class ExportDialogController {
 				selRegion = RegionType.values()[selectedOptions[2]];
 			}
 
-			ExportAspect selAspect;
+			AspectType selAspect;
 			if(selectedOptions.length < 4 || selectedOptions[3] < 0 ||
-				selectedOptions[3] >= ExportAspect.values().length) {
-				selAspect = ExportAspect.getDefault();
+				selectedOptions[3] >= AspectType.values().length) {
+				selAspect = AspectType.getDefault();
 				
 			} else {
-				selAspect = ExportAspect.values()[selectedOptions[3]];
+				selAspect = AspectType.values()[selectedOptions[3]];
 			}
 
 			boolean showSelections;

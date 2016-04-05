@@ -33,7 +33,7 @@ import org.freehep.graphicsio.svg.SVGGraphics2D;
 
 import java.awt.Color;
 
-import edu.stanford.genetics.treeview.ExportAspect;
+import edu.stanford.genetics.treeview.AspectType;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PaperType;
 import edu.stanford.genetics.treeview.PpmWriter;
@@ -269,12 +269,12 @@ public class ExportHandler {
 	 * @author rleach
 	 * @param aR - aspect ratio
 	 */
-	public void setTileAspectRatio(final ExportAspect eAsp) {
-		if(eAsp == ExportAspect.ASSEEN) {
+	public void setTileAspectRatio(final AspectType eAsp) {
+		if(eAsp == AspectType.ASSEEN) {
 			setTileAspectRatioToScreen(RegionType.VISIBLE);
 		} else {
 			setTileAspectRatio(1.0);
-			if(eAsp != ExportAspect.ONETOONE) {
+			if(eAsp != AspectType.ONETOONE) {
 				LogBuffer.println("Warning: Invalid or unselected aspect " +
 					"ratio type submitted.  Defaulting to 1:1.");
 			}
@@ -336,7 +336,7 @@ public class ExportHandler {
 	}
 
 	public void setCalculatedDimensions(final RegionType region,
-		final ExportAspect aspect) {
+		final AspectType aspect) {
 
 		setTileAspectRatio(aspect);
 		setCalculatedDimensions(region,aspectRatio);
@@ -767,7 +767,7 @@ public class ExportHandler {
 	 *                         predicted size
 	 * @return
 	 */
-	public List<ExportAspect> getOversizedAspects(
+	public List<AspectType> getOversizedAspects(
 		final RegionType selectedRegion) {
 
 		//Save the current dimension values
@@ -777,9 +777,9 @@ public class ExportHandler {
 		int saveTileWidth   = tileWidth;
 		int saveGapSize     = treeMatrixGapSize;
 
-		List<ExportAspect> asps = new ArrayList<ExportAspect>();
-		for(int i = 0;i < ExportAspect.values().length;i++) {
-			ExportAspect aspect = ExportAspect.values()[i];
+		List<AspectType> asps = new ArrayList<AspectType>();
+		for(int i = 0;i < AspectType.values().length;i++) {
+			AspectType aspect = AspectType.values()[i];
 			setCalculatedDimensions(selectedRegion,aspect);
 			//If this aspect results in an image that is too big
 			if(((double) getXDim(selectedRegion) /

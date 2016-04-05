@@ -233,15 +233,15 @@ public class ExportDialog extends CustomDialog {
 		final RegionType selectedRegion,final FormatType selectedFormat) {
 
 		// Switched to normal for loop to handle last button via index
-		ExportAspect[] vals = ExportAspect.values();
+		AspectType[] vals = AspectType.values();
 		for(int i = 0; i < vals.length; i++) {
-			ExportAspect asp = vals[i];
+			AspectType asp = vals[i];
 			JRadioButton option = new JRadioButton(asp.toString());
-			List<ExportAspect> tooBigs =
+			List<AspectType> tooBigs =
 				eh.getOversizedAspects(selectedRegion);
 			//Default region pre-selected
-			ExportAspect defAsp = (selectedFormat.isDocumentFormat() ?
-				ExportAspect.getDefault() : ExportAspect.getDefault(tooBigs));
+			AspectType defAsp = (selectedFormat.isDocumentFormat() ?
+				AspectType.getDefault() : AspectType.getDefault(tooBigs));
 			if(asp == defAsp) {
 				option.setSelected(true);
 			}
@@ -587,7 +587,7 @@ public class ExportDialog extends CustomDialog {
 		 * Adapt matrix size depending on selected aspect ratio 
 		 * concept: grow or shrink until the bigger side fits
 		 */
-		if(exportOptions.getAspectType() == ExportAspect.ONETOONE) {
+		if(exportOptions.getAspectType() == AspectType.ONETOONE) {
 			// Square tiles	
 			newWidth = dataMatrixSize.getWidth();
 			newHeight = dataMatrixSize.getHeight();
@@ -719,13 +719,13 @@ public class ExportDialog extends CustomDialog {
 
 		Enumeration<AbstractButton> aBtns = aspectRadioBtns.getElements();
 		boolean changeSelected = false;
-		List<ExportAspect> bigAsps = new ArrayList<ExportAspect>();
+		List<AspectType> bigAsps = new ArrayList<AspectType>();
 
 		//Check if aspect radio buttons need to be disabled/enabled based on
 		//selected region
 		while(aBtns.hasMoreElements()) {
 			AbstractButton option = aBtns.nextElement();
-			ExportAspect asp = ExportAspect.getAspect(option.getText());
+			AspectType asp = AspectType.getAspect(option.getText());
 			eh.setTileAspectRatio(asp);
 			eh.setCalculatedDimensions(selectedRegion);
 			final boolean tooBig = eh.isOversized(selectedRegion);
@@ -747,18 +747,18 @@ public class ExportDialog extends CustomDialog {
 
 		//If the selected option was disabled, select a new default
 		if(changeSelected) {
-			ExportAspect defAsp;
+			AspectType defAsp;
 			if(isDocFormat) {
-				defAsp = ExportAspect.getDefault();
+				defAsp = AspectType.getDefault();
 			} else {
-				defAsp = ExportAspect.getDefault(bigAsps);
+				defAsp = AspectType.getDefault(bigAsps);
 			}
 
 			if(defAsp != null) {
 				aBtns = aspectRadioBtns.getElements();
 				while(aBtns.hasMoreElements()) {
 					AbstractButton option = aBtns.nextElement();
-					ExportAspect asp = ExportAspect.getAspect(option.getText());
+					AspectType asp = AspectType.getAspect(option.getText());
 					if(asp == defAsp) {
 						option.setSelected(true);
 					}
@@ -779,7 +779,7 @@ public class ExportDialog extends CustomDialog {
 		exportOptions.setOrientation((String)orientBox.getSelectedItem());
 		
 		/* Aspect ratio */
-		ExportAspect aspectType = ExportAspect.getDefault();
+		AspectType aspectType = AspectType.getDefault();
 		String buttonText = "default";
 		for(Enumeration<AbstractButton> buttons = aspectRadioBtns.getElements();
 				buttons.hasMoreElements();) {
@@ -790,7 +790,7 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 		
-		for(ExportAspect eA : ExportAspect.values()) {
+		for(AspectType eA : AspectType.values()) {
 			if(eA.toString().equalsIgnoreCase(buttonText)) {
 				aspectType = eA;
 				break;

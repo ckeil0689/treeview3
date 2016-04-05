@@ -15,7 +15,7 @@ public class ExportOptions {
 	private FormatType formatType;
 	private PaperType paperType;
 	private RegionType regionType;
-	private ExportAspect aspectType;
+	private AspectType aspectType;
 	private String orientation;
 	private boolean showSelections;
 	
@@ -24,7 +24,7 @@ public class ExportOptions {
 		this.formatType = FormatType.getDefault();
 		this.paperType = PaperType.getDefault();
 		this.regionType = RegionType.getDefault();
-		this.aspectType = ExportAspect.getDefault();
+		this.aspectType = AspectType.getDefault();
 		this.orientation = PageConstants.A4;
 		this.showSelections = false;
 	}
@@ -45,7 +45,7 @@ public class ExportOptions {
 		return regionType;
 	}
 	
-	public ExportAspect getAspectType() {
+	public AspectType getAspectType() {
 		return aspectType;
 	}
 	
@@ -77,7 +77,7 @@ public class ExportOptions {
 		this.regionType = regionType;
 	}
 
-	public void setAspectType(ExportAspect aspectType) {
+	public void setAspectType(AspectType aspectType) {
 		this.aspectType = aspectType;
 	}
 
