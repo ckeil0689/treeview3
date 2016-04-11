@@ -23,6 +23,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
+import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -83,7 +84,10 @@ public abstract class ViewFrame extends Observable implements Observer,
 		final int height = configNode.getInt("frame_height", init_height);
 
 		appFrame.setBounds(left, top, width, height);
-		appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//Handle app quit via a confirmation box, so set the default close
+		//operation to do nothing. Closing will be handled by an explicit call
+		//to dispose.
+		appFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		setupWindowListener();
 	}
@@ -272,32 +276,43 @@ public abstract class ViewFrame extends Observable implements Observer,
 	public void closeWindow() {
 
 		/* Confirm user's intent to exit the application. */
-		final int option = JOptionPane.showConfirmDialog(appFrame,
-				"Are you sure you want to close TreeView?", "Exit TreeView?",
-				JOptionPane.YES_NO_OPTION);
+		Object[] options = {"Quit","Cancel"};
+		final int choice = JOptionPane.showOptionDialog(appFrame,
+			"Quit TreeView?", "Quit TreeView?",JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.WARNING_MESSAGE,null,options,options[1]);
 
-		switch (option) {
+		switch (choice) {
 
-		case JOptionPane.YES_OPTION:
-			LogBuffer.println("Saving settings before window close.");
-			// Not sure a call to saveSettings is necessary anymore because
-			// added
-			// calls upon window resize and winow move in DendroController and
-			// ViewFrame respectively. If it does something other than save
-			// those two things, then sure, there's reason to keep it. However,
-			// note that resizing the window without data loaded does not save
-			// settings because it's tied to the matrix jpanel
-			saveSettings();
-			appFrame.dispose();
-			LogBuffer.println("Will this print, and when?.");
-			System.exit(0);
-			break;
+			case JOptionPane.OK_OPTION:
+				LogBuffer.println("Saving settings before window close.");
 
-		case JOptionPane.NO_OPTION:
-			return;
+				// Not sure a call to saveSettings is necessary anymore because
+				// added calls upon window resize and window move in
+				// DendroController and ViewFrame respectively. If it does
+				// something other than save those two things, then sure,
+				// there's reason to keep it. However, note that resizing the
+				// window without data loaded does not save settings because
+				// it's tied to the matrix jpanel
+				saveSettings();
 
-		default:
-			return;
+				appFrame.dispose();
+
+				//Commented this call to System.exit out while working on issue
+				//#369 because it seems to currently be quitting in a timely
+				//manner without it.  Perhaps the resolution of 369 has made
+				//this actually work...  If we experience issues similar to
+				//issue #74 on bitbucket, we should uncomment this line again:
+				//https://bitbucket.org/TreeView3Dev/treeview3/issues/74/selecting-close-window-leaves-the-app-in-a
+//				System.exit(0);
+
+				break;
+			case JOptionPane.CANCEL_OPTION:
+				LogBuffer.println("User decided not to quit treeview.");
+				return;
+			default:
+				LogBuffer.println("User closed the confirmation window (same " +
+					"as cancel).");
+				return;
 		}
 	}
 
