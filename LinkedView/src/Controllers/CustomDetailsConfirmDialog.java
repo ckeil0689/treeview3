@@ -48,40 +48,54 @@ public class CustomDetailsConfirmDialog {
 		message.setPreferredSize(labelSize);
 		content.add(message);
 
-//		final JTextArea textPane = new JTextArea();
 		final JTextPane textPane = new JTextPane();
 		textPane.setContentType("text/html");
 		textPane.setText(details);
-//		textPane.setWrapStyleWord(true);
-//		textPane.setSize((int) labelSize.getWidth(),50);
-		final Dimension detailSize = new Dimension((int) labelSize.getWidth(),(int) labelSize.getHeight() + 150);
-//		detailSize.setSize(labelSize.getWidth(),100);
-		textPane.setMaximumSize(detailSize);
-		textPane.setSize(detailSize);
-		content.setMaximumSize(detailSize);
-		content.setSize(detailSize);
-//		textPane.setSize(50,50);
 		textPane.setEditable(false);
 
-		final JScrollPane scrollPane = new JScrollPane(textPane);
-		scrollPane.setAlignmentX(0);
-		scrollPane.setMaximumSize(detailSize);
-		scrollPane.setSize(detailSize);
+		//Determine the width of the summary message to use for the width of the
+		//detail pane (and set a static height).
+		final Dimension detailSize = new Dimension((int) labelSize.getWidth(),
+			200);
 
+		//The message may be too big to fit in a dialog window, so we will throw
+		//it in a scrollpane.
+		final JScrollPane scrollPane = new JScrollPane(textPane);
+
+		//This aligns the details pane with the summary message above it
+		scrollPane.setAlignmentX(0);
+
+		//This pares down the size of the details panel to the width of the
+		//summary message above it
+		scrollPane.setMaximumSize(detailSize);
+
+		//Create a pane to put everything in and then create a dialog out of it.
 		final JOptionPane pane = new JOptionPane(
 			content,
 			JOptionPane.WARNING_MESSAGE,
 			JOptionPane.OK_CANCEL_OPTION);
 		final JDialog dialog = pane.createDialog(parentFrame,title);
-		pane.setMaximumSize(detailSize);
-		dialog.setMaximumSize(detailSize);
-		final Dimension winSize = new Dimension((int) detailSize.getWidth() + 200,(int) labelSize.getHeight() + 150);
-		final Dimension largeWinSize = new Dimension((int) detailSize.getWidth() + 200,(int) detailSize.getHeight() + 150);
 
+		//Determine the 2 different window sizes (with & without the details
+		//pane)
+		final Dimension winSize =
+			new Dimension((int) detailSize.getWidth() + 200,
+				(int) labelSize.getHeight() + 150);
+		final Dimension largeWinSize =
+			new Dimension((int) detailSize.getWidth() + 200,
+				(int) detailSize.getHeight() + 150);
+
+		//Create the details checkbox with a listener that adds/removes the
+		//detail message and updates the window size to accommodate it
 		JCheckBox cb = new JCheckBox(new AbstractAction() {
 
 			private static final long serialVersionUID = 1L;
 
+			//I'm not sure I understand why this needs to be in an anonymous
+			//code block, but it doesn't compile without it.
+			//Apparently it's an anonymous subclass to give the parent class an
+			//instance initializer:
+			//http://stackoverflow.com/questions/891380/java-anonymous-class-that-implements-actionlistener
 			{
 				this.putValue(Action.SELECTED_KEY,false);
 				this.putValue(Action.NAME,"Details");
@@ -89,6 +103,8 @@ public class CustomDetailsConfirmDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
+				//Adjust the dialog content and determine window size
 				Dimension newWinSize = new Dimension();
 				if ((Boolean) this.getValue(Action.SELECTED_KEY)) {
 					content.add(scrollPane);
@@ -98,11 +114,13 @@ public class CustomDetailsConfirmDialog {
 					newWinSize = winSize;
 				}
 				content.invalidate();
-				content.setMaximumSize(detailSize);
-				content.setSize(detailSize);
 				dialog.invalidate();
+
+				//pack does not work here, because it uses the length of the
+				//detail message as if it was all 1 line, hence the setting of
+				//static sizes...
 //				dialog.pack();
-				dialog.setMaximumSize(newWinSize);
+
 				dialog.setSize(newWinSize);
 			}
 		});
