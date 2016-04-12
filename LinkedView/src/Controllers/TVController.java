@@ -107,11 +107,25 @@ public class TVController implements Observer {
 	public void resetPreferences() {
 
 		try {
-			final int option = JOptionPane.showConfirmDialog(
-					Frame.getFrames()[0],
-					"Are you sure you want to reset preferences and "
-							+ "close TreeView?", "Reset Preferences?",
-					JOptionPane.YES_NO_OPTION);
+			final int option = CustomDetailsConfirmDialog.showDialog(
+				Frame.getFrames()[0],"Reset Preferences?",
+				"Are you sure you want to reset the preferences and quit " +
+				"TreeView?<BR>\nCustom settings such as colors will be reset to " +
+				"default for all files.",
+				"Resetting the application-wide preferences can frequently " +
+				"resolve behavior and display problems. TreeView3 keeps track " +
+				"of input-file-specific settings independent of the input " +
+				"file itself, so resetting the preferences affects things " +
+				"like custom label and color settings for all previously " +
+				"viewed files. These are things like, selected fonts, custom " +
+				"color selections, the data values associated with those " +
+				"colors in the chosen spectrum, minimum font size, and the " +
+				"selected label type to display as the row/column labels. " +
+				"Other things such as 'last file opened', the starting " +
+				"directory in the open file dialog, and window size/position " +
+				"will also be lost. Your data in the files remains untouched. " +
+				"Only superficial data is lost. Clustering, trees, and data " +
+				"values remain intact.");
 
 			switch (option) {
 
