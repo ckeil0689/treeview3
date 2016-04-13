@@ -276,7 +276,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 	public void closeWindow() {
 
 		/* Confirm user's intent to exit the application. */
-		Object[] options = {"Quit","Cancel"};
+		String[] options = {"Quit","Cancel"};
 		final int choice = JOptionPane.showOptionDialog(appFrame,
 			"Quit TreeView?", "Quit TreeView?",JOptionPane.OK_CANCEL_OPTION,
 			JOptionPane.WARNING_MESSAGE,null,options,options[1]);
