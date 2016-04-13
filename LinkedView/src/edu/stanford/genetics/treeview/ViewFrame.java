@@ -297,13 +297,17 @@ public abstract class ViewFrame extends Observable implements Observer,
 
 				appFrame.dispose();
 
-				//Commented this call to System.exit out while working on issue
-				//#369 because it seems to currently be quitting in a timely
-				//manner without it.  Perhaps the resolution of 369 has made
-				//this actually work...  If we experience issues similar to
-				//issue #74 on bitbucket, we should uncomment this line again:
+				//The JVM exits when the last non-daemon thread exits.
+				//System.exit(0) is called here because there are some threads
+				//which I have found to be in wait-mode after execution (via
+				//profiling). Plain termination of the main() method does not
+				//guarantee that the JVM fully shuts down, since non-daemon
+				//threads may still be alive.  It's a fail-safe for now and
+				//could probably be removed at some point if we can ensure those
+				//threads get cleaned up.  Refer to issue #74 on bitbucket for
+				//more info:
 				//https://bitbucket.org/TreeView3Dev/treeview3/issues/74/selecting-close-window-leaves-the-app-in-a
-//				System.exit(0);
+				System.exit(0);
 
 				break;
 			case JOptionPane.CANCEL_OPTION:
