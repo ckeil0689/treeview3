@@ -39,35 +39,29 @@ public class CustomDetailsConfirmDialog {
 	public static int showDialog(Frame parentFrame,String title,String summary,
 		String details) {
 
-		final JPanel content = new JPanel();
-		content.setLayout(new BoxLayout(content,BoxLayout.PAGE_AXIS));
+		//Determine how big to make the line length in the details pane
+		int maxLineLen = getLongestLineLength(summary,null);
+		//The font size of the detail message for some reason is smaller than
+		//that of the summary which determines dialog window size, so this is an
+		//estimate to increase the line length in the details to roughly match
+		//the pixel line length of the summary
+		maxLineLen += (int) ((double) maxLineLen * 0.1);
+		int lineLen = maxLineLen > 50 ? maxLineLen : 50;
 
-		JLabel message = new JLabel("<HTML>" + summary + "</HTML>");
-		message.setBorder(new EmptyBorder(10,10,10,10));
-		Dimension labelSize = message.getPreferredSize();
-		message.setPreferredSize(labelSize);
-		content.add(message);
-
+		//Create the details pane with inserted line wraps
 		final JTextPane textPane = new JTextPane();
 		textPane.setContentType("text/html");
-		textPane.setText(details);
+		textPane.setText("<HTML>" + getWrappedString(details,lineLen,"<BR>\n") +
+			"</HTML>");
 		textPane.setEditable(false);
-
-		//Determine the width of the summary message to use for the width of the
-		//detail pane (and set a static height).
-		final Dimension detailSize = new Dimension((int) labelSize.getWidth(),
-			200);
 
 		//The message may be too big to fit in a dialog window, so we will throw
 		//it in a scrollpane.
 		final JScrollPane scrollPane = new JScrollPane(textPane);
-
-		//This aligns the details pane with the summary message above it
 		scrollPane.setAlignmentX(0);
 
-		//This pares down the size of the details panel to the width of the
-		//summary message above it
-		scrollPane.setMaximumSize(detailSize);
+		final JPanel content = new JPanel();
+		content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
 
 		//Create a pane to put everything in and then create a dialog out of it.
 		final JOptionPane pane = new JOptionPane(
@@ -76,14 +70,17 @@ public class CustomDetailsConfirmDialog {
 			JOptionPane.OK_CANCEL_OPTION);
 		final JDialog dialog = pane.createDialog(parentFrame,title);
 
-		//Determine the 2 different window sizes (with & without the details
-		//pane)
-		final Dimension winSize =
-			new Dimension((int) detailSize.getWidth() + 200,
-				(int) labelSize.getHeight() + 150);
-		final Dimension largeWinSize =
-			new Dimension((int) detailSize.getWidth() + 200,
-				(int) detailSize.getHeight() + 150);
+		//Create the summary message
+		JLabel message = new JLabel("<HTML>" + summary + "</HTML>");
+		message.setBorder(new EmptyBorder(10,10,10,10));
+		message.setAlignmentX(0);
+		Dimension labelSize = message.getPreferredSize();
+		//If the message is long, set a preferred limited window width
+		if(labelSize.width > 500) {
+			labelSize.setSize(500,labelSize.height);
+			message.setPreferredSize(labelSize);
+		}
+		content.add(message);
 
 		//Create the details checkbox with a listener that adds/removes the
 		//detail message and updates the window size to accommodate it
@@ -103,25 +100,14 @@ public class CustomDetailsConfirmDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
-				//Adjust the dialog content and determine window size
-				Dimension newWinSize = new Dimension();
 				if ((Boolean) this.getValue(Action.SELECTED_KEY)) {
 					content.add(scrollPane);
-					newWinSize = largeWinSize;
 				} else {
 					content.remove(scrollPane);
-					newWinSize = winSize;
 				}
 				content.invalidate();
 				dialog.invalidate();
-
-				//pack does not work here, because it uses the length of the
-				//detail message as if it was all 1 line, hence the setting of
-				//static sizes...
-//				dialog.pack();
-
-				dialog.setSize(newWinSize);
+				dialog.pack();
 			}
 		});
 		content.add(cb);
@@ -130,7 +116,6 @@ public class CustomDetailsConfirmDialog {
 		dialog.pack();
 		dialog.setLocationRelativeTo(parentFrame);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setSize(winSize);
 		dialog.setVisible(true);
 
 		//Retrieve the selected option
@@ -156,5 +141,69 @@ public class CustomDetailsConfirmDialog {
 		}
 
 		return(selection);
+	}
+
+	/**
+	 * Returns the length of the longest line in a string.
+	 * 
+	 * @param s
+	 * @param lineDelimiter - defaults to "\n"
+	 * @return
+	 */
+	public static int getLongestLineLength(final String s,String lineDelimiter) {
+		if(lineDelimiter == null) {
+			lineDelimiter = "\n";
+		}
+		int maxLineLen = 0;
+		int lastLinePos = -1;
+		int i = 0;
+		while((i = s.indexOf(lineDelimiter,lastLinePos + 1)) != -1) {
+			if((i - lastLinePos) > maxLineLen) {
+				maxLineLen = i - lastLinePos;
+			}
+			lastLinePos = i;
+		}
+		return(maxLineLen);
+	}
+
+	/**
+	 * Takes a string and returns the same string with supplied delimiters
+	 * inserted where spaces are found just before indicated line length
+	 * positions
+	 * 
+	 * @param s - supplied string
+	 * @param lineLength - defaults to 80
+	 * @param lineDelimiter - Defaults to "\n"
+	 * @return wrapped string
+	 */
+	public static String getWrappedString(final String s,int lineLength,
+		String lineDelimiter) {
+
+		if(((Integer) lineLength) == null || lineLength < 1) {
+			lineLength = 80;
+		}
+
+		if(lineDelimiter == null) {
+			lineDelimiter = "\n";
+		}
+
+		StringBuilder sb = new StringBuilder(s);
+
+		//Check whether there are already delimiters in the string
+		if(sb.indexOf(lineDelimiter,0) != -1) {
+			LogBuffer.println("ERROR: The submitted string appears to already " +
+				"have been wrapped.");
+			return(s);
+		}
+
+		int i = 0;
+		while(i + lineLength < sb.length() &&
+			(i = sb.lastIndexOf(" ",i + lineLength)) != -1) {
+
+			sb.replace(i,i + 1,lineDelimiter);
+			i += lineDelimiter.length() - 1;
+		}
+
+		return(sb.toString());
 	}
 }
