@@ -29,6 +29,11 @@ public enum Format {
 		return(Format.PDF);
 	}
 
+	public static Format[] getHiResFormats() {
+		Format[] hiResFormats = {PDF,SVG,PS,PNG,PPM};
+		return(hiResFormats);
+	}
+
 	public static Format[] getDocumentFormats() {
 		Format[] docFormats = {PDF,SVG,PS};
 		return(docFormats);

@@ -62,11 +62,11 @@ public class ExportDialogController {
 
 			Format selFormat;
 			if(selectedOptions.length < 1 || selectedOptions[0] < 0 ||
-				selectedOptions[0] >= Format.values().length) {
+				selectedOptions[0] >= Format.getHiResFormats().length) {
 
 				selFormat = Format.getDefault();
 			} else {
-				selFormat = Format.values()[selectedOptions[0]];
+				selFormat = Format.getHiResFormats()[selectedOptions[0]];
 			}
 
 			PaperType selPaper;
@@ -205,10 +205,10 @@ public class ExportDialogController {
 
 			Format selFormat;
 			if(selectedOptions.length < 1 || selectedOptions[0] < 0 ||
-				selectedOptions[0] >= Format.values().length) {
+				selectedOptions[0] >= Format.getHiResFormats().length) {
 				selFormat = Format.getDefault();
 			} else {
-				selFormat = Format.values()[selectedOptions[0]];
+				selFormat = Format.getHiResFormats()[selectedOptions[0]];
 			}
 
 			exportDialog.getPaperBox().setEnabled(selFormat.isDocumentFormat());
@@ -238,10 +238,10 @@ public class ExportDialogController {
 
 			Format selFormat;
 			if(selectedOptions.length < 1 || selectedOptions[0] < 0 ||
-				selectedOptions[0] >= Format.values().length) {
+				selectedOptions[0] >= Format.getHiResFormats().length) {
 				selFormat = Format.getDefault();
 			} else {
-				selFormat = Format.values()[selectedOptions[0]];
+				selFormat = Format.getHiResFormats()[selectedOptions[0]];
 			}
 
 			Region selRegion;
