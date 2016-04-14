@@ -18,7 +18,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.FileImageOutputStream;
 
 import org.freehep.graphics2d.VectorGraphics;
 import org.freehep.graphicsio.PageConstants;
@@ -539,7 +544,14 @@ public class ExportHandler {
 			if(format == Format.PNG) {
 				ImageIO.write(im,"png",exportFile);
 			} else if(format == Format.JPG) {
-				ImageIO.write(im,"jpg",exportFile);
+				//Code from http://stackoverflow.com/questions/17108234/setting-jpg-compression-level-with-imageio-in-java
+				JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+				jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+				jpegParams.setCompressionQuality(1f);
+				final ImageWriter writer =
+					ImageIO.getImageWritersByFormatName("jpg").next();
+				writer.setOutput(new FileImageOutputStream(exportFile));
+				writer.write(null,new IIOImage(im,null,null),jpegParams);
 			} else if(format == Format.PPM) { //ppm = bitmat
 				final OutputStream os = new BufferedOutputStream(
 					new FileOutputStream(exportFile));

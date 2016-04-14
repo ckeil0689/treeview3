@@ -82,7 +82,7 @@ public class ExportDialog extends CustomDialog {
 
 		Format selectedFormat = Format.getDefault();
 		if(eh.isImageExportPossible()) {
-			formatBox = new JComboBox<Object>(Format.values());
+			formatBox = new JComboBox<Object>(Format.getHiResFormats());
 			formatBox.setSelectedItem(Format.getDefault());
 		} else {
 			selectedFormat = Format.getDefaultDocumentFormat();
