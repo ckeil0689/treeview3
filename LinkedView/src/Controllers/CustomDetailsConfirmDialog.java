@@ -57,27 +57,6 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 	 */
 	@Override
 	protected void setupLayout() {
-		//Determine how big to make the line length in the details pane
-		int maxLineLen = getLongestLineLength(summary,null);
-		//The font size of the detail message for some reason is smaller than
-		//that of the summary which determines dialog window size, so this is an
-		//estimate to increase the line length in the details to roughly match
-		//the pixel line length of the summary
-		maxLineLen += (int) ((double) maxLineLen * 0.1);
-		int lineLen = maxLineLen > 50 ? maxLineLen : 50;
-
-		//Create the details pane with inserted line wraps
-		final JTextPane textPane = new JTextPane();
-		textPane.setContentType("text/html");
-		textPane.setText("<HTML>" + getWrappedString(details,lineLen,"<BR>\n") +
-			"</HTML>");
-		textPane.setEditable(false);
-
-		//The message may be too big to fit in a dialog window, so we will throw
-		//it in a scrollpane.
-		final JScrollPane scrollPane = new JScrollPane(textPane);
-		scrollPane.setAlignmentX(0);
-
 		final JPanel content = new JPanel();
 		content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
 
@@ -99,6 +78,21 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 			message.setPreferredSize(labelSize);
 		}
 		content.add(message);
+
+		//Create the details pane with inserted line wraps
+		final JTextArea textArea = new JTextArea();
+		textArea.setLineWrap(true);
+		textArea.setWrapStyleWord(true);
+		textArea.setText(details);
+		textArea.setEditable(false);
+
+		//The message may be too big to fit in a dialog window, so we will throw
+		//it in a scrollpane.
+		final JScrollPane scrollPane = new JScrollPane(textArea);
+		scrollPane.setAlignmentX(0);
+		Dimension detailSize = textArea.getPreferredSize();
+		detailSize.setSize(labelSize.width,200);
+		scrollPane.setPreferredSize(detailSize);
 
 		//Create the details checkbox with a listener that adds/removes the
 		//detail message and updates the window size to accommodate it
@@ -161,69 +155,5 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 		}
 
 		return(selection);
-	}
-
-	/**
-	 * Returns the length of the longest line in a string.
-	 * 
-	 * @param s
-	 * @param lineDelimiter - defaults to "\n"
-	 * @return
-	 */
-	public static int getLongestLineLength(final String s,String lineDelimiter) {
-		if(lineDelimiter == null) {
-			lineDelimiter = "\n";
-		}
-		int maxLineLen = 0;
-		int lastLinePos = -1;
-		int i = 0;
-		while((i = s.indexOf(lineDelimiter,lastLinePos + 1)) != -1) {
-			if((i - lastLinePos) > maxLineLen) {
-				maxLineLen = i - lastLinePos;
-			}
-			lastLinePos = i;
-		}
-		return(maxLineLen);
-	}
-
-	/**
-	 * Takes a string and returns the same string with supplied delimiters
-	 * inserted where spaces are found just before indicated line length
-	 * positions
-	 * 
-	 * @param s - supplied string
-	 * @param lineLength - defaults to 80
-	 * @param lineDelimiter - Defaults to "\n"
-	 * @return wrapped string
-	 */
-	public static String getWrappedString(final String s,int lineLength,
-		String lineDelimiter) {
-
-		if(((Integer) lineLength) == null || lineLength < 1) {
-			lineLength = 80;
-		}
-
-		if(lineDelimiter == null) {
-			lineDelimiter = "\n";
-		}
-
-		StringBuilder sb = new StringBuilder(s);
-
-		//Check whether there are already delimiters in the string
-		if(sb.indexOf(lineDelimiter,0) != -1) {
-			LogBuffer.println("ERROR: The submitted string appears to already " +
-				"have been wrapped.");
-			return(s);
-		}
-
-		int i = 0;
-		while(i + lineLength < sb.length() &&
-			(i = sb.lastIndexOf(" ",i + lineLength)) != -1) {
-
-			sb.replace(i,i + 1,lineDelimiter);
-			i += lineDelimiter.length() - 1;
-		}
-
-		return(sb.toString());
 	}
 }
