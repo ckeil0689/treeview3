@@ -1417,6 +1417,13 @@ public class MapContainer extends Observable implements Observer,
 		
 		scrollToIndex(scrollVal);
 
+		int firstX = 0;
+		while (firstX < getMaxIndex() && !isVisible(firstX)) {
+			firstX++;
+		}
+
+		setFirstVisible(firstX);
+
 		/*
 		 * TODO move this outside to avoid multiple calls? center and zoom 
 		 * are usually called together... 
@@ -1433,7 +1440,6 @@ public class MapContainer extends Observable implements Observer,
 		
 		if(numVisible == 0) {
 			setNumVisible(getTotalTileNum());
-			setFirstVisible(0);
 		}
 
 		double newScale = (double) getAvailablePixels() / (double) numVisible;
@@ -1554,7 +1560,7 @@ public class MapContainer extends Observable implements Observer,
 		// Keep track of the first visible index
 		// This used to be set using scrollbar.getVisibleAmount, but that can
 		// change implicitly when the window is resized.
-		setFirstVisibleStrictly(scrollVal);
+		setFirstVisible(scrollVal);
 
 		//Image needs to be updated if either scroll position changes (because a
 		//scroll of the labels changes the blue box)
@@ -1565,11 +1571,12 @@ public class MapContainer extends Observable implements Observer,
 
 	public void scrollToFirstIndex(int i) {
 
-		if(i < getMinIndex() || i + getNumVisible() - 1 > getMaxIndex()) {
+		if(i < getMinIndex() || i > getMaxIndex()) {
 			if(i < 0) {
 				i = 0;
 			} else {
-				i = getTotalTileNum() - getNumVisible();
+				LogBuffer.println("ERROR: Index out of range: " + i);
+				return;
 			}
 		}
 		
@@ -1578,7 +1585,7 @@ public class MapContainer extends Observable implements Observer,
 		scrollbar.setValue(i);
 
 		// Keep track of the first visible index
-		setFirstVisibleStrictly(i);
+		setFirstVisible(i);
 
 		if (j != scrollbar.getValue()) {
 			setChanged();
@@ -1610,14 +1617,14 @@ public class MapContainer extends Observable implements Observer,
 		if(newVal < scrollbar.getMinimum() ) {
 			newVal = scrollbar.getMinimum();
 			
-		} else if(newVal + getNumVisible() - 1 > scrollbar.getMaximum()) {
-			newVal = scrollbar.getMaximum() - getNumVisible() + 1;
+		} else if(newVal + getNumVisible() > scrollbar.getMaximum()) {
+			newVal = scrollbar.getMaximum() - getNumVisible();
 		}
 		
 		scrollbar.setValue(newVal);
 
 		// Keep track of the first visible index
-		setFirstVisibleStrictly(newVal);
+		setFirstVisible(newVal);
 
 		if (j != scrollbar.getValue()) {
 			setChanged();
@@ -1661,7 +1668,7 @@ public class MapContainer extends Observable implements Observer,
 			final int max = current.getMaxIndex() - current.getMinIndex() + 1;
 			if (value + extent > max) {
 				value = max - extent;
-				setFirstVisibleStrictly(value);
+				setFirstVisible(value);
 			}
 
 			if (value < 0) {
@@ -1871,18 +1878,11 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	public void setFirstVisible(final int i) {
-		if(i >= 0 && i < getTotalTileNum()) {
+		if (i >= 0 && i < getTotalTileNum()) {
 			firstVisible = i;
 		}
 	}
 
-	/**
-	 * If doing a combination of zoom & scroll (such as zooming into a center
-	 * tile), call setNumVisible first and then call this method to ensure no
-	 * invalid values get set.
-	 * 
-	 * @param i
-	 */
 	public void setFirstVisibleStrictly(final int i) {
 		if (i < 0) {
 			firstVisible = 0;
@@ -1997,15 +1997,15 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	public int getFirstVisible() {
-		/** TODO: For some undetermined reason, this method encounters an
+		/** TODO: For some undetermined reason, the above sometimes yields an
 		 * out of bounds number. I suspect that it has something to do with
 		 * multiple cells under a single pixel, but I'm not sure. For now, this
 		 * work-around will prevent exceptions. Figure this out & fix it
 		 * eventually. */
 		if(firstVisible + numVisible - 1 > getMaxIndex()) {
 			LogBuffer.println("Warning: Encountered invalid/too-large " +
-				"firstVisible value: [" + firstVisible + "] (firstVisible + numVisible - 1 > getMaxIndex() : " + firstVisible + " + " + numVisible + " - 1 > " + getMaxIndex() + ").  Resetting.");
-			firstVisible = getMaxIndex() - numVisible + 1;
+				"firstVisible value: [" + firstVisible + "].  Resetting.");
+			firstVisible = getMaxIndex() - numVisible;
 		}
 		if(firstVisible < 0) {
 			LogBuffer.println("Warning: Encountered invalid/negative " +
