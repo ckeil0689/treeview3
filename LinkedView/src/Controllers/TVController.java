@@ -107,8 +107,8 @@ public class TVController implements Observer {
 	public void resetPreferences() {
 
 		try {
-			final int option = CustomDetailsConfirmDialog.showDialog(
-				Frame.getFrames()[0],"Reset Preferences?",
+			int option = (new CustomDetailsConfirmDialog(
+				(JFrame) JFrame.getFrames()[0],"Reset Preferences?",
 				"Are you sure you want to reset the preferences and quit " +
 				"TreeView?<BR>\nCustom settings such as colors will be reset to " +
 				"default for all files.",
@@ -125,7 +125,7 @@ public class TVController implements Observer {
 				"directory in the open file dialog, and window size/position " +
 				"will also be lost. Your data in the files remains untouched. " +
 				"Only superficial data is lost. Clustering, trees, and data " +
-				"values remain intact.");
+				"values remain intact.")).getSelection();
 
 			switch (option) {
 

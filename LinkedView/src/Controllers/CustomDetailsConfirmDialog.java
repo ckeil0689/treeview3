@@ -6,8 +6,9 @@
  */
 
 package Controllers;
+import Utilities.CustomDialog;
+
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 
 import javax.swing.*;
@@ -20,25 +21,42 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * Original code from:
  * http://www.javaknowledge.info/custom-jdialog-with-expandable-details-pane/
  */
-public class CustomDetailsConfirmDialog {
+public class CustomDetailsConfirmDialog extends CustomDialog {
+
+	private static final long serialVersionUID = 1L;
+
+	private final JFrame parentFrame;
+	private final String title;
+	private final String summary;
+	private final String details;
+	private JOptionPane pane;
 
 	/**
-	 * Shows a confirmation dialog of type OK_CANCEL_OPTION with a confirmation
-	 * message and initially hidden explanation.  To be used for confirmations
-	 * which have extensive ramifications a user should really understand before
-	 * confirming, but which would be too verbose for someone who knows what
-	 * they're doing.  The dialog is presented as a warning dialog.
+	 * Constructor
 	 * 
-	 * @param parentFrame - For relative positioning of the dialog
-	 * @param title - For the title in the dialog window's title bar
-	 * @param summary - The short version of the confirmation message.
-	 * @param details - An initially hidden extended explanation of the
-	 *                  confirmation message
-	 * @return
+	 * @param parentFrame
+	 * @param title
+	 * @param summary
+	 * @param details
 	 */
-	public static int showDialog(Frame parentFrame,String title,String summary,
+	public CustomDetailsConfirmDialog(JFrame parentFrame,String title,String summary,
 		String details) {
 
+		super(title);
+		
+		this.parentFrame = parentFrame;
+		this.title = title;
+		this.summary = summary;
+		this.details = details;
+
+		setupLayout();
+	}
+
+	/**
+	 * Set up the GUI elements
+	 */
+	@Override
+	protected void setupLayout() {
 		//Determine how big to make the line length in the details pane
 		int maxLineLen = getLongestLineLength(summary,null);
 		//The font size of the detail message for some reason is smaller than
@@ -64,7 +82,7 @@ public class CustomDetailsConfirmDialog {
 		content.setLayout(new BoxLayout(content, BoxLayout.PAGE_AXIS));
 
 		//Create a pane to put everything in and then create a dialog out of it.
-		final JOptionPane pane = new JOptionPane(
+		/* final JOptionPane */ pane = new JOptionPane(
 			content,
 			JOptionPane.WARNING_MESSAGE,
 			JOptionPane.OK_CANCEL_OPTION);
@@ -117,7 +135,9 @@ public class CustomDetailsConfirmDialog {
 		dialog.setLocationRelativeTo(parentFrame);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
+	}
 
+	public int getSelection() {
 		//Retrieve the selected option
 		Object selectedValue = pane.getValue();
 		int selection;
