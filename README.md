@@ -1,45 +1,60 @@
-## WELCOME
+WELCOME
+=======
 
-TreeView is a software for visualizing clustergrams. It was first released in
-1998 by Michael Eisen and then, a few years later, by Alok Saldanha, who
-developed an open source version Java TreeView.
+TreeView is an open-source Java app for visualizing large data matrices. It can load a data matrix, cluster it, browse it, customize its appearance and export it (or parts of it) into a figure.
 
-Despite its popularity (~1,900 downloads/month on average), Java Treeview has
-not been updated in almost a decade and has collected many bug reports and
-feature requests. We are now working on addressing these issues and releasing a
-new version of Java TreeView that will be faster, cleaner and easier to use.
+It was first developed by Michael Eisen in 1998 (Treeview 1.0) and updated a few years later by Alok Saldanha (Treeview 2.0). We have now completely redesigned the app and released a new & improved TreeView 3.0 that is faster, cleaner and easier to use.
 
-Current users of Java TreeView! How are you, gentlepeople? We need your help. We
-need to know which software features you use and which ones are obsolete. We'd
-like to hear your requests, comments, suggestions and complaints.
+If you are interested in providing feedback, please watch this repository, create new issues or contact us at <treeview@princeton.edu>.
 
-If you are interested in providing feedback, or would like to request to be
-added to our pre-release testers email list, please contact us at
-treeview@princeton.edu. We will send you updates and ask for your opinion in
-occasional brief surveys. We will also let you know of early software releases
-for which you can become a beta-tester, if you are interested.
 
-## INSTALL
 
-TreeView3 can be downloaded from:
+DOWNLOAD
+========
 
-http://www.princeton.edu/~abarysh/treeview/15-06-02/tv3_alpha02_final.jar
+The latest TreeView 3.0 can be downloaded from:
 
-## DEPENDENCIES
+<https://bitbucket.org/TreeView3Dev/treeview3/downloads/tv3_alpha02_final.jar>
 
-Java 7 or higher
-Go to http://java.com/en/download/ to find out what version you currently have.
 
-Place the downloaded JAR file anywhere on your computer and run it by double-
-clicking on the icon. For Mac users, the first time you open the JAR file,
-please do it by right-clicking on the icon and choosing:
 
-Open with > Jar Launcher.app
+INSTALL
+=======
 
-For all subsequent times, directly double-clicking the icon should work
-perfectly.
+## Requirements ##
 
-### PREFERENCES
-If you tested Alpha 1, we recommend that you reset your preferences before you
-use the new version. This might prove especially helpful if you are experiencing
-issues with the software.
+* Java 7 or higher - go to <http://java.com/en/download/> to find out what version you currently have.
+* If you tested an older alpha or beta version of Treeview 3.0, we recommend that you reset your preferences before you upgrade to the latest version. 
+
+## Windows ##
+
+Place the downloaded JAR file anywhere on your computer and run it by double-clicking on the icon.
+
+## Mac ##
+
+Place the downloaded JAR file anywhere on your computer.
+
+**First time**: right-click on the icon and choose `Open with` > `Jar Launcher.app`.
+
+**Every time after that**: double-click on the icon.
+
+
+DOCUMENTATION
+=============
+
+[Add link].
+
+
+DEVELOPERS
+==========
+
+* Chris Keil - University of Hamburg
+* Robert Leach - Princeton University
+* Lance Parsons - Princeton University
+* Anastasia Baryshnikova - Princeton University - <http://www.baryshnikova-lab.org>
+
+
+LICENSE
+=======
+
+[Add]
