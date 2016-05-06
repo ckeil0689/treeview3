@@ -58,8 +58,8 @@ public class ExportDialog extends CustomDialog {
 		this.bigRegs = eh.getOversizedRegions(useMinimums);
 		this.selectionsExist = selectionsExist;
 		
-		this.backgroundWidth = PaperType.LONGSIDE;
-		this.backgroundHeight = PaperType.LONGSIDE;
+		this.backgroundWidth = PaperType.LONGSIDELEN;
+		this.backgroundHeight = PaperType.LONGSIDELEN;
 		
 		setupLayout();
 	}
@@ -469,8 +469,8 @@ public class ExportDialog extends CustomDialog {
 			
 		} else {
 			// set normal / transparent background
-			backgroundWidth = PaperType.LONGSIDE;
-			backgroundHeight = PaperType.LONGSIDE;
+			backgroundWidth = PaperType.LONGSIDELEN;
+			backgroundHeight = PaperType.LONGSIDELEN;
 			
 			background.setBackground(mainPanel.getBackground());
 			background.setBorder(null);
