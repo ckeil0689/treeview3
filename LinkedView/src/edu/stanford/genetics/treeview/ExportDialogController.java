@@ -13,8 +13,6 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import org.freehep.graphicsio.PageConstants;
-
 import Controllers.ExportHandler;
 import Controllers.FormatType;
 import Controllers.RegionType;
@@ -96,71 +94,15 @@ public class ExportDialogController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			/* For now, the selected indices of the 2 JComboBoxes */
-			int[] selectedOptions = exportDialog.getSelectedOptions();
-
-			FormatType selFormat;
-			if(selectedOptions.length < 1 || selectedOptions[0] < 0 ||
-				selectedOptions[0] >= FormatType.getHiResFormats().length) {
-				selFormat = FormatType.getDefault();
-				
-			} else {
-				selFormat = FormatType.getHiResFormats()[selectedOptions[0]];
-
-			}
-
-			PaperType selPaper;
-			if(selectedOptions.length < 2 || selectedOptions[1] < 0 ||
-				selectedOptions[1] >= PaperType.values().length) {
-				selPaper = PaperType.getDefault();
-				
-			} else {
-				selPaper = PaperType.values()[selectedOptions[1]];
-			}
-
-			RegionType selRegion;
-			if(selectedOptions.length < 3 || selectedOptions[2] < 0 ||
-				selectedOptions[2] >= RegionType.values().length) {
-				selRegion = RegionType.getDefault();
-				
-			} else {
-				selRegion = RegionType.values()[selectedOptions[2]];
-			}
-
-			AspectType selAspect;
-			if(selectedOptions.length < 4 || selectedOptions[3] < 0 ||
-				selectedOptions[3] >= AspectType.values().length) {
-				selAspect = AspectType.getDefault();
-				
-			} else {
-				selAspect = AspectType.values()[selectedOptions[3]];
-			}
-
-			boolean showSelections;
-			if(selectedOptions.length < 5) {
-				showSelections = false;
-				
-			} else {
-				showSelections = (selectedOptions[4] == 1 ? true : false);
-			}
-
-			String selOrient;
-			if(selectedOptions.length < 6 || selectedOptions[5] < 0 ||
-				selectedOptions[5] >=
-				PageConstants.getOrientationList().length) {
-				selOrient = PageConstants.LANDSCAPE;
-				
-			} else {
-				selOrient =
-					PageConstants.getOrientationList()[selectedOptions[5]];
-			}
-
 			//This will open a file chooser dialog
-			String exportFilename = chooseSaveFile(selFormat);
+			String exportFilename = 
+					chooseSaveFile(exportOptions.getFormatType());
 
 			//If the returned string is null or empty, they either canceled or
 			//there was an error
 			if(exportFilename == null || exportFilename.isEmpty()) {
+				LogBuffer.println("Could not export. A file name could "
+						+ "not be created.");
 				return;
 			}
 
@@ -169,10 +111,13 @@ public class ExportDialogController {
 				ExportHandler eh = new ExportHandler(dendroView,interactiveXmap,
 					interactiveYmap,colSelection,rowSelection);
 				//TODO use and pass ExportOptions object instead
-				eh.setDefaultPageSize(selPaper);
-				eh.setDefaultPageOrientation(selOrient);
-				eh.setTileAspectRatio(selAspect);
-				eh.export(selFormat,exportFilename,selRegion,showSelections);
+				eh.setDefaultPageSize(exportOptions.getPaperType());
+				eh.setDefaultPageOrientation(exportOptions.getOrientation());
+				eh.setTileAspectRatio(exportOptions.getAspectType());
+				eh.export(exportOptions.getFormatType(), 
+						exportFilename, 
+						exportOptions.getRegionType(), 
+						exportOptions.isShowSelections());
 
 				String msg = "Exported file: [" + exportFilename + "].";
 				LogBuffer.println(msg);
@@ -181,6 +126,7 @@ public class ExportDialogController {
 
 				//Open the file in the default system app
 				Desktop.getDesktop().open(new File(exportFilename));
+				
 			} catch(OutOfMemoryError oome) {
 				showWarning("ERROR: Out of memory.  Note, you may be able to " +
 					"export a smaller portion of the matrix.");
@@ -207,6 +153,7 @@ public class ExportDialogController {
 			File outFile = new File(getInitialExportFileString(selFormat));
 			fileDialog.setDirectory(inFile.getCanonicalPath());
 			fileDialog.setFile(outFile.getName());
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -248,17 +195,7 @@ public class ExportDialogController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			/* For now, the selected indices of the 2 JComboBoxes */
-			int[] selectedOptions = exportDialog.getSelectedOptions();
-
-			FormatType selFormat;
-			if(selectedOptions.length < 1 || selectedOptions[0] < 0 ||
-				selectedOptions[0] >= FormatType.getHiResFormats().length) {
-				selFormat = FormatType.getDefault();
-				
-			} else {
-				selFormat = FormatType.getHiResFormats()[selectedOptions[0]];
-			}
+			FormatType selFormat = exportOptions.getFormatType();
 
 			exportDialog.getPaperBox().setEnabled(selFormat.isDocumentFormat());
 			exportDialog.getOrientBox().setEnabled(
@@ -284,26 +221,8 @@ public class ExportDialogController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			/* For now, the selected indices of the 2 JComboBoxes */
-			int[] selectedOptions = exportDialog.getSelectedOptions();
-
-			FormatType selFormat;
-			if(selectedOptions.length < 1 || selectedOptions[0] < 0 ||
-				selectedOptions[0] >= FormatType.getHiResFormats().length) {
-				selFormat = FormatType.getDefault();
-				
-			} else {
-				selFormat = FormatType.getHiResFormats()[selectedOptions[0]];
-			}
-
-			RegionType selRegion;
-			if(selectedOptions.length < 3 || selectedOptions[2] < 0 ||
-				selectedOptions[2] >= RegionType.values().length) {
-
-				selRegion = RegionType.getDefault();
-			} else {
-				selRegion = RegionType.values()[selectedOptions[2]];
-			}
+			FormatType selFormat = exportOptions.getFormatType();
+			RegionType selRegion = exportOptions.getRegionType();
 
 			exportDialog.updateAspectRadioBtns(selFormat.isDocumentFormat(),
 				selRegion);

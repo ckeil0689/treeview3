@@ -327,65 +327,6 @@ public class ExportDialog extends CustomDialog {
 	}
 
 	/**
-	 * @return an int array which contains 5 values: 0. the selected index of
-	 * the [Format] drop-down. 1. the selected index of the [PaperType] dropdown
-	 * 2. the selected index of the [Region] radio buttons 3. the selected index
-	 * of the [ExportAspect] radio buttons and 4. whether to [0] not show
-	 * selections or [1] show selections.  If any option was not selected, the
-	 * selected index returned is -1.  It is assumed that the loops used
-	 * encounter enumeration options in the same order in which they are defined
-	 * in the enum definitions.
-	 */
-	public int[] getSelectedOptions() {
-
-		int[] options = new int[5];
-
-		if(formatBox == null) {
-			options[0] = -1;
-		} else {
-			options[0] = formatBox.getSelectedIndex();
-		}
-
-		if(paperBox == null) {
-			options[1] = -1;
-		} else {
-			options[1] = paperBox.getSelectedIndex();
-		}
-
-		options[2] = -1;
-		int cnt = 0;
-		for(Enumeration<AbstractButton> buttons =
-			regionRadioBtns.getElements();buttons.hasMoreElements();) {
-			AbstractButton button = buttons.nextElement();
-			if(button.isSelected()) {
-				options[2] = cnt;
-			}
-			cnt++;
-		}
-
-		options[3] = -1;
-		cnt = 0;
-		for(Enumeration<AbstractButton> buttons =
-			aspectRadioBtns.getElements();buttons.hasMoreElements();) {
-			AbstractButton button = buttons.nextElement();
-			if(button.isSelected()) {
-				options[3] = cnt;
-			}
-			cnt++;
-		}
-
-		if(selectionsBox == null) {
-			options[4] = -1;
-		} else if(selectionsBox.isSelected()) {
-			options[4] = 1;
-		} else {
-			options[4] = 0;
-		}
-
-		return(options);
-	}
-
-	/**
 	 * @author rleach
 	 * @return the paperBox
 	 */
