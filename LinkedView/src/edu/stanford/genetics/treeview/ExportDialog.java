@@ -88,7 +88,7 @@ public class ExportDialog extends CustomDialog {
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
 		JLabel matrix = GUIFactory.createLabel("Matrix:",GUIFactory.FONTS);
 		JLabel region = GUIFactory.createLabel("Export:",GUIFactory.FONTS);
-		JLabel aspect = GUIFactory.createLabel("Aspect:",GUIFactory.FONTS);
+		JLabel aspect = GUIFactory.createLabel("Tile Aspect:",GUIFactory.FONTS);
 		JLabel orient = GUIFactory.createLabel("Orientation:",GUIFactory.FONTS);
 
 		FormatType selectedFormat = FormatType.getDefault();
