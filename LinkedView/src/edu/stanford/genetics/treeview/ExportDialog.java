@@ -514,10 +514,10 @@ public class ExportDialog extends CustomDialog {
 		int rowTreeSize = (int) (treeRatio * adjBgWidth);
 		int colTreeSize = (int) (treeRatio * adjBgHeight);
 		
-		//-------
-		int pixelBuffer = 20;
+		// Total per-axis distance from document edge to drawn components
+		int edgeBuffer = 20;
 		
-		//adjust maximum matrix side length for tree thickness
+		// adjust maximum matrix side length for tree thickness
 		if(rowPrevTrees != null) {
 			rowPrevTrees.setShortSide(rowTreeSize);
 			adjBgWidth -= rowTreeSize;
@@ -529,8 +529,8 @@ public class ExportDialog extends CustomDialog {
 		}
 		
 		//give a little additional space
-		adjBgWidth -= pixelBuffer;
-		adjBgHeight -= pixelBuffer;
+		adjBgWidth -= edgeBuffer;
+		adjBgHeight -= edgeBuffer;
 		
 		double newWidth;
 		double newHeight;
