@@ -32,8 +32,11 @@ public class ExportDialog extends CustomDialog {
 
 	private JPanel previewComp;
 	private JPanel background;
-	private int backgroundWidth;
-	private int backgroundHeight;
+	
+	private int bgWidth;
+	private int bgHeight;
+	
+	private Dimension totalCompArea;
 	
 	private ExportPreviewTrees rowPrevTrees;
 	private ExportPreviewTrees colPrevTrees;
@@ -58,8 +61,8 @@ public class ExportDialog extends CustomDialog {
 		this.bigRegs = eh.getOversizedRegions(useMinimums);
 		this.selectionsExist = selectionsExist;
 		
-		this.backgroundWidth = PaperType.LONGSIDELEN;
-		this.backgroundHeight = PaperType.LONGSIDELEN;
+		this.bgWidth = PaperType.LONGSIDELEN;
+		this.bgHeight = PaperType.LONGSIDELEN;
 		
 		setupLayout();
 	}
@@ -373,33 +376,47 @@ public class ExportDialog extends CustomDialog {
 		
 		JPanel previews = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		
+		// Defaults
+		int treeYGap = 5;
+		int treeXGap = 5;
+		
+		if(totalCompArea != null) {
+			treeYGap = (int) (eh.getTreeMatrixGapRatio() * 
+					totalCompArea.getHeight());
+			treeXGap = (int) (eh.getTreeMatrixGapRatio() * 
+					totalCompArea.getWidth());
+		}
+		
 		/* Tree panels need to have the same size as the matrix */
 		JPanel filler = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevTrees != null) {
 			previews.add(filler, "w " + rowPrevTrees.getShortSide() + "!, "
-					+ "h " + colPrevTrees.getShortSide() + "!");
+					+ "h " + colPrevTrees.getShortSide() + "!,"
+							+ "gap " + treeXGap + "! " + treeYGap);
 		}
 
 		if(colPrevTrees != null) {
 			colPrevTrees.setLongSide(matrix.getMatrixWidth());
 			previews.add(colPrevTrees, "growx, pushx, "
 					+ "h " + colPrevTrees.getShortSide() + "!,"
-					+ " w " + colPrevTrees.getLongSide() + "!, wrap");
+					+ " w " + colPrevTrees.getLongSide() + "!, "
+					+ "gapy " + treeYGap + "!, wrap");
 		}
 
 		if(rowPrevTrees != null) {
 			rowPrevTrees.setLongSide(matrix.getMatrixHeight());
 			previews.add(rowPrevTrees, "growy, aligny 0, pushy, "
 					+ "h " + rowPrevTrees.getLongSide() + "!, "
-					+ "w " + rowPrevTrees.getShortSide() + "!");
+					+ "w " + rowPrevTrees.getShortSide() + "!, "
+					+ "gapx " + treeXGap + "!");
 		}
 
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
 				+ matrix.getMatrixWidth() + "!, aligny 0, push, grow");
 		
 		background.add(previews, "push, align 50%");
-		previewComp.add(background, "w " + backgroundWidth + "!, h " 
-				+ backgroundHeight + "!, grow, push, align 50%");
+		previewComp.add(background, "w " + bgWidth + "!, h " 
+				+ bgHeight + "!, grow, push, align 50%");
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
@@ -424,7 +441,7 @@ public class ExportDialog extends CustomDialog {
 			final Dimension imvSize, final Dimension dataMatrixSize) {
 		
 		updateBackground(exportOptions);
-		Dimension bgSize = new Dimension(backgroundWidth, backgroundHeight);
+		Dimension bgSize = new Dimension(bgWidth, bgHeight);
 		updatePreviewMatrix(exportOptions, bgSize, imvSize, dataMatrixSize);
 		
 		arrangePreviewPanel();
@@ -464,18 +481,18 @@ public class ExportDialog extends CustomDialog {
 			// adjust background panel to paper orientation and size
 			String orientation = exportOptions.getOrientation();
 			if((PageConstants.LANDSCAPE).equalsIgnoreCase(orientation)) {
-				backgroundWidth = (int)bgSize.getHeight();
-				backgroundHeight = (int)bgSize.getWidth();
+				bgWidth = (int)bgSize.getHeight();
+				bgHeight = (int)bgSize.getWidth();
 				
 			} else {
-				backgroundWidth = (int)bgSize.getWidth();
-				backgroundHeight = (int)bgSize.getHeight();
+				bgWidth = (int)bgSize.getWidth();
+				bgHeight = (int)bgSize.getHeight();
 			}
 			
 		} else {
 			// set normal / transparent background
-			backgroundWidth = PaperType.LONGSIDELEN;
-			backgroundHeight = PaperType.LONGSIDELEN;
+			bgWidth = PaperType.LONGSIDELEN;
+			bgHeight = PaperType.LONGSIDELEN;
 			
 			background.setBackground(mainPanel.getBackground());
 			background.setBorder(null);
@@ -516,6 +533,12 @@ public class ExportDialog extends CustomDialog {
 		
 		// Total per-axis distance from document edge to drawn components
 		int edgeBuffer = 20;
+		//give a little additional space
+		adjBgWidth -= edgeBuffer;
+		adjBgHeight -= edgeBuffer;
+		
+		// before adjusting for trees, store for later gap calculations
+		this.totalCompArea = new Dimension(adjBgWidth, adjBgHeight);
 		
 		// adjust maximum matrix side length for tree thickness
 		if(rowPrevTrees != null) {
@@ -527,10 +550,6 @@ public class ExportDialog extends CustomDialog {
 			colPrevTrees.setShortSide(colTreeSize);
 			adjBgHeight -= colTreeSize;
 		}
-		
-		//give a little additional space
-		adjBgWidth -= edgeBuffer;
-		adjBgHeight -= edgeBuffer;
 		
 		double newWidth;
 		double newHeight;
@@ -560,13 +579,6 @@ public class ExportDialog extends CustomDialog {
 		
 		matrixWidth = (int) finalDim.getWidth();
 		matrixHeight = (int) finalDim.getHeight();
-		
-		LogBuffer.println("Matrix width: " + matrixWidth);
-		LogBuffer.println("Matrix height: " + matrixHeight);
-		LogBuffer.println("RowTreeWidth: " + rowTreeSize);
-		LogBuffer.println("ColTreeHeight: " + colTreeSize);
-		LogBuffer.println("BgWidth: " + adjBgWidth);
-		LogBuffer.println("BgHeight: " + adjBgHeight);
 		
 		matrix.setMatrixWidth(matrixWidth);
 		matrix.setMatrixHeight(matrixHeight);
