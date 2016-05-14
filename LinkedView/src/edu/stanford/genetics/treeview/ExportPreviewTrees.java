@@ -17,8 +17,9 @@ public class ExportPreviewTrees extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	/* Initial default sizes */
 	public static final int D_LONG = 400;
-	public static final int SHORT = 80;
+	public static final int D_SHORT = 80;
 	
 	private final Image paintImage;
 	private final boolean isRows;
@@ -34,6 +35,7 @@ public class ExportPreviewTrees extends JPanel {
 		this.isRows = isRows;
 		
 		setLayout(new MigLayout());
+		setShortSide(D_SHORT);
 		setLongSide(D_LONG);	
 		setPaperBackground(false);
 	}
@@ -57,7 +59,23 @@ public class ExportPreviewTrees extends JPanel {
 	}
 	
 	/**
-	 * The tree panels can very in length but not in thickness. This method
+	 * The tree panels can very in thickness. This method can be used to 
+	 * adapt the length to represent the calculated tree thickness according 
+	 * to calculated matrix-tree ratios in ExportHandler.
+	 * @param shortSide - The thickness of the tree preview panel.
+	 */
+	public void setShortSide(final int shortSide) {
+		
+		if(isRows) {
+			this.xSide = shortSide;
+			
+		} else {
+			this.ySide = shortSide;
+		}
+	}
+	
+	/**
+	 * The tree panels can very in length depending on the matrix. This method
 	 * can be used to adapt the length to retain the same size as the matrix
 	 * they belong to.
 	 * @param longSide - The size of the long side of the tree preview panel.
@@ -65,13 +83,27 @@ public class ExportPreviewTrees extends JPanel {
 	public void setLongSide(final int longSide) {
 		
 		if(isRows) {
-			this.xSide = SHORT;
 			this.ySide = longSide;
 			
 		} else {
 			this.xSide = longSide;
-			this.ySide = SHORT;
 		}
+	}
+	
+	/**
+	 * @return the longest side length for the preview trees.
+	 */
+	public int getLongSide() {
+		
+		return (isRows) ? ySide : xSide;
+	}
+	
+	/**
+	 * @return the shortest side length (thickness) for the preview trees.
+	 */
+	public int getShortSide() {
+		
+		return (isRows) ? xSide : ySide;
 	}
 	
 	/*

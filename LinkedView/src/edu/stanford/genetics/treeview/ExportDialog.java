@@ -35,8 +35,8 @@ public class ExportDialog extends CustomDialog {
 	private int backgroundWidth;
 	private int backgroundHeight;
 	
-	private ExportPreviewTrees rowTrees;
-	private ExportPreviewTrees colTrees;
+	private ExportPreviewTrees rowPrevTrees;
+	private ExportPreviewTrees colPrevTrees;
 	private ExportPreviewMatrix matrix;
 	
 	private JComboBox<FormatType> formatBox;
@@ -352,14 +352,15 @@ public class ExportDialog extends CustomDialog {
 	public void setPreviewComponents(ExportPreviewTrees rowTrees, 
 			ExportPreviewTrees colTrees, ExportPreviewMatrix matrix) {
 
-		this.rowTrees = rowTrees;
-		this.colTrees = colTrees;
+		this.rowPrevTrees = rowTrees;
+		this.colPrevTrees = colTrees;
 		this.matrix = matrix;
 	}
 	
 	/**
 	 * Arranges the trees and the matrix on the preview panel, depending on
-	 *which trees are active.
+	 * which trees are active. Previously calculated component sizes are used
+	 * here to dynamically create a layout.
 	 **/
 	public void arrangePreviewPanel() {
 		
@@ -374,20 +375,23 @@ public class ExportDialog extends CustomDialog {
 		
 		/* Tree panels need to have the same size as the matrix */
 		JPanel filler = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
-		if(rowTrees != null && colTrees != null) {
-			previews.add(filler, "w 80!, h 80!");
+		if(rowPrevTrees != null && colPrevTrees != null) {
+			previews.add(filler, "w " + rowPrevTrees.getShortSide() + "!, "
+					+ "h " + colPrevTrees.getShortSide() + "!");
 		}
 
-		if(colTrees != null) {
-			colTrees.setLongSide(matrix.getMatrixWidth());
-			previews.add(colTrees, "growx, pushx, h 80!, w " 
-					+ matrix.getMatrixWidth() + "!, wrap");
+		if(colPrevTrees != null) {
+			colPrevTrees.setLongSide(matrix.getMatrixWidth());
+			previews.add(colPrevTrees, "growx, pushx, "
+					+ "h " + colPrevTrees.getShortSide() + "!,"
+					+ " w " + colPrevTrees.getLongSide() + "!, wrap");
 		}
 
-		if(rowTrees != null) {
-			rowTrees.setLongSide(matrix.getMatrixHeight());
-			previews.add(rowTrees, "growy, aligny 0, pushy, h " 
-					+ matrix.getMatrixHeight() + "!, w 80!");
+		if(rowPrevTrees != null) {
+			rowPrevTrees.setLongSide(matrix.getMatrixHeight());
+			previews.add(rowPrevTrees, "growy, aligny 0, pushy, "
+					+ "h " + rowPrevTrees.getLongSide() + "!, "
+					+ "w " + rowPrevTrees.getShortSide() + "!");
 		}
 
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
@@ -440,12 +444,12 @@ public class ExportDialog extends CustomDialog {
 		/* First, set the background color depending on document format */
 		final boolean isPaper = exportOptions.getFormatType().isDocumentFormat();
 		
-		if(rowTrees != null) {
-			rowTrees.setPaperBackground(isPaper);
+		if(rowPrevTrees != null) {
+			rowPrevTrees.setPaperBackground(isPaper);
 		}
 		
-		if(colTrees != null) {
-			colTrees.setPaperBackground(isPaper);
+		if(colPrevTrees != null) {
+			colPrevTrees.setPaperBackground(isPaper);
 		}
 		
 		if(isPaper) {
@@ -498,25 +502,35 @@ public class ExportDialog extends CustomDialog {
 		 * because plain truncating is fine. 
 		 */
 		
-		int adjustedBgWidth = (int) bgSize.getWidth();
-		int adjustedBgHeight = (int) bgSize.getHeight();
+		int adjBgWidth = (int) bgSize.getWidth();
+		int adjBgHeight = (int) bgSize.getHeight();
 		
 		/* Define maximal side length of matrix to remain within background */
-		int treeSize = ExportPreviewTrees.SHORT;
+		// issue #6 implementation
+		eh.setCalculatedDimensions(exportOptions.getRegionType(), 
+				exportOptions.getAspectType());
+		
+		double treeRatio = eh.getTreeRatio();
+		int rowTreeSize = (int) (treeRatio * adjBgWidth);
+		int colTreeSize = (int) (treeRatio * adjBgHeight);
+		
+		//-------
 		int pixelBuffer = 20;
 		
 		//adjust maximum matrix side length for tree thickness
-		if(rowTrees != null) {
-			adjustedBgWidth -= treeSize;
+		if(rowPrevTrees != null) {
+			rowPrevTrees.setShortSide(rowTreeSize);
+			adjBgWidth -= rowTreeSize;
 		}
 		
-		if(colTrees != null) {
-			adjustedBgHeight -= treeSize;
+		if(colPrevTrees != null) {
+			colPrevTrees.setShortSide(colTreeSize);
+			adjBgHeight -= colTreeSize;
 		}
 		
 		//give a little additional space
-		adjustedBgWidth -= pixelBuffer;
-		adjustedBgHeight -= pixelBuffer;
+		adjBgWidth -= pixelBuffer;
+		adjBgHeight -= pixelBuffer;
 		
 		double newWidth;
 		double newHeight;
@@ -524,7 +538,6 @@ public class ExportDialog extends CustomDialog {
 		int matrixWidth;
 		int matrixHeight;
 		
-		Dimension adjBgDim = new Dimension(adjustedBgWidth, adjustedBgHeight);
 		/* 
 		 * Adapt matrix size depending on selected aspect ratio 
 		 * concept: grow or shrink until the bigger side fits
@@ -541,37 +554,54 @@ public class ExportDialog extends CustomDialog {
 		}
 		
 		Dimension startDim = new Dimension((int) newWidth, (int) newHeight);
-		Dimension newDim = adjustDim(startDim, adjBgDim);
+		Dimension targetDim = new Dimension(adjBgWidth, adjBgHeight);
 		
-		matrixWidth = (int) newDim.getWidth();
-		matrixHeight = (int) newDim.getHeight();
+		Dimension finalDim = adjustDim(startDim, targetDim);
+		
+		matrixWidth = (int) finalDim.getWidth();
+		matrixHeight = (int) finalDim.getHeight();
+		
+		LogBuffer.println("Matrix width: " + matrixWidth);
+		LogBuffer.println("Matrix height: " + matrixHeight);
+		LogBuffer.println("RowTreeWidth: " + rowTreeSize);
+		LogBuffer.println("ColTreeHeight: " + colTreeSize);
+		LogBuffer.println("BgWidth: " + adjBgWidth);
+		LogBuffer.println("BgHeight: " + adjBgHeight);
 		
 		matrix.setMatrixWidth(matrixWidth);
 		matrix.setMatrixHeight(matrixHeight);
 	}
 	
+	/**
+	 * Grows or shrinks the newly created dimension until it fits 
+	 * the background nicely.
+	 * @param startDim - The newly created dimension
+	 * @param adjBgDim - The previously adjusted background dimension. The
+	 * fit of startDim is calculated for this dimension.
+	 * @return A dimension that fits the background dimension such that the 
+	 * longest side fills its dimension and the overall dimension ratio is 
+	 * retained.
+	 */
 	private Dimension adjustDim(final Dimension startDim, 
 			final Dimension adjBgDim) {
 		
 		double adjWidth = startDim.getWidth();
 		double adjHeight = startDim.getHeight();
 		
-		double adjustedBgWidth = adjBgDim.getWidth();
-		double adjustedBgHeight = adjBgDim.getHeight();
+		double adjBgWidth = adjBgDim.getWidth();
+		double adjBgHeight = adjBgDim.getHeight();
 		
-		if(adjWidth > adjustedBgWidth || adjHeight > adjustedBgHeight) {
-			// shrink until fit
+		if(adjWidth > adjBgWidth || adjHeight > adjBgHeight) {
+			// iteratively shrink until fit
 			double shrinkFactor = 0.99;
-			while(adjWidth > adjustedBgWidth 
-					|| adjHeight > adjustedBgHeight) {
+			while(adjWidth > adjBgWidth || adjHeight > adjBgHeight) {
 				adjWidth = adjWidth * shrinkFactor;
 				adjHeight = adjHeight * shrinkFactor;
 			}
 		} else {
-			// grow until fit
+			// iteratively grow until fit
 			double growthFactor = 1.01;
-			while(adjWidth < adjustedBgWidth 
-					&& adjHeight < adjustedBgHeight) {
+			while(adjWidth < adjBgWidth && adjHeight < adjBgHeight) {
 				adjWidth = adjWidth * growthFactor;
 				adjHeight = adjHeight * growthFactor;
 			}

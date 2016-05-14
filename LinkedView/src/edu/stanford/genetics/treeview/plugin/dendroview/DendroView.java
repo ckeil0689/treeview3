@@ -1417,14 +1417,17 @@ public class DendroView implements Observer, DendroPanel {
 			return new ExportPreviewTrees(null, isRows); // empty panel
 		}
 		
+		/* using defaults here. The actual image will be rescaled later
+		 * in the ExportDialog. */
 		int width;
 		int height;
 		if(isRows) {
-			width = ExportPreviewTrees.SHORT;
+			width = ExportPreviewTrees.D_SHORT;
 			height = ExportPreviewTrees.D_LONG;
+			
 		} else {
 			width = ExportPreviewTrees.D_LONG;
-			height = ExportPreviewTrees.SHORT;
+			height = ExportPreviewTrees.D_SHORT;
 		}
 		
 		/* Set up column tree image */
