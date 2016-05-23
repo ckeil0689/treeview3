@@ -12,9 +12,11 @@ If you are interested in providing feedback, please watch this repository, creat
 DOWNLOAD
 ========
 
-The latest TreeView 3.0 can be downloaded from:
+The Alpha 2 version of TreeView 3.0 can be downloaded from:
 
 <https://bitbucket.org/TreeView3Dev/treeview3/downloads/tv3_alpha02_final.jar>
+
+The Alpha 3 version of Treeview 3.0: coming soon.
 
 
 
