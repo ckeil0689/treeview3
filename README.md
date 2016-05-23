@@ -1,5 +1,5 @@
-WELCOME
-=======
+TREEVIEW 3.0
+============
 
 TreeView is an open-source Java app for visualizing large data matrices. It can load a data matrix, cluster it, browse it, customize its appearance and export it (or parts of it) into a figure.
 
@@ -24,7 +24,7 @@ INSTALL
 ## Requirements ##
 
 * Java 7 or higher - go to <http://java.com/en/download/> to find out what version you currently have.
-* If you tested an older alpha or beta version of Treeview 3.0, we recommend that you reset your preferences before you upgrade to the latest version. 
+* If you tested an older alpha or beta version of Treeview 3.0, we recommend that you reset your preferences before you upgrade to the latest version (File > Preferences > Reset Preferences). 
 
 ## Windows ##
 
@@ -37,6 +37,31 @@ Place the downloaded JAR file anywhere on your computer.
 **First time**: right-click on the icon and choose `Open with` > `Jar Launcher.app`.
 
 **Every time after that**: double-click on the icon.
+
+
+WHAT'S NEW
+==========
+
+## In Alpha 3 ##
+
+* Updated window layout to optimize the use of screen space
+* Improved navigation:
+    * whizzing labels and trees
+    * double-click to zoom
+* Added data export functions:
+    * copy labels and/or matrix data to clipboard
+    * export matrix view to PDF, SVG, PNG, JPG, PPM
+* Improved search
+* Improved color selection and editing
+* Other minor updates and bug fixes
+
+## In Treeview 3.0 overall ##
+
+* We have completely re-worked the interface to include one main data panel, with zooming, scrolling and searching options.
+* We have made clustering an integral part of TreeView (no need for Cluster 3.0).
+* We have added more flexible color settings (multiple colors, varying ranges)
+* We have eliminated some of the features that we considered obsolete or in need of a major re-work.
+* We have added a much improved option for image export.
 
 
 DOCUMENTATION
