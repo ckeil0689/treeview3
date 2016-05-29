@@ -29,6 +29,8 @@ import Utilities.GUIFactory;
 public class ExportDialog extends CustomDialog {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final int PAPER_LONGSIDELEN = 450;
 
 	private JPanel previewComp;
 	private JPanel background;
@@ -61,8 +63,8 @@ public class ExportDialog extends CustomDialog {
 		this.bigRegs = eh.getOversizedRegions(useMinimums);
 		this.selectionsExist = selectionsExist;
 		
-		this.bgWidth = PaperType.LONGSIDELEN;
-		this.bgHeight = PaperType.LONGSIDELEN;
+		this.bgWidth = PAPER_LONGSIDELEN;
+		this.bgHeight = PAPER_LONGSIDELEN;
 		
 		setupLayout();
 	}
@@ -476,7 +478,8 @@ public class ExportDialog extends CustomDialog {
 			
 			// default is portrait orientation
 			Dimension bgSize = 
-					PaperType.getDimension(exportOptions.getPaperType());
+					PaperType.getDimFromLongSide(exportOptions.getPaperType(), 
+					                             PAPER_LONGSIDELEN);
 			
 			// adjust background panel to paper orientation and size
 			String orientation = exportOptions.getOrientation();
@@ -491,8 +494,8 @@ public class ExportDialog extends CustomDialog {
 			
 		} else {
 			// set normal / transparent background
-			bgWidth = PaperType.LONGSIDELEN;
-			bgHeight = PaperType.LONGSIDELEN;
+			bgWidth = PAPER_LONGSIDELEN;
+			bgHeight = PAPER_LONGSIDELEN;
 			
 			background.setBackground(mainPanel.getBackground());
 			background.setBorder(null);
