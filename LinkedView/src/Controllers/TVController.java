@@ -125,7 +125,7 @@ public class TVController implements Observer {
 				"directory in the open file dialog, and window size/position " +
 				"will also be lost. Your data in the files remains untouched. " +
 				"Only superficial data is lost. Clustering, trees, and data " +
-				"values remain intact.")).getSelection();
+				"values remain intact.","Reset")).getSelection();
 
 			switch (option) {
 
