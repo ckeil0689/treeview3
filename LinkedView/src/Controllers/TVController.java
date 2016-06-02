@@ -107,8 +107,8 @@ public class TVController implements Observer {
 	public void resetPreferences() {
 
 		try {
-			int option = (new CustomDetailsConfirmDialog(
-				(JFrame) JFrame.getFrames()[0],"Reset Preferences?",
+			CustomDetailsConfirmDialog dlg = new CustomDetailsConfirmDialog(
+				"Reset Preferences?",
 				"Are you sure you want to reset the preferences and quit " +
 				"TreeView?<BR>\nCustom settings such as colors will be reset to " +
 				"default for all files.",
@@ -125,21 +125,25 @@ public class TVController implements Observer {
 				"directory in the open file dialog, and window size/position " +
 				"will also be lost. Your data in the files remains untouched. " +
 				"Only superficial data is lost. Clustering, trees, and data " +
-				"values remain intact.","Reset")).getSelection();
+				"values remain intact.","Reset");
+			int option = dlg.showDialog();
 
 			switch (option) {
 
-			case JOptionPane.YES_OPTION:
-				tvFrame.getConfigNode().parent().removeNode();
-				tvFrame.getAppFrame().dispose();
-				System.exit(0);
-				break;
+				case CustomDetailsConfirmDialog.OK_OPTION:
+					LogBuffer.println("Resetting preferences and quitting.");
+					tvFrame.getConfigNode().parent().removeNode();
+					tvFrame.getAppFrame().dispose();
+					System.exit(0);
+					break;
 
-			case JOptionPane.NO_OPTION:
-				return;
+				case CustomDetailsConfirmDialog.CANCEL_OPTION:
+					LogBuffer.println("Canceling reset prefs.");
+					return;
 
-			default:
-				return;
+				default:
+					LogBuffer.println("Reset prefs dialog was closed.");
+					return;
 			}
 
 		} catch (final BackingStoreException e) {
