@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <profiles version="2">
 <profile kind="CleanUpProfile" name="Princeton Bioinformatics Group Rob 1" version="2">
-<setting id="cleanup.qualify_static_method_accesses_with_declaring_class" value="false"/>
+<setting id="cleanup.qualify_static_method_accesses_with_declaring_class" value="true"/>
 <setting id="cleanup.always_use_this_for_non_static_method_access" value="false"/>
 <setting id="cleanup.organize_imports" value="true"/>
 <setting id="cleanup.remove_trailing_whitespaces_ignore_empty" value="false"/>
 <setting id="cleanup.use_type_arguments" value="false"/>
 <setting id="cleanup.format_source_code_changes_only" value="false"/>
-<setting id="cleanup.qualify_static_field_accesses_with_declaring_class" value="false"/>
+<setting id="cleanup.qualify_static_field_accesses_with_declaring_class" value="true"/>
 <setting id="cleanup.add_generated_serial_version_id" value="false"/>
-<setting id="cleanup.qualify_static_member_accesses_through_subtypes_with_declaring_class" value="false"/>
+<setting id="cleanup.qualify_static_member_accesses_through_subtypes_with_declaring_class" value="true"/>
 <setting id="cleanup.remove_redundant_type_arguments" value="true"/>
 <setting id="cleanup.remove_unused_imports" value="true"/>
 <setting id="cleanup.insert_inferred_type_arguments" value="false"/>
@@ -21,7 +21,7 @@
 <setting id="cleanup.remove_trailing_whitespaces_all" value="true"/>
 <setting id="cleanup.add_missing_annotations" value="true"/>
 <setting id="cleanup.always_use_this_for_non_static_field_access" value="false"/>
-<setting id="cleanup.make_parameters_final" value="false"/>
+<setting id="cleanup.make_parameters_final" value="true"/>
 <setting id="cleanup.sort_members" value="false"/>
 <setting id="cleanup.remove_private_constructors" value="true"/>
 <setting id="cleanup.always_use_parentheses_in_expressions" value="true"/>
@@ -51,11 +51,11 @@
 <setting id="cleanup.make_local_variable_final" value="true"/>
 <setting id="cleanup.add_missing_methods" value="false"/>
 <setting id="cleanup.never_use_parentheses_in_expressions" value="false"/>
-<setting id="cleanup.qualify_static_member_accesses_with_declaring_class" value="false"/>
+<setting id="cleanup.qualify_static_member_accesses_with_declaring_class" value="true"/>
 <setting id="cleanup.use_parentheses_in_expressions" value="true"/>
 <setting id="cleanup.add_missing_override_annotations" value="true"/>
 <setting id="cleanup.use_blocks" value="true"/>
-<setting id="cleanup.make_variable_declarations_final" value="false"/>
+<setting id="cleanup.make_variable_declarations_final" value="true"/>
 <setting id="cleanup.correct_indentation" value="true"/>
 <setting id="cleanup.remove_unused_private_types" value="true"/>
 </profile>
