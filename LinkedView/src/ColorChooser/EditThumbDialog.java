@@ -1,8 +1,6 @@
 package ColorChooser;
 
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -11,8 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
@@ -36,6 +34,7 @@ public class EditThumbDialog extends CustomDialog {
 
 	/* GUI components */
 	private JLabel enterPrompt;
+	private JTextArea valueStatus;
 	private JTextField inputField;
 	private JButton colorButton;
 	private ColorIcon colorIcon;
@@ -159,10 +158,13 @@ public class EditThumbDialog extends CustomDialog {
 		}
 	}
 
+	/**
+	 * Changes the text of the error JTextArea to the supplied message.
+	 * @param message - The text to display.
+	 */
 	private void setError(String message) {
 
-		enterPrompt.setForeground(GUIFactory.RED1);
-		enterPrompt.setText(message);
+		valueStatus.setText(message);
 	}
 
 	private class SetColorListener implements ActionListener {
@@ -227,6 +229,9 @@ public class EditThumbDialog extends CustomDialog {
 			GUIFactory.FONTS);
 		enterPrompt = GUIFactory.createLabel("Set data value:", 
 			GUIFactory.FONTS);
+		
+		valueStatus = GUIFactory.createWrappableTextArea();
+		valueStatus.setForeground(GUIFactory.RED1);
 
 		/* default */
 		startX = thumbBox.getThumbDataVal(thumbIndex);
@@ -246,15 +251,15 @@ public class EditThumbDialog extends CustomDialog {
 		colorButton = GUIFactory.createColorIconBtn("",colorIcon);
 		colorButton.addActionListener(new SetColorListener());
 
-		final JButton meanBtn = getTextButton(String.valueOf(mean));
+		final JButton meanBtn = GUIFactory.getTextButton(String.valueOf(mean));
 		meanBtn.addActionListener(new SetToMeanListener());
-		final JButton medianBtn = getTextButton(String.valueOf(median));
+		final JButton medianBtn = GUIFactory.getTextButton(String.valueOf(median));
 		medianBtn.addActionListener(new SetToMedianListener());
-		final JButton centerBtn = getTextButton(String.valueOf(center));
+		final JButton centerBtn = GUIFactory.getTextButton(String.valueOf(center));
 		centerBtn.addActionListener(new SetToCenterListener());
-		final JButton minBtn = getTextButton(String.valueOf(min));
+		final JButton minBtn = GUIFactory.getTextButton(String.valueOf(min));
 		minBtn.addActionListener(new SetToMinListener());
-		final JButton maxBtn = getTextButton(String.valueOf(max));
+		final JButton maxBtn = GUIFactory.getTextButton(String.valueOf(max));
 		maxBtn.addActionListener(new SetToMaxListener());
 
 		final JLabel meanLabel = GUIFactory.createLabel("Mean:",
@@ -282,7 +287,7 @@ public class EditThumbDialog extends CustomDialog {
 		panel.add(enterPrompt, "align right, span 2");
 		panel.add(inputField, "growx, span 2, align left, wrap");
 
-		panel.add(GUIFactory.createLabel(" ",GUIFactory.FONTS),"wrap");
+		panel.add(valueStatus, "growx, span, wrap");
 
 		panel.add(meanLabel, "pushx, align right");
 		panel.add(meanBtn, "pushx, align left, gapright 8px");
@@ -303,17 +308,5 @@ public class EditThumbDialog extends CustomDialog {
 		panel.add(okButton, "pushx, span 2, align left");
 
 		mainPanel.add(panel, "w 200::, h 150::");
-	}
-
-	protected JButton getTextButton(String text) {
-		final JButton btn = new JButton(text);
-		btn.setFocusPainted(false);
-		btn.setMargin(new Insets(0,0,0,0));
-		btn.setContentAreaFilled(false);
-		btn.setBorderPainted(false);
-		btn.setOpaque(false);
-		btn.setBorder(new EmptyBorder(0,0,0,0));
-		btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		return(btn);
 	}
 }
