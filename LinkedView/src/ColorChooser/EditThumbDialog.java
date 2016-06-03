@@ -15,7 +15,6 @@ import javax.swing.JTextField;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.Helper;
-import edu.stanford.genetics.treeview.LogBuffer;
 
 public class EditThumbDialog extends CustomDialog {
 
@@ -134,60 +133,54 @@ public class EditThumbDialog extends CustomDialog {
 			double thumbVal = thumbBox.getThumbVal(index);
 			boolean isInputEqualToThumbVal = Helper.nearlyEqual(inputX, thumbVal);
 			
-			LogBuffer.println("Min: " + min);
-			LogBuffer.println("Max: " + max);
-			LogBuffer.println("InputVal: " + inputX);
-			LogBuffer.println("ThumbVal: " + thumbVal);
-			
 		  // Stay within dataset bounds
 		  if(inputX < min || inputX > max) {
-				LogBuffer.println("Value is outside of bounds");
 				setError("This value is out of data bounds.");
 				isInvalid = true;
 				
-			// Boundary thumbs
+			// If edited thumb is boundary thumb
 			} else if (t instanceof BoundaryThumb) {
-				LogBuffer.println("Boundary Thumb");
 				BoundaryThumb bT = (BoundaryThumb) t;
 				double otherBoundVal;
 				int otherBoundIdx;
-				LogBuffer.println("Current BT Val: "  + bT.getDataValue());
 				// Min bound
 				if (bT.isMin()) {
 					otherBoundIdx = maxThumbIdx;
 					otherBoundVal = thumbBox.getThumbVal(otherBoundIdx);
-					LogBuffer.println("min_other thumb val: " + otherBoundVal);
 					isInvalid = !(inputX < otherBoundVal);
 					if(isInvalid) {
-						setError("Cannot be equal to or bigger than max.");
+						setError("Cannot be equal to or greater than max.");
 					}
         
 				// Max bound
 				} else {
 					otherBoundIdx = minThumbIdx;
 					otherBoundVal = thumbBox.getThumbVal(otherBoundIdx);
-					LogBuffer.println("min_other thumb val: " + otherBoundVal);
 					isInvalid = !(inputX > otherBoundVal);
 					if(isInvalid) {
-						setError("Cannot be equal to or smaller than min.");
+						setError("Cannot be equal to or less than min.");
 					}
 				}
+		  // Overshoots or equals min boundary
+			} else if(!(inputX > thumbBox.getThumbVal(minThumbIdx))) {
+				// Left here in case we decide to do a replace in the future
+//				thumbBox.replaceThumbAt(minThumbIdx, t);
+				setError("Value has to be greater than left-most handle.");
+				isInvalid = true;
+				
+			// Overshoots or equals max boundary
+			} else if(!(inputX < thumbBox.getThumbVal(maxThumbIdx))) {
+			// Left here in case we decide to do a replace in the future
+//				thumbBox.replaceThumbAt(maxThumbIdx, t);
+				setError("Value has to be less than right-most handle.");
+				isInvalid = true;
+				
 			// Replace other handle if other handle with same data value exists
 			} else if(!isInputEqualToThumbVal && thumbBox.hasThumbForVal(inputX)) {
-				LogBuffer.println("Thumb value exists");
 				setError("A handle exists for this value.");
-	
 				thumbBox.removeThumbWithVal(inputX);
-				
-			} else if(inputX < thumbBox.getThumbVal(minThumbIdx)) {
-				thumbBox.replaceThumbAt(minThumbIdx, t);
-				
-			} else if(inputX > thumbBox.getThumbVal(maxThumbIdx)) {
-				thumbBox.replaceThumbAt(maxThumbIdx, t);
 			}
 			
-			LogBuffer.println("Is invalid: " + isInvalid);
-			LogBuffer.println("--------");
 			return isInvalid;
 
 		} catch (final NumberFormatException e) {
