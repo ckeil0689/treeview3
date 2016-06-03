@@ -149,7 +149,7 @@ public class EditThumbDialog extends CustomDialog {
 					otherBoundVal = thumbBox.getThumbVal(otherBoundIdx);
 					isInvalid = !(inputX < otherBoundVal);
 					if(isInvalid) {
-						setError("Cannot be equal to or greater than max.");
+						setError("Cannot be equal to or greater than right-most handle.");
 					}
         
 				// Max bound
@@ -158,7 +158,7 @@ public class EditThumbDialog extends CustomDialog {
 					otherBoundVal = thumbBox.getThumbVal(otherBoundIdx);
 					isInvalid = !(inputX > otherBoundVal);
 					if(isInvalid) {
-						setError("Cannot be equal to or less than min.");
+						setError("Cannot be equal to or less than left-most handle.");
 					}
 				}
 		  // Overshoots or equals min boundary
