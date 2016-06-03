@@ -125,6 +125,8 @@ public class EditThumbDialog extends CustomDialog {
 	private boolean isValueInvalid() {
 
 		boolean isInvalid = false;
+		int minThumbIdx = 0;
+		int maxThumbIdx = colorList.size() - 1;
 		setError(""); // ensure label reset
 		
 		try {
@@ -142,18 +144,6 @@ public class EditThumbDialog extends CustomDialog {
 				LogBuffer.println("Value is outside of bounds");
 				setError("This value is out of data bounds.");
 				isInvalid = true;
-						
-			// Replace other handle if data value already exists
-			} else if(!isInputEqualToThumbVal && thumbBox.hasThumbForVal(inputX)) {
-				LogBuffer.println("Thumb value exists");
-				setError("A handle exists for this value.");
-				//isInvalid = true;
-				// remove old thumb first...
-				if (t instanceof BoundaryThumb) {
-					isInvalid = true;
-				} else {
-					thumbBox.removeThumbWithVal(inputX);
-				}
 				
 			// Boundary thumbs
 			} else if (t instanceof BoundaryThumb) {
@@ -164,7 +154,7 @@ public class EditThumbDialog extends CustomDialog {
 				LogBuffer.println("Current BT Val: "  + bT.getDataValue());
 				// Min bound
 				if (bT.isMin()) {
-					otherBoundIdx = colorList.size() - 1;
+					otherBoundIdx = maxThumbIdx;
 					otherBoundVal = thumbBox.getThumbVal(otherBoundIdx);
 					LogBuffer.println("min_other thumb val: " + otherBoundVal);
 					isInvalid = !(inputX < otherBoundVal);
@@ -174,7 +164,7 @@ public class EditThumbDialog extends CustomDialog {
         
 				// Max bound
 				} else {
-					otherBoundIdx = 0;
+					otherBoundIdx = minThumbIdx;
 					otherBoundVal = thumbBox.getThumbVal(otherBoundIdx);
 					LogBuffer.println("min_other thumb val: " + otherBoundVal);
 					isInvalid = !(inputX > otherBoundVal);
@@ -182,13 +172,18 @@ public class EditThumbDialog extends CustomDialog {
 						setError("Cannot be equal to or smaller than min.");
 					}
 				}
-//			} else if (!(t instanceof BoundaryThumb)){
-//				double minBoundVal = thumbBox.getThumbVal(0);
-//				double maxBoundVal = thumbBox.getThumbVal(colorList.size() - 1);
-//				
-//				if(!(inputX > minBoundVal) && !(inputX < maxBoundVal)) {
-//					setError("Cannot move")
-//				}
+			// Replace other handle if other handle with same data value exists
+			} else if(!isInputEqualToThumbVal && thumbBox.hasThumbForVal(inputX)) {
+				LogBuffer.println("Thumb value exists");
+				setError("A handle exists for this value.");
+	
+				thumbBox.removeThumbWithVal(inputX);
+				
+			} else if(inputX < thumbBox.getThumbVal(minThumbIdx)) {
+				thumbBox.replaceThumbAt(minThumbIdx, t);
+				
+			} else if(inputX > thumbBox.getThumbVal(maxThumbIdx)) {
+				thumbBox.replaceThumbAt(maxThumbIdx, t);
 			}
 			
 			LogBuffer.println("Is invalid: " + isInvalid);
@@ -196,8 +191,8 @@ public class EditThumbDialog extends CustomDialog {
 			return isInvalid;
 
 		} catch (final NumberFormatException e) {
-			inputField.setText("Enter a valid number!");
-			return false;
+			setError("Enter a valid number!");
+			return true;
 		}
 	}
 
@@ -205,9 +200,10 @@ public class EditThumbDialog extends CustomDialog {
 	 * Changes the text of the error JTextArea to the supplied message.
 	 * @param message - The text to display.
 	 */
-	private void setError(String message) {
+	private void setError(final String message) {
 
 		valueStatus.setText(message);
+		this.setVisible(true); // message may chase mainPanel size
 	}
 
 	private class SetColorListener implements ActionListener {

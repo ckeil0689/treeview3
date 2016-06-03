@@ -604,6 +604,31 @@ public class ThumbBox {
 		colorPicker.updateFractions();
 		colorPicker.updateColors();
 	}
+	
+	/**
+	 * Replaces a thumb and color at the specified index.
+	 * 
+	 * @param idx - The index at which to replace the thumb.
+	 * @param t - The thumb to replace the old thumb with
+	 */
+	protected void replaceThumbAt(final int idx, final Thumb t) {
+
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		List<Color> colors = colorPicker.getColorList();
+
+		int currIdx = thumbs.indexOf(t);
+		
+		// replace
+		thumbs.set(idx, t);
+		colors.set(idx, t.getColor());
+		
+	  // remove & shrink
+	  thumbs.remove(currIdx);
+		colors.remove(currIdx);
+		
+		colorPicker.updateFractions();
+		colorPicker.updateColors();
+	}
 
 	/**
 	 * Requests if selected thumb is currently set or not. If yes, that means
