@@ -204,7 +204,7 @@ public class ThumbBox {
 		double[] thumbDataVals = new double[colorPicker.getThumbNumber()];
 
 		for (int i = 0; i < thumbDataVals.length; i++) {
-			thumbDataVals[i] = getThumbDataVal(i);
+			thumbDataVals[i] = getThumbVal(i);
 		}
 
 		/* get position of previous thumb */
@@ -476,7 +476,7 @@ public class ThumbBox {
 	 * @return A double value between minimum and maximum of the currently
 	 *         relevant data range for coloring.
 	 */
-	protected double getThumbDataVal(final int thumbIndex) {
+	protected double getThumbVal(final int thumbIndex) {
 
 		double range = colorPicker.getRange();
 		double minVal = colorPicker.getMinVal();
@@ -563,14 +563,14 @@ public class ThumbBox {
 	 * @param dataVal
 	 * @return
 	 */
-	protected boolean hasThumbForDataVal(double dataVal) {
+	protected boolean hasThumbForVal(double dataVal) {
 
 		boolean hasThumb = false;
 		List<Thumb> thumbs = colorPicker.getThumbList();
 
 		for (final Thumb t : thumbs) {
 
-			double tDataVal = getThumbDataVal(thumbs.indexOf(t));
+			double tDataVal = getThumbVal(thumbs.indexOf(t));
 			if (Helper.nearlyEqual(tDataVal, dataVal)) {
 				hasThumb = true;
 				break;
@@ -578,6 +578,29 @@ public class ThumbBox {
 		}
 
 		return hasThumb;
+	}
+	
+	/**
+	 * Check if there is any thumb associated with the given data value. If yes,
+	 * return its index.
+	 * 
+	 * @param dataVal
+	 * @return Thumb index in data
+	 */
+	protected void removeThumbWithVal(double dataVal) {
+
+		List<Thumb> thumbs = colorPicker.getThumbList();
+
+		for (final Thumb t : thumbs) {
+			double tDataVal = getThumbVal(thumbs.indexOf(t));
+			if (Helper.nearlyEqual(tDataVal, dataVal)) {
+				int idx = thumbs.indexOf(t);
+				thumbs.remove(idx);
+				colorPicker.getColorList().remove(idx);
+			}
+		}
+		
+		colorPicker.updateFractions();
 	}
 
 	/**

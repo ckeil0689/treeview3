@@ -126,31 +126,48 @@ public class EditThumbDialog extends CustomDialog {
 		boolean isInvalid = false;
 		try {
 			inputX = Double.parseDouble(inputField.getText());
-			double currentThumbData = thumbBox.getThumbDataVal(index);
-			boolean isCurrentThumbData = Helper.nearlyEqual(inputX,
-					currentThumbData);
-			isInvalid = thumbBox.hasThumbForDataVal(inputX);
-
-			if (t instanceof BoundaryThumb) {
+			double thumbVal = thumbBox.getThumbVal(index);
+			boolean isInputEqualToThumbVal = Helper.nearlyEqual(inputX, thumbVal);
+			
+			if(thumbBox.hasThumbForVal(inputX)) {
+				setError("A handle exists for this value.");
+				//isInvalid = true;
+				// remove old thumb first...
+				thumbBox.removeThumbWithVal(inputX);
+			
+			// Equal to or outside of dataset bounds
+			} else if(!(thumbVal > min) || !(thumbVal < max)) {
+				setError("This value is out of data bounds.");
+				isInvalid = true;
+				
+			// Boundary thumbs
+			} else if (t instanceof BoundaryThumb) {
 				BoundaryThumb bT = (BoundaryThumb) t;
-				double boundVal;
+				double otherBoundVal;
+				int otherBoundIdx;
+				// Min bound
 				if (bT.isMin()) {
-					boundVal = thumbBox.getThumbDataVal(colorList.size() - 1);
-					isInvalid = (inputX > boundVal)
-							|| Helper.nearlyEqual(inputX, boundVal);
-					setError("Cannot be bigger than max.");
-
+					otherBoundIdx = colorList.size() - 1;
+					otherBoundVal = thumbBox.getThumbVal(otherBoundIdx);
+					isInvalid = !(inputX < otherBoundVal);
+					if(isInvalid) {
+						setError("Cannot be equal to or bigger than max.");
+					}
+        
+				// Max bound
 				} else {
-					boundVal = thumbBox.getThumbDataVal(0);
-					isInvalid = (inputX < boundVal)
-							|| Helper.nearlyEqual(inputX, boundVal);
-					setError("Cannot be smaller than min.");
+					otherBoundIdx = 0;
+					otherBoundVal = thumbBox.getThumbVal(otherBoundIdx);
+					isInvalid = !(inputX > otherBoundVal);
+					if(isInvalid) {
+						setError("Cannot be equal to or smaller than min.");
+					}
 				}
-
 			} else {
-				setError("Value already has a handle!");
+				setError("");
 			}
-			return isInvalid && !isCurrentThumbData;
+			
+			return isInvalid && !isInputEqualToThumbVal;
 
 		} catch (final NumberFormatException e) {
 			inputField.setText("Enter a valid number!");
@@ -234,7 +251,7 @@ public class EditThumbDialog extends CustomDialog {
 		valueStatus.setForeground(GUIFactory.RED1);
 
 		/* default */
-		startX = thumbBox.getThumbDataVal(thumbIndex);
+		startX = thumbBox.getThumbVal(thumbIndex);
 		finalX = startX;
 
 		newColor = t.getColor();
@@ -244,7 +261,7 @@ public class EditThumbDialog extends CustomDialog {
 
 		/* Initially display thumb position */
 		inputField
-				.setText(Double.toString(thumbBox.getThumbDataVal(thumbIndex)));
+				.setText(Double.toString(thumbBox.getThumbVal(thumbIndex)));
 		inputField.addActionListener(new SetValueListener());
 
 		colorIcon = new ColorIcon(t.getColor());
