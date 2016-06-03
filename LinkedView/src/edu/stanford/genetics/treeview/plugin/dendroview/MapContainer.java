@@ -1136,9 +1136,7 @@ public class MapContainer extends Observable implements Observer,
 		   ((int) Math.round(targetZoomFrac)) == 1) {
 			return(getTotalTileNum() - cells);
 		}
-		//int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
-		int zoomVal = (int) Math.round(cells /
-				(1 - targetZoomFrac) - cells);
+		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
 		int numPixels = getAvailablePixels();
 		//LogBuffer.println("getBestZoomOutVal: Called with pixel [" + pixel +
 		//		"] and targetZoomFrac [" + targetZoomFrac +
@@ -1205,7 +1203,6 @@ public class MapContainer extends Observable implements Observer,
 			if(i > (zoomMax - zoomMin)) break;
 		}
 
-		
 		double minDiffThresh = 0.005;	//0=best possible ratio. "Good enough
 										//value" for when the ratio of the
 										//relative cell position of the cell

@@ -70,6 +70,7 @@ public class InteractiveMatrixView extends MatrixView {
 		//11 = Debug zoom animation "toward" selection/sub-selection
 		//13 = Debug zooming to/toward a target
 		//14 = Debug temporary band drawing upon mousePressed
+		//15 = Debug unbalanced zooming
 	}
 
 	/**
@@ -807,6 +808,13 @@ public class InteractiveMatrixView extends MatrixView {
 				}
 			}
 		}
+
+		debug("At zoom level x" + numXCells + ", y" + numYCells +
+			" - Zooming out by x" + zoomXVal + " and y" + zoomYVal +
+			" tiles. Aspect Ratio: [" + aspectRatio +
+			"] Num xcells should have: [" + numXCellsShouldHave +
+			"] targetZoomFrac: [" + targetZoomFrac + "] correction: [" +
+			targetZoomFracCorrection + "]",15);
 
 		if(xmap.zoomAwayPixel(xPxPos, zoomXVal) == 1)
 			updateAspectRatio();
