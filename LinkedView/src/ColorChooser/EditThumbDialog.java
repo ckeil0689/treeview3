@@ -77,11 +77,11 @@ public class EditThumbDialog extends CustomDialog {
 		this.colorList = colorList;
 		this.index = thumbIndex;
 
-		this.mean = mean;
-		this.median = median;
-		this.center = center;
-		this.min = min;
-		this.max = max;
+		this.mean = Helper.roundDouble(mean, 4);
+		this.median = Helper.roundDouble(median, 4);
+		this.center = Helper.roundDouble(center, 4);
+		this.min = Helper.roundDouble(min, 4);
+		this.max = Helper.roundDouble(max, 4);
 
 		setupLayout();
 	}

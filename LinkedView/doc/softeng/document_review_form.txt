@@ -10,10 +10,9 @@ REFERENCES:
 3. SCMP_TreeView2.doc
 
 USAGE:
-Please refer to sections 3.2.4.2.2.1 (INDEPENDENT DOCUMENT REVIEWS) of the
-SCMP[3] for details on conducting document reviews using this form, but simply,
-use the following forms for reporting each issue found during the document
-review.
+Please refer to sections 3.2.6.2.2 (PROCESSING A MERGE REQUEST) of the SCMP[3]
+for details on conducting document reviews using this form, but simply, use the
+following forms for reporting each issue found during the document review.
 
 
 BITBUCKET REVIEW TEMPLATE
