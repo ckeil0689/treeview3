@@ -202,6 +202,11 @@ public class GradientBox {
 				index = thumbs.indexOf(t);
 			}
 		}
+		
+		if(!(index < colorList.size())) {
+			LogBuffer.println("Tried to remove color outside of color list bounds.");
+			return;
+		}
 
 		JPanel panel = colorPicker.getContainerPanel();
 		newCol = JColorChooser.showDialog(panel, "Pick a Color",

@@ -337,7 +337,7 @@ public class ColorPicker {
 
 		this.minVal = minVal;
 		colorExtractor.setMin(minVal);
-		minThumb.setDataValue(minVal);
+		minThumb.setValue(minVal);
 		updateRange();
 
 		updateFractions();
@@ -351,7 +351,7 @@ public class ColorPicker {
 	protected void setMaxVal(double maxVal) {
 		this.maxVal = maxVal;
 		colorExtractor.setMax(maxVal);
-		maxThumb.setDataValue(maxVal);
+		maxThumb.setValue(maxVal);
 		updateRange();
 		updateFractions();
 	}

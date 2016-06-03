@@ -17,7 +17,7 @@ public class Thumb {
 	protected int x;
 	protected int y;
 
-	protected double dataVal;
+	private double dataVal;
 
 	/* Thumb dimensions */
 	protected int width = 12;
@@ -59,7 +59,7 @@ public class Thumb {
 	 * 
 	 * @param dataVal
 	 */
-	public void setDataValue(final double dataVal) {
+	public void setValue(final double dataVal) {
 
 		this.dataVal = dataVal;
 	}

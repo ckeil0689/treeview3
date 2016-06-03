@@ -411,6 +411,7 @@ implements ConfigNodePersistent {
 				/* Switch to RedGreen */
 				colorSetName = "RedGreen";
 				colorChooserUI.setCustomSelected(false);
+				//TODO reset values!
 
 			} else if (selected.equalsIgnoreCase("YellowBlue")) {
 				/* Switch to YellowBlue */
