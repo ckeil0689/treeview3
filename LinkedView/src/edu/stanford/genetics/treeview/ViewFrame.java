@@ -28,7 +28,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import Cluster.ClusterFileFilter;
-import Utilities.StringRes;
 import edu.stanford.genetics.treeview.core.FileMru;
 
 /* BEGIN_HEADER                                                   TreeView 3
@@ -71,8 +70,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 
 		this.appFrame = new JFrame(title);
 		this.configNode = mainConfigNode;
-
-		handlePreferencesVersion();
 		
 		/* maximize frame first */
 		setupFrameSize();
@@ -93,52 +90,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 		appFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		setupWindowListener();
-	}
-	
-	/** 
-	 * Versioning following MAJOR.MINOR.PATCH
-	 * See http://semver.org/
-	 * This routine now has the purpose of handling the preferences version.
-	 * If needed, it will make a decision how old versions are adapted and if
-	 * major restructuring of old preferences setups are needed.
-	 */
-	private void handlePreferencesVersion() {
-		
-		// Default 'none' to detect if Preferences are stored for the first time
-		String currVersion = getNotedPreferencesVersion();
-		
-		// Reset or never stored version before
-		if("none".equals(currVersion)) {
-			// anything to do here?
-			
-		// An earlier version exists	
-		} else {
-			// Earlier version does not match current version
-			if(!StringRes.preferencesVersionTag.equals(currVersion)) {
-				// make sure old preferences are migrated well (BB Issue #407)
-			}
-		}
-		
-		// finally store the new version
-		configNode.put("version", StringRes.preferencesVersionTag);
-	}
-	
-	/**
-	 * 
-	 * @return The version String denoting the Preferences version stored in
-	 * the node which was initially assigned to the onfigNode of this class
-	 * upon application startup.
-	 */
-	public String getNotedPreferencesVersion() {
-		
-		String version;
-		if(configNode == null) {
-			return "none";
-		}
-		
-		version = configNode.get("version", "none");
-		
-		return version;
 	}
 
 	/**

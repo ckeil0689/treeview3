@@ -15,6 +15,7 @@ import java.util.prefs.Preferences;
 import javax.swing.ToolTipManager;
 
 import Controllers.TVController;
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.model.TVModel;
 
 /**
@@ -80,8 +81,10 @@ public abstract class TreeViewApp {// implements WindowListener {
 			globalConfig = preferences;
 
 		} else {
-			globalConfig = setPreferences();
+			globalConfig = getMainPreferencesNode();
 		}
+		
+		handlePreferencesVersion();
 
 		rowUrlPresets = new UrlPresets("GeneUrlPresets");
 		rowUrlPresets.setConfigNode(getGlobalConfig());
@@ -147,9 +150,55 @@ public abstract class TreeViewApp {// implements WindowListener {
 	 *
 	 * @return Preferences
 	 */
-	public Preferences setPreferences() {
+	public Preferences getMainPreferencesNode() {
 
 		return Preferences.userRoot().node("TreeViewApp");
+	}
+	
+	/** 
+	 * Versioning following MAJOR.MINOR.PATCH
+	 * See http://semver.org/
+	 * This routine now has the purpose of handling the preferences version.
+	 * If needed, it will make a decision how old versions are adapted and if
+	 * major restructuring of old preferences setups are needed.
+	 */
+	private void handlePreferencesVersion() {
+		
+		// Default 'none' to detect if Preferences are stored for the first time
+		String currVersion = getNotedPreferencesVersion();
+		
+		// Reset or never stored version before
+		if("none".equals(currVersion)) {
+			// anything to do here?
+			
+		// An earlier version exists	
+		} else {
+			// Earlier version does not match current version
+			if(!StringRes.preferencesVersionTag.equals(currVersion)) {
+				// make sure old preferences are migrated well (BB Issue #407)
+			}
+		}
+		
+		// finally store the new version
+		globalConfig.put("version", StringRes.preferencesVersionTag);
+	}
+	
+	/**
+	 * 
+	 * @return The version String denoting the Preferences version stored in
+	 * the node which was initially assigned to the onfigNode of this class
+	 * upon application startup.
+	 */
+	public String getNotedPreferencesVersion() {
+		
+		String version;
+		if(globalConfig == null) {
+			return "none";
+		}
+		
+		version = globalConfig.get("version", "none");
+		
+		return version;
 	}
 
 	/**
