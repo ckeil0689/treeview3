@@ -37,8 +37,6 @@ public class ExportDialog extends CustomDialog {
 	
 	private int bgWidth;
 	private int bgHeight;
-	
-	private Dimension totalCompArea;
 	private int gapsize;
 	
 	private ExportPreviewTrees rowPrevTrees;
@@ -431,12 +429,11 @@ public class ExportDialog extends CustomDialog {
 	 * to adjust the preview components
 	 * @param dataMatrixSize - The size of the dataMatrix (rows x columns)
 	 */
-	public void updatePreviewComponents(final ExportOptions exportOptions, 
-			final Dimension imvSize, final Dimension dataMatrixSize) {
+	public void updatePreviewComponents(final ExportOptions exportOptions) {
 		
 		updateBackground(exportOptions);
 		Dimension bgSize = new Dimension(bgWidth, bgHeight);
-		updatePreviewMatrix(exportOptions, bgSize, imvSize, dataMatrixSize);
+		updatePreviewMatrix(exportOptions, bgSize);
 		
 		arrangePreviewPanel();
 		
@@ -506,8 +503,7 @@ public class ExportDialog extends CustomDialog {
 	 * (1 element = 1px)
 	 */
 	private void updatePreviewMatrix(final ExportOptions exportOptions, 
-			final Dimension bgSize, final Dimension imvSize, 
-			final Dimension dataMatrixSize) {
+			final Dimension bgSize) {
 		
 		/* (!)
 		 * Using int casts throughout this method instead of Math methods,
@@ -521,14 +517,7 @@ public class ExportDialog extends CustomDialog {
 		availBgWidth -= margin;
 		availBgHeight -= margin;
 		
-		/* 
-		 * Set the total area that may be taken up by all components - used for
-		 * setting up the layout outside of this routine. In the end, scaling
-		 * of the components has to fit this area.
-		 */
-		this.totalCompArea = new Dimension(availBgWidth, availBgHeight);
-		
-		// issue #6/ #6.1 implementation
+		/* issue #6/ #6.1 implementation */
 		eh.setCalculatedDimensions(exportOptions.getRegionType(), 
 				exportOptions.getAspectType());
 		
@@ -536,36 +525,31 @@ public class ExportDialog extends CustomDialog {
 		int exportWidth = eh.getXDim(exportOptions.getRegionType());
 		int exportHeight = eh.getYDim(exportOptions.getRegionType());
 
-		Dimension exportDim = new Dimension(exportWidth, exportHeight);
-		
 		/* 
 		 * Define scales to fit ExportHandler-calculated sizes of preview 
 		 * components to the available background area.
 		 */
-		double scale1 = ((double) availBgWidth) / exportWidth;
-		double scale2 = 1;
+		double scaleWidth = ((double) availBgWidth) / exportWidth;
+		double scaleHeight = 1;
 		
-		LogBuffer.println("scale1: " + scale1);
+		/* Apply width scale */
+		int previewImgWidth = (int)(exportWidth * scaleWidth);
+		int previewImgHeight = (int)(exportHeight * scaleWidth);
 		
-		/* Apply scale */
-		int previewImgWidth = (int)(exportWidth * scale1);
-		int previewImgHeight = (int)(exportHeight * scale1);
-		
+		/* If height is still too great, rescale */
 		if(availBgHeight < previewImgHeight) {
-			scale2 = ((double)availBgHeight) / previewImgHeight;
+			scaleHeight = ((double)availBgHeight) / previewImgHeight;
 		}
 		
-		previewImgWidth *= scale2;
-		previewImgHeight *= scale2;
-		
-		Dimension scaledExportDim = new Dimension(previewImgWidth, previewImgHeight);
-		
+		/* Apply height scale */
+		previewImgWidth *= scaleHeight;
+		previewImgHeight *= scaleHeight;
 		
 		/* Get scaled sizes for trees and gaps */
-		int treeSize = (int)(scale1 * scale2 * eh.getTreesHeight());
-		this.gapsize = (int)(scale1 * scale2 * eh.getTreeMatrixGapSize());
+		int treeSize = (int)(scaleWidth * scaleHeight * eh.getTreesHeight());
+		this.gapsize = (int)(scaleWidth * scaleHeight * eh.getTreeMatrixGapSize());
 		
-		// adjust maximum matrix side length for tree thickness
+		// adjust maximum matrix side length for tree thickness and gaps
 		if(rowPrevTrees != null) {
 			rowPrevTrees.setShortSide(treeSize);
 			previewImgWidth -= treeSize;
@@ -578,54 +562,8 @@ public class ExportDialog extends CustomDialog {
 			previewImgHeight -= gapsize;
 		}
 		
-		Dimension matrixDim = new Dimension(previewImgWidth, previewImgHeight);
-		
-		LogBuffer.println("ExportDim: " + exportDim.toString());
-		LogBuffer.println("ScaledExportDim: " + scaledExportDim.toString());
-		LogBuffer.println("MatrixDim: " + matrixDim.toString());
-		LogBuffer.println("totalAreaAvail: " + totalCompArea.toString());
-		
-		
 		matrix.setMatrixWidth(previewImgWidth);
 		matrix.setMatrixHeight(previewImgHeight);
-	}
-	
-	/**
-	 * Grows or shrinks the newly created dimension until it fits 
-	 * the background nicely.
-	 * @param startDim - The newly created dimension
-	 * @param adjBgDim - The previously adjusted background dimension. The
-	 * fit of startDim is calculated for this dimension.
-	 * @return A dimension that fits the background dimension such that the 
-	 * longest side fills its dimension and the overall dimension ratio is 
-	 * retained.
-	 */
-	private Dimension adjustDim(final Dimension startDim, 
-			final Dimension adjBgDim) {
-		
-		double adjWidth = startDim.getWidth();
-		double adjHeight = startDim.getHeight();
-		
-		double adjBgWidth = adjBgDim.getWidth();
-		double adjBgHeight = adjBgDim.getHeight();
-		
-		if(adjWidth > adjBgWidth || adjHeight > adjBgHeight) {
-			// iteratively shrink until fit
-			double shrinkFactor = 0.99;
-			while(adjWidth > adjBgWidth || adjHeight > adjBgHeight) {
-				adjWidth = adjWidth * shrinkFactor;
-				adjHeight = adjHeight * shrinkFactor;
-			}
-		} else {
-			// iteratively grow until fit
-			double growthFactor = 1.01;
-			while(adjWidth < adjBgWidth && adjHeight < adjBgHeight) {
-				adjWidth = adjWidth * growthFactor;
-				adjHeight = adjHeight * growthFactor;
-			}
-		}
-		
-		return new Dimension((int) adjWidth, (int) adjHeight);
 	}
 	
 	/**
