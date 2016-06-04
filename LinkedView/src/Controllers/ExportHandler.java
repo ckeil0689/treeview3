@@ -800,6 +800,16 @@ public class ExportHandler {
 
 		return(asps);
 	}
+	
+	public int getTreesHeight() {
+		
+		return treesHeight;
+	}
+	
+	public int getTreeMatrixGapSize() {
+		
+		return treeMatrixGapSize;
+	}
 
 	/**
 	 * Given current settings for aspect ratio, will the supplied region end up

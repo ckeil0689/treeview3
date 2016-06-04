@@ -39,6 +39,7 @@ public class ExportDialog extends CustomDialog {
 	private int bgHeight;
 	
 	private Dimension totalCompArea;
+	private int gapsize;
 	
 	private ExportPreviewTrees rowPrevTrees;
 	private ExportPreviewTrees colPrevTrees;
@@ -62,6 +63,8 @@ public class ExportDialog extends CustomDialog {
 		final boolean useMinimums = true;
 		this.bigRegs = eh.getOversizedRegions(useMinimums);
 		this.selectionsExist = selectionsExist;
+		
+		this.gapsize = 5; // default
 		
 		this.bgWidth = PAPER_LONGSIDELEN;
 		this.bgHeight = PAPER_LONGSIDELEN;
@@ -378,23 +381,12 @@ public class ExportDialog extends CustomDialog {
 		
 		JPanel previews = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		
-		// Defaults
-		int treeYGap = 5;
-		int treeXGap = 5;
-		
-		if(totalCompArea != null) {
-			treeYGap = (int) (eh.getTreeMatrixGapRatio() * 
-					totalCompArea.getHeight());
-			treeXGap = (int) (eh.getTreeMatrixGapRatio() * 
-					totalCompArea.getWidth());
-		}
-		
 		/* Tree panels need to have the same size as the matrix */
 		JPanel filler = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevTrees != null) {
 			previews.add(filler, "w " + rowPrevTrees.getShortSide() + "!, "
 					+ "h " + colPrevTrees.getShortSide() + "!,"
-							+ "gap " + treeXGap + "! " + treeYGap);
+							+ "gap " + gapsize + "! " + gapsize);
 		}
 
 		if(colPrevTrees != null) {
@@ -402,7 +394,7 @@ public class ExportDialog extends CustomDialog {
 			previews.add(colPrevTrees, "growx, pushx, "
 					+ "h " + colPrevTrees.getShortSide() + "!,"
 					+ " w " + colPrevTrees.getLongSide() + "!, "
-					+ "gapy " + treeYGap + "!, wrap");
+					+ "gapy " + gapsize + "!, wrap");
 		}
 
 		if(rowPrevTrees != null) {
@@ -410,7 +402,7 @@ public class ExportDialog extends CustomDialog {
 			previews.add(rowPrevTrees, "growy, aligny 0, pushy, "
 					+ "h " + rowPrevTrees.getLongSide() + "!, "
 					+ "w " + rowPrevTrees.getShortSide() + "!, "
-					+ "gapx " + treeXGap + "!");
+					+ "gapx " + gapsize + "!");
 		}
 
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
@@ -521,70 +513,81 @@ public class ExportDialog extends CustomDialog {
 		 * Using int casts throughout this method instead of Math methods,
 		 * because plain truncating is fine. 
 		 */
+		int availBgWidth = (int) bgSize.getWidth();
+		int availBgHeight = (int) bgSize.getHeight();
 		
-		int adjBgWidth = (int) bgSize.getWidth();
-		int adjBgHeight = (int) bgSize.getHeight();
+		// Shrink available background area to realize an arbitrary 10px margin
+		int margin = 20;
+		availBgWidth -= margin;
+		availBgHeight -= margin;
 		
-		/* Define maximal side length of matrix to remain within background */
-		// issue #6 implementation
+		/* 
+		 * Set the total area that may be taken up by all components - used for
+		 * setting up the layout outside of this routine. In the end, scaling
+		 * of the components has to fit this area.
+		 */
+		this.totalCompArea = new Dimension(availBgWidth, availBgHeight);
+		
+		// issue #6/ #6.1 implementation
 		eh.setCalculatedDimensions(exportOptions.getRegionType(), 
 				exportOptions.getAspectType());
 		
-		double treeRatio = eh.getTreeRatio();
-		int rowTreeSize = (int) (treeRatio * adjBgWidth);
-		int colTreeSize = (int) (treeRatio * adjBgHeight);
+		/* Dimensions of full exported image before scaling */
+		int exportWidth = eh.getXDim(exportOptions.getRegionType());
+		int exportHeight = eh.getYDim(exportOptions.getRegionType());
+
+		Dimension exportDim = new Dimension(exportWidth, exportHeight);
 		
-		// Total per-axis distance from document edge to drawn components
-		int edgeBuffer = 20;
-		//give a little additional space
-		adjBgWidth -= edgeBuffer;
-		adjBgHeight -= edgeBuffer;
+		/* 
+		 * Define scales to fit ExportHandler-calculated sizes of preview 
+		 * components to the available background area.
+		 */
+		double scale1 = ((double) availBgWidth) / exportWidth;
+		double scale2 = 1;
 		
-		// before adjusting for trees, store for later gap calculations
-		this.totalCompArea = new Dimension(adjBgWidth, adjBgHeight);
+		LogBuffer.println("scale1: " + scale1);
+		
+		/* Apply scale */
+		int previewImgWidth = (int)(exportWidth * scale1);
+		int previewImgHeight = (int)(exportHeight * scale1);
+		
+		if(availBgHeight < previewImgHeight) {
+			scale2 = ((double)availBgHeight) / previewImgHeight;
+		}
+		
+		previewImgWidth *= scale2;
+		previewImgHeight *= scale2;
+		
+		Dimension scaledExportDim = new Dimension(previewImgWidth, previewImgHeight);
+		
+		
+		/* Get scaled sizes for trees and gaps */
+		int treeSize = (int)(scale1 * scale2 * eh.getTreesHeight());
+		this.gapsize = (int)(scale1 * scale2 * eh.getTreeMatrixGapSize());
 		
 		// adjust maximum matrix side length for tree thickness
 		if(rowPrevTrees != null) {
-			rowPrevTrees.setShortSide(rowTreeSize);
-			adjBgWidth -= rowTreeSize;
+			rowPrevTrees.setShortSide(treeSize);
+			previewImgWidth -= treeSize;
+			previewImgWidth -= gapsize;
 		}
 		
 		if(colPrevTrees != null) {
-			colPrevTrees.setShortSide(colTreeSize);
-			adjBgHeight -= colTreeSize;
+			colPrevTrees.setShortSide(treeSize);
+			previewImgHeight -= treeSize;
+			previewImgHeight -= gapsize;
 		}
 		
-		double newWidth;
-		double newHeight;
+		Dimension matrixDim = new Dimension(previewImgWidth, previewImgHeight);
 		
-		int matrixWidth;
-		int matrixHeight;
+		LogBuffer.println("ExportDim: " + exportDim.toString());
+		LogBuffer.println("ScaledExportDim: " + scaledExportDim.toString());
+		LogBuffer.println("MatrixDim: " + matrixDim.toString());
+		LogBuffer.println("totalAreaAvail: " + totalCompArea.toString());
 		
-		/* 
-		 * Adapt matrix size depending on selected aspect ratio 
-		 * concept: grow or shrink until the bigger side fits
-		 */
-		if(exportOptions.getAspectType() == AspectType.ONETOONE) {
-			// Square tiles	
-			newWidth = dataMatrixSize.getWidth();
-			newHeight = dataMatrixSize.getHeight();
-						
-		// calculate fitting size for preview matrix from full matrix size	
-		} else {
-			newWidth = imvSize.getWidth();
-			newHeight = imvSize.getHeight();
-		}
 		
-		Dimension startDim = new Dimension((int) newWidth, (int) newHeight);
-		Dimension targetDim = new Dimension(adjBgWidth, adjBgHeight);
-		
-		Dimension finalDim = adjustDim(startDim, targetDim);
-		
-		matrixWidth = (int) finalDim.getWidth();
-		matrixHeight = (int) finalDim.getHeight();
-		
-		matrix.setMatrixWidth(matrixWidth);
-		matrix.setMatrixHeight(matrixHeight);
+		matrix.setMatrixWidth(previewImgWidth);
+		matrix.setMatrixHeight(previewImgHeight);
 	}
 	
 	/**
