@@ -14,6 +14,7 @@ public class StringRes {
 	/* Global Application Fields */
 	/** Version of application */
 	public final static String versionTag = "3.0alpha03";
+	public final static String preferencesVersionTag = "0.1.0-alpha";
 
 	/** Homepage for updates */
 	public final static String updateUrl = "https://www.princeton.edu/"

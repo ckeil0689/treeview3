@@ -23,12 +23,12 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
-import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import Cluster.ClusterFileFilter;
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.core.FileMru;
 
 /* BEGIN_HEADER                                                   TreeView 3
@@ -67,29 +67,78 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 * @param title
 	 *            Title for the ViewFrame.
 	 */
-	public ViewFrame(final String title, final Preferences configNode) {
+	public ViewFrame(final String title, final Preferences mainConfigNode) {
 
 		this.appFrame = new JFrame(title);
-		this.configNode = configNode;
+		this.configNode = mainConfigNode;
 
+		handlePreferencesVersion();
+		
 		/* maximize frame first */
 		setupFrameSize();
 
 		final int init_width = appFrame.getWidth();
 		final int init_height = appFrame.getHeight();
 
-		final int left = configNode.getInt("frame_left", 0);
-		final int top = configNode.getInt("frame_top", 0);
-		final int width = configNode.getInt("frame_width", init_width);
-		final int height = configNode.getInt("frame_height", init_height);
+		final int left = mainConfigNode.getInt("frame_left", 0);
+		final int top = mainConfigNode.getInt("frame_top", 0);
+		final int width = mainConfigNode.getInt("frame_width", init_width);
+		final int height = mainConfigNode.getInt("frame_height", init_height);
 
 		appFrame.setBounds(left, top, width, height);
+		
 		//Handle app quit via a confirmation box, so set the default close
 		//operation to do nothing. Closing will be handled by an explicit call
 		//to dispose.
 		appFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		setupWindowListener();
+	}
+	
+	/** 
+	 * Versioning following MAJOR.MINOR.PATCH
+	 * See http://semver.org/
+	 * This routine now has the purpose of handling the preferences version.
+	 * If needed, it will make a decision how old versions are adapted and if
+	 * major restructuring of old preferences setups are needed.
+	 */
+	private void handlePreferencesVersion() {
+		
+		// Default 'none' to detect if Preferences are stored for the first time
+		String currVersion = getNotedPreferencesVersion();
+		
+		// Reset or never stored version before
+		if("none".equals(currVersion)) {
+			// anything to do here?
+			
+		// An earlier version exists	
+		} else {
+			// Earlier version does not match current version
+			if(!StringRes.preferencesVersionTag.equals(currVersion)) {
+				// make sure old preferences are migrated well (BB Issue #407)
+			}
+		}
+		
+		// finally store the new version
+		configNode.put("version", StringRes.preferencesVersionTag);
+	}
+	
+	/**
+	 * 
+	 * @return The version String denoting the Preferences version stored in
+	 * the node which was initially assigned to the onfigNode of this class
+	 * upon application startup.
+	 */
+	public String getNotedPreferencesVersion() {
+		
+		String version;
+		if(configNode == null) {
+			return "none";
+		}
+		
+		version = configNode.get("version", "none");
+		
+		return version;
 	}
 
 	/**
