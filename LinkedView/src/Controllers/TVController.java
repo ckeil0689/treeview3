@@ -107,25 +107,43 @@ public class TVController implements Observer {
 	public void resetPreferences() {
 
 		try {
-			final int option = JOptionPane.showConfirmDialog(
-					Frame.getFrames()[0],
-					"Are you sure you want to reset preferences and "
-							+ "close TreeView?", "Reset Preferences?",
-					JOptionPane.YES_NO_OPTION);
+			CustomDetailsConfirmDialog dlg = new CustomDetailsConfirmDialog(
+				"Reset Preferences?",
+				"Are you sure you want to reset the preferences and quit " +
+				"TreeView?<BR>\nCustom settings such as colors will be reset to " +
+				"default for all files.",
+				"Resetting the application-wide preferences can frequently " +
+				"resolve behavior and display problems. TreeView3 keeps track " +
+				"of input-file-specific settings independent of the input " +
+				"file itself, so resetting the preferences affects things " +
+				"like custom label and color settings for all previously " +
+				"viewed files. These are things like, selected fonts, custom " +
+				"color selections, the data values associated with those " +
+				"colors in the chosen spectrum, minimum font size, and the " +
+				"selected label type to display as the row/column labels. " +
+				"Other things such as 'last file opened', the starting " +
+				"directory in the open file dialog, and window size/position " +
+				"will also be lost. Your data in the files remains untouched. " +
+				"Only superficial data is lost. Clustering, trees, and data " +
+				"values remain intact.","Reset");
+			int option = dlg.showDialog();
 
 			switch (option) {
 
-			case JOptionPane.YES_OPTION:
-				tvFrame.getConfigNode().parent().removeNode();
-				tvFrame.getAppFrame().dispose();
-				System.exit(0);
-				break;
+				case CustomDetailsConfirmDialog.OK_OPTION:
+					LogBuffer.println("Resetting preferences and quitting.");
+					tvFrame.getConfigNode().parent().removeNode();
+					tvFrame.getAppFrame().dispose();
+					System.exit(0);
+					break;
 
-			case JOptionPane.NO_OPTION:
-				return;
+				case CustomDetailsConfirmDialog.CANCEL_OPTION:
+					LogBuffer.println("Canceling reset prefs.");
+					return;
 
-			default:
-				return;
+				default:
+					LogBuffer.println("Reset prefs dialog was closed.");
+					return;
 			}
 
 		} catch (final BackingStoreException e) {

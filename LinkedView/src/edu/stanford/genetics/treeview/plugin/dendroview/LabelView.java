@@ -2806,9 +2806,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				drawSelection.setIndexSelection(index, true);
 				otherSelection.selectAllIndexes();
 			}
-		} else {
-			otherSelection.deselectAllIndexes();
-			drawSelection.deselectAllIndexes();
 		}
 
 		drawSelection.notifyObservers();
