@@ -93,3 +93,13 @@ This program is free software: you can redistribute it and/or modify it under th
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+DEPENDENCIES
+=======
+
+* Java TreeView (https://sourceforge.net/projects/jtreeview/)
+* FreeHep (http://java.freehep.org/license.html)
+* MigLayout (http://www.miglayout.com/)
+* SwingX - Autocompletion (http://www.java2s.com/Code/Jar/s/Downloadswingxcore162AutoCompletitionjar.htm)
+* xml-apis/ Xerces (https://xerces.apache.org/xml-commons/)
