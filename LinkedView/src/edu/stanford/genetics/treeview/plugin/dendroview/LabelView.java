@@ -820,7 +820,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//scrollbar drag, but it has been replaced by this more universal
 		//method.  Note, this method returns 0 or the max index if the cursor is
 		//hovered off that nearest edge.
-		forceUpdatePrimaryHoverIndex();
+		if(SwingUtilities.getWindowAncestor(this).isActive())
+		    forceUpdatePrimaryHoverIndex();
 
 		debug(getPaneType() + " forced hover index: [" + getPrimaryHoverIndex() +
 			"] isOverIMV? [" + (map.isOverIMV() ? "yes" : "no") + "]",9);
