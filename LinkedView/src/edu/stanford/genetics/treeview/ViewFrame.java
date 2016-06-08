@@ -23,7 +23,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
-import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -67,23 +66,24 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 * @param title
 	 *            Title for the ViewFrame.
 	 */
-	public ViewFrame(final String title, final Preferences configNode) {
+	public ViewFrame(final String title, final Preferences mainConfigNode) {
 
 		this.appFrame = new JFrame(title);
-		this.configNode = configNode;
-
+		this.configNode = mainConfigNode;
+		
 		/* maximize frame first */
 		setupFrameSize();
 
 		final int init_width = appFrame.getWidth();
 		final int init_height = appFrame.getHeight();
 
-		final int left = configNode.getInt("frame_left", 0);
-		final int top = configNode.getInt("frame_top", 0);
-		final int width = configNode.getInt("frame_width", init_width);
-		final int height = configNode.getInt("frame_height", init_height);
+		final int left = mainConfigNode.getInt("frame_left", 0);
+		final int top = mainConfigNode.getInt("frame_top", 0);
+		final int width = mainConfigNode.getInt("frame_width", init_width);
+		final int height = mainConfigNode.getInt("frame_height", init_height);
 
 		appFrame.setBounds(left, top, width, height);
+		
 		//Handle app quit via a confirmation box, so set the default close
 		//operation to do nothing. Closing will be handled by an explicit call
 		//to dispose.
