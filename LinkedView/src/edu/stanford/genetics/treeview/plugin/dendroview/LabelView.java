@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -816,13 +817,17 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 * here on out
 		 */
 
-		//There used to be a custom case for hover index updates during
-		//scrollbar drag, but it has been replaced by this more universal
-		//method.  Note, this method returns 0 or the max index if the cursor is
-		//hovered off that nearest edge.
-		if(SwingUtilities.getWindowAncestor(this).isActive())
+		/* Gets the Current active Window (eg: export or treeview frame). It 
+		 * will return null if we are active in other application.
+		 */
+		Window activeWindow = javax.swing.FocusManager.getCurrentManager().getActiveWindow();		
+		if(activeWindow == null || SwingUtilities.getWindowAncestor(this).isActive()){
+			//There used to be a custom case for hover index updates during
+			//scrollbar drag, but it has been replaced by this more universal
+			//method.  Note, this method returns 0 or the max index if the cursor is
+			//hovered off that nearest edge.
 		    forceUpdatePrimaryHoverIndex();
-
+		}
 		debug(getPaneType() + " forced hover index: [" + getPrimaryHoverIndex() +
 			"] isOverIMV? [" + (map.isOverIMV() ? "yes" : "no") + "]",9);
 
