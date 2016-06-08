@@ -167,15 +167,11 @@ public abstract class TreeViewApp {// implements WindowListener {
 		// Default 'none' to detect if Preferences are stored for the first time
 		String currVersion = getNotedPreferencesVersion();
 		
-		// Reset or never stored version before
-		if("none".equals(currVersion)) {
-			// anything to do here?
-			
-		// An earlier version exists	
-		} else {
-			// Earlier version does not match current version
+	  // An earlier version exists
+		if(!"none".equals(currVersion)) {
+			// Existing version does not match current version
 			if(!StringRes.preferencesVersionTag.equals(currVersion)) {
-				// make sure old preferences are migrated well (BB Issue #407)
+				// TODO make sure old preferences are migrated well (BB Issue #407)
 			}
 		}
 		
@@ -186,7 +182,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 	/**
 	 * 
 	 * @return The version String denoting the Preferences version stored in
-	 * the node which was initially assigned to the onfigNode of this class
+	 * the node which was initially assigned to the configNode of this class
 	 * upon application startup.
 	 */
 	public String getNotedPreferencesVersion() {
