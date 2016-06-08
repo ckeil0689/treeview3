@@ -12,8 +12,10 @@ package Utilities;
 public class StringRes {
 
 	/* Global Application Fields */
-	/** Version of application */
+	/* Version of application */
 	public final static String versionTag = "3.0alpha03";
+	
+	/* Versioning following MAJOR.MINOR.PATCH - See http://semver.org/ */
 	public final static String preferencesVersionTag = "0.1.0-alpha";
 
 	/** Homepage for updates */
