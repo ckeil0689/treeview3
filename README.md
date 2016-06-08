@@ -86,7 +86,7 @@ LICENSE
 
 Treeview 3.0 - visualization and analysis of large data matrices
 
-Our project license can be found [here](https://bitbucket.org/TreeView3Dev/treeview3/src/85ca08ccd77f32f80d1f219aaf8ec23898a29828/LICENSE?at=master&fileviewer=file-view-default).
+Our project uses the MIT license. It can be found [here](https://bitbucket.org/TreeView3Dev/treeview3/src/85ca08ccd77f32f80d1f219aaf8ec23898a29828/LICENSE?at=master&fileviewer=file-view-default).
 
 DEPENDENCIES
 =======
