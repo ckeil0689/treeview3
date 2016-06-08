@@ -93,7 +93,7 @@ public class DendroView implements Observer, DendroPanel {
 	protected final RowLabelView rowLabelView;
 	protected final ColumnLabelView colLabelView;
 
-	/* JScrollBars for GlobalView */
+	/* JScrollBars for InteractiveMatrixView */
 	protected JScrollBar matrixXscrollbar;
 	protected JScrollBar matrixYscrollbar;
 
