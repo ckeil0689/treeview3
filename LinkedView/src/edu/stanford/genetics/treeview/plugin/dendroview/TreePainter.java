@@ -721,8 +721,6 @@ public class TreePainter extends TreeDrawer {
 				leftChildXCoord = (int) xT.transform(left.getIndex() + .5);
 				parentXCoord = (int) xT.transform(node.getIndex() + .5);
 
-				LogBuffer.println("Col tree left branch heights: parent: [" + node.getCorr() + " : " + parentYCoord + "px] child: [" + left.getCorr() + " : " + leftChildYCoord + "px].");
-
 				if(Math.abs(leftChildYCoord - parentYCoord) < 3) {
 					pointerBaseOffset = 0;
 				}
