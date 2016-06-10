@@ -31,6 +31,8 @@ public class LinearTransformation {
 		 * System.out.println("from (" + fromX + ", " + fromY + "), (" + toX+
 		 * ", " + toY + ")");
 		 */
+		System.out.println("from (x" + fromX + ", y" + fromY + "), to (x" + toX+
+			", y" + toY + ")");
 	}
 
 	public LinearTransformation() { /* default, map everything to 0.0 */
