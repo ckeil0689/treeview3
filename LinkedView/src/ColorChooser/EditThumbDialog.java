@@ -130,46 +130,41 @@ public class EditThumbDialog extends CustomDialog {
 		
 		try {
 			inputX = Double.parseDouble(inputField.getText());
-			double thumbVal = thumbBox.getThumbVal(index);
+			double thumbVal = thumbBox.calcThumbVal(index);
 			boolean isInputEqualToThumbVal = Helper.nearlyEqual(inputX, thumbVal);
-			
-		  // Stay within dataset bounds
-		  if(inputX < min || inputX > max) {
-				setError("This value is out of data bounds.");
-				isInvalid = true;
-				
+
 			// If edited thumb is boundary thumb
-			} else if (t instanceof BoundaryThumb) {
+			if (t instanceof BoundaryThumb) {
 				BoundaryThumb bT = (BoundaryThumb) t;
 				double otherBoundVal;
 				int otherBoundIdx;
 				// Min bound
 				if (bT.isMin()) {
 					otherBoundIdx = maxThumbIdx;
-					otherBoundVal = thumbBox.getThumbVal(otherBoundIdx);
+					otherBoundVal = thumbBox.calcThumbVal(otherBoundIdx);
 					isInvalid = !(inputX < otherBoundVal);
 					if(isInvalid) {
 						setError("Cannot be equal to or greater than right-most handle.");
-					}
+					} 
         
 				// Max bound
 				} else {
 					otherBoundIdx = minThumbIdx;
-					otherBoundVal = thumbBox.getThumbVal(otherBoundIdx);
+					otherBoundVal = thumbBox.calcThumbVal(otherBoundIdx);
 					isInvalid = !(inputX > otherBoundVal);
 					if(isInvalid) {
 						setError("Cannot be equal to or less than left-most handle.");
 					}
 				}
 		  // Overshoots or equals min boundary
-			} else if(!(inputX > thumbBox.getThumbVal(minThumbIdx))) {
+			} else if(!(inputX > thumbBox.calcThumbVal(minThumbIdx))) {
 				// Left here in case we decide to do a replace in the future
 //				thumbBox.replaceThumbAt(minThumbIdx, t);
 				setError("Value has to be greater than left-most handle.");
 				isInvalid = true;
 				
 			// Overshoots or equals max boundary
-			} else if(!(inputX < thumbBox.getThumbVal(maxThumbIdx))) {
+			} else if(!(inputX < thumbBox.calcThumbVal(maxThumbIdx))) {
 			// Left here in case we decide to do a replace in the future
 //				thumbBox.replaceThumbAt(maxThumbIdx, t);
 				setError("Value has to be less than right-most handle.");
@@ -266,7 +261,7 @@ public class EditThumbDialog extends CustomDialog {
 		valueStatus.setForeground(GUIFactory.RED1);
 
 		/* default */
-		startX = thumbBox.getThumbVal(thumbIndex);
+		startX = thumbBox.calcThumbVal(thumbIndex);
 		finalX = startX;
 
 		newColor = t.getColor();
@@ -276,7 +271,7 @@ public class EditThumbDialog extends CustomDialog {
 
 		/* Initially display thumb position */
 		inputField
-				.setText(Double.toString(thumbBox.getThumbVal(thumbIndex)));
+				.setText(Double.toString(thumbBox.calcThumbVal(thumbIndex)));
 		inputField.addActionListener(new SetValueListener());
 
 		colorIcon = new ColorIcon(t.getColor());

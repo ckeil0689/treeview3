@@ -287,7 +287,7 @@ implements ConfigNodePersistent {
 		public void mouseDragged(final MouseEvent e) {
 
 			dragged = true;
-			colorPicker.getThumbBox().moveThumbTo(e.getX());
+			colorPicker.getThumbBox().moveInnerThumbTo(e.getX());
 		}
 
 		@Override
@@ -308,7 +308,7 @@ implements ConfigNodePersistent {
 		public void mouseReleased(final MouseEvent e) {
 
 			if (!colorChooserUI.isCustomSelected() && dragged) {
-				colorPicker.getThumbBox().moveThumbTo(e.getX());
+				colorPicker.getThumbBox().moveInnerThumbTo(e.getX());
 				colorChooserUI.setCustomSelected(true);
 				setActiveColorSet("Custom");
 				dragged = false;

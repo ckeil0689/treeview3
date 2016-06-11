@@ -445,7 +445,7 @@ public class ColorPicker {
 		double dataVal;
 
 		dataVal = Math.abs((range) * frac) + minVal;
-		dataVal = (double) Math.round(dataVal * 1000) / 1000;
+		dataVal = Helper.roundDouble(dataVal, 3);
 
 		return dataVal;
 	}

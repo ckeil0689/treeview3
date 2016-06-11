@@ -153,10 +153,9 @@ public class ThumbBox {
 	 * Updates a thumb position based on a supplied x-coordinate. This is mainly
 	 * useful to implement the drag-to-position feature to allow sliding thumbs.
 	 * 
-	 * @param inputX
-	 *            New x-coordinate of the selected thumb.
+	 * @param inputX - New x-coordinate of the selected thumb.
 	 */
-	protected void moveThumbTo(int inputX) {
+	protected void moveInnerThumbTo(int inputX) {
 
 		if (selectedThumb == null || selectedThumb instanceof BoundaryThumb) {
 			return;
@@ -164,7 +163,7 @@ public class ThumbBox {
 
 		double dataVal;
 
-		/* Max out on edges */
+		/* Max out on edges for inner thumbs */
 		if (inputX < (int) thumbRect.getMinX()) {
 			dataVal = colorPicker.getMinVal() + CORRECTION;
 
@@ -179,32 +178,35 @@ public class ThumbBox {
 			dataVal = colorPicker.getDataFromFraction(newFrac);
 		}
 
-		updateThumbVal(dataVal);
+		dataVal = Helper.roundDouble(dataVal, 3);
+		updateThumbToVal(dataVal);
 	}
 
 	/**
-	 * TODO break up method into smaller parts
+	 * Ensures that the supplied data value is represented by a thumb at the
+	 * correct index of the thumb list and color list and that the data value
+	 * is assigned to a thumb.
 	 * 
-	 * @param inputData
+	 * @param dataVal - The data value to handle.
 	 */
-	protected void updateThumbVal(final double inputData) {
+	protected void updateThumbToVal(final double dataVal) {
 
 		/* Stay between boundaries */
-		if (selectedThumb == null || inputData < colorPicker.getMinVal()
-				|| inputData > colorPicker.getMaxVal()) {
+		if (selectedThumb == null || dataVal < colorPicker.getMinVal()
+				|| dataVal > colorPicker.getMaxVal()) {
 			return;
 		}
 
 		/* Cannot move to boundary fractions */
-		if (Helper.nearlyEqual(colorPicker.getMinVal(), inputData)
-				|| Helper.nearlyEqual(colorPicker.getMaxVal(), inputData)) {
+		if (Helper.nearlyEqual(colorPicker.getMinVal(), dataVal)
+				|| Helper.nearlyEqual(colorPicker.getMaxVal(), dataVal)) {
 			return;
 		}
 
 		double[] thumbDataVals = new double[colorPicker.getThumbNumber()];
 
 		for (int i = 0; i < thumbDataVals.length; i++) {
-			thumbDataVals[i] = getThumbVal(i);
+			thumbDataVals[i] = calcThumbVal(i);
 		}
 
 		/* get position of previous thumb */
@@ -218,28 +220,28 @@ public class ThumbBox {
 
 		/* deal with boundary cases */
 		if (selectedIndex == 0) {
-			boolean isSafeShrink = inputData < thumbDataVals[selectedIndex + 1];
+			boolean isSafeShrink = dataVal < thumbDataVals[selectedIndex + 1];
 			int removed = 0;
 			if (!isSafeShrink) {
-				removed = shrinkThumbsToDataRange(inputData, true);
+				removed = shrinkThumbsToDataRange(dataVal, true);
 			}
 			int nextIndex = selectedIndex + 1 + removed;
 			previousData = -1.0 * Double.MAX_VALUE;
 			nextData = thumbDataVals[nextIndex];
-			colorPicker.setMinVal(inputData); // calls updateFractions()...maybe
+			colorPicker.setMinVal(dataVal); // calls updateFractions()...maybe
 												// theres a better way
 
 		} else if (selectedIndex == colorPicker.getThumbNumber() - 1) {
-			boolean isSafeShrink = (inputData > thumbDataVals[selectedIndex - 1]);
+			boolean isSafeShrink = (dataVal > thumbDataVals[selectedIndex - 1]);
 			int removed = 0;
 			if (!isSafeShrink) {
-				removed = shrinkThumbsToDataRange(inputData, false);
+				removed = shrinkThumbsToDataRange(dataVal, false);
 				selectedIndex -= removed;
 			}
 			int prevIndex = selectedIndex - 1;
 			previousData = thumbDataVals[prevIndex];
 			nextData = Double.MAX_VALUE;
-			colorPicker.setMaxVal(inputData);
+			colorPicker.setMaxVal(dataVal);
 
 			/* Non-boundary */
 		} else {
@@ -248,21 +250,21 @@ public class ThumbBox {
 		}
 
 		/* set new thumb position and check for boundaries/ other thumbs */
-		if ((previousData < inputData && inputData < nextData)) {
-			thumbs.get(selectedIndex).setValue(inputData);
+		if ((previousData < dataVal && dataVal < nextData)) {
+			thumbs.get(selectedIndex).setValue(dataVal);
 
-		} else if (inputData < previousData
+		} else if (dataVal < previousData
 				&& !Helper.nearlyEqual(previousData, colorPicker.getMinVal())) {
 			colorPicker.swapPositions(selectedIndex, selectedIndex - 1);
 
 			thumbs.get(selectedIndex).setValue(previousData);
-			thumbs.get(selectedIndex - 1).setValue(inputData);
+			thumbs.get(selectedIndex - 1).setValue(dataVal);
 
-		} else if (inputData > nextData && nextData < colorPicker.getMaxVal()) {
+		} else if (dataVal > nextData && nextData < colorPicker.getMaxVal()) {
 			colorPicker.swapPositions(selectedIndex, selectedIndex + 1);
 
 			thumbs.get(selectedIndex).setValue(nextData);
-			thumbs.get(selectedIndex + 1).setValue(inputData);
+			thumbs.get(selectedIndex + 1).setValue(dataVal);
 		}
 
 		colorPicker.updateFractions();
@@ -365,9 +367,9 @@ public class ThumbBox {
 			return;
 		}
 
+		/* Update every thumb */
 		for (int i = 0; i < fractions.length; i++) {
-
-			final int pos = getPosFromFraction(fractions[i]);
+			final int pos = getXPosFromFraction(fractions[i]);
 
 			Thumb t = colorPicker.getThumb(i);
 			t.setCoords(pos, t.getY());
@@ -375,12 +377,14 @@ public class ThumbBox {
 	}
 
 	/**
-	 * Turns a fraction into a data value.
+	 * Determines the x-position for a thumb using the given fraction. The
+	 * width of the ColorPicker is a constant. The x-position of a thumb is the
+	 * fraction of the the ColorPicker width while considering an offset. 
 	 * 
-	 * @param frac
-	 * @return
+	 * @param frac - The fraction which will be used to determine the x-position.
+	 * @return The x-position of the thumb which represents the given fraction.
 	 */
-	protected int getPosFromFraction(float frac) {
+	protected int getXPosFromFraction(float frac) {
 
 		int x = ColorPicker.OFFSET;
 		int w = ColorPicker.WIDTH;
@@ -404,28 +408,35 @@ public class ThumbBox {
 			thumbIndex,this,colorPicker.getColorList(),colorPicker.getMean(),
 			colorPicker.getMedian(),colorPicker.getDataCenter(),
 			colorPicker.getDataMin(),colorPicker.getDataMax());
-
+		
+		double initVal = t.getDataValue();
 		double dataVal = posInputDialog.showDialog(colorPicker
 				.getContainerPanel());
+		
+		// No position change occurred
+		if(dataVal == initVal) {
+			return;
+		}
 
-		t.setValue(dataVal);
-
-		alignThumbWithVal(dataVal);
+		if(t instanceof BoundaryThumb) {
+			moveBoundaryThumbTo((BoundaryThumb)t, dataVal);
+			
+		} else {
+			t.setValue(dataVal);
+			alignThumbWithVal(dataVal);
+		}
 	}
 
 	/**
-	 * Finds the correct x-position for a thumb for a given data value.
-	 * 
-	 * @param dataVal
-	 *            A data value for which the corresponding thumb's x-position is
-	 *            to be determined.
+	 * Decides how to handle a data value and whether to extend the minimum
+	 * or maximum of the ColorPicker range.
+	 * @param dataVal - The data value to handle.
 	 */
-	protected void alignThumbWithVal(double dataVal) {
+	protected void alignThumbWithVal(final double dataVal) {
 
 		double minVal = colorPicker.getMinVal();
 		double maxVal = colorPicker.getMaxVal();
 
-		/* TODO adapt range if values are outside */
 		if (dataVal < minVal) {
 			colorPicker.setMinVal(dataVal);
 
@@ -433,7 +444,7 @@ public class ThumbBox {
 			colorPicker.setMaxVal(dataVal);
 
 		} else {
-			updateThumbVal(dataVal);
+			updateThumbToVal(dataVal);
 		}
 	}
 
@@ -470,13 +481,13 @@ public class ThumbBox {
 	}
 
 	/**
-	 * Gets the data value a thumb represents.
+	 * Calculates the data value which the thumb at the given index represents.
 	 *
 	 * @param t
 	 * @return A double value between minimum and maximum of the currently
 	 *         relevant data range for coloring.
 	 */
-	protected double getThumbVal(final int thumbIndex) {
+	protected double calcThumbVal(final int thumbIndex) {
 
 		double range = colorPicker.getRange();
 		double minVal = colorPicker.getMinVal();
@@ -570,7 +581,7 @@ public class ThumbBox {
 
 		for (final Thumb t : thumbs) {
 
-			double tDataVal = getThumbVal(thumbs.indexOf(t));
+			double tDataVal = calcThumbVal(thumbs.indexOf(t));
 			if (Helper.nearlyEqual(tDataVal, dataVal)) {
 				hasThumb = true;
 				break;
@@ -593,7 +604,7 @@ public class ThumbBox {
 
 		for (final Thumb t : thumbs) {
 			int idx = thumbs.indexOf(t);
-			double tDataVal = getThumbVal(idx);
+			double tDataVal = calcThumbVal(idx);
 			if (Helper.nearlyEqual(tDataVal, dataVal)) {
 				thumbs.remove(idx);
 				colorPicker.getColorList().remove(idx);
@@ -611,23 +622,141 @@ public class ThumbBox {
 	 * @param idx - The index at which to replace the thumb.
 	 * @param t - The thumb to replace the old thumb with
 	 */
-	protected void replaceThumbAt(final int idx, final Thumb t) {
+	protected void replaceInnerThumbAt(final int idx, final Thumb t) {
 
+		if(colorPicker == null) {
+			LogBuffer.println("ColorPicker was null. Could not replace thumb.");
+			return;
+		}
+		
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		List<Color> colors = colorPicker.getColorList();
 
-		int currIdx = thumbs.indexOf(t);
+		// List.set() moves elements one to the right
+//		int currIdx = idx + 1;
 		
 		// replace
 		thumbs.set(idx, t);
 		colors.set(idx, t.getColor());
 		
 	  // remove & shrink
-	  thumbs.remove(currIdx);
-		colors.remove(currIdx);
+//	  thumbs.remove(currIdx);
+//		colors.remove(currIdx);
 		
 		colorPicker.updateFractions();
 		colorPicker.updateColors();
+	}
+	
+	/**
+	 * Replaces a boundary thumb and the color at the specified index.
+	 * 
+	 * @param bT - The boundary thumb to replace the old boundary thumb with
+	 */
+	protected void replaceBoundaryThumb(final BoundaryThumb bT) {
+
+		if(colorPicker == null) {
+			LogBuffer.println("ColorPicker was null. Could not replace thumb.");
+			return;
+		}
+		
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		List<Color> colors = colorPicker.getColorList();
+
+		// List.set() moves elements one to the right
+		int replaceIdx;
+//		int shiftedIdx; 
+		if(bT.isMin()) {
+			replaceIdx = 0;
+//			shiftedIdx = 1;
+			
+		} else {
+			replaceIdx = thumbs.size() - 1;
+//			shiftedIdx = thumbs.size() - 2;
+		}
+		
+		// replace
+		thumbs.set(replaceIdx, bT);
+		colors.set(replaceIdx, bT.getColor());
+		
+	  // remove & shrink
+//	  thumbs.remove(shiftedIdx);
+//		colors.remove(shiftedIdx);
+		
+		colorPicker.updateFractions();
+		colorPicker.updateColors();
+	}
+	
+	/**
+	 * This method takes care of appropriately moving boundary thumbs to the
+	 * specified user input. Boundary thumbs can be any value, even outside of 
+	 * the currently loaded data set. They can also pass inner thumbs in either
+	 * direction. In that case, the outer-most inner thumb will become a new 
+	 * boundary. The previous boundary thumb will become an inner thumb at the
+	 * specified location.
+	 * @param bT - The boundary thumb to be moved.
+	 * @param dataVal - The data value at which to place the boundary thumb.
+	 */
+	protected void moveBoundaryThumbTo(final BoundaryThumb bT, 
+	                                   final double dataVal) {
+		
+		if(colorPicker == null) {
+			LogBuffer.println("ColorPicker was null. Could not move BoundaryThumb.");
+			return;
+		}
+		
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		List<Color> colors = colorPicker.getColorList();
+		
+		if(bT.isMin()) {
+			/* Always set outer-most inner thumb to new boundary, if the old 
+			 * boundary thumb "passes over".
+			 */
+			final int outermostInnerIdx = 1;
+			
+			/* Determine the thumb list index the new position corresponds to */
+			int insertionIdx = 0;
+			for(Thumb t : thumbs) {
+				if(t.getDataValue() > dataVal && !t.equals(bT)) {
+					insertionIdx = thumbs.indexOf(t) - 1;
+					break;
+				}
+			}
+			
+			/* First create the new thumbs */
+//			bT.setValue(input);
+//			alignThumbWithVal(input);
+			
+			/* Do not continue if no thumb to swap (-1 or 0) */
+			if(insertionIdx < 1) {
+				LogBuffer.println("No need to swap boundary thumb.");
+				alignThumbWithVal(dataVal);
+				return;
+			}
+			
+			LogBuffer.println("Swapping boundary thumb...");
+			Thumb oldInnerThumb = thumbs.get(outermostInnerIdx);
+			
+			/* Set up new boundary */
+			BoundaryThumb newBoundary = new BoundaryThumb(bT.isMin());
+			newBoundary.setValue(oldInnerThumb.getDataValue());
+			newBoundary.setColor(oldInnerThumb.getColor());
+			
+			Thumb newInnerThumb = new Thumb(bT.getColor());
+			newInnerThumb.setValue(dataVal);
+			
+			colorPicker.setMinVal(oldInnerThumb.getDataValue());
+			
+			replaceBoundaryThumb(newBoundary);
+			replaceInnerThumbAt(1, newInnerThumb);
+			
+			LogBuffer.println("Debug");
+			
+		} else {
+			
+		}
+		
+//		colorPicker.updateFractions();
+//		colorPicker.updateColors();
 	}
 
 	/**
