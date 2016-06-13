@@ -1984,7 +1984,7 @@ public class MapContainer extends Observable implements Observer,
 		 * multiple cells under a single pixel, but I'm not sure. For now, this
 		 * work-around will prevent exceptions. Figure this out & fix it
 		 * eventually. */
-		if(numVisible > getMaxIndex() + 1) {
+		if(numVisible > getTotalTileNum()) {
 			if(getMaxIndex() > 0) {
 				LogBuffer.println("Warning: Encountered invalid/too-large " +
 					"numVisible value: [" + numVisible + "].  Resetting.");
