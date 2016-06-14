@@ -1315,8 +1315,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				/* Set label color */
 				if((drawSelection.isIndexSelected(j) &&
 					doDrawLabelPort()) ||
-				   j == getPrimaryHoverIndex() ||
-				   ((map.getHoverTreeMinIndex() > -1 &&
+					(j == getPrimaryHoverIndex() &&
+						map.overALabelPortLinkedView()) ||
+					((map.getHoverTreeMinIndex() > -1 &&
 						j >= map.getHoverTreeMinIndex() &&
 						j <= map.getHoverTreeMaxIndex()))) {
 					if(colorIndex > 0) {
