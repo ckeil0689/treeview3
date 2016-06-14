@@ -1315,8 +1315,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				/* Set label color */
 				if((drawSelection.isIndexSelected(j) &&
 					doDrawLabelPort()) ||
-					(j == getPrimaryHoverIndex() &&
-						map.overALabelLinkedView()) ||
+					j == getAbsolutePrimaryHoverIndex() ||
 					((map.getHoverTreeMinIndex() > -1 &&
 						j >= map.getHoverTreeMinIndex() &&
 						j <= map.getHoverTreeMaxIndex()))) {
@@ -2121,6 +2120,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	public int getPrimaryHoverIndex() {
 		return(map.getHoverIndex());
+	}
+
+	/**
+	 * Gets the data index that is hovered over, or -1 if not a valid hover
+	 * position
+	 * @author rleach
+	 * @return data index
+	 */
+	public int getAbsolutePrimaryHoverIndex() {
+		return(map.overALabelLinkedView() ? map.getHoverIndex() : -1);
 	}
 
 	public void updatePrimaryHoverIndexDuringScrollWheel() {
