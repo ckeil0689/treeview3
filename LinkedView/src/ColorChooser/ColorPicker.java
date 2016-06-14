@@ -317,15 +317,50 @@ public class ColorPicker {
 	/**
 	 * Swaps positions of thumbs and colors in their specific lists.
 	 * 
-	 * @param oldIndex
+	 * @param fromIdx
 	 *            Previous position of color/ thumb in their respective lists.
-	 * @param newIndex
+	 * @param toIdx
 	 *            New position of color/ thumb in their respective lists.
 	 */
-	protected void swapPositions(int oldIndex, int newIndex) {
+	protected void swapThumbs(int fromIdx, int toIdx) {
 
-		Collections.swap(thumbList, oldIndex, newIndex);
-		Collections.swap(colorList, oldIndex, newIndex);
+		if(thumbList == null || colorList == null) {
+			LogBuffer.println("Could not swap thumbs. Either thumb list " +
+				"or color list was null.");
+			return;
+		}
+		
+		Collections.swap(thumbList, fromIdx, toIdx);
+		Collections.swap(colorList, fromIdx, toIdx);
+	}
+	
+	/**
+	 * Swaps positions of thumbs and colors in their specific lists.
+	 * 
+	 * @param fromIdx
+	 *            Previous position of color/ thumb in their respective lists.
+	 * @param toIdx
+	 *            New position of color/ thumb in their respective lists.
+	 */
+	protected void relocateThumb(int fromIdx, int toIdx) {
+
+		if(thumbList == null || colorList == null) {
+			LogBuffer.println("Could not swap thumbs. Either thumb list " +
+				"or color list was null.");
+			return;
+		}
+		
+		Thumb t = thumbList.get(fromIdx);
+		Color c = colorList.get(fromIdx);
+		
+		thumbList.remove(fromIdx);
+		colorList.remove(fromIdx);
+		
+		/* Account for left-shift from remove() */
+		toIdx -= 1;
+		
+		thumbList.add(toIdx, t);
+		colorList.add(toIdx, c);
 	}
 
 	/**
@@ -335,6 +370,7 @@ public class ColorPicker {
 	 */
 	protected void setMinVal(double minVal) {
 
+		LogBuffer.println("Setting new minimum value: " + minVal);
 		this.minVal = minVal;
 		colorExtractor.setMin(minVal);
 		minThumb.setValue(minVal);
@@ -349,6 +385,7 @@ public class ColorPicker {
 	 * @param maxVal
 	 */
 	protected void setMaxVal(double maxVal) {
+		LogBuffer.println("Setting new maximum value: " + maxVal);
 		this.maxVal = maxVal;
 		colorExtractor.setMax(maxVal);
 		maxThumb.setValue(maxVal);
