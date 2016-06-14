@@ -711,7 +711,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void updateLabelRepaintTimers() {
 		//If the mouse is not hovering over the IMV, stop both timers, set the
 		//last hover index, and tell mapcontainer that the animation has stopped
-		if(!map.overALabelPortLinkedView()) {
+		if(!map.overALabelLinkedView()) {
 			if(repaintTimer != null && repaintTimer.isRunning()) {
 				debug("Not hovering over a label port linked view - stopping animation",9);
 				repaintTimer.stop();
@@ -756,7 +756,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Else if the mouse hasn't moved, start the second timer to slow down
 		//the first after 1 second (this mitigates delays upon mouse motion
 		//after a brief period of no motion)
-		else if(map.overALabelPortLinkedView() &&
+		else if(map.overALabelLinkedView() &&
 			getPrimaryHoverIndex() == lastHoverIndex) {
 			/* TODO: If anastasia doesn't like trees linked to whizzing labels,
 			 * uncomment the following commented code. If she likes it, delete. This
@@ -1316,13 +1316,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				if((drawSelection.isIndexSelected(j) &&
 					doDrawLabelPort()) ||
 					(j == getPrimaryHoverIndex() &&
-						map.overALabelPortLinkedView()) ||
+						map.overALabelLinkedView()) ||
 					((map.getHoverTreeMinIndex() > -1 &&
 						j >= map.getHoverTreeMinIndex() &&
 						j <= map.getHoverTreeMaxIndex()))) {
 					if(colorIndex > 0) {
-						g.setColor(TreeColorer
-						           .getColor(headers[colorIndex]));
+						g.setColor(TreeColorer.getColor(headers[colorIndex]));
 					}
 
 					if(j == getPrimaryHoverIndex() ||
@@ -2176,7 +2175,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @return
 	 */
 	public boolean doDrawLabelPort() {
-		return(inLabelPortMode() && map.overALabelPortLinkedView() &&
+		return(inLabelPortMode() && map.overALabelLinkedView() &&
 		       ((!isFixed && map.getScale() < (getMin()  + SQUEEZE)) ||
 		        (isFixed  && map.getScale() < (last_size + SQUEEZE))));
 	}

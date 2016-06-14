@@ -379,7 +379,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			int lastVisIndex;
 
 			//If we're in label port/whizzing label mode
-			if(map.isLabelAnimeRunning() && map.overALabelPortLinkedView() &&
+			if(map.isLabelAnimeRunning() && map.overALabelLinkedView() &&
 				!map.shouldKeepTreeGlobal() && map.isWhizMode() &&
 				map.getFirstVisibleLabel() > -1 &&
 				map.getLastVisibleLabel() > -1) {
@@ -796,7 +796,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	public void updateTreeRepaintTimers() {
 		//If the mouse is not hovering over the IMV, stop both timers, set the
 		//last hover index, and tell mapcontainer that the animation has stopped
-		if(!map.overALabelPortLinkedView()) {
+		if(!map.overALabelLinkedView()) {
 			if(repaintTimer != null && repaintTimer.isRunning()) {
 				debug("Not hovering over a label port linked view - stopping " +
 					"animation",9);
@@ -841,7 +841,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		//Else if the mouse hasn't moved, start the second timer to slow down
 		//the first after 1 second (this mitigates delays upon mouse motion
 		//after a brief period of no motion)
-		else if(map.overALabelPortLinkedView() &&
+		else if(map.overALabelLinkedView() &&
 			getPrimaryHoverIndex() == lastHoverIndex) {
 			if(repaintTimer.getDelay() == REPAINT_INTERVAL) {
 				debug("Hovering on one spot [" + lastHoverIndex +
