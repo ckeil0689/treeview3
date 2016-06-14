@@ -621,7 +621,9 @@ public class ThumbBox {
 	 * @param wasMin - Whether the new inner thumb comes was the minimum boundary
 	 * before
 	 */
-	protected void replaceInnerThumb(final int origin, final Thumb t, 
+	protected void replaceInnerThumb(final int origin, 
+	                                 int insertionIdx,
+	                                 final Thumb t, 
 	                                 final boolean wasMin) {
 
 		if(colorPicker == null) {
@@ -636,8 +638,10 @@ public class ThumbBox {
 		thumbs.remove(origin);
 		colors.remove(origin);
 		
-		/* Then figure out were to insert based on data value */
-		int insertionIdx = findInsertionIdx(t.getDataValue(), thumbs);
+		/* Adjust insertion index after element removal */
+		if(origin < insertionIdx) {
+			insertionIdx -= 1;
+		}
 
 		/* Then insert */
 		thumbs.add(insertionIdx, t);
@@ -713,7 +717,7 @@ public class ThumbBox {
 		}
 		
 		/* Since we got here, we need to swap and move thumbs */
-		prepareBoundaryThumbSwap(outermostInnerIdx, bT, dataVal);
+		prepareBoundaryThumbSwap(outermostInnerIdx, insertionIdx, bT, dataVal);
 	}
 	
 	/**
@@ -750,12 +754,11 @@ public class ThumbBox {
 	 * be moved.
 	 */
 	private void prepareBoundaryThumbSwap(final int outermostInnerIdx, 
+	                                      final int insertionIdx,
 	                                 final BoundaryThumb bT, 
 	                                 final double dataVal) {
 		
 		List<Thumb> thumbs = colorPicker.getThumbList();
-		
-		LogBuffer.println("Swapping boundary thumb...");
 		Thumb oldInnerThumb = thumbs.get(outermostInnerIdx);
 		
 		/* Set up new boundary */
@@ -775,7 +778,8 @@ public class ThumbBox {
 		}
 		
 		replaceBoundaryThumb(newBoundary);
-		replaceInnerThumb(outermostInnerIdx, newInnerThumb, bT.isMin());
+		replaceInnerThumb(outermostInnerIdx, insertionIdx, 
+		                  newInnerThumb, bT.isMin());
 	}
 
 	/**
