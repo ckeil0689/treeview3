@@ -284,7 +284,7 @@ public class ColorPicker {
 
 		this.fractions = newFracs;
 
-		thumbBox.verifyThumbs();
+		thumbBox.verifyInnerThumbs();
 		thumbBox.adjustThumbsToFractions();
 	}
 

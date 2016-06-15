@@ -103,6 +103,7 @@ public class EditThumbDialog extends CustomDialog {
 				return;
 			}
 
+			/* Set value that is returned when dialog closes */ 
 			finalX = inputX;
 
 			/*
@@ -178,18 +179,9 @@ public class EditThumbDialog extends CustomDialog {
 			// Replace other handle if other handle with same data value exists
 			} else if(!isInputEqualToThumbVal && thumbBox.hasThumbForVal(inputX)) {
 				/* Pop up a warning dialog */
-				Object[] options = {"Continue", "Cancel"};
-				String warning = "Replace existing handle " +
-					"for the value " + inputX + "?";
-				int choice = JOptionPane.showOptionDialog(JFrame.getFrames()[0], 
-				                                          warning,
-				                                          "Replace handle?",  
-				                                          JOptionPane.YES_NO_OPTION,
-				                                          JOptionPane.WARNING_MESSAGE,
-				                                          null,
-				                                          options, options[0]);
+				boolean shouldRemove = thumbBox.askForThumbRemoval(inputX);
 				/* Proceed according to user choice */
-				if(choice == JOptionPane.YES_OPTION) {
+				if(shouldRemove) {
 					thumbBox.removeThumbWithVal(inputX);
 					
 				} else {
