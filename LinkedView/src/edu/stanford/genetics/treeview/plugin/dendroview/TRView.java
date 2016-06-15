@@ -924,9 +924,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		if (treePainter == null)
 			return;
 
-		setHoveredNode(getClosestParentNode(e));
 		map.setHoverPixel(getPrimaryPixelIndex(e));
 		map.setHoverIndex(map.getIndex(getPrimaryPixelIndex(e)));
+		setHoveredNode(getClosestParentNode(e));
 		synchMap();
 	}
 
