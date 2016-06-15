@@ -7,7 +7,9 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -15,6 +17,7 @@ import javax.swing.JTextField;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.Helper;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 public class EditThumbDialog extends CustomDialog {
 
@@ -158,22 +161,40 @@ public class EditThumbDialog extends CustomDialog {
 				}
 		  // Overshoots or equals min boundary
 			} else if(!(inputX > thumbBox.calcThumbVal(minThumbIdx))) {
+				LogBuffer.println("Overshooting min boundary.");
 				// Left here in case we decide to do a replace in the future
 //				thumbBox.replaceThumbAt(minThumbIdx, t);
-				setError("Value has to be greater than left-most handle.");
-				isInvalid = true;
+//				setError("Value has to be greater than left-most handle.");
+//				isInvalid = true;
 				
 			// Overshoots or equals max boundary
 			} else if(!(inputX < thumbBox.calcThumbVal(maxThumbIdx))) {
+				LogBuffer.println("Overshooting max boundary.");
 			// Left here in case we decide to do a replace in the future
 //				thumbBox.replaceThumbAt(maxThumbIdx, t);
-				setError("Value has to be less than right-most handle.");
-				isInvalid = true;
+//				setError("Value has to be less than right-most handle.");
+//				isInvalid = true;
 				
 			// Replace other handle if other handle with same data value exists
 			} else if(!isInputEqualToThumbVal && thumbBox.hasThumbForVal(inputX)) {
-				setError("A handle exists for this value.");
-				thumbBox.removeThumbWithVal(inputX);
+				/* Pop up a warning dialog */
+				Object[] options = {"Continue", "Cancel"};
+				String warning = "Replace existing handle " +
+					"for the value " + inputX + "?";
+				int choice = JOptionPane.showOptionDialog(JFrame.getFrames()[0], 
+				                                          warning,
+				                                          "Replace handle?",  
+				                                          JOptionPane.YES_NO_OPTION,
+				                                          JOptionPane.WARNING_MESSAGE,
+				                                          null,
+				                                          options, options[0]);
+				/* Proceed according to user choice */
+				if(choice == JOptionPane.YES_OPTION) {
+					thumbBox.removeThumbWithVal(inputX);
+					
+				} else {
+					isInvalid = true;
+				}
 			}
 			
 			return isInvalid;

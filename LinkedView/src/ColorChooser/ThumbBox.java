@@ -421,7 +421,7 @@ public class ThumbBox {
 			
 		} else {
 			t.setValue(dataVal);
-			alignThumbWithVal(dataVal);
+			alignThumbWithVal(t, dataVal);
 		}
 	}
 
@@ -430,17 +430,52 @@ public class ThumbBox {
 	 * or maximum of the ColorPicker range.
 	 * @param dataVal - The data value to handle.
 	 */
-	protected void alignThumbWithVal(final double dataVal) {
+	protected void alignThumbWithVal(Thumb t, final double dataVal) {
 
+		List<Thumb> thumbs = colorPicker.getThumbList();
+		List<Color> colors = colorPicker.getColorList();
+		
 		double minVal = colorPicker.getMinVal();
 		double maxVal = colorPicker.getMaxVal();
 
+		BoundaryThumb bT;
+		Color oldBoundColor;
+		Color oldInnerColor;
+		double oldBoundVal;
+		
 		if (dataVal < minVal) {
+			bT = (BoundaryThumb) thumbs.get(0);
+			if(!t.equals(bT)) {
+				/* Make actual copies */
+				oldBoundColor = new Color(bT.getColor().getRGB());
+				oldInnerColor = new Color(t.getColor().getRGB());
+				oldBoundVal = bT.getDataValue();
+				
+				bT.setColor(oldInnerColor);
+				bT.setValue(t.getDataValue());
+				
+				t.setColor(oldBoundColor);
+				t.setValue(oldBoundVal);
+			}
+			
 			colorPicker.setMinVal(dataVal);
-
+			
 		} else if (dataVal > maxVal) {
+			bT = (BoundaryThumb) thumbs.get(thumbs.size() - 1);
+			if(!t.equals(bT)) {
+				oldBoundColor = new Color(bT.getColor().getRGB());
+				oldInnerColor = new Color(t.getColor().getRGB());
+				oldBoundVal = bT.getDataValue();
+				
+				bT.setColor(oldInnerColor);
+				bT.setValue(t.getDataValue());
+				
+				t.setColor(oldBoundColor);
+				t.setValue(oldBoundVal);
+			}
+			
 			colorPicker.setMaxVal(dataVal);
-
+			
 		} else {
 			updateSelectedThumbToVal(dataVal);
 		}
@@ -712,7 +747,7 @@ public class ThumbBox {
 		/* Do not continue if no thumb to swap (-1 or 0) */
 		if(!shouldSwap) {
 			LogBuffer.println("No need to swap max boundary thumb.");
-			alignThumbWithVal(dataVal);
+			alignThumbWithVal(bT, dataVal);
 			return;
 		}
 		
