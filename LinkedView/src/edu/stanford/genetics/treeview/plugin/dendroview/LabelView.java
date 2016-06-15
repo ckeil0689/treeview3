@@ -57,7 +57,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	//This is the space between labels in pixels
 	protected final static int SQUEEZE = 1;
 
-
 	/* DataModel is an observer */
 	protected DataModel dataModel;
 
@@ -1941,31 +1940,34 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 
+		/* NOTE: Right click is captured elsewhere application-wide and
+		 * deselects everything */
+
 		if (!enclosingWindow().isActive() ||
-			(SwingUtilities.isLeftMouseButton(e) && e.isControlDown())) {
-			debug("Control is down - do nothing on release",23);
+			(SwingUtilities.isLeftMouseButton(e) && e.isControlDown()) ||
+			!SwingUtilities.isLeftMouseButton(e)) {
+			debug("Window inactive, control is down, or not left mouse " +
+				"button - do nothing on release",23);
 			return;
 		}
 
-		//When left button is used
-		//This might interfere with mouseClicked - That should be checked...
-		if(SwingUtilities.isLeftMouseButton(e) &&
-		   map.getSelectingStart() !=
-		   map.getIndex(getPrimaryHoverPosition(e))) {
+		int hDI = map.getIndex(getPrimaryHoverPosition(e));
+
+		//If the user dragged off an edge, the index will be out of bounds,
+		//so fix it
+		if(hDI < 0) {
+			hDI = 0;
+		} else if(hDI > map.getMaxIndex()) {
+			hDI = map.getMaxIndex();
+		}
+
+		//If this was a drag event
+		if(map.getSelectingStart() != getPrimaryHoverIndex(e)) {
 
 			/* TODO: Handle the temporary outlining of the matrix
 			 * NOT SURE HOW TO DO THIS YET - CANNOT TALK TO IMV */
 
-			int hDI = map.getIndex(getPrimaryHoverPosition(e));
-			//If the user dragged off an edge, the index will be out of bounds,
-			//so fix it
-			if(hDI < 0) {
-				hDI = 0;
-			} else if(hDI > map.getMaxIndex()) {
-				hDI = map.getMaxIndex();
-			}
-
-			//Make the selection upon release
+			//If a selection already exists
 			if(otherSelection.getNSelectedIndexes() > 0) {
 				if(e.isShiftDown()) {
 					drawSelection.selectIndexRange(map.getSelectingStart(),
@@ -1975,7 +1977,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						map.getSelectingStart() +
 						"] to [" + hDI + "]",23);
 					toggleSelectRange(map.getSelectingStart(),
-					                  hDI);
+						hDI);
 				} else if(e.isAltDown()) {
 					debug("Toggling selection of index range [" +
 						map.getSelectingStart() +
@@ -1983,22 +1985,48 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					deSelectRange(map.getSelectingStart(),
 						hDI);
 				} else {
-					//Deselect everything
-					drawSelection.deselectAllIndexes();
-					otherSelection.deselectAllIndexes();
-
-					//Select what was dragged over
-					otherSelection.selectAllIndexes();
 					drawSelection.selectNewIndexRange(map.getSelectingStart(),
 						hDI);
 				}
-			} else if(!e.isAltDown()) {
-				//Assumes there is no selection at all & selects what was
-				//dragged over
+			}
+			//Else if there's no current selection and we're not deselecting
+			else if(!e.isAltDown()) {
 				otherSelection.selectAllIndexes();
-				drawSelection
-				.selectNewIndexRange(map.getSelectingStart(),
-					map.getIndex(getPrimaryHoverPosition(e)));
+				drawSelection.selectNewIndexRange(map.getSelectingStart(),hDI);
+			}
+		}
+		//Else this was not a drag
+		else {
+
+			//Do a deselect of everything if command-option are down
+			if(e.isMetaDown() && e.isAltDown()) {
+				drawSelection.deselectAllIndexes();
+				otherSelection.deselectAllIndexes();
+			}
+			//If a selection already exists
+			else if (otherSelection.getNSelectedIndexes() > 0) {
+				if(e.isShiftDown()) {
+					if(!drawSelection.isIndexSelected(hDI)) {
+						toggleSelectFromClosestToIndex(drawSelection,hDI);
+					}
+				} else if(e.isMetaDown()) {
+					debug("Toggling selection of index [" + hDI +
+						"]",23);
+					toggleSelect(drawSelection,hDI);
+				} else if(e.isAltDown()) {
+					if(drawSelection.isIndexSelected(hDI)) {
+						debug("Setting selection of index [" + hDI +
+							"] to false",23);
+						toggleSelectFromClosestToIndex(drawSelection,hDI);
+					}
+				} else {
+					selectAnew(drawSelection,hDI);
+				}
+			}
+			//Else nothing is selected and if we're not deselecting
+			else if(!e.isAltDown()) {
+				drawSelection.setIndexSelection(hDI, true);
+				otherSelection.selectAllIndexes();
 			}
 		}
 
@@ -2779,43 +2807,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		map.unsetHoverPixel();
 		unsetPrimaryHoverIndex();
 		repaint();
-	}
-
-	@Override
-	public void mouseClicked(final MouseEvent e) {
-		final int index = getPrimaryHoverIndex(e);
-
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			if(e.isControlDown()) {
-				debug("Control is down - do nothing on click",23);
-				return;
-			}
-			if (otherSelection.getNSelectedIndexes() > 0) {
-				if(e.isMetaDown() && e.isAltDown()) {
-					drawSelection.deselectAllIndexes();
-					otherSelection.deselectAllIndexes();
-				} else if(e.isShiftDown()) {
-					toggleSelectFromClosestToIndex(drawSelection,index);
-				} else if(e.isMetaDown()) {
-					debug("Toggling selection of index [" + index +
-						"]",23);
-					toggleSelect(drawSelection,index);
-				} else if(e.isAltDown()) {
-					debug("Setting selection of index [" + index + "] to false",
-						23);
-					drawSelection.setIndexSelection(index,false);
-				} else {
-					selectAnew(drawSelection,index);
-				}
-			} else if(!e.isAltDown()) {
-				//Assumes there is no selection at all
-				drawSelection.setIndexSelection(index, true);
-				otherSelection.selectAllIndexes();
-			}
-		}
-
-		drawSelection.notifyObservers();
-		otherSelection.notifyObservers();
 	}
 
 	/**
