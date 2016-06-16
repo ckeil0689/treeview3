@@ -23,6 +23,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
@@ -86,9 +87,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected String  face;
 	protected int     style;
 	protected int     size;
-	protected String  lastDrawnFace;  //used only by getMaxStringLength
-	protected int     lastDrawnStyle; //used only by getMaxStringLength
-	protected int     lastDrawnSize;  //used only by getMaxStringLength
+	protected int[]   labelTypes;
+	protected String  lastDrawnFace;       //used only by getMaxStringLength
+	protected int     lastDrawnStyle;      //used only by getMaxStringLength
+	protected int     lastDrawnSize;       //used only by getMaxStringLength
+	protected int[]   lastDrawnLabelTypes; //used only by getMaxStringLength
 	protected int     min;
 	protected int     max;
 	protected int     last_size;
@@ -476,6 +479,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		return isRightJustified;
 	}
 
+	public int[] getLabels() {
+		return getHeaderSummary().getIncluded();
+	}
+
 	/**
 	 * Rotates the pane content as necessary
 	 * @author rleach
@@ -848,7 +855,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		/* Shouldn't draw if there's no TreeSelection defined */
 		if(drawSelection == null) {
 			LogBuffer.println("Error: drawSelection not defined. Can't draw " +
-			                  "labels.");
+				"labels.");
 			return;
 		}
 
@@ -1720,9 +1727,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * This function returns the length in pixels of the longest label and
 	 * tracks the font settings using data members [lastDrawnFace versus current
 	 * 'face', lastDrawnStyle versus current 'style', lastDrawnSize versus
-	 * current 'size', longest_str_length, and longest_str_index]. If nothing
-	 * about the font has changed, it returns longest_str_length. If the face or
-	 * style have changed, it re-measures the string at longest_str_index.
+	 * current 'size', lastDrawnLabels versus current labels,
+	 * longest_str_length, and longest_str_index]. If nothing about the font has
+	 * changed, it returns longest_str_length. If the face or style have
+	 * changed, it re-measures the string at longest_str_index.
 	 * Otherwise, it searches all the strings again to get the longest.
 	 * @param FontMetrics metrics
 	 * @return maxStrLen
@@ -1747,8 +1755,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		//If nothing about the font has changed, calculate the length of the
 		//longest string
-		if(lastDrawnFace == face  && lastDrawnStyle == style &&
-			longest_str_index > -1 && lastDrawnSize == size &&
+		if(Arrays.equals(lastDrawnLabelTypes,labelTypes) &&
+			lastDrawnFace == face   && lastDrawnStyle == style &&
+			longest_str_index > -1 && lastDrawnSize == size   &&
 			longest_str.equals(headerSummary.getSummary(headerInfo,
 				longest_str_index))) {
 
@@ -1760,8 +1769,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 		//Else if the font size only has changed, recalculate the longest
 		//string's length
-		else if(lastDrawnFace == face && lastDrawnStyle == style &&
-			longest_str_index > -1 && lastDrawnSize != size &&
+		else if(Arrays.equals(lastDrawnLabelTypes,labelTypes) &&
+			lastDrawnFace == face && lastDrawnStyle == style &&
+			longest_str_index > -1    && lastDrawnSize != size   &&
 			longest_str.equals(headerSummary.getSummary(headerInfo,
 				longest_str_index))) {
 
@@ -1822,10 +1832,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	private void saveLastDrawnFontDetails(int maxStrLen) {
 		//Save the state to detect changes upon the next call of this method
-		lastDrawnFace      = face;
-		lastDrawnStyle     = style;
-		lastDrawnSize      = size;
-		longest_str_length = maxStrLen;
+		lastDrawnFace       = face;
+		lastDrawnStyle      = style;
+		lastDrawnSize       = size;
+		lastDrawnLabelTypes = getLabels();
+		longest_str_length  = maxStrLen;
 	}
 
 	/**
