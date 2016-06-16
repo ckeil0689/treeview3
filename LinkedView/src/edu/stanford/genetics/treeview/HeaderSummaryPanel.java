@@ -32,7 +32,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	private HeaderSummary headerSummary;
 	private final JList<String> headerList = new JList<String>(new String[0]);
 
-	//Hooks to be able to reset the label view scrollbars, etc
+	//Hook to be able to reset the label view scrollbar
 	private final LabelView labelView;
 
 	public HeaderSummaryPanel(final HeaderInfo headerInfo,

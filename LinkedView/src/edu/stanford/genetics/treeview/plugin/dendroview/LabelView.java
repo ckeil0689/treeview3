@@ -23,7 +23,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.util.Arrays;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
@@ -87,9 +86,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected String  face;
 	protected int     style;
 	protected int     size;
-	protected String  lastDrawnFace;       //used only by getMaxStringLength
-	protected int     lastDrawnStyle;      //used only by getMaxStringLength
-	protected int     lastDrawnSize;       //used only by getMaxStringLength
+	protected String  lastDrawnFace;  //used only by getMaxStringLength
+	protected int     lastDrawnStyle; //used only by getMaxStringLength
+	protected int     lastDrawnSize;  //used only by getMaxStringLength
 	protected int     min;
 	protected int     max;
 	protected int     last_size;
@@ -475,10 +474,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public boolean getJustifyOption() {
 		return isRightJustified;
-	}
-
-	public int[] getLabels() {
-		return getHeaderSummary().getIncluded();
 	}
 
 	/**
@@ -1725,7 +1720,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * This function returns the length in pixels of the longest label and
 	 * tracks the font settings using data members [lastDrawnFace versus current
 	 * 'face', lastDrawnStyle versus current 'style', lastDrawnSize versus
-	 * current 'size',  longest_str_length, and longest_str_index]. If nothing
+	 * current 'size', longest_str_length, and longest_str_index]. If nothing
 	 * about the font has changed, it returns longest_str_length. If the face or
 	 * style have changed, it re-measures the string at longest_str_index.
 	 * Otherwise, it searches all the strings again to get the longest.
