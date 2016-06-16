@@ -1725,10 +1725,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * This function returns the length in pixels of the longest label and
 	 * tracks the font settings using data members [lastDrawnFace versus current
 	 * 'face', lastDrawnStyle versus current 'style', lastDrawnSize versus
-	 * current 'size', lastDrawnLabels versus current labels,
-	 * longest_str_length, and longest_str_index]. If nothing about the font has
-	 * changed, it returns longest_str_length. If the face or style have
-	 * changed, it re-measures the string at longest_str_index.
+	 * current 'size',  longest_str_length, and longest_str_index]. If nothing
+	 * about the font has changed, it returns longest_str_length. If the face or
+	 * style have changed, it re-measures the string at longest_str_index.
 	 * Otherwise, it searches all the strings again to get the longest.
 	 * @param FontMetrics metrics
 	 * @return maxStrLen
@@ -1828,10 +1827,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	private void saveLastDrawnFontDetails(int maxStrLen) {
 		//Save the state to detect changes upon the next call of this method
-		lastDrawnFace       = face;
-		lastDrawnStyle      = style;
-		lastDrawnSize       = size;
-		longest_str_length  = maxStrLen;
+		lastDrawnFace      = face;
+		lastDrawnStyle     = style;
+		lastDrawnSize      = size;
+		longest_str_length = maxStrLen;
 	}
 
 	/**
