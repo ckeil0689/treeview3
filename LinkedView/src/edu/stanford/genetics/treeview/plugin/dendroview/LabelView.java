@@ -87,11 +87,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected String  face;
 	protected int     style;
 	protected int     size;
-	protected int[]   labelTypes;
 	protected String  lastDrawnFace;       //used only by getMaxStringLength
 	protected int     lastDrawnStyle;      //used only by getMaxStringLength
 	protected int     lastDrawnSize;       //used only by getMaxStringLength
-	protected int[]   lastDrawnLabelTypes; //used only by getMaxStringLength
 	protected int     min;
 	protected int     max;
 	protected int     last_size;
@@ -1755,8 +1753,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		//If nothing about the font has changed, calculate the length of the
 		//longest string
-		if(Arrays.equals(lastDrawnLabelTypes,labelTypes) &&
-			lastDrawnFace == face   && lastDrawnStyle == style &&
+		if(lastDrawnFace == face   && lastDrawnStyle == style &&
 			longest_str_index > -1 && lastDrawnSize == size   &&
 			longest_str.equals(headerSummary.getSummary(headerInfo,
 				longest_str_index))) {
@@ -1769,8 +1766,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 		//Else if the font size only has changed, recalculate the longest
 		//string's length
-		else if(Arrays.equals(lastDrawnLabelTypes,labelTypes) &&
-			lastDrawnFace == face && lastDrawnStyle == style &&
+		else if(lastDrawnFace == face && lastDrawnStyle == style &&
 			longest_str_index > -1    && lastDrawnSize != size   &&
 			longest_str.equals(headerSummary.getSummary(headerInfo,
 				longest_str_index))) {
@@ -1835,7 +1831,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		lastDrawnFace       = face;
 		lastDrawnStyle      = style;
 		lastDrawnSize       = size;
-		lastDrawnLabelTypes = getLabels();
 		longest_str_length  = maxStrLen;
 	}
 
