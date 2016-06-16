@@ -264,8 +264,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		if (xScaleEq != null) {
 			treePainter.paintSubtree(offscreenGraphics,xScaleEq,yScaleEq,
-				destRect,node,isLeft,getPrimaryHoverIndex(),treeSelection,
-				hoveredNode);
+				destRect,node,isLeft,getAbsolutePrimaryHoverIndex(),
+				treeSelection,hoveredNode);
 		}
 	}
 
@@ -379,7 +379,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			int lastVisIndex;
 
 			//If we're in label port/whizzing label mode
-			if(map.isLabelAnimeRunning() && map.overALabelPortLinkedView() &&
+			if(map.isLabelAnimeRunning() && map.overALabelLinkedView() &&
 				!map.shouldKeepTreeGlobal() && map.isWhizMode() &&
 				map.getFirstVisibleLabel() > -1 &&
 				map.getLastVisibleLabel() > -1) {
@@ -419,7 +419,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			} else {
 				//If we are looking at a global/data-linked tree with whizzing
 				//labels
-				if(map.isWhizMode()) {
+				if(map.isWhizMode() && map.overALabelLinkedView()) {
 
 					g.setColor(whiz_bg_color);
 
@@ -451,7 +451,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 			/* draw trees */
 			treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,
-				getPrimaryHoverIndex(),treeSelection,hoveredNode);
+				getAbsolutePrimaryHoverIndex(),treeSelection,hoveredNode);
 		}
 	}
 
@@ -662,8 +662,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		//Paint from the parent down based on new selection
 		treePainter.paintSubtree(offscreenGraphics,xScaleEq,yScaleEq,
-			destRect,selectedNode,isLeft,getPrimaryHoverIndex(),treeSelection,
-			hoveredNode);
+			destRect,selectedNode,isLeft,getAbsolutePrimaryHoverIndex(),
+			treeSelection,hoveredNode);
 
 		repaint();
 	}
@@ -679,8 +679,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		synchMap();
 
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-			destRect,current,isLeft,getPrimaryHoverIndex(),treeSelection,
-			hoveredNode);
+			destRect,current,isLeft,getAbsolutePrimaryHoverIndex(),
+			treeSelection,hoveredNode);
 
 		repaint();
 	}
@@ -696,8 +696,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		synchMap();
 
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-			destRect,current,isLeft,getPrimaryHoverIndex(),treeSelection,
-			hoveredNode);
+			destRect,current,isLeft,getAbsolutePrimaryHoverIndex(),
+			treeSelection,hoveredNode);
 
 		repaint();
 	}
@@ -796,7 +796,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	public void updateTreeRepaintTimers() {
 		//If the mouse is not hovering over the IMV, stop both timers, set the
 		//last hover index, and tell mapcontainer that the animation has stopped
-		if(!map.overALabelPortLinkedView()) {
+		if(!map.overALabelLinkedView()) {
 			if(repaintTimer != null && repaintTimer.isRunning()) {
 				debug("Not hovering over a label port linked view - stopping " +
 					"animation",9);
@@ -841,7 +841,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		//Else if the mouse hasn't moved, start the second timer to slow down
 		//the first after 1 second (this mitigates delays upon mouse motion
 		//after a brief period of no motion)
-		else if(map.overALabelPortLinkedView() &&
+		else if(map.overALabelLinkedView() &&
 			getPrimaryHoverIndex() == lastHoverIndex) {
 			if(repaintTimer.getDelay() == REPAINT_INTERVAL) {
 				debug("Hovering on one spot [" + lastHoverIndex +
@@ -889,12 +889,24 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	}
 
 	/**
-	 * Gets the data index that is hovered over
+	 * Gets the data index that is hovered over, including edges if the mouse is
+	 * hovered off a label linked view (especially useful when dragging off an
+	 * edge)
 	 * @author rleach
 	 * @return data index
 	 */
 	public int getPrimaryHoverIndex() {
 		return(map.getHoverIndex());
+	}
+
+	/**
+	 * Gets the data index that is hovered over, or -1 if not a valid hover
+	 * position
+	 * @author rleach
+	 * @return data index
+	 */
+	public int getAbsolutePrimaryHoverIndex() {
+		return(map.overALabelLinkedView() ? map.getHoverIndex() : -1);
 	}
 
 	/**
@@ -924,9 +936,9 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		if (treePainter == null)
 			return;
 
-		setHoveredNode(getClosestParentNode(e));
 		map.setHoverPixel(getPrimaryPixelIndex(e));
 		map.setHoverIndex(map.getIndex(getPrimaryPixelIndex(e)));
+		setHoveredNode(getClosestParentNode(e));
 		synchMap();
 	}
 

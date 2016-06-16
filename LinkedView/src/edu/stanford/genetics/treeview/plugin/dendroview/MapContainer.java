@@ -2182,7 +2182,7 @@ public class MapContainer extends Observable implements Observer,
 	//must be tracked here in the data model because it's the common point of
 	//reference for all the classes in the view and is their only way to
 	//communicate with one another.
-	public boolean overALabelPortLinkedView() {
+	public boolean overALabelLinkedView() {
 		debug("overALabelPortLinkedView: overLabels [" +
 			(overLabels ? "true" : "false") + "] overInteractiveMatrix [" +
 			(overInteractiveMatrix ? "true" : "false") +
@@ -2247,7 +2247,7 @@ public class MapContainer extends Observable implements Observer,
 
 		//If LabelView is not controlling its own repaints anymore, start it
 		//back up with a call to notifyObservers
-		if(!labelAnimeRunning && overALabelPortLinkedView()) {
+		if(!labelAnimeRunning && overALabelLinkedView()) {
 			setChanged();
 			notifyObservers();
 		}
