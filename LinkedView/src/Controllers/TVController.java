@@ -378,12 +378,10 @@ public class TVController implements Observer {
 					"Alert", JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + message);
 
-//			tvFrame.setLoadErrorMessage("Data was not loaded.");
-
 			/* Set model status, which will update the view. */
 			((TVModel) model).setLoaded(false);
 
-			//Bring the user back to the load dialog
+			//Bring the user back to the load dialog to try again or cancel load
 			DataLoadInfo dataInfo;
 			dataInfo = useImportDialog(loadingFile);
 
