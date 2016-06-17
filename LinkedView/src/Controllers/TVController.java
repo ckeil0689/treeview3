@@ -375,7 +375,9 @@ public class TVController implements Observer {
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
 		} else {
-			final String message = "No data matrix could be set.";
+			final String message = "No numeric data could be found in the " +
+				"input file.\nThe input file must contain tab-delimited " +
+				"numeric values.";
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
 					"Alert", JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + message);
