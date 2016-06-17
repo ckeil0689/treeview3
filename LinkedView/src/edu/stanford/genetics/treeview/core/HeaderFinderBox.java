@@ -464,7 +464,11 @@ public abstract class HeaderFinderBox {
 			//possibly remain red from a previously failed search.
 			companionBox.updateSearchTextColor(true);
 			gotSomething = this.seekAllHelper();
-			updateSearchTextColor(gotSomething);
+			if(isSearchTermEntered()) {
+				updateSearchTextColor(gotSomething);
+			} else {
+				updateSearchTextColor(true);
+			}
 		}
 	}
 
