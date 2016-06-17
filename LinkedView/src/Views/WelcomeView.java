@@ -155,6 +155,7 @@ public class WelcomeView {
 
 	public JPanel makeWelcome(FileSet fs) {
 
+		//Reset the welcome (in case we're coming back here from a failed load)
 		jl.setText(StringRes.title_Hello);
 		jl2.setText(StringRes.title_Welcome + StringRes.appName +
 			StringRes.dot);
