@@ -155,6 +155,10 @@ public class WelcomeView {
 
 	public JPanel makeWelcome(FileSet fs) {
 
+		jl.setText(StringRes.title_Hello);
+		jl2.setText(StringRes.title_Welcome + StringRes.appName +
+			StringRes.dot);
+
 		isLoading = false;
 
 		loadPanel.removeAll();

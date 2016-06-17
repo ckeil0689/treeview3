@@ -184,11 +184,6 @@ public class TVController implements Observer {
 			tvFrame.getWelcomeView().addLoadLastListener(
 					new LoadLastButtonListener());
 		}
-
-		if (tvFrame.getLoadErrorView() != null) {
-			tvFrame.getLoadErrorView().addLoadNewListener(
-					new LoadButtonListener());
-		}
 	}
 
 	public void toggleTrees() {
@@ -382,7 +377,7 @@ public class TVController implements Observer {
 					"Alert", JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + message);
 
-			tvFrame.setLoadErrorMessage("Data was not loaded.");
+//			tvFrame.setLoadErrorMessage("Data was not loaded.");
 
 			/* Set model status, which will update the view. */
 			((TVModel) model).setLoaded(false);

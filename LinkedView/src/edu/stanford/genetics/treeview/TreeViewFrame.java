@@ -35,7 +35,6 @@ import javax.swing.WindowConstants;
 
 import Utilities.GUIFactory;
 import Utilities.StringRes;
-import Views.LoadErrorView;
 import Views.WelcomeView;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
@@ -56,7 +55,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		ConfigNodePersistent {
 
 	public static final int WELCOME_VIEW = 0;
-	public static final int LOADERROR_VIEW = 1;
 	public static final int PROGRESS_VIEW = 2;
 	public static final int DENDRO_VIEW = 3;
 
@@ -71,7 +69,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	// Different Views to be displayed
 	private final WelcomeView welcomeView;
-	private final LoadErrorView loadErrorView;
 	private final DendroView dendroView;
 
 	private String loadErrorMessage;
@@ -113,7 +110,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		/* Initialize main views */
 		welcomeView = new WelcomeView();
-		loadErrorView = new LoadErrorView();
 		dendroView = new DendroView(this);
 
 		setWindowActive(true);
@@ -177,11 +173,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		case PROGRESS_VIEW:
 			view = welcomeView.makeLoading();
-			break;
-
-		case LOADERROR_VIEW:
-			loadErrorView.setErrorMessage(loadErrorMessage);
-			view = loadErrorView.makeError();
 			break;
 
 		case DENDRO_VIEW:
@@ -378,16 +369,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	}
 
 	/**
-	 * Returns TVFrame's current LoadErrorView instance
-	 *
-	 * @return welcomeView
-	 */
-	public LoadErrorView getLoadErrorView() {
-
-		return loadErrorView;
-	}
-
-	/**
 	 * Returns TVFrame's current DendroView instance
 	 *
 	 * @return dendroView
@@ -454,7 +435,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		} else {
 			appFrame.setTitle(StringRes.appName);
 			setTitleString(appFrame.getName());
-			generateView(LOADERROR_VIEW);
+			generateView(WELCOME_VIEW);
 		}
 
 		buildMenuBar();
