@@ -78,6 +78,7 @@ public class TVController implements Observer {
 	private MenubarController menuController;
 	private File file;
 	private FileSet fileMenuSet;
+	private FileSet loadingFile;
 
 	private Preferences oldNode;
 	private String[] clusterNodeSourceKeys;
@@ -381,6 +382,18 @@ public class TVController implements Observer {
 
 			/* Set model status, which will update the view. */
 			((TVModel) model).setLoaded(false);
+
+			//Bring the user back to the load dialog
+			DataLoadInfo dataInfo;
+			dataInfo = useImportDialog(loadingFile);
+
+			if (dataInfo != null) {
+				loadData(loadingFile, false, dataInfo);
+				
+			} else {
+				String msg = "Data loading was interrupted.";
+				LogBuffer.println(msg);
+			}
 		}
 
 		addViewListeners();
@@ -543,16 +556,17 @@ public class TVController implements Observer {
 		try {
 			if(fileSet == null) {
 				file = tvFrame.selectFile();
-	
+
 				/* Only run loader, if JFileChooser wasn't canceled. */
 				if (file != null) {
 					fileSet = tvFrame.getFileSet(file);
-	
+
 				} else {
 					return;
 				}
 			}
-			
+
+			loadingFile = fileSet;
 			getDataInfoAndLoad(fileSet, false);
 			
 		} catch (final LoadException e) {
