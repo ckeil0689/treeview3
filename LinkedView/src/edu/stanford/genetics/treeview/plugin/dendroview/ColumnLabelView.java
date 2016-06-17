@@ -19,7 +19,7 @@ public class ColumnLabelView extends LabelView {
 	private static final long serialVersionUID = 1L;
 
 	public ColumnLabelView() {
-		
+
 		super();
 		d_justified = false;
 		zoomHint = StringRes.lbl_ZoomColLabels;

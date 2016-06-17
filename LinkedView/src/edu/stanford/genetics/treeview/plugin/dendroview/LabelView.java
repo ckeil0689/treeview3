@@ -848,7 +848,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		/* Shouldn't draw if there's no TreeSelection defined */
 		if(drawSelection == null) {
 			LogBuffer.println("Error: drawSelection not defined. Can't draw " +
-			                  "labels.");
+				"labels.");
 			return;
 		}
 
@@ -1747,8 +1747,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		//If nothing about the font has changed, calculate the length of the
 		//longest string
-		if(lastDrawnFace == face  && lastDrawnStyle == style &&
-			longest_str_index > -1 && lastDrawnSize == size &&
+		if(lastDrawnFace == face   && lastDrawnStyle == style &&
+			longest_str_index > -1 && lastDrawnSize == size   &&
 			longest_str.equals(headerSummary.getSummary(headerInfo,
 				longest_str_index))) {
 
@@ -1761,7 +1761,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Else if the font size only has changed, recalculate the longest
 		//string's length
 		else if(lastDrawnFace == face && lastDrawnStyle == style &&
-			longest_str_index > -1 && lastDrawnSize != size &&
+			longest_str_index > -1    && lastDrawnSize != size   &&
 			longest_str.equals(headerSummary.getSummary(headerInfo,
 				longest_str_index))) {
 

@@ -48,8 +48,8 @@ public class FontSettings implements SettingsPanel {
 
 	private Font[] fonts;
 
-	private final LabelView client;
-	private final LabelView client2;
+	private final LabelView rowLabelView;
+	private final LabelView colLabelView;
 	
 	private JPanel fontPanel;
 	private JComboBox<String> font_choice;
@@ -60,10 +60,10 @@ public class FontSettings implements SettingsPanel {
 	private JSpinner min_field;
 	private JSpinner max_field;
 
-	public FontSettings(final LabelView fs, final LabelView fs2) {
+	public FontSettings(final LabelView rows, final LabelView cols) {
 
-		client = fs;
-		client2 = fs2;
+		rowLabelView = rows;
+		colLabelView = cols;
 	}
 
 	/**
@@ -222,14 +222,14 @@ public class FontSettings implements SettingsPanel {
 		font_choice = GUIFactory.createComboBox(fontNames);
 		font_choice.setEditable(true);
 		AutoCompleteDecorator.decorate(font_choice);
-		font_choice.setSelectedItem(client.getFace());
+		font_choice.setSelectedItem(rowLabelView.getFace());
 		font_choice.addActionListener(new SelectionListener());
 	}
 
 	private void setupStyleChoice() {
 
 		style_choice = GUIFactory.createComboBox(styles);
-		style_choice.setSelectedItem(decode_style(client.getStyle()));
+		style_choice.setSelectedItem(decode_style(rowLabelView.getStyle()));
 		style_choice.addActionListener(new SelectionListener());
 	}
 
@@ -245,21 +245,21 @@ public class FontSettings implements SettingsPanel {
 		size = correctSize(size, min, max);
 		updateSpinnerModels(size, min, max);
 
-		client.setFace(string);
-		client.setStyle(i);
-		client.setFixed(isFixed);
-		client.setSavedPoints(size);
-		client.setMin(min);
-		client.setMax(max);
-		client.resetSecondaryScroll();
+		rowLabelView.setFace(string);
+		rowLabelView.setStyle(i);
+		rowLabelView.setFixed(isFixed);
+		rowLabelView.setSavedPoints(size);
+		rowLabelView.setMin(min);
+		rowLabelView.setMax(max);
+		rowLabelView.resetSecondaryScroll();
 
-		client2.setFace(string);
-		client2.setStyle(i);
-		client2.setFixed(isFixed);
-		client2.setSavedPoints(size);
-		client2.setMin(min);
-		client2.setMax(max);
-		client2.resetSecondaryScroll();
+		colLabelView.setFace(string);
+		colLabelView.setStyle(i);
+		colLabelView.setFixed(isFixed);
+		colLabelView.setSavedPoints(size);
+		colLabelView.setMin(min);
+		colLabelView.setMax(max);
+		colLabelView.resetSecondaryScroll();
 	}
 	
 	/**
@@ -313,11 +313,11 @@ public class FontSettings implements SettingsPanel {
 		setupStyleChoice();
 		fontPanel.add(style_choice, "span, wrap");
 
-		SpinnerModel size_model = new SpinnerNumberModel(client.getPoints(), 0, 
+		SpinnerModel size_model = new SpinnerNumberModel(rowLabelView.getPoints(), 0, 
 				50, 1);
-		SpinnerModel min_model = new SpinnerNumberModel(client.getMin(), 0, 
+		SpinnerModel min_model = new SpinnerNumberModel(rowLabelView.getMin(), 0, 
 				50, 1);
-		SpinnerModel max_model = new SpinnerNumberModel(client.getMax(), 0, 
+		SpinnerModel max_model = new SpinnerNumberModel(rowLabelView.getMax(), 0, 
 				50, 1);
 		
 		/* Font size */
@@ -327,7 +327,7 @@ public class FontSettings implements SettingsPanel {
 		fontPanel.add(size_field);
 
 		fixedBox = new JCheckBox("Keep fixed");
-		fixedBox.setSelected(client.getFixed());
+		fixedBox.setSelected(rowLabelView.getFixed());
 		fixedBox.addActionListener(new SelectionListener());
 		fontPanel.add(fixedBox, "wrap");
 
