@@ -86,7 +86,9 @@ public abstract class HeaderFinderBox {
 	protected HeaderFinderBox companionBox;
 
 	//defaultText is what's in the finder box before a term is entered.
-	protected static String defaultText;
+	//This variable must not be static so that this box and the contained
+	//companion box's defaults can be distinguished.
+	protected String defaultText;
 
 	/**
 	 * Constructor
@@ -468,11 +470,9 @@ public abstract class HeaderFinderBox {
 
 	public void updateSearchTextColor(final boolean gotSomething) {
 		if(gotSomething) {
-			LogBuffer.println("Changed to found color");
 			searchTermBox.getEditor().getEditorComponent().
 				setBackground(FOUNDCOLOR);
 		} else {
-			LogBuffer.println("Changed to notfound color");
 			searchTermBox.getEditor().getEditorComponent().
 				setBackground(NOTFOUNDCOLOR);
 		}
