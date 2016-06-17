@@ -88,8 +88,6 @@ public abstract class HeaderFinderBox {
 	//defaultText is what's in the finder box before a term is entered.
 	protected static String defaultText;
 
-//	boolean dropdownclicked = false;
-
 	/**
 	 * Constructor
 	 * @param type - A string describing what's searched (e.g. Row or Column)
@@ -222,7 +220,7 @@ public abstract class HeaderFinderBox {
 		public void mouseReleased(java.awt.event.MouseEvent e){
 			//Calling seekAll() directly did not work. It worked occasionally
 			//when called from ActionListener's actionPerformed method (only
-			//when dropdownclicked was set to true here).  It turns out that
+			//when a boolean was set to true here).  It turns out that
 			//simulating an enter key keypress here works really well, albeit
 			//admittedly hackily, but there's no standard way to initiate an
 			//action only when an item in the dropdown is clicked without
