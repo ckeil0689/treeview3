@@ -64,9 +64,6 @@ public class ColorPicker {
 	/* Data boundaries */
 	private final double mean;
 	private final double median;
-	
-	private double range;
-	
 	private final double dataCenter;
 
 	public ColorPicker(final ColorExtractor drawer, final double minVal,
@@ -97,7 +94,6 @@ public class ColorPicker {
 
 		setMinVal(minVal);
 		setMaxVal(maxVal);
-		updateRange();
 	}
 
 	public JPanel getContainerPanel() {
@@ -279,7 +275,7 @@ public class ColorPicker {
 				frac = 1.0f;
 
 			} else {
-				frac = (float) (diff / (range));
+				frac = (float) (diff / (getRange()));
 			}
 
 			newFractions[i] = frac;
@@ -389,8 +385,6 @@ public class ColorPicker {
 		this.minVal = minVal;
 		colorExtractor.setMin(minVal);
 		minThumb.setValue(minVal);
-		updateRange();
-
 		updateFractions();
 	}
 
@@ -404,7 +398,6 @@ public class ColorPicker {
 		this.maxVal = maxVal;
 		colorExtractor.setMax(maxVal);
 		maxThumb.setValue(maxVal);
-		updateRange();
 		updateFractions();
 	}
 	
@@ -426,13 +419,6 @@ public class ColorPicker {
 		
 		this.maxThumb = bT;
 		setMaxVal(bT.getDataValue()); 
-	}
-
-	/**
-	 * Updates the range.
-	 */
-	private void updateRange() {
-		this.range = maxVal - minVal;
 	}
 
 	/**
@@ -474,15 +460,13 @@ public class ColorPicker {
 	 */
 	protected double getRange() {
 
-		double testRange = maxVal - minVal;
-
-		/* make sure the range is always defined correctly */
-		if (!Helper.nearlyEqual(range, testRange)) {
-			LogBuffer.println("Range was not defined properly!");
-			this.range = testRange;
+		if(!(maxVal > minVal)) {
+			LogBuffer.println("Max value should not be larger than min value." +
+				"Cannot return proper range.");
+			return Double.NaN;
 		}
-
-		return range;
+		
+		return (maxVal - minVal);
 	}
 
 	/**
@@ -516,7 +500,7 @@ public class ColorPicker {
 
 		double dataVal;
 
-		dataVal = Math.abs((range) * frac) + minVal;
+		dataVal = Math.abs((getRange()) * frac) + minVal;
 		dataVal = Helper.roundDouble(dataVal, 3);
 
 		return dataVal;
