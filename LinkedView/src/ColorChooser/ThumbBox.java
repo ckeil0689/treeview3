@@ -110,9 +110,7 @@ public class ThumbBox {
 
 		/* Excludes boundary thumbs */
 		for (int i = 1; i < fractions.length - 1; i++) {
-
-			boolean hasNoThumbForFrac = !hasThumbForFraction(i);
-			boolean isNotSynced = !colorPicker.isSynced();
+			
 			if (!hasThumbForFraction(i) && !colorPicker.isSynced()) {
 				insertThumbAt(fractions[i], i, colorPicker.getColorList()
 						.get(i));

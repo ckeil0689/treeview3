@@ -46,8 +46,8 @@ public class ColorPicker {
 	private Color[] colors;
 
 	/* List of all active thumbs (one per color) */
-	protected Thumb minThumb;
-	protected Thumb maxThumb;
+	protected BoundaryThumb minThumb;
+	protected BoundaryThumb maxThumb;
 	private List<Thumb> thumbList;
 
 	/* List of all active colors (depends on active ColorSet) */
@@ -254,11 +254,14 @@ public class ColorPicker {
 	}
 
 	/**
-	 * Adjusts the fractions to new data values.
-	 * 
-	 * @param dataValues
+	 * Calculates new fraction array from stored thumb data values.
 	 */
 	protected void updateFractions() {
+		
+		if(thumbList == null) {
+			LogBuffer.println("No thumb list defined. Could not update fractions.");
+			return;
+		}
 
 		float[] newFractions = new float[thumbList.size()];
 
@@ -306,11 +309,8 @@ public class ColorPicker {
 	protected void updateColorArray() {
 
 		/* TODO simplify */
-		colors = new Color[colorList.size()];
-
-		for (int i = 0; i < colors.length; i++) {
-			colors[i] = colorList.get(i);
-		}
+		this.colors = new Color[colorList.size()];
+    colorList.toArray(colors);
 	}
 
 	/**
@@ -367,7 +367,7 @@ public class ColorPicker {
 		thumbList.remove(fromIdx);
 		colorList.remove(fromIdx);
 		
-		/* Account for left-shift from remove() */
+		// account for left-shift from remove()
 		toIdx -= 1;
 		
 		thumbList.add(toIdx, t);
@@ -381,7 +381,6 @@ public class ColorPicker {
 	 */
 	protected void setMinVal(double minVal) {
 
-		LogBuffer.println("Setting new minimum value: " + minVal);
 		this.minVal = minVal;
 		colorExtractor.setMin(minVal);
 		minThumb.setValue(minVal);
@@ -394,7 +393,7 @@ public class ColorPicker {
 	 * @param maxVal
 	 */
 	protected void setMaxVal(double maxVal) {
-		LogBuffer.println("Setting new maximum value: " + maxVal);
+		
 		this.maxVal = maxVal;
 		colorExtractor.setMax(maxVal);
 		maxThumb.setValue(maxVal);
@@ -408,6 +407,7 @@ public class ColorPicker {
 	protected void setMinBound(final BoundaryThumb bT) {
 		
 		this.minThumb = bT;
+		minBox.setNewThumb(bT);
 		setMinVal(bT.getDataValue());
 	}
 	
@@ -418,6 +418,7 @@ public class ColorPicker {
 	protected void setMaxBound(final BoundaryThumb bT) {
 		
 		this.maxThumb = bT;
+		maxBox.setNewThumb(bT);
 		setMaxVal(bT.getDataValue()); 
 	}
 
@@ -545,7 +546,7 @@ public class ColorPicker {
 		return thumbList.size();
 	}
 
-	protected Thumb getThumb(int index) {
+	protected Thumb getThumb(final int index) {
 
 		return thumbList.get(index);
 	}
@@ -578,7 +579,6 @@ public class ColorPicker {
 	 */
 	protected boolean isSynced() {
 
-		return (fractions.length == thumbList.size());//colorList.size());
-//				&& (colorList.size() == thumbList.size());
+		return (fractions.length == thumbList.size());
 	}
 }

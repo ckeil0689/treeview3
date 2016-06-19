@@ -23,7 +23,7 @@ public class BoundaryBox extends ThumbBox {
 	/**
 	 * Constructs a GradientBox object.
 	 */
-	public BoundaryBox(ColorPicker cP, Thumb thumb, boolean isMin) {
+	public BoundaryBox(ColorPicker cP, BoundaryThumb thumb, boolean isMin) {
 
 		super(cP);
 
@@ -95,5 +95,13 @@ public class BoundaryBox extends ThumbBox {
 	protected Rectangle2D getBoundaryRect() {
 
 		return boundaryRect;
+	}
+	
+	/**
+	 * Update the current thumb defined for this BoundaryBox.
+	 * @param bT - The new BoundaryThumb object.
+	 */
+	protected void setNewThumb(final BoundaryThumb bT) {
+		this.thumb = bT;
 	}
 }
