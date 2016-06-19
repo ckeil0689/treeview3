@@ -433,26 +433,16 @@ public class ThumbBox {
 			return;
 		}
 
-		/* Handle position change depending on thumb type */
+		// Handle position change depending on thumb type
 		if(t instanceof BoundaryThumb) {
 			manageBoundaryThumbMoveTo((BoundaryThumb)t, dataVal);
 			
 		} else {
 			manageInnerThumbMoveTo(t, dataVal);
 		}
-		
-		// TODO when extending thumbs, the new thumb value isn't inserted at the correct position...
-		LogBuffer.println("Fracs before edit: " + Arrays.toString(colorPicker.getFractions()));
-		for(Thumb th : colorPicker.getThumbList()) {
-			LogBuffer.println("Thumb #" + colorPicker.getThumbList().indexOf(th) + ": " + th.getDataValue());
-		}
+
 		colorPicker.updateFractions();
 		colorPicker.updateColors();
-		LogBuffer.println("Fracs after edit: " + Arrays.toString(colorPicker.getFractions()));
-		for(Thumb th : colorPicker.getThumbList()) {
-			LogBuffer.println("Thumb #" + colorPicker.getThumbList().indexOf(th) + ": " + th.getDataValue());
-		}
-		LogBuffer.println("-----------");
 	}
 
 	/**

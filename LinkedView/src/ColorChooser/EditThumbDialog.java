@@ -121,7 +121,9 @@ public class EditThumbDialog extends CustomDialog {
 	}
 
 	/**
-	 * Parses the input and checks if it should be accepted.
+	 * Parses the input and checks muliple conditions to decide if it 
+	 * should be accepted. Those conditions are largely defined by the intended
+	 * behavior of the handles.
 	 * 
 	 * @return Whether the user input is considered valid.
 	 */

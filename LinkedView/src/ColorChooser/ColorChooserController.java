@@ -92,6 +92,7 @@ implements ConfigNodePersistent {
 		}
 
 		/* Choose ColorSet according to name */
+		// TODO work with Enum...
 		final ColorSet selectedColorSet;
 		if (colorScheme.equalsIgnoreCase("Custom")) {
 			colorChooserUI.getPresetChoices().setSelectedItem("Custom");
@@ -120,7 +121,7 @@ implements ConfigNodePersistent {
 	 */
 	private void saveStatus() {
 
-		ColorSet colorSet = colorChooserUI.getColorPicker().saveCustomPresets();
+		ColorSet colorSet = colorChooserUI.getColorPicker().generateCustomColorSet();
 		colorPresets.addColorSet(colorSet);
 	}
 

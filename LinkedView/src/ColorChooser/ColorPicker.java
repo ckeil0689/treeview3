@@ -52,17 +52,21 @@ public class ColorPicker {
 
 	/* List of all active colors (depends on active ColorSet) */
 	private final List<Color> colorList;
-
+	
+	/* These should never change! */
+	private final double dataMinVal;
+	private final double dataMaxVal;
+	
+	/* These can change and be adjusted by the user */
+	private double minVal;
+	private double maxVal;
+	
 	/* Data boundaries */
 	private final double mean;
 	private final double median;
 	
-	private double minVal;
-	private double maxVal;
 	private double range;
-
-	private final double dataMin;
-	private final double dataMax;
+	
 	private final double dataCenter;
 
 	public ColorPicker(final ColorExtractor drawer, final double minVal,
@@ -72,8 +76,8 @@ public class ColorPicker {
 		
 		this.mean = mean;
 		this.median = median;
-		this.dataMin = minVal;
-		this.dataMax = maxVal;
+		this.dataMinVal = minVal;
+		this.dataMaxVal = maxVal;
 		this.dataCenter = minVal + (maxVal - minVal) / 2;
 		
 		this.thumbList = new ArrayList<Thumb>();
@@ -154,26 +158,31 @@ public class ColorPicker {
 	 */
 	protected void loadPresets() {
 
-		/* clearing all data */
+		// clearing all data
 		colorList.clear();
 		thumbList.clear();
 
+		// Adding boundary thumbs - inner thumbs are inserted by verifyInnerThumbs()
 		thumbList.add(minThumb);
 		thumbList.add(maxThumb);
 
 		colorExtractor.setMissingColor(activeColorSet.getMissing());
 
-		/* Only load non-dataset min/max if custom colorset is loaded */
-		if (!("RedGreen".equalsIgnoreCase(activeColorSet.getName()) || "YellowBlue"
-				.equalsIgnoreCase(activeColorSet.getName()))) {
+		// Only load non-dataset min/max if custom colorset is loaded
+		if ("Custom".equalsIgnoreCase(activeColorSet.getName())) {
+			LogBuffer.println("Loading custom min/max");
 			setMinVal(activeColorSet.getMin());
 			setMaxVal(activeColorSet.getMax());
+			
+		} else {
+			LogBuffer.println("Loading data min/max");
+			setMinVal(dataMinVal);
+			setMaxVal(dataMaxVal);
 		}
 
 		final String[] colors = activeColorSet.getColors();
 
 		for (final String color : colors) {
-
 			colorList.add(Color.decode(color));
 		}
 
@@ -182,17 +191,23 @@ public class ColorPicker {
 	}
 
 	/**
-	 * Serves to store the currently chosen custom color setup in a configNode.
+	 * Creates a custom ColorSet from the current fractions, colors, and min-max
+	 * values.
 	 * 
 	 * @return The new ColorSet object created from the current custom colors
 	 *         and the relative positions of the associated thumbs.
 	 */
-	protected ColorSet saveCustomPresets() {
+	protected ColorSet generateCustomColorSet() {
+		
+		if(fractions.length != colorList.size()) {
+			LogBuffer.println("Did not generate custom ColorSet, because the" +
+				"size of gradient fractions and colors does not match.");
+			return null;
+		}
 
 		final List<Double> fractionList = new ArrayList<Double>();
 
 		for (final float f : fractions) {
-
 			fractionList.add((double) f);
 		}
 
@@ -481,14 +496,14 @@ public class ColorPicker {
 	 * @return Returns the currently defined min of the dataset.
 	 */
 	protected double getDataMin() {
-		return(dataMin);
+		return(dataMinVal);
 	}
 
 	/**
 	 * @return Returns the currently defined max of the dataset.
 	 */
 	protected double getDataMax() {
-		return(dataMax);
+		return(dataMaxVal);
 	}
 
 	/**
