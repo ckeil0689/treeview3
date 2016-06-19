@@ -121,7 +121,7 @@ public class EditThumbDialog extends CustomDialog {
 	}
 
 	/**
-	 * Parses the input and checks muliple conditions to decide if it 
+	 * Parses the input and checks multiple conditions to decide if it 
 	 * should be accepted. Those conditions are largely defined by the intended
 	 * behavior of the handles.
 	 * 
@@ -163,20 +163,11 @@ public class EditThumbDialog extends CustomDialog {
 					}
 				}
 		  // Overshoots or equals min boundary
-			} else if(!(inputX > thumbBox.calcThumbVal(minThumbIdx))) {
-				LogBuffer.println("Overshooting min boundary.");
-				// Left here in case we decide to do a replace in the future
-//				thumbBox.replaceThumbAt(minThumbIdx, t);
-//				setError("Value has to be greater than left-most handle.");
-//				isInvalid = true;
+//			} else if(inputX < thumbBox.calcThumbVal(minThumbIdx)) {
+				
 				
 			// Overshoots or equals max boundary
-			} else if(!(inputX < thumbBox.calcThumbVal(maxThumbIdx))) {
-				LogBuffer.println("Overshooting max boundary.");
-			// Left here in case we decide to do a replace in the future
-//				thumbBox.replaceThumbAt(maxThumbIdx, t);
-//				setError("Value has to be less than right-most handle.");
-//				isInvalid = true;
+//			} else if(inputX > thumbBox.calcThumbVal(maxThumbIdx)) {
 				
 			// Replace other handle if other handle with same data value exists
 			} else if(!isInputEqualToThumbVal && thumbBox.hasThumbForVal(inputX)) {

@@ -654,8 +654,7 @@ public class ThumbBox {
 		List<Thumb> thumbs = colorPicker.getThumbList();
 
 		for (final Thumb t : thumbs) {
-
-			double tDataVal = calcThumbVal(thumbs.indexOf(t));
+			double tDataVal = t.getDataValue();
 			if (Helper.nearlyEqual(tDataVal, dataVal)) {
 				hasThumb = true;
 				break;
@@ -675,14 +674,51 @@ public class ThumbBox {
 	protected void removeThumbWithVal(double dataVal) {
 
 		List<Thumb> thumbs = colorPicker.getThumbList();
+		List<Color> colors = colorPicker.getColorList();
 
+		// Look for thumb with equal data value
+		int replaceIdx = -1;
 		for (final Thumb t : thumbs) {
 			int idx = thumbs.indexOf(t);
 			double tDataVal = calcThumbVal(idx);
 			if (Helper.nearlyEqual(tDataVal, dataVal)) {
-				thumbs.remove(idx);
-				colorPicker.getColorList().remove(idx);
+				replaceIdx = idx;
 				break;
+			}
+		}
+		
+		if(replaceIdx != -1) {
+			// Replacing a boundary
+			if(thumbs.get(replaceIdx) instanceof BoundaryThumb) {
+				int selectedIdx = getSelectedThumbIndex();
+				BoundaryThumb oldBT = (BoundaryThumb) thumbs.get(replaceIdx);
+				
+				// Create new boundary thumb
+				BoundaryThumb newBT = new BoundaryThumb(oldBT.isMin());
+				newBT.setValue(dataVal);
+				newBT.setColor(new Color(colors.get(selectedIdx).getRGB()));
+				
+				thumbs.remove(selectedIdx);
+				colors.remove(selectedIdx);
+				
+				// Recalc because list shrank from remove()
+			  replaceIdx = (newBT.isMin())	? 0 : (thumbs.size() - 1);
+			  
+				thumbs.set(replaceIdx, newBT);
+				colors.set(replaceIdx, newBT.getColor());
+				
+				// Don't forget to update the correct bound for the ColorPicker
+				if(newBT.isMin()) {
+					colorPicker.setMinBound(newBT);
+					
+				} else {
+					colorPicker.setMaxBound(newBT);
+				}
+			
+			// Replacing inner thumb - just remove the old one
+			} else {
+				thumbs.remove(replaceIdx);
+				colors.remove(replaceIdx);
 			}
 		}
 	}
