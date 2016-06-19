@@ -166,12 +166,10 @@ public class ColorPicker {
 
 		// Only load non-dataset min/max if custom colorset is loaded
 		if ("Custom".equalsIgnoreCase(activeColorSet.getName())) {
-			LogBuffer.println("Loading custom min/max");
 			setMinVal(activeColorSet.getMin());
 			setMaxVal(activeColorSet.getMax());
 			
 		} else {
-			LogBuffer.println("Loading data min/max");
 			setMinVal(dataMinVal);
 			setMaxVal(dataMaxVal);
 		}

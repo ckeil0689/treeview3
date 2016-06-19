@@ -7,9 +7,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -17,7 +15,6 @@ import javax.swing.JTextField;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.Helper;
-import edu.stanford.genetics.treeview.LogBuffer;
 
 public class EditThumbDialog extends CustomDialog {
 
