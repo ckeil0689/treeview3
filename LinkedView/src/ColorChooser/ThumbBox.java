@@ -111,6 +111,8 @@ public class ThumbBox {
 		/* Excludes boundary thumbs */
 		for (int i = 1; i < fractions.length - 1; i++) {
 
+			boolean hasNoThumbForFrac = !hasThumbForFraction(i);
+			boolean isNotSynced = !colorPicker.isSynced();
 			if (!hasThumbForFraction(i) && !colorPicker.isSynced()) {
 				insertThumbAt(fractions[i], i, colorPicker.getColorList()
 						.get(i));
@@ -436,10 +438,10 @@ public class ThumbBox {
 			manageBoundaryThumbMoveTo((BoundaryThumb)t, dataVal);
 			
 		} else {
-//			t.setValue(dataVal);
 			manageInnerThumbMoveTo(t, dataVal);
 		}
 		
+		// TODO when extending thumbs, the new thumb value isn't inserted at the correct position...
 		LogBuffer.println("Fracs before edit: " + Arrays.toString(colorPicker.getFractions()));
 		for(Thumb th : colorPicker.getThumbList()) {
 			LogBuffer.println("Thumb #" + colorPicker.getThumbList().indexOf(th) + ": " + th.getDataValue());
@@ -499,7 +501,7 @@ public class ThumbBox {
 		List<Color> colors = colorPicker.getColorList();
 		
 		int boundIdx = (extendMin) ? 0 : thumbs.size() - 1;
-		int innerIdx = thumbs.indexOf(oldInner);
+		int newInnerIdx = (extendMin) ? (boundIdx + 1) : (boundIdx - 1);
 		
 		BoundaryThumb oldBT = (BoundaryThumb) thumbs.get(boundIdx);
 		oldBoundColor = new Color(oldBT.getColor().getRGB());
@@ -514,19 +516,21 @@ public class ThumbBox {
 	  Thumb newInner = new Thumb(oldBoundColor);
 	  newInner.setValue(oldBoundVal);
 	  
+	  thumbs.remove(oldInner);
+	  colors.remove(oldInnerColor);
+	  
+	  thumbs.add(newInnerIdx, newInner);
+	  colors.add(newInnerIdx, newInner.getColor());
+	  
 	  /* Replace boundary thumb */
 	  thumbs.set(boundIdx, newBT);
 	  colors.set(boundIdx, newBT.getColor());
 	  
-	  /* Replace inner thumb */
-	  thumbs.set(innerIdx, newInner);
-	  colors.set(innerIdx, newInner.getColor());
-	  
 	  if(extendMin) {
-	  	colorPicker.setMinVal(dataVal);
+	  	colorPicker.setMinBound(newBT);
 	  	
 	  } else {
-	  	colorPicker.setMaxVal(dataVal);
+	  	colorPicker.setMaxBound(newBT);
 	  }
 	}
 

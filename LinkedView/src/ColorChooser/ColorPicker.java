@@ -283,7 +283,7 @@ public class ColorPicker {
 	protected void setFractions(float[] newFracs) {
 
 		this.fractions = newFracs;
-
+		
 		thumbBox.verifyInnerThumbs();
 		thumbBox.adjustThumbsToFractions();
 	}
@@ -391,6 +391,26 @@ public class ColorPicker {
 		maxThumb.setValue(maxVal);
 		updateRange();
 		updateFractions();
+	}
+	
+	/**
+	 * Set a new minimum boundary thumb.
+	 * @param bT - The new boundary thumb.
+	 */
+	protected void setMinBound(final BoundaryThumb bT) {
+		
+		this.minThumb = bT;
+		setMinVal(bT.getDataValue());
+	}
+	
+	/**
+	 * Set a new maimum boundary thumb.
+	 * @param bT - The new boundary thumb
+	 */
+	protected void setMaxBound(final BoundaryThumb bT) {
+		
+		this.maxThumb = bT;
+		setMaxVal(bT.getDataValue()); 
 	}
 
 	/**
@@ -559,7 +579,7 @@ public class ColorPicker {
 	 */
 	protected boolean isSynced() {
 
-		return (fractions.length == colorList.size())
-				&& (colorList.size() == thumbList.size());
+		return (fractions.length == thumbList.size());//colorList.size());
+//				&& (colorList.size() == thumbList.size());
 	}
 }
