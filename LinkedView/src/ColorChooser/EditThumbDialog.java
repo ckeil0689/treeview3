@@ -159,24 +159,17 @@ public class EditThumbDialog extends CustomDialog {
 						setError("Cannot be equal to or less than left-most handle.");
 					}
 				}
-		  // Overshoots or equals min boundary
-//			} else if(inputX < thumbBox.calcThumbVal(minThumbIdx)) {
-				
-				
-			// Overshoots or equals max boundary
-//			} else if(inputX > thumbBox.calcThumbVal(maxThumbIdx)) {
-				
-			// Replace other handle if other handle with same data value exists
-			} else if(!isInputEqualToThumbVal && thumbBox.hasThumbForVal(inputX)) {
-				/* Pop up a warning dialog */
-				boolean shouldRemove = thumbBox.askForThumbRemoval(inputX);
-				/* Proceed according to user choice */
-				if(shouldRemove) {
-					thumbBox.removeThumbWithVal(inputX);
-					
-				} else {
-					isInvalid = true;
-				}
+//			// Replace other handle if other handle with same data value exists
+//			} else if(!isInputEqualToThumbVal && thumbBox.hasThumbForVal(inputX)) {
+//				/* Pop up a warning dialog */
+//				boolean shouldRemove = thumbBox.askForThumbRemoval(inputX);
+//				/* Proceed according to user choice */
+//				if(!shouldRemove) {
+//					//thumbBox.removeThumbWithVal(inputX);
+//					
+////				} else {
+//					isInvalid = true;
+//				}
 			}
 			
 			return isInvalid;
