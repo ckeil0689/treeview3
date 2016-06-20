@@ -52,9 +52,6 @@ public class StringRes {
 	// Loading
 	public static final String load_OneSec = "One moment, please.";
 	public static final String load_active = "Loading your data!";
-	public static final String load_Ohoh = "Oh oh!";
-	public static final String load_Error = "Looks like we ran into the "
-			+ "following issue: ";
 
 	// Menu Titles
 	public static final String menu_Open = "Open...";
