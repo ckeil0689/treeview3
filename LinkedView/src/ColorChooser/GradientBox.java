@@ -125,7 +125,7 @@ public class GradientBox {
 		final float addFrac = fractions[newColorIndex - 1] + halfDiff;
 
 		colorPicker.getColorList().add(newColorIndex, newCol);
-		colorPicker.getThumbBox().insertThumbAt(addFrac, newColorIndex, newCol);
+		colorPicker.getThumbBox().insertThumbForFrac(addFrac, newColorIndex, newCol);
 
 		colorPicker.updateFractions();
 		colorPicker.updateColors();

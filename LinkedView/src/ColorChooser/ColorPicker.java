@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -296,7 +295,7 @@ public class ColorPicker {
 
 		this.fractions = newFracs;
 		
-		thumbBox.verifyInnerThumbs();
+		thumbBox.syncInnerThumbsToFracs();
 		thumbBox.adjustThumbsToFractions();
 	}
 
@@ -321,26 +320,6 @@ public class ColorPicker {
 	public void setActiveColorSet(final ColorSet set) {
 
 		this.activeColorSet = set;
-	}
-
-	/**
-	 * Swaps positions of thumbs and colors in their specific lists.
-	 * 
-	 * @param fromIdx
-	 *            Previous position of color/ thumb in their respective lists.
-	 * @param toIdx
-	 *            New position of color/ thumb in their respective lists.
-	 */
-	protected void swapThumbs(int fromIdx, int toIdx) {
-
-		if(thumbList == null || colorList == null) {
-			LogBuffer.println("Could not swap thumbs. Either thumb list " +
-				"or color list was null.");
-			return;
-		}
-		
-		Collections.swap(thumbList, fromIdx, toIdx);
-		Collections.swap(colorList, fromIdx, toIdx);
 	}
 	
 	/**
@@ -503,6 +482,17 @@ public class ColorPicker {
 		dataVal = Helper.roundDouble(dataVal, 3);
 
 		return dataVal;
+	}
+	
+	/**
+	 * Tests whether a data value is outside of the defined minimum and maximum
+	 * bounds currently set for ColorPicker.
+	 * @param dataVal - The data value to test.
+	 * @return Whether the data value is outside of bounds.
+	 */
+	protected boolean isOutsideBounds(final double dataVal) {
+		
+		return (dataVal < getMinVal() || dataVal > getMaxVal());
 	}
 
 	/**
