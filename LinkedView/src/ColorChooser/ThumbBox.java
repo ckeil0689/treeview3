@@ -493,20 +493,13 @@ public class ThumbBox {
 		// First check if data value already exists as inner thumb
 		int matchIdx = findThumbIdxForVal(dataVal);
 		
-		// If yes, remove it so the old boundary can take the place
-		// noSwapIdx == outermostInnerIdx before possible removal
-		boolean isInnerMatch = (matchIdx > 0) && (matchIdx < thumbs.size() - 1);
-		if(isInnerMatch && askForThumbRemoval(dataVal)) {
-			replaceThumbAt(matchIdx, dataVal);
-		}
-		
 		int outermostInnerIdx = (bT.isMin()) ? 1 : thumbs.size() - 2;
 		int insertionIdx = thumbs.indexOf(bT);
 		boolean shouldSwap = false;
 		
 		// Swapping only makes sense if there are inner thumbs at all
 		if(thumbs.size() > 2 && outermostInnerIdx != matchIdx) {
-			insertionIdx = findInsertionIdx(dataVal, thumbs, thumbs.indexOf(bT));
+			insertionIdx = findInsertionIdx(dataVal, bT, thumbs);
 			
 			if(bT.isMin()) {
 				shouldSwap = (insertionIdx >= outermostInnerIdx);
@@ -617,7 +610,8 @@ public class ThumbBox {
 			Thumb removedThumb = thumbs.remove(selectedIdx);
 			Color removedColor = colors.remove(selectedIdx);
 			
-			int insertionIdx = findInsertionIdx(dataVal, thumbs, -1);
+			int insertionIdx = findInsertionIdx(dataVal, thumbs.get(selectedIdx), 
+			                                    thumbs);
 			
 			removedThumb.setValue(dataVal);
 			
@@ -889,33 +883,28 @@ public class ThumbBox {
 	 * value should be inserted so that the list remains in increasing order of 
 	 * data values.
 	 * @param dataVal - The data value for the new thumb to be inserted.
+	 * @param insertionThumb - The thumb to be moved should not be considered
+	 * for the comparison of the data value.
 	 * @param thumbs - The list of thumbs to check.
-	 * @param skipIdx - Removes element at this index before checking for insertion.
-	 * This way the element cannot interfere with the search. If this is -1, 
-	 * no element will be removed.
 	 * @return The index at which the new thumb with the data value should be 
 	 * inserted.
 	 */
-	private int findInsertionIdx(final double dataVal, final List<Thumb> thumbs, 
-	                             final int skipIdx) {
-		
-		// Remove element so it doesn't influence search
-		Thumb remThumb = null;
-		if(skipIdx != -1) {
-			remThumb = thumbs.remove(skipIdx);
-		}
+	private int findInsertionIdx(final double dataVal, final Thumb insertionThumb,
+	                             final List<Thumb> thumbs) {
 		
 		int insertionIdx = thumbs.size() - 1;
+		int adj = 0;
+		
 		for(Thumb t : thumbs) {
+			if(t.equals(insertionThumb)) {
+				adj = 1;
+				continue;
+			}
+			
 			if(t.getDataValue() > dataVal) {
-				insertionIdx = thumbs.indexOf(t);
+				insertionIdx = thumbs.indexOf(t) - adj;
 				break;
 			}
-		}
-		
-		// Readd element
-		if(remThumb != null) {
-			thumbs.add(skipIdx, remThumb);
 		}
 		
 		return insertionIdx;
