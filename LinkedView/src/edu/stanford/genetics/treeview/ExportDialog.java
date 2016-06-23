@@ -512,10 +512,14 @@ public class ExportDialog extends CustomDialog {
 		int availBgWidth = (int) bgSize.getWidth();
 		int availBgHeight = (int) bgSize.getHeight();
 		
+		LogBuffer.println("BGSize: " + bgSize.toString());
+		
 		// Shrink available background area to realize an arbitrary 10px margin
 		int margin = 20;
 		availBgWidth -= margin;
 		availBgHeight -= margin;
+		
+		LogBuffer.println("BGSize (margin added): " + new Dimension(availBgWidth, availBgHeight).toString());
 		
 		/* issue #6/ #6.1 implementation */
 		eh.setCalculatedDimensions(exportOptions.getRegionType(), 
@@ -525,6 +529,8 @@ public class ExportDialog extends CustomDialog {
 		int exportWidth = eh.getXDim(exportOptions.getRegionType());
 		int exportHeight = eh.getYDim(exportOptions.getRegionType());
 
+		LogBuffer.println("EHDim: " + new Dimension(exportWidth, exportHeight).toString());
+		
 		/* 
 		 * Define scales to fit ExportHandler-calculated sizes of preview 
 		 * components to the available background area.
@@ -536,6 +542,8 @@ public class ExportDialog extends CustomDialog {
 		int previewImgWidth = (int)(exportWidth * scaleWidth);
 		int previewImgHeight = (int)(exportHeight * scaleWidth);
 		
+		LogBuffer.println("EHDim (width-scaled): " + new Dimension(previewImgWidth, previewImgHeight).toString());
+		
 		/* If height is still too great, rescale */
 		if(availBgHeight < previewImgHeight) {
 			scaleHeight = ((double)availBgHeight) / previewImgHeight;
@@ -545,9 +553,14 @@ public class ExportDialog extends CustomDialog {
 		previewImgWidth *= scaleHeight;
 		previewImgHeight *= scaleHeight;
 		
+		LogBuffer.println("EHDim (both-axes-scaled): " + new Dimension(previewImgWidth, previewImgHeight).toString());
+		
 		/* Get scaled sizes for trees and gaps */
 		int treeSize = (int)(scaleWidth * scaleHeight * eh.getTreesHeight());
 		this.gapsize = (int)(scaleWidth * scaleHeight * eh.getTreeMatrixGapSize());
+		
+		LogBuffer.println("Tree size (scaled): " + treeSize);
+		LogBuffer.println("Gap size: " + gapsize);
 		
 		// adjust maximum matrix side length for tree thickness and gaps
 		if(rowPrevTrees != null) {
@@ -561,6 +574,8 @@ public class ExportDialog extends CustomDialog {
 			previewImgHeight -= treeSize;
 			previewImgHeight -= gapsize;
 		}
+		
+		LogBuffer.println("EHDim (final w/o gaps + trees): " + new Dimension(previewImgWidth, previewImgHeight).toString());
 		
 		matrix.setMatrixWidth(previewImgWidth);
 		matrix.setMatrixHeight(previewImgHeight);
