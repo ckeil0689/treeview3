@@ -72,7 +72,7 @@ public class ExportDialog extends CustomDialog {
 
 	@Override
 	protected void setupLayout() {
-
+		
 		this.mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		JPanel contentPanel = GUIFactory.createJPanel(false, 
@@ -88,8 +88,8 @@ public class ExportDialog extends CustomDialog {
 		previewPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
 		
 		this.previewComp = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
-		this.background = GUIFactory.createJPanel(true, GUIFactory.DEBUG);
-
+		this.background = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS);
+		
 		JLabel format = GUIFactory.createLabel("Format:",GUIFactory.FONTS);
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
 		JLabel matrix = GUIFactory.createLabel("Matrix:",GUIFactory.FONTS);
@@ -164,7 +164,7 @@ public class ExportDialog extends CustomDialog {
 		btnPanel.add(closeBtn, "tag cancel, pushx, al right");
 		btnPanel.add(exportBtn, "al right");
 
-		mainPanel.add(contentPanel, "push, grow, wrap");//w 800!, wrap");
+		mainPanel.add(contentPanel, "push, grow, wrap");
 		mainPanel.add(btnPanel, "bottom, pushx, growx, span");
 
 		getContentPane().add(mainPanel);
@@ -403,12 +403,13 @@ public class ExportDialog extends CustomDialog {
 					+ "gapx " + gapsize + "!");
 		}
 
+		
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
 				+ matrix.getMatrixWidth() + "!, aligny 0, push, grow");
 		
-		background.add(previews, "push, align 50%");
+		background.add(previews, "push, align center");
 		previewComp.add(background, "w " + bgWidth + "!, h " 
-				+ bgHeight + "!, grow, push, align 50%");
+				+ bgHeight + "!, push, align center");
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
@@ -505,12 +506,6 @@ public class ExportDialog extends CustomDialog {
 	private void updatePreviewMatrix(final ExportOptions exportOptions, 
 			final Dimension bgSize) {
 		
-		LogBuffer.println("DialogDim: " + this.getSize());
-		LogBuffer.println("PreviewPanelDim: " + previewComp.getSize());
-		LogBuffer.println("backgroundDim: " + background.getSize());
-		LogBuffer.println("MainPanelDim: " + mainPanel.getSize());
-		
-		
 		/* (!)
 		 * Using int casts throughout this method instead of Math methods,
 		 * because plain truncating is fine. 
@@ -518,14 +513,10 @@ public class ExportDialog extends CustomDialog {
 		int availBgWidth = (int) bgSize.getWidth();
 		int availBgHeight = (int) bgSize.getHeight();
 		
-		LogBuffer.println("BGSize: " + bgSize.toString());
-		
 		// Shrink available background area to realize an arbitrary 10px margin
 		int margin = 20;
 		availBgWidth -= margin;
 		availBgHeight -= margin;
-		
-		LogBuffer.println("BGSize (margin added): " + new Dimension(availBgWidth, availBgHeight).toString());
 		
 		/* issue #6/ #6.1 implementation */
 		eh.setCalculatedDimensions(exportOptions.getRegionType(), 
@@ -535,8 +526,6 @@ public class ExportDialog extends CustomDialog {
 		int exportWidth = eh.getXDim(exportOptions.getRegionType());
 		int exportHeight = eh.getYDim(exportOptions.getRegionType());
 
-		LogBuffer.println("EHDim: " + new Dimension(exportWidth, exportHeight).toString());
-		
 		/* 
 		 * Define scales to fit ExportHandler-calculated sizes of preview 
 		 * components to the available background area.
@@ -548,8 +537,6 @@ public class ExportDialog extends CustomDialog {
 		int previewImgWidth = (int)(exportWidth * scaleWidth);
 		int previewImgHeight = (int)(exportHeight * scaleWidth);
 		
-		LogBuffer.println("EHDim (width-scaled): " + new Dimension(previewImgWidth, previewImgHeight).toString());
-		
 		/* If height is still too great, rescale */
 		if(availBgHeight < previewImgHeight) {
 			scaleHeight = ((double)availBgHeight) / previewImgHeight;
@@ -559,14 +546,9 @@ public class ExportDialog extends CustomDialog {
 		previewImgWidth *= scaleHeight;
 		previewImgHeight *= scaleHeight;
 		
-		LogBuffer.println("EHDim (both-axes-scaled): " + new Dimension(previewImgWidth, previewImgHeight).toString());
-		
 		/* Get scaled sizes for trees and gaps */
 		int treeSize = (int)(scaleWidth * scaleHeight * eh.getTreesHeight());
 		this.gapsize = (int)(scaleWidth * scaleHeight * eh.getTreeMatrixGapSize());
-		
-		LogBuffer.println("Tree size (scaled): " + treeSize);
-		LogBuffer.println("Gap size: " + gapsize);
 		
 		// adjust maximum matrix side length for tree thickness and gaps
 		if(rowPrevTrees != null) {
@@ -580,8 +562,6 @@ public class ExportDialog extends CustomDialog {
 			previewImgHeight -= treeSize;
 			previewImgHeight -= gapsize;
 		}
-		
-		LogBuffer.println("EHDim (final w/o gaps + trees): " + new Dimension(previewImgWidth, previewImgHeight).toString());
 		
 		matrix.setMatrixWidth(previewImgWidth);
 		matrix.setMatrixHeight(previewImgHeight);
