@@ -88,7 +88,7 @@ public class ExportDialog extends CustomDialog {
 		previewPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
 		
 		this.previewComp = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
-		this.background = GUIFactory.createJPanel(true, GUIFactory.DEFAULT);
+		this.background = GUIFactory.createJPanel(true, GUIFactory.DEBUG);
 
 		JLabel format = GUIFactory.createLabel("Format:",GUIFactory.FONTS);
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
@@ -507,6 +507,7 @@ public class ExportDialog extends CustomDialog {
 		
 		LogBuffer.println("DialogDim: " + this.getSize());
 		LogBuffer.println("PreviewPanelDim: " + previewComp.getSize());
+		LogBuffer.println("backgroundDim: " + background.getSize());
 		LogBuffer.println("MainPanelDim: " + mainPanel.getSize());
 		
 		
