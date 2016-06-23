@@ -505,6 +505,11 @@ public class ExportDialog extends CustomDialog {
 	private void updatePreviewMatrix(final ExportOptions exportOptions, 
 			final Dimension bgSize) {
 		
+		LogBuffer.println("DialogDim: " + this.getSize());
+		LogBuffer.println("PreviewPanelDim: " + previewComp.getSize());
+		LogBuffer.println("MainPanelDim: " + mainPanel.getSize());
+		
+		
 		/* (!)
 		 * Using int casts throughout this method instead of Math methods,
 		 * because plain truncating is fine. 
