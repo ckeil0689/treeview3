@@ -146,6 +146,17 @@ public class MapContainer extends Observable implements Observer,
 		// then, fix self up...
 		setMap(configNode.getInt("current", default_map));
 	}
+	
+	@Override
+	public String toString() {
+		
+		String mapInfo;
+		mapInfo = "FirstVisible: " + firstVisible + "; numVisible: " 
+				+ numVisible + "; Scale: " + getScale() + "; tileNumVisible: " 
+				+ getTileNumVisible();
+		
+		return mapInfo;
+	}
 
 	/**
 	 * Sets the MapContainer's scale back to the default value.
@@ -1889,6 +1900,17 @@ public class MapContainer extends Observable implements Observer,
 			firstVisible = i;
 		}
 	}
+	
+	public void setTileNumVisible(final int i) {
+
+		if(i > getTotalTileNum()) {
+			tileNumVisible = getTotalTileNum();
+		} else if(i < 1) {
+			tileNumVisible = 1;
+		} else {
+			tileNumVisible = i;
+		}
+	}
 
 	public int getMiddlePixel(final int i) {
 
@@ -1902,7 +1924,7 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public int getTotalTileNum() {
 		
-		return getMaxIndex() + 1;
+		return getMaxIndex() - getMinIndex() + 1;
 	}
 
 	/**
@@ -1980,10 +2002,10 @@ public class MapContainer extends Observable implements Observer,
 		 * multiple cells under a single pixel, but I'm not sure. For now, this
 		 * work-around will prevent exceptions. Figure this out & fix it
 		 * eventually. */
-		if(numVisible > getMaxIndex() + 1) {
+		if(numVisible > getTotalTileNum()) {
 			LogBuffer.println("Warning: Encountered invalid/too-large " +
 				"numVisible value: [" + numVisible + "].  Resetting.");
-			numVisible = getMaxIndex() + 1;
+			numVisible = getTotalTileNum();
 		}
 		if(numVisible < 1) {
 			LogBuffer.println("Warning: Encountered invalid/too-small " +

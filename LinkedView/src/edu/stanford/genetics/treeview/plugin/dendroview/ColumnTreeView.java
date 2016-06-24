@@ -259,4 +259,20 @@ public class ColumnTreeView extends TRView {
 				treePainter.getCorrMax(),
 				dest.y + dest.height));
 	}
+	
+	@Override
+	protected int getSnapShotDestRectStart(final Rectangle dest) {
+		if(dest == null) {
+			return(-1);
+		}
+		return(dest.x);
+	}
+
+	@Override
+	protected int getSnapShotDestRectEnd(final Rectangle dest) {
+		if(dest == null) {
+			return(-1);
+		}
+		return(dest.x + dest.width);
+	}
 }

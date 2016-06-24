@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -16,26 +17,93 @@ public class ExportPreviewTrees extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private final Image paintImage;
-	public static final int WIDTH = 400;
-	public static final int HEIGHT = 80;
+	/* Initial default sizes */
+	public static final int D_LONG = 400;
+	public static final int D_SHORT = 80;
 	
-	private int x; 
-	private int y;
+	private final Image paintImage;
+	private final boolean isRows;
+	
+	private Color backgroundColor;
+	
+	private int xSide; 
+	private int ySide;
 	
 	public ExportPreviewTrees(final BufferedImage trees, final boolean isRows) {
 		
 		this.paintImage = trees;
-		this.setLayout(new MigLayout());
+		this.isRows = isRows;
 		
-		if(isRows) {
-			x = HEIGHT;
-			y = WIDTH;
+		setLayout(new MigLayout());
+		setShortSide(D_SHORT);
+		setLongSide(D_LONG);	
+		setPaperBackground(false);
+	}
+	
+	/**
+	 * Define the background color of the tree drawing. For paper type 
+	 * export formats this will turn the background white. For non-paper type
+	 * backgrounds the color will be the default of the application, making it
+	 * look transparent.
+	 * @param isPaper - Whether the export format type is belongs in the paper
+	 * category (for example A4)
+	 */
+	public void setPaperBackground(boolean isPaper) {
+		
+		if(isPaper) {
+			this.backgroundColor = Color.WHITE;
 			
 		} else {
-			x = WIDTH;
-			y = HEIGHT;
-		}		
+			this.backgroundColor = this.getBackground();
+		}
+	}
+	
+	/**
+	 * The tree panels can very in thickness. This method can be used to 
+	 * adapt the length to represent the calculated tree thickness according 
+	 * to calculated matrix-tree ratios in ExportHandler.
+	 * @param shortSide - The thickness of the tree preview panel.
+	 */
+	public void setShortSide(final int shortSide) {
+		
+		if(isRows) {
+			this.xSide = shortSide;
+			
+		} else {
+			this.ySide = shortSide;
+		}
+	}
+	
+	/**
+	 * The tree panels can very in length depending on the matrix. This method
+	 * can be used to adapt the length to retain the same size as the matrix
+	 * they belong to.
+	 * @param longSide - The size of the long side of the tree preview panel.
+	 */
+	public void setLongSide(final int longSide) {
+		
+		if(isRows) {
+			this.ySide = longSide;
+			
+		} else {
+			this.xSide = longSide;
+		}
+	}
+	
+	/**
+	 * @return the longest side length for the preview trees.
+	 */
+	public int getLongSide() {
+		
+		return (isRows) ? ySide : xSide;
+	}
+	
+	/**
+	 * @return the shortest side length (thickness) for the preview trees.
+	 */
+	public int getShortSide() {
+		
+		return (isRows) ? xSide : ySide;
 	}
 	
 	/*
@@ -53,17 +121,16 @@ public class ExportPreviewTrees extends JPanel {
 		
 		Graphics2D g2d = (Graphics2D) g;
 
-		// update offscreenBuffer if necessary
-		g2d.setColor(this.getBackground());
-		g2d.fillRect(0, 0, x, y);
+		g2d.setColor(backgroundColor);
+		g2d.fillRect(0, 0, xSide, ySide);
 
 		if(paintImage != null) {
-			g2d.drawImage(paintImage, 0, 0, x, y, this);
+			g2d.drawImage(paintImage, 0, 0, xSide, ySide, this);
 			
 		} else {
-			BufferedImage img = new BufferedImage(x, y, 
+			BufferedImage img = new BufferedImage(xSide, ySide, 
 					BufferedImage.TYPE_BYTE_GRAY);
-			g2d.drawImage(img, 0, 0, x, y, this);
+			g2d.drawImage(img, 0, 0, xSide, ySide, this);
 		}
 	}
 }
