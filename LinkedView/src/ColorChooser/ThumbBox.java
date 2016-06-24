@@ -20,7 +20,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class ThumbBox {
 
 	// How many places a double variable is rounded to.
-	private final static int DATA_PRECISION = 3;
+	public final static int DATA_PRECISION = 3;
 	
 	/*
 	 * When mouse is quickly moved outside thumbBox we need to max out the thumb

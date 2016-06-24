@@ -7,8 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
@@ -28,8 +26,6 @@ implements ConfigNodePersistent {
 	public static final Integer DEFAULT_MULTI_CLICK_INTERVAL = 300;
 	private final ColorChooserUI colorChooserUI;
 	private final ColorPicker colorPicker;
-	
-//	private CustomDialog drawColorsDialog;
 
 	/* Node for saved data */
 	private Preferences configNode;
@@ -60,7 +56,6 @@ implements ConfigNodePersistent {
 			colorChooserUI.addMissingListener(new MissingBtnListener());
 			colorChooserUI.addEditListener(new EditButtonListener());
 			colorChooserUI.addApplyChangeListener(new ApplyChangeListener());
-			colorChooserUI.addDialogCloseListener(new WindowCloseListener());
 		}
 	}
 
@@ -163,17 +158,6 @@ implements ConfigNodePersistent {
 
 		return multiClickInterval;
 	}
-
-	private class WindowCloseListener extends WindowAdapter {
-
-		@Override
-		public void windowClosed(final WindowEvent e) {
-			
-			if (colorChooserUI.isCustomSelected()) {
-				saveStatus();
-			}
-		}
-	}
 	
 	private class ApplyChangeListener implements ActionListener {
 
@@ -183,6 +167,7 @@ implements ConfigNodePersistent {
 			colorPicker.setGradientColors();
 			setChanged();
 			notifyObservers();
+			saveStatus();
 		}
 	}
 
