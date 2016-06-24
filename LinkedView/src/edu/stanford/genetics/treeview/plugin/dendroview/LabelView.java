@@ -2118,6 +2118,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	@Override
 	public void mouseMoved(final MouseEvent e) {
+		
+		//if(!hasFocus()) return;
+
 		setHoverPosition(e);
 		//Note that the hover index is updated by forceUpdatePrimaryHoverIndex
 		//which is called from updateBuffer

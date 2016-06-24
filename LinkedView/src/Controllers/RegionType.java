@@ -9,12 +9,12 @@ import java.util.List;
  * The region of the matrix to export to a file
  * @author rleach
  */
-public enum Region {
+public enum RegionType {
 	ALL("All"),VISIBLE("Visible"),SELECTION("Selection");
 
 	private final String toString;
 	
-	private Region(String toString) {
+	private RegionType(String toString) {
 		this.toString = toString;
 	}
 	
@@ -28,8 +28,8 @@ public enum Region {
 	 * 
 	 * @return
 	 */
-	public static Region getDefault() {
-		return(Region.VISIBLE);
+	public static RegionType getDefault() {
+		return(RegionType.VISIBLE);
 	}
 
 	/**
@@ -38,9 +38,9 @@ public enum Region {
 	 * @param selectionsExist
 	 * @return
 	 */
-	public static Region getDefault(final boolean selectionsExist) {
-		return(getDefault() == Region.SELECTION && !selectionsExist ?
-			Region.VISIBLE : Region.SELECTION);
+	public static RegionType getDefault(final boolean selectionsExist) {
+		return(getDefault() == RegionType.SELECTION && !selectionsExist ?
+			RegionType.VISIBLE : RegionType.SELECTION);
 	}
 
 	/**
@@ -50,13 +50,13 @@ public enum Region {
 	 * @param bigRegs
 	 * @return
 	 */
-	public static Region getDefault(final List<Region> bigRegs,
+	public static RegionType getDefault(final List<RegionType> bigRegs,
 		final boolean selectionsExist) {
 
-		Region[] priority = {Region.VISIBLE,Region.ALL,Region.SELECTION};
-		for(Region reg : priority) {
+		RegionType[] priority = {RegionType.VISIBLE,RegionType.ALL,RegionType.SELECTION};
+		for(RegionType reg : priority) {
 			if(!bigRegs.contains(reg) &&
-				(reg != Region.SELECTION || selectionsExist)) {
+				(reg != RegionType.SELECTION || selectionsExist)) {
 
 				return(reg);
 			}
@@ -71,8 +71,8 @@ public enum Region {
 	 * @param regName
 	 * @return
 	 */
-	public static Region getRegion(String regName) {
-		for(Region reg : Region.values()) {
+	public static RegionType getRegion(String regName) {
+		for(RegionType reg : RegionType.values()) {
 			if(reg.toString().equals(regName)) {
 				return(reg);
 			}

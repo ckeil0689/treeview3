@@ -147,6 +147,17 @@ public class MapContainer extends Observable implements Observer,
 		// then, fix self up...
 		setMap(configNode.getInt("current", default_map));
 	}
+	
+	@Override
+	public String toString() {
+		
+		String mapInfo;
+		mapInfo = "FirstVisible: " + firstVisible + "; numVisible: " 
+				+ numVisible + "; Scale: " + getScale() + "; tileNumVisible: " 
+				+ getTileNumVisible();
+		
+		return mapInfo;
+	}
 
 	/**
 	 * Sets the MapContainer's scale back to the default value.

@@ -33,7 +33,7 @@ import org.freehep.graphicsio.svg.SVGGraphics2D;
 
 import java.awt.Color;
 
-import edu.stanford.genetics.treeview.ExportAspect;
+import edu.stanford.genetics.treeview.AspectType;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PaperType;
 import edu.stanford.genetics.treeview.PpmWriter;
@@ -59,7 +59,7 @@ public class ExportHandler {
 	final protected TreeSelectionI rowSelection;
 
 	protected PaperType defPageSize = PaperType.getDefault();
-	protected String defPageOrientation = PageConstants.LANDSCAPE;
+	protected static String defPageOrientation = PageConstants.LANDSCAPE;
 
 	protected double aspectRatio = 1.0; //x / y
 	protected double treeRatio = 0.2; //fraction of the long content dimension
@@ -137,7 +137,7 @@ public class ExportHandler {
 	 * @author rleach
 	 * @return the defPageOrientation
 	 */
-	public String getDefaultPageOrientation() {
+	public static String getDefaultPageOrientation() {
 		return(defPageOrientation);
 	}
 
@@ -146,7 +146,7 @@ public class ExportHandler {
 	 * @param defPageOrientation the defPageOrientation to set
 	 */
 	public void setDefaultPageOrientation(String defPageOrientation) {
-		this.defPageOrientation = defPageOrientation;
+		ExportHandler.defPageOrientation = defPageOrientation;
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class ExportHandler {
 	 * @param region
 	 * @return int
 	 */
-	public int getXDim(final Region region) {
+	public int getXDim(final RegionType region) {
 		int xDim = getNumXExportIndexes(region) * tileWidth +
 			(dendroView.getRowTreeView().treeExists() ? treesHeight +
 				treeMatrixGapSize : 0);
@@ -170,7 +170,7 @@ public class ExportHandler {
 	 * @param region
 	 * @return
 	 */
-	public int getMinXDim(final Region region) {
+	public int getMinXDim(final RegionType region) {
 		int minXDim = getNumXExportIndexes(region) * minTileDim +
 			(dendroView.getRowTreeView().treeExists() ? treesHeight +
 				treeMatrixGapSize : 0);
@@ -184,7 +184,7 @@ public class ExportHandler {
 	 * @param region
 	 * @return int
 	 */
-	public int getYDim(final Region region) {
+	public int getYDim(final RegionType region) {
 		int yDim = getNumYExportIndexes(region) * tileHeight +
 			(dendroView.getColumnTreeView().treeExists() ? treesHeight +
 				treeMatrixGapSize : 0);
@@ -198,7 +198,7 @@ public class ExportHandler {
 	 * @param region
 	 * @return
 	 */
-	public int getMinYDim(final Region region) {
+	public int getMinYDim(final RegionType region) {
 		int minYDim = getNumYExportIndexes(region) * minTileDim +
 			(dendroView.getColumnTreeView().treeExists() ? treesHeight +
 				treeMatrixGapSize : 0);
@@ -211,12 +211,12 @@ public class ExportHandler {
 	 * @param region
 	 * @return int
 	 */
-	public int getNumXExportIndexes(final Region region) {
-		if(region == Region.ALL) {
+	public int getNumXExportIndexes(final RegionType region) {
+		if(region == RegionType.ALL) {
 			return(interactiveXmap.getTotalTileNum());
-		} else if(region == Region.VISIBLE) {
+		} else if(region == RegionType.VISIBLE) {
 			return(interactiveXmap.getNumVisible());
-		} else if(region == Region.SELECTION) {
+		} else if(region == RegionType.SELECTION) {
 			if(colSelection == null ||
 				colSelection.getNSelectedIndexes() == 0) {
 				LogBuffer.println("ERROR: Selection uninitialized or empty.");
@@ -236,12 +236,12 @@ public class ExportHandler {
 	 * @param region
 	 * @return int
 	 */
-	public int getNumYExportIndexes(final Region region) {
-		if(region == Region.ALL) {
+	public int getNumYExportIndexes(final RegionType region) {
+		if(region == RegionType.ALL) {
 			return(interactiveYmap.getTotalTileNum());
-		} else if(region == Region.VISIBLE) {
+		} else if(region == RegionType.VISIBLE) {
 			return(interactiveYmap.getNumVisible());
-		} else if(region == Region.SELECTION) {
+		} else if(region == RegionType.SELECTION) {
 			if(rowSelection == null ||
 				rowSelection.getNSelectedIndexes() == 0) {
 				LogBuffer.println("ERROR: Selection uninitialized or empty.");
@@ -269,12 +269,12 @@ public class ExportHandler {
 	 * @author rleach
 	 * @param aR - aspect ratio
 	 */
-	public void setTileAspectRatio(final ExportAspect eAsp) {
-		if(eAsp == ExportAspect.ASSEEN) {
-			setTileAspectRatioToScreen(Region.VISIBLE);
+	public void setTileAspectRatio(final AspectType eAsp) {
+		if(eAsp == AspectType.ASSEEN) {
+			setTileAspectRatioToScreen(RegionType.VISIBLE);
 		} else {
 			setTileAspectRatio(1.0);
-			if(eAsp != ExportAspect.ONETOONE) {
+			if(eAsp != AspectType.ONETOONE) {
 				LogBuffer.println("Warning: Invalid or unselected aspect " +
 					"ratio type submitted.  Defaulting to 1:1.");
 			}
@@ -286,7 +286,7 @@ public class ExportHandler {
 	 * @author rleach
 	 * @param region
 	 */
-	public void setTileAspectRatioToScreen(final Region region) {
+	public void setTileAspectRatioToScreen(final RegionType region) {
 		int matrixPxWidth = dendroView.getInteractiveMatrixView().getWidth();
 		int matrixPxHeight = dendroView.getInteractiveMatrixView().getHeight();
 		int numCols = getNumXExportIndexes(region);
@@ -335,8 +335,8 @@ public class ExportHandler {
 		this.treeMatrixGapRatio = treeMatrixGapRatio;
 	}
 
-	public void setCalculatedDimensions(final Region region,
-		final ExportAspect aspect) {
+	public void setCalculatedDimensions(final RegionType region,
+		final AspectType aspect) {
 
 		setTileAspectRatio(aspect);
 		setCalculatedDimensions(region,aspectRatio);
@@ -347,7 +347,7 @@ public class ExportHandler {
 	 * 
 	 * @param region
 	 */
-	public void setCalculatedDimensions(final Region region) {
+	public void setCalculatedDimensions(final RegionType region) {
 		setCalculatedDimensions(region,aspectRatio);
 	}
 
@@ -361,7 +361,7 @@ public class ExportHandler {
 	 * @author rleach
 	 * @param region
 	 */
-	public void setCalculatedDimensions(final Region region,
+	public void setCalculatedDimensions(final RegionType region,
 		final double aspectRatio) {
 
 		//Calculates: treesHeight,treeMatrixGapSize,tileHeight, and tileWidth
@@ -432,7 +432,7 @@ public class ExportHandler {
 	 * @param region
 	 * @return int
 	 */
-	public int calculateMaxFinalImageDim(final Region region) {
+	public int calculateMaxFinalImageDim(final RegionType region) {
 		int matrixWidth = getNumXExportIndexes(region) * tileWidth;
 		int matrixHeight = getNumYExportIndexes(region) * tileHeight;
 		int maxMatrixDim =
@@ -473,8 +473,8 @@ public class ExportHandler {
 	 * @param region - String.  Implied recognized values: all, visible,
 	 *                 selection
 	 */
-	public void export(final Format format,final String fileName,
-		final Region region,final boolean showSelections) throws Exception {
+	public void export(final FormatType format,final String fileName,
+		final RegionType region,final boolean showSelections) throws Exception {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -482,8 +482,8 @@ public class ExportHandler {
 			return;
 		}
 
-		if(format == Format.PDF || format == Format.SVG ||
-			format == Format.PS) {
+		if(format == FormatType.PDF || format == FormatType.SVG ||
+			format == FormatType.PS) {
 
 			exportDocument(format,defPageSize,fileName,region,showSelections);
 		} else {
@@ -502,8 +502,8 @@ public class ExportHandler {
 	 * @param fileName
 	 * @param region
 	 */
-	public void exportImage(final Format format,final String fileName,
-		final Region region,final boolean showSelections) throws Exception {
+	public void exportImage(final FormatType format,final String fileName,
+		final RegionType region,final boolean showSelections) throws Exception {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -515,7 +515,7 @@ public class ExportHandler {
 			int colorProfile;
 			//JPG is the only format that doesn't support an alpha channel, so
 			//we must create a buffered image object without the ARGB type
-			if(format == Format.JPG) {
+			if(format == FormatType.JPG) {
 				colorProfile = BufferedImage.TYPE_INT_RGB;
 				LogBuffer.println("Exporting withOUT an alpha channel");
 			} else {
@@ -532,7 +532,7 @@ public class ExportHandler {
 			//Formats JPG and PPM default to a black background, so we need to
 			//draw a white canvas.  Note, setting the background color did not
 			//work
-			if(format == Format.JPG || format == Format.PPM) {
+			if(format == FormatType.JPG || format == FormatType.PPM) {
 				g2d.setBackground(Color.WHITE);
 				g2d.setColor(Color.WHITE);
 				g2d.fillRect(0,0,getXDim(region),getYDim(region));
@@ -541,9 +541,10 @@ public class ExportHandler {
 			createContent(g2d,region,showSelections);
 
 			File exportFile = new File(fileName);
-			if(format == Format.PNG) {
+			if(format == FormatType.PNG) {
 				ImageIO.write(im,"png",exportFile);
-			} else if(format == Format.JPG) {
+				
+			} else if(format == FormatType.JPG) {
 				//Code from http://stackoverflow.com/questions/17108234/setting-jpg-compression-level-with-imageio-in-java
 				JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
 				jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
@@ -552,7 +553,8 @@ public class ExportHandler {
 					ImageIO.getImageWritersByFormatName("jpg").next();
 				writer.setOutput(new FileImageOutputStream(exportFile));
 				writer.write(null,new IIOImage(im,null,null),jpegParams);
-			} else if(format == Format.PPM) { //ppm = bitmat
+				
+			} else if(format == FormatType.PPM) { //ppm = bitmat
 				final OutputStream os = new BufferedOutputStream(
 					new FileOutputStream(exportFile));
 				PpmWriter.writePpm(im,os);
@@ -606,12 +608,12 @@ public class ExportHandler {
 	 * @param region
 	 * @return boolean
 	 */
-	public boolean isExportValid(final Region region) {
-		if(region == Region.ALL) {
+	public boolean isExportValid(final RegionType region) {
+		if(region == RegionType.ALL) {
 			return(interactiveXmap.getTotalTileNum() > 0);
-		} else if(region == Region.VISIBLE) {
+		} else if(region == RegionType.VISIBLE) {
 			return(interactiveXmap.getNumVisible() > 0);
-		} else if(region == Region.SELECTION) {
+		} else if(region == RegionType.SELECTION) {
 			return(!(colSelection == null ||
 				colSelection.getNSelectedIndexes() == 0));
 		}
@@ -628,8 +630,8 @@ public class ExportHandler {
 	 * @param fileName
 	 * @param region
 	 */
-	public void exportDocument(final Format format,final PaperType pageSize,
-		String fileName,final Region region,final boolean showSelections) {
+	public void exportDocument(final FormatType format,final PaperType pageSize,
+		String fileName,final RegionType region,final boolean showSelections) {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -645,17 +647,17 @@ public class ExportHandler {
 			File exportFile = new File(fileName);
 
 			VectorGraphics g;
-			if(format == Format.PDF) {
+			if(format == FormatType.PDF) {
 				if (!fileName.endsWith(".pdf")) {
 					fileName += ".pdf";
 				}
 				g = new PDFGraphics2D(exportFile,dims);
-			} else if(format == Format.PS) {
+			} else if(format == FormatType.PS) {
 				if (!fileName.endsWith(".ps")) {
 					fileName += ".ps";
 				}
 				g = new PSGraphics2D(exportFile,dims);
-			} else if(format == Format.SVG) {
+			} else if(format == FormatType.SVG) {
 				if (!fileName.endsWith(".svg")) {
 					fileName += ".svg";
 				}
@@ -697,7 +699,7 @@ public class ExportHandler {
 	 *                  if the current size is too big
 	 * @return
 	 */
-	public List<Region> getOversizedMinimumRegions() {
+	public List<RegionType> getOversizedMinimumRegions() {
 		return(getOversizedRegions(true));
 	}
 
@@ -707,16 +709,16 @@ public class ExportHandler {
 	 * 
 	 * @return
 	 */
-	public List<Region> getMinimumAvailableRegions() {
-		List<Region> regs = new ArrayList<Region>();
-		for(int i = 0;i < Region.values().length;i++) {
+	public List<RegionType> getMinimumAvailableRegions() {
+		List<RegionType> regs = new ArrayList<RegionType>();
+		for(int i = 0;i < RegionType.values().length;i++) {
 			//If this region is valid for export and it is not too big
-			if(isExportValid(Region.values()[i]) &&
-				((double) getMinXDim(Region.values()[i]) /
+			if(isExportValid(RegionType.values()[i]) &&
+				((double) getMinXDim(RegionType.values()[i]) /
 					(double) MAX_IMAGE_SIZE *
-					(double) getMinYDim(Region.values()[i])) <= 1.0) {
+					(double) getMinYDim(RegionType.values()[i])) <= 1.0) {
 
-				regs.add(Region.values()[i]);
+				regs.add(RegionType.values()[i]);
 			}
 		}
 		return(regs);
@@ -740,17 +742,17 @@ public class ExportHandler {
 	 *                  if the current size is too big
 	 * @return
 	 */
-	public List<Region> getOversizedRegions(final boolean minimum) {
-		List<Region> regs = new ArrayList<Region>();
-		for(int i = 0;i < Region.values().length;i++) {
+	public List<RegionType> getOversizedRegions(final boolean minimum) {
+		List<RegionType> regs = new ArrayList<RegionType>();
+		for(int i = 0;i < RegionType.values().length;i++) {
 			//If this region is valid for export and it is too big
-			if(isExportValid(Region.values()[i]) &&
-				((double) (minimum ? getMinXDim(Region.values()[i]) :
-					getXDim(Region.values()[i])) / (double) MAX_IMAGE_SIZE *
-					(double) (minimum ? getMinYDim(Region.values()[i]) :
-						getYDim(Region.values()[i])) > 1.0)) {
+			if(isExportValid(RegionType.values()[i]) &&
+				((double) (minimum ? getMinXDim(RegionType.values()[i]) :
+					getXDim(RegionType.values()[i])) / (double) MAX_IMAGE_SIZE *
+					(double) (minimum ? getMinYDim(RegionType.values()[i]) :
+						getYDim(RegionType.values()[i])) > 1.0)) {
 
-				regs.add(Region.values()[i]);
+				regs.add(RegionType.values()[i]);
 			}
 		}
 		return(regs);
@@ -765,8 +767,8 @@ public class ExportHandler {
 	 *                         predicted size
 	 * @return
 	 */
-	public List<ExportAspect> getOversizedAspects(
-		final Region selectedRegion) {
+	public List<AspectType> getOversizedAspects(
+		final RegionType selectedRegion) {
 
 		//Save the current dimension values
 		double saveAspect   = aspectRatio;
@@ -775,9 +777,9 @@ public class ExportHandler {
 		int saveTileWidth   = tileWidth;
 		int saveGapSize     = treeMatrixGapSize;
 
-		List<ExportAspect> asps = new ArrayList<ExportAspect>();
-		for(int i = 0;i < ExportAspect.values().length;i++) {
-			ExportAspect aspect = ExportAspect.values()[i];
+		List<AspectType> asps = new ArrayList<AspectType>();
+		for(int i = 0;i < AspectType.values().length;i++) {
+			AspectType aspect = AspectType.values()[i];
 			setCalculatedDimensions(selectedRegion,aspect);
 			//If this aspect results in an image that is too big
 			if(((double) getXDim(selectedRegion) /
@@ -798,6 +800,16 @@ public class ExportHandler {
 
 		return(asps);
 	}
+	
+	public int getTreesHeight() {
+		
+		return treesHeight;
+	}
+	
+	public int getTreeMatrixGapSize() {
+		
+		return treeMatrixGapSize;
+	}
 
 	/**
 	 * Given current settings for aspect ratio, will the supplied region end up
@@ -806,7 +818,7 @@ public class ExportHandler {
 	 * @param reg
 	 * @return
 	 */
-	public boolean isOversized(Region reg) {
+	public boolean isOversized(RegionType reg) {
 		//If this region is too big
 		if(((double) getXDim(reg) / (double) MAX_IMAGE_SIZE *
 			(double) getYDim(reg)) > 1.0) {
@@ -824,7 +836,7 @@ public class ExportHandler {
 	 * @param g2d
 	 * @param region
 	 */
-	public void createContent(Graphics2D g2d,final Region region,
+	public void createContent(Graphics2D g2d,final RegionType region,
 		final boolean showSelections) {
 
 		dendroView.getInteractiveMatrixView().export(g2d,

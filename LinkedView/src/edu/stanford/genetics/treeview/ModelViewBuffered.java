@@ -158,7 +158,6 @@ public abstract class ModelViewBuffered extends ModelView {
 				offscreenValid = true;
 			}
 		} else {
-			// System.out.println(viewName() + " not enabled");
 			final Graphics tg = offscreenBuffer.getGraphics();
 			tg.setColor(GUIFactory.DEFAULT_BG);
 			tg.fillRect(0, 0, offscreenSize.width, offscreenSize.height);
@@ -168,7 +167,6 @@ public abstract class ModelViewBuffered extends ModelView {
 			g.drawImage(offscreenBuffer, 0, 0, this);
 		}
 		paintComposite(g);
-		// System.out.println("Exiting " + viewName() + " to clip " + clip );
 	}
 
 }
