@@ -88,14 +88,21 @@ public final class Helper {
 	 * @return The rounded double.
 	 */
 	public static double roundDouble(final double value, final int places) {
-	   
+		
 		if (places < 0) {
 	    	throw new IllegalArgumentException();
-	    }
-
-	    BigDecimal bd = new BigDecimal(value);
+    }
+    
+		try {
+			BigDecimal bd = new BigDecimal(value);
 	    bd = bd.setScale(places, RoundingMode.HALF_UP);
 	    return bd.doubleValue();
+	    
+		} catch (NumberFormatException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Could not round value.");
+			return value;
+		}
 	}
 
 	/**

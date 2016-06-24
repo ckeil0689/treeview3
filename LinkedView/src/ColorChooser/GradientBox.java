@@ -125,7 +125,7 @@ public class GradientBox {
 		final float addFrac = fractions[newColorIndex - 1] + halfDiff;
 
 		colorPicker.getColorList().add(newColorIndex, newCol);
-		colorPicker.getThumbBox().insertThumbAt(addFrac, newColorIndex, newCol);
+		colorPicker.getThumbBox().insertThumbForFrac(addFrac, newColorIndex, newCol);
 
 		colorPicker.updateFractions();
 		colorPicker.updateColors();
@@ -201,6 +201,11 @@ public class GradientBox {
 				distance = Math.abs(t.getX() - clickPos);
 				index = thumbs.indexOf(t);
 			}
+		}
+		
+		if(!(index < colorList.size())) {
+			LogBuffer.println("Tried to remove color outside of color list bounds.");
+			return;
 		}
 
 		JPanel panel = colorPicker.getContainerPanel();

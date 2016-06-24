@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -46,23 +45,24 @@ public class ColorPicker {
 	private Color[] colors;
 
 	/* List of all active thumbs (one per color) */
-	protected Thumb minThumb;
-	protected Thumb maxThumb;
+	protected BoundaryThumb minThumb;
+	protected BoundaryThumb maxThumb;
 	private List<Thumb> thumbList;
 
 	/* List of all active colors (depends on active ColorSet) */
 	private final List<Color> colorList;
-
+	
+	/* These should never change! */
+	private final double dataMinVal;
+	private final double dataMaxVal;
+	
+	/* These can change and be adjusted by the user */
+	private double minVal;
+	private double maxVal;
+	
 	/* Data boundaries */
 	private final double mean;
 	private final double median;
-	
-	private double minVal;
-	private double maxVal;
-	private double range;
-
-	private final double dataMin;
-	private final double dataMax;
 	private final double dataCenter;
 
 	public ColorPicker(final ColorExtractor drawer, final double minVal,
@@ -72,8 +72,8 @@ public class ColorPicker {
 		
 		this.mean = mean;
 		this.median = median;
-		this.dataMin = minVal;
-		this.dataMax = maxVal;
+		this.dataMinVal = minVal;
+		this.dataMaxVal = maxVal;
 		this.dataCenter = minVal + (maxVal - minVal) / 2;
 		
 		this.thumbList = new ArrayList<Thumb>();
@@ -93,7 +93,6 @@ public class ColorPicker {
 
 		setMinVal(minVal);
 		setMaxVal(maxVal);
-		updateRange();
 	}
 
 	public JPanel getContainerPanel() {
@@ -154,26 +153,29 @@ public class ColorPicker {
 	 */
 	protected void loadPresets() {
 
-		/* clearing all data */
+		// clearing all data
 		colorList.clear();
 		thumbList.clear();
 
+		// Adding boundary thumbs - inner thumbs are inserted by verifyInnerThumbs()
 		thumbList.add(minThumb);
 		thumbList.add(maxThumb);
 
 		colorExtractor.setMissingColor(activeColorSet.getMissing());
 
-		/* Only load non-dataset min/max if custom colorset is loaded */
-		if (!("RedGreen".equalsIgnoreCase(activeColorSet.getName()) || "YellowBlue"
-				.equalsIgnoreCase(activeColorSet.getName()))) {
+		// Only load non-dataset min/max if custom colorset is loaded
+		if ("Custom".equalsIgnoreCase(activeColorSet.getName())) {
 			setMinVal(activeColorSet.getMin());
 			setMaxVal(activeColorSet.getMax());
+			
+		} else {
+			setMinVal(dataMinVal);
+			setMaxVal(dataMaxVal);
 		}
 
 		final String[] colors = activeColorSet.getColors();
 
 		for (final String color : colors) {
-
 			colorList.add(Color.decode(color));
 		}
 
@@ -182,17 +184,23 @@ public class ColorPicker {
 	}
 
 	/**
-	 * Serves to store the currently chosen custom color setup in a configNode.
+	 * Creates a custom ColorSet from the current fractions, colors, and min-max
+	 * values.
 	 * 
 	 * @return The new ColorSet object created from the current custom colors
 	 *         and the relative positions of the associated thumbs.
 	 */
-	protected ColorSet saveCustomPresets() {
+	protected ColorSet generateCustomColorSet() {
+		
+		if(fractions.length != colorList.size()) {
+			LogBuffer.println("Did not generate custom ColorSet, because the" +
+				"size of gradient fractions and colors does not match.");
+			return null;
+		}
 
 		final List<Double> fractionList = new ArrayList<Double>();
 
 		for (final float f : fractions) {
-
 			fractionList.add((double) f);
 		}
 
@@ -243,11 +251,14 @@ public class ColorPicker {
 	}
 
 	/**
-	 * Adjusts the fractions to new data values.
-	 * 
-	 * @param dataValues
+	 * Calculates new fraction array from stored thumb data values.
 	 */
 	protected void updateFractions() {
+		
+		if(thumbList == null) {
+			LogBuffer.println("No thumb list defined. Could not update fractions.");
+			return;
+		}
 
 		float[] newFractions = new float[thumbList.size()];
 
@@ -264,7 +275,7 @@ public class ColorPicker {
 				frac = 1.0f;
 
 			} else {
-				frac = (float) (diff / (range));
+				frac = (float) (diff / (getRange()));
 			}
 
 			newFractions[i] = frac;
@@ -283,8 +294,8 @@ public class ColorPicker {
 	protected void setFractions(float[] newFracs) {
 
 		this.fractions = newFracs;
-
-		thumbBox.verifyThumbs();
+		
+		thumbBox.syncInnerThumbsToFracs();
 		thumbBox.adjustThumbsToFractions();
 	}
 
@@ -295,11 +306,8 @@ public class ColorPicker {
 	protected void updateColorArray() {
 
 		/* TODO simplify */
-		colors = new Color[colorList.size()];
-
-		for (int i = 0; i < colors.length; i++) {
-			colors[i] = colorList.get(i);
-		}
+		this.colors = new Color[colorList.size()];
+    colorList.toArray(colors);
 	}
 
 	/**
@@ -315,20 +323,6 @@ public class ColorPicker {
 	}
 
 	/**
-	 * Swaps positions of thumbs and colors in their specific lists.
-	 * 
-	 * @param oldIndex
-	 *            Previous position of color/ thumb in their respective lists.
-	 * @param newIndex
-	 *            New position of color/ thumb in their respective lists.
-	 */
-	protected void swapPositions(int oldIndex, int newIndex) {
-
-		Collections.swap(thumbList, oldIndex, newIndex);
-		Collections.swap(colorList, oldIndex, newIndex);
-	}
-
-	/**
 	 * Defines a new minimum value for the color range.
 	 * 
 	 * @param minVal
@@ -337,9 +331,7 @@ public class ColorPicker {
 
 		this.minVal = minVal;
 		colorExtractor.setMin(minVal);
-		minThumb.setDataValue(minVal);
-		updateRange();
-
+		minThumb.setValue(minVal);
 		updateFractions();
 	}
 
@@ -349,18 +341,33 @@ public class ColorPicker {
 	 * @param maxVal
 	 */
 	protected void setMaxVal(double maxVal) {
+		
 		this.maxVal = maxVal;
 		colorExtractor.setMax(maxVal);
-		maxThumb.setDataValue(maxVal);
-		updateRange();
+		maxThumb.setValue(maxVal);
 		updateFractions();
 	}
-
+	
 	/**
-	 * Updates the range.
+	 * Set a new minimum boundary thumb.
+	 * @param bT - The new boundary thumb.
 	 */
-	private void updateRange() {
-		this.range = maxVal - minVal;
+	protected void setMinBound(final BoundaryThumb bT) {
+		
+		this.minThumb = bT;
+		minBox.setNewThumb(bT);
+		setMinVal(bT.getDataValue());
+	}
+	
+	/**
+	 * Set a new maimum boundary thumb.
+	 * @param bT - The new boundary thumb
+	 */
+	protected void setMaxBound(final BoundaryThumb bT) {
+		
+		this.maxThumb = bT;
+		maxBox.setNewThumb(bT);
+		setMaxVal(bT.getDataValue()); 
 	}
 
 	/**
@@ -402,15 +409,13 @@ public class ColorPicker {
 	 */
 	protected double getRange() {
 
-		double testRange = maxVal - minVal;
-
-		/* make sure the range is always defined correctly */
-		if (!Helper.nearlyEqual(range, testRange)) {
-			LogBuffer.println("Range was not defined properly!");
-			this.range = testRange;
+		if(!(maxVal > minVal)) {
+			LogBuffer.println("Max value should not be larger than min value." +
+				"Cannot return proper range.");
+			return Double.NaN;
 		}
-
-		return range;
+		
+		return (maxVal - minVal);
 	}
 
 	/**
@@ -424,14 +429,14 @@ public class ColorPicker {
 	 * @return Returns the currently defined min of the dataset.
 	 */
 	protected double getDataMin() {
-		return(dataMin);
+		return(dataMinVal);
 	}
 
 	/**
 	 * @return Returns the currently defined max of the dataset.
 	 */
 	protected double getDataMax() {
-		return(dataMax);
+		return(dataMaxVal);
 	}
 
 	/**
@@ -444,10 +449,21 @@ public class ColorPicker {
 
 		double dataVal;
 
-		dataVal = Math.abs((range) * frac) + minVal;
-		dataVal = (double) Math.round(dataVal * 1000) / 1000;
+		dataVal = Math.abs((getRange()) * frac) + minVal;
+		dataVal = Helper.roundDouble(dataVal, ThumbBox.DATA_PRECISION);
 
 		return dataVal;
+	}
+	
+	/**
+	 * Tests whether a data value is outside of the defined minimum and maximum
+	 * bounds currently set for ColorPicker.
+	 * @param dataVal - The data value to test.
+	 * @return Whether the data value is outside of bounds.
+	 */
+	protected boolean isOutsideBounds(final double dataVal) {
+		
+		return (dataVal < getMinVal() || dataVal > getMaxVal());
 	}
 
 	/**
@@ -489,7 +505,7 @@ public class ColorPicker {
 		return thumbList.size();
 	}
 
-	protected Thumb getThumb(int index) {
+	protected Thumb getThumb(final int index) {
 
 		return thumbList.get(index);
 	}
@@ -522,7 +538,6 @@ public class ColorPicker {
 	 */
 	protected boolean isSynced() {
 
-		return (fractions.length == colorList.size())
-				&& (colorList.size() == thumbList.size());
+		return (fractions.length == thumbList.size());
 	}
 }

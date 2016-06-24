@@ -17,7 +17,7 @@ public class Thumb {
 	protected int x;
 	protected int y;
 
-	protected double dataVal;
+	private double dataVal;
 
 	/* Thumb dimensions */
 	protected int width = 12;
@@ -32,9 +32,19 @@ public class Thumb {
 	/**
 	 * Constructs a thumb object if given the x/y-coordinates and a color.
 	 *
-	 * @param x
-	 * @param y
-	 * @param color
+	 * @param x - The x-Position of the thumb.
+	 * @param color - The color of the thumb.
+	 */
+	public Thumb(final Color color) {
+
+		this(0, ColorPicker.THUMB_HEIGHT, color);
+	}
+	
+	/**
+	 * Constructs a thumb object if given the x/y-coordinates and a color.
+	 *
+	 * @param x - The x-Position of the thumb.
+	 * @param y - The y-position of the thumb.
 	 */
 	public Thumb(final int x, final int y) {
 
@@ -44,9 +54,9 @@ public class Thumb {
 	/**
 	 * Constructs a thumb object if given the x/y-coordinates and a color.
 	 *
-	 * @param x
-	 * @param y
-	 * @param color
+	 * @param x - The x-Position of the thumb.
+	 * @param y - The y-position of the thumb.
+	 * @param color - The color of the thumb.
 	 */
 	public Thumb(final int x, final int y, final Color color) {
 
@@ -59,7 +69,7 @@ public class Thumb {
 	 * 
 	 * @param dataVal
 	 */
-	public void setDataValue(final double dataVal) {
+	public void setValue(final double dataVal) {
 
 		this.dataVal = dataVal;
 	}

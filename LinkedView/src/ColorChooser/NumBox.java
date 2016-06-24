@@ -38,18 +38,17 @@ public class NumBox {
 
 		List<Thumb> thumbs = colorPicker.getThumbList();
 
-		/* store the selected thumb because it always has to be painted last */
+		// store the selected thumb because it always has to be painted last
 		Thumb selected_thumb = null;
 		for (final Thumb t : thumbs) {
-
-			/* do not paint min/ max thumb data values here */
+			// do not paint min/ max thumb data values here
 			if (thumbs.indexOf(t) == 0
 					|| thumbs.indexOf(t) == thumbs.size() - 1) {
 				continue;
 			}
 
 			if (t.isSelected()) {
-				/* store a reference to t for later */
+				// store a reference to t for later
 				selected_thumb = t;
 				continue;
 			}
@@ -66,16 +65,24 @@ public class NumBox {
 		}
 	}
 
-	private void paintString(Graphics2D g2, Thumb t) {
+	/**
+	 * Paints a background rectangle and a number string which represents
+	 * the assigned data value of the passed thumb.
+	 * @param g2 - The Graphics object to paint to.
+	 * @param t - The thumb for which the data value will be painted.
+	 */
+	private void paintString(final Graphics2D g2, final Thumb t) {
 
 		String value_s = Double.toString(t.getDataValue());
 		int stringWidth = fm.stringWidth(value_s);
 
+		// painting background rectangle for overlap case
 		g2.setColor(GUIFactory.DEFAULT_BG);
 		g2.fillRect(t.getX() - (stringWidth / 2) - (TOTAL_MARGIN / 2), 0,
 				stringWidth + TOTAL_MARGIN, (int) numRect.getHeight());
+		
+		// paint the number string
 		g2.setColor(Color.black);
-
 		g2.drawString(value_s, t.getX() - (stringWidth / 2),
 				(int) ((numRect.getHeight() / 2) + numRect.getMinY()));
 	}
