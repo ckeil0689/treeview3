@@ -607,11 +607,12 @@ public class ThumbBox {
 			updateDataBound(movingBT);
 			
 		} else {
-			Thumb removedThumb = thumbs.remove(selectedIdx);
-			Color removedColor = colors.remove(selectedIdx);
-			
 			int insertionIdx = findInsertionIdx(dataVal, thumbs.get(selectedIdx), 
 			                                    thumbs);
+			
+			// Remove and then reinsert at destination
+			Thumb removedThumb = thumbs.remove(selectedIdx);
+			Color removedColor = colors.remove(selectedIdx);
 			
 			removedThumb.setValue(dataVal);
 			
