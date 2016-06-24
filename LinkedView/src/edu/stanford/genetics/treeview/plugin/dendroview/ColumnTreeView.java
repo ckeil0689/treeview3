@@ -154,7 +154,7 @@ public class ColumnTreeView extends TRView {
 		if(destRect == null) {
 			return(-1);
 		}
-		return(destRect.y + destRect.height);
+		return(destRect.y + destRect.height - 1);
 	}
 
 	@Override

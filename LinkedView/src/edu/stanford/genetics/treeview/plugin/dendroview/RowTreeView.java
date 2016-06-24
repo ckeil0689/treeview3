@@ -151,7 +151,7 @@ public class RowTreeView extends TRView {
 		if(destRect == null) {
 			return(-1);
 		}
-		return(destRect.x + destRect.width);
+		return(destRect.x + destRect.width - 1);
 	}
 
 	@Override
