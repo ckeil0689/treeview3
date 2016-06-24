@@ -59,7 +59,6 @@ public class PreferencesController {
 
 		preferences.addSaveAndCloseListener(new SaveAndCloseListener());
 		preferences.addOKButtonListener(new ConfirmationListener());
-		preferences.addCustomLabelListener(new CustomLabelListener());
 		preferences.addResizeDialogListener(new PreferencesComponentListener());
 		preferences.addJustifyListener(new LabelJustifyListener());
 	}

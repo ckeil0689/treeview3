@@ -5,8 +5,9 @@ TreeView is an open-source Java app for visualizing large data matrices. It can 
 
 It was first developed by Michael Eisen in 1998 (Treeview 1.0) and updated a few years later by Alok Saldanha (Treeview 2.0). We have now completely redesigned the app and released a new & improved TreeView 3.0 that is faster, cleaner and easier to use.
 
-If you are interested in providing feedback, please watch this repository, create new issues or contact us at <treeview@princeton.edu>.
+If you are interested in providing feedback, you can watch this repository, create new issues or contact us at <treeview@princeton.edu>.
 
+Also, you can subscribe to the Treeview users' mailing list at <http://www.princeton.edu/~abarysh/treeview/>. You will receive an email when new software versions are available.
 
 
 DOWNLOAD

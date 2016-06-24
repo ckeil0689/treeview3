@@ -1620,6 +1620,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	private void requestFocusForZoomBtn() {
 
+		setAdaptiveButtonStatus();
+
 		if(dendroView.isAFinderBoxFocussed()) {
 			return;
 		}
@@ -1629,8 +1631,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		} else {
 			dendroView.getXYPlusButton().requestFocusInWindow();
 		}
-
-		setAdaptiveButtonStatus();
 	}
 
 	/**

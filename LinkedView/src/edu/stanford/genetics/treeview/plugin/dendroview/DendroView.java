@@ -337,26 +337,26 @@ public class DendroView implements Observer, DendroPanel {
 	 * @return A JPanel containing all major UI navigation + info elements.
 	 */
 	private JPanel createToolbarPanel() {
-		
+
 		JPanel navBtnPanel;
 		JPanel searchBarPanel;
 		JPanel colorValIndicatorPanel;
 		JPanel toolbarPanel;
-	
+
 		colorValIndicatorPanel = createColorValIndicatorPanel();
 		navBtnPanel = createNavBtnPanel();
 		searchBarPanel = createSearchBarPanel();
-		
+
 		// Toolbar
 		toolbarPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS_OR_INSETS);
-		toolbarPanel.add(colorValIndicatorPanel, "al left, w 33%");
+			GUIFactory.NO_GAPS_OR_INSETS);
+		toolbarPanel.add(colorValIndicatorPanel, "al left, w 33%, wmax 33%");
 		toolbarPanel.add(navBtnPanel, "al center, pushx");
 		toolbarPanel.add(searchBarPanel, "al right, w 33%");
-		
+
 		return toolbarPanel;
 	}
-	
+
 	/**
 	 * Creates a panel to hold the row dendrogram. This will be added to
 	 * the left side of the corresponding JSplitPane. The dendrogram is only

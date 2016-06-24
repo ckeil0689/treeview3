@@ -78,6 +78,7 @@ public class TVController implements Observer {
 	private MenubarController menuController;
 	private File file;
 	private FileSet fileMenuSet;
+	private FileSet loadingFile;
 
 	private Preferences oldNode;
 	private String[] clusterNodeSourceKeys;
@@ -183,11 +184,6 @@ public class TVController implements Observer {
 			tvFrame.getWelcomeView().addLoadListener(new LoadButtonListener());
 			tvFrame.getWelcomeView().addLoadLastListener(
 					new LoadLastButtonListener());
-		}
-
-		if (tvFrame.getLoadErrorView() != null) {
-			tvFrame.getLoadErrorView().addLoadNewListener(
-					new LoadButtonListener());
 		}
 	}
 
@@ -375,15 +371,27 @@ public class TVController implements Observer {
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
 		} else {
-			final String message = "No data matrix could be set.";
+			final String message = "No numeric data could be found in the " +
+				"input file.\nThe input file must contain tab-delimited " +
+				"numeric values.";
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
 					"Alert", JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + message);
 
-			tvFrame.setLoadErrorMessage("Data was not loaded.");
-
 			/* Set model status, which will update the view. */
 			((TVModel) model).setLoaded(false);
+
+			//Bring the user back to the load dialog to try again or cancel load
+			DataLoadInfo dataInfo;
+			dataInfo = useImportDialog(loadingFile);
+
+			if (dataInfo != null) {
+				loadData(loadingFile, false, dataInfo);
+				
+			} else {
+				String msg = "Data loading was interrupted.";
+				LogBuffer.println(msg);
+			}
 		}
 
 		addViewListeners();
@@ -546,16 +554,17 @@ public class TVController implements Observer {
 		try {
 			if(fileSet == null) {
 				file = tvFrame.selectFile();
-	
+
 				/* Only run loader, if JFileChooser wasn't canceled. */
 				if (file != null) {
 					fileSet = tvFrame.getFileSet(file);
-	
+
 				} else {
 					return;
 				}
 			}
-			
+
+			loadingFile = fileSet;
 			getDataInfoAndLoad(fileSet, false);
 			
 		} catch (final LoadException e) {
