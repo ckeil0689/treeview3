@@ -1548,15 +1548,15 @@ public class MapContainer extends Observable implements Observer,
 		// called.
 		// scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
 
-		int scrollVal = i - getNumVisible() / 2;
-		if(scrollVal > (getTotalTileNum() - getNumVisible())) {
-			scrollVal = getTotalTileNum() - getNumVisible();
+		int scrollToVal = i - getNumVisible() / 2;
+		if(scrollToVal > (getTotalTileNum() - getNumVisible())) {
+			scrollToVal = getTotalTileNum() - getNumVisible();
 		}
 
-		scrollbar.setValue(scrollVal);
+		scrollbar.setValue(scrollToVal);
 
 		// Keep track of the first visible index
-		setFirstVisibleStrictly(scrollVal);
+		setFirstVisibleStrictly(scrollToVal);
 
 		//Image needs to be updated if either scroll position changes (because a
 		//scroll of the labels changes the blue box)
