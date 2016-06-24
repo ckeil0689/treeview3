@@ -1556,9 +1556,7 @@ public class MapContainer extends Observable implements Observer,
 		scrollbar.setValue(scrollVal);
 
 		// Keep track of the first visible index
-		// This used to be set using scrollbar.getVisibleAmount, but that can
-		// change implicitly when the window is resized.
-		setFirstVisible(scrollVal < 0 ? 0 : scrollVal);
+		setFirstVisibleStrictly(scrollVal);
 
 		//Image needs to be updated if either scroll position changes (because a
 		//scroll of the labels changes the blue box)
@@ -1622,7 +1620,7 @@ public class MapContainer extends Observable implements Observer,
 		scrollbar.setValue(newVal);
 
 		// Keep track of the first visible index
-		setFirstVisible(newVal < 0 ? 0 : newVal);
+		setFirstVisibleStrictly(newVal);
 
 		if (j != scrollbar.getValue()) {
 			setChanged();
