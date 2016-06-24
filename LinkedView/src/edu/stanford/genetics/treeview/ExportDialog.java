@@ -79,8 +79,6 @@ public class ExportDialog extends CustomDialog {
 				GUIFactory.DEFAULT);
 		JPanel optionsPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.DEFAULT);
-		JPanel radioPanel = GUIFactory.createJPanel(false, 
-			GUIFactory.NO_INSETS);
 
 		/* Shows the preview */
 		JPanel previewPanel = GUIFactory.createJPanel(false, 
@@ -93,7 +91,6 @@ public class ExportDialog extends CustomDialog {
 		JLabel format = GUIFactory.createLabel("Format:",GUIFactory.FONTS);
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
 		JLabel matrix = GUIFactory.createLabel("Matrix:",GUIFactory.FONTS);
-		JLabel region = GUIFactory.createLabel("Export:",GUIFactory.FONTS);
 		JLabel aspect = GUIFactory.createLabel("Tile Aspect:",GUIFactory.FONTS);
 		JLabel orient = GUIFactory.createLabel("Orientation:",GUIFactory.FONTS);
 
@@ -131,28 +128,22 @@ public class ExportDialog extends CustomDialog {
 		previewPanel.add(previewComp, "grow, push");
 
 		optionsPanel.add(format, "label, aligny 0");
-		optionsPanel.add(formatBox, "aligny 0, growx, wrap");
+		optionsPanel.add(formatBox, "aligny 0, growx, span, wrap");
 
 		optionsPanel.add(paper, "label");
-		optionsPanel.add(paperBox, "growx, wrap");
+		optionsPanel.add(paperBox, "growx, span, wrap");
 
 		optionsPanel.add(orient, "label");
-		optionsPanel.add(orientBox, "growx, wrap");
+		optionsPanel.add(orientBox, "growx, span, wrap");
 
 		optionsPanel.add(matrix, "label, aligny 0");
-		
-		// Add JRadioButton options & selection JCheckBox to a separate panel
-		radioPanel.add(region,"label, aligny 0");
-		RegionType selectedRegion = addRegionRadioButtons(radioPanel,
+		RegionType selectedRegion = addRegionRadioButtons(optionsPanel,
 			selectedFormat);
-
-		radioPanel.add(aspect, "label, aligny 0");
-		addAspectRadioButtons(radioPanel,selectedRegion,selectedFormat);
 		
-		radioPanel.add(selectionsBox,"span");
+		optionsPanel.add(aspect, "label, aligny 0");
+		addAspectRadioButtons(optionsPanel,selectedRegion,selectedFormat);
 		
-		// Add the separate panel
-		optionsPanel.add(radioPanel, "wrap");
+		optionsPanel.add(selectionsBox,"span");
 
 		contentPanel.add(previewPanel, "grow, w 500!, h 500!");
 		contentPanel.add(optionsPanel, "aligny 0%, growx, push");
