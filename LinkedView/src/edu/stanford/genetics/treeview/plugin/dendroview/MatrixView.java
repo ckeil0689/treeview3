@@ -14,6 +14,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import ColorChooser.ColorChooserController;
+import Controllers.ExportHandler.ExportWorker;
 import Controllers.RegionType;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.HintDialog;
@@ -135,16 +136,16 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * @param yIndent - The number of points to indent the image on the y axis
 	 * @param size - The number of points in each dimension of a square tile
 	 */
-	public void export(final Graphics g,final int xIndent,final int yIndent,
+	public void export(ExportWorker e, final Graphics g,final int xIndent,final int yIndent,
 		final int tileXsize,final int tileYsize,final RegionType region,
 		final boolean showSelections) {
 
 		if(region == RegionType.ALL) {
-			exportAll(g,xIndent,yIndent,tileXsize,tileYsize,showSelections);
+			exportAll(e,g,xIndent,yIndent,tileXsize,tileYsize,showSelections);
 		} else if(region == RegionType.VISIBLE) {
-			exportVisible(g,xIndent,yIndent,tileXsize,tileYsize,showSelections);
+			exportVisible(e,g,xIndent,yIndent,tileXsize,tileYsize,showSelections);
 		} else if(region == RegionType.SELECTION) {
-			exportSelection(g,xIndent,yIndent,tileXsize,tileYsize,
+			exportSelection(e,g,xIndent,yIndent,tileXsize,tileYsize,
 				showSelections);
 		} else {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -161,11 +162,11 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * @param tileXsize
 	 * @param tileYsize
 	 */
-	public void exportAll(final Graphics g,final int xIndent,final int yIndent,
+	private void exportAll(ExportWorker e, final Graphics g,final int xIndent,final int yIndent,
 		final int tileXsize,final int tileYsize,final boolean showSelections) {
 
 		if(drawer != null) {
-			drawer.paint(g,0,0,xmap.getMaxIndex(),ymap.getMaxIndex(),
+			drawer.paint(e,g,0,0,xmap.getMaxIndex(),ymap.getMaxIndex(),
 				xIndent,yIndent,tileXsize,tileYsize,
 				showSelections,colSelection,rowSelection);
 		}
@@ -179,12 +180,12 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * @param yIndent - The number of points to indent the image on the y axis
 	 * @param size - The number of points in each dimension of a square tile
 	 */
-	public void exportVisible(final Graphics g,final int xIndent,
+	private void exportVisible(ExportWorker e, final Graphics g,final int xIndent,
 		final int yIndent,final int tileXsize,final int tileYsize,
 		final boolean showSelections) {
 
 		if(drawer != null) {
-			drawer.paint(g,xmap.getFirstVisible(),ymap.getFirstVisible(),
+			drawer.paint(e,g,xmap.getFirstVisible(),ymap.getFirstVisible(),
 				xmap.getLastVisible(),ymap.getLastVisible(),
 				xIndent,yIndent,tileXsize,tileYsize,
 				showSelections,colSelection,rowSelection);
@@ -199,13 +200,13 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * @param yIndent - The number of points to indent the image on the y axis
 	 * @param size - The number of points in each dimension of a square tile
 	 */
-	public void exportSelection(final Graphics g,final int xIndent,
+	private void exportSelection(ExportWorker e, final Graphics g,final int xIndent,
 		final int yIndent,final int tileXsize,final int tileYsize,
 		final boolean showSelections) {
 
 		if(drawer != null) {
 			if(colSelection != null && colSelection.getNSelectedIndexes() > 0) {
-				drawer.paint(g,colSelection.getMinIndex(),
+				drawer.paint(e,g,colSelection.getMinIndex(),
 					rowSelection.getMinIndex(),colSelection.getMaxIndex(),
 					rowSelection.getMaxIndex(),
 					xIndent,yIndent,tileXsize,tileYsize,
@@ -401,6 +402,13 @@ public abstract class MatrixView extends ModelViewProduced {
 		xmap = m;
 		xmap.addObserver(this);
 	}
+	
+	/**
+	 * DEPRECATE get the xmapping for this view
+	 */
+	public MapContainer getXMap() {
+		return xmap;
+	}
 
 	/**
 	 * DEPRECATE set the ymapping for this view
@@ -416,6 +424,13 @@ public abstract class MatrixView extends ModelViewProduced {
 
 		ymap = m;
 		ymap.addObserver(this);
+	}
+	
+	/**
+	 * DEPRECATE get the ymapping for this view
+	 */
+	public MapContainer getYMap() {
+		return ymap;
 	}
 	
 	/**
