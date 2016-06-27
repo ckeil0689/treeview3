@@ -729,6 +729,14 @@ ConfigNodePersistent, Controller {
 		ticker.setValue(model.getDataMatrix().getValue(colIdx, rowIdx));
 	}
 	
+	/* Set the data ticker to matrix average
+	 * Rounding off to 4 decimals
+	 */
+	public void setMeanDataValue() {
+		double matrixAvg = model.getDataMatrix().getMean();
+		ticker.setValue( (double)Math.round(matrixAvg*10000)/10000 + " [matrix ave]");
+	}
+	
 	/**
 	 * Scrolls to index i in the y-MapContainer
 	 *

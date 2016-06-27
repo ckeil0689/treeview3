@@ -261,4 +261,18 @@ public class RowTreeView extends TRView {
 		}
 		return(dest.y + dest.height);
 	}
+
+	@Override
+	protected void setDataTickerValue(MouseEvent e) {
+		int from = (int) hoveredNode.getLeftLeaf().getIndex();
+		int to = (int) hoveredNode.getRightLeaf().getIndex();
+		double sum = 0.0;
+		double count = 0;
+		for(int i=from ; i<=to ; i++){
+			sum += dataModel.getDataMatrix().getRowAverage(i);
+			count++;
+		}
+		double treeAvg = sum/count;
+		ticker.setValue( (double)Math.round(treeAvg*10000)/10000 + " [tree ave]");
+	}
 }

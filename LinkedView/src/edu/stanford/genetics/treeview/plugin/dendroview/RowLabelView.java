@@ -198,4 +198,11 @@ public class RowLabelView extends LabelView {
 		
 		return(e.isShiftDown());
 	}
+
+	@Override
+	protected void setDataTickerValue(MouseEvent e) {
+		int rowIdx = getPrimaryHoverIndex(e);
+		double rowAvg = dataModel.getDataMatrix().getRowAverage(rowIdx);
+		ticker.setValue( (double)Math.round(rowAvg*10000)/10000 + " [row ave]");
+	}
 }

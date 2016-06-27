@@ -359,7 +359,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 		}
 
 		imView.setHasMouse(false);
-		mvController.setDataValueAt(-1, -1);
+		mvController.setMeanDataValue();
 
 		xmap.setHoverIndex(-1);
 		ymap.setHoverIndex(-1);

@@ -38,6 +38,7 @@ import javax.swing.event.ChangeListener;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -59,6 +60,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/* DataModel is an observer */
 	protected DataModel dataModel;
+	protected DataTicker ticker;
 
 	/* Required label data */
 	protected HeaderInfo headerInfo;
@@ -154,6 +156,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	int lastScrollEndPos      = -1;
 	int secondaryPaneSize     = -1;
 	int secondaryViewportSize = -1;
+	
+	/*
+	 * When mouse is moved on the label, this method is called to update
+	 * data ticker value
+	 */
+	protected abstract void setDataTickerValue(final MouseEvent e);
 
 	/* TODO: Instead of resetting the justification position whenever the font
 	 * size changes, we should calculate and remember the relative position of
@@ -2118,7 +2126,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	@Override
 	public void mouseMoved(final MouseEvent e) {
-		
 		//if(!hasFocus()) return;
 
 		setHoverPosition(e);
@@ -2136,6 +2143,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //			repaintTimer.restart();
 //		}
 
+		/* Set the Data ticker value to average value of the current row/column
+		 * Rounding off to 4 decimals
+		 */
+		setDataTickerValue(e);
+		
 		repaint();
 	}
 
@@ -2793,6 +2805,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			map.setKeepTreeGlobal(false);
 //		}
 		map.setOverLabels(true);
+		
 		super.mouseEntered(e);
 	}
 
@@ -2818,7 +2831,17 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		map.unsetHoverPixel();
 		unsetPrimaryHoverIndex();
+		setMeanDataTickerValue();
 		repaint();
+	}
+
+	/**
+	 * Set the data ticker to matrix average
+	 * Rounding off to 4 decimals
+	 */
+	private void setMeanDataTickerValue() {
+		double matrixAvg = dataModel.getDataMatrix().getMean();
+		ticker.setValue( (double)Math.round(matrixAvg*10000)/10000 + " [matrix ave]");
 	}
 
 	/**
@@ -3071,4 +3094,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		revalidate();
 		repaint();
 	}
+	
+    public void setDataTicker(final DataTicker ticker) {
+		
+		this.ticker = ticker;
+	}
+    
+    public void setDataModel(final DataModel dataModel) {
+		
+		this.dataModel = dataModel;
+	}
+    
 }

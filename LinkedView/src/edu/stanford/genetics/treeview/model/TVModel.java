@@ -782,6 +782,28 @@ public class TVModel extends Observable implements DataModel {
 
 			return modified;
 		}
+		
+		public double getRowAverage(int rowId){
+			double sum = 0;
+			final int numOfCols = nExpr();
+			for(int i=0 ; i<numOfCols ; i++){
+				double value = getValue(i, rowId);
+				if(!Double.isNaN(value))
+					sum += value;
+			}
+			return sum/numOfCols;
+		}
+		
+		public double getColAverage(int colId){
+			double sum = 0;
+			final int numOfRows = nGene();
+			for(int i=0 ; i<numOfRows ; i++){
+				double value = getValue(colId, i);
+				if(!Double.isNaN(value))
+					sum += value;
+			}
+			return sum/numOfRows;
+		}
 	}
 
 	/** holds actual node information for array tree */

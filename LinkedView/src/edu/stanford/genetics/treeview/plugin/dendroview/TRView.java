@@ -24,6 +24,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import Controllers.RegionType;
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -61,6 +63,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * with the labels. */
 //	private int slowRepaintInterval = 1000;//update every 1s if mouse not moving
 	private int lastHoverIndex = -1;
+	
+	/* Used to update data ticker
+	 * 
+	 */
+	protected DataModel dataModel;
+	protected DataTicker ticker;
 
 	public TRView(final boolean isGeneTree) {
 
@@ -556,6 +564,11 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	
 	protected abstract int  getSnapShotDestRectStart(final Rectangle dest);
 	protected abstract int  getSnapShotDestRectEnd(final Rectangle dest);
+	/* 
+	 * Used to set the Data ticker to Tree Average. Note that the hovered node 
+	 * must be set before calling this method.
+	 */
+	protected abstract void setDataTickerValue(final MouseEvent e);
 
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
@@ -943,6 +956,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		map.setHoverIndex(map.getIndex(getPrimaryPixelIndex(e)));
 		setHoveredNode(getClosestParentNode(e));
 		synchMap();
+		/* Set the Data ticker to average value of the current tree
+		 * Rounding off to 4 decimals
+		 */
+		setDataTickerValue(e);
 	}
 
 	@Override
@@ -970,6 +987,16 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		map.setOverTree(false);
 		unsetHoveredNode();
+		setMeanDataTickerValue();
+	}
+
+	/**
+	 * Set the data ticker to matrix average
+	 * Rounding off to 4 decimals
+	 */
+	private void setMeanDataTickerValue() {
+		double matrixAvg = dataModel.getDataMatrix().getMean();
+		ticker.setValue( (double)Math.round(matrixAvg*10000)/10000 + " [matrix ave]");
 	}
 
 	@Override
@@ -1102,5 +1129,15 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		setPrimaryScaleEq(primaryScaleEq);
 		
 		return scaled;
+	}
+	
+	public void setDataTicker(final DataTicker ticker) {
+		
+		this.ticker = ticker;
+	}
+    
+    public void setDataModel(final DataModel dataModel) {
+		
+		this.dataModel = dataModel;
 	}
 }
