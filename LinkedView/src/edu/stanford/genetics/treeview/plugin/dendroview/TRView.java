@@ -239,7 +239,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		hoveredNode = n;
 
-		synchMap();
 		repaint();
 	}
 
