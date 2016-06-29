@@ -13,20 +13,18 @@ Also, you can subscribe to the Treeview users' mailing list at <http://www.princ
 DOWNLOAD
 ========
 
-The Alpha 2 version of TreeView 3.0 can be downloaded from:
+Alpha 2: <https://bitbucket.org/TreeView3Dev/treeview3/downloads/tv3_alpha02_final.jar>
 
-<https://bitbucket.org/TreeView3Dev/treeview3/downloads/tv3_alpha02_final.jar>
-
-The Alpha 3 version of Treeview 3.0: coming soon.
+Alpha 3: coming soon.
 
 
 
-INSTALL
-=======
+INSTALL & RUN
+=============
 
 ## Requirements ##
 
-* Java 7 or higher - go to <http://java.com/en/download/> to find out what version you currently have.
+* Java 7 or higher - visit <http://java.com/en/download/installed.jsp> to verify your current Java version.
 * If you tested an older alpha or beta version of Treeview 3.0, we recommend that you reset your preferences before you upgrade to the latest version (File > Preferences > Reset Preferences). 
 
 ## Windows ##
@@ -47,30 +45,30 @@ WHAT'S NEW
 
 ## In Alpha 3 ##
 
-* Updated window layout to optimize the use of screen space
+* New window layout that optimizes screen space
 * Improved navigation:
     * whizzing labels and trees
     * double-click to zoom
-* Added data export functions:
-    * copy labels and/or matrix data to clipboard
-    * export matrix view to PDF, SVG, PNG, JPG, PPM
+* New data export:
+    * copy labels to clipboard
+    * export matrix view to PDF, SVG, PNG, JPG and PPM
 * Improved search
 * Improved color selection and editing
 * Other minor updates and bug fixes
 
 ## In Treeview 3.0 overall ##
 
-* We have completely re-worked the interface to include one main data panel, with zooming, scrolling and searching options.
+* We have completely re-designed the interface to include one main data panel, with zooming, scrolling and searching options.
 * We have made clustering an integral part of TreeView (no need for Cluster 3.0).
-* We have added more flexible color settings (multiple colors, varying ranges)
+* We have added more flexible color settings (multiple colors, varying ranges) and label settings.
 * We have eliminated some of the features that we considered obsolete or in need of a major re-work.
-* We have added a much improved option for image export.
+* We have improved image export.
 
 
 DOCUMENTATION
 =============
 
-[Add link].
+[Coming soon]
 
 
 DEVELOPERS
@@ -90,7 +88,7 @@ Treeview 3.0 - visualization and analysis of large data matrices
 Our project uses the MIT license. It can be found [here](https://bitbucket.org/TreeView3Dev/treeview3/src/85ca08ccd77f32f80d1f219aaf8ec23898a29828/LICENSE?at=master&fileviewer=file-view-default).
 
 DEPENDENCIES
-=======
+============
 
 * Java TreeView (https://sourceforge.net/projects/jtreeview/)
 * FreeHep (http://java.freehep.org/license.html)
