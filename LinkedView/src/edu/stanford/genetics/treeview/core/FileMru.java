@@ -8,6 +8,7 @@
 package edu.stanford.genetics.treeview.core;
 
 import java.util.Observable;
+import java.util.Stack;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -31,7 +32,29 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public class FileMru extends Observable implements ConfigNodePersistent {
 
+	/*
+	 * Java Preference node of "/TreeViewApp/TreeViewFrame/FileMRU"
+	 */
 	private Preferences configNode;
+	/*
+	 * Maximum number of files to be stored in the Preferences.
+	 * Essentially changing this value should effect maximum number
+	 * of recently opened files stored
+	 */
+	private static final int MAX_STORED_FILES = 10;
+	
+	/*
+	 * Contains the children of configNode. Note that Both configNode and
+	 * this stack gets populate at the application start
+	 */
+	private SizedStack<Preferences> fileNodes = new SizedStack<Preferences>(MAX_STORED_FILES);
+	
+	/*
+	 * skipIndex is used to skip a node in the fileNodes while reading it
+	 * This is used when the user loads a file that is already present in
+	 * the recently loaded list.
+	 */
+	private int skipIndex = -1;
 
 	/**
 	 * Binds FileMru to a ConfigNode
@@ -44,6 +67,8 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 		if (parentNode != null) {
 			this.configNode = parentNode.node(StringRes.pnode_FileMRU);
+			
+			pushChildrenIntoFileStack();
 
 		} else {
 			LogBuffer.println("Could not find or create FileMRU Preferences"
@@ -53,16 +78,37 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	}
 
 	/**
+	 * This push of Files into the fileNodes stack must happen only 
+	 * once, during the application start. This method essentially
+	 * builds the file stack from the java preferences
+	 */
+	private void pushChildrenIntoFileStack() {
+		try {
+			for(String fileName : configNode.childrenNames()){
+				fileNodes.push(configNode.node(fileName));
+			}
+		}
+		catch(BackingStoreException e) {
+			e.printStackTrace();
+			LogBuffer.println("BackingStoreException when trying to remove"
+					+ " a file in FileMRU: " + e.getMessage());
+		}
+	}
+
+	/**
 	 * Create subnode of current confignode
-	 *
+	 * File+currentTimeMillis is the relative Node name while creating
+	 * a node
 	 * @return Newly created subnode
 	 */
 	public synchronized Preferences createSubNode() {
 
 		setChanged();
-		final int subNodeIndex = getRootChildrenNodes().length + 1;
+		final long subNodeIndex = System.currentTimeMillis();
 		LogBuffer.println("Creating subNode File" + subNodeIndex);
-		return configNode.node("File" + subNodeIndex);
+		Preferences node = configNode.node("File" + subNodeIndex);
+		fileNodes.push(node);
+		return node;
 	}
 
 	/**
@@ -73,29 +119,31 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 * @return The corresponding ConfigNdoe
 	 */
 	public Preferences getConfig(final int i) {
-
-		final String[] childrenNodes = getRootChildrenNodes();
-
-		if ((i < childrenNodes.length) && (i >= 0)) {
-			return configNode.node(childrenNodes[i]);
-		}
 		
-		return null;
+		return fileNodes.get(i);
 	}
 
 	/**
-	 * Gets the configs of all files
-	 *
+	 * Gets the configs of all files. skipIndex is used only when the user 
+	 * loads a recently loaded file. Makes sure that the File is not shown
+	 * in the recently loaded list again
+	 * 
 	 * @return Array of all ConfigNodes
 	 */
 	public Preferences[] getConfigs() {
 
-		final String[] childrenNodes = getRootChildrenNodes();
-		final Preferences[] children = new Preferences[childrenNodes.length];
-
-		for (int i = 0; i < children.length; i++) {
-
-			children[i] = configNode.node(childrenNodes[i]);
+		int numOfFiles = fileNodes.size();
+		Preferences[] children = null;
+		if(skipIndex == -1)
+			children = new Preferences[numOfFiles];
+		else
+			children = new Preferences[numOfFiles-1];
+		int k = 0;
+		for (int i = 0; i < numOfFiles; i++) {
+			if(i == skipIndex)
+				continue;
+			children[k] = fileNodes.get(i); 
+			k++;
 		}
 		return children;
 	}
@@ -106,14 +154,15 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 * @return String [] of file names for display
 	 */
 	public String[] getFileNames() {
+		
+		int numOfFiles = fileNodes.size();
+		final String astring[] = new String[numOfFiles];
 
-		final String[] childrenNodes = getRootChildrenNodes();
-
-		final String astring[] = new String[childrenNodes.length];
-
-		for (int i = 0; i < childrenNodes.length; i++) {
-			astring[i] = configNode.node(childrenNodes[i]).get("root", "")
-					+ configNode.node(childrenNodes[i]).get("cdt", "");
+		for (int i = 0; i < numOfFiles; i++) {
+			if(i == skipIndex)
+				continue;
+			astring[i] = fileNodes.get(i).get("root", "")
+					+ fileNodes.get(i).get("cdt", "");
 		}
 		return astring;
 	}
@@ -124,73 +173,20 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 * @return The Most Recent Dir or null
 	 */
 	public String getMostRecentDir() {
-
-		// final ConfigNode aconfigNode[] = root.fetch("File");
-		final String[] childrenNodes = getRootChildrenNodes();
-
-		if (childrenNodes.length == 0)
+		if(fileNodes.isEmpty())
 			return null;
-
-		final Preferences childNode = configNode
-				.node(childrenNodes[childrenNodes.length - 1]);
-		return childNode.get("dir", null);
-	}
-
-	public boolean getParseQuotedStrings() {
-
-		return (configNode.getInt("quotes", FileSet.PARSE_QUOTED) == 1);
-	}
-
-	public void setParseQuotedStrings(final boolean parse) {
-
-		if (parse) {
-			configNode.putInt("quotes", 1);
-		} else {
-			configNode.putInt("quotes", 0);
-		}
-	}
-
-	public int getStyle() {
-
-		return configNode.getInt("style", FileSet.LINKED_STYLE);
-	}
-
-	public void setStyle(final int style) {
-
-		configNode.putInt("style", style);
+		return fileNodes.peek().get("dir", null);
 	}
 
 	/**
-	 * Delete the nth file in the list
+	 * Delete the ith file in the list
 	 *
 	 * @param i
 	 *            The the index of the file to delete.
 	 */
 	public synchronized void removeFile(final int i) {
 
-		final String[] childrenNodes = getRootChildrenNodes();
-		try {
-			// final Preferences node = configNode.node(childrenNodes[i]);
-
-			configNode.node(childrenNodes[i]).removeNode();
-
-		} catch (final BackingStoreException e) {
-			e.printStackTrace();
-			LogBuffer.println("BackingStoreException when trying to remove"
-					+ " a file in FileMRU: " + e.getMessage());
-		}
-		setChanged();
-	}
-
-	/**
-	 * Removes particular FileSet from Mru
-	 *
-	 * @param fileSet
-	 *            FileSet to remove
-	 */
-	public synchronized void removeFileSet(final FileSet fileSet) {
-
-		configNode.remove(fileSet.getConfigNode().name());
+		fileNodes.remove(i);
 		setChanged();
 	}
 
@@ -201,8 +197,10 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 *            Node to move to end
 	 */
 	public synchronized void setLast(final Preferences fileSetNode) {
-
-		configNode.put("last_node", fileSetNode.name());
+		/* 
+		 * We probably do not need to set last because we can easily pop or peek
+		 * from the fileNodes stack
+		 */
 		setChanged();
 	}
 
@@ -213,22 +211,9 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 */
 	public synchronized FileSet getLast() {
 
-		final String lastNode = configNode.get("last_node", "no_last");
-
-		if (lastNode.equalsIgnoreCase("no_last")) {
+		if(fileNodes.isEmpty())
 			return null;
-		}
-		
-		try {
-			if(configNode.node(lastNode).keys().length == 0) {
-				return null;
-			}
-		} catch (BackingStoreException e) {
-			LogBuffer.logException(e);
-			return null;
-		}
-
-		return new FileSet(configNode.node(lastNode));
+		return new FileSet(fileNodes.peek());
 	}
 
 	/**
@@ -247,13 +232,15 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 *            FileSet to move
 	 */
 	public synchronized void setLast(final FileSet fileSet) {
-
-		setLast(fileSet.getConfigNode());
+		/* 
+		 * We probably do not need to set last because we can easily pop or peek
+		 * from the fileNodes stack
+		 */
 	}
 
 	/**
 	 * add a fileset if it's not already in the list. Or, if it is in the list,
-	 * create a fileset with the correct confignode.
+	 * delete it and create a new node, then copy the fileset
 	 *
 	 * @return the fileset corresponding to the correct config node
 	 */
@@ -261,39 +248,37 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 
 		// check existing file nodes...
 		final Preferences[] aconfigNode = getConfigs();
+		Preferences nodeToDelete = null;
 		for (final Preferences element : aconfigNode) {
 			final FileSet fileSet2 = new FileSet(element);
 			if (fileSet2.equalsFileSet(inSet)) {
 				LogBuffer.println("Found Existing node in MRU list for "
 						+ inSet);
-				fileSet2.copyState(inSet);
-				return fileSet2;
+				
+				nodeToDelete = element;
+				break;
 			}
 		}
-
+		
 		final Preferences configNode = createSubNode();
 		final FileSet fileSet3 = new FileSet(configNode);
 		fileSet3.copyState(inSet);
 		LogBuffer.println("Creating new fileset " + fileSet3);
-		return fileSet3;
-	}
-
-	/**
-	 * Delete all but the last i files from the list
-	 *
-	 * @param i
-	 *            The number of files to delete
-	 */
-	public synchronized void trimToLength(final int i) {
-
-		// final ConfigNode aconfigNode[] = root.fetch("File");
-		final String[] childrenNodes = getRootChildrenNodes();
-
-		final int j = childrenNodes.length - i;
-		for (int k = 0; k < j; k++) {
-			configNode.remove(childrenNodes[k]);
+		// now delete the old node
+		if(nodeToDelete != null){
+			fileNodes.remove(fileNodes.indexOf(nodeToDelete));
+			inSet.setNode(configNode);
+			setChanged();
+			/*
+			 * this is when the user loads an already loaded file, here we set
+			 * skipIndex and notify listeners i.e. FileMenu to update with the
+			 * new set of files (skipping the current file)
+			 */
+			skipIndex = fileNodes.indexOf(configNode);
+			notifyObservers();
+			skipIndex = -1;
 		}
-		setChanged();
+		return fileSet3;
 	}
 
 	public synchronized void removeMoved() {
@@ -321,19 +306,14 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	public void removeDuplicates(final FileSet inSet) {
 
 		final Preferences[] nodes = getConfigs();
-		int keeper = -1;
 		for (int i = nodes.length; i > 0; i--) {
 			final FileSet fileSet = new FileSet(nodes[i - 1]);
 			if (fileSet.equalsFileSet(inSet)) {
-				if (keeper != -1) {
-					// delete node, keep the keeper
-					LogBuffer.println("Found duplicate of " + fileSet.getCdt()
-							+ ", removing from mru...");
-					removeFile(i - 1);
-					setChanged();
-				} else {
-					keeper = i;
-				}
+				// delete node, keep the keeper
+				LogBuffer.println("Found duplicate of " + fileSet.getCdt()
+						+ ", removing from mru...");
+				removeFile(i - 1);
+				setChanged();
 			}
 		}
 	}
@@ -345,15 +325,51 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 */
 	public String[] getRootChildrenNodes() {
 
-		String[] childrenNodes;
-		try {
-			childrenNodes = configNode.childrenNames();
-			return childrenNodes;
-
-		} catch (final BackingStoreException e) {
-			e.printStackTrace();
-			return new String[0];
+		String[] childrenNodes = new String[fileNodes.size()];
+		for(int i=0 ; i<fileNodes.size() ; i++){
+			childrenNodes[i] = fileNodes.get(i).name();
 		}
+
+		return childrenNodes;
+
+	}
+	
+	/*
+	 * This is an implementation of a sized Stack, meaning max
+	 * size of Stack will not go over given input size 
+	 * T needs to be of Type Preferences
+	 */
+	private class SizedStack<T> extends Stack<T> {
+		private static final long serialVersionUID = 1L;
+		private int maxSize;
+
+	    public SizedStack(int size) {
+	        super();
+	        this.maxSize = size;
+	    }
+
+	    @Override
+	    public T push(T object) {
+	        //If the stack is too big, remove elements until it's the right size.
+	        while (this.size() >= maxSize) {
+	            this.remove(0);
+	        }
+	        return super.push((T) object);
+	    }
+	    
+	    @Override
+	    public T remove(int i) {
+	    	try {
+				configNode.node(((Preferences)this.get(i)).name()).removeNode();
+				configNode.flush();
+			}
+			catch(BackingStoreException e) {
+				e.printStackTrace();
+				LogBuffer.println("BackingStoreException when trying to remove"
+						+ " a file in FileMRU: " + e.getMessage());
+			}
+            return super.remove(i);
+	    }
 	}
 
 }
