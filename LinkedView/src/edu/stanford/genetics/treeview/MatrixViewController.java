@@ -593,18 +593,28 @@ ConfigNodePersistent, Controller {
 			this.reverseZoomDirection = reverse;
 		}
 
-		public boolean isNaturalScroll() {
-
-			boolean natural = false;
+		public boolean onAMac() {
+			boolean onamac = false;
 			try {
 				/* TODO: Figure out a way to get the OS from where it was
 				 * determined in TreeView3.java instead of replicating that code
 				 * here. */
-				if(System.getProperty("os.name").toLowerCase().
-					startsWith("mac os x")) {
+				onamac = System.getProperty("os.name").toLowerCase().
+					startsWith("mac os x");
+			} catch (Exception ex) {
+				LogBuffer.println("Failed to determine os: " + ex.getMessage());
+			}
+			return(onamac);
+		}
 
+		public boolean isNaturalScroll() {
+
+			boolean natural = false;
+			try {
+				if(onAMac()) {
 					File globalPref = new File(System.getProperty("user.home") +
 						"/Library/Preferences/.GlobalPreferences.plist");
+
 					NSDictionary dict =
 						(NSDictionary)PropertyListParser.parse(globalPref);
 
@@ -617,7 +627,7 @@ ConfigNodePersistent, Controller {
 					}
 				}
 			} catch (Exception ex) {
-				LogBuffer.println("Faild to parse plist: " + ex.getMessage());
+				LogBuffer.println("Failed to parse plist: " + ex.getMessage());
 			}
 
 			return(natural);
