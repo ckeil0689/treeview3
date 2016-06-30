@@ -583,9 +583,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			// prefSubMenu.add(fontMenuItem);
 			// stackMenuList.add(fontMenuItem);
 
-			final JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_URL);
-			prefSubMenu.add(urlMenuItem);
-			stackMenuList.add(urlMenuItem);
+			// final JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_URL);
+			// prefSubMenu.add(urlMenuItem);
+			// stackMenuList.add(urlMenuItem);
 
 			// Functional Enrichment Menu
 			// TODO Create the feature.... :)
