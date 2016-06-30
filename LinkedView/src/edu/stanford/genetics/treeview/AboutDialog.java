@@ -65,19 +65,6 @@ public class AboutDialog extends CustomDialog {
 
 		detailPanel.add(hp);
 		detailPanel.add(GUIFactory.getHyperlinkButton(StringRes.updateUrl), "wrap");
-//		detailPanel.add(new JTextField(StringRes.updateUrl));
-
-//		JButton yesB = GUIFactory.createBtn("Open");
-//		yesB.addActionListener(new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(final ActionEvent arg0) {
-//
-//				tvFrame.displayURL(StringRes.updateUrl);
-//			}
-//
-//		});
-//		detailPanel.add(yesB, "wrap");
 
 		final JLabel announce = GUIFactory.createLabel("Announcements:",
 				GUIFactory.FONTS);
@@ -85,17 +72,6 @@ public class AboutDialog extends CustomDialog {
 		detailPanel.add(announce);
 		detailPanel.add(GUIFactory.getHyperlinkButton(StringRes.announcementUrl), 
 		                "wrap");
-//		detailPanel.add(new JTextField(StringRes.announcementUrl));
-//
-//		yesB = GUIFactory.createBtn("Sign Up");
-//		yesB.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(final ActionEvent arg0) {
-//
-//				tvFrame.displayURL(StringRes.announcementUrl);
-//			}
-//		});
-//		detailPanel.add(yesB, "wrap");
 
 		mainPanel.add(detailPanel, "push, grow");
 	}
