@@ -2,13 +2,18 @@ package Utilities;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
@@ -379,6 +384,45 @@ public class GUIFactory {
 		btn.setOpaque(false);
 		btn.setBorder(new EmptyBorder(0,0,0,0));
 		btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		return(btn);
+	}
+	
+	/**
+	 * A clickable JButton is created which imitates the look of a hyperlink
+	 * by using HTML formatting.
+	 * It has an ActionListener attached which can open the link when the
+	 * action is invoked.
+	 * @param url - The clickable URL.
+	 * @return The JButton formatted to look like a hyperlink.
+	 */
+	public static JButton getHyperlinkButton(final String url) {
+		
+		final JButton btn = new JButton();
+		btn.setText("<HTML><FONT color=\"#000099\"><U>" + url + "</U></FONT>" +
+			"</HTML>");
+		btn.setFocusPainted(false);
+		btn.setMargin(new Insets(0,0,0,0));
+		btn.setContentAreaFilled(false);
+		btn.setOpaque(false);
+		btn.setBorderPainted(false);
+		btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		
+		// action for opening the supplied URL
+		btn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				try {
+					Desktop.getDesktop().browse(new URI(url));
+				}
+				catch(IOException | URISyntaxException e1) {
+					LogBuffer.logException(e1);
+					LogBuffer.println("Could not open URL: " + url);
+				}
+			}
+		});
+		
 		return(btn);
 	}
 

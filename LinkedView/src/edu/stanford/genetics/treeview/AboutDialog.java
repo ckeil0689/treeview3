@@ -1,14 +1,9 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
@@ -28,13 +23,9 @@ public class AboutDialog extends CustomDialog {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private final TreeViewFrame tvFrame;
-
-	public AboutDialog(final TreeViewFrame tvFrame) {
+	public AboutDialog() {
 
 		super(StringRes.dlg_about);
-		this.tvFrame = tvFrame;
-
 		setupLayout();
 	}
 
@@ -73,35 +64,38 @@ public class AboutDialog extends CustomDialog {
 		final JLabel hp = GUIFactory.createLabel("Homepage:", GUIFactory.FONTS);
 
 		detailPanel.add(hp);
-		detailPanel.add(new JTextField(StringRes.updateUrl));
+		detailPanel.add(GUIFactory.getHyperlinkButton(StringRes.updateUrl), "wrap");
+//		detailPanel.add(new JTextField(StringRes.updateUrl));
 
-		JButton yesB = GUIFactory.createBtn("Open");
-		yesB.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				tvFrame.displayURL(StringRes.updateUrl);
-			}
-
-		});
-		detailPanel.add(yesB, "wrap");
+//		JButton yesB = GUIFactory.createBtn("Open");
+//		yesB.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(final ActionEvent arg0) {
+//
+//				tvFrame.displayURL(StringRes.updateUrl);
+//			}
+//
+//		});
+//		detailPanel.add(yesB, "wrap");
 
 		final JLabel announce = GUIFactory.createLabel("Announcements:",
 				GUIFactory.FONTS);
 
 		detailPanel.add(announce);
-		detailPanel.add(new JTextField(StringRes.announcementUrl));
-
-		yesB = GUIFactory.createBtn("Sign Up");
-		yesB.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent arg0) {
-
-				tvFrame.displayURL(StringRes.announcementUrl);
-			}
-		});
-		detailPanel.add(yesB, "wrap");
+		detailPanel.add(GUIFactory.getHyperlinkButton(StringRes.announcementUrl), 
+		                "wrap");
+//		detailPanel.add(new JTextField(StringRes.announcementUrl));
+//
+//		yesB = GUIFactory.createBtn("Sign Up");
+//		yesB.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(final ActionEvent arg0) {
+//
+//				tvFrame.displayURL(StringRes.announcementUrl);
+//			}
+//		});
+//		detailPanel.add(yesB, "wrap");
 
 		mainPanel.add(detailPanel, "push, grow");
 	}

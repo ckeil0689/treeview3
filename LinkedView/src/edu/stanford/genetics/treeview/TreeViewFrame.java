@@ -71,8 +71,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private final WelcomeView welcomeView;
 	private final DendroView dendroView;
 
-	private String loadErrorMessage;
-
 	private FileSet fileMenuSet;
 
 	// Menu Items to be added to menu bar
@@ -192,17 +190,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	}
 
 	/**
-	 * Displays a screen to notify the user of a loading issue. Offers the user
-	 * to load a different file by providing the appropriate button.
-	 *
-	 * @param errorMessage
-	 */
-	public void setLoadErrorMessage(final String errorMessage) {
-
-		this.loadErrorMessage = errorMessage;
-	}
-
-	/**
 	 * Setting the JPanel to be displayed within TVFrame
 	 *
 	 * @param view
@@ -265,7 +252,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showAboutWindow() {
 
-		new AboutDialog(TreeViewFrame.this).setVisible(true);
+		new AboutDialog().setVisible(true);
 	}
 
 	/**
