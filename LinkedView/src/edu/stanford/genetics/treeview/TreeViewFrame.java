@@ -582,10 +582,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			// JMenuItem(StringRes.menu_Font);
 			// prefSubMenu.add(fontMenuItem);
 			// stackMenuList.add(fontMenuItem);
-
-			final JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_URL);
-			prefSubMenu.add(urlMenuItem);
-			stackMenuList.add(urlMenuItem);
+			
+			// Comments the code to disable the URL menu item (File -> Preferences)
+			// final JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_URL);
+			// prefSubMenu.add(urlMenuItem);
+			// stackMenuList.add(urlMenuItem);
 
 			// Functional Enrichment Menu
 			// TODO Create the feature.... :)
