@@ -370,6 +370,18 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 			}
             return super.remove(i);
 	    }
+	    
+	    @Override
+	    public T get(int i) {
+			try{
+				return super.get(i);
+			}catch(ArrayIndexOutOfBoundsException e){
+				e.printStackTrace();
+				LogBuffer.println("Index ["+i+"] is out of reach, The range of this"
+			        + "file stack in FileMRU.java is [0-"+this.size()+"]");
+			}
+			return null;
+	    }
 	}
 
 }
