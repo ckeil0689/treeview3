@@ -7,7 +7,7 @@ It was first developed by Michael Eisen in 1998 (Treeview 1.0) and updated a few
 
 If you are interested in providing feedback, you can watch this repository, create new issues or contact us at <treeview@princeton.edu>.
 
-Also, you can subscribe to the Treeview users' mailing list at <http://www.princeton.edu/~abarysh/treeview/>. You will receive an email when new software versions are available.
+Also, you can subscribe to the Treeview users' mailing list at <http://eepurl.com/A2Xzf>. You will receive an email when new software versions are available.
 
 
 DOWNLOAD
