@@ -1,8 +1,14 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.AWTEvent;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -14,9 +20,13 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 
 import org.freehep.graphicsio.PageConstants;
 
@@ -25,6 +35,7 @@ import Controllers.FormatType;
 import Controllers.RegionType;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
+import Controllers.ExportHandler.ExportWorker;
 
 public class ExportDialog extends CustomDialog {
 
@@ -684,6 +695,132 @@ public class ExportDialog extends CustomDialog {
 					}
 				}
 			}
+		}
+	}
+	
+	/* A Dialog box with progress bar used to show the export progress
+	 * 
+	 */
+	public static class ExportBarDialog extends CustomDialog{
+		private static final long serialVersionUID = 1L;
+		/*
+		 *  Swing worker which is handling the progress of the progress bar jpb
+		 */
+		private ExportWorker worker;
+		private JProgressBar jpb = null;
+		private JLabel label = null;
+		private JButton cancelButton = null;
+		private JTextArea exportFileName = null;
+		
+		public ExportBarDialog(String title, ExportWorker worker) {
+			super(title);
+			this.worker = worker;
+		}
+		
+		public void setupDialogComponents(){
+			setupLayout();
+		}
+
+		@Override
+		protected void setupLayout() {
+			this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+			mainPanel = GUIFactory.createJPanel(false, GUIFactory.FILL);
+			label = GUIFactory.createLabel("Loading...");
+			exportFileName = GUIFactory.createWrappableTextArea();
+			exportFileName.setFont(GUIFactory.FONTXS);
+			exportFileName.setFocusable(true);
+			cancelButton = GUIFactory.createSquareBtn("cancel", 15);
+			jpb = new JProgressBar();
+	        mainPanel.add(label,"push, grow, w 375, wrap");
+	        mainPanel.add(jpb, "push, grow, split 2, gapright 15,  w 300!,  h 25!");
+	        mainPanel.add(cancelButton, "push, grow, w 75!, h 25!, wrap");
+			mainPanel.add(exportFileName,"push, grow, w 390!, wrap");
+			getContentPane().add(mainPanel);
+			this.setResizable(false);
+			mainPanel.revalidate();
+			mainPanel.repaint();
+			addWindowListener(new ExportBarWindowListener(worker));
+			cancelButton.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					onPressCancelButton(worker,cancelButton.getParent());
+				}
+			});
+		}
+
+		/**
+		 * @return the jpb
+		 */
+		public JProgressBar getProgressBar() {
+			return jpb;
+		}
+
+		/**
+		 * @param jpb the jpb to set
+		 */
+		public void setProgressBar(JProgressBar jpb) {
+			this.jpb = jpb;
+		}
+		
+		/**
+		 * @param jpb the jpb value to set
+		 */
+		public void setProgressBarValue(int value) {
+			this.jpb.setValue(value);
+		}
+		
+		/**
+		 * @param text the status to set
+		 */
+		public void setText(String text) {
+			this.label.setText(text);
+		}
+
+		public void setExportFileName(String exportFileName) {
+			this.exportFileName.setText(exportFileName);
+		}
+
+	}
+	
+	private static class ExportBarWindowListener extends WindowAdapter{
+		ExportWorker worker;
+		public ExportBarWindowListener(ExportWorker worker) {
+			this.worker = worker;
+		}
+		
+		// This event gets fired when the user closes the Export bar
+		public void windowClosing(WindowEvent e) {
+			onPressCancelButton(worker,e.getComponent());
+		}
+	}
+	
+	private static void onPressCancelButton(ExportWorker worker, Component c){
+		Object[] options = {"Yes", "No"};
+		/* returns -1 if window is closed,
+         * change the window to DO_NOTHING_ON_CLOSE
+         */
+        int answer = JOptionPane.showOptionDialog(c, "Are your sure you want to cancel the export?",
+                                                  "Cancelling Export!",
+                                                  JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+                                                  null, options, options[0]);
+        
+        if(answer != 0)
+        	return;
+  
+        worker.ebd.dispose();
+        LogBuffer.println("User closed the Export Progress bar");
+		//set the boolean
+		worker.setExportSuccessful(false);
+		/* Now gracefully try to end the SwingWorker. The call worker.cancel(true) will
+		 * always throws java.util.concurrent.CancellationException when swingworker is
+		 * running. we need to handle it and use isCancelled method while executing 
+		 * doInBackground() to gracefully end the Export.
+		 */
+		try {
+			worker.cancel(true);
+		}
+		catch(java.util.concurrent.CancellationException ex){
+			LogBuffer.println("Cancelled the Export process");
 		}
 	}
 	

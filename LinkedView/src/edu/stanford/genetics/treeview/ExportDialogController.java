@@ -113,28 +113,28 @@ public class ExportDialogController {
 				eh.setDefaultPageSize(exportOptions.getPaperType());
 				eh.setDefaultPageOrientation(exportOptions.getOrientation());
 				eh.setTileAspectRatio(exportOptions.getAspectType());
-				eh.export(exportOptions.getFormatType(), 
+				boolean exportSucess = eh.export(exportOptions.getFormatType(), 
 						exportFilename, 
 						exportOptions.getRegionType(), 
 						exportOptions.isShowSelections());
 
-				String msg = "Exported file: [" + exportFilename + "].";
-				LogBuffer.println(msg);
-
-				exportDialog.dispose();
-
-				//Open the file in the default system app
-				Desktop.getDesktop().open(new File(exportFilename));
-				
-			} catch(OutOfMemoryError oome) {
-				showWarning("ERROR: Out of memory.  Note, you may be able to " +
-					"export a smaller portion of the matrix.");
-				
+				if(exportSucess){
+					String msg = "Exported file: [" + exportFilename + "].";
+					LogBuffer.println(msg);
+	
+					exportDialog.dispose();
+	
+					//Open the file in the default system app
+					Desktop.getDesktop().open(new File(exportFilename));
+				} else{
+					String msg = "Could not export the file : [" + exportFilename + "].";
+					LogBuffer.println(msg);
+				}
 			} catch(Exception iae) {
 				LogBuffer.logException(iae);
 				showWarning(iae.getLocalizedMessage());
 			}
-		}
+	    }
 	}
 
 	public String chooseSaveFile(FormatType selFormat) {
