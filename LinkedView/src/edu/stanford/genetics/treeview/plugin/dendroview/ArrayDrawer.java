@@ -16,6 +16,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
+import Controllers.ExportHandler.ExportWorker;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 /**
@@ -177,6 +178,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	/**
 	 * A method to export a portion of the matrix
 	 * @author rleach
+	 * @param e - Swingworker class which is used to run the export
 	 * @param g - A graphics2D-compatible object
 	 * @param xend - The index of the last column of data to be included
 	 * @param yend - The index of the last row of data to be included
@@ -186,7 +188,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 	 * @param xstart - The index of the first column of data to be included
 	 * @param ystart - The index of the first row of data to be included
 	 */
-	public void paint(final Graphics g,
+	public void paint(ExportWorker e, final Graphics g,
 		final int xDataStart,final int yDataStart,
 		final int xDataEnd,final int yDataEnd,
 		final int xImageStart,final int yImageStart,
@@ -194,6 +196,7 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 		final boolean showSelections,
 		final TreeSelectionI colSelection,final TreeSelectionI rowSelection) {
 	
+		int k=0;
 		for (int j = yDataStart; j <= yDataEnd; j++) {
 			for (int i = xDataStart; i <= xDataEnd; i++) {
 				//setPaintMode seems to help color overlapping (affecting the
@@ -209,6 +212,12 @@ public abstract class ArrayDrawer extends Observable implements Observer {
 					yImageStart + (j - yDataStart) * yTileSize,xTileSize,yTileSize);
 				g.fillRect(xImageStart + (i - xDataStart) * xTileSize,
 					yImageStart + (j - yDataStart) * yTileSize,xTileSize,yTileSize);
+				setChanged();
+				notifyObservers(++k);
+				if(e.isCancelled()){
+		    		e.setExportSuccessful(false);
+					return;
+		    	}
 			}
 		}
 
