@@ -314,7 +314,8 @@ public class TVController implements Observer {
 		} catch (final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. "
 					+ "Increase the JVM's heap size. Error: " + e.getMessage();
-			tvFrame.setLoadErrorMessage(oomError);
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0], oomError, 
+			                              "Out of memory", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

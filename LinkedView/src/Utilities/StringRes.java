@@ -19,8 +19,8 @@ public class StringRes {
 	public final static String preferencesVersionTag = "0.1.0-alpha";
 
 	/** Homepage for updates */
-	public final static String updateUrl = "https://www.princeton.edu/"
-			+ "~abarysh/treeview/";
+	public final static String updateUrl = "https://bitbucket.org/" +
+		"TreeView3Dev/treeview3/";
 
 	/** url of announcements mailing list */
 	public final static String announcementUrl = "https://www.princeton.edu/"
