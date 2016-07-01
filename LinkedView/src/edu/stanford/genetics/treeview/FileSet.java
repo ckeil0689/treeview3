@@ -467,4 +467,8 @@ public class FileSet {
 		return getDir().startsWith("http");
 	}
 
+	public void setNode(Preferences node) {
+		this.node = node;
+	}
+
 }
