@@ -73,10 +73,6 @@ public abstract class ModelViewProduced extends ModelView {
 
 	protected synchronized void createNewBuffer(final int w, final int h) {
 
-		// should I be copy over pixels instead?
-		LogBuffer.println("Creating new image buffer: " + viewName());
-		LogBuffer.println("Pixels: " + (w * h));
-		
 		offscreenScanSize = w;
 		offscreenImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		WritableRaster raster = ((BufferedImage)offscreenImage).getRaster();

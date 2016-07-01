@@ -380,7 +380,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void update(final Observable o, final Object obj) {
 
 		if (o instanceof FileMru) {
-			LogBuffer.println("Updating fileMRU in TVFrame.");
 			buildMenuBar();
 			setChanged();
 			notifyObservers();
