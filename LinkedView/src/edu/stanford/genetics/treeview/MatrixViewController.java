@@ -509,8 +509,8 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			interactiveXmap.zoomInBegin();
-			interactiveYmap.zoomInBegin();
+			interactiveXmap.zoomInCenter(MapContainer.ZOOM_DEFAULT);
+			interactiveYmap.zoomInCenter(MapContainer.ZOOM_DEFAULT);
 
 			notifyAllMapObservers();
 		}
@@ -524,8 +524,8 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			interactiveXmap.zoomOutBegin();
-			interactiveYmap.zoomOutBegin();
+			interactiveXmap.zoomOutCenter(MapContainer.ZOOM_DEFAULT);
+			interactiveYmap.zoomOutCenter(MapContainer.ZOOM_DEFAULT);
 
 			notifyAllMapObservers();
 		}
