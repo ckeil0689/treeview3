@@ -170,10 +170,8 @@ public class DataImportController {
 		@Override
 		public void stateChanged(final ChangeEvent e) {
 
-			int maxRow = (Integer) previewDialog.getRowStartSpinner()
-					.getValue();
-			int maxCol = (Integer) previewDialog.getColStartSpinner()
-					.getValue();
+			int maxRow = previewDialog.getRowSpinnerDataIndex();
+			int maxCol = previewDialog.getColSpinnerDataIndex();
 
 			previewDialog.updateTableLabels(maxRow, maxCol);
 			previewDialog.setPreviewStatus();

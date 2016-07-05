@@ -32,6 +32,8 @@ public final class PreviewLoader {
 	 */
 	private final static String MISSING = "(?i)(^N(/)?A.?$|EMPTY|NONE|^MISS.*$)";
 
+	public final static int LIMIT = 20;  //The number of rows & cols to include
+
 	private PreviewLoader() {
 
 		/* prevent instantiation */
@@ -40,7 +42,6 @@ public final class PreviewLoader {
 	public static int[] findDataStartCoords(final String filename,
 			final String delimiter) {
 
-		final int LIMIT = 20; // just check 20 first rows
 		int[] dataStartCoords = new int[2];
 
 		try {
@@ -209,7 +210,6 @@ public final class PreviewLoader {
 	private static String[][] extractPreviewData(final BufferedReader reader,
 			final String delimiter) {
 
-		final int LIMIT = 20;
 		final String[][] previewData = new String[LIMIT][];
 		String line;
 		int count = 0;
