@@ -239,7 +239,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		hoveredNode = n;
 
-		synchMap();
 		repaint();
 	}
 
@@ -984,6 +983,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			//Value of label length scrollbar
 			map.scrollBy(shift);
 			updatePrimaryHoverIndexDuringScrollWheel();
+			setHoveredNode(getClosestParentNode(e));
+			synchMap();
 		}
 	}
 

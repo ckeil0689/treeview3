@@ -416,7 +416,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			return;
 		}
 
-		LogBuffer.println("Setting new label configNode");
 		importSettingsFromNode(configNode);
 	}
 

@@ -1531,8 +1531,9 @@ public class MapContainer extends Observable implements Observer,
 		}
 
 		if (newMap == null) {
-			LogBuffer.println("Couldn't find map matching type " + type
-					+ " in MapContainer.java");
+			// default
+//			LogBuffer.println("Couldn't find map matching type " + type
+//					+ " in MapContainer.java");
 			newMap = fixedMap;
 		}
 

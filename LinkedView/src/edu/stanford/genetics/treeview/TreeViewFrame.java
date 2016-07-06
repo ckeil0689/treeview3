@@ -71,8 +71,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private final WelcomeView welcomeView;
 	private final DendroView dendroView;
 
-	private String loadErrorMessage;
-
 	private FileSet fileMenuSet;
 
 	// Menu Items to be added to menu bar
@@ -192,17 +190,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	}
 
 	/**
-	 * Displays a screen to notify the user of a loading issue. Offers the user
-	 * to load a different file by providing the appropriate button.
-	 *
-	 * @param errorMessage
-	 */
-	public void setLoadErrorMessage(final String errorMessage) {
-
-		this.loadErrorMessage = errorMessage;
-	}
-
-	/**
 	 * Setting the JPanel to be displayed within TVFrame
 	 *
 	 * @param view
@@ -265,7 +252,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showAboutWindow() {
 
-		new AboutDialog(TreeViewFrame.this).setVisible(true);
+		new AboutDialog().setVisible(true);
 	}
 
 	/**
@@ -393,7 +380,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void update(final Observable o, final Object obj) {
 
 		if (o instanceof FileMru) {
-			LogBuffer.println("Updating fileMRU in TVFrame.");
 			buildMenuBar();
 			setChanged();
 			notifyObservers();
@@ -582,10 +568,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			// JMenuItem(StringRes.menu_Font);
 			// prefSubMenu.add(fontMenuItem);
 			// stackMenuList.add(fontMenuItem);
-
-			final JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_URL);
-			prefSubMenu.add(urlMenuItem);
-			stackMenuList.add(urlMenuItem);
+			
+			// Comments the code to disable the URL menu item (File -> Preferences)
+			// final JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_URL);
+			// prefSubMenu.add(urlMenuItem);
+			// stackMenuList.add(urlMenuItem);
 
 			// Functional Enrichment Menu
 			// TODO Create the feature.... :)

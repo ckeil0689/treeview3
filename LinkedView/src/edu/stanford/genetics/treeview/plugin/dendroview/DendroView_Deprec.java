@@ -894,9 +894,10 @@ MainPanel, Observer {
 			// e.printStackTrace();
 			final Box mismatch = new Box(BoxLayout.Y_AXIS);
 			mismatch.add(new JLabel(e.getMessage()));
-			mismatch.add(new JLabel("Perhaps there is a mismatch "
-					+ "between your ATR and CDT files?"));
-			mismatch.add(new JLabel("Ditching Array Tree, since it's lame."));
+			mismatch.add(new JLabel("The ATR and CDT files appear to be " +
+					"corrupted/out-of-sync."));
+			mismatch.add(new JLabel("Rebuilding the ATR file's tree " +
+					"structure."));
 
 			JOptionPane.showMessageDialog(applicationFrame, mismatch,
 					"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
@@ -1087,10 +1088,10 @@ MainPanel, Observer {
 				// e.printStackTrace();
 				final Box mismatch = new Box(BoxLayout.Y_AXIS);
 				mismatch.add(new JLabel(e.getMessage()));
-				mismatch.add(new JLabel("Perhaps there is a mismatch "
-						+ "between your ATR and CDT files?"));
-				mismatch.add(new JLabel("Ditching Array Tree, "
-						+ "since it's lame."));
+				mismatch.add(new JLabel("The ATR and CDT files appear to be " +
+					"corrupted/out-of-sync."));
+				mismatch.add(new JLabel("Rebuilding the ATR file's tree " +
+					"structure."));
 
 				JOptionPane.showMessageDialog(applicationFrame, mismatch,
 						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
@@ -1142,10 +1143,10 @@ MainPanel, Observer {
 				// e.printStackTrace();
 				final Box mismatch = new Box(BoxLayout.Y_AXIS);
 				mismatch.add(new JLabel(e.getMessage()));
-				mismatch.add(new JLabel("Perhaps there is a mismatch "
-						+ "between your GTR and CDT files?"));
-				mismatch.add(new JLabel("Ditching Gene Tree, "
-						+ "since it's lame."));
+				mismatch.add(new JLabel("The GTR and CDT files appear to be " +
+					"corrupted/out-of-sync."));
+				mismatch.add(new JLabel("Rebuilding the GTR file's tree " +
+					"structure."));
 
 				JOptionPane.showMessageDialog(applicationFrame, mismatch,
 						"Tree Construction Error", JOptionPane.ERROR_MESSAGE);
