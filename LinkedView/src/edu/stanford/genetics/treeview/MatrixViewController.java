@@ -733,8 +733,7 @@ ConfigNodePersistent, Controller {
 	 * Rounding off to 4 decimals
 	 */
 	public void setMeanDataValue() {
-		double matrixAvg = model.getDataMatrix().getMean();
-		ticker.setValue( (double)Math.round(matrixAvg*10000)/10000 + " [matrix ave]");
+		ticker.setValue( model.getDataMatrix().getMean() + " [matrix ave]");
 	}
 	
 	/**

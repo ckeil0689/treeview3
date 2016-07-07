@@ -783,26 +783,58 @@ public class TVModel extends Observable implements DataModel {
 			return modified;
 		}
 		
-		public double getRowAverage(int rowId){
+		/*
+		 * returns the average of a set of Rows - fromRow to toRow(included)
+		 * (non-Javadoc)
+		 * @see edu.stanford.genetics.treeview.DataMatrix#getRowAverage(int, int)
+		 */
+		public double getRowAverage(int fromRowId, int toRowId){
 			double sum = 0;
+			int count = 0;
 			final int numOfCols = nExpr();
-			for(int i=0 ; i<numOfCols ; i++){
-				double value = getValue(i, rowId);
-				if(!Double.isNaN(value))
-					sum += value;
+			for( int j=fromRowId ; j<=toRowId; j++ ){
+				for(int i=0 ; i<numOfCols ; i++){
+					double value = getValue(i, j);
+					if(!Double.isNaN(value)){
+						sum += value;
+						count++;
+					}
+				}
 			}
-			return sum/numOfCols;
+			if(count == 0)
+				// TODO: if all the data is NaN, is this 0 or NaN?
+				return Double.NaN;
+			else{
+				double avg = sum/count; 
+				return Helper.roundDouble(avg, 4);
+			}
 		}
 		
-		public double getColAverage(int colId){
+		/*
+		 * returns the average of a set of Columns - fromcolumn to toColumn(included)
+		 * (non-Javadoc)
+		 * @see edu.stanford.genetics.treeview.DataMatrix#getColAverage(int, int)
+		 */
+		public double getColAverage(int fromColId, int toColId){
 			double sum = 0;
+			int count = 0;
 			final int numOfRows = nGene();
-			for(int i=0 ; i<numOfRows ; i++){
-				double value = getValue(colId, i);
-				if(!Double.isNaN(value))
-					sum += value;
+			for( int j=fromColId ; j<=toColId; j++ ){
+				for(int i=0 ; i<numOfRows ; i++){
+					double value = getValue(j, i);
+					if(!Double.isNaN(value)){
+						sum += value;
+						count++;
+					}
+				}	
 			}
-			return sum/numOfRows;
+			if(count == 0)
+				// TODO: if all the data is NaN, is this 0 or NaN?
+				return Double.NaN;
+			else{
+				double avg = sum/(count); 
+				return Helper.roundDouble(avg, 4);
+			}
 		}
 	}
 

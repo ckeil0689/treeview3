@@ -203,15 +203,13 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		}
 
 		@Override
-		public double getRowAverage(int rowId) {
-			// TODO fix this
-			return parent.getDataMatrix().getRowAverage(rowId);
+		public double getRowAverage(int fromRowId, int toRowId) {
+			return parent.getDataMatrix().getRowAverage(fromRowId, toRowId);
 		}
 
 		@Override
-		public double getColAverage(int colId) {
-			// TODO fix this
-			return parent.getDataMatrix().getColAverage(colId);
+		public double getColAverage(int fromColId, int toColId) {
+			return parent.getDataMatrix().getColAverage(fromColId, toColId);
 		}
 	}
 
