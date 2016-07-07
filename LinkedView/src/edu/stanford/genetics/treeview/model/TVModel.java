@@ -829,7 +829,6 @@ public class TVModel extends Observable implements DataModel {
 				}	
 			}
 			if(count == 0)
-				// TODO: if all the data is NaN, is this 0 or NaN?
 				return Double.NaN;
 			else{
 				double avg = sum/(count); 

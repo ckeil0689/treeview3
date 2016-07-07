@@ -2840,8 +2840,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * Rounding off to 4 decimals
 	 */
 	private void setMeanDataTickerValue() {
-		double matrixAvg = dataModel.getDataMatrix().getMean();
-		ticker.setValue( (double)Math.round(matrixAvg*10000)/10000 + " [matrix ave]");
+		ticker.setValue( dataModel.getDataMatrix().getMean() + " [matrix ave]");
 	}
 
 	/**
