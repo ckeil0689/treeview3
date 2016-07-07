@@ -48,6 +48,7 @@ public class InteractiveMatrixView extends MatrixView {
 	 */
 	private List<Rectangle> selectionRectList = new ArrayList<Rectangle>();
 	private Rectangle tmpRect = new Rectangle();
+	private Rectangle hoverRect = new Rectangle();
 
 	/**
 	 * Circle to be used as indicator for selection
@@ -55,6 +56,7 @@ public class InteractiveMatrixView extends MatrixView {
 	private List<Ellipse2D.Double> indicatorCircleList = null;
 
 	private boolean overlayTempChange = false;
+	private boolean overlayHoverChange = false;
 
 	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
@@ -172,6 +174,12 @@ public class InteractiveMatrixView extends MatrixView {
 			g2.drawRect(tmpRect.x, tmpRect.y, tmpRect.width, tmpRect.height);
 		}
 
+		if(isOverlayHoverChange()) {
+			setOverlayHoverChange(false);
+			g2.drawRect(hoverRect.x,hoverRect.y,hoverRect.width,
+				hoverRect.height);
+		}
+
 		if (selectionRectList != null) {
 			//Reinitialize the graphics object
 			g2 = (Graphics2D) g;
@@ -260,6 +268,14 @@ public class InteractiveMatrixView extends MatrixView {
 
 	/**
 	 * @author rleach
+	 * @return the overlayTempChange
+	 */
+	public boolean isOverlayHoverChange() {
+		return(overlayHoverChange);
+	}
+
+	/**
+	 * @author rleach
 	 * @param overlayTempChange the overlayTempChange to set
 	 */
 	public void setOverlayTempChange(boolean overlayTempChange) {
@@ -268,10 +284,26 @@ public class InteractiveMatrixView extends MatrixView {
 
 	/**
 	 * @author rleach
+	 * @param overlayTempChange the overlayTempChange to set
+	 */
+	public void setOverlayHoverChange(boolean overlayHoverChange) {
+		this.overlayHoverChange = overlayHoverChange;
+	}
+
+	/**
+	 * @author rleach
 	 * @param tmpRect the tmpRect to set
 	 */
 	public void setTmpRect(Rectangle tmpRect) {
 		this.tmpRect = tmpRect;
+	}
+
+	/**
+	 * @author rleach
+	 * @param tmpRect the tmpRect to set
+	 */
+	public void setHoverRect(Rectangle hRect) {
+		this.hoverRect = hRect;
 	}
 
 	/**

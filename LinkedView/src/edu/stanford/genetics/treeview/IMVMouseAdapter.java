@@ -38,7 +38,12 @@ public class IMVMouseAdapter extends MouseAdapter {
 	 * This rectangle keeps track of where the drag rect was drawn
 	 */
 	private final Rectangle dragRect = new Rectangle();
-	
+
+	/**
+	 * This rectangle keeps track of where the hover rect was drawn
+	 */
+	private final Rectangle hoverRect = new Rectangle();
+
 	/**
 	 * Points to track candidate selected rows/cols should reflect where the
 	 * mouse has actually been
@@ -86,17 +91,25 @@ public class IMVMouseAdapter extends MouseAdapter {
 		if(!imView.enclosingWindow().isActive()) {
 			return;
 		}
-		
+
 		/* TODO passing index makes the most sense but an overloaded method 
 		 * that takes a pixel works well too. 
 		 * Reduces clutter in calling classes a little bit.
 		 */
 		int rowIdx = ymap.getIndex(e.getY());
 		int colIdx = xmap.getIndex(e.getX());
-		
+
 		xmap.setHoverIndex(colIdx);
 		ymap.setHoverIndex(rowIdx);
-		
+
+		if(e.isShiftDown()) {
+			processShiftHover(e.getX(),e.getY());
+		} else if(e.isControlDown()) {
+			processControlHover(e.getX(),e.getY());
+		} else {
+			imView.repaint();
+		}
+
 		mvController.setDataValueAt(rowIdx, colIdx);
 	}
 	
@@ -1362,7 +1375,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 		imView.drawBand(getPixelRect(dragRect));
 	}
-	
+
 	/**
 	 * Processes left shift click drag movement event
 	 * @author rleach
@@ -1398,7 +1411,34 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 		imView.drawBand(getPixelRect(dragRect));
 	}
-	
+
+	/**
+	 * Processes shift hover event
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
+	public void processShiftHover(int xPixel,int yPixel) {
+
+		Point startHover = new Point();
+		Point endHover   = new Point();
+
+		startHover.setLocation(xmap.getPixel(xmap.getMinIndex()),
+			ymap.getPixel(ymap.getIndex(yPixel)));
+		endHover.setLocation(xmap.getPixel(xmap.getMaxIndex()),
+			ymap.getPixel(ymap.getIndex(yPixel) + 1) - 1);
+
+		/* Full row hover coords */
+		hoverRect.setLocation(startHover);
+		hoverRect.setSize(0,0);
+		hoverRect.add(endHover);
+
+		imView.setHoverRect(hoverRect);
+
+		imView.setOverlayHoverChange(true);
+		imView.repaint();
+	}
+
 	/**
 	 * Processes left control click drag movement event
 	 * @author rleach
@@ -1434,7 +1474,33 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 		imView.drawBand(getPixelRect(dragRect));
 	}
+
+	/**
+	 * Processes shift hover event
+	 * @author rleach
+	 * @param xPixel
+	 * @param yPixel
+	 */
+	public void processControlHover(int xPixel,int yPixel) {
+
+		Point startHover = new Point();
+		Point endHover   = new Point();
+		startHover.setLocation(xmap.getPixel(xmap.getIndex(xPixel)),
+			ymap.getPixel(ymap.getMinIndex()));
+		endHover.setLocation(xmap.getPixel(xmap.getIndex(xPixel) + 1) - 1,
+			ymap.getPixel(ymap.getMaxIndex()));
+
+		/* Full row hover coords */
+		hoverRect.setLocation(startHover);
+		hoverRect.setSize(0,0);
+		hoverRect.add(endHover);
 	
+		imView.setHoverRect(hoverRect);
+
+		imView.setOverlayHoverChange(true);
+		imView.repaint();
+	}
+
 	/**
 	 * Processes a completed right single click.
 	 * TODO Delete parameters from method signature UNLESS method will be used
