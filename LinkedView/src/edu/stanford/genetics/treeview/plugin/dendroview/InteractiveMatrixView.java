@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
@@ -48,7 +49,8 @@ public class InteractiveMatrixView extends MatrixView {
 	 */
 	private List<Rectangle> selectionRectList = new ArrayList<Rectangle>();
 	private Rectangle tmpRect = new Rectangle();
-	private Rectangle hoverRect = new Rectangle();
+	private Rectangle rowHoverRect = new Rectangle();
+	private Rectangle columnHoverRect = new Rectangle();
 
 	/**
 	 * Circle to be used as indicator for selection
@@ -56,7 +58,8 @@ public class InteractiveMatrixView extends MatrixView {
 	private List<Ellipse2D.Double> indicatorCircleList = null;
 
 	private boolean overlayTempChange = false;
-	private boolean overlayHoverChange = false;
+	private boolean rowHoverChange = false;
+	private boolean columnHoverChange = false;
 
 	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
@@ -174,10 +177,18 @@ public class InteractiveMatrixView extends MatrixView {
 			g2.drawRect(tmpRect.x, tmpRect.y, tmpRect.width, tmpRect.height);
 		}
 
-		if(isOverlayHoverChange()) {
-			setOverlayHoverChange(false);
-			g2.drawRect(hoverRect.x,hoverRect.y,hoverRect.width,
-				hoverRect.height);
+		if(isRowHoverChange()) {
+			setRowHoverChange(false);
+			updateRowHoverRect();
+			g2.drawRect(rowHoverRect.x,rowHoverRect.y,rowHoverRect.width,
+			            rowHoverRect.height);
+		}
+
+		if(isColumnHoverChange()) {
+			setColumnHoverChange(false);
+			updateColumnHoverRect();
+			g2.drawRect(columnHoverRect.x,columnHoverRect.y,
+				columnHoverRect.width,columnHoverRect.height);
 		}
 
 		if (selectionRectList != null) {
@@ -270,8 +281,16 @@ public class InteractiveMatrixView extends MatrixView {
 	 * @author rleach
 	 * @return the overlayTempChange
 	 */
-	public boolean isOverlayHoverChange() {
-		return(overlayHoverChange);
+	public boolean isRowHoverChange() {
+		return(rowHoverChange);
+	}
+
+	/**
+	 * @author rleach
+	 * @return the overlayTempChange
+	 */
+	public boolean isColumnHoverChange() {
+		return(columnHoverChange);
 	}
 
 	/**
@@ -284,10 +303,18 @@ public class InteractiveMatrixView extends MatrixView {
 
 	/**
 	 * @author rleach
-	 * @param overlayTempChange the overlayTempChange to set
+	 * @param overlayHoverChange the rowHoverChange to set
 	 */
-	public void setOverlayHoverChange(boolean overlayHoverChange) {
-		this.overlayHoverChange = overlayHoverChange;
+	public void setRowHoverChange(boolean overlayHoverChange) {
+		this.rowHoverChange = overlayHoverChange;
+	}
+
+	/**
+	 * @author rleach
+	 * @param overlayHoverChange the overlayTempChange to set
+	 */
+	public void setColumnHoverChange(boolean overlayHoverChange) {
+		this.columnHoverChange = overlayHoverChange;
 	}
 
 	/**
@@ -300,10 +327,54 @@ public class InteractiveMatrixView extends MatrixView {
 
 	/**
 	 * @author rleach
-	 * @param tmpRect the tmpRect to set
+	 * @param hRect the rowHoverRect to set
 	 */
-	public void setHoverRect(Rectangle hRect) {
-		this.hoverRect = hRect;
+	public void setRowHoverRect(Rectangle hRect) {
+		this.rowHoverRect = hRect;
+	}
+
+	/**
+	 * @author rleach
+	 * @param hRect the columnHoverRect to set
+	 */
+	public void setColumnHoverRect(Rectangle hRect) {
+		this.columnHoverRect = hRect;
+	}
+
+	public void updateRowHoverRect() {
+		Point startHover = new Point();
+		Point endHover   = new Point();
+
+		startHover.setLocation(xmap.getPixel(xmap.getMinIndex()),
+			ymap.getPixel(ymap.getHoverIndex()));
+		endHover.setLocation(xmap.getPixel(xmap.getMaxIndex()),
+			ymap.getPixel(ymap.getHoverIndex() + 1) - 1);
+		setRowHoverChange(true);
+
+		/* Full row hover coords */
+		rowHoverRect.setLocation(startHover);
+		rowHoverRect.setSize(0,0);
+		rowHoverRect.add(endHover);
+
+		repaint();
+	}
+
+	public void updateColumnHoverRect() {
+		Point startHover = new Point();
+		Point endHover   = new Point();
+	
+		startHover.setLocation(xmap.getPixel(xmap.getHoverIndex()),
+			ymap.getPixel(ymap.getMinIndex()));
+		endHover.setLocation(xmap.getPixel(xmap.getHoverIndex() + 1) - 1,
+			ymap.getPixel(ymap.getMaxIndex()));
+		setColumnHoverChange(true);
+	
+		/* Full row hover coords */
+		columnHoverRect.setLocation(startHover);
+		columnHoverRect.setSize(0,0);
+		columnHoverRect.add(endHover);
+	
+		repaint();
 	}
 
 	/**

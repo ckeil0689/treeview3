@@ -40,11 +40,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 	private final Rectangle dragRect = new Rectangle();
 
 	/**
-	 * This rectangle keeps track of where the hover rect was drawn
-	 */
-	private final Rectangle hoverRect = new Rectangle();
-
-	/**
 	 * Points to track candidate selected rows/cols should reflect where the
 	 * mouse has actually been
 	 */
@@ -102,13 +97,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 		xmap.setHoverIndex(colIdx);
 		ymap.setHoverIndex(rowIdx);
 
-		if(e.isShiftDown()) {
-			processShiftHover(e.getX(),e.getY());
-		} else if(e.isControlDown()) {
-			processControlHover(e.getX(),e.getY());
-		} else {
-			imView.repaint();
-		}
+		imView.repaint();
 
 		mvController.setDataValueAt(rowIdx, colIdx);
 	}
@@ -1413,33 +1402,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 	}
 
 	/**
-	 * Processes shift hover event
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processShiftHover(int xPixel,int yPixel) {
-
-		Point startHover = new Point();
-		Point endHover   = new Point();
-
-		startHover.setLocation(xmap.getPixel(xmap.getMinIndex()),
-			ymap.getPixel(ymap.getIndex(yPixel)));
-		endHover.setLocation(xmap.getPixel(xmap.getMaxIndex()),
-			ymap.getPixel(ymap.getIndex(yPixel) + 1) - 1);
-
-		/* Full row hover coords */
-		hoverRect.setLocation(startHover);
-		hoverRect.setSize(0,0);
-		hoverRect.add(endHover);
-
-		imView.setHoverRect(hoverRect);
-
-		imView.setOverlayHoverChange(true);
-		imView.repaint();
-	}
-
-	/**
 	 * Processes left control click drag movement event
 	 * @author rleach
 	 * @param xPixel
@@ -1473,32 +1435,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 		dragRect.add(endPoint);
 	
 		imView.drawBand(getPixelRect(dragRect));
-	}
-
-	/**
-	 * Processes shift hover event
-	 * @author rleach
-	 * @param xPixel
-	 * @param yPixel
-	 */
-	public void processControlHover(int xPixel,int yPixel) {
-
-		Point startHover = new Point();
-		Point endHover   = new Point();
-		startHover.setLocation(xmap.getPixel(xmap.getIndex(xPixel)),
-			ymap.getPixel(ymap.getMinIndex()));
-		endHover.setLocation(xmap.getPixel(xmap.getIndex(xPixel) + 1) - 1,
-			ymap.getPixel(ymap.getMaxIndex()));
-
-		/* Full row hover coords */
-		hoverRect.setLocation(startHover);
-		hoverRect.setSize(0,0);
-		hoverRect.add(endHover);
-	
-		imView.setHoverRect(hoverRect);
-
-		imView.setOverlayHoverChange(true);
-		imView.repaint();
 	}
 
 	/**

@@ -331,6 +331,42 @@ ConfigNodePersistent, Controller {
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier),
 				"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,1),
+			"rowHoverStart");
+		action_map.put("rowHoverStart", new RowHoverStartAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,0,true),
+			"rowHoverStop");
+		action_map.put("rowHoverStop", new RowHoverStopAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,2),
+			"columnHoverStart");
+		action_map.put("columnHoverStart", new ColumnHoverStartAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,0,true),
+			"columnHoverStop");
+		action_map.put("columnHoverStop", new ColumnHoverStopAction());
+
+		//The following cases handle various combinations occurring in different
+		//orders of both the shift and control modifiers being pressed/released
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,
+			KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+			"bothHoverStart");
+		action_map.put("bothHoverStart", new BothHoverStartAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,2,true),
+			"rowHoverStop");
+		action_map.put("rowHoverStop", new RowHoverStopAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,
+			KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+			"bothHoverStart");
+		action_map.put("bothHoverStart", new BothHoverStartAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,1,true),
+			"columnHoverStop");
+		action_map.put("columnHoverStop", new ColumnHoverStopAction());
 	}
 	
 	/* -------------- Listeners --------------------- */
@@ -552,6 +588,92 @@ ConfigNodePersistent, Controller {
 		}
 	}
 	
+	/**
+	 * Starts highlighting the hovered row and column
+	 */
+	private class BothHoverStartAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			imView.setRowHoverChange(true);
+			imView.setColumnHoverChange(true);
+			imView.repaint();
+		}
+	}
+
+	/**
+	 * Starts highlighting the hovered row
+	 */
+	private class RowHoverStartAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			imView.setRowHoverChange(true);
+			imView.repaint();
+		}
+	}
+
+	public void setRowHoverChange(boolean hc) {
+		imView.setRowHoverChange(hc);
+		imView.repaint();
+	}
+
+	/**
+	 * Starts highlighting the hovered row
+	 */
+	private class RowHoverStopAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			imView.setRowHoverChange(false);
+			imView.repaint();
+		}
+	}
+
+	/**
+	 * Starts highlighting the hovered column
+	 */
+	private class ColumnHoverStartAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			imView.setColumnHoverChange(true);
+			imView.repaint();
+		}
+	}
+
+	public void setColumnHoverChange(boolean hc) {
+		imView.setColumnHoverChange(hc);
+		imView.repaint();
+	}
+
+	/**
+	 * Starts highlighting the hovered column
+	 */
+	private class ColumnHoverStopAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			imView.setColumnHoverChange(false);
+			imView.repaint();
+		}
+	}
+
 	/**
 	 * Recalculates proportions for the MapContainers, when the layout was
 	 * changed by removing or adding components, or resizing the TVFrame. Only
