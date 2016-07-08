@@ -185,11 +185,13 @@ public class IMVMouseAdapter extends MouseAdapter {
 			if(e.isShiftDown()) {
 				processLeftShiftDragDuring(pressedX, pressedY, e.getX(), 
 						e.getY());
-				
+				imView.setRowHoverChange(false);
+				imView.setColumnHoverChange(false);
 			} else if(e.isControlDown()) {
 				processLeftControlDragDuring(pressedX, pressedY, e.getX(),
 						e.getY());
-				
+				imView.setColumnHoverChange(false);
+				imView.setRowHoverChange(false);
 			} else {
 				processLeftDragDuring(pressedX, pressedY, e.getX(), e.getY());
 			}
