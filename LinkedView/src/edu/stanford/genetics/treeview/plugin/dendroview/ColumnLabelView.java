@@ -201,4 +201,10 @@ public class ColumnLabelView extends LabelView {
 		
 		return(!e.isShiftDown());
 	}
+
+	@Override
+	protected void setDataTickerValue(MouseEvent e) {
+		int colIdx = getPrimaryHoverIndex(e);
+		ticker.setValue( dataModel.getDataMatrix().getColAverage(colIdx, colIdx) + " [Column ave]");
+	}
 }

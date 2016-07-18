@@ -201,6 +201,16 @@ public class ReorderedDataModel extends Observable implements DataModel {
 			
 			return parent.getDataMatrix().getMedian();
 		}
+
+		@Override
+		public double getRowAverage(int fromRowId, int toRowId) {
+			return parent.getDataMatrix().getRowAverage(fromRowId, toRowId);
+		}
+
+		@Override
+		public double getColAverage(int fromColId, int toColId) {
+			return parent.getDataMatrix().getColAverage(fromColId, toColId);
+		}
 	}
 
 	/**

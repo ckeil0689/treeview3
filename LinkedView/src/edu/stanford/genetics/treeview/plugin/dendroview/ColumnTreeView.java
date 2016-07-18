@@ -275,4 +275,12 @@ public class ColumnTreeView extends TRView {
 		}
 		return(dest.x + dest.width);
 	}
+
+	@Override
+	protected void setDataTickerValue(MouseEvent e) {
+		int from = (int) hoveredNode.getLeftLeaf().getIndex();
+		int to = (int) hoveredNode.getRightLeaf().getIndex();
+		ticker.setValue( dataModel.getDataMatrix().getColAverage(from, to) + " [tree ave]");
+	}
+	
 }

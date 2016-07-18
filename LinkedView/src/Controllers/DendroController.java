@@ -183,6 +183,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 						interactiveYmap);
 		
 		dendroView.setupLayout();
+		setModelAndTicker(dendroView,tvModel);
 		setObservables();
 
 		/*
@@ -206,6 +207,22 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		addKeyBindings();
 		addListeners();
+	}
+
+	/** sets data model and ticker in Label View and TreeView classes
+	 * @param dendroView
+	 * @param tvModel
+	 */
+	private void setModelAndTicker(final DendroView dendroView,
+								final DataModel tvModel) {
+		dendroView.getRowLabelView().setDataTicker(dendroView.getDataTicker());
+		dendroView.getColumnLabelView().setDataTicker(dendroView.getDataTicker());
+		dendroView.getRowLabelView().setDataModel(tvModel);
+		dendroView.getColumnLabelView().setDataModel(tvModel);
+		dendroView.getRowTreeView().setDataTicker(dendroView.getDataTicker());
+		dendroView.getColumnTreeView().setDataTicker(dendroView.getDataTicker());
+		dendroView.getRowTreeView().setDataModel(tvModel);
+		dendroView.getColumnTreeView().setDataModel(tvModel);
 	}
 	
 	/**
