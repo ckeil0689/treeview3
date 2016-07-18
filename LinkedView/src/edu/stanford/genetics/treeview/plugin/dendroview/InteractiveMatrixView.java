@@ -342,6 +342,11 @@ public class InteractiveMatrixView extends MatrixView {
 	}
 
 	public void updateRowHoverRect() {
+		if(!hasMouse()) {
+			rowHoverRect.setLocation(-2,-2);
+			return;
+		}
+
 		Point startHover = new Point();
 		Point endHover   = new Point();
 
@@ -360,6 +365,11 @@ public class InteractiveMatrixView extends MatrixView {
 	}
 
 	public void updateColumnHoverRect() {
+		if(!hasMouse()) {
+			columnHoverRect.setLocation(-2,-2);
+			return;
+		}
+
 		Point startHover = new Point();
 		Point endHover   = new Point();
 	

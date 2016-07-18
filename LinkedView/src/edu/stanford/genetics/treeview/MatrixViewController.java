@@ -598,9 +598,7 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			imView.setRowHoverChange(true);
-			imView.setColumnHoverChange(true);
-			imView.repaint();
+			setRowColumnHoverChange(true);
 		}
 	}
 
@@ -614,8 +612,7 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			imView.setRowHoverChange(true);
-			imView.repaint();
+			setRowHoverChange(true);
 		}
 	}
 
@@ -634,8 +631,7 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			imView.setRowHoverChange(false);
-			imView.repaint();
+			setRowHoverChange(false);
 		}
 	}
 
@@ -649,12 +645,17 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			imView.setColumnHoverChange(true);
-			imView.repaint();
+			setColumnHoverChange(true);
 		}
 	}
 
 	public void setColumnHoverChange(boolean hc) {
+		imView.setColumnHoverChange(hc);
+		imView.repaint();
+	}
+
+	public void setRowColumnHoverChange(boolean hc) {
+		imView.setRowHoverChange(hc);
 		imView.setColumnHoverChange(hc);
 		imView.repaint();
 	}
@@ -669,8 +670,7 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			imView.setColumnHoverChange(false);
-			imView.repaint();
+			setColumnHoverChange(false);
 		}
 	}
 
