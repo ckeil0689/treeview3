@@ -58,8 +58,6 @@ public class InteractiveMatrixView extends MatrixView {
 	private List<Ellipse2D.Double> indicatorCircleList = null;
 
 	private boolean overlayTempChange = false;
-	private boolean rowHoverChange = false;
-	private boolean columnHoverChange = false;
 
 	/**
 	 * GlobalView also likes to have an globalxmap and globalymap (both of type
@@ -177,15 +175,17 @@ public class InteractiveMatrixView extends MatrixView {
 			g2.drawRect(tmpRect.x, tmpRect.y, tmpRect.width, tmpRect.height);
 		}
 
-		if(isRowHoverChange()) {
-			setRowHoverChange(false);
+		if(isRowHoverHighlightActive() && ymap.overALabelLinkedView() &&
+			!ymap.isSelecting()) {
+
 			updateRowHoverRect();
 			g2.drawRect(rowHoverRect.x,rowHoverRect.y,rowHoverRect.width,
-			            rowHoverRect.height);
+				rowHoverRect.height);
 		}
 
-		if(isColumnHoverChange()) {
-			setColumnHoverChange(false);
+		if(isColumnHoverHighlightActive() && xmap.overALabelLinkedView() &&
+			!xmap.isSelecting()) {
+
 			updateColumnHoverRect();
 			g2.drawRect(columnHoverRect.x,columnHoverRect.y,
 				columnHoverRect.width,columnHoverRect.height);
@@ -281,16 +281,16 @@ public class InteractiveMatrixView extends MatrixView {
 	 * @author rleach
 	 * @return the overlayTempChange
 	 */
-	public boolean isRowHoverChange() {
-		return(rowHoverChange);
+	public boolean isRowHoverHighlightActive() {
+		return(ymap.isHoverHighlightActive());
 	}
 
 	/**
 	 * @author rleach
 	 * @return the overlayTempChange
 	 */
-	public boolean isColumnHoverChange() {
-		return(columnHoverChange);
+	public boolean isColumnHoverHighlightActive() {
+		return(xmap.isHoverHighlightActive());
 	}
 
 	/**
@@ -303,18 +303,18 @@ public class InteractiveMatrixView extends MatrixView {
 
 	/**
 	 * @author rleach
-	 * @param overlayHoverChange the rowHoverChange to set
+	 * @param rhh the HighlightHover to set
 	 */
-	public void setRowHoverChange(boolean overlayHoverChange) {
-		this.rowHoverChange = overlayHoverChange;
+	public void setRowHoverHighlight(boolean rhh) {
+		ymap.setHoverHighlight(rhh);
 	}
 
 	/**
 	 * @author rleach
-	 * @param overlayHoverChange the overlayTempChange to set
+	 * @param chh the HighlightHoverChange to set
 	 */
-	public void setColumnHoverChange(boolean overlayHoverChange) {
-		this.columnHoverChange = overlayHoverChange;
+	public void setColumnHoverHighlight(boolean chh) {
+		xmap.setHoverHighlight(chh);
 	}
 
 	/**
@@ -342,8 +342,9 @@ public class InteractiveMatrixView extends MatrixView {
 	}
 
 	public void updateRowHoverRect() {
-		if(!hasMouse()) {
-			rowHoverRect.setLocation(-2,-2);
+		if(!ymap.overALabelLinkedView()) {
+			//Push the column highlight offscreen
+			rowHoverRect.setLocation(0,(int) -ymap.getScale() - 1);
 			return;
 		}
 
@@ -352,9 +353,8 @@ public class InteractiveMatrixView extends MatrixView {
 
 		startHover.setLocation(xmap.getPixel(xmap.getMinIndex()),
 			ymap.getPixel(ymap.getHoverIndex()));
-		endHover.setLocation(xmap.getPixel(xmap.getMaxIndex()),
+		endHover.setLocation(xmap.getPixel(xmap.getMaxIndex() + 1) - 1,
 			ymap.getPixel(ymap.getHoverIndex() + 1) - 1);
-		setRowHoverChange(true);
 
 		/* Full row hover coords */
 		rowHoverRect.setLocation(startHover);
@@ -365,8 +365,9 @@ public class InteractiveMatrixView extends MatrixView {
 	}
 
 	public void updateColumnHoverRect() {
-		if(!hasMouse()) {
-			columnHoverRect.setLocation(-2,-2);
+		if(!xmap.overALabelLinkedView()) {
+			//Push the column highlight offscreen
+			columnHoverRect.setLocation((int) -xmap.getScale() - 1,0);
 			return;
 		}
 
@@ -376,8 +377,7 @@ public class InteractiveMatrixView extends MatrixView {
 		startHover.setLocation(xmap.getPixel(xmap.getHoverIndex()),
 			ymap.getPixel(ymap.getMinIndex()));
 		endHover.setLocation(xmap.getPixel(xmap.getHoverIndex() + 1) - 1,
-			ymap.getPixel(ymap.getMaxIndex()));
-		setColumnHoverChange(true);
+			ymap.getPixel(ymap.getMaxIndex() + 1) - 1);
 	
 		/* Full row hover coords */
 		columnHoverRect.setLocation(startHover);

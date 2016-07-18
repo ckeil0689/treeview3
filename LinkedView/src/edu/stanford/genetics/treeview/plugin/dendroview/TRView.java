@@ -930,6 +930,20 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		}
 	}
 
+	/**
+	 * When a mouse is pressed, the hover highlight is deactivated.
+	 */
+	@Override
+	public void mousePressed(final MouseEvent e) {
+
+		if (!isEnabled() || !enclosingWindow().isActive())
+			return;
+		if (treePainter == null)
+			return;
+
+		map.setHoverHighlight(false);
+	}
+
 	@Override
 	public void mouseMoved(final MouseEvent e) {
 

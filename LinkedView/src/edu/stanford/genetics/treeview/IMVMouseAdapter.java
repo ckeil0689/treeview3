@@ -115,6 +115,9 @@ public class IMVMouseAdapter extends MouseAdapter {
 		imView.debug("mousePressed: Setting pressedX [" + pressedX +
 			"] and pressedY [" + pressedY + "].", 10);
 
+		imView.setRowHoverHighlight(false);
+		imView.setColumnHoverHighlight(false);
+
 		//If a previous 200ms timer is still running, restart the timer and
 		//increment the clickCount
 		if(multiClickActionTimer != null &&
@@ -185,13 +188,9 @@ public class IMVMouseAdapter extends MouseAdapter {
 			if(e.isShiftDown()) {
 				processLeftShiftDragDuring(pressedX, pressedY, e.getX(), 
 						e.getY());
-				imView.setRowHoverChange(false);
-				imView.setColumnHoverChange(false);
 			} else if(e.isControlDown()) {
 				processLeftControlDragDuring(pressedX, pressedY, e.getX(),
 						e.getY());
-				imView.setColumnHoverChange(false);
-				imView.setRowHoverChange(false);
 			} else {
 				processLeftDragDuring(pressedX, pressedY, e.getX(), e.getY());
 			}

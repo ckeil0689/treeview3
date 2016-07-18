@@ -1905,6 +1905,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			return;
 		}
 
+		map.setHoverHighlight(false);
+
 		// if left button is used
 		if(SwingUtilities.isLeftMouseButton(e)) {
 			//Handle the temporary yellow highlighting of the labels

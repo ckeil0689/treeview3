@@ -96,6 +96,10 @@ public class MapContainer extends Observable implements Observer,
 	private int     selectingStart        = -1;
 	private boolean whizMode              = false;
 
+	//These allow modifier keys in the label/tree areas to reveal the row/col
+	//highlight bar
+	private boolean hoverHighlight = false;
+
 	int debug = 0;
 	//1 = debug the state of the variables in overALabelPortLinkedView
 	//18 = debug tree hover highlighting of labels
@@ -2617,5 +2621,24 @@ public class MapContainer extends Observable implements Observer,
 		if(level == debug) {
 			LogBuffer.println(msg);
 		}
+	}
+
+	/**
+	 * This is used to determine whether an entire row/column will be
+	 * highlighted in the matrix overlay during drawing
+	 * @return the highlightHoverChange
+	 */
+	public boolean isHoverHighlightActive() {
+		return(hoverHighlight);
+	}
+
+	/**
+	 * Set this to true when you want to trigger an entire row/col to be
+	 * highlighted on the matrix.  This is called from MatrixViewController
+	 * whenever the user presses/releases a modifier key.
+	 * @param rowHoverChange the rowHoverChange to set
+	 */
+	public void setHoverHighlight(boolean highlightHoverChange) {
+		this.hoverHighlight = highlightHoverChange;
 	}
 }

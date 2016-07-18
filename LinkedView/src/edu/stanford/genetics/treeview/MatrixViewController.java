@@ -332,6 +332,8 @@ ConfigNodePersistent, Controller {
 				"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
 
+		//Holding control and/or shift controls a col/row highlight that follows
+		//the hover position
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,1),
 			"rowHoverStart");
 		action_map.put("rowHoverStart", new RowHoverStartAction());
@@ -348,8 +350,9 @@ ConfigNodePersistent, Controller {
 			"columnHoverStop");
 		action_map.put("columnHoverStop", new ColumnHoverStopAction());
 
-		//The following cases handle various combinations occurring in different
-		//orders of both the shift and control modifiers being pressed/released
+		//The following cases handle various combinations of row/col highlights
+		//occurring in different orders of both the shift and control modifiers
+		//being pressed/released
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,
 			KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
 			"bothHoverStart");
@@ -598,7 +601,7 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			setRowColumnHoverChange(true);
+			setRowColumnHoverHighlight(true);
 		}
 	}
 
@@ -612,12 +615,14 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			setRowHoverChange(true);
+			if(!imView.getYMap().isSelecting()) {
+				setRowHoverHighlight(true);
+			}
 		}
 	}
 
-	public void setRowHoverChange(boolean hc) {
-		imView.setRowHoverChange(hc);
+	public void setRowHoverHighlight(boolean hc) {
+		imView.setRowHoverHighlight(hc);
 		imView.repaint();
 	}
 
@@ -631,7 +636,7 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			setRowHoverChange(false);
+			setRowHoverHighlight(false);
 		}
 	}
 
@@ -645,18 +650,20 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			setColumnHoverChange(true);
+			if(!imView.getXMap().isSelecting()) {
+				setColumnHoverHighlight(true);
+			}
 		}
 	}
 
-	public void setColumnHoverChange(boolean hc) {
-		imView.setColumnHoverChange(hc);
+	public void setColumnHoverHighlight(boolean hc) {
+		imView.setColumnHoverHighlight(hc);
 		imView.repaint();
 	}
 
-	public void setRowColumnHoverChange(boolean hc) {
-		imView.setRowHoverChange(hc);
-		imView.setColumnHoverChange(hc);
+	public void setRowColumnHoverHighlight(boolean hc) {
+		imView.setRowHoverHighlight(hc);
+		imView.setColumnHoverHighlight(hc);
 		imView.repaint();
 	}
 
@@ -670,7 +677,7 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			setColumnHoverChange(false);
+			setColumnHoverHighlight(false);
 		}
 	}
 
