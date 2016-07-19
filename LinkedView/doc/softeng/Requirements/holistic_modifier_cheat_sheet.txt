@@ -4,17 +4,17 @@ Holistic Modifier Cheat sheet:
 ++++++++++++++++++++++++++++++
 
 needed?
-+	command-a			Select all
-	command-d			Deselect all
-+	escape				Deselect all or hide popup menu depending on context
-	command-t			Toggle trees
-	command-f			Search
-	command-o			Open
-+	command-c			Copy
++	command-a		Select all
+	command-d		Deselect all
++	escape			Deselect all or hide popup menu depending on context
+	command-t		Toggle trees
+	command-f		Search
+	command-o		Open
++	command-c		Copy
 +	command-option-c	Cluster
-	command-e			Export
-	command-w			Close window
-+	command-l			Label settings
+	command-e		Export
+	command-w		Close window
++	command-l		Label settings
 +	command-shift-c		Color settings
 
 When hovering over the matrix:
@@ -44,8 +44,6 @@ When hovering over the matrix:
 +	control-single-click				select a single row anew
 +	control-shift-single-click			select/deselect (based on selection state of clicked tile) extend/shrink existing from closest edge to clicked row
 +	control-command-single-click			toggle single row selection
-
-MODIFIERS SHOULD DRAW BOXES SO THEY KNOW WHAT THEY GET IF THEY CLICK
 
 	click-drag					select a group of rows & columns (tiles) anew
 +	shift-click-drag				select/deselect (based on selection state of 1st clicked tile) dragged rows & columns
@@ -262,13 +260,13 @@ Keyboard Shortcuts
 	option-home					full zoom out (with animation)
 	option-shift-home				full zoom out (without animation)
 
-	=/+						medium zoom in
+	=						medium zoom in
 	-						medium zoom out
-	control-+/=					small zoom in
+	control-=					small zoom in
 	control--					small zoom out
-	shift-+/=					large zoom in
-	shift--						large zoom out
-	command-+/=					stepwise zoom in (selection-aware with animation)
+	shift-=(or "+")					large zoom in
+	shift--(or "_")					large zoom out
+	command-=					stepwise zoom in (selection-aware with animation)
 	command--					stepwise zoom out (selection-aware with animation)
-	command-shift-+/=				stepwise zoom in (selection-aware without animation)
-	command-shift--					stepwise zoom out (selection-aware without animation)
+	command-shift-=(or "command-+")			stepwise zoom in (selection-aware without animation)
+	command-shift--(or "command-_")			stepwise zoom out (selection-aware without animation)
