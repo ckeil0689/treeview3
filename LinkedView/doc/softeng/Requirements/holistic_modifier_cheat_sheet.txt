@@ -71,6 +71,18 @@ MODIFIERS SHOULD DRAW BOXES SO THEY KNOW WHAT THEY GET IF THEY CLICK
 	option-command-double-click			step-wise column zoom out (with animation)
 	option-shift-command-double-click		step-wise column zoom out (without animation)
 
+	hover						no highlight
++	shift-hover					highlights what the resulting extend/shrink selection would be if clicked
++	command-hover					highlights what the resulting single tile selection would be if clicked
+
++	control-hover					highlights a row (the resulting new selection if clicked)
++	control-shift-hover				highlights what the resulting extend/shrink row selection would be if clicked
++	control-command-hover				highlights what the resulting single toggled row selection would be if clicked
+
++	option-hover					highlights a column (the resulting new selection if clicked)
++	option-shift-hover				highlights what the resulting extend/shrink column selection would be if clicked
++	option-command-hover				highlights what the resulting single toggled column selection would be if clicked
+
 When hovering over labels:
 ==========================
 	scroll						medium label or matrix scroll (depending on column or row label areas respectively)
@@ -117,6 +129,12 @@ When hovering over labels:
 +	option-command-double-click			step-wise zoom out from column or row (with animation)
 +	option-shift-command-double-click		step-wise zoom out from column or row (without animation)
 
+	hover						no highlight
++	shift-hover					highlights what the resulting extend/shrink selection would be if clicked
++	command-hover					highlights what the resulting single row/col selection/deselection would be if clicked
++	control-hover					highlights a row (the resulting added selection if clicked)
++	option-hover					highlights a column (the resulting removed selection if clicked)
+
 When hovering over trees:
 =========================
 	scroll						medium label or matrix scroll (depending on column or row tree areas respectively)
@@ -160,6 +178,12 @@ When hovering over trees:
 +	option-shift-double-click			large zoom out from column or row
 +	option-command-double-click			step-wise zoom out from column or row (with animation)
 +	option-shift-command-double-click		step-wise zoom out from column or row (without animation)
+
+	hover						no highlight
++	shift-hover					highlights what the resulting extend/shrink selection would be if clicked
++	command-hover					highlights what the resulting single row/col selection/deselection would be if clicked
++	control-hover					highlights a row (the resulting added selection if clicked)
++	option-hover					highlights a column (the resulting removed selection if clicked)
 
 When clicking a main +/- nav button:
 ====================================
