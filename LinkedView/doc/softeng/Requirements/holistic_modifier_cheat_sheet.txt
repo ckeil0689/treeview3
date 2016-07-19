@@ -3,22 +3,25 @@
 Holistic Modifier Cheat sheet:
 ++++++++++++++++++++++++++++++
 
-needed?
-+	command-a		Select all
-	command-d		Deselect all
-+	escape			Deselect all or hide popup menu depending on context
-	command-t		Toggle trees
-	command-f		Search
-	command-o		Open
-+	command-c		Copy
-+	command-option-c	Cluster
-	command-e		Export
-	command-w		Close window
-+	command-l		Label settings
-+	command-shift-c		Color settings
+NOTE: The modifier names and shortcuts in this document use mac-standard naming & shortcuts, where:
+
+	control = ^
+	option  = ⌥
+	command = ⌘
+	copy uses the command key
+
+The windows analogs of these keys are:
+
+	Mac		Windows
+	---		-------
+	control(^)	control(ctrl)
+	option(⌥)	alt(alt)
+	command(⌘)	windows(win)
+	copy=⌘-c	copy=ctrl-c
 
 When hovering over the matrix:
 ==============================
+needed?
 	scroll						medium vertical scroll
 	shift-scroll					medium horizontal scroll
 +	control-scroll*					small(/slow) vertical scroll (*unavailable on mac when control-scroll screen zoom is enabled in sysprefs.)
@@ -231,6 +234,19 @@ When clicking a scrollbar nav button:
 
 Keyboard Shortcuts
 ==================
++	command-a					Select all
+	command-d					Deselect all
++	escape						Deselect all or hide popup menu depending on context
+	command-t					Toggle trees
+	command-f					Search
+	command-o					Open
++	command-c (windows: control-c)			Copy
++	command-option-c				Cluster
+	command-e					Export
+	command-w					Close window
++	command-l					Label settings
++	command-shift-c					Color settings
+
 	arrow						small scroll
 	shift-arrow					large scroll
 	command-arrow					scroll to end (with animation)
