@@ -128,10 +128,12 @@ public class PreviewDataTable extends JTable {
 					table, value, isSelected, hasFocus, row, col);
 
 			/* Conditions for cell highlighting */
-			boolean adjustRowComp = !label_rows.isEmpty()
-					&& label_rows.contains(Integer.valueOf(row));
-			boolean adjustColumnComp = !label_cols.isEmpty()
-					&& label_cols.contains(Integer.valueOf(col));
+			boolean adjustRowComp = !label_rows.isEmpty() &&
+				label_rows.contains(Integer.valueOf(row));
+			boolean adjustColumnComp = !label_cols.isEmpty() &&
+				label_cols.contains(Integer.valueOf(col));
+			boolean firstDataCell = row == label_rows.size() &&
+				col == label_cols.size();
 
 			/* Apply highlighting (or not) */
 			if (adjustRowComp || adjustColumnComp) {
@@ -145,6 +147,11 @@ public class PreviewDataTable extends JTable {
 					cellColor = new Color(245, 245, 245);
 				}
 				c.setBackground(cellColor);
+
+				if(firstDataCell) {
+					c.setBorder(BorderFactory.createMatteBorder(2,2,2,2,
+						PreviewDataTable.CELL_HIGHLIGHT));
+				}
 			}
 
 			return c;
