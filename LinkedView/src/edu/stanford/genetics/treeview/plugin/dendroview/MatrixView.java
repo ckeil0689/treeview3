@@ -404,7 +404,7 @@ public abstract class MatrixView extends ModelViewProduced {
 	}
 	
 	/**
-	 * DEPRECATE get the xmapping for this view
+	 * get the xmapping for this view
 	 */
 	public MapContainer getXMap() {
 		return xmap;
@@ -427,7 +427,7 @@ public abstract class MatrixView extends ModelViewProduced {
 	}
 	
 	/**
-	 * DEPRECATE get the ymapping for this view
+	 * get the ymapping for this view
 	 */
 	public MapContainer getYMap() {
 		return ymap;
