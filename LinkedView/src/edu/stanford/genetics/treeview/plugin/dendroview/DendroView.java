@@ -292,7 +292,6 @@ public class DendroView implements Observer, DendroPanel {
 	}
 	
 	/**
-<<<<<<< HEAD
 	 * Reset default state for all model views.
 	 */
 	public void resetModelViewDefaults() {
@@ -318,9 +317,6 @@ public class DendroView implements Observer, DendroPanel {
 	}
 	
 	/**
-=======
-	 * TODO currently only a DataTicker placeholder is realized.
->>>>>>> master
 	 * Creates a panel which contains the color-value indicator. This is
 	 * used to display the data value of the currently hovered matrix pixel.
 	 * @return JPanel containing the olor-value indicator.
@@ -1407,6 +1403,7 @@ public class DendroView implements Observer, DendroPanel {
 		if(colTreeView == null || colDataPane == null) {
 			LogBuffer.println("colTreeView could not be enabled/ disabled "
 					+ "because it was null");
+			return;
 		}
 		
 		colTreeView.setEnabled(enabled);
@@ -1423,6 +1420,7 @@ public class DendroView implements Observer, DendroPanel {
 		if(rowTreeView == null || rowDataPane == null) {
 			LogBuffer.println("rowTreeView could not be enabled/ disabled "
 					+ "because it was null");
+			return;
 		}
 		
 		rowTreeView.setEnabled(enabled);

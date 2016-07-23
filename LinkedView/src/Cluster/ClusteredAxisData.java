@@ -36,12 +36,12 @@ public class ClusteredAxisData {
 		this.reorderedIDs = newReorderedIDs;
 	}
 	
-	public void setAxisHeaders(final String[] newAxisHeaders) {
+	public void setHeaders(final String[] newAxisHeaders) {
 		
 		this.axisHeaders = newAxisHeaders;
 	}
 	
-	public void setAxisLabels(final String[][] newAxisLabels) {
+	public void setLabels(final String[][] newAxisLabels) {
 		
 		this.axisLabels = newAxisLabels;
 	}

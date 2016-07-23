@@ -685,7 +685,7 @@ public class ClusterDialogController {
 		@Override
 		protected void done() {
 
-			if (!isCancelled() && checkTreeFileIntegrity()) {
+			if (!isCancelled() && hasEnsuredTreeFilePresence()) {
 				ClusterView.setStatusText("Saving done!");
 				loadClusteredData(filePath);
 				LogBuffer.println("SaveTask is done: success.");
@@ -701,9 +701,10 @@ public class ClusterDialogController {
 		 * Makes sure that a tree file exists for an axis that is supposed to
 		 * be clustered. If not, it attempts to take one from a previous 
 		 * cluster and if that does not exist either it will consider an axis
-		 * as not clustered.
+		 * as not clustered. In that case, a tree file will not be present. Returns
+		 * true upon successful completion.
 		 */
-		private boolean checkTreeFileIntegrity() {
+		private boolean hasEnsuredTreeFilePresence() {
 	
 			if(filePath == null || fileName == null) {
 				return false;
@@ -819,7 +820,7 @@ public class ClusterDialogController {
 		deleteFile(atrFile);
 		deleteFile(gtrFile);
 		
-		deleteDir(dir);
+		deleteEmptyDir(dir);
 	}
 	
 	/**
@@ -854,6 +855,12 @@ public class ClusterDialogController {
 		return dir;
 	}
 	
+	/**
+	 * If the passed File object exists and is indeed a normal file, it deletion
+	 * will be attempted. The passed object will also be set to null to avoid
+	 * lingering of object data.
+	 * @param file - The File to be deleted.
+	 */
 	private void deleteFile(File file) {
 		
 		if(file == null) {
@@ -866,18 +873,27 @@ public class ClusterDialogController {
 		if(file.isFile() && file.exists()) {
 			success = file.delete();
 			LogBuffer.println("Attempted delete of " + name);
+			
 		} else {
 			LogBuffer.println(name + " is not a file or file does not exist.");
 		}
 		
 		if(success) {
 			LogBuffer.println(name + " was successfully deleted.");
+			file = null;
+			
 		} else {
 			LogBuffer.println(name + " could not be deleted.");
 		}
 	}
 	
-	private void deleteDir(File dir) {
+	/**
+	 * Checks if the passed File object is a directory, if it is empty, and if
+	 * that is true it attempts to delete the directory.
+	 * @param dir - The File object to be deleted. It should represent 
+	 * an empty directory.
+	 */
+	private void deleteEmptyDir(File dir) {
 		
 		if(dir == null) {
 			return;
@@ -890,6 +906,7 @@ public class ClusterDialogController {
 			File[] files = dir.listFiles();
 			if(files.length == 0) {
 				success = dir.delete();
+				
 			} else {
 				LogBuffer.println("Directory " + name + " still has " 
 						+ files.length + " files.");
@@ -900,6 +917,8 @@ public class ClusterDialogController {
 		
 		if(success) {
 			LogBuffer.println(name + " was successfully deleted.");
+			dir = null;
+			
 		} else {
 			LogBuffer.println(name + " could not be deleted.");
 		}
@@ -932,7 +951,6 @@ public class ClusterDialogController {
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], alert, "Alert",
 					JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + alert);
-			LogBuffer.println("File path: " + newFilePath);
 		}
 	}
 
@@ -1116,8 +1134,6 @@ public class ClusterDialogController {
 			LogBuffer.println("Cancelling save task...");
 			saveTask.cancel(true);
 		}
-
-//		deleteAllFiles();
 	}
 
 	/**

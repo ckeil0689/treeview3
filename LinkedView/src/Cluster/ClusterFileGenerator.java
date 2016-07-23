@@ -88,8 +88,8 @@ public class ClusterFileGenerator {
 	public void prepare(final IntHeaderInfo rowHeaderI,
 			final IntHeaderInfo colHeaderI) {
 
-		this.rowClusterData.setAxisHeaders(rowHeaderI.getNames());
-		this.colClusterData.setAxisHeaders(colHeaderI.getNames());
+		this.rowClusterData.setHeaders(rowHeaderI.getNames());
+		this.colClusterData.setHeaders(colHeaderI.getNames());
 
 		/* The list containing all the reorganized row-data */
 	//	this.cdtData_s = new String[origMatrix.length][];
@@ -98,8 +98,8 @@ public class ClusterFileGenerator {
 		 * retrieving names and weights of row elements
 		 * format: [[YAL063C, 1.0], ..., [...]]
 		 */
-		this.rowClusterData.setAxisLabels(rowHeaderI.getHeaderArray());
-		this.colClusterData.setAxisLabels(colHeaderI.getHeaderArray());
+		this.rowClusterData.setLabels(rowHeaderI.getHeaderArray());
+		this.colClusterData.setLabels(colHeaderI.getHeaderArray());
 		
         int rowLabelNum = rowClusterData.getNumLabels();
         int colLabelNum = colClusterData.getNumLabels();

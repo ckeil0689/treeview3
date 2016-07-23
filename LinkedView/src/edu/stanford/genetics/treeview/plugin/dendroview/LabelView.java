@@ -515,8 +515,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	public void importStateFrom(final Preferences node) {
 		
-//		resetDefaults();
-		
 		setMin(node.getInt("min", d_min));
 		setMax(node.getInt("max", d_max));
 		setFace(node.get("face", d_face));
