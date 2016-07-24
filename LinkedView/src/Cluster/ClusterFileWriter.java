@@ -51,7 +51,9 @@ public class ClusterFileWriter {
 	}
 	
 	/**
-	 * Defines how exactly the FileWriter writes its data.
+	 * Creates a single string by calling doParse() and then writes the 
+	 * supplied data using the BufferedWriter object.
+	 * @param data - A String array of data to be written to a file.
 	 */
 	public void writeData(final String[] data) {
 			

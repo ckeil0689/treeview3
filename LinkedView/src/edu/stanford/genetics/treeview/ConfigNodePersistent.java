@@ -44,7 +44,7 @@ public interface ConfigNodePersistent {
 	/**
 	 * If a configuration node is needed to store preferences, use this method.
 	 * It accepts a parent node as parameter so the new node can be added to the
-	 * exisiting hierarchy of Preferences nodes. The node will be a child of the
+	 * existing hierarchy of Preferences nodes. The node will be a child of the
 	 * supplied parent node.
 	 */
 	public void setConfigNode(final Preferences parentNode);

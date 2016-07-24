@@ -85,11 +85,13 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	}
 	
 	/**
-	 * binds this ColorExtractor to a particular ConfigNode. This makes colors
-	 * persistent
+	 * binds this ColorExtractor to a particular Preferences node. 
+	 * This allows colors persistent by providing the ability to store and
+	 * retrieve values using an XML file. Also initiates loading of stored 
+	 * values to update the state of this class by calling requestStoredState().
 	 *
-	 * @param configNode
-	 *            confignode to bind to
+	 * @param parentNode - The parentNode under which a specific node for 
+	 * ColorExtractor.java is placed.
 	 */
 	@Override
 	public void setConfigNode(final Preferences parentNode) {

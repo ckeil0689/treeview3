@@ -312,85 +312,87 @@ public class ClusterFileGenerator {
 		
 		final String[] orderedGIDs = rowClusterData.getReorderedIDs();
 		final String[] orderedAIDs = colClusterData.getReorderedIDs();
-
+    
+		// Define how long a single matrix row needs to be
 		int rowLength = rowHeaders.length + colClusterData.getNumLabels();
+		
 		if (rowClusterData.isAxisClustered() && !foundGIDs) {
+			// a clustered row axis without GID column needs one added, so increment
 			rowLength++;
 		}
 
-		/* Row length finalized, calculate column index where data starts */
+		// Row length finalized, calculate column index where data starts
 		final int dataStartCol = rowLength - colClusterData.getNumLabels();
-		/* The String array to be written as a single row */
+		// The String array to be written as a single row
 		final String[] cdtRow = new String[rowLength];
-		/* Keeps track at which index of cdtRow data should be added */
-		int addIndex;
+		// Moving through cdtRow array, idxTracker keeps track of the position.
+		int idxTracker = 0;
 		
-		addIndex = 0;
+		// >>> Adding data to String arrays representing rows starts here <<<
 		if (rowClusterData.isAxisClustered() && !foundGIDs) {
-			cdtRow[addIndex] = ROW_ID_HEADER;
-			addIndex++;
+			cdtRow[idxTracker] = ROW_ID_HEADER;
+			idxTracker++;
 		}
 
-		System.arraycopy(rowHeaders, 0, cdtRow, addIndex, rowHeaders.length);
-		addIndex += rowHeaders.length;
+		System.arraycopy(rowHeaders, 0, cdtRow, idxTracker, rowHeaders.length);
+		idxTracker += rowHeaders.length;
 
-		/* Adding column names to first row */
+		// Adding column names to first row
 		for (final String[] labels : colClusterData.getOrderedLabels()) {
-			cdtRow[addIndex] = labels[0];
-			addIndex++;
+			cdtRow[idxTracker] = labels[0];
+			idxTracker++;
 		}
 
-		/* write finished row */
+		// write finished row to buffer
 		clusterFileWriter.writeData(cdtRow);
 
-		/* next row */
-		/* if columns were clustered, make AID row */
+		// next row
+		// if columns were clustered, make AID row
 		if (colClusterData.isAxisClustered()) {
 			cdtRow[0] = COL_ID_HEADER;
 
-			/* Fill with AIDs ("COL3X") */
+			// Fill with AIDs ("COL3X")
 			System.arraycopy(orderedAIDs, 0, cdtRow, dataStartCol, 
 					orderedAIDs.length);
 
 			clusterFileWriter.writeData(cdtRow);
 		}
 
-		/* remaining label rows */
+		// remaining label rows
 		for (int i = 1; i < colHeaders.length; i++) {
 			
 			if (colHeaders[i].equals(COL_ID_HEADER)) {
 				continue;
 			}
 
-			addIndex = 0;
+			idxTracker = 0;
 			
-			cdtRow[addIndex] = colHeaders[i];
-			addIndex++;
+			cdtRow[idxTracker] = colHeaders[i];
+			idxTracker++;
 			
-			while (addIndex < dataStartCol) {
-				cdtRow[addIndex] = "";
-				addIndex++;
+			while (idxTracker < dataStartCol) {
+				cdtRow[idxTracker] = "";
+				idxTracker++;
 			}
 
 			for (final String[] names : colClusterData.getOrderedLabels()) {
-				cdtRow[addIndex] = names[i];
-				addIndex++;
+				cdtRow[idxTracker] = names[i];
+				idxTracker++;
 			}
 
 			clusterFileWriter.writeData(cdtRow);
 		}
 
-		/* Filling the data rows */
+		// Filling the data rows
 		for (int i = 0; i < origMatrix.length; i++) {
-
-			/* 1) adding row IDs ("ROW130X")... */
-			addIndex = 0;
+			// 1) adding row IDs ("ROW130X")...
+			idxTracker = 0;
 			final String[] row = new String[rowLength];
 			String[] labels = rowClusterData.getOrderedLabels()[i];
 			
 			if (rowClusterData.isAxisClustered() && !foundGIDs) {
-				row[addIndex] = orderedGIDs[i];
-				addIndex++;
+				row[idxTracker] = orderedGIDs[i];
+				idxTracker++;
 			
 			/* 
 			 * Ensure the labels are consistent with what was created for 
@@ -403,13 +405,13 @@ public class ClusterFileGenerator {
 				labels[0] = orderedGIDs[i];
 			}
 
-			/* 2) adding remaining row labels */
-			System.arraycopy(labels, 0, row, addIndex, labels.length);
-			addIndex += labels.length;
+			// 2) adding remaining row labels
+			System.arraycopy(labels, 0, row, idxTracker, labels.length);
+			idxTracker += labels.length;
 
-			/* 3) adding data values */
+			// 3) adding data values
 			String[] rowData = getStringArray(origMatrix[i]);
-			System.arraycopy(rowData, 0, row, addIndex, rowData.length);
+			System.arraycopy(rowData, 0, row, idxTracker, rowData.length);
 
 			clusterFileWriter.writeData(row);
 		}
