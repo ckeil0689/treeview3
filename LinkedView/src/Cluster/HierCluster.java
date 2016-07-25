@@ -471,7 +471,7 @@ public class HierCluster {
 		//
 		// LogBuffer.println("Ordered nodes: " + orderedNodes);
 
-		treeWriter.closeWriter();;
+		treeWriter.closeWriter();
 		linker.close();
 		reorderRows(currentClusters.get(0));
 

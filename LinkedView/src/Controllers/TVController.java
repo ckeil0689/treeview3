@@ -4,11 +4,11 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -23,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 
 import ColorChooser.ColorChooserController;
 import ColorChooser.ColorChooserUI;
@@ -62,9 +63,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.TRView;
 
 /**
  * This class controls user interaction with TVFrame and its views.
- *
- * @author CKeil
- *
  */
 public class TVController implements Observer {
 
@@ -80,13 +78,13 @@ public class TVController implements Observer {
 		this.model = model;
 		this.tvFrame = tvFrame;
 		this.dendroController = new DendroController(tvFrame, this);
-		//this.selectedLabels = new String[2];
 
 		/* Add the view as observer to the model */
 		((TVModel) model).addObserver(tvFrame);
 
 		tvFrame.addObserver(this);
-
+    tvFrame.getAppFrame().addComponentListener(new AppFrameListener());
+    
 		addViewListeners();
 		addMenuListeners();
 		addKeyBindings();
@@ -241,6 +239,63 @@ public class TVController implements Observer {
 
 				final String title = ((JMenuItem) e.getSource()).getText();
 				menuController.execute(title);
+			}
+		}
+	}
+	
+	/**
+	 *  The window position/size should be saved when it changes (or after 
+	 *  a move has finished). There are two reasons for this: 
+	 *  1) Quitting the app via the app menu or command-q does not initiate 
+	 *  the save (which could be rectified via packaging).
+	 *  2) If the app crashes, the position/size will be lost
+	 * 
+	 * Listens to the resizing of DendroView and makes changes to MapContainers
+	 * as a result.
+	 */
+	private class AppFrameListener extends ComponentAdapter {
+
+		// Timer to prevent repeatedly saving window dimensions upon resize
+		private final int saveResizeDelay = 1000;
+		private javax.swing.Timer saveResizeTimer;
+		ActionListener saveWindowAttrs = new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				if (evt.getSource() == saveResizeTimer) {
+					/* Stop timer */
+					saveResizeTimer.stop();
+					saveResizeTimer = null;
+
+					tvFrame.storeState();
+				}
+			}
+		};
+
+		@Override
+		public void componentResized(final ComponentEvent arg0) {
+
+			// Previously, resetMapContainers was called here, but that caused
+			// the zoom level to change when the user resized the window, so I
+			// added a way to track the currently visible area in mapContainer
+			// and implemented these functions to make the necessary
+			// adjustments to the image when that happens
+			if(dendroController != null) {
+				dendroController.refocusViewPort();
+			}
+
+			// Save the new dimensions/position if it's done changing
+			if (this.saveResizeTimer == null) {
+				/*
+				 * Start waiting for saveResizeDelay millis to elapse and then
+				 * call actionPerformed of the ActionListener "saveWindowAttrs".
+				 */
+				this.saveResizeTimer = new Timer(this.saveResizeDelay, saveWindowAttrs);
+				this.saveResizeTimer.start();
+				
+			} else {
+				/* Event came too soon, swallow it by resetting the timer.. */
+				this.saveResizeTimer.restart();
 			}
 		}
 	}

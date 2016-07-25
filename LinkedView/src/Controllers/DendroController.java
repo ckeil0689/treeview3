@@ -30,7 +30,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
-import javax.swing.Timer;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
@@ -61,7 +60,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.IntegerMap;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenu;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenuController;
-import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
@@ -286,7 +284,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		dendroView.addZoomListener(new ZoomSelectionListener());
 		dendroView.addDividerListener(new DividerListener());
 		dendroView.addSplitPaneListener(new SplitPaneListener());
-		dendroView.addResizeListener(new AppFrameListener());
 		dendroView.addDeselectClickListener(new PanelClickDeselector());
 		addDividerHoverListeners();
 		addDividerMouseWheelListeners();
@@ -660,7 +657,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 						+ "in DendroController ScaleListener.");
 			}
 
-			notifyAllMapObservers();
+			mvController.notifyAllMapObservers();
 		}
 	}
 
@@ -687,72 +684,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	}
 
 	/**
-	 * TODO - in my opinion obsolete because this only needs to be saved upon 
-	 * application quit (already happens) but discuss before removal - Chris
-	 * Also, this would belong in TVController since it handles the application 
-	 * window / frame.
-	 * 
-	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
-	 * as a result.
-	 */
-	private class AppFrameListener extends ComponentAdapter {
-
-		// Timer to prevent repeatedly saving window dimensions upon resize
-		private final int saveResizeDelay = 1000;
-		private javax.swing.Timer saveResizeTimer;
-		ActionListener saveWindowAttrs = new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				if (evt.getSource() == saveResizeTimer) {
-					/* Stop timer */
-					saveResizeTimer.stop();
-					saveResizeTimer = null;
-
-					tvFrame.storeState();
-				}
-			}
-		};
-
-		@Override
-		public void componentResized(final ComponentEvent arg0) {
-
-			// Previously, resetMapContainers was called here, but that caused
-			// the zoom level to change when the user resized the window, so I
-			// added a way to track the currently visible area in mapContainer
-			// and implemented these functions to make the necessary
-			// adjustments to the image when that happens
-			refocusViewPort();
-
-			// Save the new dimensions/position if it's done changing
-			if (this.saveResizeTimer == null) {
-				/*
-				 * Start waiting for saveResizeDelay millis to elapse and then
-				 * call actionPerformed of the ActionListener "saveWindowAttrs".
-				 */
-				this.saveResizeTimer = new Timer(this.saveResizeDelay,
-						saveWindowAttrs);
-				this.saveResizeTimer.start();
-			} else {
-				/* Event came too soon, swallow it by resetting the timer.. */
-				this.saveResizeTimer.restart();
-			}
-		}
-	}
-
-	/**
-	 * Notifies all MapContainers' observers.
-	 */
-	private void notifyAllMapObservers() {
-
-		globalXmap.notifyObservers();
-		globalYmap.notifyObservers();
-
-		interactiveXmap.notifyObservers();
-		interactiveYmap.notifyObservers();
-	}
-
-	/**
 	 * Deselects all of both axes' current selections.
 	 */
 	public void deselectAll() {
@@ -767,11 +698,16 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	}
 
 	/**
+	 * TODO Should be in MatrixViewController
 	 * Stores MapContainer settings (scale + scroll values) in Preferences
 	 * nodes.
 	 */
 	public void saveSettings() {
-
+    
+		if(configNode == null) {
+			return;
+		}
+		
 		try {
 			if (configNode.nodeExists("GlobalXMap") && interactiveXmap != null) {
 				configNode.node("GlobalXMap").putInt("scale",
@@ -804,7 +740,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	}
 
 	// TODO move to MVController
-	private void refocusViewPort() {
+	protected void refocusViewPort() {
 
 		interactiveXmap.adjustToScreenChange();
 		interactiveYmap.adjustToScreenChange();
@@ -1534,60 +1470,26 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		LogBuffer.println("Importing labels...");
 		
 		try {
+			Preferences labelViewNode;
 			if(!oldNode.nodeExists("RowLabelView")) {
 				LogBuffer.println("Missing node in parent. Could not import "
 						+ "row label settings.");
 			} else {
-				importLabelNode(dendroView.getRowLabelView(), 
-						oldNode.node("RowLabelView"));
+				labelViewNode = oldNode.node("RowLabelView");
+				dendroView.getRowLabelView().importStateFrom(labelViewNode);
 			}
 		
 			if(!oldNode.nodeExists("ColLabelView")) {
 				LogBuffer.println("Missing node in parent. Could not import "
 						+ "column label settings.");
 			} else {
-				importLabelNode(dendroView.getColLabelView(), 
-						oldNode.node("ColLabelView"));
+				labelViewNode = oldNode.node("ColLabelView");
+				dendroView.getColLabelView().importStateFrom(labelViewNode);
 			}
 		} catch (BackingStoreException e) {
 			LogBuffer.logException(e);
 			LogBuffer.println("Problem when trying to import label settings."
 					+ " Could not complete import.");
-			return;
-		}
-	}
-	
-	/**
-	 * Delegate the import of a Preferences node to a LabelView object
-	 * by passing the node to the LabelView object and replacing the 
-	 * configNode of the LabelView's HeaderSummary object with the node to be
-	 * imported.
-	 * @param labelView - The LabelView object for which to import preferences.
-	 * @param labelViewNode - The Preferences node from which to import stored
-	 * label settings.
-	 */
-	private void importLabelNode(final LabelView labelView, 
-			final Preferences labelViewNode) {
-		
-		labelView.importStateFrom(labelViewNode);
-		
-		try {
-			Preferences summaryNode;
-			if(labelViewNode.nodeExists("RowSummary")) {
-				summaryNode = labelViewNode.node("RowSummary");
-				
-			} else if(labelViewNode.nodeExists("ColSummary")) {
-				summaryNode = labelViewNode.node("ColSummary");
-				
-			} else {
-				summaryNode = null;
-			}
-			
-			labelView.getHeaderSummary().importStateFrom(summaryNode);
-			
-		} catch (BackingStoreException e) {
-			LogBuffer.logException(e);
-			LogBuffer.println("Skipping import of selected headers.");
 			return;
 		}
 	}
@@ -1600,7 +1502,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	// tvFrame.showSubDataModel(indexes, null, null);
 	// }
 
-	// Setters
 	/**
 	 * This should be called after setDataModel has been set to the appropriate
 	 * model

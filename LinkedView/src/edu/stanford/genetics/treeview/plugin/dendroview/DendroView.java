@@ -742,12 +742,6 @@ public class DendroView implements Observer, DendroPanel {
 		}
 	}
 
-	/* >>>>>>>>>> UI component listeners <<<<<<<<<< */
-	public void addResizeListener(final ComponentListener l) {
-
-		dendroPane.addComponentListener(l);
-	}
-
 	/**
 	 * Adds an ActionListener to the scale buttons in DendroView.
 	 *

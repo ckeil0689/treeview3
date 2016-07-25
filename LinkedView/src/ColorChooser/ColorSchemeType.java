@@ -1,5 +1,7 @@
 package ColorChooser;
 
+import edu.stanford.genetics.treeview.LogBuffer;
+
 public enum ColorSchemeType {
 	REDGREEN("Red-Green"), YELLOWBLUE("Yellow-Blue"), CUSTOM("Custom");
 	
@@ -31,6 +33,8 @@ public enum ColorSchemeType {
 			
 		} else {
 			member = REDGREEN;
+			LogBuffer.println("Could not get member from key: " + key 
+			                  + ". Set default: " + REDGREEN);
 		}
 		
 		return member;

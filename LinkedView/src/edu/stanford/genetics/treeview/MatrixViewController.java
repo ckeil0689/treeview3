@@ -877,7 +877,7 @@ ConfigNodePersistent, Controller {
 	/**
 	 * Notifies all MapContainers' observers.
 	 */
-	private void notifyAllMapObservers() {
+	public void notifyAllMapObservers() {
 
 		globalXmap.notifyObservers();
 		globalYmap.notifyObservers();

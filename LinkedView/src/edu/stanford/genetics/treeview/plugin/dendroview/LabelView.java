@@ -23,6 +23,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.util.Observable;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BoundedRangeModel;
@@ -522,10 +523,30 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		setSavedPoints(node.getInt("size", d_size));
 		setJustifyOption(node.getBoolean("isRightJustified", d_justified));
 		setFixed(node.getBoolean("isFixed", d_fixed));
-
+		
 		//Signal that the secondary scroll position should be reset the next
 		//time it is needed
 		resetSecondaryScroll();
+		
+		try {
+			Preferences summaryNode;
+			if(node.nodeExists("RowSummary")) {
+				summaryNode = node.node("RowSummary");
+				
+			} else if(node.nodeExists("ColSummary")) {
+				summaryNode = node.node("ColSummary");
+				
+			} else {
+				summaryNode = null;
+			}
+			
+			getHeaderSummary().importStateFrom(summaryNode);
+			
+		} catch (BackingStoreException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Skipping import of selected headers.");
+			return;
+		}
 	}
 
 	@Override
