@@ -26,7 +26,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
  * @author CKeil
  *
  */
-public class LabelSettings extends CustomDialog {//implements ConfigNodePersistent {
+public class LabelSettings extends CustomDialog {
 
 	/**
 	 * Default serial version ID to keep Eclipse happy...
@@ -37,7 +37,6 @@ public class LabelSettings extends CustomDialog {//implements ConfigNodePersiste
 	private String menu;
 	private HeaderInfo rowHI;
 	private HeaderInfo colHI;
-//	private Preferences configNode;
 
 	private final DendroView dendroView;
 	private JButton okBtn;
@@ -68,52 +67,6 @@ public class LabelSettings extends CustomDialog {//implements ConfigNodePersiste
 		this.menu = menu;
 		setupLayout();
 	}
-
-//	/**
-//	 * Setting the configNode for the PreferencesMenu
-//	 *
-//	 * @param configNode
-//	 */
-//	@Override
-//	public void setConfigNode(final Preferences parentNode) {
-//
-//		if (parentNode == null) {
-//			LogBuffer.println("Could not find or create LabelSettings "
-//					+ "node because parentNode was null.");
-//			return;
-//		}
-//		
-//		this.configNode = parentNode.node(StringRes.pnode_Preferences);
-//	}
-//	
-//	/**
-//	 * Returns PreferencesMenu's configNode.
-//	 *
-//	 * @return
-//	 */
-//	@Override
-//	public Preferences getConfigNode() {
-//
-//		return configNode;
-//	}
-//
-//	@Override
-//	public void requestStoredState() {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
-//	@Override
-//	public void storeState() {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//	
-//	@Override
-//	public void importStateFrom(Preferences oldNode) {
-//		// TODO Auto-generated method stub
-//		
-//	}
 
 	/**
 	 * Returns the menu frame holding all the JPanels to display to the user.

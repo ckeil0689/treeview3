@@ -112,7 +112,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 				setIncluded(new int[0]);
 
 			} else {
-				String[] inclArray = getValuesFromStoredString(incString);
+				String[] inclArray = getStringValuesFromKeyString(incString);
 				int[] array = new int[inclArray.length];
 				
 				try {
@@ -276,16 +276,16 @@ implements ConfigNodePersistent, ModelLoadReset {
 	}
 	
 	/**
-	 * Preferences nodes store can only store String arrays as a single string.
+	 * Preferences nodes can only store String arrays as a single string.
 	 * This method is a helper used to convert such strings back to an array
 	 * by removing brackets, spaces, and splitting the String up at commas.
-	 * @param storedVal - A String object, should be a single String 
+	 * @param keyString - A String object, should be a single String 
 	 * representing comma-separated String array.
 	 * @return An array of Strings
 	 */
-	private String[] getValuesFromStoredString(final String storedVal) {
+	private String[] getStringValuesFromKeyString(final String keyString) {
 		
-		String[] storedVals = storedVal
+		String[] storedVals = keyString
 				.replaceAll("\\[", "")
 				.replaceAll("\\]", "")
 				.split(",");
@@ -325,7 +325,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 		
 		if (nodeHasAttribute("includedNames", configNode)) {
 			String names = configNode.get("includedNames", "[0]");
-			inclNames = getValuesFromStoredString(names);
+			inclNames = getStringValuesFromKeyString(names);
 			
 			int inclSize = inclNames.length;
 			newIncluded = new int[inclSize];

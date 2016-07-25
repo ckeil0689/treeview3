@@ -60,7 +60,7 @@ ConfigNodePersistent, Controller {
 	private DataModel model;
 	protected Preferences configNode;
 	
-	/* Data ticker reference, so it can be updated by the MouseAdapter */ 
+	// Data ticker reference, so it can be updated by the MouseAdapter
 	private DataTicker ticker;
 	
 	public MatrixViewController(final InteractiveMatrixView imView,
@@ -231,8 +231,6 @@ ConfigNodePersistent, Controller {
 	
 	private void setupDrawingComponents() {
 		
-//		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
-//		colorPresets.setConfigNode(configNode);
 		this.colorExtractor = new ColorExtractor(
 				model.getDataMatrix().getMinVal(), model.getDataMatrix()
 						.getMaxVal());

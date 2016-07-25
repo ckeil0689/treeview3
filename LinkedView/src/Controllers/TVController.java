@@ -79,7 +79,7 @@ public class TVController implements Observer {
 		this.tvFrame = tvFrame;
 		this.dendroController = new DendroController(tvFrame, this);
 
-		/* Add the view as observer to the model */
+		// Add the view as observer to the model
 		((TVModel) model).addObserver(tvFrame);
 
 		tvFrame.addObserver(this);
@@ -281,7 +281,7 @@ public class TVController implements Observer {
 			// and implemented these functions to make the necessary
 			// adjustments to the image when that happens
 			if(dendroController != null) {
-				dendroController.refocusViewPort();
+				 dendroController.refocusViewPort();
 			}
 
 			// Save the new dimensions/position if it's done changing
@@ -346,7 +346,8 @@ public class TVController implements Observer {
 	/**
 	 * Finish up loading by setting the model loaded status to true and creating
 	 * a new DendroView.
-	 * @param wasClusterFile Whether a file is being loaded after clustering.
+	 * @param dataInfo - An object containing important information for data
+	 * loading including user selections from the import dialog, if available.
 	 */
 	public void finishLoading(final DataLoadInfo dataInfo) {
 
@@ -360,7 +361,7 @@ public class TVController implements Observer {
 
 			if (fileMenuSet != null) {
 				/*
-				 * Needs to happen after setNewMatrix because a new
+				 * TODO Needs to happen after setNewMatrix because a new
 				 * ColorExtractor object is created, which would void the 
 				 * updated ColorExtractor state if copying happens before. 
 				 * Implement a nicer solution one day...
@@ -430,7 +431,7 @@ public class TVController implements Observer {
 	 * Copies label and color data from the pre-clustered file to the
 	 * Preferences node of the post-clustered file.
 	 * 
-	 * @param oldNode A node from which to import preferences settings.
+	 * @param loadedNode - A node from which to import preferences settings.
 	 */
 	private void importOldPreferencesFrom(final Preferences loadedNode) {
 
