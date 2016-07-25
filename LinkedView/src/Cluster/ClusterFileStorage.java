@@ -2,6 +2,8 @@ package Cluster;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -30,9 +32,31 @@ public class ClusterFileStorage {
 	public File createFile(final String filePath, final String fileEnd,
 			final int linkMethod) {
 		
+		if(filePath == null || fileEnd == null) {
+			LogBuffer.println("Cannot create file. FilePath or fileEnd was null.");
+			return null;
+		}
+		
+		Path path = Paths.get(filePath);
+		
+		if(path == null) {
+			LogBuffer.println("Cannot create file. Path could not be resolved.");
+			return null;
+		}
+		
+		Path fileNameP = path.getFileName();
+		Path rootDirP = path.getParent();
+		
+		if(fileNameP == null || rootDirP == null) {
+			LogBuffer.println("Cannot create file. File name or root directory " +
+				"could not be resolved.");
+			return null;
+		}
+		
+		String fileName = fileNameP.toString();
+		String rootDir = rootDirP.toString() + File.separatorChar;
+		
 		String linkName = getLinkName(linkMethod);
-		String fileName = getFileName(filePath);
-		String rootDir = getRootDir(filePath, fileName);
 		String subDir = setLinkDir(rootDir, fileName, linkName);
 		
 		return retrieveFile(subDir, fileName, linkName, fileEnd);
@@ -80,6 +104,11 @@ public class ClusterFileStorage {
 
 		// Substring starts one right from last separator char
 		int startIdx = getLastFileSeparatorPos(filePath) + 1;
+		
+		// Check if path is only a directory (trailing separator char)
+		if(startIdx == filePath.length()) {
+			return null;
+		}
 
 		return getRootFileName(filePath.substring(startIdx, filePath.length()));
 	}
@@ -95,6 +124,12 @@ public class ClusterFileStorage {
 	                                 final String fileName) {
 
 		int first = filePath.indexOf(fileName, 0);
+		
+		// fileName does not occur in filePath, does it cannot be removed
+		// or the filePath is the same as fileName
+		if(first < 1) {
+			return null;
+		}
 
 		return filePath.substring(0, first);
 	}
@@ -148,15 +183,17 @@ public class ClusterFileStorage {
 	private static String setLinkDir(final String rootDir, final String fileName, 
 			final String linkName) {
 
-		String linkSubDir = rootDir + fileName + File.separator + linkName;
-		File file = new File(linkSubDir);
+//		String linkSubDir = rootDir + fileName + File.separator + linkName;
+		Path subdir = Paths.get(rootDir, fileName, linkName);
+		File file = subdir.toFile();
+//		File file = new File(linkSubDir);
 
 		// Create folder if it does not exist
 		if (!(file.exists() && file.isDirectory())) {
 			file.mkdirs();
 		}
 
-		return linkSubDir += File.separator;
+		return subdir.toString();//linkSubDir += File.separator;
 	}
 
 	/**
@@ -271,12 +308,13 @@ public class ClusterFileStorage {
   /**
    * Finds the last position of a File.separatorChar in a filePath String.  
    * @param filePath - The filePath String.
-   * @return The index of the last position of a File.separatorChar.
+   * @return The index of the last position of a File.separatorChar. 
+   * If no separator char is found it returns -1.
    */
   private static int getLastFileSeparatorPos(final String filePath) {
   	
 		char[] nameArray = filePath.toCharArray();
-		int startIndex = 0;
+		int startIndex = -1;
 		for (int i = 0; i < nameArray.length; i++) {
 			if (nameArray[i] == File.separatorChar) {
 				startIndex = i;
