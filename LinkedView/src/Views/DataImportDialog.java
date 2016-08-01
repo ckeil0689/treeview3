@@ -18,6 +18,7 @@ import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.PreviewDataTable;
+import edu.stanford.genetics.treeview.model.PreviewLoader;
 
 public class DataImportDialog extends CustomDialog {
 
@@ -92,8 +93,10 @@ public class DataImportDialog extends CustomDialog {
 				GUIFactory.createBoldLabel(findDataStartText);
 
 		// must be ints for spinner listener
-		SpinnerNumberModel indexModel = new SpinnerNumberModel(0, 0, 10, 1);
-		SpinnerNumberModel indexModel2 = new SpinnerNumberModel(0, 0, 10, 1);
+		SpinnerNumberModel indexModel = new SpinnerNumberModel(1,1,
+			PreviewLoader.LIMIT,1);
+		SpinnerNumberModel indexModel2 = new SpinnerNumberModel(1,1,
+			PreviewLoader.LIMIT,1);
 
 		final String rowSpinnerText = "Row:";
 		JLabel rowSpinnerLabel = GUIFactory.createLabel(rowSpinnerText);
@@ -112,7 +115,8 @@ public class DataImportDialog extends CustomDialog {
 		indexPanel.add(columnDataStart, "pushx 5");
 		indexPanel.add(findDataBtn, "pushx");
 
-		final String previewText = "Preview (25x25):";
+		final String previewText = "Preview (" + PreviewLoader.LIMIT + "x" +
+			PreviewLoader.LIMIT + "):";
 		final JLabel preTableLine = GUIFactory.createBoldLabel(previewText);
 
 		final JScrollPane scrollPane = new JScrollPane(dataTable);
@@ -244,18 +248,50 @@ public class DataImportDialog extends CustomDialog {
 		getRootPane().setDefaultButton(proceedBtn);
 	}
 
+	/**
+	 * Takes the number of rows & columns that are label rows/columns and sets
+	 * the column & row number (numbered from 1) which represents the first data
+	 * cell (i.e. non-label row/col).  Note that the spinners reflect the "First
+	 * Data Cell".
+	 * @param rowCount - number of rows (from the top) containing labels.  Also
+	 *                   can be interpreted as the index of the first row of
+	 *                   data
+	 * @param columnCount - number of columns (from the left) containing labels
+	 *                      Also can be interpreted as the index of the first
+	 *                      column of data
+	 **/
 	public void setSpinnerValues(final int rowCount, final int columnCount) {
 
-		rowDataStart.setValue(Integer.valueOf(rowCount));
-		columnDataStart.setValue(Integer.valueOf(columnCount));
+		rowDataStart.setValue(Integer.valueOf(rowCount) + 1);
+		columnDataStart.setValue(Integer.valueOf(columnCount) + 1);
 	}
 
 	public void setResult(final String delimiter) {
 
-		int rowNum = (Integer) rowDataStart.getValue();
-		int colNum = (Integer) columnDataStart.getValue();
+		int rowNum = getRowSpinnerDataIndex();
+		int colNum = getColSpinnerDataIndex();
 
 		this.result = new DataLoadInfo(new int[] { rowNum, colNum }, delimiter);
+	}
+
+	/**
+	 * Calculates and returns the data index of the first row containing data
+	 * 
+	 * @return int
+	 */
+	public int getRowSpinnerDataIndex() {
+
+		return((Integer) rowDataStart.getValue() - 1);
+	}
+
+	/**
+	 * Calculates and returns the data index of the first column containing data
+	 * 
+	 * @return int
+	 */
+	public int getColSpinnerDataIndex() {
+
+		return((Integer) columnDataStart.getValue() - 1);
 	}
 
 	public JSpinner getRowStartSpinner() {

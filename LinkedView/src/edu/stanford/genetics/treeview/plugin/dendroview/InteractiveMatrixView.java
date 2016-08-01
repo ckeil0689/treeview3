@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
@@ -48,6 +49,8 @@ public class InteractiveMatrixView extends MatrixView {
 	 */
 	private List<Rectangle> selectionRectList = new ArrayList<Rectangle>();
 	private Rectangle tmpRect = new Rectangle();
+	private Rectangle rowHoverRect = new Rectangle();
+	private Rectangle columnHoverRect = new Rectangle();
 
 	/**
 	 * Circle to be used as indicator for selection
@@ -172,6 +175,22 @@ public class InteractiveMatrixView extends MatrixView {
 			g2.drawRect(tmpRect.x, tmpRect.y, tmpRect.width, tmpRect.height);
 		}
 
+		if(isRowHoverHighlightActive() && ymap.overALabelLinkedView() &&
+			!ymap.isSelecting()) {
+
+			updateRowHoverRect();
+			g2.drawRect(rowHoverRect.x,rowHoverRect.y,rowHoverRect.width,
+				rowHoverRect.height);
+		}
+
+		if(isColumnHoverHighlightActive() && xmap.overALabelLinkedView() &&
+			!xmap.isSelecting()) {
+
+			updateColumnHoverRect();
+			g2.drawRect(columnHoverRect.x,columnHoverRect.y,
+				columnHoverRect.width,columnHoverRect.height);
+		}
+
 		if (selectionRectList != null) {
 			//Reinitialize the graphics object
 			g2 = (Graphics2D) g;
@@ -260,6 +279,22 @@ public class InteractiveMatrixView extends MatrixView {
 
 	/**
 	 * @author rleach
+	 * @return the overlayTempChange
+	 */
+	public boolean isRowHoverHighlightActive() {
+		return(ymap.isHoverHighlightActive());
+	}
+
+	/**
+	 * @author rleach
+	 * @return the overlayTempChange
+	 */
+	public boolean isColumnHoverHighlightActive() {
+		return(xmap.isHoverHighlightActive());
+	}
+
+	/**
+	 * @author rleach
 	 * @param overlayTempChange the overlayTempChange to set
 	 */
 	public void setOverlayTempChange(boolean overlayTempChange) {
@@ -268,10 +303,88 @@ public class InteractiveMatrixView extends MatrixView {
 
 	/**
 	 * @author rleach
+	 * @param rhh the HighlightHover to set
+	 */
+	public void setRowHoverHighlight(boolean rhh) {
+		ymap.setHoverHighlight(rhh);
+	}
+
+	/**
+	 * @author rleach
+	 * @param chh the HighlightHoverChange to set
+	 */
+	public void setColumnHoverHighlight(boolean chh) {
+		xmap.setHoverHighlight(chh);
+	}
+
+	/**
+	 * @author rleach
 	 * @param tmpRect the tmpRect to set
 	 */
 	public void setTmpRect(Rectangle tmpRect) {
 		this.tmpRect = tmpRect;
+	}
+
+	/**
+	 * @author rleach
+	 * @param hRect the rowHoverRect to set
+	 */
+	public void setRowHoverRect(Rectangle hRect) {
+		this.rowHoverRect = hRect;
+	}
+
+	/**
+	 * @author rleach
+	 * @param hRect the columnHoverRect to set
+	 */
+	public void setColumnHoverRect(Rectangle hRect) {
+		this.columnHoverRect = hRect;
+	}
+
+	public void updateRowHoverRect() {
+		if(!ymap.overALabelLinkedView()) {
+			//Push the column highlight offscreen
+			rowHoverRect.setLocation(0,(int) -ymap.getScale() - 1);
+			return;
+		}
+
+		Point startHover = new Point();
+		Point endHover   = new Point();
+
+		startHover.setLocation(xmap.getPixel(xmap.getMinIndex()),
+			ymap.getPixel(ymap.getHoverIndex()));
+		endHover.setLocation(xmap.getPixel(xmap.getMaxIndex() + 1) - 1,
+			ymap.getPixel(ymap.getHoverIndex() + 1) - 1);
+
+		/* Full row hover coords */
+		rowHoverRect.setLocation(startHover);
+		rowHoverRect.setSize(0,0);
+		rowHoverRect.add(endHover);
+
+		repaint();
+	}
+
+	public void updateColumnHoverRect() {
+		if(!xmap.overALabelLinkedView()) {
+			//Push the column highlight offscreen
+			columnHoverRect.setLocation((int) -xmap.getScale() - 1,0);
+			return;
+		}
+
+		Point startHover = new Point();
+		Point endHover   = new Point();
+	
+		startHover.setLocation(xmap.getPixel(xmap.getHoverIndex()),
+			ymap.getPixel(ymap.getMinIndex()));
+		endHover.setLocation(xmap.getPixel(xmap.getHoverIndex() + 1) - 1,
+			ymap.getPixel(ymap.getMaxIndex() + 1) - 1);
+	
+		/* Full row hover coords */
+		columnHoverRect.setLocation(startHover);
+		columnHoverRect.setSize(0,0);
+		columnHoverRect.add(endHover);
+	
+		repaint();
 	}
 
 	/**

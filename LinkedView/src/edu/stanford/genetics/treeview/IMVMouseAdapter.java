@@ -38,7 +38,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	 * This rectangle keeps track of where the drag rect was drawn
 	 */
 	private final Rectangle dragRect = new Rectangle();
-	
+
 	/**
 	 * Points to track candidate selected rows/cols should reflect where the
 	 * mouse has actually been
@@ -86,17 +86,19 @@ public class IMVMouseAdapter extends MouseAdapter {
 		if(!imView.enclosingWindow().isActive()) {
 			return;
 		}
-		
+
 		/* TODO passing index makes the most sense but an overloaded method 
 		 * that takes a pixel works well too. 
 		 * Reduces clutter in calling classes a little bit.
 		 */
 		int rowIdx = ymap.getIndex(e.getY());
 		int colIdx = xmap.getIndex(e.getX());
-		
+
 		xmap.setHoverIndex(colIdx);
 		ymap.setHoverIndex(rowIdx);
-		
+
+		imView.repaint();
+
 		mvController.setDataValueAt(rowIdx, colIdx);
 	}
 	
@@ -112,6 +114,9 @@ public class IMVMouseAdapter extends MouseAdapter {
 
 		imView.debug("mousePressed: Setting pressedX [" + pressedX +
 			"] and pressedY [" + pressedY + "].", 10);
+
+		imView.setRowHoverHighlight(false);
+		imView.setColumnHoverHighlight(false);
 
 		//If a previous 200ms timer is still running, restart the timer and
 		//increment the clickCount
@@ -183,11 +188,9 @@ public class IMVMouseAdapter extends MouseAdapter {
 			if(e.isShiftDown()) {
 				processLeftShiftDragDuring(pressedX, pressedY, e.getX(), 
 						e.getY());
-				
 			} else if(e.isControlDown()) {
 				processLeftControlDragDuring(pressedX, pressedY, e.getX(),
 						e.getY());
-				
 			} else {
 				processLeftDragDuring(pressedX, pressedY, e.getX(), e.getY());
 			}
@@ -359,7 +362,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 		}
 
 		imView.setHasMouse(false);
-		mvController.setDataValueAt(-1, -1);
+		mvController.setMeanDataValue();
 
 		xmap.setHoverIndex(-1);
 		ymap.setHoverIndex(-1);
@@ -1362,7 +1365,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 		imView.drawBand(getPixelRect(dragRect));
 	}
-	
+
 	/**
 	 * Processes left shift click drag movement event
 	 * @author rleach
@@ -1398,7 +1401,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 		imView.drawBand(getPixelRect(dragRect));
 	}
-	
+
 	/**
 	 * Processes left control click drag movement event
 	 * @author rleach
@@ -1434,7 +1437,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 	
 		imView.drawBand(getPixelRect(dragRect));
 	}
-	
+
 	/**
 	 * Processes a completed right single click.
 	 * TODO Delete parameters from method signature UNLESS method will be used
