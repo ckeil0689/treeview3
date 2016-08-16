@@ -37,6 +37,8 @@ public class ClusterFileStorage {
 			return null;
 		}
 		
+		LogBuffer.println(">>>>> " + fileEnd);
+		LogBuffer.println("filePath: " + filePath);
 		Path path = Paths.get(filePath);
 		
 		if(path == null) {
@@ -53,11 +55,15 @@ public class ClusterFileStorage {
 			return null;
 		}
 		
-		String fileName = fileNameP.toString();
+		String fileName = getRootFileName(fileNameP.toString());
 		String rootDir = rootDirP.toString() + File.separatorChar;
 		
 		String linkName = getLinkName(linkMethod);
-		String subDir = setLinkDir(rootDir, fileName, linkName);
+		String subDir = createSubDir(rootDir, fileName, linkName);
+		
+		LogBuffer.println("RootDir: " + rootDir);
+		LogBuffer.println("Created subDir: " + subDir);
+		LogBuffer.println("Found file name: " + fileName);
 		
 		return retrieveFile(subDir, fileName, linkName, fileEnd);
 	}
@@ -90,48 +96,6 @@ public class ClusterFileStorage {
 		}
 
 		return linkName;
-	}
-
-	/**
-	 * Gets the name of a file from a file path String by finding the last
-	 * occurrence of a File.separatorChar and using it as a startIndex to
-	 * extract a substring of the file name + extension which is passed to
-	 * getRootFileName() where the file name will be determined.
-	 * @param filePath - The path of a file for which to extract the name.
-	 * @return The name of a file.
-	 */
-	private static String getFileName(final String filePath) {
-
-		// Substring starts one right from last separator char
-		int startIdx = getLastFileSeparatorPos(filePath) + 1;
-		
-		// Check if path is only a directory (trailing separator char)
-		if(startIdx == filePath.length()) {
-			return null;
-		}
-
-		return getRootFileName(filePath.substring(startIdx, filePath.length()));
-	}
-
-	/**
-	 * Extracts the path to a directory in which the file with the supplied name 
-	 * is present. 
-	 * @param filePath - The full path to the file.
-	 * @param fileName - The name of the file.
-	 * @return The original filePath String shortened by the name of the file.
-	 */
-	private static String getRootDir(final String filePath, 
-	                                 final String fileName) {
-
-		int first = filePath.indexOf(fileName, 0);
-		
-		// fileName does not occur in filePath, does it cannot be removed
-		// or the filePath is the same as fileName
-		if(first < 1) {
-			return null;
-		}
-
-		return filePath.substring(0, first);
 	}
 
 	/**
@@ -180,20 +144,20 @@ public class ClusterFileStorage {
 	 *            The directory plus file name without file type.
 	 * @return The main file's directory.
 	 */
-	private static String setLinkDir(final String rootDir, final String fileName, 
-			final String linkName) {
+	private static String createSubDir(final String rootDir, 
+	                                   final String fileName, 
+	                                   final String linkName) {
 
-//		String linkSubDir = rootDir + fileName + File.separator + linkName;
 		Path subdir = Paths.get(rootDir, fileName, linkName);
+		LogBuffer.println("Checking for this directory: " + subdir.toString());
 		File file = subdir.toFile();
-//		File file = new File(linkSubDir);
 
 		// Create folder if it does not exist
 		if (!(file.exists() && file.isDirectory())) {
 			file.mkdirs();
 		}
 
-		return subdir.toString();//linkSubDir += File.separator;
+		return subdir.toString();
 	}
 
 	/**
@@ -209,9 +173,7 @@ public class ClusterFileStorage {
 	                          final String linkName, final String fileEnd) {
 
 		fileName += "_" + linkName;
-		String fullFileID = dir + fileName + fileEnd;
-		
-		File tempFile = new File(fullFileID);
+		File tempFile = Paths.get(dir, fileName, fileEnd).toFile();
 		
 		try {
 			// Do not overwrite at the moment
@@ -239,21 +201,30 @@ public class ClusterFileStorage {
 	 */
 	private static File getNewFile(String dir, String oldName, String fileEnd) {
 
-		File file = new File(dir + oldName + fileEnd);
+		String fileDescr = oldName + fileEnd;
+		File file = Paths.get(dir, fileDescr).toFile();
 
 		/*
 		 * Even for gtr and atr files, the cdt files are the ones that should 
 		 * be exclusively counted. While single axes might be clustered, 
 		 * if the user hits cancel during clustering, no .cdt file will exist. 
 		 */
-		File cdtFile = new File(dir + oldName + ".cdt");
+		String cdtFileDescr = oldName + ".cdt";
+		File cdtFile = Paths.get(dir, cdtFileDescr).toFile();
 
 		int fileCount = 0;
-
+    String cdtSuffix;
+    String suffix;
 		while (cdtFile.exists()) {
 			fileCount++;
-			cdtFile = new File(dir + oldName + "_" + fileCount + ".cdt");
-			file = new File(dir + oldName + "_" + fileCount + fileEnd);
+			
+			cdtSuffix = "_" + fileCount + ".cdt";
+			cdtFileDescr = oldName + cdtSuffix;
+			cdtFile = Paths.get(dir, cdtFileDescr).toFile();
+			
+			suffix = "_" + fileCount + fileEnd;
+			fileDescr = oldName + suffix;
+			file = Paths.get(dir, fileDescr).toFile();
 		}
 
 		cdtFile = null;
@@ -304,23 +275,4 @@ public class ClusterFileStorage {
 		
 		return fileEnd;
    }
-   
-  /**
-   * Finds the last position of a File.separatorChar in a filePath String.  
-   * @param filePath - The filePath String.
-   * @return The index of the last position of a File.separatorChar. 
-   * If no separator char is found it returns -1.
-   */
-  private static int getLastFileSeparatorPos(final String filePath) {
-  	
-		char[] nameArray = filePath.toCharArray();
-		int startIndex = -1;
-		for (int i = 0; i < nameArray.length; i++) {
-			if (nameArray[i] == File.separatorChar) {
-				startIndex = i;
-			}
-		}
-		
-		return startIndex;
-  }
 }

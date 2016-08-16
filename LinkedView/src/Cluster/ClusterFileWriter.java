@@ -95,7 +95,7 @@ public class ClusterFileWriter {
 			
 		} catch (final IOException e) {
 			LogBuffer.logException(e);
-            bw = null;
+      bw = null;
 		}
 	}
 	
