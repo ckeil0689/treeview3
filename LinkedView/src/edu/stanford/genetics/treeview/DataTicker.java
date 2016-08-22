@@ -10,6 +10,7 @@ package edu.stanford.genetics.treeview;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
@@ -18,6 +19,11 @@ public class DataTicker {
 
 	private final JPanel tickerPanel;
 	private final JTextArea valTextArea;
+	/** 
+	 * describes which of the average values that is being displayed
+	 * e.g. Data Value, Row Ave, Col Ave...
+	 */
+	private final JLabel textLabel;
 
 	/**
 	 * Creates a new DataTicker instance.
@@ -25,6 +31,8 @@ public class DataTicker {
 	public DataTicker() {
 
 		this.valTextArea = GUIFactory.createWrappableTextArea();
+		this.textLabel = GUIFactory.createLabel("",GUIFactory.FONTS);
+		textLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.tickerPanel = new TickerPanel();
 	}
 
@@ -52,11 +60,12 @@ public class DataTicker {
 		}
 
 		private void setupDataTicker() {
-
-			final JLabel val = GUIFactory.createLabel("Data value:",
+			
+			final JLabel val = GUIFactory.createLabel(":",
 					GUIFactory.FONTS);
-			add(val, "w 10%");
-			add(valTextArea, "w 90%, growx, wrap");
+			add(textLabel, "w 80!");
+			add(val);
+			add(valTextArea, "wrap");
 
 			revalidate();
 			repaint();
@@ -75,9 +84,10 @@ public class DataTicker {
 	
 	/**
 	 * Updates the JTextArea which displays the String.
-	 * @param val - The value to be displayed as String.
+	 * @param text - The value to be displayed as String.
 	 */
-	public void setValue(String str) {
-		valTextArea.setText(str);
+	public void setText(String text){
+		textLabel.setText(text);
 	}
+	
 }

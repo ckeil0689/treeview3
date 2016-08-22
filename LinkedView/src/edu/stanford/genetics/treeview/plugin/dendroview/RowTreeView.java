@@ -266,6 +266,7 @@ public class RowTreeView extends TRView {
 	protected void setDataTickerValue(MouseEvent e) {
 		int from = (int) hoveredNode.getLeftLeaf().getIndex();
 		int to = (int) hoveredNode.getRightLeaf().getIndex();
-		ticker.setValue( dataModel.getDataMatrix().getRowAverage(from, to) + " [tree ave]");
+		ticker.setText("Subtree Ave");
+		ticker.setValue( dataModel.getDataMatrix().getRowAverage(from, to));
 	}
 }
