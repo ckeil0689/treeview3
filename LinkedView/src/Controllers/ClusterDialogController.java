@@ -262,7 +262,7 @@ public class ClusterDialogController {
 			}
 			
 			/* If all went smooth, create File object for CDT file */
-			String fileEnd = clusStore.getClusterFileExtension(
+			String fileEnd = clusStore.determineClusterFileExt(
 					isHierarchical(), clusterView.getSpinnerValues(), 
 					rowClusterData, colClusterData);
 			
