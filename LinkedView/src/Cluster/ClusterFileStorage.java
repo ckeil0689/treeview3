@@ -40,7 +40,6 @@ public class ClusterFileStorage {
 			return null;
 		}
 
-		LogBuffer.println(">>>>> " + filePath);
 		final Path path = Paths.get(filePath);
 
 		if(path == null) {
@@ -62,10 +61,6 @@ public class ClusterFileStorage {
 
 		final String linkName = ClusterFileStorage.getLinkName(linkMethod);
 		final String subDir = ClusterFileStorage.createSubDir(rootDir, linkName);
-
-		LogBuffer.println("RootDir: " + rootDir);
-		LogBuffer.println("Created subDir: " + subDir);
-		LogBuffer.println("Found file name: " + rootFileName);
 
 		rootFileName += "_" + linkName;
 		clusterFileCommonPath = Paths.get(subDir, rootFileName);
@@ -90,7 +85,7 @@ public class ClusterFileStorage {
 			String elem = it.next().toString();
 			elemCounter++;
 			if(elem.equalsIgnoreCase(rootFileName)) {
-				return defaultPath.subpath(0, elemCounter).toString();
+				return defaultPath.getRoot().toString() + defaultPath.subpath(0, elemCounter).toString();
 			}
 		}
 	
@@ -178,7 +173,6 @@ public class ClusterFileStorage {
 	private static String createSubDir(final String rootDir, final String linkName) {
 
 		final Path subdir = Paths.get(rootDir, linkName);
-		LogBuffer.println("Checking for this directory: " + subdir.toString());
 		final File file = subdir.toFile();
 
 		// Create folder if it does not exist

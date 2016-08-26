@@ -228,6 +228,7 @@ public class ClusterDialogController {
 			
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], clusterCheck[COL_IDX]);
 			
+			// TODO need to add drive partition part to the path when subpath is created
 			final Path clusterFilePath = ClusterFileStorage.createDirectoryStruc(oldFileName, 
 					clusterView.getLinkMethod());
 			
