@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -193,15 +194,11 @@ public class ClusterDialogController {
 		protected Boolean doInBackground() throws Exception {
 
 			/* Get fileName for saving calculated data */
-			final ClusterFileStorage clusStore = new ClusterFileStorage();
 			final int extlen = tvModel.getFileSet().getExt().length();
-			
-			this.oldFileName = tvModel.getSource().substring(0,
-					tvModel.getSource().length() - extlen);
+			this.oldFileName = tvModel.getSource().substring(0, tvModel.getSource().length() - extlen);
 
 			/* Initialize the clustering processor and pass the data */
-			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
-					.getDataMatrix();
+			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel.getDataMatrix();
 			
 			/* Initialize the cluster processor */
 			if(isHierarchical()) {
@@ -211,11 +208,10 @@ public class ClusterDialogController {
 				final IntHeaderInfo rowHeaderI = tvModel.getRowHeaderInfo();
 				final IntHeaderInfo colHeaderI = tvModel.getColHeaderInfo();
 				
-				processor = new ClusterProcessor(originalMatrix, oldFileName,
-						rowHeaderI, colHeaderI);
+				processor = new ClusterProcessor(originalMatrix, oldFileName, rowHeaderI, colHeaderI);
 			}
 
-			/* Set zeroes invalid if they should be ignored. */
+			// Set zeroes invalid if they should be ignored.
 			if (clusterView.isIgnoreZeroesChecked()) {
 				originalMatrix.setZeroesToMissing();
 			}
@@ -230,15 +226,15 @@ public class ClusterDialogController {
 				return false;
 			}
 			
-			setupClusterViewProgressBar(clusterCheck[ROW_IDX], 
-					clusterCheck[COL_IDX]);
+			setupClusterViewProgressBar(clusterCheck[ROW_IDX], clusterCheck[COL_IDX]);
 			
-			/* Cluster rows */
+			final Path clusterFilePath = ClusterFileStorage.createDirectoryStruc(oldFileName, 
+					clusterView.getLinkMethod());
+			
+			// Cluster rows if user selected option
 			if (clusterCheck[ROW_IDX]) {
-				gtrFile = clusStore.createFile(oldFileName, GTR_END, 
-						clusterView.getLinkMethod());
-				rowClusterData.setReorderedIDs(
-						calculateAxis(rowSimilarity, ROW, gtrFile));
+				gtrFile = ClusterFileStorage.retrieveFile(clusterFilePath, GTR_END);
+				rowClusterData.setReorderedIDs(calculateAxis(rowSimilarity, ROW, gtrFile));
 				rowClusterData.shouldReorderAxis(true);
 			}
 
@@ -247,12 +243,10 @@ public class ClusterDialogController {
 				return false;
 			}
 			
-			/* Cluster columns */
+			// Cluster columns if user selected option
 			if (clusterCheck[COL_IDX]) {
-				atrFile = clusStore.createFile(oldFileName, ATR_END, 
-						clusterView.getLinkMethod());
-				colClusterData.setReorderedIDs(
-						calculateAxis(colSimilarity, COL, atrFile));
+				atrFile = ClusterFileStorage.retrieveFile(clusterFilePath, ATR_END);
+				colClusterData.setReorderedIDs(calculateAxis(colSimilarity, COL, atrFile));
 				colClusterData.shouldReorderAxis(true);
 			}
 			
@@ -261,13 +255,12 @@ public class ClusterDialogController {
 				return false;
 			}
 			
-			/* If all went smooth, create File object for CDT file */
-			String fileEnd = clusStore.determineClusterFileExt(
+			// Determine file extensions for CDT file (varies between hierarchical and k-means)
+			String fileEnd = ClusterFileStorage.determineClusterFileExt(
 					isHierarchical(), clusterView.getSpinnerValues(), 
 					rowClusterData, colClusterData);
 			
-			cdtFile = clusStore.createFile(oldFileName, fileEnd, 
-					clusterView.getLinkMethod());
+			cdtFile = ClusterFileStorage.retrieveFile(clusterFilePath, fileEnd);
 
 			if(cdtFile == null) {
 				this.cancel(true);

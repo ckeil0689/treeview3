@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 
+import Controllers.ClusterDialogController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /** This class determines the file name structure (full path) for a file
@@ -19,23 +21,26 @@ public class ClusterFileStorage {
 	private static final String KMEANS_ROW_SUFFIX = "_G";
 	private static final String KMEANS_COL_SUFFIX = "_A";
 
-	/** Create a file obejct from the passed arguments.
+	/** Create a Path object from the passed arguments which will provide a directory and base name for the different
+	 * cluster files (GTR, ATR, CDT). Example: path-to-orig-file/orig-filename/linkmethod-name/orig-filename 
+	 * + {.cdt/.gtr/.atr}
 	 * 
 	 * @param filePath - The file path for the new file.
 	 * @param fileEnd - The file type / file end for the new file.
-	 * @param linkMethod - The linkage method used during clustering which will
-	 *          be added to the file name for better distinction of files.
-	 * @return A new file object */
-	public static File createFile(final String filePath, final String fileEnd,
-																final int linkMethod) {
+	 * @param linkMethod - The linkage method used during clustering which will be added to the file name for 
+	 * better distinction of files.
+	 * @return A new Path object 
+	 */
+	public static Path createDirectoryStruc(final String filePath, final int linkMethod) {
 
-		if((filePath == null) || (fileEnd == null)) {
-			LogBuffer.println("Cannot create file. FilePath or fileEnd was null.");
+		Path clusterFileCommonPath;
+		
+		if((filePath == null)) {
+			LogBuffer.println("Cannot create file. FilePath was null.");
 			return null;
 		}
 
-		LogBuffer.println(">>>>> " + fileEnd);
-		LogBuffer.println("filePath: " + filePath);
+		LogBuffer.println(">>>>> " + filePath);
 		final Path path = Paths.get(filePath);
 
 		if(path == null) {
@@ -44,25 +49,52 @@ public class ClusterFileStorage {
 		}
 
 		final Path fileNameP = path.getFileName();
-		final Path rootDirP = path.getParent();
+		final Path defaultDirP = path.getParent();
 
-		if((fileNameP == null) || (rootDirP == null)) {
+		if((fileNameP == null) || (defaultDirP == null)) {
 			LogBuffer.println("Cannot create file. File name or root directory " +
 												"could not be resolved.");
 			return null;
 		}
 
-		final String fileName = ClusterFileStorage.getRootFileName(fileNameP.toString());
-		final String rootDir = rootDirP.toString() + File.separatorChar;
+		String rootFileName = ClusterFileStorage.getRootFileName(fileNameP.toString());
+		final String rootDir = findRootDir(defaultDirP, rootFileName) + File.separatorChar;
 
 		final String linkName = ClusterFileStorage.getLinkName(linkMethod);
-		final String subDir = ClusterFileStorage.createSubDir(rootDir, fileName, linkName);
+		final String subDir = ClusterFileStorage.createSubDir(rootDir, linkName);
 
 		LogBuffer.println("RootDir: " + rootDir);
 		LogBuffer.println("Created subDir: " + subDir);
-		LogBuffer.println("Found file name: " + fileName);
+		LogBuffer.println("Found file name: " + rootFileName);
 
-		return ClusterFileStorage.retrieveFile(subDir, fileName, linkName, fileEnd);
+		rootFileName += "_" + linkName;
+		clusterFileCommonPath = Paths.get(subDir, rootFileName);
+		
+		return clusterFileCommonPath;
+	}
+	
+	/**
+	 * Determines if a useful root path exists, for example when the same original matrix file has been clustered 
+	 * before. It attempts to find a folder with a name identical to rootFileName. Otherwise the defaultPath will be
+	 * used as the root.
+	 * @param defaultPath - The path in which the file to be clustered (open file in TreeView) resides.
+	 * @param rootFileName - The name of the file without path or extension.
+	 * @return The root directory at which to store all the new cluster files.
+	 */
+	private static String findRootDir(final Path defaultPath, final String rootFileName) {
+		
+		Iterator<Path> it = defaultPath.iterator();
+		int elemCounter = 0;
+		
+		while(it.hasNext()) {
+			String elem = it.next().toString();
+			elemCounter++;
+			if(elem.equalsIgnoreCase(rootFileName)) {
+				return defaultPath.subpath(0, elemCounter).toString();
+			}
+		}
+	
+		return defaultPath.toString() + File.separator + rootFileName;
 	}
 
 	/** Returns a cluster linkage name String that matches the passed linkage
@@ -139,14 +171,13 @@ public class ClusterFileStorage {
 	/** Creates a folder with the general file name to store all variations and
 	 * subfiles of clustering in one folder.
 	 *
-	 * @param fileDir
-	 *          The directory plus file name without file type.
+	 * @param rootDir - The root directory which is used as a basis for a new sub-directory.
+	 * @param linkName - The name of the linkage method is another part of the new sub-directory name. This way new
+	 * sub-directories are created for each linkage method.
 	 * @return The main file's directory. */
-	private static String createSubDir(	final String rootDir,
-																			final String fileName,
-																			final String linkName) {
+	private static String createSubDir(final String rootDir, final String linkName) {
 
-		final Path subdir = Paths.get(rootDir, fileName, linkName);
+		final Path subdir = Paths.get(rootDir, linkName);
 		LogBuffer.println("Checking for this directory: " + subdir.toString());
 		final File file = subdir.toFile();
 
@@ -161,21 +192,17 @@ public class ClusterFileStorage {
 	/** Creates a new file from based on the passed directory, file name, link
 	 * name, and file end.
 	 * 
-	 * @param dir - The directory for the new file
-	 * @param fileName - The name for the new file
-	 * @param linkName - The linkage type component for the new file name
+	 * @param clusterPath - The Path object which represents the directory in which the new file will reside.
 	 * @param fileEnd - The file ending
 	 * @return A newly created File object. */
-	private static File retrieveFile(	final String dir, String fileName,
-																		final String linkName,
-																		final String fileEnd) {
+	public static File retrieveFile(final Path clusterPath, final String fileEnd) {
 
-		fileName += "_" + linkName;
-		File tempFile = Paths.get(dir, fileName, fileEnd).toFile();
+		final String fullFilePath = clusterPath.toString() + fileEnd;
+		File tempFile = Paths.get(fullFilePath).toFile();
 
 		try {
 			// Do not overwrite at the moment
-			tempFile = ClusterFileStorage.getNewFile(dir, fileName, fileEnd);
+			tempFile = ClusterFileStorage.getNewFile(clusterPath, fileEnd);
 			tempFile.createNewFile();
 
 		}
@@ -197,19 +224,18 @@ public class ClusterFileStorage {
 	 * @param oldName - The original name for the file which is used as a basis.
 	 * @param fileEnd - The original file ending.
 	 * @return A new file object. */
-	private static File getNewFile(	final String dir, final String oldName,
-																	final String fileEnd) {
+	private static File getNewFile(final Path oldClusterPath, final String fileEnd) {
 
-		String fileDescr = oldName + fileEnd;
-		File file = Paths.get(dir, fileDescr).toFile();
+		String fileDescr = oldClusterPath.toString() + fileEnd;
+		File file = Paths.get(fileDescr).toFile();
 
 		/*
 		 * Even for gtr and atr files, the cdt files are the ones that should
 		 * be exclusively counted. While single axes might be clustered,
 		 * if the user hits cancel during clustering, no .cdt file will exist.
 		 */
-		String cdtFileDescr = oldName + ".cdt";
-		File cdtFile = Paths.get(dir, cdtFileDescr).toFile();
+		String cdtFileDescr = oldClusterPath.toString() + ClusterDialogController.CDT_END;
+		File cdtFile = Paths.get(cdtFileDescr).toFile();
 
 		int fileCount = 0;
 		String cdtSuffix;
@@ -217,13 +243,13 @@ public class ClusterFileStorage {
 		while(cdtFile.exists()) {
 			fileCount++;
 
-			cdtSuffix = "_" + fileCount + ".cdt";
-			cdtFileDescr = oldName + cdtSuffix;
-			cdtFile = Paths.get(dir, cdtFileDescr).toFile();
+			cdtSuffix = "_" + fileCount + ClusterDialogController.CDT_END;
+			cdtFileDescr = oldClusterPath.toString() + cdtSuffix;
+			cdtFile = Paths.get(cdtFileDescr).toFile();
 
 			suffix = "_" + fileCount + fileEnd;
-			fileDescr = oldName + suffix;
-			file = Paths.get(dir, fileDescr).toFile();
+			fileDescr = oldClusterPath.toString() + suffix;
+			file = Paths.get(fileDescr).toFile();
 		}
 
 		cdtFile = null;
@@ -242,10 +268,9 @@ public class ClusterFileStorage {
 	 * @param rowClusterData - The specific cluster data for the row axis.
 	 * @param colClusterData - The specific cluster data for the column axis.
 	 * @return A String representing a file extension. */
-	public static String determineClusterFileExt(	final boolean isHier,
-																								final Integer[] spinnerInput,
-																								final ClusteredAxisData rowClusterData,
-																								final ClusteredAxisData colClusterData) {
+	public static String determineClusterFileExt(final boolean isHier, final Integer[] spinnerInput,
+												 final ClusteredAxisData rowClusterData,
+												 final ClusteredAxisData colClusterData) {
 		String fileEnd = "";
 
 		if(isHier) {
@@ -271,7 +296,7 @@ public class ClusterFileStorage {
 				colC = ClusterFileStorage.KMEANS_COL_SUFFIX + col_clusterN;
 			}
 
-			fileEnd = ClusterFileStorage.KMEANS_DESIGNATOR +rowC + colC +
+			fileEnd = ClusterFileStorage.KMEANS_DESIGNATOR + rowC + colC +
 								ClusterFileStorage.FILE_EXT;
 		}
 
