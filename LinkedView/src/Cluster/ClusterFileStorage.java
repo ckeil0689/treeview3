@@ -21,9 +21,9 @@ public class ClusterFileStorage {
 	private static final String KMEANS_ROW_SUFFIX = "_G";
 	private static final String KMEANS_COL_SUFFIX = "_A";
 
-	/** Create a Path object from the passed arguments which will provide a directory and base name for the different
-	 * cluster files (GTR, ATR, CDT). Example: path-to-orig-file/orig-filename/linkmethod-name/orig-filename 
-	 * + {.cdt/.gtr/.atr}
+	/** Create a Path object from the passed arguments which will provide a common directory and base name 
+	 * for the different cluster files (GTR, ATR, CDT). 
+	 * Example: path-to-orig-file/orig-filename/linkmethod-name/orig-filename + {.cdt/.gtr/.atr}
 	 * 
 	 * @param filePath - The file path for the new file.
 	 * @param fileEnd - The file type / file end for the new file.
@@ -58,7 +58,6 @@ public class ClusterFileStorage {
 
 		String rootFileName = ClusterFileStorage.getRootFileName(fileNameP.toString());
 		final String rootDir = findRootDir(defaultDirP, rootFileName) + File.separatorChar;
-
 		final String linkName = ClusterFileStorage.getLinkName(linkMethod);
 		final String subDir = ClusterFileStorage.createSubDir(rootDir, linkName);
 
