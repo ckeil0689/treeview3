@@ -6,7 +6,6 @@
  */
 package edu.stanford.genetics.treeview;
 
-import java.awt.Dialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -492,17 +491,24 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	private void constructFileMenu(final boolean isMac) {
 
-		/* File */
+		// File
 		final JMenu fileMenu = new JMenu(StringRes.mbar_File);
 		fileMenu.setMnemonic(KeyEvent.VK_F);
 
-		// Open new file Menu
+		// Open new file menu
 		final JMenuItem openMenuItem = new JMenuItem(StringRes.menu_Open,
 				KeyEvent.VK_O);
 		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		fileMenu.add(openMenuItem);
 		stackMenuList.add(openMenuItem);
+		
+		// Open new file with import dialog menu
+		final JMenuItem openWithDialogMenuItem = new JMenuItem(StringRes.menu_OpenWithDialog, KeyEvent.VK_I);
+		openWithDialogMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
+				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		fileMenu.add(openWithDialogMenuItem);
+		stackMenuList.add(openWithDialogMenuItem);
 
 		// menubar.addMenuItem("Open Url...", new ActionListener() {
 		// public void actionPerformed(ActionEvent actionEvent) {
@@ -737,7 +743,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		final JDialog dialog = new JDialog(appFrame);
 		dialog.setTitle("Information");
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
+		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
 
 		final JPanel panel = GUIFactory.createJPanel(true,
 				GUIFactory.NO_INSETS, null);

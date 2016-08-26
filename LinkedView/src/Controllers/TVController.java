@@ -192,7 +192,7 @@ public class TVController implements Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			openFile(null);
+			openFile(null, false);
 		}
 	}
 
@@ -207,7 +207,7 @@ public class TVController implements Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			final FileSet last = tvFrame.getFileMRU().getLast();
-			openFile(last);
+			openFile(last, false);
 		}
 	}
 
@@ -507,17 +507,19 @@ public class TVController implements Observer {
 	/**
 	 * This method opens a file dialog to open either the visualization view or
 	 * the cluster view depending on which file type is chosen.
-	 *
+	 * @param fileSet - A FileSet object representing the files to be loaded.
+	 * @param shouldUseImport - Explicitly tells the loader function called in this method to use the import dialog
+	 * for opening a file. Only used through menubar's 'File > Open File With Import Dialog...' at the moment.
 	 * @throws LoadException
 	 */
-	public void openFile(FileSet fileSet) {
+	public void openFile(FileSet fileSet, final boolean shouldUseImport) {
 
 		String message;
 		try {
 			if(fileSet == null) {
 				file = tvFrame.selectFile();
 	
-				/* Only run loader, if JFileChooser wasn't canceled. */
+				// Only run loader, if JFileChooser wasn't canceled.
 				if (file != null) {
 					fileSet = tvFrame.getFileSet(file);
 	
@@ -526,7 +528,7 @@ public class TVController implements Observer {
 				}
 			}
 			
-			getDataInfoAndLoad(fileSet, null, null, false);
+			getDataInfoAndLoad(fileSet, null, null, false, shouldUseImport);
 			
 		} catch (final LoadException e) {
 			message = "Loading the file was interrupted.";
@@ -552,7 +554,7 @@ public class TVController implements Observer {
 	 * clustering.
 	 */
 	public void getDataInfoAndLoad(final FileSet newFileSet, 
-			final String oldRoot, final String oldExt, boolean isFromCluster) {
+			final String oldRoot, final String oldExt, boolean isFromCluster, boolean shouldUseImport) {
 		
 		Preferences oldNode;
 		
@@ -568,13 +570,13 @@ public class TVController implements Observer {
 		}
 
 		DataLoadInfo dataInfo;
-		if (oldNode != null) {
-			LogBuffer.println(">>>>>>>> Loading with old node.");
-			dataInfo = getDataLoadInfo(newFileSet, oldNode);
-			
-		} else {
+		if (oldNode == null || shouldUseImport) {
 			LogBuffer.println(">>>>>>>> No old node found. Import.");
 			dataInfo = useImportDialog(newFileSet);
+			
+		} else {
+			LogBuffer.println(">>>>>>>> Loading with old node.");
+			dataInfo = getDataLoadInfo(newFileSet, oldNode);
 		}
 
 		if (dataInfo != null) {
@@ -952,7 +954,7 @@ public class TVController implements Observer {
 			fileMenuSet = tvFrame.findFileSet((JMenuItem) actionEvent
 					.getSource());
 
-			openFile(fileMenuSet);
+			openFile(fileMenuSet, false);
 		}
 	}
 

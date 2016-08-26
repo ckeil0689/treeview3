@@ -51,7 +51,10 @@ public class MenubarController {
 		switch (name) {
 
 		case StringRes.menu_Open:
-			controller.openFile(null);
+			controller.openFile(null, false);
+			break;
+		case StringRes.menu_OpenWithDialog:
+			controller.openFile(null, true);
 			break;
 		// case StringRes.menu_Save:
 		// controller.doModelSave(true);
