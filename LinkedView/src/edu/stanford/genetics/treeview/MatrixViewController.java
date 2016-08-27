@@ -9,6 +9,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.BackingStoreException;
@@ -22,7 +23,14 @@ import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+<<<<<<< HEAD
 import ColorChooser.ColorSchemeType;
+=======
+import com.dd.plist.NSDictionary;
+import com.dd.plist.NSNumber;
+import com.dd.plist.PropertyListParser;
+
+>>>>>>> master
 import Controllers.Controller;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
@@ -350,6 +358,45 @@ ConfigNodePersistent, Controller {
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier),
 				"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
+
+		//Holding control and/or shift controls a col/row highlight that follows
+		//the hover position
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,1),
+			"rowHoverStart");
+		action_map.put("rowHoverStart", new RowHoverStartAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,0,true),
+			"rowHoverStop");
+		action_map.put("rowHoverStop", new RowHoverStopAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,2),
+			"columnHoverStart");
+		action_map.put("columnHoverStart", new ColumnHoverStartAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,0,true),
+			"columnHoverStop");
+		action_map.put("columnHoverStop", new ColumnHoverStopAction());
+
+		//The following cases handle various combinations of row/col highlights
+		//occurring in different orders of both the shift and control modifiers
+		//being pressed/released
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,
+			KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+			"bothHoverStart");
+		action_map.put("bothHoverStart", new BothHoverStartAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,2,true),
+			"rowHoverStop");
+		action_map.put("rowHoverStop", new RowHoverStopAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,
+			KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+			"bothHoverStart");
+		action_map.put("bothHoverStart", new BothHoverStartAction());
+
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,1,true),
+			"columnHoverStop");
+		action_map.put("columnHoverStop", new ColumnHoverStopAction());
 	}
 	
 	/* -------------- Listeners --------------------- */
@@ -533,8 +580,8 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			interactiveXmap.zoomInBegin();
-			interactiveYmap.zoomInBegin();
+			interactiveXmap.zoomInCenter(MapContainer.ZOOM_DEFAULT);
+			interactiveYmap.zoomInCenter(MapContainer.ZOOM_DEFAULT);
 
 			notifyAllMapObservers();
 		}
@@ -548,8 +595,8 @@ ConfigNodePersistent, Controller {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			interactiveXmap.zoomOutBegin();
-			interactiveYmap.zoomOutBegin();
+			interactiveXmap.zoomOutCenter(MapContainer.ZOOM_DEFAULT);
+			interactiveYmap.zoomOutCenter(MapContainer.ZOOM_DEFAULT);
 
 			notifyAllMapObservers();
 		}
@@ -572,6 +619,96 @@ ConfigNodePersistent, Controller {
 	}
 	
 	/**
+	 * Starts highlighting the hovered row and column
+	 */
+	private class BothHoverStartAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			setRowColumnHoverHighlight(true);
+		}
+	}
+
+	/**
+	 * Starts highlighting the hovered row
+	 */
+	private class RowHoverStartAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			if(!imView.getYMap().isSelecting()) {
+				setRowHoverHighlight(true);
+			}
+		}
+	}
+
+	public void setRowHoverHighlight(boolean hc) {
+		imView.setRowHoverHighlight(hc);
+		imView.repaint();
+	}
+
+	/**
+	 * Starts highlighting the hovered row
+	 */
+	private class RowHoverStopAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			setRowHoverHighlight(false);
+		}
+	}
+
+	/**
+	 * Starts highlighting the hovered column
+	 */
+	private class ColumnHoverStartAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			if(!imView.getXMap().isSelecting()) {
+				setColumnHoverHighlight(true);
+			}
+		}
+	}
+
+	public void setColumnHoverHighlight(boolean hc) {
+		imView.setColumnHoverHighlight(hc);
+		imView.repaint();
+	}
+
+	public void setRowColumnHoverHighlight(boolean hc) {
+		imView.setRowHoverHighlight(hc);
+		imView.setColumnHoverHighlight(hc);
+		imView.repaint();
+	}
+
+	/**
+	 * Starts highlighting the hovered column
+	 */
+	private class ColumnHoverStopAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			setColumnHoverHighlight(false);
+		}
+	}
+
+	/**
 	 * Recalculates proportions for the MapContainers, when the layout was
 	 * changed by removing or adding components, or resizing the TVFrame. Only
 	 * works if GlobalView is already resized (has availablePixels set to new
@@ -591,7 +728,64 @@ ConfigNodePersistent, Controller {
 	}
 	
 	private class MatrixMouseWheelListener implements MouseWheelListener {
-		
+
+		private boolean reverseZoomDirection;
+
+		public MatrixMouseWheelListener() {
+			super();
+			/* TODO: Doing the system preferences check here is efficient
+			 * because we're not reading a file on every scroll event, however
+			 * if the user edits the system preference for natural scroll while
+			 * TreeView is running, scroll-zooming will get reversed.  Figure
+			 * out an efficient way to capture scroll-direction behavior changes
+			 * while running. */
+			setReverseZoomDirection(isNaturalScroll());
+		}
+
+		public void setReverseZoomDirection(final boolean reverse) {
+			this.reverseZoomDirection = reverse;
+		}
+
+		public boolean onAMac() {
+			boolean onamac = false;
+			try {
+				/* TODO: Figure out a way to get the OS from where it was
+				 * determined in TreeView3.java instead of replicating that code
+				 * here. */
+				onamac = System.getProperty("os.name").toLowerCase().
+					startsWith("mac os x");
+			} catch (Exception ex) {
+				LogBuffer.println("Failed to determine os: " + ex.getMessage());
+			}
+			return(onamac);
+		}
+
+		public boolean isNaturalScroll() {
+
+			boolean natural = false;
+			try {
+				if(onAMac()) {
+					File globalPref = new File(System.getProperty("user.home") +
+						"/Library/Preferences/.GlobalPreferences.plist");
+
+					NSDictionary dict =
+						(NSDictionary)PropertyListParser.parse(globalPref);
+
+					NSNumber pref =
+						(NSNumber)dict.objectForKey("com.apple.swipescroll" +
+							"direction");
+
+					if(pref.boolValue()) {
+						natural = true;
+					}
+				}
+			} catch (Exception ex) {
+				LogBuffer.println("Failed to parse plist: " + ex.getMessage());
+			}
+
+			return(natural);
+		}
+
 		/**
 		 * Zooming when the mouse wheel is used in conjunction with the alt/
 		 * option key.  Vertical scrolling if the shift key is not pressed.
@@ -608,12 +802,14 @@ ConfigNodePersistent, Controller {
 
 			//On macs' magic mouse, horizontal scroll comes in as if the shift
 			//was down
-			if (e.isAltDown()) {
-				if (notches < 0) {
+			if(e.isAltDown()) {
+				if((!reverseZoomDirection && notches < 0) ||
+					(reverseZoomDirection && notches > 0)) {
+
 					//This ensures we only zoom toward the cursor when the
 					//cursor is over the map
 					if (imView.hasMouse()) {
-						imView.smoothZoomTowardPixel(e.getX(), e.getY());
+						imView.smoothZoomTowardPixel(e.getX(),e.getY());
 					}
 					//This should happen when the mouse is not over the heatmap
 					else {
@@ -622,21 +818,23 @@ ConfigNodePersistent, Controller {
 					}
 				} else {
 					if (imView.hasMouse()) {
-						imView.smoothZoomFromPixel(e.getX(), e.getY());
+						imView.smoothZoomFromPixel(e.getX(),e.getY());
 					} else {
 						interactiveXmap.zoomOutBegin();
 						interactiveYmap.zoomOutBegin();
 					}
 				}
-			} else if (e.isShiftDown()) {
+			} else if(e.isShiftDown()) {
 				interactiveXmap.scrollBy(shift);
 				//Now we are hovered over a new index
-				interactiveXmap.setHoverIndex(interactiveXmap.getIndex(e.getX()));
+				interactiveXmap.setHoverIndex(
+					interactiveXmap.getIndex(e.getX()));
 				
 			} else {
 				interactiveYmap.scrollBy(shift);
 				//Now we are hovered over a new index
-				interactiveYmap.setHoverIndex(interactiveYmap.getIndex(e.getY()));
+				interactiveYmap.setHoverIndex(
+					interactiveYmap.getIndex(e.getY()));
 			}
 
 			imView.repaint();
@@ -748,6 +946,13 @@ ConfigNodePersistent, Controller {
 	public void setDataValueAt(final int rowIdx, final int colIdx) {
 		
 		ticker.setValue(model.getDataMatrix().getValue(colIdx, rowIdx));
+	}
+	
+	/* Set the data ticker to matrix average
+	 * Rounding off to 4 decimals
+	 */
+	public void setMeanDataValue() {
+		ticker.setValue( model.getDataMatrix().getMean() + " [matrix ave]");
 	}
 	
 	/**

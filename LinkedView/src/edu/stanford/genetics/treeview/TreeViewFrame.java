@@ -34,7 +34,6 @@ import javax.swing.WindowConstants;
 
 import Utilities.GUIFactory;
 import Utilities.StringRes;
-import Views.LoadErrorView;
 import Views.WelcomeView;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
@@ -54,6 +53,13 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		ConfigNodePersistent {
 
+<<<<<<< HEAD
+=======
+	public static final int WELCOME_VIEW = 0;
+	public static final int PROGRESS_VIEW = 2;
+	public static final int DENDRO_VIEW = 3;
+
+>>>>>>> master
 	protected final JPanel viewPanel;
 	protected final JPanel mainPanel;
 	protected DendroPanel running;
@@ -65,10 +71,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	// Different Views to be displayed
 	private final WelcomeView welcomeView;
-	private final LoadErrorView loadErrorView;
 	private final DendroView dendroView;
-
-	private String loadErrorMessage;
 
 	private FileSet fileMenuSet;
 
@@ -106,9 +109,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		this.treeView = treeView;
 
 		/* Initialize main views */
+<<<<<<< HEAD
 		this.welcomeView = new WelcomeView();
 		this.loadErrorView = new LoadErrorView();
 		this.dendroView = new DendroView(this);
+=======
+		welcomeView = new WelcomeView();
+		dendroView = new DendroView(this);
+>>>>>>> master
 
 		setWindowActive(true);
 
@@ -190,11 +198,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			view = welcomeView.makeLoading();
 			break;
 
-		case LOADERROR_VIEW:
-			loadErrorView.setErrorMessage(loadErrorMessage);
-			view = loadErrorView.makeError();
-			break;
-
 		case DENDRO_VIEW:
 			view = dendroView.makeDendro();
 			break;
@@ -209,17 +212,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		buildMenuBar();
 		displayView(view);
-	}
-
-	/**
-	 * Displays a screen to notify the user of a loading issue. Offers the user
-	 * to load a different file by providing the appropriate button.
-	 *
-	 * @param errorMessage
-	 */
-	public void setLoadErrorMessage(final String errorMessage) {
-
-		this.loadErrorMessage = errorMessage;
 	}
 
 	/**
@@ -285,7 +277,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void showAboutWindow() {
 
-		new AboutDialog(TreeViewFrame.this).setVisible(true);
+		new AboutDialog().setVisible(true);
 	}
 
 	/**
@@ -389,16 +381,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	}
 
 	/**
-	 * Returns TVFrame's current LoadErrorView instance
-	 *
-	 * @return welcomeView
-	 */
-	public LoadErrorView getLoadErrorView() {
-
-		return loadErrorView;
-	}
-
-	/**
 	 * Returns TVFrame's current DendroView instance
 	 *
 	 * @return dendroView
@@ -423,7 +405,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void update(final Observable o, final Object obj) {
 
 		if (o instanceof FileMru) {
-			LogBuffer.println("Updating fileMRU in TVFrame.");
 			buildMenuBar();
 			setChanged();
 			notifyObservers();
@@ -465,7 +446,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		} else {
 			appFrame.setTitle(StringRes.appName);
 			setTitleString(appFrame.getName());
+<<<<<<< HEAD
 			generateView(ViewType.LOADERROR_VIEW);
+=======
+			generateView(WELCOME_VIEW);
+>>>>>>> master
 		}
 
 		buildMenuBar();
@@ -619,10 +604,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			// JMenuItem(StringRes.menu_Font);
 			// prefSubMenu.add(fontMenuItem);
 			// stackMenuList.add(fontMenuItem);
-
-			final JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_URL);
-			prefSubMenu.add(urlMenuItem);
-			stackMenuList.add(urlMenuItem);
+			
+			// Comments the code to disable the URL menu item (File -> Preferences)
+			// final JMenuItem urlMenuItem = new JMenuItem(StringRes.menu_URL);
+			// prefSubMenu.add(urlMenuItem);
+			// stackMenuList.add(urlMenuItem);
 
 			// Functional Enrichment Menu
 			// TODO Create the feature.... :)

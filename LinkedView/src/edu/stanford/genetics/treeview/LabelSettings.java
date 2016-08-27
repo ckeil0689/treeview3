@@ -127,14 +127,6 @@ public class LabelSettings extends CustomDialog {
 		addWindowListener(listener);
 	}
 
-	public void addCustomLabelListener(final ActionListener listener) {
-
-		if (annotationSettings != null) {
-			annotationSettings.getCustomLabelButton().addActionListener(
-					listener);
-		}
-	}
-
 	public void addJustifyListener(final ActionListener listener) {
 
 		if (annotationSettings != null) {
@@ -223,7 +215,6 @@ public class LabelSettings extends CustomDialog {
 	class AnnotationPanel {
 
 		private final JPanel mainPanel;
-		private final JButton custom_btn;
 
 		private final HeaderSummaryPanel genePanel;
 		private final HeaderSummaryPanel arrayPanel;
@@ -238,18 +229,29 @@ public class LabelSettings extends CustomDialog {
 			this.mainPanel = GUIFactory.createJPanel(false, 
 					GUIFactory.NO_INSETS);
 
+<<<<<<< HEAD
 			this.genePanel = new HeaderSummaryPanel(rowHI, dendroView
 					.getRowLabelView().getHeaderSummary());
 
 			this.arrayPanel = new HeaderSummaryPanel(colHI, dendroView
 					.getColLabelView().getHeaderSummary());
+=======
+			genePanel = new HeaderSummaryPanel(rowHI,
+				dendroView.getRowLabelView());
+
+			arrayPanel = new HeaderSummaryPanel(colHI,
+				dendroView.getColumnLabelView());
+>>>>>>> master
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,
 					GUIFactory.NO_INSETS);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
+<<<<<<< HEAD
 			this.custom_btn = GUIFactory.createBtn(StringRes.btn_CustomLabels);
 
+=======
+>>>>>>> master
 			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
 			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
 
@@ -310,22 +312,20 @@ public class LabelSettings extends CustomDialog {
 			JPanel fontPanel = new FontPanel().makeFontPanel();
 
 			mainPanel.add(fontPanel, "push, grow, alignx 50%, span");
+<<<<<<< HEAD
 
 			// Commented out for version 3.0alpha1 because it doesn't work yet
 			// mainPanel.add(custom_button, "pushx, alignx 50%, span");
 			mainPanel.revalidate();
 			mainPanel.repaint();
 
+=======
+>>>>>>> master
 		}
 
 		public JPanel makeLabelPane() {
 
 			return mainPanel;
-		}
-
-		public JButton getCustomLabelButton() {
-
-			return custom_btn;
 		}
 
 		public void synchronize() {

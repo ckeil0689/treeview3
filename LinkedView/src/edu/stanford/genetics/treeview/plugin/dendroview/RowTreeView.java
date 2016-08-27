@@ -147,7 +147,7 @@ public class RowTreeView extends TRView {
 		if(destRect == null) {
 			return(-1);
 		}
-		return(destRect.x + destRect.width);
+		return(destRect.x + destRect.width - 1);
 	}
 
 	@Override
@@ -240,5 +240,28 @@ public class RowTreeView extends TRView {
 				dest.x,
 				treePainter.getCorrMax(),
 				dest.x + dest.width));
+	}
+	
+	@Override
+	protected int getSnapShotDestRectStart(final Rectangle dest) {
+		if(dest == null) {
+			return(-1);
+		}
+		return(dest.y);
+	}
+
+	@Override
+	protected int getSnapShotDestRectEnd(final Rectangle dest) {
+		if(dest == null) {
+			return(-1);
+		}
+		return(dest.y + dest.height);
+	}
+
+	@Override
+	protected void setDataTickerValue(MouseEvent e) {
+		int from = (int) hoveredNode.getLeftLeaf().getIndex();
+		int to = (int) hoveredNode.getRightLeaf().getIndex();
+		ticker.setValue( dataModel.getDataMatrix().getRowAverage(from, to) + " [tree ave]");
 	}
 }

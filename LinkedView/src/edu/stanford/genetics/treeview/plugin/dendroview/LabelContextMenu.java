@@ -26,7 +26,7 @@ public class LabelContextMenu extends JPopupMenu {
 		this.clipboardMenu = new JMenu("Copy labels");
 		this.copyAll = new JMenuItem("All");
 		this.copySelected = new JMenuItem("Selected");
-		this.copyVisibleMatrix = new JMenuItem("Visible (matrix)");
+		this.copyVisibleMatrix = new JMenuItem("Zoomed");
 		
 		clipboardMenu.add(copyAll);
 		clipboardMenu.add(copySelected);

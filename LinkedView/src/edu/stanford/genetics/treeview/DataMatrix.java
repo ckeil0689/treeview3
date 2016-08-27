@@ -118,5 +118,9 @@ public interface DataMatrix {
 	boolean getModified();
 
 	void setModified(boolean b);
+	
+	public double getRowAverage(int fromRowId, int toRowId);
+	
+	public double getColAverage(int fromColId, int toColId);
 
 }

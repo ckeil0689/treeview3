@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
@@ -39,8 +38,6 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialogController;
-import edu.stanford.genetics.treeview.ExportPreviewMatrix;
-import edu.stanford.genetics.treeview.ExportPreviewTrees;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.GeneListMaker;
 import edu.stanford.genetics.treeview.LabelSettings;
@@ -59,7 +56,10 @@ import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
+<<<<<<< HEAD
 import edu.stanford.genetics.treeview.plugin.dendroview.TRView;
+=======
+>>>>>>> master
 
 /**
  * This class controls user interaction with TVFrame and its views.
@@ -72,6 +72,7 @@ public class TVController implements Observer {
 	private MenubarController menuController;
 	private File file;
 	private FileSet fileMenuSet;
+	private FileSet loadingFile;
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
@@ -97,25 +98,43 @@ public class TVController implements Observer {
 	public void resetPreferences() {
 
 		try {
-			final int option = JOptionPane.showConfirmDialog(
-					Frame.getFrames()[0],
-					"Are you sure you want to reset preferences and "
-							+ "close TreeView?", "Reset Preferences?",
-					JOptionPane.YES_NO_OPTION);
+			CustomDetailsConfirmDialog dlg = new CustomDetailsConfirmDialog(
+				"Reset Preferences?",
+				"Are you sure you want to reset the preferences and quit " +
+				"TreeView?<BR>\nCustom settings such as colors will be reset to " +
+				"default for all files.",
+				"Resetting the application-wide preferences can frequently " +
+				"resolve behavior and display problems. TreeView3 keeps track " +
+				"of input-file-specific settings independent of the input " +
+				"file itself, so resetting the preferences affects things " +
+				"like custom label and color settings for all previously " +
+				"viewed files. These are things like, selected fonts, custom " +
+				"color selections, the data values associated with those " +
+				"colors in the chosen spectrum, minimum font size, and the " +
+				"selected label type to display as the row/column labels. " +
+				"Other things such as 'last file opened', the starting " +
+				"directory in the open file dialog, and window size/position " +
+				"will also be lost. Your data in the files remains untouched. " +
+				"Only superficial data is lost. Clustering, trees, and data " +
+				"values remain intact.","Reset");
+			int option = dlg.showDialog();
 
 			switch (option) {
 
-			case JOptionPane.YES_OPTION:
-				tvFrame.getConfigNode().parent().removeNode();
-				tvFrame.getAppFrame().dispose();
-				System.exit(0);
-				break;
+				case CustomDetailsConfirmDialog.OK_OPTION:
+					LogBuffer.println("Resetting preferences and quitting.");
+					tvFrame.getConfigNode().parent().removeNode();
+					tvFrame.getAppFrame().dispose();
+					System.exit(0);
+					break;
 
-			case JOptionPane.NO_OPTION:
-				return;
+				case CustomDetailsConfirmDialog.CANCEL_OPTION:
+					LogBuffer.println("Canceling reset prefs.");
+					return;
 
-			default:
-				return;
+				default:
+					LogBuffer.println("Reset prefs dialog was closed.");
+					return;
 			}
 
 		} catch (final BackingStoreException e) {
@@ -155,11 +174,6 @@ public class TVController implements Observer {
 			tvFrame.getWelcomeView().addLoadListener(new LoadButtonListener());
 			tvFrame.getWelcomeView().addLoadLastListener(
 					new LoadLastButtonListener());
-		}
-
-		if (tvFrame.getLoadErrorView() != null) {
-			tvFrame.getLoadErrorView().addLoadNewListener(
-					new LoadButtonListener());
 		}
 	}
 
@@ -339,7 +353,8 @@ public class TVController implements Observer {
 		} catch (final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. "
 					+ "Increase the JVM's heap size. Error: " + e.getMessage();
-			tvFrame.setLoadErrorMessage(oomError);
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0], oomError, 
+			                              "Out of memory", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -382,15 +397,27 @@ public class TVController implements Observer {
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
 		} else {
-			final String message = "No data matrix could be set.";
+			final String message = "No numeric data could be found in the " +
+				"input file.\nThe input file must contain tab-delimited " +
+				"numeric values.";
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
 					"Alert", JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + message);
 
-			tvFrame.setLoadErrorMessage("Data was not loaded.");
-
 			/* Set model status, which will update the view. */
 			((TVModel) model).setLoaded(false);
+
+			//Bring the user back to the load dialog to try again or cancel load
+			DataLoadInfo dataInfo;
+			dataInfo = useImportDialog(loadingFile);
+
+			if (dataInfo != null) {
+				loadData(loadingFile, false, dataInfo);
+				
+			} else {
+				String msg = "Data loading was interrupted.";
+				LogBuffer.println(msg);
+			}
 		}
 
 		addViewListeners();
@@ -518,17 +545,28 @@ public class TVController implements Observer {
 		try {
 			if(fileSet == null) {
 				file = tvFrame.selectFile();
+<<<<<<< HEAD
 	
 				// Only run loader, if JFileChooser wasn't canceled.
+=======
+
+				/* Only run loader, if JFileChooser wasn't canceled. */
+>>>>>>> master
 				if (file != null) {
 					fileSet = tvFrame.getFileSet(file);
-	
+
 				} else {
 					return;
 				}
 			}
+<<<<<<< HEAD
 			
 			getDataInfoAndLoad(fileSet, null, null, false, shouldUseImport);
+=======
+
+			loadingFile = fileSet;
+			getDataInfoAndLoad(fileSet, false);
+>>>>>>> master
 			
 		} catch (final LoadException e) {
 			message = "Loading the file was interrupted.";
@@ -705,7 +743,6 @@ public class TVController implements Observer {
 		arrayUrlExtractor.bindConfig(documentConfig.node("ArrayUrlExtractor"));
 		tvFrame.setArrayUrlExtractor(arrayUrlExtractor);
 
-		LogBuffer.println("Set new selection objects.");
 		tvFrame.setGeneSelection(new TreeSelection(ngene));
 		tvFrame.setArraySelection(new TreeSelection(nexpr));
 	}
@@ -990,61 +1027,25 @@ public class TVController implements Observer {
 	 */
 	public void openExportMenu() {
 
-		if(tvFrame.getDendroView() == null) {
+		if(tvFrame.getDendroView() == null || !tvFrame.isLoaded()) {
 			LogBuffer.println("DendroView is not instantiated. "
 					+ "Nothing to export.");
 			return;
 		}
-		
-		/* Set up tree images */
-		ExportPreviewTrees expRowTrees = getTreeSnapshot(
-				tvFrame.getDendroView().getRowTreeView(), true);
-		ExportPreviewTrees expColTrees = getTreeSnapshot(
-				tvFrame.getDendroView().getColumnTreeView(), false);
-		
-		/* Set up matrix image */
-		BufferedImage matrix = tvFrame.getDendroView()
-				.getInteractiveMatrixView().getVisibleImage();
-		ExportPreviewMatrix expMatrix = new ExportPreviewMatrix(matrix);
 
 		ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
 			dendroController.getInteractiveXMap(),
 			dendroController.getInteractiveYMap(),tvFrame.getColSelection(),
 			tvFrame.getRowSelection());
+		
 		boolean selectionsExist = (tvFrame.getColSelection() != null &&
 			tvFrame.getColSelection().getNSelectedIndexes() > 0);
+		
 		ExportDialog exportDialog = new ExportDialog(selectionsExist,eh);
-		exportDialog.setPreview(expRowTrees, expColTrees, expMatrix);
 		
 		new ExportDialogController(exportDialog,tvFrame,
 			dendroController.getInteractiveXMap(),
 			dendroController.getInteractiveYMap(),model);
-		
-		exportDialog.setVisible(true);
-	}
-	
-	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView, 
-			final boolean isRows) {
-		
-		int width;
-		int height;
-		if(isRows) {
-			width = ExportPreviewTrees.HEIGHT;
-			height = ExportPreviewTrees.WIDTH;
-		} else {
-			width = ExportPreviewTrees.WIDTH;
-			height = ExportPreviewTrees.HEIGHT;
-		}
-		
-		/* Set up column tree image */
-		BufferedImage treeSnapshot = null;
-		ExportPreviewTrees expTrees = null;
-		if(treeAxisView.isEnabled()) {
-			treeSnapshot = treeAxisView.getSnapshot(width, height);
-			expTrees = new ExportPreviewTrees(treeSnapshot, isRows);
-		}
-		
-		return expTrees;
 	}
 
 	/*

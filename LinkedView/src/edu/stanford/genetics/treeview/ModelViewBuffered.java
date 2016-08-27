@@ -164,6 +164,10 @@ public abstract class ModelViewBuffered extends ModelView {
 		if (g != offscreenGraphics) { // sometimes paint directly
 			g.drawImage(offscreenBuffer, 0, 0, this);
 		}
+<<<<<<< HEAD
+=======
+		paintComposite(g);
+>>>>>>> master
 	}
 
 }

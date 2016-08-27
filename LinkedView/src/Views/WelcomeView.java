@@ -155,6 +155,11 @@ public class WelcomeView {
 
 	public JPanel makeWelcome(FileSet fs) {
 
+		//Reset the welcome (in case we're coming back here from a failed load)
+		jl.setText(StringRes.title_Hello);
+		jl2.setText(StringRes.title_Welcome + StringRes.appName +
+			StringRes.dot);
+
 		isLoading = false;
 
 		loadPanel.removeAll();
@@ -167,6 +172,10 @@ public class WelcomeView {
 		if (fs != null) {
 			filename = fs.getCdt();
 			loadLastButton.setEnabled(true);
+			/* TODO: Figure out how to get this setting of the default button to
+			 * work after returning to the welcome screen upon a load error.
+			 * Currently, the button does not highlight or respond to return
+			 * keypress after a load error. */
 			((JFrame) JFrame.getFrames()[0]).getRootPane().setDefaultButton(
 					loadLastButton);
 		} else {

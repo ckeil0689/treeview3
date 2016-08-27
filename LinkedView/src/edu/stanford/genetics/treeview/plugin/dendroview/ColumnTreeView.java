@@ -151,7 +151,7 @@ public class ColumnTreeView extends TRView {
 		if(destRect == null) {
 			return(-1);
 		}
-		return(destRect.y + destRect.height);
+		return(destRect.y + destRect.height - 1);
 	}
 
 	@Override
@@ -256,4 +256,28 @@ public class ColumnTreeView extends TRView {
 				treePainter.getCorrMax(),
 				dest.y + dest.height));
 	}
+	
+	@Override
+	protected int getSnapShotDestRectStart(final Rectangle dest) {
+		if(dest == null) {
+			return(-1);
+		}
+		return(dest.x);
+	}
+
+	@Override
+	protected int getSnapShotDestRectEnd(final Rectangle dest) {
+		if(dest == null) {
+			return(-1);
+		}
+		return(dest.x + dest.width);
+	}
+
+	@Override
+	protected void setDataTickerValue(MouseEvent e) {
+		int from = (int) hoveredNode.getLeftLeaf().getIndex();
+		int to = (int) hoveredNode.getRightLeaf().getIndex();
+		ticker.setValue( dataModel.getDataMatrix().getColAverage(from, to) + " [tree ave]");
+	}
+	
 }

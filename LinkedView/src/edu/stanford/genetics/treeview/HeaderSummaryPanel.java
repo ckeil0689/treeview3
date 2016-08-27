@@ -16,6 +16,11 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+<<<<<<< HEAD
+=======
+import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
+import net.miginfocom.swing.MigLayout;
+>>>>>>> master
 import Utilities.GUIFactory;
 import net.miginfocom.swing.MigLayout;
 
@@ -31,11 +36,15 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	private HeaderSummary headerSummary;
 	private final JList<String> headerList = new JList<String>(new String[0]);
 
+	//Hook to be able to reset the label view scrollbar
+	private final LabelView labelView;
+
 	public HeaderSummaryPanel(final HeaderInfo headerInfo,
-			final HeaderSummary headerSummary) {
+		LabelView labelView) {
 
 		this.headerInfo = headerInfo;
-		this.headerSummary = headerSummary;
+		this.headerSummary = labelView.getHeaderSummary();
+		this.labelView = labelView;
 
 		setLayout(new MigLayout());
 		setOpaque(false);
@@ -139,6 +148,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	public void synchronizeTo() {
 
 		getHeaderSummary().setIncluded(getHeaderList().getSelectedIndices());
+		labelView.resetSecondaryScroll();
 	}
 
 	/*

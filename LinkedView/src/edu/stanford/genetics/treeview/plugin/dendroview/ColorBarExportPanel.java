@@ -576,7 +576,7 @@ public abstract class ColorBarExportPanel extends javax.swing.JPanel implements
 			dest.height = (int) (getYscale() * scale);
 		}
 
-		drawer.paint(g, source, dest, null);
+		drawer.paint(g, source, dest);
 	}
 
 	/**

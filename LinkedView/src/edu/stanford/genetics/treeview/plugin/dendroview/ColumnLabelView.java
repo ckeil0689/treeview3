@@ -19,7 +19,7 @@ public class ColumnLabelView extends LabelView {
 	private static final long serialVersionUID = 1L;
 
 	public ColumnLabelView() {
-		
+
 		super();
 		d_justified = false;
 		zoomHint = StringRes.lbl_ZoomColLabels;
@@ -200,5 +200,11 @@ public class ColumnLabelView extends LabelView {
 	protected boolean isASecondaryScroll(final MouseWheelEvent e) {
 		
 		return(!e.isShiftDown());
+	}
+
+	@Override
+	protected void setDataTickerValue(MouseEvent e) {
+		int colIdx = getPrimaryHoverIndex(e);
+		ticker.setValue( dataModel.getDataMatrix().getColAverage(colIdx, colIdx) + " [Column ave]");
 	}
 }

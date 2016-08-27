@@ -72,4 +72,12 @@ public class DataTicker {
 		String val_s = Double.toString(val);
 		valTextArea.setText(val_s);
 	}
+	
+	/**
+	 * Updates the JTextArea which displays the String.
+	 * @param val - The value to be displayed as String.
+	 */
+	public void setValue(String str) {
+		valTextArea.setText(str);
+	}
 }

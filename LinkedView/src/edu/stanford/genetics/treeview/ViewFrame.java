@@ -80,24 +80,28 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 * @param title
 	 *            Title for the ViewFrame.
 	 */
-	public ViewFrame(final String title, final Preferences configNode) {
+	public ViewFrame(final String title, final Preferences mainConfigNode) {
 
 		this.appFrame = new JFrame(title);
-		this.configNode = configNode;
-
+		this.configNode = mainConfigNode;
+		
 		/* maximize frame first */
 		setupFrameSize();
 
 		final int init_width = appFrame.getWidth();
 		final int init_height = appFrame.getHeight();
 
-		final int left = configNode.getInt("frame_left", 0);
-		final int top = configNode.getInt("frame_top", 0);
-		final int width = configNode.getInt("frame_width", init_width);
-		final int height = configNode.getInt("frame_height", init_height);
+		final int left = mainConfigNode.getInt("frame_left", 0);
+		final int top = mainConfigNode.getInt("frame_top", 0);
+		final int width = mainConfigNode.getInt("frame_width", init_width);
+		final int height = mainConfigNode.getInt("frame_height", init_height);
 
 		appFrame.setBounds(left, top, width, height);
-		appFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		//Handle app quit via a confirmation box, so set the default close
+		//operation to do nothing. Closing will be handled by an explicit call
+		//to dispose.
+		appFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		setupWindowListener();
 	}
@@ -279,6 +283,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 	public void closeWindow() {
 
 		/* Confirm user's intent to exit the application. */
+<<<<<<< HEAD
 		final int option = JOptionPane.showConfirmDialog(appFrame,
 				"Are you sure you want to close TreeView?", "Exit TreeView?",
 				JOptionPane.YES_NO_OPTION);
@@ -305,6 +310,49 @@ public abstract class ViewFrame extends Observable implements Observer,
 
 		default:
 			return;
+=======
+		String[] options = {"Quit","Cancel"};
+		final int choice = JOptionPane.showOptionDialog(appFrame,
+			"Quit TreeView?", "Quit TreeView?",JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.WARNING_MESSAGE,null,options,options[1]);
+
+		switch (choice) {
+
+			case JOptionPane.OK_OPTION:
+				LogBuffer.println("Saving settings before window close.");
+
+				// Not sure a call to saveSettings is necessary anymore because
+				// added calls upon window resize and window move in
+				// DendroController and ViewFrame respectively. If it does
+				// something other than save those two things, then sure,
+				// there's reason to keep it. However, note that resizing the
+				// window without data loaded does not save settings because
+				// it's tied to the matrix jpanel
+				saveSettings();
+
+				appFrame.dispose();
+
+				//The JVM exits when the last non-daemon thread exits.
+				//System.exit(0) is called here because there are some threads
+				//which I have found to be in wait-mode after execution (via
+				//profiling). Plain termination of the main() method does not
+				//guarantee that the JVM fully shuts down, since non-daemon
+				//threads may still be alive.  It's a fail-safe for now and
+				//could probably be removed at some point if we can ensure those
+				//threads get cleaned up.  Refer to issue #74 on bitbucket for
+				//more info:
+				//https://bitbucket.org/TreeView3Dev/treeview3/issues/74/selecting-close-window-leaves-the-app-in-a
+				System.exit(0);
+
+				break;
+			case JOptionPane.CANCEL_OPTION:
+				LogBuffer.println("User decided not to quit treeview.");
+				return;
+			default:
+				LogBuffer.println("User closed the confirmation window (same " +
+					"as cancel).");
+				return;
+>>>>>>> master
 		}
 	}
 

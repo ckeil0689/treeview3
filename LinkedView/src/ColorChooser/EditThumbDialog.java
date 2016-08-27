@@ -1,8 +1,6 @@
 package ColorChooser;
 
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -11,8 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
@@ -36,6 +34,7 @@ public class EditThumbDialog extends CustomDialog {
 
 	/* GUI components */
 	private JLabel enterPrompt;
+	private JTextArea valueStatus;
 	private JTextField inputField;
 	private JButton colorButton;
 	private ColorIcon colorIcon;
@@ -77,11 +76,11 @@ public class EditThumbDialog extends CustomDialog {
 		this.colorList = colorList;
 		this.index = thumbIndex;
 
-		this.mean = mean;
-		this.median = median;
-		this.center = center;
-		this.min = min;
-		this.max = max;
+		this.mean = Helper.roundDouble(mean, 4);
+		this.median = Helper.roundDouble(median, 4);
+		this.center = Helper.roundDouble(center, 4);
+		this.min = Helper.roundDouble(min, 4);
+		this.max = Helper.roundDouble(max, 4);
 
 		setupLayout();
 	}
@@ -101,6 +100,7 @@ public class EditThumbDialog extends CustomDialog {
 				return;
 			}
 
+			/* Set value that is returned when dialog closes */ 
 			finalX = inputX;
 
 			/*
@@ -118,51 +118,76 @@ public class EditThumbDialog extends CustomDialog {
 	}
 
 	/**
-	 * Parses the input and checks if it should be accepted.
+	 * Parses the input and checks multiple conditions to decide if it 
+	 * should be accepted. Those conditions are largely defined by the intended
+	 * behavior of the handles.
 	 * 
 	 * @return Whether the user input is considered valid.
 	 */
 	private boolean isValueInvalid() {
 
 		boolean isInvalid = false;
+		int minThumbIdx = 0;
+		int maxThumbIdx = colorList.size() - 1;
+		setError(""); // ensure label reset
+		
 		try {
 			inputX = Double.parseDouble(inputField.getText());
-			double currentThumbData = thumbBox.getThumbDataVal(index);
-			boolean isCurrentThumbData = Helper.nearlyEqual(inputX,
-					currentThumbData);
-			isInvalid = thumbBox.hasThumbForDataVal(inputX);
+			double thumbVal = thumbBox.calcThumbVal(index);
+			boolean isInputEqualToThumbVal = Helper.nearlyEqual(inputX, thumbVal);
 
+			// If edited thumb is boundary thumb
 			if (t instanceof BoundaryThumb) {
 				BoundaryThumb bT = (BoundaryThumb) t;
-				double boundVal;
+				double otherBoundVal;
+				int otherBoundIdx;
+				// Min bound
 				if (bT.isMin()) {
-					boundVal = thumbBox.getThumbDataVal(colorList.size() - 1);
-					isInvalid = (inputX > boundVal)
-							|| Helper.nearlyEqual(inputX, boundVal);
-					setError("Cannot be bigger than max.");
-
+					otherBoundIdx = maxThumbIdx;
+					otherBoundVal = thumbBox.calcThumbVal(otherBoundIdx);
+					isInvalid = !(inputX < otherBoundVal);
+					if(isInvalid) {
+						setError("Cannot be equal to or greater than right-most handle.");
+					} 
+        
+				// Max bound
 				} else {
-					boundVal = thumbBox.getThumbDataVal(0);
-					isInvalid = (inputX < boundVal)
-							|| Helper.nearlyEqual(inputX, boundVal);
-					setError("Cannot be smaller than min.");
+					otherBoundIdx = minThumbIdx;
+					otherBoundVal = thumbBox.calcThumbVal(otherBoundIdx);
+					isInvalid = !(inputX > otherBoundVal);
+					if(isInvalid) {
+						setError("Cannot be equal to or less than left-most handle.");
+					}
 				}
-
-			} else {
-				setError("Value already has a handle!");
+//			// Replace other handle if other handle with same data value exists
+//			} else if(!isInputEqualToThumbVal && thumbBox.hasThumbForVal(inputX)) {
+//				/* Pop up a warning dialog */
+//				boolean shouldRemove = thumbBox.askForThumbRemoval(inputX);
+//				/* Proceed according to user choice */
+//				if(!shouldRemove) {
+//					//thumbBox.removeThumbWithVal(inputX);
+//					
+////				} else {
+//					isInvalid = true;
+//				}
 			}
-			return isInvalid && !isCurrentThumbData;
+			
+			return isInvalid;
 
 		} catch (final NumberFormatException e) {
-			inputField.setText("Enter a valid number!");
-			return false;
+			setError("Enter a valid number!");
+			return true;
 		}
 	}
 
-	private void setError(String message) {
+	/**
+	 * Changes the text of the error JTextArea to the supplied message.
+	 * @param message - The text to display.
+	 */
+	private void setError(final String message) {
 
-		enterPrompt.setForeground(GUIFactory.RED1);
-		enterPrompt.setText(message);
+		valueStatus.setText(message);
+		this.setVisible(true); // message may chase mainPanel size
 	}
 
 	private class SetColorListener implements ActionListener {
@@ -227,9 +252,12 @@ public class EditThumbDialog extends CustomDialog {
 			GUIFactory.FONTS);
 		enterPrompt = GUIFactory.createLabel("Set data value:", 
 			GUIFactory.FONTS);
+		
+		valueStatus = GUIFactory.createWrappableTextArea();
+		valueStatus.setForeground(GUIFactory.RED1);
 
 		/* default */
-		startX = thumbBox.getThumbDataVal(thumbIndex);
+		startX = thumbBox.calcThumbVal(thumbIndex);
 		finalX = startX;
 
 		newColor = t.getColor();
@@ -239,22 +267,22 @@ public class EditThumbDialog extends CustomDialog {
 
 		/* Initially display thumb position */
 		inputField
-				.setText(Double.toString(thumbBox.getThumbDataVal(thumbIndex)));
+				.setText(Double.toString(thumbBox.calcThumbVal(thumbIndex)));
 		inputField.addActionListener(new SetValueListener());
 
 		colorIcon = new ColorIcon(t.getColor());
 		colorButton = GUIFactory.createColorIconBtn("",colorIcon);
 		colorButton.addActionListener(new SetColorListener());
 
-		final JButton meanBtn = getTextButton(String.valueOf(mean));
+		final JButton meanBtn = GUIFactory.getTextButton(String.valueOf(mean));
 		meanBtn.addActionListener(new SetToMeanListener());
-		final JButton medianBtn = getTextButton(String.valueOf(median));
+		final JButton medianBtn = GUIFactory.getTextButton(String.valueOf(median));
 		medianBtn.addActionListener(new SetToMedianListener());
-		final JButton centerBtn = getTextButton(String.valueOf(center));
+		final JButton centerBtn = GUIFactory.getTextButton(String.valueOf(center));
 		centerBtn.addActionListener(new SetToCenterListener());
-		final JButton minBtn = getTextButton(String.valueOf(min));
+		final JButton minBtn = GUIFactory.getTextButton(String.valueOf(min));
 		minBtn.addActionListener(new SetToMinListener());
-		final JButton maxBtn = getTextButton(String.valueOf(max));
+		final JButton maxBtn = GUIFactory.getTextButton(String.valueOf(max));
 		maxBtn.addActionListener(new SetToMaxListener());
 
 		final JLabel meanLabel = GUIFactory.createLabel("Mean:",
@@ -282,7 +310,7 @@ public class EditThumbDialog extends CustomDialog {
 		panel.add(enterPrompt, "align right, span 2");
 		panel.add(inputField, "growx, span 2, align left, wrap");
 
-		panel.add(GUIFactory.createLabel(" ",GUIFactory.FONTS),"wrap");
+		panel.add(valueStatus, "growx, span, wrap");
 
 		panel.add(meanLabel, "pushx, align right");
 		panel.add(meanBtn, "pushx, align left, gapright 8px");
@@ -303,17 +331,5 @@ public class EditThumbDialog extends CustomDialog {
 		panel.add(okButton, "pushx, span 2, align left");
 
 		mainPanel.add(panel, "w 200::, h 150::");
-	}
-
-	protected JButton getTextButton(String text) {
-		final JButton btn = new JButton(text);
-		btn.setFocusPainted(false);
-		btn.setMargin(new Insets(0,0,0,0));
-		btn.setContentAreaFilled(false);
-		btn.setBorderPainted(false);
-		btn.setOpaque(false);
-		btn.setBorder(new EmptyBorder(0,0,0,0));
-		btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		return(btn);
 	}
 }

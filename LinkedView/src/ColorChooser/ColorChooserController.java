@@ -7,8 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
@@ -61,7 +59,6 @@ implements ConfigNodePersistent {
 			colorChooserUI.addMissingListener(new MissingBtnListener());
 			colorChooserUI.addEditListener(new EditButtonListener());
 			colorChooserUI.addApplyChangeListener(new ApplyChangeListener());
-			colorChooserUI.addDialogCloseListener(new WindowCloseListener());
 		}
 	}
 
@@ -130,10 +127,34 @@ implements ConfigNodePersistent {
 	protected void setPresets() {
 
 		/* Choose ColorSet according to name */
+<<<<<<< HEAD
 		final ColorSet selectedColorSet = colorPresets.getColorSet(
 				colorScheme.toString());
 		
 		colorChooserUI.getPresetChoices().setSelectedItem(colorScheme);
+=======
+		// TODO work with Enum...
+		final ColorSet selectedColorSet;
+		if (colorScheme.equalsIgnoreCase("Custom")) {
+			colorChooserUI.getPresetChoices().setSelectedItem("Custom");
+			selectedColorSet = colorPresets.getColorSet(colorScheme);
+
+		} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
+			colorChooserUI.getPresetChoices().setSelectedItem("RedGreen");
+			selectedColorSet = colorPresets.getColorSet(colorScheme);
+
+		} else if (colorScheme.equalsIgnoreCase("YellowBlue")) {
+			colorChooserUI.getPresetChoices().setSelectedItem("YellowBlue");
+			selectedColorSet = colorPresets.getColorSet("YellowBlue");
+
+		} else {
+			/* Should never get here */
+			selectedColorSet = null;
+			LogBuffer.println("No matching ColorSet found in "
+					+ "ColorGradientChooser.setPresets()");
+		}
+
+>>>>>>> master
 		colorChooserUI.getColorPicker().setActiveColorSet(selectedColorSet);
 	}
 
@@ -142,7 +163,7 @@ implements ConfigNodePersistent {
 	 */
 	private void saveStatus() {
 
-		ColorSet colorSet = colorChooserUI.getColorPicker().saveCustomPresets();
+		ColorSet colorSet = colorChooserUI.getColorPicker().generateCustomColorSet();
 		colorPresets.addColorSet(colorSet);
 	}
 
@@ -191,17 +212,6 @@ implements ConfigNodePersistent {
 
 		return multiClickInterval;
 	}
-
-	private class WindowCloseListener extends WindowAdapter {
-
-		@Override
-		public void windowClosed(final WindowEvent e) {
-			
-			if (colorChooserUI.isCustomSelected()) {
-				saveStatus();
-			}
-		}
-	}
 	
 	private class ApplyChangeListener implements ActionListener {
 
@@ -212,6 +222,7 @@ implements ConfigNodePersistent {
 			storeState();
 			setChanged();
 			notifyObservers();
+			saveStatus();
 		}
 	}
 
@@ -317,7 +328,7 @@ implements ConfigNodePersistent {
 		public void mouseDragged(final MouseEvent e) {
 
 			dragged = true;
-			colorPicker.getThumbBox().moveThumbTo(e.getX());
+			colorPicker.getThumbBox().dragInnerThumbTo(e.getX());
 		}
 
 		@Override
@@ -338,7 +349,7 @@ implements ConfigNodePersistent {
 		public void mouseReleased(final MouseEvent e) {
 
 			if (!colorChooserUI.isCustomSelected() && dragged) {
-				colorPicker.getThumbBox().moveThumbTo(e.getX());
+				colorPicker.getThumbBox().dragInnerThumbTo(e.getX());
 				colorChooserUI.setCustomSelected(true);
 				setActiveColorSet("Custom");
 				dragged = false;
@@ -442,6 +453,7 @@ implements ConfigNodePersistent {
 				/* Switch to RedGreen */
 				colorSetName = ColorSchemeType.REDGREEN.toString();
 				colorChooserUI.setCustomSelected(false);
+				//TODO reset values!
 
 			} else if (selected == ColorSchemeType.YELLOWBLUE) {
 				/* Switch to YellowBlue */

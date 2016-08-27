@@ -72,7 +72,11 @@ public abstract class ModelViewProduced extends ModelView {
 	}
 
 	protected synchronized void createNewBuffer(final int w, final int h) {
+<<<<<<< HEAD
 		
+=======
+
+>>>>>>> master
 		offscreenScanSize = w;
 		offscreenImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		WritableRaster raster = ((BufferedImage)offscreenImage).getRaster();

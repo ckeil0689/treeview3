@@ -2,12 +2,18 @@ package Utilities;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
@@ -23,6 +29,7 @@ import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.WideComboBox;
@@ -31,12 +38,12 @@ import net.miginfocom.swing.MigLayout;
 public class GUIFactory {
 
 	// Application fonts
-	public static final Font FONTXS = new Font("Sans Serif", Font.PLAIN, 12);
-	public static final Font FONTS = new Font("Sans Serif", Font.PLAIN, 14);
-	public static final Font FONTS_B = new Font("Sans Serif", Font.BOLD, 14);
-	public static final Font FONTM = new Font("Sans Serif", Font.PLAIN, 16);
-	public static final Font FONTM_B = new Font("Sans Serif", Font.BOLD, 16);
-	public static final Font FONTL = new Font("Sans Serif", Font.PLAIN, 20);
+	public static final Font FONTXS = new Font("Sans Serif", Font.PLAIN, 10);
+	public static final Font FONTS = new Font("Sans Serif", Font.PLAIN, 12);
+	public static final Font FONTS_B = new Font("Sans Serif", Font.BOLD, 12);
+	public static final Font FONTM = new Font("Sans Serif", Font.PLAIN, 14);
+	public static final Font FONTM_B = new Font("Sans Serif", Font.BOLD, 14);
+	public static final Font FONTL = new Font("Sans Serif", Font.PLAIN, 16);
 	public static final Font FONTXXL = new Font("Sans Serif", Font.PLAIN, 30);
 
 	// Color scheme
@@ -360,6 +367,63 @@ public class GUIFactory {
 		btn.setPreferredSize(d);
 
 		return btn;
+	}
+	
+	/**
+	 * Returns a button with all graphical button features removed. It has
+	 * the appearance of a simple JLabel but is clickable.
+	 * @param text - The label of the button.
+	 * @return The plain button with the supplied label.
+	 */
+	public static JButton getTextButton(String text) {
+		final JButton btn = new JButton(text);
+		btn.setFocusPainted(false);
+		btn.setMargin(new Insets(0,0,0,0));
+		btn.setContentAreaFilled(false);
+		btn.setBorderPainted(false);
+		btn.setOpaque(false);
+		btn.setBorder(new EmptyBorder(0,0,0,0));
+		btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		return(btn);
+	}
+	
+	/**
+	 * A clickable JButton is created which imitates the look of a hyperlink
+	 * by using HTML formatting.
+	 * It has an ActionListener attached which can open the link when the
+	 * action is invoked.
+	 * @param url - The clickable URL.
+	 * @return The JButton formatted to look like a hyperlink.
+	 */
+	public static JButton getHyperlinkButton(final String url) {
+		
+		final JButton btn = new JButton();
+		btn.setText("<HTML><FONT color=\"#000099\"><U>" + url + "</U></FONT>" +
+			"</HTML>");
+		btn.setFocusPainted(false);
+		btn.setMargin(new Insets(0,0,0,0));
+		btn.setContentAreaFilled(false);
+		btn.setOpaque(false);
+		btn.setBorderPainted(false);
+		btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		
+		// action for opening the supplied URL
+		btn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				try {
+					Desktop.getDesktop().browse(new URI(url));
+				}
+				catch(IOException | URISyntaxException e1) {
+					LogBuffer.logException(e1);
+					LogBuffer.println("Could not open URL: " + url);
+				}
+			}
+		});
+		
+		return(btn);
 	}
 
 	/**

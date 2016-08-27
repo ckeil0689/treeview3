@@ -11,9 +11,12 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -46,6 +49,8 @@ public class InteractiveMatrixView extends MatrixView {
 	 */
 	private List<Rectangle> selectionRectList = new ArrayList<Rectangle>();
 	private Rectangle tmpRect = new Rectangle();
+	private Rectangle rowHoverRect = new Rectangle();
+	private Rectangle columnHoverRect = new Rectangle();
 
 	/**
 	 * Circle to be used as indicator for selection
@@ -70,6 +75,7 @@ public class InteractiveMatrixView extends MatrixView {
 		//11 = Debug zoom animation "toward" selection/sub-selection
 		//13 = Debug zooming to/toward a target
 		//14 = Debug temporary band drawing upon mousePressed
+		//15 = Debug unbalanced zooming
 	}
 
 	/**
@@ -146,7 +152,7 @@ public class InteractiveMatrixView extends MatrixView {
 							- ymap.getIndex(0));
 
 			if ((sourceRect.x >= 0) && (sourceRect.y >= 0) && drawer != null) {
-				drawer.paint(g2d, sourceRect, destRect, null);
+				drawer.paint(g2d, sourceRect, destRect);
 			}
 		}
 	}
@@ -169,6 +175,22 @@ public class InteractiveMatrixView extends MatrixView {
 			g2.drawRect(tmpRect.x, tmpRect.y, tmpRect.width, tmpRect.height);
 		}
 
+		if(isRowHoverHighlightActive() && ymap.overALabelLinkedView() &&
+			!ymap.isSelecting()) {
+
+			updateRowHoverRect();
+			g2.drawRect(rowHoverRect.x,rowHoverRect.y,rowHoverRect.width,
+				rowHoverRect.height);
+		}
+
+		if(isColumnHoverHighlightActive() && xmap.overALabelLinkedView() &&
+			!xmap.isSelecting()) {
+
+			updateColumnHoverRect();
+			g2.drawRect(columnHoverRect.x,columnHoverRect.y,
+				columnHoverRect.width,columnHoverRect.height);
+		}
+
 		if (selectionRectList != null) {
 			//Reinitialize the graphics object
 			g2 = (Graphics2D) g;
@@ -181,7 +203,7 @@ public class InteractiveMatrixView extends MatrixView {
 			}
 
 			/*
-			 * draw white selection circle if only 1 tile is selected and small
+			 * draw yellow selection circle if only 1 tile is selected and small
 			 * enough.
 			 */
 			if (indicatorCircleList != null) {
@@ -231,11 +253,13 @@ public class InteractiveMatrixView extends MatrixView {
 					for(final List<Integer> xBoundaries : arrayBoundaryList) {
 						for(final List<Integer> yBoundaries : geneBoundaryList){
 	
-							selectionRectList
-								.add(new Rectangle(xBoundaries.get(0),
+							Rectangle newRect = 
+									new Rectangle(xBoundaries.get(0),
 									yBoundaries.get(0), xBoundaries.get(1)
 									- xBoundaries.get(0), yBoundaries
-									.get(1) - yBoundaries.get(0)));
+									.get(1) - yBoundaries.get(0));
+							
+							selectionRectList.add(newRect);
 						}
 					}
 				}
@@ -255,6 +279,22 @@ public class InteractiveMatrixView extends MatrixView {
 
 	/**
 	 * @author rleach
+	 * @return the overlayTempChange
+	 */
+	public boolean isRowHoverHighlightActive() {
+		return(ymap.isHoverHighlightActive());
+	}
+
+	/**
+	 * @author rleach
+	 * @return the overlayTempChange
+	 */
+	public boolean isColumnHoverHighlightActive() {
+		return(xmap.isHoverHighlightActive());
+	}
+
+	/**
+	 * @author rleach
 	 * @param overlayTempChange the overlayTempChange to set
 	 */
 	public void setOverlayTempChange(boolean overlayTempChange) {
@@ -263,10 +303,88 @@ public class InteractiveMatrixView extends MatrixView {
 
 	/**
 	 * @author rleach
+	 * @param rhh the HighlightHover to set
+	 */
+	public void setRowHoverHighlight(boolean rhh) {
+		ymap.setHoverHighlight(rhh);
+	}
+
+	/**
+	 * @author rleach
+	 * @param chh the HighlightHoverChange to set
+	 */
+	public void setColumnHoverHighlight(boolean chh) {
+		xmap.setHoverHighlight(chh);
+	}
+
+	/**
+	 * @author rleach
 	 * @param tmpRect the tmpRect to set
 	 */
 	public void setTmpRect(Rectangle tmpRect) {
 		this.tmpRect = tmpRect;
+	}
+
+	/**
+	 * @author rleach
+	 * @param hRect the rowHoverRect to set
+	 */
+	public void setRowHoverRect(Rectangle hRect) {
+		this.rowHoverRect = hRect;
+	}
+
+	/**
+	 * @author rleach
+	 * @param hRect the columnHoverRect to set
+	 */
+	public void setColumnHoverRect(Rectangle hRect) {
+		this.columnHoverRect = hRect;
+	}
+
+	public void updateRowHoverRect() {
+		if(!ymap.overALabelLinkedView()) {
+			//Push the column highlight offscreen
+			rowHoverRect.setLocation(0,(int) -ymap.getScale() - 1);
+			return;
+		}
+
+		Point startHover = new Point();
+		Point endHover   = new Point();
+
+		startHover.setLocation(xmap.getPixel(xmap.getMinIndex()),
+			ymap.getPixel(ymap.getHoverIndex()));
+		endHover.setLocation(xmap.getPixel(xmap.getMaxIndex() + 1) - 1,
+			ymap.getPixel(ymap.getHoverIndex() + 1) - 1);
+
+		/* Full row hover coords */
+		rowHoverRect.setLocation(startHover);
+		rowHoverRect.setSize(0,0);
+		rowHoverRect.add(endHover);
+
+		repaint();
+	}
+
+	public void updateColumnHoverRect() {
+		if(!xmap.overALabelLinkedView()) {
+			//Push the column highlight offscreen
+			columnHoverRect.setLocation((int) -xmap.getScale() - 1,0);
+			return;
+		}
+
+		Point startHover = new Point();
+		Point endHover   = new Point();
+	
+		startHover.setLocation(xmap.getPixel(xmap.getHoverIndex()),
+			ymap.getPixel(ymap.getMinIndex()));
+		endHover.setLocation(xmap.getPixel(xmap.getHoverIndex() + 1) - 1,
+			ymap.getPixel(ymap.getMaxIndex() + 1) - 1);
+	
+		/* Full row hover coords */
+		columnHoverRect.setLocation(startHover);
+		columnHoverRect.setSize(0,0);
+		columnHoverRect.add(endHover);
+	
+		repaint();
 	}
 
 	/**
@@ -512,8 +630,8 @@ public class InteractiveMatrixView extends MatrixView {
 		double targetZoomInc) {
 
 		//If there's nothing to zoom, just return
-		if(xmap.getNumVisible() == (xmap.getMaxIndex() + 1) &&
-			ymap.getNumVisible() == (ymap.getMaxIndex() + 1)) {
+		if(xmap.getNumVisible() == (xmap.getTotalTileNum()) &&
+			ymap.getNumVisible() == (ymap.getTotalTileNum())) {
 			return;
 		}
 
@@ -757,13 +875,13 @@ public class InteractiveMatrixView extends MatrixView {
 					zoomYVal = 2;
 				} else if(numXCells < xmap.getMaxIndex()) {
 					zoomXVal = 2;
-				} else if(numYCells < (ymap.getMaxIndex() + 1) &&
-						numXCells < (xmap.getMaxIndex() + 1)) {
+				} else if(numYCells < (ymap.getTotalTileNum()) &&
+						numXCells < (xmap.getTotalTileNum())) {
 					zoomXVal = 1;
 					zoomYVal = 1;
-				} else if(numYCells < (ymap.getMaxIndex() + 1)) {
+				} else if(numYCells < (ymap.getTotalTileNum())) {
 					zoomYVal = 1;
-				} else if(numXCells < (xmap.getMaxIndex() + 1)) {
+				} else if(numXCells < (xmap.getTotalTileNum())) {
 					zoomXVal = 1;
 				}
 			}
@@ -776,9 +894,9 @@ public class InteractiveMatrixView extends MatrixView {
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
 				//If there's room to zoom out in the X dimension
-				if(numXCells < (xmap.getMaxIndex() + 1)) {
+				if(numXCells < (xmap.getTotalTileNum())) {
 					zoomXVal = 1;
-				} else if(numYCells < (ymap.getMaxIndex() + 1)) {
+				} else if(numYCells < (ymap.getTotalTileNum())) {
 					zoomYVal = 1;
 				}
 			}
@@ -800,13 +918,20 @@ public class InteractiveMatrixView extends MatrixView {
 			//If no zoom has occurred
 			if(zoomXVal == 0 && zoomYVal == 0) {
 				//If there's room to zoom out in the Y dimension
-				if(numYCells < (ymap.getMaxIndex() + 1)) {
+				if(numYCells < (ymap.getTotalTileNum())) {
 					zoomYVal = 1;
-				} else if(numXCells < (xmap.getMaxIndex() + 1)) {
+				} else if(numXCells < (xmap.getTotalTileNum())) {
 					zoomXVal = 1;
 				}
 			}
 		}
+
+		debug("At zoom level x" + numXCells + ", y" + numYCells +
+			" - Zooming out by x" + zoomXVal + " and y" + zoomYVal +
+			" tiles. Aspect Ratio: [" + aspectRatio +
+			"] Num xcells should have: [" + numXCellsShouldHave +
+			"] targetZoomFrac: [" + targetZoomFrac + "] correction: [" +
+			targetZoomFracCorrection + "]",15);
 
 		if(xmap.zoomAwayPixel(xPxPos, zoomXVal) == 1)
 			updateAspectRatio();
@@ -830,8 +955,8 @@ public class InteractiveMatrixView extends MatrixView {
 		 * TODO: Fix the smoothZoomTowardSelection function below and then
 		 * remove the work-around code - Rob
 		 */
-		smoothZoomTowardSelection(0,(xmap.getMaxIndex() + 1),
-				0,(ymap.getMaxIndex() + 1));
+		smoothZoomTowardSelection(0,(xmap.getTotalTileNum()),
+				0,(ymap.getTotalTileNum()));
 
 		//The function above has a bug that prevents full zoom out sometimes
 		// - this works around that, though it may have been fixed
@@ -849,9 +974,9 @@ public class InteractiveMatrixView extends MatrixView {
 		}
 
 		//If we've reached full zoom-out, reset the aspect ratio
-		if(xmap.getNumVisible() == (xmap.getMaxIndex() + 1) &&
-				ymap.getNumVisible() == (ymap.getMaxIndex() + 1)) {
-			setAspectRatio(xmap.getMaxIndex() + 1,ymap.getMaxIndex() + 1);
+		if(xmap.getNumVisible() == (xmap.getTotalTileNum()) &&
+				ymap.getNumVisible() == (ymap.getTotalTileNum())) {
+			setAspectRatio(xmap.getTotalTileNum(),ymap.getTotalTileNum());
 		}
 	}
 
@@ -1016,24 +1141,24 @@ public class InteractiveMatrixView extends MatrixView {
 			ymap.getNumVisible() != numYSelectedIndexes) &&
 			//The matrix is too small (in a dimension that's not fully zoomed)
 			//for the logic following to work
-			(1.0 / (double) (xmap.getMaxIndex() + 1) > zoomInc &&
+			(1.0 / (double) (xmap.getTotalTileNum()) > zoomInc &&
 				xmap.getNumVisible() != numXSelectedIndexes) ||
-			(1.0 / (double) (ymap.getMaxIndex() + 1) > zoomInc &&
+			(1.0 / (double) (ymap.getTotalTileNum()) > zoomInc &&
 				ymap.getNumVisible() != numYSelectedIndexes) ||
 			//X Size difference is less than the zoom increment (times two
 			//because this is for the outer edge)
 			(double) Math.abs(xmap.getNumVisible() - numXSelectedIndexes) * 2 /
-			(double) (xmap.getMaxIndex() + 1) < zoomInc &&
+			(double) (xmap.getTotalTileNum()) < zoomInc &&
 			//X Position difference is less than the zoom increment
 			(double) Math.abs(xmap.getFirstVisible() - selecXStartIndex) /
-			(double) (xmap.getMaxIndex() + 1) < zoomInc &&
+			(double) (xmap.getTotalTileNum()) < zoomInc &&
 			//Y Size difference is less than the zoom increment (times two
 			//because this is for the outer edge)
 			(double) Math.abs(ymap.getNumVisible() - numYSelectedIndexes) * 2 /
-			(double) (ymap.getMaxIndex() + 1) < zoomInc &&
+			(double) (ymap.getTotalTileNum()) < zoomInc &&
 			//Y Position difference is less than the zoom increment
 			(double) Math.abs(ymap.getFirstVisible() - selecYStartIndex) /
-			(double) (ymap.getMaxIndex() + 1) < zoomInc) {
+			(double) (ymap.getTotalTileNum()) < zoomInc) {
 
 			debug("Hard zooming to target to finish off the zoom step.",11);
 
@@ -1273,12 +1398,12 @@ public class InteractiveMatrixView extends MatrixView {
 				} else if((numXSelectedIndexes <= xmap.getNumVisible() &&
 						   numXCells > 1) ||
 						  (numXSelectedIndexes > xmap.getNumVisible() &&
-						   numXCells < (xmap.getMaxIndex() + 1))) {
+						   numXCells < (xmap.getTotalTileNum()))) {
 					zoomXVal = 1;
 				} else if((numYSelectedIndexes <= ymap.getNumVisible() &&
 						   numYCells > 1) ||
 						  (numYSelectedIndexes > ymap.getNumVisible() &&
-						   numYCells < (ymap.getMaxIndex() + 1))) {
+						   numYCells < (ymap.getTotalTileNum()))) {
 					zoomYVal = 1;
 				}
 			}
@@ -1297,8 +1422,8 @@ public class InteractiveMatrixView extends MatrixView {
 			//"the Y axis: [" + numYCellsShouldHave + "]");
 			//if(numYCellsShouldHave < numYSelectedIndexes) {
 			//	numYCellsShouldHave = numYSelectedIndexes;
-			//} else if(numYCellsShouldHave > (ymap.getMaxIndex() + 1)) {
-			//	numYCellsShouldHave = (ymap.getMaxIndex() + 1);
+			//} else if(numYCellsShouldHave > (ymap.getTotalTileNum())) {
+			//	numYCellsShouldHave = (ymap.getTotalTileNum());
 			//}
 
 			//debug("Zooming in on Y axis more: " +
@@ -1379,12 +1504,12 @@ public class InteractiveMatrixView extends MatrixView {
 				if((numXSelectedIndexes <= xmap.getNumVisible() &&
 					numXCells > 1) ||
 				   (numXSelectedIndexes > xmap.getNumVisible() &&
-					numXCells < (xmap.getMaxIndex() + 1))) {
+					numXCells < (xmap.getTotalTileNum()))) {
 					zoomXVal = 1;
 				} else if((numYSelectedIndexes <= ymap.getNumVisible() &&
 						   numYCells > 1) ||
 						(numYSelectedIndexes > ymap.getNumVisible() &&
-						 numYCells < (ymap.getMaxIndex() + 1))) {
+						 numYCells < (ymap.getTotalTileNum()))) {
 					zoomYVal = 1;
 				}
 			}
@@ -1442,12 +1567,12 @@ public class InteractiveMatrixView extends MatrixView {
 				if((numXSelectedIndexes <= xmap.getNumVisible() &&
 					numXCells > 1) ||
 				   (numXSelectedIndexes > xmap.getNumVisible() &&
-					numXCells < (xmap.getMaxIndex() + 1))) {
+					numXCells < (xmap.getTotalTileNum()))) {
 					zoomXVal = 1;
 				} else if((numYSelectedIndexes <= ymap.getNumVisible() &&
 						   numYCells > 1) ||
 						  (numYSelectedIndexes > ymap.getNumVisible() &&
-						   numYCells < (ymap.getMaxIndex() + 1))) {
+						   numYCells < (ymap.getTotalTileNum()))) {
 					zoomYVal = 1;
 				}
 			}
@@ -1905,10 +2030,8 @@ public class InteractiveMatrixView extends MatrixView {
 		List<List<Integer>> arrayBoundaryList;
 		List<List<Integer>> geneBoundaryList;
 
-		arrayBoundaryList = findRectBoundaries(selectedArrayIndexes,
-				xmap);
-		geneBoundaryList  = findRectBoundaries(selectedGeneIndexes,
-				ymap);
+		arrayBoundaryList = findRectBoundaries(selectedArrayIndexes,xmap);
+		geneBoundaryList  = findRectBoundaries(selectedGeneIndexes,ymap);
 
 		/*
 		 * TODO: Instead of just checking the last(/next) selection
@@ -1960,6 +2083,115 @@ public class InteractiveMatrixView extends MatrixView {
 			}
 			lastxb = xBoundaries.get(1);
 		}
+	}
+	
+	/**
+	 * Get a snapshot that contains only the visible portions of the matrix.
+	 * @param withSelections - whether to draw selections
+	 * @return An image snapshot of the matrix
+	 */
+	public Image getVisibleImage(boolean withSelections) {
+		
+		setSubImage();
+		
+		return getSnapShotImage(withSelections);
+	}
+	
+	/**
+	 * Get a snapshot that contains the full matrix.
+	 * @param withSelections - whether to draw selections
+	 * @return An image snapshot of the matrix
+	 */
+	public Image getFullImage(boolean withSelections) {
+		
+		Image img;
+		
+		/* 
+		 * The zoom stuff here is necessary because creating the selection
+		 * rectangles depends on the 'scale' variable of the MapContainers.
+		 * The zoom methods already calculate it correctly, so they are reused.
+		 * This is a massive hack, but the dependence on the MapContainers for
+		 * creating selection rectangles makes it very difficult to circumvent.
+		 */
+		// Store for reset
+		int firstVisX = xmap.getFirstVisible();
+		int lastVisX = xmap.getLastVisible();
+		int xScrollPos = xmap.getScroll().getValue();
+		int firstVisY = ymap.getFirstVisible();
+		int lastVisY = ymap.getLastVisible();
+		int yScrollPos = ymap.getScroll().getValue();
+		
+		// defines the matrix region
+		setBoundedSubImage(xmap.getMinIndex(), ymap.getMinIndex(), 
+				xmap.getTotalTileNum(), ymap.getTotalTileNum());
+		
+		// Temporary zoom to get the scale right for drawing selection rects
+		xmap.zoomToSelected(xmap.getMinIndex(), xmap.getMaxIndex());
+		ymap.zoomToSelected(ymap.getMinIndex(), ymap.getMaxIndex());
+		
+		img = getSnapShotImage(withSelections);
+
+		// Reset zoom
+		xmap.zoomToSelected(firstVisX, lastVisX);
+		ymap.zoomToSelected(firstVisY, lastVisY);
+		
+		// Scrollbars also get messed up, so reset...
+		xmap.getScroll().setValue(xScrollPos);
+		ymap.getScroll().setValue(yScrollPos);
+		
+		/* Reset the paint image boundaries to normal MapContainer bounds */
+		setSubImage();
+		repaint();
+		
+		return img;
+	}
+	
+	/**
+	 * Get a snapshot that contains only selected portions of the matrix.
+	 * @return An image snapshot of the matrix
+	 */
+	public Image getSelectionImage() {
+		
+		Image img;
+		// defines the matrix region
+		setBoundedSubImage(colSelection.getMinIndex(), 
+				rowSelection.getMinIndex(), colSelection.getNSelectedIndexes(),
+				rowSelection.getNSelectedIndexes());
+		
+		img = getSnapShotImage(false);
+		setSubImage();
+		
+		return img;
+	}
+	
+	/**
+	 * 
+	 * @param withSelections
+	 * @return
+	 */
+	public Image getSnapShotImage(boolean withSelections) {
+		
+		BufferedImage newImg;
+				
+		if(withSelections) {
+			// draw selection rectangles etc. on top of image
+			newImg = new BufferedImage((int)offscreenSize.getWidth(), 
+							(int)offscreenSize.getHeight(), 
+							BufferedImage.TYPE_INT_RGB);
+			Graphics2D g = (Graphics2D) newImg.getGraphics();
+			
+			/* Needed to adjust selection rectangle scale to region type */
+			recalculateOverlay();
+			
+			super.paintComponent(g);
+			g.setStroke(new BasicStroke(8));
+			this.paintComponent(g);
+			
+		} else {
+			newImg = super.getVisibleImage();
+		}
+		
+		return newImg;
 	}
 
 	public TreeSelectionI getRowSelection() {

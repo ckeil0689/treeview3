@@ -96,6 +96,10 @@ public class MapContainer extends Observable implements Observer,
 	private int     selectingStart        = -1;
 	private boolean whizMode              = false;
 
+	//These allow modifier keys in the label/tree areas to reveal the row/col
+	//highlight bar
+	private boolean hoverHighlight = false;
+
 	int debug = 0;
 	//1 = debug the state of the variables in overALabelPortLinkedView
 	//18 = debug tree hover highlighting of labels
@@ -118,6 +122,7 @@ public class MapContainer extends Observable implements Observer,
 		 * TODO Initial numVisible currently set in setIndexRange() Default
 		 * should NOT be zero, but max value!
 		 */
+		setNumVisible(1);
 		setFirstVisible(0);
 	}
 
@@ -212,6 +217,17 @@ public class MapContainer extends Observable implements Observer,
 
 		nullMap.setConfigNode(configNode);
 		nullMap.setType(IntegerMap.NULL);
+	}
+	
+	@Override
+	public String toString() {
+		
+		String mapInfo;
+		mapInfo = "FirstVisible: " + firstVisible + "; numVisible: " 
+				+ numVisible + "; Scale: " + getScale() + "; tileNumVisible: " 
+				+ getTileNumVisible();
+		
+		return mapInfo;
 	}
 
 	/**
@@ -378,7 +394,7 @@ public class MapContainer extends Observable implements Observer,
 		setScale(newScale);
 
 		int newFirstVisible = initialFirstVisible -
-		                      (numVisible - prevNumVisible) / 2;
+			(numVisible - prevNumVisible) / 2;
 		if((newFirstVisible + numVisible) > (getTotalTileNum())) {
 			newFirstVisible = (getTotalTileNum()) - numVisible;
 		}
@@ -1196,9 +1212,7 @@ public class MapContainer extends Observable implements Observer,
 		   ((int) Math.round(targetZoomFrac)) == 1) {
 			return(getTotalTileNum() - cells);
 		}
-		//int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
-		int zoomVal = (int) Math.round(cells /
-				(1 - targetZoomFrac) - cells);
+		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
 		int numPixels = getAvailablePixels();
 		//LogBuffer.println("getBestZoomOutVal: Called with pixel [" + pixel +
 		//		"] and targetZoomFrac [" + targetZoomFrac +
@@ -1265,7 +1279,6 @@ public class MapContainer extends Observable implements Observer,
 			if(i > (zoomMax - zoomMin)) break;
 		}
 
-		
 		double minDiffThresh = 0.005;	//0=best possible ratio. "Good enough
 										//value" for when the ratio of the
 										//relative cell position of the cell
@@ -1583,6 +1596,7 @@ public class MapContainer extends Observable implements Observer,
 			
 		case IntegerMap.FIXED:
 			newMap = fixedMap;
+<<<<<<< HEAD
 			break;
 			
 		case IntegerMap.FILL:
@@ -1592,6 +1606,14 @@ public class MapContainer extends Observable implements Observer,
 		default:
 			LogBuffer.println("Map type (" + type + ") not found. "
 					+ "Setting fixed map.");
+=======
+		}
+
+		if (newMap == null) {
+			// default
+//			LogBuffer.println("Couldn't find map matching type " + type
+//					+ " in MapContainer.java");
+>>>>>>> master
 			newMap = fixedMap;
 		}
 
@@ -1614,17 +1636,15 @@ public class MapContainer extends Observable implements Observer,
 		// called.
 		// scrollbar.setValue(i - scrollbar.getVisibleAmount() / 2);
 
-		int scrollVal = i - getNumVisible() / 2;
-		if(scrollVal > (getTotalTileNum() - getNumVisible())) {
-			scrollVal = getTotalTileNum() - getNumVisible();
+		int scrollToVal = i - getNumVisible() / 2;
+		if(scrollToVal > (getTotalTileNum() - getNumVisible())) {
+			scrollToVal = getTotalTileNum() - getNumVisible();
 		}
 
-		scrollbar.setValue(scrollVal);
+		scrollbar.setValue(scrollToVal);
 
 		// Keep track of the first visible index
-		// This used to be set using scrollbar.getVisibleAmount, but that can
-		// change implicitly when the window is resized.
-		setFirstVisible(scrollVal);
+		setFirstVisibleStrictly(scrollToVal);
 
 		//Image needs to be updated if either scroll position changes (because a
 		//scroll of the labels changes the blue box)
@@ -1691,7 +1711,7 @@ public class MapContainer extends Observable implements Observer,
 		scrollbar.setValue(newVal);
 
 		// Keep track of the first visible index
-		setFirstVisible(newVal);
+		setFirstVisibleStrictly(newVal);
 
 		if (j != scrollbar.getValue()) {
 			setChanged();
@@ -1935,12 +1955,19 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public void setNumVisible(final int i) {
 
-		if(i > getTotalTileNum()) {
+		if(i > getTotalTileNum() && getTotalTileNum() > 0) {
 			numVisible = getTotalTileNum();
 		} else if(i < 1) {
 			numVisible = 1;
+<<<<<<< HEAD
 		} else {
 			this.numVisible = i;
+=======
+		} else if(i > 0) {
+			numVisible = i;
+		} else {
+			numVisible = 1;
+>>>>>>> master
 		}
 	}
 
@@ -1953,7 +1980,8 @@ public class MapContainer extends Observable implements Observer,
 	public void setFirstVisibleStrictly(final int i) {
 		if (i < 0) {
 			firstVisible = 0;
-		} else if(i > (getTotalTileNum() - getNumVisible())) {
+		} else if(i > (getTotalTileNum() - getNumVisible()) &&
+			getTotalTileNum() > 0 && getNumVisible() > 0) {
 			firstVisible = getTotalTileNum() - getNumVisible();
 		} else {
 			firstVisible = i;
@@ -2050,10 +2078,12 @@ public class MapContainer extends Observable implements Observer,
 		 * multiple cells under a single pixel, but I'm not sure. For now, this
 		 * work-around will prevent exceptions. Figure this out & fix it
 		 * eventually. */
-		if(numVisible > getMaxIndex() + 1) {
-			LogBuffer.println("Warning: Encountered invalid/too-large " +
-				"numVisible value: [" + numVisible + "].  Resetting.");
-			numVisible = getMaxIndex() + 1;
+		if(numVisible > getTotalTileNum()) {
+			if(getMaxIndex() > 0) {
+				LogBuffer.println("Warning: Encountered invalid/too-large " +
+					"numVisible value: [" + numVisible + "].  Resetting.");
+				numVisible = getMaxIndex() + 1;
+			}
 		}
 		if(numVisible < 1) {
 			LogBuffer.println("Warning: Encountered invalid/too-small " +
@@ -2069,7 +2099,8 @@ public class MapContainer extends Observable implements Observer,
 		 * multiple cells under a single pixel, but I'm not sure. For now, this
 		 * work-around will prevent exceptions. Figure this out & fix it
 		 * eventually. */
-		if(firstVisible + numVisible - 1 > getMaxIndex()) {
+		if(firstVisible + numVisible - 1 > getMaxIndex() &&
+			getMaxIndex() > -1) {
 			LogBuffer.println("Warning: Encountered invalid/too-large " +
 				"firstVisible value: [" + firstVisible + "].  Resetting.");
 			firstVisible = getMaxIndex() - numVisible;
@@ -2250,7 +2281,7 @@ public class MapContainer extends Observable implements Observer,
 	//must be tracked here in the data model because it's the common point of
 	//reference for all the classes in the view and is their only way to
 	//communicate with one another.
-	public boolean overALabelPortLinkedView() {
+	public boolean overALabelLinkedView() {
 		debug("overALabelPortLinkedView: overLabels [" +
 			(overLabels ? "true" : "false") + "] overInteractiveMatrix [" +
 			(overInteractiveMatrix ? "true" : "false") +
@@ -2315,7 +2346,7 @@ public class MapContainer extends Observable implements Observer,
 
 		//If LabelView is not controlling its own repaints anymore, start it
 		//back up with a call to notifyObservers
-		if(!labelAnimeRunning && overALabelPortLinkedView()) {
+		if(!labelAnimeRunning && overALabelLinkedView()) {
 			setChanged();
 			notifyObservers();
 		}
@@ -2672,5 +2703,24 @@ public class MapContainer extends Observable implements Observer,
 		if(level == debug) {
 			LogBuffer.println(msg);
 		}
+	}
+
+	/**
+	 * This is used to determine whether an entire row/column will be
+	 * highlighted in the matrix overlay during drawing
+	 * @return the highlightHoverChange
+	 */
+	public boolean isHoverHighlightActive() {
+		return(hoverHighlight);
+	}
+
+	/**
+	 * Set this to true when you want to trigger an entire row/col to be
+	 * highlighted on the matrix.  This is called from MatrixViewController
+	 * whenever the user presses/releases a modifier key.
+	 * @param rowHoverChange the rowHoverChange to set
+	 */
+	public void setHoverHighlight(boolean highlightHoverChange) {
+		this.hoverHighlight = highlightHoverChange;
 	}
 }

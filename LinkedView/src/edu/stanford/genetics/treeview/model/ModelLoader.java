@@ -571,7 +571,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	 * Encapsulates loading progress, so both label and progress bar can be
 	 * updated using publish() and only one SwingWorker.
 	 */
-	class LoadStatus {
+	public static class LoadStatus {
 
 		private int progress;
 		private int max_progress;

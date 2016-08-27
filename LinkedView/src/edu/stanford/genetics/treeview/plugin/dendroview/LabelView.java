@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -38,6 +39,7 @@ import javax.swing.event.ChangeListener;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -56,6 +58,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	//This is the space between labels in pixels
 	protected final static int SQUEEZE = 1;
+<<<<<<< HEAD
 	
 	/* Selection of row/ column indices */
 	protected final Color textFGColor          = Color.black;
@@ -65,9 +68,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected final Color selectionTextFGColor = Color.black;
 	protected final Color hoverTextFGColor     = Color.red;
 	protected final Color labelPortColor       = new Color(30,144,251); //blu
+=======
+>>>>>>> master
 
 	/* DataModel is an observer */
 	protected DataModel dataModel;
+	protected DataTicker ticker;
 
 	/* Required label data */
 	protected HeaderInfo headerInfo;
@@ -154,6 +160,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	int lastScrollEndPos      = -1;
 	int secondaryPaneSize     = -1;
 	int secondaryViewportSize = -1;
+	
+	/*
+	 * When mouse is moved on the label, this method is called to update
+	 * data ticker value
+	 */
+	protected abstract void setDataTickerValue(final MouseEvent e);
 
 	/* TODO: Instead of resetting the justification position whenever the font
 	 * size changes, we should calculate and remember the relative position of
@@ -451,6 +463,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			LogBuffer.println("parentNode for LabelView was null.");
 			return;
 		}
+<<<<<<< HEAD
 		
 		this.configNode = parentNode;
 		getHeaderSummary().setConfigNode(configNode);
@@ -507,6 +520,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		configNode.putBoolean("isFixed", d_fixed);
 		
 		resetSecondaryScroll();
+=======
+
+		importSettingsFromNode(configNode);
+>>>>>>> master
 	}
 
 	/**
@@ -831,7 +848,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void updateLabelRepaintTimers() {
 		//If the mouse is not hovering over the IMV, stop both timers, set the
 		//last hover index, and tell mapcontainer that the animation has stopped
-		if(!map.overALabelPortLinkedView()) {
+		if(!map.overALabelLinkedView()) {
 			if(repaintTimer != null && repaintTimer.isRunning()) {
 				debug("Not hovering over a label port linked view - stopping animation",9);
 				repaintTimer.stop();
@@ -876,7 +893,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Else if the mouse hasn't moved, start the second timer to slow down
 		//the first after 1 second (this mitigates delays upon mouse motion
 		//after a brief period of no motion)
-		else if(map.overALabelPortLinkedView() &&
+		else if(map.overALabelLinkedView() &&
 			getPrimaryHoverIndex() == lastHoverIndex) {
 			/* TODO: If anastasia doesn't like trees linked to whizzing labels,
 			 * uncomment the following commented code. If she likes it, delete. This
@@ -937,12 +954,17 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 * here on out
 		 */
 
-		//There used to be a custom case for hover index updates during
-		//scrollbar drag, but it has been replaced by this more universal
-		//method.  Note, this method returns 0 or the max index if the cursor is
-		//hovered off that nearest edge.
-		forceUpdatePrimaryHoverIndex();
-
+		/* Gets the Current active Window (eg: export or treeview frame). It 
+		 * will return null if we are active in other application.
+		 */
+		Window activeWindow = javax.swing.FocusManager.getCurrentManager().getActiveWindow();		
+		if(activeWindow == null || SwingUtilities.getWindowAncestor(this).isActive()){
+			//There used to be a custom case for hover index updates during
+			//scrollbar drag, but it has been replaced by this more universal
+			//method.  Note, this method returns 0 or the max index if the cursor is
+			//hovered off that nearest edge.
+		    forceUpdatePrimaryHoverIndex();
+		}
 		debug(getPaneType() + " forced hover index: [" + getPrimaryHoverIndex() +
 			"] isOverIMV? [" + (map.isOverIMV() ? "yes" : "no") + "]",9);
 
@@ -964,7 +986,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		/* Shouldn't draw if there's no TreeSelection defined */
 		if(drawSelection == null) {
 			LogBuffer.println("Error: drawSelection not defined. Can't draw " +
-			                  "labels.");
+				"labels.");
 			return;
 		}
 
@@ -1424,13 +1446,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				/* Set label color */
 				if((drawSelection.isIndexSelected(j) &&
 					doDrawLabelPort()) ||
-				   j == getPrimaryHoverIndex() ||
-				   ((map.getHoverTreeMinIndex() > -1 &&
+					j == getAbsolutePrimaryHoverIndex() ||
+					((map.getHoverTreeMinIndex() > -1 &&
 						j >= map.getHoverTreeMinIndex() &&
 						j <= map.getHoverTreeMaxIndex()))) {
 					if(colorIndex > 0) {
-						g.setColor(TreeColorer
-						           .getColor(headers[colorIndex]));
+						g.setColor(TreeColorer.getColor(headers[colorIndex]));
 					}
 
 					if(j == getPrimaryHoverIndex() ||
@@ -1858,8 +1879,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		//If nothing about the font has changed, calculate the length of the
 		//longest string
-		if(lastDrawnFace == face  && lastDrawnStyle == style &&
-			longest_str_index > -1 && lastDrawnSize == size &&
+		if(lastDrawnFace == face   && lastDrawnStyle == style &&
+			longest_str_index > -1 && lastDrawnSize == size   &&
 			longest_str.equals(headerSummary.getSummary(headerInfo,
 				longest_str_index))) {
 
@@ -1872,7 +1893,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//Else if the font size only has changed, recalculate the longest
 		//string's length
 		else if(lastDrawnFace == face && lastDrawnStyle == style &&
-			longest_str_index > -1 && lastDrawnSize != size &&
+			longest_str_index > -1    && lastDrawnSize != size   &&
 			longest_str.equals(headerSummary.getSummary(headerInfo,
 				longest_str_index))) {
 
@@ -2017,6 +2038,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			return;
 		}
 
+		map.setHoverHighlight(false);
+
 		// if left button is used
 		if(SwingUtilities.isLeftMouseButton(e)) {
 			//Handle the temporary yellow highlighting of the labels
@@ -2050,31 +2073,34 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 
+		/* NOTE: Right click is captured elsewhere application-wide and
+		 * deselects everything */
+
 		if (!enclosingWindow().isActive() ||
-			(SwingUtilities.isLeftMouseButton(e) && e.isControlDown())) {
-			debug("Control is down - do nothing on release",23);
+			(SwingUtilities.isLeftMouseButton(e) && e.isControlDown()) ||
+			!SwingUtilities.isLeftMouseButton(e)) {
+			debug("Window inactive, control is down, or not left mouse " +
+				"button - do nothing on release",23);
 			return;
 		}
 
-		//When left button is used
-		//This might interfere with mouseClicked - That should be checked...
-		if(SwingUtilities.isLeftMouseButton(e) &&
-		   map.getSelectingStart() !=
-		   map.getIndex(getPrimaryHoverPosition(e))) {
+		int hDI = map.getIndex(getPrimaryHoverPosition(e));
+
+		//If the user dragged off an edge, the index will be out of bounds,
+		//so fix it
+		if(hDI < 0) {
+			hDI = 0;
+		} else if(hDI > map.getMaxIndex()) {
+			hDI = map.getMaxIndex();
+		}
+
+		//If this was a drag event
+		if(map.getSelectingStart() != getPrimaryHoverIndex(e)) {
 
 			/* TODO: Handle the temporary outlining of the matrix
 			 * NOT SURE HOW TO DO THIS YET - CANNOT TALK TO IMV */
 
-			int hDI = map.getIndex(getPrimaryHoverPosition(e));
-			//If the user dragged off an edge, the index will be out of bounds,
-			//so fix it
-			if(hDI < 0) {
-				hDI = 0;
-			} else if(hDI > map.getMaxIndex()) {
-				hDI = map.getMaxIndex();
-			}
-
-			//Make the selection upon release
+			//If a selection already exists
 			if(otherSelection.getNSelectedIndexes() > 0) {
 				if(e.isShiftDown()) {
 					drawSelection.selectIndexRange(map.getSelectingStart(),
@@ -2084,7 +2110,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						map.getSelectingStart() +
 						"] to [" + hDI + "]",23);
 					toggleSelectRange(map.getSelectingStart(),
-					                  hDI);
+						hDI);
 				} else if(e.isAltDown()) {
 					debug("Toggling selection of index range [" +
 						map.getSelectingStart() +
@@ -2092,22 +2118,48 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					deSelectRange(map.getSelectingStart(),
 						hDI);
 				} else {
-					//Deselect everything
-					drawSelection.deselectAllIndexes();
-					otherSelection.deselectAllIndexes();
-
-					//Select what was dragged over
-					otherSelection.selectAllIndexes();
 					drawSelection.selectNewIndexRange(map.getSelectingStart(),
 						hDI);
 				}
-			} else if(!e.isAltDown()) {
-				//Assumes there is no selection at all & selects what was
-				//dragged over
+			}
+			//Else if there's no current selection and we're not deselecting
+			else if(!e.isAltDown()) {
 				otherSelection.selectAllIndexes();
-				drawSelection
-				.selectNewIndexRange(map.getSelectingStart(),
-					map.getIndex(getPrimaryHoverPosition(e)));
+				drawSelection.selectNewIndexRange(map.getSelectingStart(),hDI);
+			}
+		}
+		//Else this was not a drag
+		else {
+
+			//Do a deselect of everything if command-option are down
+			if(e.isMetaDown() && e.isAltDown()) {
+				drawSelection.deselectAllIndexes();
+				otherSelection.deselectAllIndexes();
+			}
+			//If a selection already exists
+			else if (otherSelection.getNSelectedIndexes() > 0) {
+				if(e.isShiftDown()) {
+					if(!drawSelection.isIndexSelected(hDI)) {
+						toggleSelectFromClosestToIndex(drawSelection,hDI);
+					}
+				} else if(e.isMetaDown()) {
+					debug("Toggling selection of index [" + hDI +
+						"]",23);
+					toggleSelect(drawSelection,hDI);
+				} else if(e.isAltDown()) {
+					if(drawSelection.isIndexSelected(hDI)) {
+						debug("Setting selection of index [" + hDI +
+							"] to false",23);
+						toggleSelectFromClosestToIndex(drawSelection,hDI);
+					}
+				} else {
+					selectAnew(drawSelection,hDI);
+				}
+			}
+			//Else nothing is selected and if we're not deselecting
+			else if(!e.isAltDown()) {
+				drawSelection.setIndexSelection(hDI, true);
+				otherSelection.selectAllIndexes();
 			}
 		}
 
@@ -2200,6 +2252,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	@Override
 	public void mouseMoved(final MouseEvent e) {
+		//if(!hasFocus()) return;
+
 		setHoverPosition(e);
 		//Note that the hover index is updated by forceUpdatePrimaryHoverIndex
 		//which is called from updateBuffer
@@ -2215,6 +2269,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //			repaintTimer.restart();
 //		}
 
+		/* Set the Data ticker value to average value of the current row/column
+		 * Rounding off to 4 decimals
+		 */
+		setDataTickerValue(e);
+		
 		repaint();
 	}
 
@@ -2230,6 +2289,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	public int getPrimaryHoverIndex() {
 		return(map.getHoverIndex());
+	}
+
+	/**
+	 * Gets the data index that is hovered over, or -1 if not a valid hover
+	 * position
+	 * @author rleach
+	 * @return data index
+	 */
+	public int getAbsolutePrimaryHoverIndex() {
+		return(map.overALabelLinkedView() ? map.getHoverIndex() : -1);
 	}
 
 	public void updatePrimaryHoverIndexDuringScrollWheel() {
@@ -2284,7 +2353,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @return
 	 */
 	public boolean doDrawLabelPort() {
-		return(inLabelPortMode() && map.overALabelPortLinkedView() &&
+		return(inLabelPortMode() && map.overALabelLinkedView() &&
 		       ((!isFixed && map.getScale() < (getMin()  + SQUEEZE)) ||
 		        (isFixed  && map.getScale() < (last_size + SQUEEZE))));
 	}
@@ -2862,6 +2931,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			map.setKeepTreeGlobal(false);
 //		}
 		map.setOverLabels(true);
+		
 		super.mouseEntered(e);
 	}
 
@@ -2887,47 +2957,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		map.unsetHoverPixel();
 		unsetPrimaryHoverIndex();
+		setMeanDataTickerValue();
 		repaint();
 	}
 
-	@Override
-	public void mouseClicked(final MouseEvent e) {
-		final int index = getPrimaryHoverIndex(e);
-
-		if (SwingUtilities.isLeftMouseButton(e)) {
-			if(e.isControlDown()) {
-				debug("Control is down - do nothing on click",23);
-				return;
-			}
-			if (otherSelection.getNSelectedIndexes() > 0) {
-				if(e.isMetaDown() && e.isAltDown()) {
-					drawSelection.deselectAllIndexes();
-					otherSelection.deselectAllIndexes();
-				} else if(e.isShiftDown()) {
-					toggleSelectFromClosestToIndex(drawSelection,index);
-				} else if(e.isMetaDown()) {
-					debug("Toggling selection of index [" + index +
-						"]",23);
-					toggleSelect(drawSelection,index);
-				} else if(e.isAltDown()) {
-					debug("Setting selection of index [" + index + "] to false",
-						23);
-					drawSelection.setIndexSelection(index,false);
-				} else {
-					selectAnew(drawSelection,index);
-				}
-			} else if(!e.isAltDown()) {
-				//Assumes there is no selection at all
-				drawSelection.setIndexSelection(index, true);
-				otherSelection.selectAllIndexes();
-			}
-		} else {
-			otherSelection.deselectAllIndexes();
-			drawSelection.deselectAllIndexes();
-		}
-
-		drawSelection.notifyObservers();
-		otherSelection.notifyObservers();
+	/**
+	 * Set the data ticker to matrix average
+	 * Rounding off to 4 decimals
+	 */
+	private void setMeanDataTickerValue() {
+		ticker.setValue( dataModel.getDataMatrix().getMean() + " [matrix ave]");
 	}
 
 	/**
@@ -3180,4 +3219,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		revalidate();
 		repaint();
 	}
+	
+    public void setDataTicker(final DataTicker ticker) {
+		
+		this.ticker = ticker;
+	}
+    
+    public void setDataModel(final DataModel dataModel) {
+		
+		this.dataModel = dataModel;
+	}
+    
 }

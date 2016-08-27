@@ -23,7 +23,14 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+<<<<<<< HEAD
 import Controllers.Region;
+=======
+import Controllers.RegionType;
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.DataTicker;
+import edu.stanford.genetics.treeview.HeaderSummary;
+>>>>>>> master
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
@@ -59,6 +66,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * with the labels. */
 //	private int slowRepaintInterval = 1000;//update every 1s if mouse not moving
 	private int lastHoverIndex = -1;
+	
+	/* Used to update data ticker
+	 * 
+	 */
+	protected DataModel dataModel;
+	protected DataTicker ticker;
 
 	public TRView(final boolean isGeneTree) {
 
@@ -224,7 +237,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		hoveredNode = n;
 
-		synchMap();
 		repaint();
 	}
 
@@ -249,8 +261,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		if (xScaleEq != null) {
 			treePainter.paintSubtree(offscreenGraphics,xScaleEq,yScaleEq,
-				destRect,node,isLeft,getPrimaryHoverIndex(),treeSelection,
-				hoveredNode);
+				destRect,node,isLeft,getAbsolutePrimaryHoverIndex(),
+				treeSelection,hoveredNode);
 		}
 	}
 
@@ -364,7 +376,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			int lastVisIndex;
 
 			//If we're in label port/whizzing label mode
-			if(map.isLabelAnimeRunning() && map.overALabelPortLinkedView() &&
+			if(map.isLabelAnimeRunning() && map.overALabelLinkedView() &&
 				!map.shouldKeepTreeGlobal() && map.isWhizMode() &&
 				map.getFirstVisibleLabel() > -1 &&
 				map.getLastVisibleLabel() > -1) {
@@ -404,7 +416,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			} else {
 				//If we are looking at a global/data-linked tree with whizzing
 				//labels
-				if(map.isWhizMode()) {
+				if(map.isWhizMode() && map.overALabelLinkedView()) {
 
 					g.setColor(whiz_bg_color);
 
@@ -436,7 +448,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 			/* draw trees */
 			treePainter.paint(g,xScaleEq,yScaleEq,destRect,isLeft,
-				getPrimaryHoverIndex(),treeSelection,hoveredNode);
+				getAbsolutePrimaryHoverIndex(),treeSelection,hoveredNode);
 		}
 	}
 
@@ -450,13 +462,13 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * @param region - what portion of the tree to export
 	 */
 	public void export(final Graphics g,final int xIndent,final int yIndent,
-		final int size,final Region region,final boolean showSelections) {
+		final int size,final RegionType region,final boolean showSelections) {
 
-		if(region == Region.ALL) {
+		if(region == RegionType.ALL) {
 			exportAll(g,xIndent,yIndent,size,showSelections);
-		} else if(region == Region.VISIBLE) {
+		} else if(region == RegionType.VISIBLE) {
 			exportVisible(g,xIndent,yIndent,size,showSelections);
-		} else if(region == Region.SELECTION) {
+		} else if(region == RegionType.SELECTION) {
 			exportSelection(g,xIndent,yIndent,size,showSelections);
 		} else {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -538,6 +550,14 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	protected abstract void drawFittedWhizBackground(final Graphics g,
 		LinearTransformation scaleEq);
 	protected abstract void setExportPreviewScale(final Rectangle dest);
+	
+	protected abstract int  getSnapShotDestRectStart(final Rectangle dest);
+	protected abstract int  getSnapShotDestRectEnd(final Rectangle dest);
+	/* 
+	 * Used to set the Data ticker to Tree Average. Note that the hovered node 
+	 * must be set before calling this method.
+	 */
+	protected abstract void setDataTickerValue(final MouseEvent e);
 
 	/**
 	 * Need to blit another part of the buffer to the screen when the scrollbar
@@ -647,8 +667,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		//Paint from the parent down based on new selection
 		treePainter.paintSubtree(offscreenGraphics,xScaleEq,yScaleEq,
-			destRect,selectedNode,isLeft,getPrimaryHoverIndex(),treeSelection,
-			hoveredNode);
+			destRect,selectedNode,isLeft,getAbsolutePrimaryHoverIndex(),
+			treeSelection,hoveredNode);
 
 		repaint();
 	}
@@ -664,8 +684,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		synchMap();
 
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-			destRect,current,isLeft,getPrimaryHoverIndex(),treeSelection,
-			hoveredNode);
+			destRect,current,isLeft,getAbsolutePrimaryHoverIndex(),
+			treeSelection,hoveredNode);
 
 		repaint();
 	}
@@ -681,8 +701,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		synchMap();
 
 		treePainter.paintSubtree(offscreenGraphics, xScaleEq, yScaleEq,
-			destRect,current,isLeft,getPrimaryHoverIndex(),treeSelection,
-			hoveredNode);
+			destRect,current,isLeft,getAbsolutePrimaryHoverIndex(),
+			treeSelection,hoveredNode);
 
 		repaint();
 	}
@@ -781,7 +801,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	public void updateTreeRepaintTimers() {
 		//If the mouse is not hovering over the IMV, stop both timers, set the
 		//last hover index, and tell mapcontainer that the animation has stopped
-		if(!map.overALabelPortLinkedView()) {
+		if(!map.overALabelLinkedView()) {
 			if(repaintTimer != null && repaintTimer.isRunning()) {
 				debug("Not hovering over a label port linked view - stopping " +
 					"animation",9);
@@ -826,7 +846,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		//Else if the mouse hasn't moved, start the second timer to slow down
 		//the first after 1 second (this mitigates delays upon mouse motion
 		//after a brief period of no motion)
-		else if(map.overALabelPortLinkedView() &&
+		else if(map.overALabelLinkedView() &&
 			getPrimaryHoverIndex() == lastHoverIndex) {
 			if(repaintTimer.getDelay() == REPAINT_INTERVAL) {
 				debug("Hovering on one spot [" + lastHoverIndex +
@@ -874,12 +894,24 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	}
 
 	/**
-	 * Gets the data index that is hovered over
+	 * Gets the data index that is hovered over, including edges if the mouse is
+	 * hovered off a label linked view (especially useful when dragging off an
+	 * edge)
 	 * @author rleach
 	 * @return data index
 	 */
 	public int getPrimaryHoverIndex() {
 		return(map.getHoverIndex());
+	}
+
+	/**
+	 * Gets the data index that is hovered over, or -1 if not a valid hover
+	 * position
+	 * @author rleach
+	 * @return data index
+	 */
+	public int getAbsolutePrimaryHoverIndex() {
+		return(map.overALabelLinkedView() ? map.getHoverIndex() : -1);
 	}
 
 	/**
@@ -901,6 +933,20 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		}
 	}
 
+	/**
+	 * When a mouse is pressed, the hover highlight is deactivated.
+	 */
+	@Override
+	public void mousePressed(final MouseEvent e) {
+
+		if (!isEnabled() || !enclosingWindow().isActive())
+			return;
+		if (treePainter == null)
+			return;
+
+		map.setHoverHighlight(false);
+	}
+
 	@Override
 	public void mouseMoved(final MouseEvent e) {
 
@@ -909,10 +955,14 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		if (treePainter == null)
 			return;
 
-		setHoveredNode(getClosestParentNode(e));
 		map.setHoverPixel(getPrimaryPixelIndex(e));
 		map.setHoverIndex(map.getIndex(getPrimaryPixelIndex(e)));
+		setHoveredNode(getClosestParentNode(e));
 		synchMap();
+		/* Set the Data ticker to average value of the current tree
+		 * Rounding off to 4 decimals
+		 */
+		setDataTickerValue(e);
 	}
 
 	@Override
@@ -940,6 +990,15 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		map.setOverTree(false);
 		unsetHoveredNode();
+		setMeanDataTickerValue();
+	}
+
+	/**
+	 * Set the data ticker to matrix average
+	 * Rounding off to 4 decimals
+	 */
+	private void setMeanDataTickerValue() {
+		ticker.setValue( dataModel.getDataMatrix().getMean() + " [matrix ave]");
 	}
 
 	@Override
@@ -954,6 +1013,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			//Value of label length scrollbar
 			map.scrollBy(shift);
 			updatePrimaryHoverIndexDuringScrollWheel();
+			setHoveredNode(getClosestParentNode(e));
+			synchMap();
 		}
 	}
 
@@ -995,7 +1056,17 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		return(treePainter != null && treePainter.getRootNode() != null);
 	}
 	
-	public BufferedImage getSnapshot(final int width, final int height) {
+	/**
+	 * Get a scaled snapshot of the trees. The snapshot will be taken in
+	 * the specified region.
+	 * @param width - The width of the scaled image to be returned.
+	 * @param height - The height of the scaled image to be returned.
+	 * @param region - The region from which to take a snapshot.
+	 * @param withSelections - Whether to include selections in the snapshot.
+	 * @return A scaled BufferedImage representing the trees.
+	 */
+	public BufferedImage getSnapshot(final int width, final int height, 
+			final RegionType region, final boolean withSelections) {
 	
 		BufferedImage img = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
@@ -1006,14 +1077,71 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		
 		setExportPreviewScale(dest);
 		
-		/* Draw trees to first image, original size */
-		treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
-				isLeft, -1, null, null);
+		/* 
+		 * Temporarily update MapContainer for this TreeView to get user
+		 * selected region. Reset after drawing the image.
+		 */
+		int firstVisible = map.getFirstVisible();
+		int numVisible = map.getNumVisible();
+		
+		/* These depend on the selected region */
+		int tempFirstVisible;
+		int tempNumVisible;
+		int tempLastVisible;
+		
+		switch(region) {
+		case ALL:
+			tempFirstVisible = map.getMinIndex();
+			tempNumVisible = map.getTotalTileNum();
+			break;
+		case SELECTION:
+			tempFirstVisible = treeSelection.getMinIndex();
+			tempNumVisible = treeSelection.getNSelectedIndexes();
+			break;
+		/* Fall through, visible same as default */
+		case VISIBLE:
+		default:
+			tempFirstVisible = firstVisible;
+			tempNumVisible = numVisible;
+			break;
+		}
+		
+		tempLastVisible = tempFirstVisible + tempNumVisible;
+		
+		LinearTransformation primaryScaleEq = getPrimaryScaleEq();
+		/* temporarily update for snapshot drawing */
+		setPrimaryScaleEq(new LinearTransformation(
+				tempFirstVisible,
+				getSnapShotDestRectStart(dest),
+				tempLastVisible,
+				getSnapShotDestRectEnd(dest)));
+		
+		/* Now draw trees to first image, original size */
+		if(withSelections) {
+			treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
+					isLeft, -1, treeSelection, null);
+		} else {
+			treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
+					isLeft, -1, null, null);
+		}
 		
 		/* Draw a scaled version of the old image to a new image */
 		Graphics g = scaled.getGraphics();
 		g.drawImage(img, 0, 0, width, height, null);
 		
+		/* Reset scale tree so normal TreeViews continue as usual */
+		setPrimaryScaleEq(primaryScaleEq);
+		
 		return scaled;
+	}
+	
+	public void setDataTicker(final DataTicker ticker) {
+		
+		this.ticker = ticker;
+	}
+    
+    public void setDataModel(final DataModel dataModel) {
+		
+		this.dataModel = dataModel;
 	}
 }

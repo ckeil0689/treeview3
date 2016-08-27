@@ -12,12 +12,15 @@ package Utilities;
 public class StringRes {
 
 	/* Global Application Fields */
-	/** Version of application */
+	/* Version of application */
 	public final static String versionTag = "3.0alpha03";
+	
+	/* Versioning following MAJOR.MINOR.PATCH - See http://semver.org/ */
+	public final static String preferencesVersionTag = "0.1.0-alpha";
 
 	/** Homepage for updates */
-	public final static String updateUrl = "https://www.princeton.edu/"
-			+ "~abarysh/treeview/";
+	public final static String updateUrl = "https://bitbucket.org/" +
+		"TreeView3Dev/treeview3/";
 
 	/** url of announcements mailing list */
 	public final static String announcementUrl = "https://www.princeton.edu/"
@@ -49,9 +52,6 @@ public class StringRes {
 	// Loading
 	public static final String load_OneSec = "One moment, please.";
 	public static final String load_active = "Loading your data!";
-	public static final String load_Ohoh = "Oh oh!";
-	public static final String load_Error = "Looks like we ran into the "
-			+ "following issue: ";
 
 	// Menu Titles
 	public static final String menu_Open = "Open...";

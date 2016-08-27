@@ -479,17 +479,21 @@ public class ClusterDialogController {
 			boolean shouldProceed = false;
 			
 			final int choice = JOptionPane.showConfirmDialog(
-					clusterDialog, message);
+					clusterDialog, message, "Select an Option", JOptionPane.YES_NO_OPTION);
 			
 			switch(choice) {
-			case JOptionPane.OK_OPTION:
+			case JOptionPane.YES_OPTION:
 				shouldProceed = true;
 				break;
 			case JOptionPane.NO_OPTION:
+<<<<<<< HEAD
 				shouldProceed = false;
 				break;
 			case JOptionPane.CANCEL_OPTION:
 				this.cancel(true);
+=======
+				cancelAll();
+>>>>>>> master
 				shouldProceed = false;
 				break;
 			default:
