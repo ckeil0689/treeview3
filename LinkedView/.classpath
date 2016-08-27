@@ -16,12 +16,7 @@
 	<classpathentry kind="lib" path="compile_lib/freehep-util-2.0.2.jar"/>
 	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-svg-2.4.jar"/>
 	<classpathentry kind="lib" path="compile_lib/freehep-graphicsio-ps-2.4.jar"/>
-<<<<<<< HEAD
-	<classpathentry kind="lib" path="compile_lib/xmlworker-5.5.8.jar"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-=======
 	<classpathentry kind="lib" path="compile_lib/dd-plist.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
->>>>>>> master
 	<classpathentry kind="output" path="bin"/>
 </classpath>
