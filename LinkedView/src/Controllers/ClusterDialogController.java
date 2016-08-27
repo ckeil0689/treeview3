@@ -133,11 +133,12 @@ public class ClusterDialogController {
 	 * Begins cluster process if the user clicks the 'Cluster' button in
 	 * DendroView and sufficient parameters are set.
 	 *
-	 * @author CKeil
-	 *
 	 */
 	private class TaskStartListener implements ActionListener {
 
+		// To avoid synthetic compiler creation of a constructor
+		protected TaskStartListener(){}
+		
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
@@ -223,7 +224,7 @@ public class ClusterDialogController {
 			
 			if(!clusterCheck[ROW_IDX] && !clusterCheck[COL_IDX]) {
 				this.cancel(true);
-				return false;
+				return Boolean.FALSE;
 			}
 			
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], clusterCheck[COL_IDX]);
@@ -241,7 +242,7 @@ public class ClusterDialogController {
 
 			// Check for cancellation in between axis clustering
 			if (isCancelled()) {
-				return false;
+				return Boolean.FALSE;
 			}
 			
 			// Cluster columns if user selected option
@@ -253,7 +254,7 @@ public class ClusterDialogController {
 			
 			if(!isReorderingValid(clusterCheck)) {
 				this.cancel(true);
-				return false;
+				return Boolean.FALSE;
 			}
 			
 			// Determine file extensions for CDT file (varies between hierarchical and k-means)
@@ -265,10 +266,10 @@ public class ClusterDialogController {
 
 			if(cdtFile == null) {
 				this.cancel(true);
-				return false;
+				return Boolean.FALSE;
 			}
 			// finished setting reordered axis labels
-			return true;
+			return Boolean.TRUE;
 		}
 
 		@Override
@@ -304,7 +305,7 @@ public class ClusterDialogController {
 		 * @return True if reordered arrays are the same size as the axis 
 		 * header arrays and the specific axis is supposed to be clustered.
 		 */
-		private boolean isReorderingValid(boolean[] clusterCheck) {
+		private boolean isReorderingValid(boolean[] shouldClusterAxis) {
 			
 			boolean rowsValid;
 			boolean colsValid;
@@ -315,13 +316,13 @@ public class ClusterDialogController {
 			int numReorderedRowIDs = rowClusterData.getReorderedIDs().length;
 			int numReorderedColIDs = colClusterData.getReorderedIDs().length;
 			
-			if(clusterCheck[ROW_IDX] || tvModel.gidFound()) {
+			if(shouldClusterAxis[ROW_IDX] || tvModel.gidFound()) {
 				rowsValid = (numReorderedRowIDs == numRowHeaders); 
 			} else {
 				rowsValid = (numReorderedRowIDs == 0);
 			}
 			
-			if(clusterCheck[COL_IDX] || tvModel.aidFound()) {
+			if(shouldClusterAxis[COL_IDX] || tvModel.aidFound()) {
 				colsValid = (numReorderedColIDs == numColHeaders); 
 			} else {
 				colsValid = (numReorderedColIDs == 0);
@@ -381,18 +382,18 @@ public class ClusterDialogController {
 		/** 
 		 * Determines if both axes should be clustered based on available info 
 		 * as well as user input.  
-		 * @param rowReady Whether all GUI input for row clustering allows for
+		 * @param shouldClusterRow - Whether all GUI input for row clustering allows for
 		 * the row axis to be clustered.
-		 * @param colReady Whether all GUI input for column clustering allows 
+		 * @param shouldClusterCol - Whether all GUI input for column clustering allows 
 		 * for the column axis to be clustered.
 		 * @return An array of 2 boolean values, each representing whether 
 		 * the respective axis should be clustered.
 		 */
-		private boolean[] reaffirmClusterChoice(final boolean rowReady, 
-				final boolean colReady) {
+		private boolean[] reaffirmClusterChoice(final boolean shouldClusterRow, 
+				final boolean shouldClusterCol) {
 			
 			// default: depends on ready status
-			boolean[] clusterCheck = new boolean[] {rowReady, colReady};
+			boolean[] shouldClusterAxis = new boolean[] {shouldClusterRow, shouldClusterCol};
 			
 			boolean wasRowAxisClustered = wasAxisClustered(
 					tvModel.getFileSet().getGtr(), tvModel.gidFound());
@@ -400,8 +401,8 @@ public class ClusterDialogController {
 					tvModel.getFileSet().getAtr(), tvModel.aidFound());
 			
 			// only warn if axis was clustered before AND user wants to cluster
-			boolean warnRowAxis = wasRowAxisClustered && rowReady;
-			boolean warnColAxis = wasColAxisClustered && colReady;
+			boolean warnRowAxis = wasRowAxisClustered && shouldClusterRow;
+			boolean warnColAxis = wasColAxisClustered && shouldClusterCol;
 			
 			String message = "Something happened :(";
 			if(warnRowAxis && warnColAxis) {
@@ -409,23 +410,23 @@ public class ClusterDialogController {
 						+ "Would you like to cluster your selected axes again?";
 				
 				if(!confirmChoice(message)) {
-					clusterCheck[ROW_IDX] = false;
-					clusterCheck[COL_IDX] = false;
+					shouldClusterAxis[ROW_IDX] = false;
+					shouldClusterAxis[COL_IDX] = false;
 					this.cancel(true);
-					return clusterCheck;
+					return shouldClusterAxis;
 				}
 				
 			} else if(warnRowAxis && !warnColAxis) {
 				message = "The row axis has been clustered before. "
 						+ "Would you like to cluster the rows again?";
 				
-				clusterCheck[ROW_IDX]= confirmChoice(message);
+				shouldClusterAxis[ROW_IDX]= confirmChoice(message);
 					
 			} else if(!warnRowAxis && warnColAxis){
 				message = "The column axis has been clustered before. "
 						+ "Would you like to cluster the columns again?";
 				
-				clusterCheck[COL_IDX]= confirmChoice(message);
+				shouldClusterAxis[COL_IDX]= confirmChoice(message);
 			}
 			
 			/* 
@@ -434,14 +435,14 @@ public class ClusterDialogController {
 			 * considered to be clustered. 
 			 */
 			final boolean checkForRowTreeFile = wasRowAxisClustered 
-					|| clusterCheck[ROW_IDX];
+					|| shouldClusterAxis[ROW_IDX];
 			final boolean checkForColTreeFile = wasColAxisClustered 
-					|| clusterCheck[COL_IDX];
+					|| shouldClusterAxis[COL_IDX];
 			
 			rowClusterData.setAxisClustered(checkForRowTreeFile);
 			colClusterData.setAxisClustered(checkForColTreeFile);
 			
-			return clusterCheck;
+			return shouldClusterAxis;
 		}
 		
 		/**
@@ -486,14 +487,10 @@ public class ClusterDialogController {
 				shouldProceed = true;
 				break;
 			case JOptionPane.NO_OPTION:
-<<<<<<< HEAD
 				shouldProceed = false;
 				break;
 			case JOptionPane.CANCEL_OPTION:
 				this.cancel(true);
-=======
-				cancelAll();
->>>>>>> master
 				shouldProceed = false;
 				break;
 			default:
@@ -524,7 +521,7 @@ public class ClusterDialogController {
 					pBarMax += (rowSimilarity == 5) ? (3 * rows) : (2 * rows);
 
 				} else {
-					final int cycles = clusterView.getSpinnerValues()[1];
+					final int cycles = (clusterView.getSpinnerValues()[1]).intValue();
 					if (rowSimilarity == 5) {
 						pBarMax += 2 * rows + cycles;
 
@@ -540,7 +537,7 @@ public class ClusterDialogController {
 					pBarMax += (colSimilarity == 5) ? (3 * cols) : (2 * cols);
 
 				} else {
-					final int cycles = clusterView.getSpinnerValues()[3];
+					final int cycles = (clusterView.getSpinnerValues()[3]).intValue();
 
 					if (colSimilarity == 5) {
 						pBarMax += 2 * cols + cycles;
@@ -668,16 +665,16 @@ public class ClusterDialogController {
 			filePath = cdtGen.finish();
 			
 			if(isCancelled()) {
-				return false;
+				return Boolean.FALSE;
 			}
 			
 			if(filePath == null) {
 				LogBuffer.println("Generating a CDT failed. Cancelling...");
 				this.cancel(true);
-				return false;
+				return Boolean.FALSE;
 			}
 
-			return true;
+			return Boolean.TRUE;
 		}
 
 		@Override
@@ -796,12 +793,12 @@ public class ClusterDialogController {
 		
 		/**
 		 * Checks if a file at a given path exists or not.
-		 * @param filePath The complete file path which to check.
+		 * @param path - The complete file path which to check.
 		 * @return Whether the checked file exists or not.
 		 */
-		private boolean doesFileExist(final String filePath) {
+		private boolean doesFileExist(final String path) {
 			
-			File f = new File(filePath);
+			File f = new File(path);
 			return (f.exists() && !f.isDirectory());
 		}
 	}
@@ -822,6 +819,7 @@ public class ClusterDialogController {
 	}
 	
 	/**
+	 * TODO move to ClusterFileStorage
 	 * Attempt to extract the directory from any of the cluster files, if 
 	 * they exist.
 	 * @param cdtF The CDT file of the current cluster operation.
@@ -830,7 +828,7 @@ public class ClusterDialogController {
 	 * @return File The directory where the files are stored or null if neither
 	 * of the files exists. 
 	 */
-	private File getClusterDir(File cdtF, File gtrF, File atrF) {
+	private static File getClusterDir(File cdtF, File gtrF, File atrF) {
 		
 		File dir;
 		if(cdtF != null && cdtF.exists()) {
@@ -854,12 +852,13 @@ public class ClusterDialogController {
 	}
 	
 	/**
+	 * TODO move to ClusterFileStorage
 	 * If the passed File object exists and is indeed a normal file, it deletion
 	 * will be attempted. The passed object will also be set to null to avoid
 	 * lingering of object data.
 	 * @param file - The File to be deleted.
 	 */
-	private void deleteFile(File file) {
+	private static void deleteFile(File file) {
 		
 		if(file == null) {
 			return;
@@ -878,7 +877,9 @@ public class ClusterDialogController {
 		
 		if(success) {
 			LogBuffer.println(name + " was successfully deleted.");
-			file = null;
+			//file = null;
+			// got a warning for this assignment, not sure what effects of deletion would be. can be deleted if
+			// process is not affected
 			
 		} else {
 			LogBuffer.println(name + " could not be deleted.");
@@ -886,12 +887,13 @@ public class ClusterDialogController {
 	}
 	
 	/**
+	 * TODO Move to ClusterFileStorage
 	 * Checks if the passed File object is a directory, if it is empty, and if
 	 * that is true it attempts to delete the directory.
 	 * @param dir - The File object to be deleted. It should represent 
 	 * an empty directory.
 	 */
-	private void deleteEmptyDir(File dir) {
+	private static void deleteEmptyDir(File dir) {
 		
 		if(dir == null) {
 			return;
@@ -915,8 +917,9 @@ public class ClusterDialogController {
 		
 		if(success) {
 			LogBuffer.println(name + " was successfully deleted.");
-			dir = null;
-			
+			//dir = null;
+			// got a warning for this assignment, not sure what effects of deletion would be. can be deleted if
+			// process is not affected
 		} else {
 			LogBuffer.println(name + " could not be deleted.");
 		}
@@ -962,7 +965,10 @@ public class ClusterDialogController {
 	 */
 	private class ClusterTypeListener implements ActionListener {
 
-		/* source of arg0 is a JComboBox<String> in ClusterView */
+		// To avoid synthetic compiler creation of a constructor
+		protected ClusterTypeListener(){}
+		
+		// source of arg0 is a JComboBox<String> in ClusterView
 		@SuppressWarnings("unchecked")
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
@@ -983,6 +989,9 @@ public class ClusterDialogController {
 	 */
 	private class LinkChoiceListener implements ActionListener {
 
+		// To avoid synthetic compiler creation of a constructor
+		protected LinkChoiceListener(){}
+		
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
@@ -998,6 +1007,9 @@ public class ClusterDialogController {
 	 */
 	private class RowDistListener implements ItemListener {
 
+		// To avoid synthetic compiler creation of a constructor
+		protected RowDistListener(){}
+		
 		@Override
 		public void itemStateChanged(final ItemEvent event) {
 
@@ -1019,6 +1031,9 @@ public class ClusterDialogController {
 	 */
 	private class ColDistListener implements ItemListener {
 
+		// To avoid synthetic compiler creation of a constructor
+		protected ColDistListener(){}
+		
 		@Override
 		public void itemStateChanged(final ItemEvent event) {
 
@@ -1041,6 +1056,9 @@ public class ClusterDialogController {
 	 */
 	private class SpinnerListener implements ChangeListener {
 
+		// To avoid synthetic compiler creation of a constructor
+		protected SpinnerListener(){}
+		
 		@Override
 		public void stateChanged(final ChangeEvent arg0) {
 
@@ -1062,6 +1080,8 @@ public class ClusterDialogController {
 	 */
 	private class CancelListener implements ActionListener {
 
+		protected CancelListener(){}
+		
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
@@ -1092,12 +1112,12 @@ public class ClusterDialogController {
 		switch (type) {
 
 		case ROW:
-			groups = spinnerValues[0];
-			iterations = spinnerValues[1];
+			groups = (spinnerValues[0]).intValue();
+			iterations = (spinnerValues[1]).intValue();
 			break;
 		case COL:
-			groups = spinnerValues[2];
-			iterations = spinnerValues[3];
+			groups = (spinnerValues[2]).intValue();
+			iterations = (spinnerValues[3]).intValue();
 			break;
 		default:
 			groups = 0;

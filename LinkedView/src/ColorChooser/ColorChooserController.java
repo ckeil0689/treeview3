@@ -126,35 +126,11 @@ implements ConfigNodePersistent {
 	 */
 	protected void setPresets() {
 
-		/* Choose ColorSet according to name */
-<<<<<<< HEAD
+		// Choose ColorSet according to name
 		final ColorSet selectedColorSet = colorPresets.getColorSet(
 				colorScheme.toString());
 		
 		colorChooserUI.getPresetChoices().setSelectedItem(colorScheme);
-=======
-		// TODO work with Enum...
-		final ColorSet selectedColorSet;
-		if (colorScheme.equalsIgnoreCase("Custom")) {
-			colorChooserUI.getPresetChoices().setSelectedItem("Custom");
-			selectedColorSet = colorPresets.getColorSet(colorScheme);
-
-		} else if (colorScheme.equalsIgnoreCase(defaultColors)) {
-			colorChooserUI.getPresetChoices().setSelectedItem("RedGreen");
-			selectedColorSet = colorPresets.getColorSet(colorScheme);
-
-		} else if (colorScheme.equalsIgnoreCase("YellowBlue")) {
-			colorChooserUI.getPresetChoices().setSelectedItem("YellowBlue");
-			selectedColorSet = colorPresets.getColorSet("YellowBlue");
-
-		} else {
-			/* Should never get here */
-			selectedColorSet = null;
-			LogBuffer.println("No matching ColorSet found in "
-					+ "ColorGradientChooser.setPresets()");
-		}
-
->>>>>>> master
 		colorChooserUI.getColorPicker().setActiveColorSet(selectedColorSet);
 	}
 
