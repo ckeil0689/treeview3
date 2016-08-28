@@ -1212,7 +1212,7 @@ public class MapContainer extends Observable implements Observer,
 		   ((int) Math.round(targetZoomFrac)) == 1) {
 			return(getTotalTileNum() - cells);
 		}
-		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
+		int zoomVal = (int) Math.round(cells * targetZoomFrac);
 		int numPixels = getAvailablePixels();
 		//LogBuffer.println("getBestZoomOutVal: Called with pixel [" + pixel +
 		//		"] and targetZoomFrac [" + targetZoomFrac +
@@ -1596,7 +1596,6 @@ public class MapContainer extends Observable implements Observer,
 			
 		case IntegerMap.FIXED:
 			newMap = fixedMap;
-<<<<<<< HEAD
 			break;
 			
 		case IntegerMap.FILL:
@@ -1606,14 +1605,6 @@ public class MapContainer extends Observable implements Observer,
 		default:
 			LogBuffer.println("Map type (" + type + ") not found. "
 					+ "Setting fixed map.");
-=======
-		}
-
-		if (newMap == null) {
-			// default
-//			LogBuffer.println("Couldn't find map matching type " + type
-//					+ " in MapContainer.java");
->>>>>>> master
 			newMap = fixedMap;
 		}
 
@@ -1659,9 +1650,10 @@ public class MapContainer extends Observable implements Observer,
 			return;
 		}
 		
+		int scrollToVal = i;
 		if(i < getMinIndex() || i > getMaxIndex()) {
 			if(i < 0) {
-				i = 0;
+				scrollToVal = 0;
 			} else {
 				LogBuffer.println("ERROR: Index out of range: " + i);
 				return;
@@ -1669,10 +1661,10 @@ public class MapContainer extends Observable implements Observer,
 		}
 		
 		final int j = scrollbar.getValue();
-		scrollbar.setValue(i);
+		scrollbar.setValue(scrollToVal);
 
 		// Keep track of the first visible index
-		setFirstVisible(i);
+		setFirstVisible(scrollToVal);
 
 		if (j != scrollbar.getValue()) {
 			setChanged();
@@ -1909,21 +1901,24 @@ public class MapContainer extends Observable implements Observer,
 	 * @param i The new minimum index.
 	 * @param j The new maximum index.
 	 */
-	public void setIndexRange(int i, int j) {
+	public void setIndexRange(final int i, final int j) {
+		
+		int minIdx = i;
+		int maxIdx = j;
 		
 		if (i > j) {
 			final int k = i;
-			i = j;
-			j = k;
+			minIdx = j;
+			maxIdx = k;
 		}
 
-		if (current.getMinIndex() != i || current.getMaxIndex() != j) {
-			current.setIndexRange(i, j);
+		if (current.getMinIndex() != minIdx || current.getMaxIndex() != maxIdx) {
+			current.setIndexRange(minIdx, maxIdx);
 			setupScrollbar();
-			setFirstVisible(i);
-			setFirstVisibleLabel(i);
-			setNumVisible(j + 1);
-			setLastVisibleLabel(j);
+			setFirstVisible(minIdx);
+			setFirstVisibleLabel(minIdx);
+			setNumVisible(maxIdx + 1);
+			setLastVisibleLabel(maxIdx);
 			setChanged();
 		}
 	}
@@ -1959,15 +1954,10 @@ public class MapContainer extends Observable implements Observer,
 			numVisible = getTotalTileNum();
 		} else if(i < 1) {
 			numVisible = 1;
-<<<<<<< HEAD
-		} else {
-			this.numVisible = i;
-=======
 		} else if(i > 0) {
 			numVisible = i;
 		} else {
 			numVisible = 1;
->>>>>>> master
 		}
 	}
 
@@ -2528,7 +2518,7 @@ public class MapContainer extends Observable implements Observer,
 	 * @author rleach
 	 * @return double ZOOM_INCREMENT
 	 */
-	public double getZoomIncrement() {
+	public static double getZoomIncrement() {
 		
 		return(ZOOM_INCREMENT);
 	}
@@ -2540,7 +2530,7 @@ public class MapContainer extends Observable implements Observer,
 	 * @author rleach
 	 * @return double ZOOM_INCREMENT_FAST
 	 */
-	public double getZoomIncrementFast() {
+	public static double getZoomIncrementFast() {
 		
 		return(ZOOM_INCREMENT_FAST);
 	}
