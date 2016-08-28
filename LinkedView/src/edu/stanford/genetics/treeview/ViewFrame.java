@@ -26,6 +26,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 
 import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
@@ -101,7 +102,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 		//Handle app quit via a confirmation box, so set the default close
 		//operation to do nothing. Closing will be handled by an explicit call
 		//to dispose.
-		appFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		appFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
 		setupWindowListener();
 	}
@@ -282,35 +283,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public void closeWindow() {
 
-		/* Confirm user's intent to exit the application. */
-<<<<<<< HEAD
-		final int option = JOptionPane.showConfirmDialog(appFrame,
-				"Are you sure you want to close TreeView?", "Exit TreeView?",
-				JOptionPane.YES_NO_OPTION);
-
-		switch (option) {
-
-		case JOptionPane.YES_OPTION:
-			LogBuffer.println("Saving settings before window close.");
-			// Not sure a call to saveSettings is necessary anymore because
-			// added
-			// calls upon window resize and winow move in DendroController and
-			// ViewFrame respectively. If it does something other than save
-			// those two things, then sure, there's reason to keep it. However,
-			// note that resizing the window without data loaded does not save
-			// settings because it's tied to the matrix jpanel
-			storeState();
-			appFrame.dispose();
-			LogBuffer.println("Will this print, and when?.");
-			System.exit(0);
-			break;
-
-		case JOptionPane.NO_OPTION:
-			return;
-
-		default:
-			return;
-=======
+		// Confirm user's intent to exit the application.
 		String[] options = {"Quit","Cancel"};
 		final int choice = JOptionPane.showOptionDialog(appFrame,
 			"Quit TreeView?", "Quit TreeView?",JOptionPane.OK_CANCEL_OPTION,
@@ -321,14 +294,14 @@ public abstract class ViewFrame extends Observable implements Observer,
 			case JOptionPane.OK_OPTION:
 				LogBuffer.println("Saving settings before window close.");
 
-				// Not sure a call to saveSettings is necessary anymore because
+				// Not sure a call to storeState is necessary anymore because
 				// added calls upon window resize and window move in
 				// DendroController and ViewFrame respectively. If it does
 				// something other than save those two things, then sure,
 				// there's reason to keep it. However, note that resizing the
 				// window without data loaded does not save settings because
 				// it's tied to the matrix jpanel
-				saveSettings();
+				storeState();
 
 				appFrame.dispose();
 
@@ -352,7 +325,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 				LogBuffer.println("User closed the confirmation window (same " +
 					"as cancel).");
 				return;
->>>>>>> master
 		}
 	}
 
@@ -728,7 +700,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 *
 	 * @return The fileset corresponding to the dataset.
 	 */
-	public FileSet getFileSet(final File file) {
+	public static FileSet getFileSet(final File file) {
 
 		FileSet fileSet1;
 
@@ -951,7 +923,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 *            The number
 	 * @return The VK_blah key value
 	 */
-	protected int getKey(final int i) {
+	protected static int getKey(final int i) {
 		switch (i) {
 		case 0:
 			return KeyEvent.VK_0;
@@ -973,6 +945,8 @@ public abstract class ViewFrame extends Observable implements Observer,
 			return KeyEvent.VK_8;
 		case 9:
 			return KeyEvent.VK_9;
+		default:
+			break;
 		}
 		return 0;
 	}
