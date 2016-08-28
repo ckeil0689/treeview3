@@ -23,14 +23,9 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-<<<<<<< HEAD
-import Controllers.Region;
-=======
 import Controllers.RegionType;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataTicker;
-import edu.stanford.genetics.treeview.HeaderSummary;
->>>>>>> master
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
@@ -249,8 +244,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	}
 
 	/**
+	 * TODO this method is never used. Delete?
 	 * Paint a node and its children.
-	 *
 	 * @param node
 	 *            The node which is supposed to be painted.
 	 * @param isColored
@@ -637,12 +632,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	@Override
 	public void keyTyped(final KeyEvent e) {
-
+		// no action for keyTyped implemented
 	}
 
 	@Override
 	public void keyReleased(final KeyEvent e) {
-
+		// no action for keyReleased implemented
 	}
 
 	private void selectParent() {
