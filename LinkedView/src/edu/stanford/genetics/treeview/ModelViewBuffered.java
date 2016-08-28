@@ -48,6 +48,7 @@ public abstract class ModelViewBuffered extends ModelView {
 
 		int w = i.getWidth(null);
 		int h = i.getHeight(null);
+		
 		if ((w < req.width) || (h < req.height)) {
 			if (w < req.width) {
 				w = req.width;
@@ -60,8 +61,9 @@ public abstract class ModelViewBuffered extends ModelView {
 			n.getGraphics().drawImage(i, 0, 0, null);
 			return n;
 
-		} else
-			return i;
+		}
+		
+		return i;
 	}
 
 	/**
@@ -164,10 +166,9 @@ public abstract class ModelViewBuffered extends ModelView {
 		if (g != offscreenGraphics) { // sometimes paint directly
 			g.drawImage(offscreenBuffer, 0, 0, this);
 		}
-<<<<<<< HEAD
-=======
+
+		// TODO the effect of this should be investigated
 		paintComposite(g);
->>>>>>> master
 	}
 
 }
