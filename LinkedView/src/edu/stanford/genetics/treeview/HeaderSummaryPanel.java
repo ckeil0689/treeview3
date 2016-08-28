@@ -16,13 +16,10 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-<<<<<<< HEAD
-=======
+
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
 import net.miginfocom.swing.MigLayout;
->>>>>>> master
 import Utilities.GUIFactory;
-import net.miginfocom.swing.MigLayout;
 
 /**
  * enables editing of a headerSummary object.

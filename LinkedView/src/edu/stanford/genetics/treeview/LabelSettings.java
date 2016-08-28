@@ -209,8 +209,6 @@ public class LabelSettings extends CustomDialog {
 	/**
 	 * Subclass for the Annotation settings panel.
 	 *
-	 * @author CKeil
-	 *
 	 */
 	class AnnotationPanel {
 
