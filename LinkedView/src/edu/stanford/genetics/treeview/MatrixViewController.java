@@ -23,14 +23,11 @@ import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-<<<<<<< HEAD
 import ColorChooser.ColorSchemeType;
-=======
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSNumber;
 import com.dd.plist.PropertyListParser;
 
->>>>>>> master
 import Controllers.Controller;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
@@ -381,7 +378,7 @@ ConfigNodePersistent, Controller {
 		//occurring in different orders of both the shift and control modifiers
 		//being pressed/released
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,
-			KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+			InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK),
 			"bothHoverStart");
 		action_map.put("bothHoverStart", new BothHoverStartAction());
 
@@ -390,7 +387,7 @@ ConfigNodePersistent, Controller {
 		action_map.put("rowHoverStop", new RowHoverStopAction());
 
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,
-			KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+			InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK),
 			"bothHoverStart");
 		action_map.put("bothHoverStart", new BothHoverStartAction());
 
