@@ -687,7 +687,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		@Override
 		public void componentResized(final ComponentEvent e) {
-
+			// no change on resize
 		}
 
 		@Override
@@ -908,6 +908,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	/**
 	 * Adds a separate right-click context menu object to each LabelView.
 	 */
+	@SuppressWarnings("unused") // LabelContextMenuController don't need to be stored in a variable
 	private void addLabelViewContextMenu() {
 		
 		// Set context menu for LabelViews
@@ -1093,7 +1094,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Unknow what actually happens if the file CDT does not have an associated
 	 * ATR.
 	 */
-	protected FileSet offerATRFileSelection() throws LoadException {
+	protected static FileSet offerATRFileSelection() throws LoadException {
 
 		// FileSet fileSet1; // will be chosen...
 		//
@@ -1122,7 +1123,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * @param fileDialog
 	 *            the dialog to setup
 	 */
-	protected void setupATRFileDialog(final JFileChooser fileDialog) {
+	protected static void setupATRFileDialog(final JFileChooser fileDialog) {
 
 		final CdtFilter ff = new CdtFilter();
 		try {
@@ -1755,7 +1756,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * @param isRows - A flag which indicates the target axis.
 	 * @return A constructed string for the clipboard.
 	 */
-	private String constructLabelString(final HeaderSummary axisSummary, 
+	private static String constructLabelString(final HeaderSummary axisSummary, 
 			final HeaderInfo axisInfo, final TreeSelectionI treeSelection, 
 			final MapContainer map, final CopyType copyType, 
 			final boolean isRows) {
