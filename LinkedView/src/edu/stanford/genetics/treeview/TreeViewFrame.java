@@ -6,6 +6,7 @@
  */
 package edu.stanford.genetics.treeview;
 
+import java.awt.Dialog;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -53,13 +54,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		ConfigNodePersistent {
 
-<<<<<<< HEAD
-=======
-	public static final int WELCOME_VIEW = 0;
-	public static final int PROGRESS_VIEW = 2;
-	public static final int DENDRO_VIEW = 3;
-
->>>>>>> master
 	protected final JPanel viewPanel;
 	protected final JPanel mainPanel;
 	protected DendroPanel running;
@@ -108,15 +102,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		super(appName, treeView.getGlobalConfig().node(StringRes.pnode_TVFrame));
 		this.treeView = treeView;
 
-		/* Initialize main views */
-<<<<<<< HEAD
+		// Initialize main views
 		this.welcomeView = new WelcomeView();
-		this.loadErrorView = new LoadErrorView();
 		this.dendroView = new DendroView(this);
-=======
-		welcomeView = new WelcomeView();
-		dendroView = new DendroView(this);
->>>>>>> master
 
 		setWindowActive(true);
 
@@ -241,7 +229,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	/**
 	 * Shows a panel which displays the current stats of the loaded model.
 	 */
-	public void openStatsView(final String source, final int rowNum,
+	public static void openStatsView(final String source, final int rowNum,
 			final int colNum) {
 
 		final StatsDialog stats = new StatsDialog(source, rowNum, colNum);
@@ -275,7 +263,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	/**
 	 * Displays a window with some helpful information about TreeView 3.
 	 */
-	public void showAboutWindow() {
+	public static void showAboutWindow() {
 
 		new AboutDialog().setVisible(true);
 	}
@@ -283,7 +271,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	/**
 	 * Displays a window with some helpful information about TreeView 3.
 	 */
-	public void showShortcuts() {
+	public static void showShortcuts() {
 
 		new ShortcutDialog().setVisible(true);
 	}
@@ -410,9 +398,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			notifyObservers();
 
 		} else if (o instanceof TVModel) {
-			/* TVModel passes a boolean object to notify if it was loaded. */
-			setRunning((Boolean) obj);
-			setLoaded((Boolean) obj);
+			// TVModel passes a boolean object to notify if it was loaded.
+			setRunning(((Boolean) obj).booleanValue());
+			setLoaded(((Boolean) obj).booleanValue());
 
 		} else {
 			LogBuffer.println("Observable is: " + o.getClass());
@@ -446,11 +434,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		} else {
 			appFrame.setTitle(StringRes.appName);
 			setTitleString(appFrame.getName());
-<<<<<<< HEAD
-			generateView(ViewType.LOADERROR_VIEW);
-=======
-			generateView(WELCOME_VIEW);
->>>>>>> master
+			generateView(ViewType.WELCOME_VIEW);
 		}
 
 		buildMenuBar();
@@ -474,6 +458,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		constructHelpMenu(isMac);
 	}
 
+	/**
+	 * @param isMac - (TODO unused but may change) indicates whether the program runs on macOS or not.  
+	 */
 	private void constructFileMenu(final boolean isMac) {
 
 		// File
@@ -622,6 +609,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		fileMenu.add(prefSubMenu);
 	}
 
+	/**
+	 * @param isMac - (TODO unused but may change) indicates whether the program runs on macOS or not.
+	 */
 	private void constructHelpMenu(final boolean isMac) {
 
 		/* Help */
@@ -729,10 +719,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		final JDialog dialog = new JDialog(appFrame);
 		dialog.setTitle("Information");
 		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		dialog.setModalityType(JDialog.DEFAULT_MODALITY_TYPE);
+		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 
 		final JPanel panel = GUIFactory.createJPanel(true,
-				GUIFactory.NO_INSETS, null);
+				GUIFactory.NO_INSETS);
 
 		final JButton button = GUIFactory.createBtn("OK");
 		button.addActionListener(new ActionListener() {
