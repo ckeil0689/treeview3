@@ -58,7 +58,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	//This is the space between labels in pixels
 	protected final static int SQUEEZE = 1;
-<<<<<<< HEAD
 	
 	/* Selection of row/ column indices */
 	protected final Color textFGColor          = Color.black;
@@ -68,8 +67,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected final Color selectionTextFGColor = Color.black;
 	protected final Color hoverTextFGColor     = Color.red;
 	protected final Color labelPortColor       = new Color(30,144,251); //blu
-=======
->>>>>>> master
 
 	/* DataModel is an observer */
 	protected DataModel dataModel;
@@ -454,7 +451,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	@Override
-	public void update(final Observable o,final Object arg) {}
+	public void update(final Observable o,final Object arg) { 
+		// update method not used, no updates from observing another object...
+	}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
@@ -463,7 +462,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			LogBuffer.println("parentNode for LabelView was null.");
 			return;
 		}
-<<<<<<< HEAD
 		
 		this.configNode = parentNode;
 		getHeaderSummary().setConfigNode(configNode);
@@ -520,10 +518,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		configNode.putBoolean("isFixed", d_fixed);
 		
 		resetSecondaryScroll();
-=======
-
-		importSettingsFromNode(configNode);
->>>>>>> master
 	}
 
 	/**
@@ -579,7 +573,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public int getLastSize() {
 		return last_size;
-	};
+	}
 
 	@Override
 	public int getMin() {
@@ -758,7 +752,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		
 		resetSecondaryScroll();
 		repaint();
-	};
+	}
 
 	@Override
 	public String viewName() {
@@ -941,7 +935,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	protected abstract String getPaneType(); //returns "Row" or "Column" string
 
-	public void updateBuffer(final Graphics g,final Dimension offscreenSize) {
+	public void updateBuffer(final Graphics g,final Dimension localOffscreenSize) {
 
 		/*
 		 * Manage future repaints with a pair of timers, because when
@@ -973,7 +967,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				getSecondaryViewportSize() + "] Stored: [" +
 				getSavedSecondaryViewportSize() +
 				"] secondary Content size: [" +
-				getSecondaryPaneSize(offscreenSize) + "] Stored: [" +
+				getSecondaryPaneSize(localOffscreenSize) + "] Stored: [" +
 				getSavedSecondaryPaneSize() + "]",
 				10);
 		}
