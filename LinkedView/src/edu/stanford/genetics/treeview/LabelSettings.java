@@ -152,7 +152,7 @@ public class LabelSettings extends CustomDialog {
 	 */
 	class FontPanel {
 
-		private JPanel mainPanel;
+		private JPanel fontMainPanel;
 
 		public FontPanel() {
 
@@ -160,12 +160,12 @@ public class LabelSettings extends CustomDialog {
 					dendroView.getRowLabelView(),
 					dendroView.getColLabelView());
 
-			mainPanel = fontSettings.makeFontPanel();
+			fontMainPanel = fontSettings.makeFontPanel();
 		}
 
 		public JPanel makeFontPanel() {
 
-			return mainPanel;
+			return fontMainPanel;
 		}
 	}
 
@@ -177,11 +177,11 @@ public class LabelSettings extends CustomDialog {
 	 */
 	class URLSettings {
 
-		private final JPanel mainPanel;
+		private final JPanel urlMainPanel;
 
 		public URLSettings() {
 
-			this.mainPanel = GUIFactory.createJPanel(false, 
+			this.urlMainPanel = GUIFactory.createJPanel(false, 
 					GUIFactory.NO_INSETS);
 
 			final UrlSettingsPanel genePanel = new UrlSettingsPanel(
@@ -191,18 +191,18 @@ public class LabelSettings extends CustomDialog {
 					tvFrame.getArrayUrlExtractor(),
 					tvFrame.getArrayUrlPresets());
 
-			mainPanel.add(genePanel.generate("Row URLs"), "pushx, "
+			urlMainPanel.add(genePanel.generate("Row URLs"), "pushx, "
 					+ "alignx 50%, w 95%, wrap");
-			mainPanel.add(arrayPanel.generate("Column URLs"), "pushx, "
+			urlMainPanel.add(arrayPanel.generate("Column URLs"), "pushx, "
 					+ "alignx 50%, w 95%");
 			
-			mainPanel.revalidate();
-			mainPanel.repaint();
+			urlMainPanel.revalidate();
+			urlMainPanel.repaint();
 		}
 
 		public JPanel makeURLPanel() {
 
-			return mainPanel;
+			return urlMainPanel;
 		}
 	}
 
@@ -212,7 +212,7 @@ public class LabelSettings extends CustomDialog {
 	 */
 	class AnnotationPanel {
 
-		private final JPanel mainPanel;
+		private final JPanel annotationMainPanel;
 
 		private final HeaderSummaryPanel genePanel;
 		private final HeaderSummaryPanel arrayPanel;
@@ -224,32 +224,19 @@ public class LabelSettings extends CustomDialog {
 
 		public AnnotationPanel() {
 
-			this.mainPanel = GUIFactory.createJPanel(false, 
+			this.annotationMainPanel = GUIFactory.createJPanel(false, 
 					GUIFactory.NO_INSETS);
 
-<<<<<<< HEAD
-			this.genePanel = new HeaderSummaryPanel(rowHI, dendroView
-					.getRowLabelView().getHeaderSummary());
-
-			this.arrayPanel = new HeaderSummaryPanel(colHI, dendroView
-					.getColLabelView().getHeaderSummary());
-=======
-			genePanel = new HeaderSummaryPanel(rowHI,
+			this.genePanel = new HeaderSummaryPanel(rowHI,
 				dendroView.getRowLabelView());
 
-			arrayPanel = new HeaderSummaryPanel(colHI,
-				dendroView.getColumnLabelView());
->>>>>>> master
+			this.arrayPanel = new HeaderSummaryPanel(colHI,
+				dendroView.getColLabelView());
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,
 					GUIFactory.NO_INSETS);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
-<<<<<<< HEAD
-			this.custom_btn = GUIFactory.createBtn(StringRes.btn_CustomLabels);
-
-=======
->>>>>>> master
 			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
 			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
 
@@ -299,31 +286,25 @@ public class LabelSettings extends CustomDialog {
 			colRadioBtnPanel.add(colRightJustBtn, "span, wrap");
 			colRadioBtnPanel.add(colLeftJustBtn, "span");
 
-			mainPanel.add(rows, "pushx, alignx 50%");
-			mainPanel.add(cols, "pushx, alignx 50%, wrap");
-			mainPanel.add(genePanel, "pushx, alignx 50%, w 45%");
-			mainPanel.add(arrayPanel, "pushx, alignx 50%, w 45%, wrap");
+			annotationMainPanel.add(rows, "pushx, alignx 50%");
+			annotationMainPanel.add(cols, "pushx, alignx 50%, wrap");
+			annotationMainPanel.add(genePanel, "pushx, alignx 50%, w 45%");
+			annotationMainPanel.add(arrayPanel, "pushx, alignx 50%, w 45%, wrap");
 			justifyPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
 			justifyPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%");
-			mainPanel.add(justifyPanel, "push, grow, alignx 50%, span, wrap");
+			annotationMainPanel.add(justifyPanel, "push, grow, alignx 50%, span, wrap");
 
 			JPanel fontPanel = new FontPanel().makeFontPanel();
 
-			mainPanel.add(fontPanel, "push, grow, alignx 50%, span");
-<<<<<<< HEAD
+			annotationMainPanel.add(fontPanel, "push, grow, alignx 50%, span");
 
-			// Commented out for version 3.0alpha1 because it doesn't work yet
-			// mainPanel.add(custom_button, "pushx, alignx 50%, span");
-			mainPanel.revalidate();
-			mainPanel.repaint();
-
-=======
->>>>>>> master
+			annotationMainPanel.revalidate();
+			annotationMainPanel.repaint();
 		}
 
 		public JPanel makeLabelPane() {
 
-			return mainPanel;
+			return annotationMainPanel;
 		}
 
 		public void synchronize() {
