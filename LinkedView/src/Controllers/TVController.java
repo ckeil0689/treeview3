@@ -56,10 +56,6 @@ import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
-<<<<<<< HEAD
-import edu.stanford.genetics.treeview.plugin.dendroview.TRView;
-=======
->>>>>>> master
 
 /**
  * This class controls user interaction with TVFrame and its views.
@@ -353,7 +349,7 @@ public class TVController implements Observer {
 		} catch (final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. "
 					+ "Increase the JVM's heap size. Error: " + e.getMessage();
-			JOptionPane.showMessageDialog(JFrame.getFrames()[0], oomError, 
+			JOptionPane.showMessageDialog(Frame.getFrames()[0], oomError, 
 			                              "Out of memory", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -408,11 +404,10 @@ public class TVController implements Observer {
 			((TVModel) model).setLoaded(false);
 
 			//Bring the user back to the load dialog to try again or cancel load
-			DataLoadInfo dataInfo;
-			dataInfo = useImportDialog(loadingFile);
+			DataLoadInfo importedDataInfo = useImportDialog(loadingFile);
 
-			if (dataInfo != null) {
-				loadData(loadingFile, false, dataInfo);
+			if (importedDataInfo != null) {
+				loadData(loadingFile, importedDataInfo);
 				
 			} else {
 				String msg = "Data loading was interrupted.";
@@ -542,31 +537,21 @@ public class TVController implements Observer {
 	public void openFile(FileSet fileSet, final boolean shouldUseImport) {
 
 		String message;
+		FileSet loadFileSet = fileSet;
+		
 		try {
-			if(fileSet == null) {
-				file = tvFrame.selectFile();
-<<<<<<< HEAD
+			if(loadFileSet == null) {
+				this.file = tvFrame.selectFile();
 	
 				// Only run loader, if JFileChooser wasn't canceled.
-=======
-
-				/* Only run loader, if JFileChooser wasn't canceled. */
->>>>>>> master
-				if (file != null) {
-					fileSet = tvFrame.getFileSet(file);
-
-				} else {
+				if (file == null) {
 					return;
 				}
+				
+				loadFileSet = tvFrame.getFileSet(file);
 			}
-<<<<<<< HEAD
 			
-			getDataInfoAndLoad(fileSet, null, null, false, shouldUseImport);
-=======
-
-			loadingFile = fileSet;
-			getDataInfoAndLoad(fileSet, false);
->>>>>>> master
+			getDataInfoAndLoad(loadFileSet, null, null, false, shouldUseImport);
 			
 		} catch (final LoadException e) {
 			message = "Loading the file was interrupted.";
@@ -663,12 +648,12 @@ public class TVController implements Observer {
 	 * @return A DataLoadInfo object which contains information relevant for
 	 * setting up the DataLoadDialog.
 	 */
-	public DataLoadInfo getDataLoadInfo(FileSet fileSet, Preferences node) {
+	public static DataLoadInfo getDataLoadInfo(FileSet fileSet, Preferences node) {
 		
         DataLoadInfo dataInfo;
 		String delimiter = node.get("delimiter", ModelLoader.DEFAULT_DELIM);
 		
-		/* Amount of label headers may vary, they have to be redetected */
+		// Amount of label headers may vary, they have to be re-detected
 		DataImportController importController = 
 				new DataImportController(delimiter);
 		importController.setFileSet(fileSet);
@@ -696,8 +681,7 @@ public class TVController implements Observer {
 		 * BorderLayout.CENTER);
 		 */
 		// get string from user...
-		final String urlString = JOptionPane.showInputDialog(this,
-				"Enter a Url");
+		final String urlString = JOptionPane.showInputDialog(this, "Enter a Url");
 
 		if (urlString != null) {
 			// must parse out name, parent + sep...
@@ -706,10 +690,10 @@ public class TVController implements Observer {
 			final String parent = urlString.substring(0, postfix);
 			fileSet1 = new FileSet(name, parent);
 
-		} else
-			throw new LoadException("Input Dialog closed without selection...",
-					LoadException.NOFILE);
-
+		} else {
+			throw new LoadException("Input Dialog closed without selection...", LoadException.NOFILE);
+		}
+		
 		return fileSet1;
 	}
 
@@ -730,8 +714,7 @@ public class TVController implements Observer {
 
 		// extractors...
 		final UrlPresets genePresets = tvFrame.getGeneUrlPresets();
-		final UrlExtractor urlExtractor = new UrlExtractor(
-				model.getRowHeaderInfo(), genePresets);
+		final UrlExtractor urlExtractor = new UrlExtractor(model.getRowHeaderInfo(), genePresets);
 
 		urlExtractor.bindConfig(documentConfig.node("UrlExtractor"));
 		tvFrame.setUrlExtractor(urlExtractor);
@@ -999,24 +982,24 @@ public class TVController implements Observer {
 	 * Opens the preferences menu and sets the displayed menu to the specified
 	 * option using a string as identification.
 	 *
-	 * @param menu
+	 * @param menu - The type of opened menu distinguished by its String name.
 	 */
-	public void openPrefMenu(final String menu) {
+	@SuppressWarnings("unused") // LabelSettingsController doesn't need to be stored in a variable
+	public void openLabelMenu(final String menu) {
 
 		// View
-		final LabelSettings preferences = new LabelSettings(tvFrame);
+		final LabelSettings labelSettingsView = new LabelSettings(tvFrame);
 
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
-			preferences.setHeaderInfo(model.getRowHeaderInfo(),
+			labelSettingsView.setHeaderInfo(model.getRowHeaderInfo(),
 					model.getColHeaderInfo());
 		}
 
-		preferences.setMenu(menu);
+		labelSettingsView.setMenu(menu);
 
-		// Controller
-		new PreferencesController(tvFrame, model, preferences);
+		new LabelSettingsController(tvFrame, model, labelSettingsView);
 
-		preferences.setVisible(true);
+		labelSettingsView.setVisible(true);
 	}
 	
 	/**
@@ -1025,6 +1008,7 @@ public class TVController implements Observer {
 	 *
 	 * @param menu
 	 */
+	@SuppressWarnings("unused") // ExportDialogController doesn't need to be stored in a variable
 	public void openExportMenu() {
 
 		if(tvFrame.getDendroView() == null || !tvFrame.isLoaded()) {
@@ -1046,14 +1030,6 @@ public class TVController implements Observer {
 		new ExportDialogController(exportDialog,tvFrame,
 			dendroController.getInteractiveXMap(),
 			dendroController.getInteractiveYMap(),model);
-	}
-
-	/*
-	 * TODO implement this and others to deprecate PreferencesMenu, which is a
-	 * remnant of a unified menu system (as opposed to separate dialogs)
-	 */
-	public void openLabelMenu() {
-
 	}
 
 	/**

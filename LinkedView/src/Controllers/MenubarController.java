@@ -39,6 +39,7 @@ public class MenubarController {
 	}
 
 	/**
+	 * TODO Enumerate menu items (own enum class and rmove strings)
 	 * Executes a certain function based on which menuItem was clicked by the
 	 * user. This is determined by using the name string of the MenuItem, stored
 	 * in StringRes.
@@ -78,13 +79,13 @@ public class MenubarController {
 			controller.openExportMenu();
 			break;
 		case StringRes.menu_RowAndCol:
-			controller.openPrefMenu(name);
+			controller.openLabelMenu(name);
 			break;
 		case StringRes.menu_Color:
 			controller.openColorMenu();
 			break;
 		case StringRes.menu_URL:
-			controller.openPrefMenu(name);
+			controller.openLabelMenu(name);
 			break;
 		case StringRes.menu_showTrees:
 		case StringRes.menu_hideTrees:
