@@ -36,9 +36,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 * Java Preference node of "/TreeViewApp/TreeViewFrame/FileMRU"
 	 */
 	private Preferences configNode;
-<<<<<<< HEAD
-	
-=======
+
 	/*
 	 * Maximum number of files to be stored in the Preferences.
 	 * Essentially changing this value should effect maximum number
@@ -59,7 +57,6 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 */
 	private int skipIndex = -1;
 
->>>>>>> master
 	/**
 	 * Binds FileMru to a ConfigNode
 	 *
@@ -69,16 +66,12 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	@Override
 	public synchronized void setConfigNode(final Preferences parentNode) {
 
-<<<<<<< HEAD
-		if (parentNode == null) {
-=======
 		if (parentNode != null) {
 			this.configNode = parentNode.node(StringRes.pnode_FileMRU);
 			
 			pushChildrenIntoFileStack();
 
 		} else {
->>>>>>> master
 			LogBuffer.println("Could not find or create FileMRU Preferences"
 					+ "node because parentNode was null.");
 			return;
@@ -136,16 +129,12 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	public synchronized Preferences createSubNode() {
 
 		setChanged();
-<<<<<<< HEAD
-		final int subNodeIndex = getRootChildrenNodes().length + 1;
-		return configNode.node("File" + subNodeIndex);
-=======
+
 		final long subNodeIndex = System.currentTimeMillis();
 		LogBuffer.println("Creating subNode File" + subNodeIndex);
 		Preferences node = configNode.node("File" + subNodeIndex);
 		fileNodes.push(node);
 		return node;
->>>>>>> master
 	}
 
 	/**
@@ -233,7 +222,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	 * @param configNode
 	 *            Node to move to end
 	 */
-	public synchronized void setLast(final Preferences fileSetNode) {
+	public synchronized void setLast() {
 		/* 
 		 * We probably do not need to set last because we can easily pop or peek
 		 * from the fileNodes stack
@@ -297,21 +286,21 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 			}
 		}
 		
-		final Preferences configNode = createSubNode();
-		final FileSet fileSet3 = new FileSet(configNode);
+		final Preferences configSubNode = createSubNode();
+		final FileSet fileSet3 = new FileSet(configSubNode);
 		fileSet3.copyState(inSet);
 		LogBuffer.println("Creating new fileset " + fileSet3);
 		// now delete the old node
 		if(nodeToDelete != null){
 			fileNodes.remove(fileNodes.indexOf(nodeToDelete));
-			inSet.setNode(configNode);
+			inSet.setNode(configSubNode);
 			setChanged();
 			/*
 			 * this is when the user loads an already loaded file, here we set
 			 * skipIndex and notify listeners i.e. FileMenu to update with the
 			 * new set of files (skipping the current file)
 			 */
-			skipIndex = fileNodes.indexOf(configNode);
+			skipIndex = fileNodes.indexOf(configSubNode);
 			notifyObservers();
 			skipIndex = -1;
 		}
@@ -391,7 +380,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	        while (this.size() >= maxSize) {
 	            this.remove(0);
 	        }
-	        return super.push((T) object);
+	        return super.push(object);
 	    }
 	    
 	    @Override
