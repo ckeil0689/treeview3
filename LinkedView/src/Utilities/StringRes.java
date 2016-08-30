@@ -55,7 +55,7 @@ public class StringRes {
 
 	// Menu Titles
 	public static final String menu_Open = "Open...";
-	public static final String menu_OpenWithDialog = "Open With Import Dialog...";
+	public static final String menu_OpenWithDialog = "Import...";
 	public static final String menu_OpenRecent = "Open Recent...";
 	public static final String menu_EditRecent = "Edit Recent Files";
 	public static final String menu_Save = "Save...";
