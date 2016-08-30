@@ -85,9 +85,9 @@ public class ColumnLabelView extends LabelView {
 	}
 
 	@Override
-	protected String getSummary() {
+	protected String getSummaryName() {
 		
-		return("ColumnSummary");
+		return("ColSummary");
 	}
 
 	@Override

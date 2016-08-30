@@ -33,7 +33,7 @@ import edu.stanford.genetics.treeview.model.CustomLabelLoader;
  * @author CKeil
  *
  */
-public class PreferencesController {
+public class LabelSettingsController {
 
 	private final TreeViewFrame tvFrame;
 	private final LabelSettings preferences;
@@ -42,7 +42,7 @@ public class PreferencesController {
 	private LabelLoadDialog dialog;
 	private File customFile;
 
-	public PreferencesController(final TreeViewFrame tvFrame,
+	public LabelSettingsController(final TreeViewFrame tvFrame,
 			final DataModel model, final LabelSettings preferences) {
 
 		this.tvFrame = tvFrame;
@@ -271,7 +271,7 @@ public class PreferencesController {
 				headerInfo = model.getRowHeaderInfo();
 
 			} else if (type.equalsIgnoreCase(StringRes.main_cols)) {
-				headerInfo = model.getColumnHeaderInfo();
+				headerInfo = model.getColHeaderInfo();
 				
 			} else {
 				LogBuffer.println("Could not set HeaderInfo"

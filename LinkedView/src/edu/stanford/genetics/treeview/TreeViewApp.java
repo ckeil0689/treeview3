@@ -152,7 +152,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 	 */
 	public Preferences getMainPreferencesNode() {
 
-		return Preferences.userRoot().node("TreeViewApp");
+		return Preferences.userRoot().node(StringRes.pnode_globalMain);
 	}
 	
 	/** 
@@ -242,8 +242,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 		final TVController tvController = new TVController(tvFrame, model);
 
 		if (fileSet != null) {
-			tvController.getDataInfoAndLoad(fileSet, false);
-			tvFrame.setLoaded(true);
+			tvController.openFile(fileSet, false);
 		}
 		// tvFrame.addWindowListener(this);
 		return tvFrame;

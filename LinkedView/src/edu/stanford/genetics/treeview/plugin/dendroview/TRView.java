@@ -26,7 +26,6 @@ import javax.swing.Timer;
 import Controllers.RegionType;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataTicker;
-import edu.stanford.genetics.treeview.HeaderSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
@@ -41,7 +40,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	private final Color whiz_bg_color = new Color(215,234,251); //light pale blue
 	protected TreeSelectionI treeSelection;
-	protected HeaderSummary headerSummary;
 	protected LinearTransformation xScaleEq, yScaleEq;
 	protected MapContainer map;
 
@@ -75,9 +73,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		super();
 
 		setLayout(new MigLayout());
-
-		final String summary = (isGeneTree) ? "GtrSummary" : "AtrSummary";
-		this.headerSummary = new HeaderSummary(summary);
 
 		addMouseWheelListener(this);
 
@@ -205,16 +200,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		this.treeSelection.addObserver(this);
 	}
 
-	public void setHeaderSummary(final HeaderSummary headerSummary) {
-
-		this.headerSummary = headerSummary;
-	}
-
-	public HeaderSummary getHeaderSummary() {
-
-		return headerSummary;
-	}
-
 	/**
 	 * Set the selected node and redraw
 	 *
@@ -259,8 +244,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	}
 
 	/**
+	 * TODO this method is never used. Delete?
 	 * Paint a node and its children.
-	 *
 	 * @param node
 	 *            The node which is supposed to be painted.
 	 * @param isColored
@@ -647,12 +632,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	@Override
 	public void keyTyped(final KeyEvent e) {
-
+		// no action for keyTyped implemented
 	}
 
 	@Override
 	public void keyReleased(final KeyEvent e) {
-
+		// no action for keyReleased implemented
 	}
 
 	private void selectParent() {

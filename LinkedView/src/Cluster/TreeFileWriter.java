@@ -1,6 +1,7 @@
 package Cluster;
 
-import Controllers.ClusterDialogController;
+import java.io.File;
+
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -9,10 +10,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * @author chris0689
  *
  */
-public class TreeFileWriter {
-
-	/* Writer that generates the ATR/ GTR files for trees */
-	private ClusterFileWriter bufferedWriter;
+public class TreeFileWriter extends ClusterFileWriter {
 
 	/**
 	 * Sets up a writer for tree files which keep track of the clustered matrix
@@ -25,13 +23,9 @@ public class TreeFileWriter {
 	 * @param linkMethod
 	 *            Identifier for link method used for clustering.
 	 */
-	public TreeFileWriter(final int axis, String fileName, int linkMethod) {
-
-		String fileSuffix = (axis == ClusterDialogController.ROW) ? ".gtr" : ".atr";
-
-		this.bufferedWriter = new ClusterFileWriter(fileName, fileSuffix,
-				linkMethod);
-
+	public TreeFileWriter(final File file) {
+		
+		super(file);
 	}
 
 	/**
@@ -48,7 +42,7 @@ public class TreeFileWriter {
 	 */
 	public String writeData(final String[] link, int loopNum, double min) {
 
-		if (bufferedWriter == null) {
+		if (bw == null) {
 			LogBuffer.println("Cannot write cluster data because "
 					+ "BufferedWriter object is null.");
 			return "NA";
@@ -71,16 +65,8 @@ public class TreeFileWriter {
 		nodeInfo[3] = String.valueOf(1 - min);
 
 		/* Write the node info to the tree output file */
-		bufferedWriter.writeContent(nodeInfo);
+		writeData(nodeInfo);
 
 		return nodeInfo[0];
-	}
-
-	/**
-	 * Closes the file buffer and writes the tree file to disk.
-	 */
-	public void close() {
-
-		bufferedWriter.closeWriter();
 	}
 }

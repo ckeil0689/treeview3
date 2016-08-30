@@ -48,13 +48,13 @@ public class RowLabelView extends LabelView {
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 		
-		if (parentNode != null) {
-			super.setConfigNode(parentNode.node("RowLabelView"));
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Error: Could not find or create ArrayameView"
 					+ "node because parentNode was null.");
 			return;
 		}
+		
+		super.setConfigNode(parentNode.node("RowLabelView"));
 	}
 	
 	/**
@@ -148,7 +148,7 @@ public class RowLabelView extends LabelView {
 	}
 
 	@Override
-	protected String getSummary() {
+	protected String getSummaryName() {
 		return("RowSummary");
 	}
 

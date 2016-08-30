@@ -24,6 +24,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.util.Observable;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BoundedRangeModel;
@@ -57,6 +58,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	//This is the space between labels in pixels
 	protected final static int SQUEEZE = 1;
+	
+	/* Selection of row/ column indices */
+	protected final Color textFGColor          = Color.black;
+	protected Color textBGColor;
+	protected final Color selectionBorderColor = Color.yellow;
+	protected final Color selectionTextBGColor = new Color(249,238,160);//yel
+	protected final Color selectionTextFGColor = Color.black;
+	protected final Color hoverTextFGColor     = Color.red;
+	protected final Color labelPortColor       = new Color(30,144,251); //blu
 
 	/* DataModel is an observer */
 	protected DataModel dataModel;
@@ -78,7 +88,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected final int d_size = 14;
 	protected final int d_min = 11;
 	protected final int d_max = 30;
-	protected boolean d_justified;
+	protected boolean d_justified = false;
 	protected boolean d_fixed = false;
 	protected int longest_str_index;
 	protected int longest_str_length;
@@ -98,15 +108,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/* Alignment status */
 	protected boolean isRightJustified;
-
-	/* Selection of row/ column indices */
-	protected Color textFGColor          = Color.black;
-	protected Color textBGColor;
-	protected Color selectionBorderColor = Color.yellow;
-	protected Color selectionTextBGColor = new Color(249,238,160);//yel
-	protected Color selectionTextFGColor = Color.black;
-	protected Color hoverTextFGColor     = Color.red;
-	protected Color labelPortColor       = new Color(30,144,251); //blu
 
 	/*
 	 * Stores a reference to the TreeSelection relevant for drawing and the
@@ -173,7 +174,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		setLayout(new MigLayout());
 
-		headerSummary = new HeaderSummary(getSummary());
+		setHeaderSummary(new HeaderSummary(getSummaryName()));
 
 		//this.urlExtractor = uExtractor;
 
@@ -189,7 +190,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 * Otherwise alignment cannot be guaranteed without setting explicit 
 		 * pixel sizes which should rarely if ever be done. - Chris 
 		 */
-		scrollPane = new JScrollPane(this,
+		this.scrollPane = new JScrollPane(this,
 			            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
 			            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
@@ -221,7 +222,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//23 = Debug tree-hover label coloring &  option-click deselect when nothing is selected
 		//24 = Debug the lightening of the non-label-port labels
 
-		panel = scrollPane;
+		this.panel = scrollPane;
 
 		addMouseWheelListener(this);
 
@@ -322,11 +323,39 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		getSecondaryScrollBar().getModel().addChangeListener(new
 			ScrollChangeListener());
 	}
-
-	public void generateView(final UrlExtractor uExtractor) {
-		setUrlExtractor(uExtractor);
-		headerSummary.setIncluded(new int[] { 0 });
-		headerSummary.addObserver(this);
+    
+	// TODO add javaDoc to all methods.
+	protected abstract void setLabelPaneSize(int offscreenPrimarySize,
+			int offscreenSecondarySize);
+	protected abstract int  getSecondaryPaneSize(final Dimension dims);
+	protected abstract int  getPrimaryPaneSize(final Dimension dims);
+	protected abstract void setSecondaryPaneSize(final Dimension dims,int Size);
+	
+	@Override
+	public void resetDefaults() {
+		
+		super.resetDefaults();
+		
+		this.face = d_face;
+		this.style = d_style;
+		this.size = d_size;
+		this.min = d_min;
+		this.max = d_max;
+		this.isRightJustified = d_justified;
+		this.isFixed = d_fixed;
+		
+		this.longest_str_index = -1;
+		this.longest_str_length = -1;
+		
+		this.lastScrollEndGap      = -1;
+		this.lastScrollPos         = -1;
+		this.lastScrollEndPos      = -1;
+		this.secondaryPaneSize     = -1;
+		this.secondaryViewportSize = -1;
+		
+		if(headerSummary != null) {
+			headerSummary.resetDefaults();
+		}
 	}
 
 	/**
@@ -350,7 +379,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @author rleach
 	 * @return String
 	 */
-	protected abstract String getSummary();
+	protected abstract String getSummaryName();
 
 	/**
 	 * Used to space the array names.
@@ -363,7 +392,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			map.deleteObserver(this);
 		}
 
-		map = im;
+		this.map = im;
 		map.addObserver(this);
 
 		revalidate();
@@ -371,15 +400,25 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	public void setHeaderInfo(final HeaderInfo headerInfo) {
+		
 		this.headerInfo = headerInfo;
+		
+		if(headerSummary == null) {
+			LogBuffer.println("Could not update headers for headerSummary"
+					+ " in " + getName());
+			return;
+		}
+		
+		headerSummary.setHeaders(headerInfo.getNames());
 	}
 
 	public HeaderInfo getHeaderInfo() {
 		return headerInfo;
 	}
 
-	public void setHeaderSummary(final HeaderSummary headerSummary) {
-		this.headerSummary = headerSummary;
+	public void setHeaderSummary(final HeaderSummary newHeaderSummary) {
+		this.headerSummary = newHeaderSummary;
+		headerSummary.addObserver(this);
 	}
 
 	public HeaderSummary getHeaderSummary() {
@@ -412,35 +451,113 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	@Override
-	public void update(final Observable o,final Object arg) {}
+	public void update(final Observable o,final Object arg) { 
+		// update method not used, no updates from observing another object...
+	}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
-		if(parentNode != null) {
-			configNode = parentNode;
-
-		} else {
+		
+		if(parentNode == null) {
 			LogBuffer.println("parentNode for LabelView was null.");
 			return;
 		}
-
-		importSettingsFromNode(configNode);
+		
+		this.configNode = parentNode;
+		getHeaderSummary().setConfigNode(configNode);
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+		
+		return configNode;
+	}
+	
+	@Override
+	public void requestStoredState() {
+		
+		if(configNode == null) {
+			LogBuffer.println("Could not synchronize state for " + getName() 
+				+ " because configNode was null.");
+			return;
+		}
+		
+		setMin(configNode.getInt("min",d_min));
+		setMax(configNode.getInt("max",d_max));
+		setFace(configNode.get("face",d_face));
+		setStyle(configNode.getInt("style",d_style));
+		setSavedPoints(configNode.getInt("size",d_size));
+		setJustifyOption(configNode.getBoolean("isRightJustified",d_justified));
+		setFixed(configNode.getBoolean("isFixed",d_fixed));
+		
+		resetSecondaryScroll();
+		
+		if(headerSummary == null) {
+			LogBuffer.println("Could not restore headerSummary state.");
+			return;
+		}
+		
+		headerSummary.requestStoredState();
+	}
+	
+	@Override
+	public void storeState() {
+		
+		if(configNode == null) {
+			LogBuffer.println("Could not store state for " + getName() 
+				+ " because configNode was null.");
+			return;
+		}
+		
+		configNode.putInt("min", getMin());
+		configNode.putInt("max", getMax());
+		configNode.put("face", face);
+		configNode.putInt("style", style);
+		configNode.putInt("size", size);
+		configNode.putBoolean("isRightJustified", d_justified);
+		configNode.putBoolean("isFixed", d_fixed);
+		
+		resetSecondaryScroll();
 	}
 
-	public void importSettingsFromNode(Preferences node) {
-		setMin(node.getInt("min",d_min));
-		setMax(node.getInt("max",d_max));
-		setFace(node.get("face",d_face));
-		setStyle(node.getInt("style",d_style));
-		setSavedPoints(node.getInt("size",d_size));
-		setJustifyOption(node.getBoolean("isRightJustified",d_justified));
-		setFixed(node.getBoolean("isFixed",d_fixed));
-
+	/**
+	 * Imports a state from a given Preferences node.
+	 * @param node - the Preferences node from which to import the 
+	 * current state.
+	 */
+	public void importStateFrom(final Preferences node) {
+		
+		setMin(node.getInt("min", d_min));
+		setMax(node.getInt("max", d_max));
+		setFace(node.get("face", d_face));
+		setStyle(node.getInt("style", d_style));
+		setSavedPoints(node.getInt("size", d_size));
+		setJustifyOption(node.getBoolean("isRightJustified", d_justified));
+		setFixed(node.getBoolean("isFixed", d_fixed));
+		
 		//Signal that the secondary scroll position should be reset the next
 		//time it is needed
 		resetSecondaryScroll();
-
-		getHeaderSummary().setConfigNode(node);
+		
+		try {
+			Preferences summaryNode;
+			if(node.nodeExists("RowSummary")) {
+				summaryNode = node.node("RowSummary");
+				
+			} else if(node.nodeExists("ColSummary")) {
+				summaryNode = node.node("ColSummary");
+				
+			} else {
+				summaryNode = null;
+			}
+			
+			getHeaderSummary().importStateFrom(summaryNode);
+			
+		} catch (BackingStoreException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Skipping import of selected headers.");
+			return;
+		}
 	}
 
 	@Override
@@ -456,7 +573,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public int getLastSize() {
 		return last_size;
-	};
+	}
 
 	@Override
 	public int getMin() {
@@ -549,11 +666,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public void setPoints(final int i) {
 		if(size != i) {
-			size = i;
+			this.size = i;
 			if(configNode != null) {
 				configNode.putInt("size",size);
 			}
-			setFont(new Font(face,style,size));
+			setFont(new Font(face, style, size));
 			resetSecondaryScroll();
 			repaint();
 		}
@@ -567,10 +684,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public void setStyle(final int i) {
 		if(style != i) {
-			style = i;
+			this.style = i;
+			
 			if(configNode != null) {
 				configNode.putInt("style",style);
 			}
+			
 			setFont(new Font(face,style,size));
 			resetSecondaryScroll();
 			repaint();
@@ -582,10 +701,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		if(i < 1 || max > 0 && i > max) { return; }
 
 		if(min != i) {
-			min = i;
+			this.min = i;
+			
 			if(configNode != null) {
 				configNode.putInt("min",min);
 			}
+			
 			setFont(new Font(face,style,size));
 			resetSecondaryScroll();
 			repaint();
@@ -597,10 +718,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		if(i < 1 || min > 0 && i < min) { return; }
 
 		if(max != i) {
-			max = i;
+			this.max = i;
+			
 			if(configNode != null) {
 				configNode.putInt("max",max);
 			}
+			
 			setFont(new Font(face,style,size));
 			resetSecondaryScroll();
 			repaint();
@@ -616,18 +739,20 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 
 		resetSecondaryScroll();
+		repaint();
 	}
 
 	@Override
 	public void setFixed(boolean fixed) {
-		isFixed = fixed;
-
-		resetSecondaryScroll();
+		this.isFixed = fixed;
 
 		if(configNode != null) {
 			configNode.putBoolean("isFixed",fixed);
 		}
-	};
+		
+		resetSecondaryScroll();
+		repaint();
+	}
 
 	@Override
 	public String viewName() {
@@ -810,7 +935,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	protected abstract String getPaneType(); //returns "Row" or "Column" string
 
-	public void updateBuffer(final Graphics g,final Dimension offscreenSize) {
+	public void updateBuffer(final Graphics g,final Dimension localOffscreenSize) {
 
 		/*
 		 * Manage future repaints with a pair of timers, because when
@@ -842,7 +967,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				getSecondaryViewportSize() + "] Stored: [" +
 				getSavedSecondaryViewportSize() +
 				"] secondary Content size: [" +
-				getSecondaryPaneSize(offscreenSize) + "] Stored: [" +
+				getSecondaryPaneSize(localOffscreenSize) + "] Stored: [" +
 				getSavedSecondaryPaneSize() + "]",
 				10);
 		}
@@ -948,12 +1073,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			map.setWhizMode(false);
 		}
 	}
-
-	protected abstract void setLabelPaneSize(int offscreenPrimarySize,
-		int offscreenSecondarySize);
-	protected abstract int  getSecondaryPaneSize(final Dimension dims);
-	protected abstract int  getPrimaryPaneSize(final Dimension dims);
-	protected abstract void setSecondaryPaneSize(final Dimension dims,int Size);
 
 	private int getSavedSecondaryPaneSize() {
 		return(secondaryPaneSize);
@@ -1829,10 +1948,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	private void saveLastDrawnFontDetails(int maxStrLen) {
 		//Save the state to detect changes upon the next call of this method
-		lastDrawnFace      = face;
-		lastDrawnStyle     = style;
-		lastDrawnSize      = size;
-		longest_str_length = maxStrLen;
+		this.lastDrawnFace      = face;
+		this.lastDrawnStyle     = style;
+		this.lastDrawnSize      = size;
+		this.longest_str_length = maxStrLen;
 	}
 
 	/**

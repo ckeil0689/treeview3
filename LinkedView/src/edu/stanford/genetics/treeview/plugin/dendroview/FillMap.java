@@ -7,8 +7,6 @@
 
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.util.prefs.Preferences;
-
 /**
  * maps integers (gene index) to pixels, filling available pixels
  *
@@ -88,11 +86,6 @@ public class FillMap extends IntegerMap {
 	public String typeName() {
 
 		return "FillMap";
-	}
-
-	@Override
-	public void setConfigNode(final Preferences parentNode) {
-
 	}
 
 	@Override

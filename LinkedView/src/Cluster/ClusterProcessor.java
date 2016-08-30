@@ -1,6 +1,7 @@
 package Cluster;
 
 import java.awt.Frame;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -28,10 +29,10 @@ public class ClusterProcessor {
 	private final IntHeaderInfo rowHeaderI;
 	private final IntHeaderInfo colHeaderI;
 
-	private final String fileName;
+//	private final String fileName;
 	private int pBarCount;
 	private DistanceWorker distTask;
-	private ClusterTask clusterTask;
+	private Clusterer clusterer;
 
 	/**
 	 * Hierarchical Clustering constructor for the ClusterProcessor. 
@@ -43,11 +44,9 @@ public class ClusterProcessor {
 	 * @param dataMatrix The original data matrix to be clustered.
 	 * @param fileName The name of the file to which the data matrix belongs.
 	 */
-	public ClusterProcessor(final TVDataMatrix dataMatrix,
-			final String fileName) {
+	public ClusterProcessor(final TVDataMatrix dataMatrix) {
 
 		this.originalMatrix = dataMatrix;
-		this.fileName = fileName;
 		this.rowHeaderI = null;
 		this.colHeaderI = null;
 		this.pBarCount = 0;
@@ -70,7 +69,6 @@ public class ClusterProcessor {
 			final IntHeaderInfo colHeaderI) {
 
 		this.originalMatrix = dataMatrix;
-		this.fileName = fileName;
 		this.rowHeaderI = rowHeaderI;
 		this.colHeaderI = colHeaderI;
 		this.pBarCount = 0;
@@ -118,22 +116,22 @@ public class ClusterProcessor {
 	 */
 	public String[] clusterAxis(final DistanceMatrix distMatrix,
 			final int linkMethod, final Integer[] spinnerInput,
-			final boolean hierarchical, final int axis) {
+			final boolean hierarchical, final int axis, final File treeFile) {
 
 		try {
-			this.clusterTask = new ClusterTask(distMatrix, linkMethod,
-					spinnerInput, hierarchical, axis);
-			clusterTask.execute();
+			this.clusterer = new Clusterer(distMatrix, linkMethod,
+					spinnerInput, hierarchical, axis, treeFile);
+			clusterer.execute();
 
 			/*
 			 * Get() blocks until this thread finishes, so the following code
 			 * waits for this procedure to finish.
 			 */
-			return clusterTask.get();
+			return clusterer.get();
 
 		} catch (InterruptedException | ExecutionException e) {
 			LogBuffer.logException(e);
-			return new String[] { "No clustered data." };
+			return new String[] {};
 		}
 	}
 
@@ -184,20 +182,22 @@ public class ClusterProcessor {
 				data = formatColData(originalMatrix.getExprData());
 			}
 
-			if (data != null) {
+			if (data != null && !isCancelled()) {
 				final DistMatrixCalculator dCalc = new DistMatrixCalculator(
 						data, distMeasure, axis);
 
 				/* Ranking data if Spearman was chosen */
 				if (distMeasure == DistMatrixCalculator.SPEARMAN) {
-
-					final double[][] rankMatrix = new double[data.length][data[0].length];
+					final double[][] rankMatrix = 
+							new double[data.length][data[0].length];
 
 					/* Iterate over every row of the matrix. */
 					for (int i = 0; i < rankMatrix.length; i++) {
 
-						if (isCancelled())
+						if (isCancelled()) {
 							return new double[0][];
+						}
+						
 						publish(i);
 						rankMatrix[i] = dCalc.spearman(data[i]);
 					}
@@ -214,7 +214,6 @@ public class ClusterProcessor {
 					for (int i = 0; i < data.length; i++) {
 
 						if (isCancelled()) {
-							LogBuffer.println("DistTask cancelled.");
 							return new double[0][];
 						}
 						publish(i);
@@ -251,6 +250,9 @@ public class ClusterProcessor {
 			if (!isCancelled()) {
 				/* keep track of overall progress */
 				pBarCount += axisSize;
+				LogBuffer.println("DistTask is done: success.");
+			} else {
+				LogBuffer.println("DistTask is done: cancelled.");
 			}
 		}
 
@@ -265,7 +267,6 @@ public class ClusterProcessor {
 		public double[][] formatColData(final double[][] unformattedData) {
 
 			final DataFormatter formattedData = new DataFormatter();
-
 			return formattedData.splitColumns(unformattedData);
 		}
 	}
@@ -278,7 +279,7 @@ public class ClusterProcessor {
 	 * so it can respond appropriately. Input data is translated into output
 	 * data here.
 	 */
-	private class ClusterTask extends SwingWorker<String[], Integer> {
+	private class Clusterer extends SwingWorker<String[], Integer> {
 
 		private final DistanceMatrix distMatrix;
 		private final int linkMethod;
@@ -286,16 +287,20 @@ public class ClusterProcessor {
 		private final int axis;
 		private final int max;
 		private final boolean hier;
+		
+		private ClusterFileWriter fileWriter;
+		private final File treeFile;
 
-		public ClusterTask(final DistanceMatrix distMatrix,
+		public Clusterer(final DistanceMatrix distMatrix,
 				final int linkMethod, final Integer[] spinnerInput,
-				final boolean hier, final int axis) {
+				final boolean hier, final int axis, final File treeFile) {
 
 			this.distMatrix = distMatrix;
 			this.linkMethod = linkMethod;
 			this.spinnerInput = spinnerInput;
 			this.hier = hier;
 			this.axis = axis;
+			this.treeFile = treeFile;
 
 			/* Progress bar max dependent on selected clustering type */
 			this.max = (hier) ? distMatrix.getSize() - 1 : spinnerInput[0];
@@ -304,6 +309,7 @@ public class ClusterProcessor {
 		@Override
 		protected void process(final List<Integer> chunks) {
 
+			if(isCancelled()) return;
 			final int i = chunks.get(chunks.size() - 1);
 			final int progress = (isCancelled()) ? 0 : pBarCount + i;
 			ClusterView.updatePBar(progress);
@@ -322,8 +328,21 @@ public class ClusterProcessor {
 		@Override
 		public void done() {
 
+			/* 
+			 * One MUST ensure that the file writer for ATR/ GTR is closed
+			 * if cancellation (mayInterrupt = true) has occurred because
+			 * the cluster code was likely halted before the streamw as closed.
+			 * This will make file deletion in ClusterDialogController fail!
+			 */
+			if(fileWriter != null) {
+				fileWriter.closeWriter();
+			}
+			
 			if (!isCancelled()) {
 				pBarCount += max;
+				LogBuffer.println("ProcessorClusterTask is done: success.");
+			} else {
+				LogBuffer.println("ProcessorClusterTask is done: cancelled.");
 			}
 		}
 		
@@ -335,10 +354,15 @@ public class ClusterProcessor {
 		 */
 		private String[] doHierarchicalCluster() {
 			
+			if(treeFile == null) {
+				LogBuffer.println("TreeFile not set, aborting cluster.");
+				return new String[] {};
+			}
+			
 			final HierCluster clusterer = new HierCluster(linkMethod,
 					distMatrix, axis);
-
-			clusterer.setupTreeFileWriter(axis, fileName);
+			clusterer.setupTreeFileWriter(treeFile);
+			fileWriter = clusterer.getTreeFileWriter();
 
 			/*
 			 * Continue process until distMatrix has a size of 1, This array
@@ -349,7 +373,6 @@ public class ClusterProcessor {
 			int distMatrixSize = distMatrix.getSize();
 
 			while (distMatrixSize > 1 && !isCancelled()) {
-
 				distMatrixSize = clusterer.cluster();
 				publish(loopNum++);
 			}
@@ -361,7 +384,6 @@ public class ClusterProcessor {
 
 			/* Return empty String[] if user cancels operation */
 			if (isCancelled()) {
-				LogBuffer.println("ClusterTask cancelled.");
 				return new String[] {};
 			}
 
@@ -392,14 +414,14 @@ public class ClusterProcessor {
 			final KMeansCluster clusterer = new KMeansCluster(distMatrix,
 					axis, k);
 
-			clusterer.setupFileWriter(fileName);
-
+			clusterer.setupFileWriter(treeFile);
+			fileWriter = clusterer.getClusterFileWriter();
+			
 			/*
 			 * Begin iteration of recalculating means and reassigning row
 			 * distance means to clusters.
 			 */
 			for (int i = 0; i < iterations; i++) {
-
 				clusterer.cluster();
 				publish(i);
 			}
@@ -428,18 +450,20 @@ public class ClusterProcessor {
 			return clusterer.getReorderedList();
 		}
 	}
-
+	
 	/**
 	 * Cancels all currently running threads.
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 */
 	public void cancelAll() {
 
-		if (distTask != null) {
+		if (distTask != null && !distTask.isDone()) {
 			distTask.cancel(true);
 		}
 		
-		if (clusterTask != null) {
-			clusterTask.cancel(true);
+		if (clusterer != null && !clusterer.isDone()) {
+			clusterer.cancel(true);
 		}
 	}
 }

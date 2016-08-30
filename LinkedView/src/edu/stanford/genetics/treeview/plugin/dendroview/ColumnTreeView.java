@@ -13,7 +13,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 
@@ -35,7 +34,7 @@ public class ColumnTreeView extends TRView {
 
 		super(false);
 
-		isLeft = false;
+		this.isLeft = false;
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -58,8 +57,6 @@ public class ColumnTreeView extends TRView {
 
 		return "ATRView";
 	}
-
-	public void setATRHeaderInfo(final HeaderInfo atrHI) {}
 
 	@Override
 	protected void setWhizzingDestRectBounds() {

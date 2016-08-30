@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.prefs.Preferences;
 
 import com.gurge.amd.GIFEncoder;
 import com.gurge.amd.Quantize;
@@ -26,6 +27,11 @@ import edu.stanford.genetics.treeview.SettingsPanel;
  */
 public class GifColorBarExportPanel extends ColorBarExportPanel implements
 		SettingsPanel {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	// I wish I could just inherit this...
 	public GifColorBarExportPanel(final ColorExtractor colorExtractor) {
@@ -100,5 +106,29 @@ public class GifColorBarExportPanel extends ColorBarExportPanel implements
 								+ e);
 			}
 		}
+	}
+
+	@Override
+	public Preferences getConfigNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		// TODO Auto-generated method stub
+		
 	}
 }

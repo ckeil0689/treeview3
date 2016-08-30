@@ -3,11 +3,9 @@ package Cluster;
 import java.awt.Frame;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +33,6 @@ public class HierCluster {
 	 * such that the axis to be clustered will be represented by an array of
 	 * arrays and column access doesn't always need to jump between arrays.
 	 */
-	private final int linkMethod;
 	private Linker linker;
 	private final String axisPrefix;
 	private final int initial_matrix_size;
@@ -91,7 +88,6 @@ public class HierCluster {
 	public HierCluster(final int linkMethod, final DistanceMatrix distMatrix,
 			final int axis) {
 
-		this.linkMethod = linkMethod;
 		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
@@ -100,6 +96,11 @@ public class HierCluster {
 							ClusterFileGenerator.COL_AXIS_BASEID;
 
 		prepareCluster();
+	}
+	
+	public TreeFileWriter getTreeFileWriter() {
+		
+		return this.treeWriter;
 	}
 
 	/**
@@ -470,7 +471,7 @@ public class HierCluster {
 		//
 		// LogBuffer.println("Ordered nodes: " + orderedNodes);
 
-		treeWriter.close();
+		treeWriter.closeWriter();
 		linker.close();
 		reorderRows(currentClusters.get(0));
 
@@ -517,9 +518,9 @@ public class HierCluster {
 	 * problem with setting up the buffered writer since there wouldn't be a
 	 * filePath where the cluster data could be saved anyways.
 	 */
-	public void setupTreeFileWriter(final int axis, String fileName) {
+	public void setupTreeFileWriter(final File file) {
 
-		this.treeWriter = new TreeFileWriter(axis, fileName, linkMethod);
+		this.treeWriter = new TreeFileWriter(file);
 	}
 
 	/**

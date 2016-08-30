@@ -43,6 +43,12 @@ public interface TreeSelectionI {
 	 * @return The current selection status
 	 */
 	public abstract boolean isIndexSelected(int i);
+	
+	/**
+	 * Encapsulates a test for the existence of any selection.
+	 * @return Whether a selection exists or not.
+	 */
+	public abstract boolean hasSelection();
 
 	/**
 	 *

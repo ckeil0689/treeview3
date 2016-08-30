@@ -1,6 +1,5 @@
 package Controllers;
 
-import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -17,13 +16,11 @@ import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.Box;
@@ -32,9 +29,7 @@ import javax.swing.InputMap;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.Timer;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
@@ -61,6 +56,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroException;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
+import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.IntegerMap;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenu;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenuController;
@@ -68,15 +64,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import edu.stanford.genetics.treeview.plugin.dendroview.MatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreeColorer;
 import edu.stanford.genetics.treeview.plugin.dendroview.TreePainter;
-
-import java.awt.image.BufferedImage;
-import java.awt.Dimension;
-import java.util.Properties;
-
-import org.freehep.graphics2d.VectorGraphics;
-import org.freehep.graphicsio.pdf.PDFGraphics2D;
-import org.freehep.graphicsio.ps.PSGraphics2D;
-import org.freehep.graphicsio.svg.SVGGraphics2D;
 
 
 
@@ -128,11 +115,11 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		this.tvFrame = tvFrame;
 		this.tvController = tvController;
 
-		interactiveXmap = new MapContainer(IntegerMap.FIXED, "GlobalXMap");
-		interactiveYmap = new MapContainer(IntegerMap.FIXED, "GlobalYMap");
+		this.interactiveXmap = new MapContainer(IntegerMap.FIXED, "GlobalXMap");
+		this.interactiveYmap = new MapContainer(IntegerMap.FIXED, "GlobalYMap");
 
-		globalXmap = new MapContainer(IntegerMap.FIXED, "OverviewXMap");
-		globalYmap = new MapContainer(IntegerMap.FIXED, "OverviewYMap");
+		this.globalXmap = new MapContainer(IntegerMap.FIXED, "OverviewXMap");
+		this.globalYmap = new MapContainer(IntegerMap.FIXED, "OverviewYMap");
 	}
 	
 	/**
@@ -144,18 +131,34 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			if (tvModel.getDocumentConfigRoot() != null) {
-				configNode = ((TVModel) tvModel).getDocumentConfig();
-
-			} else {
-				configNode = Preferences.userRoot().node("DendroView");
-			}
-		} else {
-			// TODO handle null parentNode beyond logging
+		if (parentNode == null) {
 			LogBuffer.println("parentNode in " + this.getClass().getName() 
 					+ " was null.");
+			return;
 		}
+		
+		if (tvModel.getDocumentConfigRoot() != null) {
+			this.configNode = ((TVModel) tvModel).getDocumentConfig();
+
+		} else {
+			this.configNode = Preferences.userRoot().node("DendroView");
+		}
+	}
+	
+	@Override
+	public void requestStoredState() {
+		
+		importStateFrom(configNode);
+	}
+
+	@Override
+	public void storeState() {
+		return; // nothing to store yet
+	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		return; // no stored state, so nothing to import yet
 	}
 
 	/**
@@ -170,40 +173,34 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;
+		this.mvController = new MatrixViewController(
+				dendroView.getInteractiveMatrixView(), 
+				dendroView.getGlobalMatrixView(), tvModel);
+		
+		resetComponentDefaults();
+		
+		mvController.setup();
+		
+		/* Assign Preferences nodes to components */
+		setComponentPreferences();
 
-		/* Get the saved settings */
-		setConfigNode(tvFrame.getConfigNode());
-
-		setMatrixController();
 		updateHeaderInfo();
 		bindComponentFunctions();
-
+		
 		dendroView.setupSearch(tvModel.getRowHeaderInfo(),
-						tvModel.getColumnHeaderInfo(), interactiveXmap,
+						tvModel.getColHeaderInfo(), interactiveXmap,
 						interactiveYmap);
 		
 		dendroView.setupLayout();
 		setModelAndTicker(dendroView,tvModel);
 		setObservables();
 
-		/*
-		 * TODO Find solution... doesn't work because of resetMapContainers
-		 * which needs to run to reset MapContainer scales in GlobalView for
-		 * potentially changed AppFrame size between closing TreeView and
-		 * loading a new matrix (changed availablePixels in GlobalView).
-		 */
-		// setSavedScale();
-
 		/**
 		 * make sure pixel colors are calculated after new model was loaded. 
 		 */
 		mvController.updateMatrixPixels();
-		/*
-		 * Needs to wait for repaint() called from resetMapContainer() and
-		 * component listener. TODO implement resetMapContainer/ setSavedScale
-		 * differently...
-		 */
 		mvController.resetMatrixViews();
+		mvController.setDataTicker(dendroView.getDataTicker());
 
 		addKeyBindings();
 		addListeners();
@@ -213,12 +210,12 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * @param dendroView
 	 * @param tvModel
 	 */
-	private void setModelAndTicker(final DendroView dendroView,
+	private static void setModelAndTicker(final DendroView dendroView,
 								final DataModel tvModel) {
 		dendroView.getRowLabelView().setDataTicker(dendroView.getDataTicker());
-		dendroView.getColumnLabelView().setDataTicker(dendroView.getDataTicker());
+		dendroView.getColLabelView().setDataTicker(dendroView.getDataTicker());
 		dendroView.getRowLabelView().setDataModel(tvModel);
-		dendroView.getColumnLabelView().setDataModel(tvModel);
+		dendroView.getColLabelView().setDataModel(tvModel);
 		dendroView.getRowTreeView().setDataTicker(dendroView.getDataTicker());
 		dendroView.getColumnTreeView().setDataTicker(dendroView.getDataTicker());
 		dendroView.getRowTreeView().setDataModel(tvModel);
@@ -226,17 +223,24 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	}
 	
 	/**
-	 * Sets up all necessary components for the MatrixView controller.
+	 * Makes all relevant components reset to a default state in order to
+	 * create a clean slate for loading a new model.
 	 */
-	private void setMatrixController() {
+	private void resetComponentDefaults() {
 		
-		this.mvController = new MatrixViewController(
-				dendroView.getInteractiveMatrixView(), 
-				dendroView.getGlobalMatrixView(), tvModel);
+		LogBuffer.println("Resetting MapContainers and DendroView components.");
 		
-		mvController.setConfigNode(configNode);
-		mvController.setDataTicker(dendroView.getDataTicker());
-		mvController.setup();
+		resetMapContainerDefaults();
+		dendroView.resetModelViewDefaults();
+	}
+	
+	private void resetMapContainerDefaults() {
+		
+		interactiveXmap.resetDefaultState();
+		interactiveYmap.resetDefaultState();
+		
+		globalXmap.resetDefaultState();
+		globalYmap.resetDefaultState();
 	}
 
 	@Override
@@ -273,7 +277,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		/* Label views */
 		dendroView.getRowLabelView().getHeaderSummary().addObserver(this);
-		dendroView.getColumnLabelView().getHeaderSummary().addObserver(this);
+		dendroView.getColLabelView().getHeaderSummary().addObserver(this);
 
 		/* MapContainers */
 		interactiveXmap.addObserver(this);
@@ -297,7 +301,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		dendroView.addZoomListener(new ZoomSelectionListener());
 		dendroView.addDividerListener(new DividerListener());
 		dendroView.addSplitPaneListener(new SplitPaneListener());
-		dendroView.addResizeListener(new AppFrameListener());
 		dendroView.addDeselectClickListener(new PanelClickDeselector());
 		addDividerHoverListeners();
 		addDividerMouseWheelListeners();
@@ -671,7 +674,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 						+ "in DendroController ScaleListener.");
 			}
 
-			notifyAllMapObservers();
+			mvController.notifyAllMapObservers();
 		}
 	}
 
@@ -684,7 +687,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		@Override
 		public void componentResized(final ComponentEvent e) {
-
+			// no change on resize
 		}
 
 		@Override
@@ -695,67 +698,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 			dendroView.setTreeVisibility(atr_loc, gtr_loc);
 		}
-	}
-
-	/**
-	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
-	 * as a result.
-	 */
-	private class AppFrameListener extends ComponentAdapter {
-
-		// Timer to prevent repeatedly saving window dimensions upon resize
-		private final int saveResizeDelay = 1000;
-		private javax.swing.Timer saveResizeTimer;
-		ActionListener saveWindowAttrs = new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				if (evt.getSource() == saveResizeTimer) {
-					/* Stop timer */
-					saveResizeTimer.stop();
-					saveResizeTimer = null;
-
-					tvFrame.saveSettings();
-				}
-			}
-		};
-
-		@Override
-		public void componentResized(final ComponentEvent arg0) {
-
-			// Previously, resetMapContainers was called here, but that caused
-			// the zoom level to change when the user resized the window, so I
-			// added a way to track the currently visible area in mapContainer
-			// and implemented these functions to make the necessary
-			// adjustments to the image when that happens
-			refocusViewPort();
-
-			// Save the new dimensions/position if it's done changing
-			if (this.saveResizeTimer == null) {
-				/*
-				 * Start waiting for saveResizeDelay millis to elapse and then
-				 * call actionPerformed of the ActionListener "saveWindowAttrs".
-				 */
-				this.saveResizeTimer = new Timer(this.saveResizeDelay,
-						saveWindowAttrs);
-				this.saveResizeTimer.start();
-			} else {
-				/* Event came too soon, swallow it by resetting the timer.. */
-				this.saveResizeTimer.restart();
-			}
-		}
-	}
-
-	/**
-	 * Notifies all MapContainers' observers.
-	 */
-	private void notifyAllMapObservers() {
-
-		globalXmap.notifyObservers();
-		globalYmap.notifyObservers();
-
-		interactiveXmap.notifyObservers();
-		interactiveYmap.notifyObservers();
 	}
 
 	/**
@@ -773,11 +715,16 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	}
 
 	/**
+	 * TODO Should be in MatrixViewController
 	 * Stores MapContainer settings (scale + scroll values) in Preferences
 	 * nodes.
 	 */
 	public void saveSettings() {
-
+    
+		if(configNode == null) {
+			return;
+		}
+		
 		try {
 			if (configNode.nodeExists("GlobalXMap") && interactiveXmap != null) {
 				configNode.node("GlobalXMap").putInt("scale",
@@ -810,13 +757,13 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	}
 
 	// TODO move to MVController
-	private void refocusViewPort() {
+	protected void refocusViewPort() {
 
 		interactiveXmap.adjustToScreenChange();
 		interactiveYmap.adjustToScreenChange();
 
-		globalXmap.setToMinScale();
-		globalYmap.setToMinScale();
+		globalXmap.setMinScale();
+		globalYmap.setMinScale();
 
 		saveSettings();
 	}
@@ -836,8 +783,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	public void setKMeansIndexes() {
 
-		if (tvModel.getColumnHeaderInfo().getIndex("GROUP") != -1) {
-			final HeaderInfo headerInfo = tvModel.getColumnHeaderInfo();
+		if (tvModel.getColHeaderInfo().getIndex("GROUP") != -1) {
+			final HeaderInfo headerInfo = tvModel.getColHeaderInfo();
 			final int groupIndex = headerInfo.getIndex("GROUP");
 
 			arrayIndex = getGroupVector(headerInfo, groupIndex);
@@ -909,7 +856,25 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	private void bindComponentFunctions() {
 
-		// Handle selection
+		setupSelectionHandlers();
+		setupMapContainers();
+
+		// TODO replace with IMVController method
+		interactiveXmap.setScrollbar(dendroView.getMatrixXScroll());
+		interactiveYmap.setScrollbar(dendroView.getMatrixYScroll());
+
+		createTreePainters();
+		bindTrees();
+		addLabelViewContextMenu();
+		defineMapContainerRanges();
+	}
+	
+	/**
+	 * Sets up the selection handlers which track details of selected indices
+	 * in LabelView, the matrices, and the trees. 
+	 */
+	private void setupSelectionHandlers() {
+		
 		if (geneIndex != null) {
 			setRowSelection(new ReorderedTreeSelection(
 					tvFrame.getRowSelection(), geneIndex));
@@ -925,24 +890,27 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		} else {
 			setColumnSelection(tvFrame.getColSelection());
 		}
+	}
+	
+	/**
+	 * Create tree painter objects and link them to the TRView objects for each
+	 * axis.
+	 */
+	private void createTreePainters() {
 		
-		setupMapContainers();
-
-		// TODO replace with IMVController method
-		interactiveXmap.setScrollbar(dendroView.getMatrixXScroll());
-		interactiveYmap.setScrollbar(dendroView.getMatrixYScroll());
-
-		leftTreeDrawer = new TreePainter();
+		this.leftTreeDrawer = new TreePainter();
 		dendroView.getRowTreeView().setTreeDrawer(leftTreeDrawer);
 
-		invertedTreeDrawer = new TreePainter();
+		this.invertedTreeDrawer = new TreePainter();
 		dendroView.getColumnTreeView().setTreeDrawer(invertedTreeDrawer);
-
-		setPresets();
-
-		// this is here because my only subclass shares this code.
-		bindTrees();
-
+	}
+	
+	/**
+	 * Adds a separate right-click context menu object to each LabelView.
+	 */
+	@SuppressWarnings("unused") // LabelContextMenuController don't need to be stored in a variable
+	private void addLabelViewContextMenu() {
+		
 		// Set context menu for LabelViews
 		LabelContextMenu rowLabelContext = new LabelContextMenu();
 		LabelContextMenu colLabelContext = new LabelContextMenu();
@@ -951,9 +919,14 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		new LabelContextMenuController(colLabelContext, tvController, false);
 		
 		dendroView.getRowLabelView().setComponentPopupMenu(rowLabelContext);
-		dendroView.getColumnLabelView().setComponentPopupMenu(colLabelContext);
-
-		// perhaps I could remember this stuff in the MapContainer...
+		dendroView.getColLabelView().setComponentPopupMenu(colLabelContext);
+	}
+	
+	/**
+	 * Let the MapContainers know their index range to work with. 
+	 */
+	private void defineMapContainerRanges() {
+		
 		interactiveXmap.setIndexRange(0,
 				tvModel.getDataMatrix().getNumCol() - 1);
 		interactiveYmap.setIndexRange(0,
@@ -967,23 +940,45 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Connects all sub components with DendroView's configuration node, so that
 	 * the hierarchical structure of Java's Preferences API can be followed.
 	 */
-	private void setPresets() {
+	private void setComponentPreferences() {
 
+		setConfigNode(tvFrame.getConfigNode());
+		
 		interactiveXmap.setConfigNode(configNode);
 		interactiveYmap.setConfigNode(configNode);
 
 		globalXmap.setConfigNode(configNode);
 		globalYmap.setConfigNode(configNode);
 
-		// URLs
-		mvController.getColorExtractor().setConfigNode(configNode);
+		DendrogramFactory.getColorPresets().setConfigNode(configNode);
+		mvController.setConfigNode(configNode);
 
 		dendroView.getRowLabelView().setConfigNode(configNode);
-		dendroView.getColumnLabelView().setConfigNode(configNode);
-		dendroView.getColumnTreeView().getHeaderSummary()
-				.setConfigNode(configNode);
-		dendroView.getRowTreeView().getHeaderSummary()
-				.setConfigNode(configNode);
+		dendroView.getColLabelView().setConfigNode(configNode);
+	}
+	
+	/**
+	 * Requests all main components of the GUI to restore their states to
+	 * saved preferences stored in their active Preferences node (configNode).
+	 * This is especially useful after performing a reset to default state for
+	 * those components to get a clean slate, for example when a new model is 
+	 * loaded.
+	 */
+	public void restoreComponentStates() {
+		
+		LogBuffer.println("Restoring components states.");
+		
+		interactiveXmap.requestStoredState();
+		interactiveYmap.requestStoredState();
+		
+		globalXmap.requestStoredState();
+		globalYmap.requestStoredState();
+		
+		mvController.requestStoredState();
+		
+		dendroView.restoreLabelViewStates();
+		
+		DendrogramFactory.getColorPresets().requestStoredState();
 	}
 
 	/**
@@ -992,7 +987,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	private void setupMapContainers() {
 
 		dendroView.getColumnTreeView().setMap(interactiveXmap);
-		dendroView.getColumnLabelView().setMap(interactiveXmap);
+		dendroView.getColLabelView().setMap(interactiveXmap);
 		dendroView.getRowTreeView().setMap(interactiveYmap);
 		dendroView.getRowLabelView().setMap(interactiveYmap);
 
@@ -1002,17 +997,12 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	}
 
 	/**
-	 * Updates all headerInfo instances for all the view components.
+	 * Updates all headerInfo instances for all the label views.
 	 */
 	private void updateHeaderInfo() {
 
-		dendroView.getColumnTreeView().setATRHeaderInfo(
-				tvModel.getAtrHeaderInfo());
-		dendroView.getRowTreeView()
-				.setGTRHeaderInfo(tvModel.getGtrHeaderInfo());
-		dendroView.getColumnLabelView().setHeaderInfo(
-				tvModel.getColumnHeaderInfo());
 		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
+		dendroView.getColLabelView().setHeaderInfo(tvModel.getColHeaderInfo());
 	}
 
 	/**
@@ -1049,7 +1039,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		try {
 			invertedTreeDrawer.setData(tvModel.getAtrHeaderInfo(),
-					tvModel.getColumnHeaderInfo());
+					tvModel.getColHeaderInfo());
 			final HeaderInfo trHeaderInfo = tvModel.getAtrHeaderInfo();
 
 			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
@@ -1104,7 +1094,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Unknow what actually happens if the file CDT does not have an associated
 	 * ATR.
 	 */
-	protected FileSet offerATRFileSelection() throws LoadException {
+	protected static FileSet offerATRFileSelection() throws LoadException {
 
 		// FileSet fileSet1; // will be chosen...
 		//
@@ -1133,7 +1123,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * @param fileDialog
 	 *            the dialog to setup
 	 */
-	protected void setupATRFileDialog(final JFileChooser fileDialog) {
+	protected static void setupATRFileDialog(final JFileChooser fileDialog) {
 
 		final CdtFilter ff = new CdtFilter();
 		try {
@@ -1187,8 +1177,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 			int[] ordering;
 			ordering = AtrAligner.align(tvModel.getAtrHeaderInfo(),
-					tvModel.getColumnHeaderInfo(), model.getAtrHeaderInfo(),
-					model.getColumnHeaderInfo());
+					tvModel.getColHeaderInfo(), model.getAtrHeaderInfo(),
+					model.getColHeaderInfo());
 
 			/*
 			 * System.out.print("New ordering: "); for(int i = 0; i <
@@ -1360,7 +1350,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				dendroView.getColumnTreeView().setEnabled(true);
 
 				invertedTreeDrawer.setData(tvModel.getAtrHeaderInfo(),
-						tvModel.getColumnHeaderInfo());
+						tvModel.getColHeaderInfo());
 				final HeaderInfo trHeaderInfo = tvModel.getAtrHeaderInfo();
 
 				if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
@@ -1482,7 +1472,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * @param node
 	 * @throws BackingStoreException
 	 */
-	public void importColorPreferences(Preferences oldNode)
+	public void importColorPreferences(final Preferences oldNode)
 			throws BackingStoreException {
 		
 		mvController.importColorPreferences(oldNode);
@@ -1492,16 +1482,36 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Update the state of label views to reflect settings from an imported
 	 * node.
 	 * 
-	 * @param node
+	 * @param oldNode - The old Preferences node from which to import label
+	 * preferences for both LabelViews (rows & columns).
 	 */
-	public void importLabelPreferences(Preferences node) {
+	public void importLabelPreferences(final Preferences oldNode) {
 
 		LogBuffer.println("Importing labels...");
 		
-		dendroView.getRowLabelView().importSettingsFromNode(
-				node.node("RowLabelView"));
-		dendroView.getColumnLabelView().importSettingsFromNode(
-				node.node("ColLabelView"));
+		try {
+			Preferences labelViewNode;
+			if(!oldNode.nodeExists("RowLabelView")) {
+				LogBuffer.println("Missing node in parent. Could not import "
+						+ "row label settings.");
+			} else {
+				labelViewNode = oldNode.node("RowLabelView");
+				dendroView.getRowLabelView().importStateFrom(labelViewNode);
+			}
+		
+			if(!oldNode.nodeExists("ColLabelView")) {
+				LogBuffer.println("Missing node in parent. Could not import "
+						+ "column label settings.");
+			} else {
+				labelViewNode = oldNode.node("ColLabelView");
+				dendroView.getColLabelView().importStateFrom(labelViewNode);
+			}
+		} catch (BackingStoreException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Problem when trying to import label settings."
+					+ " Could not complete import.");
+			return;
+		}
 	}
 
 	// /**
@@ -1512,7 +1522,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	// tvFrame.showSubDataModel(indexes, null, null);
 	// }
 
-	// Setters
 	/**
 	 * This should be called after setDataModel has been set to the appropriate
 	 * model
@@ -1532,7 +1541,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		dendroView.getColumnTreeView().setTreeSelection(colSelection);
 		dendroView.getRowLabelView().setOtherSelection(colSelection);
-		dendroView.getColumnLabelView().setDrawSelection(colSelection);
+		dendroView.getColLabelView().setDrawSelection(colSelection);
 	}
 
 	/**
@@ -1554,19 +1563,19 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		dendroView.getRowTreeView().setTreeSelection(rowSelection);
 		dendroView.getRowLabelView().setDrawSelection(rowSelection);
-		dendroView.getColumnLabelView().setOtherSelection(rowSelection);
+		dendroView.getColLabelView().setOtherSelection(rowSelection);
 	}
 
 	public void setNewIncluded(final int[] gIncluded, final int[] aIncluded) {
 
 		dendroView.getRowLabelView().getHeaderSummary().setIncluded(gIncluded);
-		dendroView.getColumnLabelView().getHeaderSummary()
+		dendroView.getColLabelView().getHeaderSummary()
 				.setIncluded(aIncluded);
 	}
 
 	public int[] getColumnIncluded() {
 
-		return dendroView.getColumnLabelView().getHeaderSummary().getIncluded();
+		return dendroView.getColLabelView().getHeaderSummary().getIncluded();
 	}
 
 	public int[] getRowIncluded() {
@@ -1629,7 +1638,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	private void updateSearchBoxes() {
 
 		dendroView.updateSearchTermBoxes(tvModel.getRowHeaderInfo(),
-						tvModel.getColumnHeaderInfo(), interactiveXmap,
+						tvModel.getColHeaderInfo(), interactiveXmap,
 						interactiveYmap);
 	}
 
@@ -1720,9 +1729,9 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			map = interactiveYmap;
 			
 		} else {
-			axisSummary = tvFrame.getDendroView().getColumnLabelView()
+			axisSummary = tvFrame.getDendroView().getColLabelView()
 					.getHeaderSummary();
-			axisInfo = tvModel.getColumnHeaderInfo();
+			axisInfo = tvModel.getColHeaderInfo();
 			treeSelection = tvFrame.getColSelection();
 			map = interactiveXmap;
 		}
@@ -1747,7 +1756,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * @param isRows - A flag which indicates the target axis.
 	 * @return A constructed string for the clipboard.
 	 */
-	private String constructLabelString(final HeaderSummary axisSummary, 
+	private static String constructLabelString(final HeaderSummary axisSummary, 
 			final HeaderInfo axisInfo, final TreeSelectionI treeSelection, 
 			final MapContainer map, final CopyType copyType, 
 			final boolean isRows) {

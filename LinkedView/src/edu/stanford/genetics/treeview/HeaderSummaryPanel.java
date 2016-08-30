@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
 import net.miginfocom.swing.MigLayout;
 import Utilities.GUIFactory;

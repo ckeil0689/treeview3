@@ -149,7 +149,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		doubleData = null;
 
 		/* Update GUI, set new DendroView */
-		controller.finishLoading();
+		controller.finishLoading(dataInfo);
 	}
 
 	/**

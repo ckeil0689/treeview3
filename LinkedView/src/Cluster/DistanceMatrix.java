@@ -9,8 +9,8 @@ import java.io.OutputStreamWriter;
 
 import javax.swing.JOptionPane;
 
-import edu.stanford.genetics.treeview.LogBuffer;
 import Utilities.Helper;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 public class DistanceMatrix {
 

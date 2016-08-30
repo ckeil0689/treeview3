@@ -27,6 +27,7 @@ public class ClusteredAxisData {
 		this.AXIS_BASEID = (axisID == 0) ? "ROW" : "COL";
 		this.shouldReorderAxis = false;
 		this.isAxisClustered = false;
+		this.reorderedIDs = new String[] {};
 	}
 	
 	/* Setters */
@@ -35,12 +36,12 @@ public class ClusteredAxisData {
 		this.reorderedIDs = newReorderedIDs;
 	}
 	
-	public void setAxisHeaders(final String[] newAxisHeaders) {
+	public void setHeaders(final String[] newAxisHeaders) {
 		
 		this.axisHeaders = newAxisHeaders;
 	}
 	
-	public void setAxisLabels(final String[][] newAxisLabels) {
+	public void setLabels(final String[][] newAxisLabels) {
 		
 		this.axisLabels = newAxisLabels;
 	}
@@ -86,12 +87,12 @@ public class ClusteredAxisData {
 		return axisLabels;
 	}
 	
-	public int getAxisLabelNum() {
+	public int getNumLabels() {
 		
 		return axisLabels.length;
 	}
 	
-	public String[][] getOrderedAxisLabels() {
+	public String[][] getOrderedLabels() {
 		
 		return orderedAxisLabels;
 	}

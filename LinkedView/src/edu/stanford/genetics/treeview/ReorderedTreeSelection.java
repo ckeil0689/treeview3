@@ -239,4 +239,10 @@ public class ReorderedTreeSelection extends Observable implements
 		return 0;
 	}
 
+	@Override
+	public boolean hasSelection() {
+		
+		return getNSelectedIndexes() > 0;
+	}
+
 }

@@ -113,7 +113,6 @@ public abstract class MatrixView extends ModelViewProduced {
 		}
 		
 		if (!offscreenValid) {
-
 			adjustPixelsToMaps();
 			revalidateScreen();
 			setSubImage();
@@ -331,10 +330,11 @@ public abstract class MatrixView extends ModelViewProduced {
 	 */
 	public void resetView() {
 
-		xmap.setToMinScale();
-		ymap.setToMinScale();
+		xmap.setMinScale();
+		ymap.setMinScale();
 
 		revalidateScreen();
+		repaint();
 	}
 
 	/**

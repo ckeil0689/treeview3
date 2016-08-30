@@ -17,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.util.Observer;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
@@ -27,19 +26,18 @@ import javax.swing.JPanel;
  * Interestingly, but necessarily, it has no dependency on any models.
  */
 public abstract class ModelView extends JPanel implements Observer,
-		MouseListener {
+		MouseListener, ModelLoadReset {
 
 	private static final long serialVersionUID = 1L;
 
 	protected ViewFrame viewFrame = null;
-	protected JFrame applicationFrame = null;
 
-	protected boolean hasMouse = false;
+	protected boolean hasMouse;
 
 	/* here so that subclass will work with BufferedModelView too */
-	protected boolean offscreenValid = false;
-	protected boolean offscreenChanged = false;
-	protected Dimension offscreenSize = null;
+	protected boolean offscreenValid;
+	protected boolean offscreenChanged;
+	protected Dimension offscreenSize;
 
 	/**
 	 * holds actual thing to be displayed...
@@ -55,6 +53,7 @@ public abstract class ModelView extends JPanel implements Observer,
 	protected ModelView() {
 
 		super(false);
+		resetDefaults();
 	}
 
 	/**
@@ -67,8 +66,7 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	public void setViewFrame(final ViewFrame m) {
 
-		viewFrame = m;
-		applicationFrame = m.getAppFrame();
+		this.viewFrame = m;
 	}
 
 	public ViewFrame getViewFrame() {
@@ -79,6 +77,18 @@ public abstract class ModelView extends JPanel implements Observer,
 	public JComponent getComponent() {
 
 		return panel;
+	}
+	
+	/**
+	 * Reset all member variables to ensure a fresh starting point.
+	 */
+	@Override
+	public void resetDefaults() {
+	
+		this.hasMouse = false;
+		this.offscreenValid = false;
+		this.offscreenChanged = false;
+		this.offscreenSize = new Dimension(0, 0);
 	}
 
 	/**
@@ -185,6 +195,12 @@ public abstract class ModelView extends JPanel implements Observer,
 	@Override
 	public void mouseExited(final MouseEvent e) {
 
+		if (viewFrame == null) {
+			LogBuffer.println("viewFrame null in ModelView.mouseExited. "
+					+ "Instance " + this);
+			return;
+		}
+		
 		hasMouse = false;
 	}
 
@@ -208,7 +224,7 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	public void setLabelPortMode(boolean m) {
 		
-		labelPortMode = m;
+		this.labelPortMode = m;
 	}
 
 	public void debug(String msg, int level) {

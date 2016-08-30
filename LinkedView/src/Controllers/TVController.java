@@ -4,6 +4,8 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Observable;
@@ -20,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 
 import ColorChooser.ColorChooserController;
 import ColorChooser.ColorChooserUI;
@@ -46,6 +49,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.UrlExtractor;
 import edu.stanford.genetics.treeview.UrlPresets;
 import edu.stanford.genetics.treeview.ViewFrame;
+import edu.stanford.genetics.treeview.ViewType;
 import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
@@ -55,9 +59,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 
 /**
  * This class controls user interaction with TVFrame and its views.
- *
- * @author CKeil
- *
  */
 public class TVController implements Observer {
 
@@ -69,22 +70,18 @@ public class TVController implements Observer {
 	private FileSet fileMenuSet;
 	private FileSet loadingFile;
 
-	private Preferences oldNode;
-	private String[] clusterNodeSourceKeys;
-	private final String[] selectedLabels;
-
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
 		this.dendroController = new DendroController(tvFrame, this);
-		this.selectedLabels = new String[2];
 
-		/* Add the view as observer to the model */
+		// Add the view as observer to the model
 		((TVModel) model).addObserver(tvFrame);
 
 		tvFrame.addObserver(this);
-
+    tvFrame.getAppFrame().addComponentListener(new AppFrameListener());
+    
 		addViewListeners();
 		addMenuListeners();
 		addKeyBindings();
@@ -205,7 +202,7 @@ public class TVController implements Observer {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			openFile(null);
+			openFile(null, false);
 		}
 	}
 
@@ -220,7 +217,7 @@ public class TVController implements Observer {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			final FileSet last = tvFrame.getFileMRU().getLast();
-			openFile(last);
+			openFile(last, false);
 		}
 	}
 
@@ -255,6 +252,63 @@ public class TVController implements Observer {
 			}
 		}
 	}
+	
+	/**
+	 *  The window position/size should be saved when it changes (or after 
+	 *  a move has finished). There are two reasons for this: 
+	 *  1) Quitting the app via the app menu or command-q does not initiate 
+	 *  the save (which could be rectified via packaging).
+	 *  2) If the app crashes, the position/size will be lost
+	 * 
+	 * Listens to the resizing of DendroView and makes changes to MapContainers
+	 * as a result.
+	 */
+	private class AppFrameListener extends ComponentAdapter {
+
+		// Timer to prevent repeatedly saving window dimensions upon resize
+		private final int saveResizeDelay = 1000;
+		private javax.swing.Timer saveResizeTimer;
+		ActionListener saveWindowAttrs = new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				if (evt.getSource() == saveResizeTimer) {
+					/* Stop timer */
+					saveResizeTimer.stop();
+					saveResizeTimer = null;
+
+					tvFrame.storeState();
+				}
+			}
+		};
+
+		@Override
+		public void componentResized(final ComponentEvent arg0) {
+
+			// Previously, resetMapContainers was called here, but that caused
+			// the zoom level to change when the user resized the window, so I
+			// added a way to track the currently visible area in mapContainer
+			// and implemented these functions to make the necessary
+			// adjustments to the image when that happens
+			if(dendroController != null) {
+				 dendroController.refocusViewPort();
+			}
+
+			// Save the new dimensions/position if it's done changing
+			if (this.saveResizeTimer == null) {
+				/*
+				 * Start waiting for saveResizeDelay millis to elapse and then
+				 * call actionPerformed of the ActionListener "saveWindowAttrs".
+				 */
+				this.saveResizeTimer = new Timer(this.saveResizeDelay, saveWindowAttrs);
+				this.saveResizeTimer.start();
+				
+			} else {
+				/* Event came too soon, swallow it by resetting the timer.. */
+				this.saveResizeTimer.restart();
+			}
+		}
+	}
 
 	/**
 	 * Load data into the model.
@@ -267,54 +321,35 @@ public class TVController implements Observer {
 	 *            should be copied to the new one. It should only occur when a
 	 *            file is being clustered.
 	 */
-	public void loadData(final FileSet fileSet, final boolean isClusterFile,
-			final DataLoadInfo dataInfo) {
+	public void loadData(final FileSet fileSet, final DataLoadInfo dataInfo) {
 
 		/* Setting loading screen */
-		tvFrame.generateView(TreeViewFrame.PROGRESS_VIEW);
+		tvFrame.generateView(ViewType.PROGRESS_VIEW);
 
 		/* Loading TVModel */
 		final TVModel tvModel = (TVModel) model;
-
-		if (isClusterFile && clusterNodeSourceKeys != null) {
-			String srcName = clusterNodeSourceKeys[0];
-			String srcExtension = clusterNodeSourceKeys[1];
-			this.oldNode = getOldPreferences(srcName, srcExtension);
-
-		} else {
-			this.oldNode = null;
-		}
-
-		fileMenuSet = (fileSet != null) ? fileSet : tvFrame.getFileSet(file);
+		
+		setFileMenuSet(fileSet);
 
 		try {
-			if (dendroController.hasDendroView()) {
-				final String[] geneNames = tvModel.getRowHeaderInfo()
-						.getNames();
-				final String[] arrayNames = tvModel.getColumnHeaderInfo()
-						.getNames();
-
-				storeSelectedLabels(geneNames, arrayNames);
-			}
-
 			/* ensure reset of the model data */
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
 
-			if (tvModel.getColumnHeaderInfo().getNumHeaders() == 0) {
+			if (tvModel.getColHeaderInfo().getNumHeaders() == 0) {
 				/* ------ Load Process -------- */
 				final ModelLoader loader = new ModelLoader(tvModel, this,
 						dataInfo);
 				loader.execute();
 
 			} else {
-				LogBuffer.println("ArrayHeaders not reset, aborted loading.");
+				LogBuffer.println("ColumnHeaders not reset, aborted loading.");
 			}
 
 		} catch (final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. "
 					+ "Increase the JVM's heap size. Error: " + e.getMessage();
-			JOptionPane.showMessageDialog(JFrame.getFrames()[0], oomError, 
+			JOptionPane.showMessageDialog(Frame.getFrames()[0], oomError, 
 			                              "Out of memory", JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -322,41 +357,38 @@ public class TVController implements Observer {
 	/**
 	 * Finish up loading by setting the model loaded status to true and creating
 	 * a new DendroView.
+	 * @param dataInfo - An object containing important information for data
+	 * loading including user selections from the import dialog, if available.
 	 */
-	public void finishLoading() {
+	public void finishLoading(final DataLoadInfo dataInfo) {
 
 		if (model.getDataMatrix().getNumRow() > 0) {
-
 			tvFrame.setTitleString(model.getSource());
 
 			/* Will notify view of successful loading. */
 			((TVModel) model).setLoaded(true);
-
 			setDataModel();
-
 			dendroController.setNewMatrix(tvFrame.getDendroView(), model);
 
-			/*
-			 * TODO Needs to happen after setNewMatrix because a new
-			 * ColorExtractor object is created, which would void the updated
-			 * ColorExtractor state if copying happens before. Implement a nicer
-			 * solution one day...
-			 */
-			Preferences loadedNode = getOldPreferences(fileMenuSet.getRoot(),
-					fileMenuSet.getExt());
-			copyOldPreferencesTo(loadedNode);
-
 			if (fileMenuSet != null) {
-				fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
+				/*
+				 * TODO Needs to happen after setNewMatrix because a new
+				 * ColorExtractor object is created, which would void the 
+				 * updated ColorExtractor state if copying happens before. 
+				 * Implement a nicer solution one day...
+				 */
+				importOldPreferencesFrom(dataInfo.getOldNode());
+	
+				this.fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
 				tvFrame.getFileMRU().setLast(fileMenuSet);
 				fileMenuSet = null;
 
 			} else {
-				LogBuffer.println("FileSet is null.");
+				LogBuffer.println("FileSet is null. Could not load old "
+						+ "preferences and add last file to recent file list.");
 			}
 
-			/* set the selected label type to the old one */
-			resetLabelSelection();
+			dendroController.restoreComponentStates();
 
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
@@ -372,11 +404,10 @@ public class TVController implements Observer {
 			((TVModel) model).setLoaded(false);
 
 			//Bring the user back to the load dialog to try again or cancel load
-			DataLoadInfo dataInfo;
-			dataInfo = useImportDialog(loadingFile);
+			DataLoadInfo importedDataInfo = useImportDialog(loadingFile);
 
-			if (dataInfo != null) {
-				loadData(loadingFile, false, dataInfo);
+			if (importedDataInfo != null) {
+				loadData(loadingFile, importedDataInfo);
 				
 			} else {
 				String msg = "Data loading was interrupted.";
@@ -388,7 +419,15 @@ public class TVController implements Observer {
 		addMenuListeners();
 	}
 
-	private Preferences getOldPreferences(String srcName, String srcExtension) {
+	/**
+	 * Checks if the root File node is parent to a node with the supplied 
+	 * srcName and srcExtension stored as name values.
+	 * @param srcName
+	 * @param srcExtension
+	 * @return The target Preferences node, if it exists. Otherwise null.
+	 */
+	private Preferences getOldPreferences(final String srcName, 
+			final String srcExtension) {
 
 		try {
 			/* First, get the relevant old node... */
@@ -414,42 +453,29 @@ public class TVController implements Observer {
 	 * Copies label and color data from the pre-clustered file to the
 	 * Preferences node of the post-clustered file.
 	 * 
-	 * @param srcName
-	 *            Source name of the post-clustered file.
-	 * @param srcExtension
-	 *            Source file extension of the post-clustered file.
+	 * @param loadedNode - A node from which to import preferences settings.
 	 */
-	private void copyOldPreferencesTo(final Preferences loadedNode) {
+	private void importOldPreferencesFrom(final Preferences loadedNode) {
 
-		if (oldNode == null) {
+		if (loadedNode == null) {
 			LogBuffer.println("No old node was found when trying to copy old"
-					+ " preferences.");
+					+ " preferences. Aborting import attempt.");
 			return;
 		}
-		
-		LogBuffer.println("Old node: " + oldNode.name());
 
 		try {
-			dendroController.importLabelPreferences(oldNode);
-
-			if (oldNode.nodeExists("ColorPresets")) {
-				dendroController.importColorPreferences(oldNode);
-
-				// set node here? maybe it disappears because it's a local var
-			} else {
-				LogBuffer.println("ColorPresets node not found when trying" 
-						+ " to import previous color settings.");
-			}
+			dendroController.importLabelPreferences(loadedNode);
+			dendroController.importColorPreferences(loadedNode);
 
 		} catch (BackingStoreException e) {
 			LogBuffer.logException(e);
+			return;
 		}
-
-		oldNode = null;
 	}
 
 	/**
-	 * Finds a specific sub-node in a root node.
+	 * Finds a specific sub-node in a root node by looking for keys with the
+	 * srcName and srcExtension.
 	 * 
 	 * @param root
 	 * @param srcName
@@ -457,8 +483,9 @@ public class TVController implements Observer {
 	 * @return The target Preferences node.
 	 * @throws BackingStoreException
 	 */
-	private static Preferences getTargetNode(Preferences root, String srcName,
-			String srcExtension) throws BackingStoreException {
+	private static Preferences getTargetNode(final Preferences root, 
+			final String srcName, final String srcExtension) 
+					throws BackingStoreException {
 
 		String[] fileNodes = root.childrenNames();
 
@@ -484,78 +511,47 @@ public class TVController implements Observer {
 
 		return targetNode;
 	}
-
-	/**
-	 * Store the currently selected labels.
-	 *
-	 * @param geneNames
-	 * @param arrayNames
-	 */
-	private void storeSelectedLabels(final String[] geneNames,
-			final String[] arrayNames) {
-
-		/* save label type selection before loading new file */
-		final int geneIncluded = dendroController.getRowIncluded()[0];
-		final int arrayIncluded = dendroController.getColumnIncluded()[0];
-
-		if (geneNames.length > 0 && arrayNames.length > 0) {
-			selectedLabels[0] = geneNames[geneIncluded];
-			selectedLabels[1] = arrayNames[arrayIncluded];
+	
+	private void setFileMenuSet(final FileSet fs) {
+		
+		FileSet newFs;
+		
+		if(fs != null) {
+			newFs =  fs;
+			
+		} else {
+			newFs = tvFrame.getFileSet(file);
 		}
-	}
-
-	/**
-	 * TODO move this to DendroController! Use the selected labels that have
-	 * been stored and select them again in the model. This should happen right
-	 * after the model has been loaded and the new DendroView was set up.
-	 */
-	private void resetLabelSelection() {
-
-		final int[] newGSelected = new int[] { 0 };
-		final String[] geneNames = model.getRowHeaderInfo().getNames();
-		for (int i = 0; i < geneNames.length; i++) {
-			if (geneNames[i].equalsIgnoreCase(selectedLabels[0])) {
-				newGSelected[0] = i;
-				break;
-			}
-		}
-
-		final int[] newASelected = new int[] { 0 };
-		final String[] arrayNames = model.getColumnHeaderInfo().getNames();
-		for (int i = 0; i < arrayNames.length; i++) {
-			if (arrayNames[i].equalsIgnoreCase(selectedLabels[1])) {
-				newASelected[0] = i;
-				break;
-			}
-		}
-
-		dendroController.setNewIncluded(newGSelected, newASelected);
+		
+		this.fileMenuSet = newFs;
 	}
 
 	/**
 	 * This method opens a file dialog to open either the visualization view or
 	 * the cluster view depending on which file type is chosen.
-	 *
+	 * @param fileSet - A FileSet object representing the files to be loaded.
+	 * @param shouldUseImport - Explicitly tells the loader function called in this method to use the import dialog
+	 * for opening a file. Only used through menubar's 'File > Open File With Import Dialog...' at the moment.
 	 * @throws LoadException
 	 */
-	public void openFile(FileSet fileSet) {
+	public void openFile(FileSet fileSet, final boolean shouldUseImport) {
 
 		String message;
+		FileSet loadFileSet = fileSet;
+		
 		try {
-			if(fileSet == null) {
-				file = tvFrame.selectFile();
-
-				/* Only run loader, if JFileChooser wasn't canceled. */
-				if (file != null) {
-					fileSet = tvFrame.getFileSet(file);
-
-				} else {
+			if(loadFileSet == null) {
+				this.file = tvFrame.selectFile();
+	
+				// Only run loader, if JFileChooser wasn't canceled.
+				if (file == null) {
 					return;
 				}
+				
+				loadFileSet = tvFrame.getFileSet(file);
 			}
-
-			loadingFile = fileSet;
-			getDataInfoAndLoad(fileSet, false);
+			
+			getDataInfoAndLoad(loadFileSet, null, null, false, shouldUseImport);
 			
 		} catch (final LoadException e) {
 			message = "Loading the file was interrupted.";
@@ -567,29 +563,48 @@ public class TVController implements Observer {
 
 	/**
 	 * Used to transfer information to ModelLoader about the data 
-	 * for proper loading. 
+	 * for proper loading and import of settings from old Preferences.
 	 * Either through saved information (stored preferences) or by offering
 	 * a dialog to the user in which they can specify parameters.
-	 * @param fileSet File name + directory information object.
+	 * The identifiers for the old FileSet are passed as Strings because 
+	 * passing another FileSet object does not work. They self-update their
+	 * state to the 'active' FileSet using a Preferences node, overwriting
+	 * their old data.
+	 * @param newFileSet File name + directory information object.
+	 * @param oldRoot The root name of the old FileSet (FileSet.getRoot())
+	 * @param oldExt The extension of the old FileSet (FileSet.getExt()) 
 	 * @param isFromCluster Whether the loading happens as a result of 
 	 * clustering.
 	 */
-	public void getDataInfoAndLoad(FileSet fileSet, boolean isFromCluster) {
-
-		/* To check if file was loaded before */
-		Preferences node = getOldPreferences(fileSet.getRoot(),
-				fileSet.getExt());
+	public void getDataInfoAndLoad(final FileSet newFileSet, 
+			final String oldRoot, final String oldExt, boolean isFromCluster, boolean shouldUseImport) {
+		
+		Preferences oldNode;
+		
+		/* Transfer settings to clustered file */
+		if(isFromCluster && oldRoot != null && oldExt != null) {
+			LogBuffer.println("Loading clustered file.");
+			oldNode = getOldPreferences(oldRoot, oldExt);
+		/* Check if file was loaded before */
+		} else {
+			LogBuffer.println("Loading normal file.");
+			oldNode = getOldPreferences(newFileSet.getRoot(), 
+					newFileSet.getExt());
+		}
 
 		DataLoadInfo dataInfo;
-		if ((FileSet.TRV).equalsIgnoreCase(fileSet.getExt()) && node != null) {
-			dataInfo = getDataLoadInfo(fileSet);
+		if (oldNode == null || shouldUseImport) {
+			LogBuffer.println(">>>>>>>> No old node found. Import.");
+			dataInfo = useImportDialog(newFileSet);
 			
 		} else {
-			dataInfo = useImportDialog(fileSet);
+			LogBuffer.println(">>>>>>>> Loading with old node.");
+			dataInfo = getDataLoadInfo(newFileSet, oldNode);
 		}
 
 		if (dataInfo != null) {
-			loadData(fileSet, isFromCluster, dataInfo);
+			dataInfo.setIsClusteredFile(isFromCluster);
+			loadData(newFileSet, dataInfo);
 			
 		} else {
 			String message = "Data loading was interrupted.";
@@ -633,16 +648,21 @@ public class TVController implements Observer {
 	 * @return A DataLoadInfo object which contains information relevant for
 	 * setting up the DataLoadDialog.
 	 */
-	public DataLoadInfo getDataLoadInfo(FileSet fileSet) {
-
-		Preferences node = getOldPreferences(fileSet.getRoot(),
-				fileSet.getExt());
-
+	public static DataLoadInfo getDataLoadInfo(FileSet fileSet, Preferences node) {
+		
+        DataLoadInfo dataInfo;
 		String delimiter = node.get("delimiter", ModelLoader.DEFAULT_DELIM);
-		int[] dataCoords = new int[] { node.getInt("rowCoord", 0),
-				node.getInt("colCoord", 0) };
-
-		return new DataLoadInfo(dataCoords, delimiter);
+		
+		// Amount of label headers may vary, they have to be re-detected
+		DataImportController importController = 
+				new DataImportController(delimiter);
+		importController.setFileSet(fileSet);
+		
+		int[] dataCoords = importController.detectDataBoundaries();
+        dataInfo = new DataLoadInfo(dataCoords, delimiter);
+        dataInfo.setOldNode(node);
+        
+		return dataInfo;
 	}
 
 	/**
@@ -661,8 +681,7 @@ public class TVController implements Observer {
 		 * BorderLayout.CENTER);
 		 */
 		// get string from user...
-		final String urlString = JOptionPane.showInputDialog(this,
-				"Enter a Url");
+		final String urlString = JOptionPane.showInputDialog(this, "Enter a Url");
 
 		if (urlString != null) {
 			// must parse out name, parent + sep...
@@ -671,10 +690,10 @@ public class TVController implements Observer {
 			final String parent = urlString.substring(0, postfix);
 			fileSet1 = new FileSet(name, parent);
 
-		} else
-			throw new LoadException("Input Dialog closed without selection...",
-					LoadException.NOFILE);
-
+		} else {
+			throw new LoadException("Input Dialog closed without selection...", LoadException.NOFILE);
+		}
+		
 		return fileSet1;
 	}
 
@@ -695,15 +714,14 @@ public class TVController implements Observer {
 
 		// extractors...
 		final UrlPresets genePresets = tvFrame.getGeneUrlPresets();
-		final UrlExtractor urlExtractor = new UrlExtractor(
-				model.getRowHeaderInfo(), genePresets);
+		final UrlExtractor urlExtractor = new UrlExtractor(model.getRowHeaderInfo(), genePresets);
 
 		urlExtractor.bindConfig(documentConfig.node("UrlExtractor"));
 		tvFrame.setUrlExtractor(urlExtractor);
 
 		final UrlPresets arrayPresets = tvFrame.getArrayUrlPresets();
 		final UrlExtractor arrayUrlExtractor = new UrlExtractor(
-				model.getColumnHeaderInfo(), arrayPresets);
+				model.getColHeaderInfo(), arrayPresets);
 
 		arrayUrlExtractor.bindConfig(documentConfig.node("ArrayUrlExtractor"));
 		tvFrame.setArrayUrlExtractor(arrayUrlExtractor);
@@ -720,13 +738,6 @@ public class TVController implements Observer {
 	 */
 	public void setupClusterView(final int clusterType) {
 
-		/*
-		 * To quickly find Preferences node of pre-cluster file to carry over
-		 * settings like color and font.
-		 */
-		FileSet fs = ((TVModel) model).getFileSet();
-		this.clusterNodeSourceKeys = new String[] { fs.getRoot(), fs.getExt() };
-
 		/* Erase selection */
 		dendroController.deselectAll();
 
@@ -734,8 +745,8 @@ public class TVController implements Observer {
 		final ClusterDialog clusterView = new ClusterDialog(clusterType);
 
 		/* Creating the Controller for this view. */
-		ClusterDialogController cController = new ClusterDialogController(clusterView,
-				TVController.this);
+		ClusterDialogController cController = 
+				new ClusterDialogController(clusterView, TVController.this);
 
 		cController.displayView();
 	}
@@ -792,7 +803,7 @@ public class TVController implements Observer {
 					(JFrame) Frame.getFrames()[0], tvFrame.getRowSelection(),
 					model.getRowHeaderInfo(), def);
 
-			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(),
+			t.setDataMatrix(model.getDataMatrix(), model.getColHeaderInfo(),
 					DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
@@ -814,7 +825,7 @@ public class TVController implements Observer {
 					model.getRowHeaderInfo(), source.getDir()
 							+ source.getRoot() + "_data.cdt");
 
-			t.setDataMatrix(model.getDataMatrix(), model.getColumnHeaderInfo(),
+			t.setDataMatrix(model.getDataMatrix(), model.getColHeaderInfo(),
 					DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
@@ -961,9 +972,9 @@ public class TVController implements Observer {
 			tvFrame.getFileMRU().notifyObservers();
 
 			fileMenuSet = tvFrame.findFileSet((JMenuItem) actionEvent
-					.getSource());// tvFrame.getFileMenuSet();
+					.getSource());
 
-			openFile(fileMenuSet);
+			openFile(fileMenuSet, false);
 		}
 	}
 
@@ -971,26 +982,24 @@ public class TVController implements Observer {
 	 * Opens the preferences menu and sets the displayed menu to the specified
 	 * option using a string as identification.
 	 *
-	 * @param menu
+	 * @param menu - The type of opened menu distinguished by its String name.
 	 */
-	public void openPrefMenu(final String menu) {
+	@SuppressWarnings("unused") // LabelSettingsController doesn't need to be stored in a variable
+	public void openLabelMenu(final String menu) {
 
 		// View
-		final LabelSettings preferences = new LabelSettings(tvFrame);
+		final LabelSettings labelSettingsView = new LabelSettings(tvFrame);
 
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
-			preferences.setHeaderInfo(model.getRowHeaderInfo(),
-					model.getColumnHeaderInfo());
+			labelSettingsView.setHeaderInfo(model.getRowHeaderInfo(),
+					model.getColHeaderInfo());
 		}
 
-		preferences.setConfigNode(tvFrame.getConfigNode().node(
-				StringRes.pnode_Preferences));
-		preferences.setMenu(menu);
+		labelSettingsView.setMenu(menu);
 
-		// Controller
-		new PreferencesController(tvFrame, model, preferences);
+		new LabelSettingsController(tvFrame, model, labelSettingsView);
 
-		preferences.setVisible(true);
+		labelSettingsView.setVisible(true);
 	}
 	
 	/**
@@ -999,6 +1008,7 @@ public class TVController implements Observer {
 	 *
 	 * @param menu
 	 */
+	@SuppressWarnings("unused") // ExportDialogController doesn't need to be stored in a variable
 	public void openExportMenu() {
 
 		if(tvFrame.getDendroView() == null || !tvFrame.isLoaded()) {
@@ -1020,14 +1030,6 @@ public class TVController implements Observer {
 		new ExportDialogController(exportDialog,tvFrame,
 			dendroController.getInteractiveXMap(),
 			dendroController.getInteractiveYMap(),model);
-	}
-
-	/*
-	 * TODO implement this and others to deprecate PreferencesMenu, which is a
-	 * remnant of a unified menu system (as opposed to separate dialogs)
-	 */
-	public void openLabelMenu() {
-
 	}
 
 	/**
@@ -1088,7 +1090,6 @@ public class TVController implements Observer {
 	@Override
 	public void update(final Observable o, final Object arg) {
 
-		LogBuffer.println("Updating TVController");
 		/* when tvFrame rebuilds its menu */
 		if (o instanceof ViewFrame) {
 			addMenuListeners();

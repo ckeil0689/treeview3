@@ -39,6 +39,7 @@ public class MenubarController {
 	}
 
 	/**
+	 * TODO Enumerate menu items (own enum class and rmove strings)
 	 * Executes a certain function based on which menuItem was clicked by the
 	 * user. This is determined by using the name string of the MenuItem, stored
 	 * in StringRes.
@@ -51,7 +52,10 @@ public class MenubarController {
 		switch (name) {
 
 		case StringRes.menu_Open:
-			controller.openFile(null);
+			controller.openFile(null, false);
+			break;
+		case StringRes.menu_OpenWithDialog:
+			controller.openFile(null, true);
 			break;
 		// case StringRes.menu_Save:
 		// controller.doModelSave(true);
@@ -75,13 +79,13 @@ public class MenubarController {
 			controller.openExportMenu();
 			break;
 		case StringRes.menu_RowAndCol:
-			controller.openPrefMenu(name);
+			controller.openLabelMenu(name);
 			break;
 		case StringRes.menu_Color:
 			controller.openColorMenu();
 			break;
 		case StringRes.menu_URL:
-			controller.openPrefMenu(name);
+			controller.openLabelMenu(name);
 			break;
 		case StringRes.menu_showTrees:
 		case StringRes.menu_hideTrees:
@@ -151,7 +155,7 @@ public class MenubarController {
 		final String source = controller.getDataModel().getSource();
 		final int rowNum = controller.getDataModel().getRowHeaderInfo()
 				.getNumHeaders();
-		final int colNum = controller.getDataModel().getColumnHeaderInfo()
+		final int colNum = controller.getDataModel().getColHeaderInfo()
 				.getNumHeaders();
 
 		tvFrame.openStatsView(source, rowNum, colNum);

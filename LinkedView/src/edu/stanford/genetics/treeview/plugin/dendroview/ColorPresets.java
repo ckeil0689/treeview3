@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.UIManager;
+
+import ColorChooser.ColorSchemeType;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -33,16 +36,13 @@ public class ColorPresets implements ConfigNodePersistent {
 	public static ColorSet[] defaultColorSets;
 
 	static {
-		/* Get system background panel color */
-		// Color sysBackground = UIManager.getColor("Panel.background");
-		// String sysBack = Integer.toHexString(sysBackground.getRGB());
-		// sysBack = sysBack.substring(2, sysBack.length());
-
 		defaultColorSets = new ColorSet[2];
-		defaultColorSets[0] = new ColorSet("RedGreen", new String[] {
-				"#FF0000", "#000000", "#00FF00" }, "#8E8E8E", "#FFFFFF");
-		defaultColorSets[1] = new ColorSet("YellowBlue", new String[] {
-				"#FEFF00", "#000000", "#1BB7E5" }, "#8E8E8E", "#FFFFFF");
+		defaultColorSets[0] = new ColorSet(ColorSchemeType.REDGREEN.toString(), 
+				new String[] {"#FF0000", "#000000", "#00FF00" }, 
+				"#8E8E8E", "#FFFFFF");
+		defaultColorSets[1] = new ColorSet(ColorSchemeType.YELLOWBLUE.toString(), 
+				new String[] {"#FEFF00", "#000000", "#1BB7E5" }, 
+				"#8E8E8E", "#FFFFFF");
 	}
 
 	private Preferences configNode;
@@ -60,36 +60,58 @@ public class ColorPresets implements ConfigNodePersistent {
 
 		super();
 
-		// Color sysBackground = UIManager.getColor("Panel.background");
-		// String sysBack = Integer.toHexString(sysBackground.getRGB());
-		// sysBack = sysBack.substring(2, sysBack.length());
-		//
-		// defaultColorSets[0].setMissing(UIManager.getColor("Panel.background"));
-
-		setConfigNode(parent);
+		Color sysBackground = UIManager.getColor("Panel.background");
+		String sysBack = Integer.toHexString(sysBackground.getRGB());
+		sysBack = sysBack.substring(2, sysBack.length());
+		
+		defaultColorSets[0].setMissing(UIManager.getColor("Panel.background"));
 	}
 
 	/** Constructor for the ColorPresets object */
 	public ColorPresets() {
 
 		super();
-
-		// Get the global configNode
-		configNode = Preferences.userRoot().node("TreeViewApp");
 	}
 
 	/* inherit description */
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			this.configNode = parentNode.node("ColorPresets");
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create ColorPresets "
 					+ "node because parentNode was null.");
 			return;
 		}
+		
+		this.configNode = parentNode.node("ColorPresets");
+	}
+	
+	/**
+	 * Returns the configNode of ColorPresets
+	 *
+	 * @return
+	 */
+	public Preferences getConfigNode() {
+
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -135,15 +157,15 @@ public class ColorPresets implements ConfigNodePersistent {
 	}
 
 	/** Adds the default color sets to the current presets */
-	// public void addDefaultPresets() {
-	//
-	// for (int i = 0; i < defaultColorSets.length; i++) {
-	//
-	// defaultColorSets[i].setConfigNode(parentNode.node("DefaultColorSet"
-	// + i));
-	// addColorSet(defaultColorSets[i]);
-	// }
-	// }
+//	 public void addDefaultPresets() {
+//	
+//		 for (int i = 0; i < defaultColorSets.length; i++) {
+//	
+//			 defaultColorSets[i].setConfigNode(configNode.node("DefaultColorSet"
+//					 											+ i));
+//			 addColorSet(defaultColorSets[i]);
+//		 }
+//	 }
 
 	/**
 	 * returns String [] of preset names for display
@@ -198,13 +220,12 @@ public class ColorPresets implements ConfigNodePersistent {
 			final String[] childrenNodes = getRootChildrenNodes();
 			final ColorSet ret = new ColorSet(
 					configNode.node(childrenNodes[index]));
-			// ret.setConfigNode(configNode.node(childrenNodes[index]));
 			return ret;
 
 		} catch (final Exception e) {
 			LogBuffer.logException(e);
-			LogBuffer.println("Error retrieving ColorSet.");
-			return null;
+			LogBuffer.println("Error retrieving ColorSet. Return default.");
+			return defaultColorSets[0];
 		}
 	}
 
@@ -290,26 +311,27 @@ public class ColorPresets implements ConfigNodePersistent {
 		configNode.remove(childrenNames[i]);
 	}
 
-	/**
-	 * Resets all the stored colorsets to default.
-	 */
-	// public void reset() {
-	//
-	// final String[] childrenNodes = getRootChildrenNodes();
-	//
-	// for (int i = 0; i < childrenNodes.length; i++) {
-	//
-	// if (childrenNodes[i].contains("ColorSet")) {
-	// configNode.remove(childrenNodes[i]);
-	// }
-	// }
-	// addDefaultPresets();
-	// }
+//	/**
+//	 * Resets all the stored colorsets to default.
+//	 */
+//	 public void reset() {
+//	
+//		 final String[] childrenNodes = getRootChildrenNodes();
+//	
+//		 for (int i = 0; i < childrenNodes.length; i++) {
+//	
+//			 if (childrenNodes[i].contains("ColorSet")) {
+//				 configNode.remove(childrenNodes[i]);
+//			 }
+//		 }
+//		 addDefaultPresets();
+//	 }
 
 	/**
 	 * Returns the names of the current children of this class' root node.
 	 *
-	 * @return
+	 * @return A String list of children nodes or an empty String list 
+	 * if no children nodes can be found.
 	 */
 	public String[] getRootChildrenNodes() {
 
@@ -323,20 +345,10 @@ public class ColorPresets implements ConfigNodePersistent {
 				LogBuffer.logException(e);
 				LogBuffer.println("Issue when retrieving children nodes for "
 						+ "Preferences.");
-				return null;
+				return new String[0];
 			}
 		}
 
-		return null;
-	}
-
-	/**
-	 * Returns the configNode of ColorPresets
-	 *
-	 * @return
-	 */
-	public Preferences getConfigNode() {
-
-		return configNode;
+		return new String[0];
 	}
 }

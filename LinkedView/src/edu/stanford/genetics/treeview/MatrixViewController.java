@@ -23,6 +23,7 @@ import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import ColorChooser.ColorSchemeType;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSNumber;
 import com.dd.plist.PropertyListParser;
@@ -64,7 +65,7 @@ ConfigNodePersistent, Controller {
 	private DataModel model;
 	protected Preferences configNode;
 	
-	/* Data ticker reference, so it can be updated by the MouseAdapter */ 
+	// Data ticker reference, so it can be updated by the MouseAdapter
 	private DataTicker ticker;
 	
 	public MatrixViewController(final InteractiveMatrixView imView,
@@ -80,12 +81,6 @@ ConfigNodePersistent, Controller {
 	 * constructor in order to allow for configNode setting first. 
 	 */
 	public void setup() {
-		
-		if(configNode == null) {
-			LogBuffer.println("Could not set up IMVController. No configNode"
-					+ "was set!");
-			return;
-		}
 		
 		setupDrawingComponents();
 		addKeyBindings();
@@ -136,14 +131,38 @@ ConfigNodePersistent, Controller {
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			configNode = parentNode;
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create IMViewController "
 					+ "node because parentNode was null.");
 			return;
-		}
+		} 
+		
+		this.configNode = parentNode;
+		getColorExtractor().setConfigNode(configNode);
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+		
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		
+		return; // nothing stored yet.
+	}
+
+	@Override
+	public void storeState() {
+		
+		return; // nothing to store yet
+	}
+	
+	@Override
+	public void importStateFrom(final Preferences oldNode) {
+		
+		return; // nothing to import yet
 	}
 	
 	/**
@@ -153,16 +172,24 @@ ConfigNodePersistent, Controller {
 	 * @param node
 	 * @throws BackingStoreException
 	 */
-	public void importColorPreferences(Preferences oldNode)
+	public void importColorPreferences(final Preferences oldNode)
 			throws BackingStoreException {
 
 		LogBuffer.println("Importing color settings...");
 
-		colorExtractor.importPreferences(oldNode);
+		if (!oldNode.nodeExists("ColorPresets")) {
+			LogBuffer.println("ColorPresets node not found when trying" 
+					+ " to import previous color settings. Aborting import"
+					+ "attempt.");
+			return;
+		}
+
+		LogBuffer.println("OldNode: " + oldNode.toString());
+		colorExtractor.importStateFrom(oldNode);
 
 		/* Update GradientChooser node */
 		String lastActive = oldNode.node("GradientChooser").get("activeColors",
-				"RedGreen");
+				ColorSchemeType.REDGREEN.toString());
 		configNode.node("GradientChooser").put("activeColors", lastActive);
 
 		/* Store copied node in new ColorPresets node */
@@ -209,12 +236,9 @@ ConfigNodePersistent, Controller {
 	
 	private void setupDrawingComponents() {
 		
-		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
-		colorPresets.setConfigNode(configNode);
-		colorExtractor = new ColorExtractor(
+		this.colorExtractor = new ColorExtractor(
 				model.getDataMatrix().getMinVal(), model.getDataMatrix()
 						.getMaxVal());
-		colorExtractor.setDefaultColorSet(colorPresets.getDefaultColorSet());
 		colorExtractor.setMissing(DataModel.NAN, DataModel.EMPTY);
 
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
@@ -354,7 +378,7 @@ ConfigNodePersistent, Controller {
 		//occurring in different orders of both the shift and control modifiers
 		//being pressed/released
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,
-			KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+			InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK),
 			"bothHoverStart");
 		action_map.put("bothHoverStart", new BothHoverStartAction());
 
@@ -363,7 +387,7 @@ ConfigNodePersistent, Controller {
 		action_map.put("rowHoverStop", new RowHoverStopAction());
 
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,
-			KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK),
+			InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK),
 			"bothHoverStart");
 		action_map.put("bothHoverStart", new BothHoverStartAction());
 
@@ -585,7 +609,7 @@ ConfigNodePersistent, Controller {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			resetMatrixViews();
-			imView.setAspectRatio(
+			imView.setAspectRatio( //TODO move into matrixview.resetView
 					interactiveXmap.getTotalTileNum(),
 					interactiveYmap.getTotalTileNum());
 		}
@@ -695,10 +719,7 @@ ConfigNodePersistent, Controller {
 			public void run() {
 
 				imView.resetView();
-				imView.repaint();
-
 				gmView.resetView();
-				gmView.repaint();
 			}
 		});
 	}
@@ -1056,7 +1077,7 @@ ConfigNodePersistent, Controller {
 	/**
 	 * Notifies all MapContainers' observers.
 	 */
-	private void notifyAllMapObservers() {
+	public void notifyAllMapObservers() {
 
 		globalXmap.notifyObservers();
 		globalYmap.notifyObservers();
@@ -1101,21 +1122,20 @@ ConfigNodePersistent, Controller {
 		int xTilesVisible = interactiveXmap.getNumVisible();
 		int yTilesVisible = interactiveYmap.getNumVisible();
 
-		final boolean genesSelected = rowSelection.getNSelectedIndexes() > 0;
-		final boolean arraysSelected = colSelection.getNSelectedIndexes() > 0;
+		final boolean rowsSelected = rowSelection.hasSelection();
+		final boolean colsSelected = colSelection.hasSelection();
 
 		// Note: A selection is "fully zoomed" if there is no selection - this
 		// will disable the zoom selection button
-		boolean isSelectionZoomed = (!genesSelected && !arraysSelected)
-				|| (genesSelected
+		boolean isSelectionZoomed = (!rowsSelected && !colsSelected)
+				|| (rowsSelected
 						&& rowSelection.getMinIndex() == interactiveYmap
 								.getFirstVisible()
-						&& (rowSelection.getMaxIndex()
-								- rowSelection.getMinIndex() + 1) == yTilesVisible
-						&& arraysSelected
+						&& (rowSelection.getFullSelectionRange()) == yTilesVisible
+						&& colsSelected
 						&& colSelection.getMinIndex() == interactiveXmap
-								.getFirstVisible() && (colSelection
-						.getMaxIndex() - colSelection.getMinIndex() + 1) == xTilesVisible);
+								.getFirstVisible() 
+						&& (colSelection.getFullSelectionRange()) == xTilesVisible);
 		
 		zoomStatus = new boolean[]{isXMin, isYMin, atRight, atLeft, atTop, 
 				atBottom, isSelectionZoomed};

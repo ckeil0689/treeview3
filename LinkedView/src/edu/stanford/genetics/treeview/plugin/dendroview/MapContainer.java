@@ -129,27 +129,94 @@ public class MapContainer extends Observable implements Observer,
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			this.configNode = parentNode.node(mapName);
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create MapContainer "
 					+ "node because parentNode was null.");
 			return;
 		}
+		
+		this.configNode = parentNode.node(mapName);
+		setupMaps();
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
 
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		
+		importStateFrom(configNode);
+	}
+
+	@Override
+	public void storeState() {
+		
+		if (configNode == null) {
+			LogBuffer.println("Unable to store MapContainer state. ConfigNode"
+					+ " was null.");
+			return;
+		}
+		
+		configNode.putInt("current", current.type());
+		configNode.putDouble("scale", current.getScale());
+	}
+	
+	@Override
+	public void importStateFrom(final Preferences oldNode) {
+		
+		setMap(oldNode.getInt("current", default_map));
+		setScale(oldNode.getDouble("scale", default_scale));
+	}
+	
+	/**
+	 * Reset the MapContainer state to a default.
+	 */
+	public void resetDefaultState() {
+		
+		this.tileNumVisible = getTotalTileNum();
+		this.numVisible = getTotalTileNum();
+		this.firstVisible = getMinIndex();
+		this.firstVisibleLabel = getMinIndex();
+		this.lastVisibleLabel = getMaxIndex();
+		this.firstVisibleLabelOffset = -1;
+		this.lastVisibleLabelOffset = -1;
+		
+		this.overLabels            = false;
+		this.overLabelsScrollbar   = false;
+		this.overInteractiveMatrix = false;
+		this.overTree              = false;
+		this.overDivider           = false;
+		this.draggingDivider       = false;
+		this.labelsBeingScrolled   = false;
+		this.lastTreeModeGlobal    = true;
+		this.keepTreeGlobal        = true;
+		this.hoverPixel            = -1;
+		this.hoverIndex            = -1;
+		this.hoverTreeMinIndex     = -1;
+		this.hoverTreeMaxIndex     = -1;
+		this.hoverChanged          = false;
+		this.selecting             = false;
+		this.toggling              = false;
+		this.deselecting           = false;
+		this.selectingStart        = -1;
+		this.whizMode              = false;
+		
+	}
+	
+	private void setupMaps() {
+		
 		// first bind subordinate maps...
-		fixedMap.setType(IntegerMap.FIXED);
 		fixedMap.setConfigNode(configNode);
+		fixedMap.setType(IntegerMap.FIXED);
 
-		fillMap.setType(IntegerMap.FILL);
 		fillMap.setConfigNode(configNode);
+		fillMap.setType(IntegerMap.FILL);
 
-		nullMap.setType(IntegerMap.NULL);
 		nullMap.setConfigNode(configNode);
-
-		// then, fix self up...
-		setMap(configNode.getInt("current", default_map));
+		nullMap.setType(IntegerMap.NULL);
 	}
 	
 	@Override
@@ -178,13 +245,6 @@ public class MapContainer extends Observable implements Observer,
 	 * Resets the MapContainer so that it completely fills out the available
 	 * screen space.
 	 */
-	public void setToMinScale() {
-		
-		setMinScale();
-		setScale(minScale);
-		notifyObservers();
-	}
-
 	public void setMinScale() {
 
 		this.tileNumVisible = getTotalTileNum();
@@ -1152,7 +1212,7 @@ public class MapContainer extends Observable implements Observer,
 		   ((int) Math.round(targetZoomFrac)) == 1) {
 			return(getTotalTileNum() - cells);
 		}
-		int zoomVal = (int) Math.round((double) cells * targetZoomFrac);
+		int zoomVal = (int) Math.round(cells * targetZoomFrac);
 		int numPixels = getAvailablePixels();
 		//LogBuffer.println("getBestZoomOutVal: Called with pixel [" + pixel +
 		//		"] and targetZoomFrac [" + targetZoomFrac +
@@ -1486,6 +1546,10 @@ public class MapContainer extends Observable implements Observer,
 				return;
 			}
 		}
+		
+		if(numVisible < 1) {
+			return;
+		}
 
 		// The divisor here was previously calculated by:
 		// getMaxIndex() - getMinIndex() + 1, which inadvertently resulted
@@ -1524,20 +1588,23 @@ public class MapContainer extends Observable implements Observer,
 		}
 
 		IntegerMap newMap = null;
-		if (nullMap.equalsType(type)) {
+		switch(type) {
+		
+		case IntegerMap.NULL:
 			newMap = nullMap;
-
-		} else if (fillMap.equalsType(type)) {
-			newMap = fillMap;
-
-		} else if (fixedMap.equalsType(type)) {
+			break;
+			
+		case IntegerMap.FIXED:
 			newMap = fixedMap;
-		}
-
-		if (newMap == null) {
-			// default
-//			LogBuffer.println("Couldn't find map matching type " + type
-//					+ " in MapContainer.java");
+			break;
+			
+		case IntegerMap.FILL:
+			newMap = fillMap;
+			break;
+			
+		default:
+			LogBuffer.println("Map type (" + type + ") not found. "
+					+ "Setting fixed map.");
 			newMap = fixedMap;
 		}
 
@@ -1579,9 +1646,14 @@ public class MapContainer extends Observable implements Observer,
 
 	public void scrollToFirstIndex(int i) {
 
+		if(scrollbar == null) {
+			return;
+		}
+		
+		int scrollToVal = i;
 		if(i < getMinIndex() || i > getMaxIndex()) {
 			if(i < 0) {
-				i = 0;
+				scrollToVal = 0;
 			} else {
 				LogBuffer.println("ERROR: Index out of range: " + i);
 				return;
@@ -1589,11 +1661,10 @@ public class MapContainer extends Observable implements Observer,
 		}
 		
 		final int j = scrollbar.getValue();
-
-		scrollbar.setValue(i);
+		scrollbar.setValue(scrollToVal);
 
 		// Keep track of the first visible index
-		setFirstVisible(i);
+		setFirstVisible(scrollToVal);
 
 		if (j != scrollbar.getValue()) {
 			setChanged();
@@ -1830,18 +1901,24 @@ public class MapContainer extends Observable implements Observer,
 	 * @param i The new minimum index.
 	 * @param j The new maximum index.
 	 */
-	public void setIndexRange(int i, int j) {
+	public void setIndexRange(final int i, final int j) {
+		
+		int minIdx = i;
+		int maxIdx = j;
 		
 		if (i > j) {
 			final int k = i;
-			i = j;
-			j = k;
+			minIdx = j;
+			maxIdx = k;
 		}
 
-		if (current.getMinIndex() != i || current.getMaxIndex() != j) {
-			current.setIndexRange(i, j);
+		if (current.getMinIndex() != minIdx || current.getMaxIndex() != maxIdx) {
+			current.setIndexRange(minIdx, maxIdx);
 			setupScrollbar();
-			setNumVisible(j + 1);
+			setFirstVisible(minIdx);
+			setFirstVisibleLabel(minIdx);
+			setNumVisible(maxIdx + 1);
+			setLastVisibleLabel(maxIdx);
 			setChanged();
 		}
 	}
@@ -1856,9 +1933,6 @@ public class MapContainer extends Observable implements Observer,
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();
-
-			configNode.putDouble("scale", d);
-			configNode.putDouble("minScale", minScale);
 		}
 	}
 
@@ -2047,9 +2121,6 @@ public class MapContainer extends Observable implements Observer,
 	private void switchMap(final IntegerMap integerMap) {
 
 		if (current != integerMap) {
-			if (configNode != null) {
-				configNode.putInt("current", integerMap.type());
-			}
 			integerMap.setAvailablePixels(current.getAvailablePixels());
 			integerMap.setIndexRange(current.getMinIndex(),
 					current.getMaxIndex());
@@ -2062,6 +2133,7 @@ public class MapContainer extends Observable implements Observer,
 			// not sure if this one is an explicit change of the viewed data by
 			// the user...
 			// setFirstVisible(current.getMinIndex());
+			storeState();
 			setChanged();
 		}
 	}
@@ -2446,7 +2518,7 @@ public class MapContainer extends Observable implements Observer,
 	 * @author rleach
 	 * @return double ZOOM_INCREMENT
 	 */
-	public double getZoomIncrement() {
+	public static double getZoomIncrement() {
 		
 		return(ZOOM_INCREMENT);
 	}
@@ -2458,7 +2530,7 @@ public class MapContainer extends Observable implements Observer,
 	 * @author rleach
 	 * @return double ZOOM_INCREMENT_FAST
 	 */
-	public double getZoomIncrementFast() {
+	public static double getZoomIncrementFast() {
 		
 		return(ZOOM_INCREMENT_FAST);
 	}

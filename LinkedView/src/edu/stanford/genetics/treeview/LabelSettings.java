@@ -3,7 +3,6 @@ package edu.stanford.genetics.treeview;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
-import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -27,8 +26,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
  * @author CKeil
  *
  */
-public class LabelSettings extends CustomDialog implements
-		ConfigNodePersistent {
+public class LabelSettings extends CustomDialog {
 
 	/**
 	 * Default serial version ID to keep Eclipse happy...
@@ -39,7 +37,6 @@ public class LabelSettings extends CustomDialog implements
 	private String menu;
 	private HeaderInfo rowHI;
 	private HeaderInfo colHI;
-	private Preferences configNode;
 
 	private final DendroView dendroView;
 	private JButton okBtn;
@@ -69,23 +66,6 @@ public class LabelSettings extends CustomDialog implements
 		
 		this.menu = menu;
 		setupLayout();
-	}
-
-	/**
-	 * Setting the configNode for the PreferencesMenu
-	 *
-	 * @param configNode
-	 */
-	@Override
-	public void setConfigNode(final Preferences parentNode) {
-
-		if (parentNode != null) {
-			this.configNode = parentNode.node(StringRes.pnode_Preferences);
-
-		} else {
-			LogBuffer.println("Could not find or create PreferencesMenu "
-					+ "node because parentNode was null.");
-		}
 	}
 
 	/**
@@ -172,20 +152,20 @@ public class LabelSettings extends CustomDialog implements
 	 */
 	class FontPanel {
 
-		private JPanel mainPanel;
+		private JPanel fontMainPanel;
 
 		public FontPanel() {
 
 			final FontSettings fontSettings = new FontSettings(
 					dendroView.getRowLabelView(),
-					dendroView.getColumnLabelView());
+					dendroView.getColLabelView());
 
-			mainPanel = fontSettings.makeFontPanel();
+			fontMainPanel = fontSettings.makeFontPanel();
 		}
 
 		public JPanel makeFontPanel() {
 
-			return mainPanel;
+			return fontMainPanel;
 		}
 	}
 
@@ -197,12 +177,12 @@ public class LabelSettings extends CustomDialog implements
 	 */
 	class URLSettings {
 
-		private final JPanel mainPanel;
+		private final JPanel urlMainPanel;
 
 		public URLSettings() {
 
-			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS,
-					null);
+			this.urlMainPanel = GUIFactory.createJPanel(false, 
+					GUIFactory.NO_INSETS);
 
 			final UrlSettingsPanel genePanel = new UrlSettingsPanel(
 					tvFrame.getUrlExtractor(), tvFrame.getGeneUrlPresets());
@@ -211,27 +191,28 @@ public class LabelSettings extends CustomDialog implements
 					tvFrame.getArrayUrlExtractor(),
 					tvFrame.getArrayUrlPresets());
 
-			mainPanel.add(genePanel.generate("Row URLs"), "pushx, "
+			urlMainPanel.add(genePanel.generate("Row URLs"), "pushx, "
 					+ "alignx 50%, w 95%, wrap");
-			mainPanel.add(arrayPanel.generate("Column URLs"), "pushx, "
+			urlMainPanel.add(arrayPanel.generate("Column URLs"), "pushx, "
 					+ "alignx 50%, w 95%");
+			
+			urlMainPanel.revalidate();
+			urlMainPanel.repaint();
 		}
 
 		public JPanel makeURLPanel() {
 
-			return mainPanel;
+			return urlMainPanel;
 		}
 	}
 
 	/**
 	 * Subclass for the Annotation settings panel.
 	 *
-	 * @author CKeil
-	 *
 	 */
 	class AnnotationPanel {
 
-		private final JPanel mainPanel;
+		private final JPanel annotationMainPanel;
 
 		private final HeaderSummaryPanel genePanel;
 		private final HeaderSummaryPanel arrayPanel;
@@ -243,17 +224,17 @@ public class LabelSettings extends CustomDialog implements
 
 		public AnnotationPanel() {
 
-			mainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS,
-					null);
+			this.annotationMainPanel = GUIFactory.createJPanel(false, 
+					GUIFactory.NO_INSETS);
 
-			genePanel = new HeaderSummaryPanel(rowHI,
+			this.genePanel = new HeaderSummaryPanel(rowHI,
 				dendroView.getRowLabelView());
 
-			arrayPanel = new HeaderSummaryPanel(colHI,
-				dendroView.getColumnLabelView());
+			this.arrayPanel = new HeaderSummaryPanel(colHI,
+				dendroView.getColLabelView());
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,
-					GUIFactory.NO_INSETS, null);
+					GUIFactory.NO_INSETS);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
 			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
@@ -261,14 +242,14 @@ public class LabelSettings extends CustomDialog implements
 
 			/* Label alignment */
 			JPanel justifyPanel = GUIFactory.createJPanel(false,
-					GUIFactory.DEFAULT, null);
+					GUIFactory.DEFAULT);
 			justifyPanel.setBorder(BorderFactory
 					.createTitledBorder("Label justification"));
 
 			final ButtonGroup rowJustifyBtnGroup = new ButtonGroup();
 
-			rowLeftJustBtn = GUIFactory.createRadioBtn("Left");
-			rowRightJustBtn = GUIFactory.createRadioBtn("Right");
+			this.rowLeftJustBtn = GUIFactory.createRadioBtn("Left");
+			this.rowRightJustBtn = GUIFactory.createRadioBtn("Right");
 
 			if (dendroView.getRowLabelView().getJustifyOption()) {
 				rowRightJustBtn.setSelected(true);
@@ -280,17 +261,17 @@ public class LabelSettings extends CustomDialog implements
 			rowJustifyBtnGroup.add(rowRightJustBtn);
 
 			final JPanel rowRadioBtnPanel = GUIFactory.createJPanel(false,
-					GUIFactory.DEFAULT, null);
+					GUIFactory.DEFAULT);
 
 			rowRadioBtnPanel.add(rowLeftJustBtn, "span, wrap");
 			rowRadioBtnPanel.add(rowRightJustBtn, "span");
 
 			final ButtonGroup colJustifyBtnGroup = new ButtonGroup();
 
-			colRightJustBtn = GUIFactory.createRadioBtn("Top");
-			colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
+			this.colRightJustBtn = GUIFactory.createRadioBtn("Top");
+			this.colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
 
-			if (dendroView.getColumnLabelView().getJustifyOption()) {
+			if (dendroView.getColLabelView().getJustifyOption()) {
 				colRightJustBtn.setSelected(true);
 			} else {
 				colLeftJustBtn.setSelected(true);
@@ -300,27 +281,30 @@ public class LabelSettings extends CustomDialog implements
 			colJustifyBtnGroup.add(colLeftJustBtn);
 
 			final JPanel colRadioBtnPanel = GUIFactory.createJPanel(false,
-					GUIFactory.DEFAULT, null);
+					GUIFactory.DEFAULT);
 
 			colRadioBtnPanel.add(colRightJustBtn, "span, wrap");
 			colRadioBtnPanel.add(colLeftJustBtn, "span");
 
-			mainPanel.add(rows, "pushx, alignx 50%");
-			mainPanel.add(cols, "pushx, alignx 50%, wrap");
-			mainPanel.add(genePanel, "pushx, alignx 50%, w 45%");
-			mainPanel.add(arrayPanel, "pushx, alignx 50%, w 45%, wrap");
+			annotationMainPanel.add(rows, "pushx, alignx 50%");
+			annotationMainPanel.add(cols, "pushx, alignx 50%, wrap");
+			annotationMainPanel.add(genePanel, "pushx, alignx 50%, w 45%");
+			annotationMainPanel.add(arrayPanel, "pushx, alignx 50%, w 45%, wrap");
 			justifyPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
 			justifyPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%");
-			mainPanel.add(justifyPanel, "push, grow, alignx 50%, span, wrap");
+			annotationMainPanel.add(justifyPanel, "push, grow, alignx 50%, span, wrap");
 
 			JPanel fontPanel = new FontPanel().makeFontPanel();
 
-			mainPanel.add(fontPanel, "push, grow, alignx 50%, span");
+			annotationMainPanel.add(fontPanel, "push, grow, alignx 50%, span");
+
+			annotationMainPanel.revalidate();
+			annotationMainPanel.repaint();
 		}
 
 		public JPanel makeLabelPane() {
 
-			return mainPanel;
+			return annotationMainPanel;
 		}
 
 		public void synchronize() {
@@ -372,8 +356,7 @@ public class LabelSettings extends CustomDialog implements
 
 		} else {
 			// In case menu cannot be loaded, display excuse.
-			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS,
-					null);
+			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 
 			final JLabel hint = GUIFactory.createLabel("Menu cannot be "
 					+ "shown because it wasn't loaded.", GUIFactory.FONTS);
@@ -387,15 +370,5 @@ public class LabelSettings extends CustomDialog implements
 
 		mainPanel.revalidate();
 		mainPanel.repaint();
-	}
-
-	/**
-	 * Returns PreferencesMenu's configNode.
-	 *
-	 * @return
-	 */
-	public Preferences getConfigNode() {
-
-		return configNode;
 	}
 }

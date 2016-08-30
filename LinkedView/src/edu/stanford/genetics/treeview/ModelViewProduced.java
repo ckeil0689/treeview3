@@ -90,7 +90,7 @@ public abstract class ModelViewProduced extends ModelView {
 	 */
 	@Override
 	public synchronized void paintComponent(final Graphics g) {
-
+		
 		Graphics2D g2d = (Graphics2D) g;
 
 		final Dimension newsize = getSize();
@@ -104,7 +104,7 @@ public abstract class ModelViewProduced extends ModelView {
 		if ((offscreenImage == null) || (reqSize.width != offscreenSize.width)
 				|| (reqSize.height != offscreenSize.height)) {
 			offscreenSize = reqSize;
-			ensureCapacity();//offscreenSize); 
+			ensureCapacity();
 			offscreenChanged = true;
 			offscreenValid = false;
 

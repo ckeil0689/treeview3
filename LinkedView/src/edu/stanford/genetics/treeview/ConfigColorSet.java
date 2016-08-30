@@ -13,7 +13,7 @@ import java.util.prefs.Preferences;
 
 /**
  * a color set which can be stored in an ConfigNode.
- *
+ * @deprecated
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.5 $ $Date: 2004-12-21 03:28:14 $
  */
@@ -232,6 +232,26 @@ public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		return;
+	}
+
+	@Override
+	public void storeState() {
+		return;
+	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		return;
 	}
 
 	/* inherit description */

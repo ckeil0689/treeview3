@@ -1,5 +1,6 @@
 package Cluster;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,11 @@ public class KMeansCluster {
 
 		prepare();
 	}
+	
+	public ClusterFileWriter getClusterFileWriter() {
+		
+		return bufferedWriter;
+	}
 
 	/**
 	 * Sets up a buffered writer used to save the data created during the
@@ -66,12 +72,12 @@ public class KMeansCluster {
 	 *
 	 * @throws IOException
 	 */
-	public void setupFileWriter(final String fileName) {
+	public void setupFileWriter(final File file) {
 
 		final String fileEnd = (axis == ClusterDialogController.ROW) ? "_K_G" + k
 				+ ".kgg" : "_K_A" + k + ".kag";
 
-		bufferedWriter = new ClusterFileWriter(fileName, fileEnd, -1);
+		bufferedWriter = new ClusterFileWriter(file);
 	}
 
 	/**
@@ -146,7 +152,7 @@ public class KMeansCluster {
 		addIndex++;
 
 		/* Writing the header line */
-		bufferedWriter.writeContent(initial);
+		bufferedWriter.writeData(initial);
 
 		/* Write the calculated data */
 		addIndex = 0;
@@ -170,7 +176,7 @@ public class KMeansCluster {
 
 				dataPair[addIndexInner] = index;
 
-				bufferedWriter.writeContent(dataPair);
+				bufferedWriter.writeData(dataPair);
 			}
 		}
 	}

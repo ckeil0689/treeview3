@@ -54,10 +54,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		ConfigNodePersistent {
 
-	public static final int WELCOME_VIEW = 0;
-	public static final int PROGRESS_VIEW = 2;
-	public static final int DENDRO_VIEW = 3;
-
 	protected final JPanel viewPanel;
 	protected final JPanel mainPanel;
 	protected DendroPanel running;
@@ -106,16 +102,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		super(appName, treeView.getGlobalConfig().node(StringRes.pnode_TVFrame));
 		this.treeView = treeView;
 
-		/* Initialize main views */
-		welcomeView = new WelcomeView();
-		dendroView = new DendroView(this);
+		// Initialize main views
+		this.welcomeView = new WelcomeView();
+		this.dendroView = new DendroView(this);
 
 		setWindowActive(true);
 
-		mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS, null);
+		this.mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS);
 
 		/* Setting up main panels */
-		viewPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS, null);
+		this.viewPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS);
 
 		/* Add main background panel to the application frame's contentPane */
 		appFrame.add(mainPanel);
@@ -124,20 +120,36 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		setupFileMru();
 
 		/* Initial view */
-		generateView(WELCOME_VIEW);
+		generateView(ViewType.WELCOME_VIEW);
 	}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			configNode = parentNode.node(StringRes.pnode_TVFrame);
+		if (parentNode == null) {
+			LogBuffer.println("Could not set configNode in " 
+					+ this.getClass().toString() + " because parent was null.");
+			return;
 		}
+		
+		this.configNode = parentNode.node(StringRes.pnode_TVFrame);
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+
+		return configNode;
+	}
+	
+	@Override
+	public void requestStoredState() {
+		
+		importStateFrom(configNode);
 	}
 
 	@Override
-	public void saveSettings() {
-
+	public void storeState() {
+		
 		/* store screen size and position */
 		final int left = appFrame.getX();
 		final int top = appFrame.getY();
@@ -148,17 +160,18 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		configNode.putInt("frame_top", top);
 		configNode.putInt("frame_width", width);
 		configNode.putInt("frame_height", height);
-
-		if (isLoaded()) {
-			// dendroController.saveSettings();
-		}
+	}
+	
+	@Override
+	public void importStateFrom(final Preferences oldNode) {
+		return; // nothing to import yet
 	}
 
 	/**
 	 * Generates the appropriate view panel.
 	 */
 	@Override
-	public void generateView(final int view_choice) {
+	public void generateView(final ViewType view_choice) {
 
 		JPanel view;
 
@@ -216,7 +229,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	/**
 	 * Shows a panel which displays the current stats of the loaded model.
 	 */
-	public void openStatsView(final String source, final int rowNum,
+	public static void openStatsView(final String source, final int rowNum,
 			final int colNum) {
 
 		final StatsDialog stats = new StatsDialog(source, rowNum, colNum);
@@ -250,7 +263,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	/**
 	 * Displays a window with some helpful information about TreeView 3.
 	 */
-	public void showAboutWindow() {
+	public static void showAboutWindow() {
 
 		new AboutDialog().setVisible(true);
 	}
@@ -258,7 +271,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	/**
 	 * Displays a window with some helpful information about TreeView 3.
 	 */
-	public void showShortcuts() {
+	public static void showShortcuts() {
 
 		new ShortcutDialog().setVisible(true);
 	}
@@ -385,9 +398,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			notifyObservers();
 
 		} else if (o instanceof TVModel) {
-			/* TVModel passes a boolean object to notify if it was loaded. */
-			setRunning((Boolean) obj);
-			setLoaded((Boolean) obj);
+			// TVModel passes a boolean object to notify if it was loaded.
+			setRunning(((Boolean) obj).booleanValue());
+			setLoaded(((Boolean) obj).booleanValue());
 
 		} else {
 			LogBuffer.println("Observable is: " + o.getClass());
@@ -410,18 +423,18 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		if (loaded) {
 			if (running == null) {
 				setTitleString(appFrame.getName());
-				generateView(WELCOME_VIEW);
+				generateView(ViewType.WELCOME_VIEW);
 				// JOptionPane.showMessageDialog(applicationFrame,
 				// "TreeViewFrame 253: No plugins to display");
 			} else {
 				setLoadedTitle();
-				generateView(DENDRO_VIEW);
+				generateView(ViewType.DENDRO_VIEW);
 			}
 
 		} else {
 			appFrame.setTitle(StringRes.appName);
 			setTitleString(appFrame.getName());
-			generateView(WELCOME_VIEW);
+			generateView(ViewType.WELCOME_VIEW);
 		}
 
 		buildMenuBar();
@@ -445,19 +458,29 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		constructHelpMenu(isMac);
 	}
 
+	/**
+	 * @param isMac - (TODO unused but may change) indicates whether the program runs on macOS or not.  
+	 */
 	private void constructFileMenu(final boolean isMac) {
 
-		/* File */
+		// File
 		final JMenu fileMenu = new JMenu(StringRes.mbar_File);
 		fileMenu.setMnemonic(KeyEvent.VK_F);
 
-		// Open new file Menu
+		// Open new file menu
 		final JMenuItem openMenuItem = new JMenuItem(StringRes.menu_Open,
 				KeyEvent.VK_O);
 		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		fileMenu.add(openMenuItem);
 		stackMenuList.add(openMenuItem);
+		
+		// Open new file with import dialog menu
+		final JMenuItem openWithDialogMenuItem = new JMenuItem(StringRes.menu_OpenWithDialog, KeyEvent.VK_I);
+		openWithDialogMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
+				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		fileMenu.add(openWithDialogMenuItem);
+		stackMenuList.add(openWithDialogMenuItem);
 
 		// menubar.addMenuItem("Open Url...", new ActionListener() {
 		// public void actionPerformed(ActionEvent actionEvent) {
@@ -586,6 +609,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		fileMenu.add(prefSubMenu);
 	}
 
+	/**
+	 * @param isMac - (TODO unused but may change) indicates whether the program runs on macOS or not.
+	 */
 	private void constructHelpMenu(final boolean isMac) {
 
 		/* Help */
@@ -696,7 +722,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 
 		final JPanel panel = GUIFactory.createJPanel(true,
-				GUIFactory.NO_INSETS, null);
+				GUIFactory.NO_INSETS);
 
 		final JButton button = GUIFactory.createBtn("OK");
 		button.addActionListener(new ActionListener() {
@@ -972,16 +998,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public boolean isLoaded() {
 
 		return loaded;
-	}
-
-	/**
-	 * Returns TreeViewFrame's configNode.
-	 *
-	 * @return
-	 */
-	public Preferences getConfigNode() {
-
-		return configNode;
 	}
 
 	/**

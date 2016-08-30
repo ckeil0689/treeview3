@@ -35,7 +35,9 @@ import edu.stanford.genetics.treeview.SettingsPanel;
 public class BitmapColorBarExportPanel extends ColorBarExportPanel implements
 		SettingsPanel {
 
-	JComboBox formatPulldown = new JComboBox(BitmapWriter.formats);
+	private static final long serialVersionUID = 1L;
+	
+	JComboBox<?> formatPulldown = new JComboBox<Object>(BitmapWriter.formats);
 
 	// I wish I could just inherit this...
 	public BitmapColorBarExportPanel(final ColorExtractor colorExtractor) {
@@ -112,5 +114,29 @@ public class BitmapColorBarExportPanel extends ColorBarExportPanel implements
 	public void setConfigNode(final Preferences parentNode) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public Preferences getConfigNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		// TODO Auto-generated method stub
+		
 	}
 }

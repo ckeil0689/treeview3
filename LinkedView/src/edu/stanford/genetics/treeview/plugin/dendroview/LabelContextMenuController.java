@@ -42,7 +42,7 @@ public class LabelContextMenuController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			tvController.openPrefMenu(StringRes.menu_RowAndCol);
+			tvController.openLabelMenu(StringRes.menu_RowAndCol);
 		}
 	}
 	

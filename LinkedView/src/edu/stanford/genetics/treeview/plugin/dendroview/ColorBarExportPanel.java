@@ -1038,6 +1038,30 @@ class TestColorBarExportPanel extends ColorBarExportPanel {
 
 		super(colorExtractor);
 	}
+
+	@Override
+	public Preferences getConfigNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void requestStoredState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		// TODO Auto-generated method stub
+		
+	}
 }
 
 class SimpleDataMatrix implements DataMatrix {

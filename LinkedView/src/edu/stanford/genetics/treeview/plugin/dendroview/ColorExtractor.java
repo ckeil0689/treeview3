@@ -14,6 +14,7 @@ import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import ColorChooser.ColorSchemeType;
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.ContrastSelectable;
@@ -32,9 +33,8 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 	private ColorSet defaultColorSet;
 	private final double default_contrast = 3.0;
-	private ColorSet colorSet = null;// new ColorSet();// Will be backed by
-	// confignode when we
-	// get one...
+	private ColorSet colorSet = null;
+	
 	private boolean m_logTranform = false;
 	private double m_logCenter = 1.0;
 	private double m_logBaseDivisor;
@@ -70,30 +70,76 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		// defaultColorSet = new ColorSet();
 		// defaultColorSet.setMissing(ColorSet.decodeColor("#909090"));
 		// defaultColorSet.setEmpty(ColorSet.decodeColor("#FFFFFF"));
-		colorList_default = new ArrayList<Color>();
-		colorList_default.add(Color.red);
-		colorList_default.add(Color.black);
-		colorList_default.add(Color.green);
+		this.colorList_default = new ArrayList<Color>();
+		this.colorList_default.add(Color.red);
+		this.colorList_default.add(Color.black);
+		this.colorList_default.add(Color.green);
 
-		fractions_default = new float[3];
-		fractions_default[0] = 0.0f;
-		fractions_default[1] = 0.5f;
-		fractions_default[2] = 1.0f;
+		this.fractions_default = new float[3];
+		this.fractions_default[0] = 0.0f;
+		this.fractions_default[1] = 0.5f;
+		this.fractions_default[2] = 1.0f;
 
 		setDefaultColorSet(defaultColorSet);
 		setLogBase(2.0);
 	}
-
+	
 	/**
-	 * Updates the state of the ColorExtractor instance to reflect the stored
-	 * settings from the supplied node.
-	 * 
-	 * @param node
-	 *            Preferences node which contains stored color settings.
+	 * binds this ColorExtractor to a particular Preferences node. 
+	 * This allows colors persistent by providing the ability to store and
+	 * retrieve values using an XML file. Also initiates loading of stored 
+	 * values to update the state of this class by calling requestStoredState().
+	 *
+	 * @param parentNode - The parentNode under which a specific node for 
+	 * ColorExtractor.java is placed.
 	 */
-	public void importPreferences(Preferences node) {
+	@Override
+	public void setConfigNode(final Preferences parentNode) {
 
-		this.colorSet = findColorSetFromNode(node);
+		if (parentNode == null) {
+			LogBuffer.println("Could not find or create ColorExtractor "
+					+ "node because parentNode was null.");
+			return;
+		} 
+
+		this.configNode = parentNode.node("ColorExtractor");
+		
+		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+		setDefaultColorSet(colorPresets.getDefaultColorSet());
+		requestStoredState();
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+
+		importStateFrom(configNode);
+	}
+
+	@Override
+	public void storeState() {
+		
+		if(configNode == null) {
+			LogBuffer.println("Could not store the state of "  
+					+ this.getClass() + " because configNode was null.");
+			return;
+		}
+		
+		configNode.putDouble("contrast", contrast);
+		configNode.putBoolean("logtransform", m_logTranform);
+		configNode.putDouble("logcenter", m_logCenter);
+		configNode.putDouble("logbase", m_logBase);
+	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+
+		this.colorSet = findColorSetFromNode(oldNode);
 
 		final String[] colors = colorSet.getColors();
 		final List<Color> cList = new ArrayList<Color>(colors.length);
@@ -103,16 +149,17 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 		setNewParams(colorSet.getFractions(), cList);
 
-		if ("Custom".equalsIgnoreCase(colorSet.getName())) {
+		if ((ColorSchemeType.CUSTOM.toString()).equalsIgnoreCase(
+				colorSet.getName())) {
 			setMin(colorSet.getMin());
 			setMax(colorSet.getMax());
 		}
 
 		synchFloats(); /* sets initial missing/ empty data colors */
-		contrast = node.getDouble("contrast", getContrast());
-		setLogCenter(node.getDouble("logcenter", 1.0));
-		setLogBase(node.getDouble("logbase", 2.0));
-		m_logTranform = (node.getInt("logtransform", 0) == 1);
+		this.contrast = oldNode.getDouble("contrast", getContrast());
+		setLogCenter(oldNode.getDouble("logcenter", 1.0));
+		setLogBase(oldNode.getDouble("logbase", 2.0));
+		this.m_logTranform = (oldNode.getBoolean("logtransform", false));
 		setChanged();
 	}
 
@@ -122,11 +169,11 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 * @param node
 	 * @return The last active colorset or a default in case it cannot be found.
 	 */
-	private ColorSet findColorSetFromNode(Preferences node) {
+	private ColorSet findColorSetFromNode(final Preferences node) {
 
 		ColorSet nodeColorSet = defaultColorSet;
 
-		String lastActive = "RedGreen";
+		String lastActive = ColorSchemeType.REDGREEN.toString();
 		try {
 			/* Check old Preferences for data */
 			if (node.nodeExists("GradientChooser")) {
@@ -140,6 +187,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 				if (defaultColorSet2.getName().equalsIgnoreCase(lastActive)) {
 					nodeColorSet = new ColorSet(defaultColorSet2);
 					foundColorSet = true;
+					break;
 				}
 			}
 
@@ -169,7 +217,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 			if (!foundColorSet) {
 				nodeColorSet = new ColorSet(ColorPresets.defaultColorSets[0]);
 				LogBuffer.println("Unable to find last used colorset: "
-						+ lastActive + "; using " + colorSet.getName());
+						+ lastActive + "; using " + nodeColorSet.getName());
 			}
 		} catch (final BackingStoreException e) {
 			LogBuffer.logException(e);
@@ -191,8 +239,8 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 	public void setNewParams(final float[] frac, final List<Color> cl) {
 
-		fractions = frac;
-		colorList = cl;
+		this.fractions = frac;
+		this.colorList = cl;
 		setChanged();
 	}
 
@@ -203,29 +251,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 */
 	public void setDefaultColorSet(final ColorSet set) {
 
-		defaultColorSet = set;
-	}
-
-	/**
-	 * binds this ColorExtractor to a particular ConfigNode. This makes colors
-	 * persistent
-	 *
-	 * @param configNode
-	 *            confignode to bind to
-	 */
-	@Override
-	public void setConfigNode(final Preferences parentNode) {
-
-		if (parentNode != null) {
-			this.configNode = parentNode.node("ColorExtractor");
-
-		} else {
-			LogBuffer.println("Could not find or create ColorExtractor "
-					+ "node because parentNode was null.");
-			return;
-		}
-
-		importPreferences(parentNode);
+		this.defaultColorSet = set;
 	}
 
 	/**
@@ -254,7 +280,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 			m_logTranform = transform;
 
 			if (configNode != null) {
-				configNode.putInt("logtransform", transform ? 1 : 0);
+				configNode.putBoolean("logtransform", transform);
 			}
 			setChanged();
 		}

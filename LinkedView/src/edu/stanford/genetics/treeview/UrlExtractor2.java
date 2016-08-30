@@ -24,8 +24,50 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 	 */
 	public UrlExtractor2(final Preferences n, final UrlPresets p) {
 
-		configNode = n;
-		presets = p;
+		this.configNode = n;
+		this.presets = p;
+	}
+	
+	@Override
+	public void setConfigNode(final Preferences parentNode) {
+
+		if (parentNode == null) {
+			LogBuffer.println("Could not find or create UrlExtractor"
+					+ "node because parentNode was null.");
+			return;
+
+		} 
+		this.configNode = parentNode.node("UrlExtractor");
+		requestStoredState();
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+
+		return configNode;
+	}
+
+	@Override
+	public void requestStoredState() {
+		
+		if(configNode == null) {
+			LogBuffer.println("Could not restore state because parent node "
+					+ "was null.");
+			return;
+		}
+		
+	}
+
+	@Override
+	public void storeState() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -87,22 +129,5 @@ public class UrlExtractor2 implements ConfigNodePersistent {
 	public void setTemplate(final String ret) {
 
 		configNode.put("template", ret);
-	}
-
-	// @Override
-	// public void bindConfig(final Preferences configNode) {
-	// root = configNode;
-	// }
-
-	@Override
-	public void setConfigNode(final Preferences parentNode) {
-
-		if (parentNode != null) {
-			this.configNode = parentNode.node("UrlExtractor");
-
-		} else {
-			LogBuffer.println("Could not find or create UrlExtractor"
-					+ "node because parentNode was null.");
-		}
 	}
 }

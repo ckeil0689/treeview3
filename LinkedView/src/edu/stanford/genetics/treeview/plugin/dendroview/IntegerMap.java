@@ -35,21 +35,50 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 		this.availablepixels = 0;
 		this.maxindex = -1;
 		this.minindex = -1;
-		this.configNode = Preferences.userRoot().node(typeName);
+		setConfigNode(Preferences.userRoot());
 	}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			this.configNode = parentNode.node(typeName);
-
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Could not find or create IntegerMap "
 					+ "node because parentNode was null.");
+			return;
 		}
-
+		
+		this.configNode = parentNode.node(typeName);
+		requestStoredState();
+	}
+	
+	@Override
+	public Preferences getConfigNode() {
+		
+		return configNode;
+	}
+	
+	@Override
+	public void requestStoredState() {
+		
+		importStateFrom(configNode);
+	}
+	
+	@Override
+	public void storeState() {
+		
+		if(configNode == null) {
+			LogBuffer.println("Could not store state of IntegerMap. ConfigNode"
+					+ " was null.");
+			return;
+		}
+		
 		configNode.putInt("type", type);
+	}
+	
+	@Override
+	public void importStateFrom(Preferences oldNode) {
+		
+		this.type = oldNode.getInt("type", IntegerMap.FIXED);
 	}
 
 	/**
@@ -59,8 +88,6 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 	 * @param type
 	 */
 	public void setType(final int type) {
-
-		this.type = type;
 		
 		switch(type) {
 		
@@ -82,6 +109,7 @@ public abstract class IntegerMap implements ConfigNodePersistent {
 		}
 		
 		this.type = type;
+		storeState();
 	}
 
 	/**
