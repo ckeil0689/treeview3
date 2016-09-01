@@ -20,6 +20,36 @@ dependencies {
   compile 'org.swinglabs.swingx:swingx-autocomplete:1.6.5-1'
 }
 
+sourceSets {
+  main {
+    java {
+      srcDir 'src/main/java/LinkedView/src/'
+      exclude '**/edu/stanford/genetics/treeview/model/FlatFileParser2.java'
+      exclude '**/edu/stanford/genetics/treeview/reg/**'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/DendroView_Deprec.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/DendroView2.java'
+      exclude '**/edu/stanford/genetics/treeview/model/TVModelLoader2.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/GTRZoomView.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/ZoomView.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/ColorBarExportPanel.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/PostscriptColorBarExportPanel.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/GifColorBarExportPanel.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/BitmapColorBarExportPanel.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/TextView_deprec.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/FontSettingsPanel.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/InvertedTreeDrawer.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/KnnDendrogramFactory.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/KnnDendroView2.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/TextViewManager.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/GlobalView_deprec.java'
+      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/ArrayNameView_deprec.java'
+      exclude '**/edu/stanford/genetics/treeview/LoadProgress2.java'
+      exclude '**/edu/stanford/genetics/treeview/CustomConfigs.java'
+      exclude '**/edu/stanford/genetics/treeview/MenuPanel.java'
+    }
+  }
+}
+
 task fatJar(type: Jar) {
   manifest {
     attributes 'Main-Class':'edu.stanford.genetics.treeview.app.TreeView3'
