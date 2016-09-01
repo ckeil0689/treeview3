@@ -20,6 +20,7 @@ dependencies {
   compile 'org.swinglabs.swingx:swingx-autocomplete:1.6.5-1'
 }
 
+<<<<<<< 5d18b662899d25c09ea4f414e8899e2d0bf9e539
 sourceSets {
   main {
     java {
@@ -50,6 +51,8 @@ sourceSets {
   }
 }
 
+=======
+>>>>>>> created Gradle build script; rearranged project structure for Gradle
 task fatJar(type: Jar) {
   manifest {
     attributes 'Main-Class':'edu.stanford.genetics.treeview.app.TreeView3'
