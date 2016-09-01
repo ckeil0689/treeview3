@@ -54,7 +54,7 @@ public class MenubarController {
 		case StringRes.menu_Open:
 			controller.openFile(null, false);
 			break;
-		case StringRes.menu_OpenWithDialog:
+		case StringRes.menu_Import:
 			controller.openFile(null, true);
 			break;
 		// case StringRes.menu_Save:

@@ -474,13 +474,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		fileMenu.add(openMenuItem);
 		stackMenuList.add(openMenuItem);
-		
-		// Open new file with import dialog menu
-		final JMenuItem openWithDialogMenuItem = new JMenuItem(StringRes.menu_OpenWithDialog, KeyEvent.VK_I);
-		openWithDialogMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
-				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		fileMenu.add(openWithDialogMenuItem);
-		stackMenuList.add(openWithDialogMenuItem);
 
 		// menubar.addMenuItem("Open Url...", new ActionListener() {
 		// public void actionPerformed(ActionEvent actionEvent) {
@@ -539,6 +532,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		fileMenu.addSeparator();
 		
 		if(running != null) {
+			// Open new file with import dialog menu
+			final JMenuItem importMenuItem = new JMenuItem(StringRes.menu_Import, KeyEvent.VK_I);
+			importMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
+					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			fileMenu.add(importMenuItem);
+			stackMenuList.add(importMenuItem);
+			
 			// Export Menu
 			final JMenuItem exportMenuItem = 
 					new JMenuItem(StringRes.menu_Export, KeyEvent.VK_E);
