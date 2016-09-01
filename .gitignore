@@ -11,6 +11,7 @@ LinkedView/doc/JTVProgrammerGuide/JTVProgrammerGuide.fo
 LinkedView/doc/JTVUserManual/JTVUserManual.fo
 LinkedView/docbook
 *.pdf
+build/classes/*
 prefs.xml
 
 # OS Stuff
