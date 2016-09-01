@@ -13,6 +13,7 @@ LinkedView/docbook
 *.pdf
 build/classes/*
 prefs.xml
+*.swp
 
 # OS Stuff
 .DS_Store
