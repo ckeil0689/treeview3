@@ -61,11 +61,7 @@ public class DataTicker {
 
 		private void setupDataTicker() {
 			
-//			final JLabel val = GUIFactory.createLabel(":",
-//					GUIFactory.FONTS);
-//			val.setHorizontalAlignment(SwingConstants.LEFT);
 			add(textLabel, "w 120!");
-//			add(val);
 			add(valTextArea, "wrap");
 
 			revalidate();
