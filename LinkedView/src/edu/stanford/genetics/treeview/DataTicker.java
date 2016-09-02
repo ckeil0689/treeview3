@@ -19,9 +19,9 @@ public class DataTicker {
 
 	private final JPanel tickerPanel;
 	private final JTextArea valTextArea;
-	/** 
+	/* 
 	 * describes which of the average values that is being displayed
-	 * e.g. Data Value, Row Ave, Col Ave...
+	 * e.g. Data Value, Row Ave, Column Ave...
 	 */
 	private final JLabel textLabel;
 
@@ -61,10 +61,11 @@ public class DataTicker {
 
 		private void setupDataTicker() {
 			
-			final JLabel val = GUIFactory.createLabel(":",
-					GUIFactory.FONTS);
-			add(textLabel, "w 80!");
-			add(val);
+//			final JLabel val = GUIFactory.createLabel(":",
+//					GUIFactory.FONTS);
+//			val.setHorizontalAlignment(SwingConstants.LEFT);
+			add(textLabel, "w 120!");
+//			add(val);
 			add(valTextArea, "wrap");
 
 			revalidate();

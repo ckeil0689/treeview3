@@ -280,7 +280,7 @@ public class ColumnTreeView extends TRView {
 	protected void setDataTickerValue(MouseEvent e) {
 		int from = (int) hoveredNode.getLeftLeaf().getIndex();
 		int to = (int) hoveredNode.getRightLeaf().getIndex();
-		ticker.setText("Subtree Ave");
+		ticker.setText("Subtree Average:");
 		ticker.setValue( dataModel.getDataMatrix().getColAverage(from, to));
 	}
 	
