@@ -449,10 +449,14 @@ public class GUIFactory {
 			final InputStream input = classLoader
 					.getResourceAsStream(iconFileName + iconType);
 
-			img = ImageIO.read(input);
-
-			input.close();
-
+			// generate default img (gray square)
+			if(input == null) {
+				img = new BufferedImage(20, 20, BufferedImage.TYPE_BYTE_GRAY);
+			} else {
+				img = ImageIO.read(input);
+				input.close();
+			}
+			
 		} catch (final IOException ex) {
 			LogBuffer.logException(ex);
 		}
