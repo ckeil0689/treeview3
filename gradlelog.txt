@@ -1,5 +1,0 @@
-:compileJava FAILED
-
-BUILD FAILED
-
-Total time: 4.985 secs
