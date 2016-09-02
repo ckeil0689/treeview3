@@ -11,7 +11,12 @@ LinkedView/doc/JTVProgrammerGuide/JTVProgrammerGuide.fo
 LinkedView/doc/JTVUserManual/JTVUserManual.fo
 LinkedView/docbook
 *.pdf
+
+# Gradle
+.gradle/*
 build/classes/*
+
+# Preferences
 prefs.xml
 *.swp
 
@@ -19,6 +24,7 @@ prefs.xml
 .DS_Store
 
 # Eclipse stuff
+.project
 .settings
 .metadata
 /bin/
