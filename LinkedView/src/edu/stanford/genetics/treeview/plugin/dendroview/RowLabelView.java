@@ -202,6 +202,7 @@ public class RowLabelView extends LabelView {
 	@Override
 	protected void setDataTickerValue(MouseEvent e) {
 		int rowIdx = getPrimaryHoverIndex(e);
-		ticker.setValue( dataModel.getDataMatrix().getRowAverage(rowIdx, rowIdx) + " [row ave]");
+		ticker.setText("Row Average:");
+		ticker.setValue( dataModel.getDataMatrix().getRowAverage(rowIdx, rowIdx));
 	}
 }

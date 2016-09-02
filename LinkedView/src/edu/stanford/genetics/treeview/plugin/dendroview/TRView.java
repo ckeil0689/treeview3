@@ -993,7 +993,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * Rounding off to 4 decimals
 	 */
 	private void setMeanDataTickerValue() {
-		ticker.setValue( dataModel.getDataMatrix().getMean() + " [matrix ave]");
+		ticker.setText("Data Average:");
+		ticker.setValue( dataModel.getDataMatrix().getMean());
 	}
 
 	@Override

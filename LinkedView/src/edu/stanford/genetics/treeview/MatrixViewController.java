@@ -941,7 +941,7 @@ ConfigNodePersistent, Controller {
 	 * DataModel.NAN otherwise.
 	 */
 	public void setDataValueAt(final int rowIdx, final int colIdx) {
-		
+		ticker.setText("Data Value:");
 		ticker.setValue(model.getDataMatrix().getValue(colIdx, rowIdx));
 	}
 	
@@ -949,7 +949,8 @@ ConfigNodePersistent, Controller {
 	 * Rounding off to 4 decimals
 	 */
 	public void setMeanDataValue() {
-		ticker.setValue( model.getDataMatrix().getMean() + " [matrix ave]");
+		ticker.setText("Data Average:");
+		ticker.setValue( model.getDataMatrix().getMean());
 	}
 	
 	/**

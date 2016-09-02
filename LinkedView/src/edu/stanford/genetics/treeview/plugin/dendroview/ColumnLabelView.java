@@ -205,6 +205,7 @@ public class ColumnLabelView extends LabelView {
 	@Override
 	protected void setDataTickerValue(MouseEvent e) {
 		int colIdx = getPrimaryHoverIndex(e);
-		ticker.setValue( dataModel.getDataMatrix().getColAverage(colIdx, colIdx) + " [Column ave]");
+		ticker.setText("Column Average:");
+		ticker.setValue( dataModel.getDataMatrix().getColAverage(colIdx, colIdx));
 	}
 }
