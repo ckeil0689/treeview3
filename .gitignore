@@ -13,7 +13,7 @@ LinkedView/docbook
 *.pdf
 
 # Gradle
-.gradle/*
+.gradle
 build/classes/*
 
 # Preferences
