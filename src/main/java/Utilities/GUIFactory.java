@@ -451,6 +451,7 @@ public class GUIFactory {
 
 			// generate default img (gray square)
 			if(input == null) {
+				LogBuffer.println("Could not load icon: " + iconFileName + iconType);
 				img = new BufferedImage(20, 20, BufferedImage.TYPE_BYTE_GRAY);
 			} else {
 				img = ImageIO.read(input);

@@ -6,14 +6,11 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 
-import javax.imageio.ImageIO;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import edu.stanford.genetics.treeview.LogBuffer;
+import Utilities.GUIFactory;
 
 public class DragBarUI extends BasicSplitPaneUI {
 
@@ -52,33 +49,8 @@ public class DragBarUI extends BasicSplitPaneUI {
 
 			super(ui);
 
-			/* TempImg to avoid issues when loading fails */
-			BufferedImage tempImg;
-			BufferedImage tempLight;
-
-			try {
-				final ClassLoader classLoader = Thread.currentThread()
-						.getContextClassLoader();
-
-				InputStream input = classLoader.getResourceAsStream(dragbarID);
-				tempImg = ImageIO.read(input);
-				input.close();
-
-				input = classLoader.getResourceAsStream(dragbarID_light);
-				tempLight = ImageIO.read(input);
-				input.close();
-
-			} catch (IOException e) {
-				tempImg = new BufferedImage(10, 10,
-						BufferedImage.TYPE_3BYTE_BGR);
-				tempLight = new BufferedImage(10, 10,
-						BufferedImage.TYPE_3BYTE_BGR);
-				LogBuffer.println("Could not load dragbar icon.");
-				LogBuffer.logException(e);
-			}
-
-			this.img_dark = tempImg;
-			this.img_light = tempLight;
+			this.img_dark = GUIFactory.getIconImage(dragbarID);
+			this.img_light = GUIFactory.getIconImage(dragbarID_light);
 
 			this.img = img_light;
 
