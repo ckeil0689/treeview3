@@ -3,7 +3,7 @@ apply plugin: 'eclipse'
 
 defaultTasks "clean", "fatJar", "eclipse"
 
-version = '0.4.0'
+version = '0.4.0-SNAPSHOT'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
@@ -26,6 +26,8 @@ sourceSets {
   main {
     java {
       srcDir 'src/main/java/LinkedView/src/'
+
+      // Deprecated files excluded from build path - check if removal makes sense!
       exclude '**/edu/stanford/genetics/treeview/model/FlatFileParser2.java'
       exclude '**/edu/stanford/genetics/treeview/reg/**'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/DendroView_Deprec.java'
