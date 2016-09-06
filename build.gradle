@@ -70,7 +70,9 @@ task fatJar(type: Jar) {
 def getVersionName() {
     def stdout = new ByteArrayOutputStream()
     exec {
-        commandLine 'git', 'describe', '--tags'
+       // might be useful for later version management
+       // commandLine 'git', 'describe', '--tags'
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
         standardOutput = stdout
     }
     return stdout.toString().trim()
