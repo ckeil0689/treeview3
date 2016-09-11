@@ -21,7 +21,7 @@ import edu.stanford.genetics.treeview.core.PluginManager;
 
 public class AlignmentFactory extends PluginFactory {
 
-	private LabelInfo rowHI;
+	private LabelInfo rowLabelI;
 
 	static {
 		PluginManager.registerPlugin(new AlignmentFactory());
@@ -75,7 +75,7 @@ public class AlignmentFactory extends PluginFactory {
 	public boolean configurePlugin(final Preferences node,
 			final ViewFrame viewFrame) {
 
-		if (rowHI.getIndex("ALN") < 0) {
+		if (rowLabelI.getIndex("ALN") < 0) {
 			JOptionPane.showMessageDialog(viewFrame.getAppFrame(),
 					new JTextArea("Cannot find aligned sequence.\n"
 							+ "Please put aligned sequence in column "
@@ -87,9 +87,9 @@ public class AlignmentFactory extends PluginFactory {
 		return true;
 	}
 
-	public void setRowHeaderInfo(final LabelInfo rowHI) {
+	public void setRowLabelInfo(final LabelInfo rowLabelI) {
 
-		this.rowHI = rowHI;
+		this.rowLabelI = rowLabelI;
 	}
 
 }
