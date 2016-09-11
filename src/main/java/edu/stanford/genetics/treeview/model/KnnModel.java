@@ -107,15 +107,6 @@ public class KnnModel extends TVModel implements DataModel {
 				"gweight  = " + gweightFound, "aid  = " + aidFound,
 				"gid  = " + gidFound };
 
-		/*
-		 * Enumeration e = genePrefix.elements(); msg += "GPREFIX: " +
-		 * e.nextElement(); for (; e.hasMoreElements() ;) { msg += " " +
-		 * e.nextElement(); }
-		 * 
-		 * e = aHeaders.elements(); msg += "\naHeaders: " + e.nextElement(); for
-		 * (; e.hasMoreElements() ;) { msg += ":" + e.nextElement(); }
-		 */
-
 		return msg;
 	}
 

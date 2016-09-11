@@ -403,7 +403,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	}
 
 	/**
-	 * Reads the label prefixes and headers from the data and stores the data in
+	 * Reads the label prefixes and labels from the data and stores the data in
 	 * the TVModel.
 	 *
 	 * @param stringLabels

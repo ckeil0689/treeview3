@@ -97,21 +97,21 @@ public class DataModelWriter {
 	}
 
 	/**
-	 * write out HeaderInfo of tree to file
+	 * write out LabelInfo of tree to file
 	 *
-	 * @param info
-	 *            HeaderInfo to write out
+	 * @param labelInfo
+	 *            LabelInfo to write out
 	 * @param filePath
 	 *            complete path of file to write to
 	 */
-	private boolean writeTree(final LabelInfo info, final String file) {
-		final LabelInfoWriter writer = new LabelInfoWriter(info);
+	private boolean writeTree(final LabelInfo labelInfo, final String file) {
+		final LabelInfoWriter writer = new LabelInfoWriter(labelInfo);
 		try {
 			final String spool = file + ".spool";
 			writer.write(spool);
 			final File f = new File(spool);
 			if (f.renameTo(new File(file))) {
-				info.setModified(false);
+				labelInfo.setModified(false);
 			}
 			return true;
 		} catch (final IOException e) {

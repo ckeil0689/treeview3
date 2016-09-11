@@ -13,17 +13,17 @@ import java.io.IOException;
 import edu.stanford.genetics.treeview.LabelInfo;
 
 /**
- * class that write out header info to flat file.
+ * class that write out label info to flat file.
  */
 public class LabelInfoWriter {
-	private final LabelInfo headerInfo;
+	private final LabelInfo labelInfo;
 
 	/**
-	 * @param atrHeaderInfo
-	 *            headerInfo to write out
+	 * @param atrLabelInfo
+	 *            labelInfo to write out
 	 */
-	public LabelInfoWriter(final LabelInfo atrHeaderInfo) {
-		headerInfo = atrHeaderInfo;
+	public LabelInfoWriter(final LabelInfo atrLabelInfo) {
+		labelInfo = atrLabelInfo;
 	}
 
 	/**
@@ -35,26 +35,26 @@ public class LabelInfoWriter {
 		FileWriter out = null;
 		try {
 			out = new FileWriter(atr);
-			// first, the header.
-			final String[] names = headerInfo.getPrefixes();
-			if (names.length > 0) {
-				out.write(names[0]);
+			// first, the prefix.
+			final String[] prefixes = labelInfo.getPrefixes();
+			if (prefixes.length > 0) {
+				out.write(prefixes[0]);
 			}
-			for (int i = 1; i < names.length; i++) {
+			for (int i = 1; i < prefixes.length; i++) {
 				out.write("\t");
-				out.write(names[i]);
+				out.write(prefixes[i]);
 			}
 			out.write("\n");
-			final int rows = headerInfo.getNumLabels();
+			final int rows = labelInfo.getNumLabels();
 			for (int row = 0; row < rows; row++) {
-				final String[] headers = headerInfo.getLabels(row);
-				if (headers.length > 0) {
-					out.write(headers[0]);
+				final String[] labels = labelInfo.getLabels(row);
+				if (labels.length > 0) {
+					out.write(labels[0]);
 				}
-				for (int i = 1; i < headers.length; i++) {
+				for (int i = 1; i < labels.length; i++) {
 					out.write("\t");
-					if (headers[i] != null) {
-						out.write(headers[i]);
+					if (labels[i] != null) {
+						out.write(labels[i]);
 					}
 				}
 				out.write("\n");
