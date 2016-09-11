@@ -152,7 +152,7 @@ public class ColumnLabelView extends LabelView {
 	public void update(final Observable o, final Object arg) {
 		if(o == map ||                                   //location changed
 			o == drawSelection || o == otherSelection || //selection change
-			o == headerSummary) {                        //annotation change
+			o == labelSummary) {                        //annotation change
 			selectionChanged();
 		} else {
 			LogBuffer.println("Warning: LabelView got funny update!");

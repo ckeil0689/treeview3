@@ -8,7 +8,7 @@ package edu.stanford.genetics.treeview;
 
 import java.util.Observer;
 
-public class DummyHeaderInfo implements LabelInfo {
+public class DummyLabelInfo implements LabelInfo {
 	String[] header1 = new String[] { "Bob1", "Alice1" };
 	String[] header2 = new String[] { "Bob2", "Alice2" };
 	String[] header3 = new String[] { "Bob3", "Alice3" };

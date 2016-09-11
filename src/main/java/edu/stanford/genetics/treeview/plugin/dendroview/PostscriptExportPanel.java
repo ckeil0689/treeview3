@@ -40,12 +40,12 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 	}
 
 	@Override
-	protected Font getGeneFont() {
+	protected Font getRowFont() {
 		return new Font("Courier", 0, 8);
 	}
 
 	@Override
-	protected Font getArrayFont() {
+	protected Font getColFont() {
 		return new Font("Courier", 0, 8);
 	}
 
@@ -144,14 +144,14 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 				ps.println(getGtrWidth() + " 0 translate");
 			}
 
-			final int yoff = getYmapPixel(minGene() - 0.5);
+			final int yoff = getYmapPixel(minRow() - 0.5);
 			final int xoff = -getXmapPixel(minArray() - 0.5);
 			ps.println("% account for offset into data matrix");
 			ps.println(xoff + " " + yoff + " translate");
 			// HACK doesn't account for discontinuous selection...
 			// for each row...
-			for (int i = minGene(); i <= maxGene(); i++) {
-				final int maxArray = maxArray(); // for efficiency...
+			for (int i = minRow(); i <= maxRow(); i++) {
+				final int maxArray = maxCol(); // for efficiency...
 				for (int j = minArray(); j <= maxArray; j++) {
 					final Color color = getArrayDrawer().getColor(j, i);
 					// setcolor
@@ -178,9 +178,9 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 
 		private void writeGeneNames(final PrintStream ps) {
 			// translate over
-			if (getGeneAnnoLength() <= 0)
+			if (getRowAnnoLength() <= 0)
 				return;
-			if (includeArrayMap()) {
+			if (includeColMap()) {
 				ps.println(getXmapWidth() + " 0 translate");
 			}
 			if (includeGtr()) {
@@ -193,19 +193,19 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 			ps.println("8 scalefont");
 			ps.println("setfont");
 
-			final int yoff = getYmapPixel(minGene() - 0.5);
+			final int yoff = getYmapPixel(minRow() - 0.5);
 			final int xoff = 0;
 			ps.println("% account for offset into data matrix");
 			ps.println(xoff + " " + yoff + " translate");
 			final int height = (int) getYmapHeight();
-			final int maxGene = maxGene();
+			final int maxGene = maxRow();
 
-			for (int j = minGene(); j <= maxGene; j++) {
-				final Color bgColor = getGeneBgColor(j);
+			for (int j = minRow(); j <= maxGene; j++) {
+				final Color bgColor = getRowBgColor(j);
 				if (bgColor != null) {
 					final int lx = 0;
 					final int ly = getYmapPixel(j - 0.5);
-					final int ux = getGeneAnnoLength();
+					final int ux = getRowAnnoLength();
 					final int uy = getYmapPixel(j + 0.5);
 					ps.println(convertColor(bgColor) + " sr");
 					// ps.println("0 " + (height - uy) + " moveto");
@@ -218,10 +218,10 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 				}
 			}
 
-			for (int j = minGene(); j <= maxGene; j++) {
+			for (int j = minRow(); j <= maxGene; j++) {
 				final int uy = getYmapPixel(j + 0.25);
-				final String out = getGeneAnno(j);
-				final Color fgColor = getGeneFgColor(j);
+				final String out = getRowAnno(j);
+				final Color fgColor = getRowFgColor(j);
 				if (out != null) {
 					if (fgColor != null) {
 						ps.println(convertColor(fgColor) + " sr");
@@ -238,20 +238,20 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 			if (includeGtr()) {
 				ps.println(-getGtrWidth() + " 0 translate");
 			}
-			if (includeArrayMap()) {
+			if (includeColMap()) {
 				ps.println(-getXmapWidth() + " 0 translate");
 			}
 		}
 
 		private void writeArrayNames(final PrintStream ps) {
-			if (getArrayAnnoLength() <= 0)
+			if (getColAnnoLength() <= 0)
 				return;
 			int tHeight = 0;
 			int tWidth = 0;
-			if (includeGeneMap()) {
+			if (includeRowMap()) {
 				tHeight += getYmapHeight();
 			}
-			if (includeAtr() && (getArrayAnnoInside() == false)) {
+			if (includeAtr() && (getColAnnoInside() == false)) {
 				tHeight += getAtrHeight();
 			}
 			if (includeGtr()) {
@@ -270,14 +270,14 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 			ps.println("8 scalefont");
 			ps.println("setfont");
 			ps.println("90 rotate");
-			final int max = maxArray();
+			final int max = maxCol();
 
 			for (int j = minArray(); j <= max; j++) {
-				final Color bgColor = getArrayBgColor(j);
+				final Color bgColor = getColBgColor(j);
 				if (bgColor != null) {
 					final int lx = 0;
 					final int ly = getXmapPixel(j - 0.5);
-					final int ux = getArrayAnnoLength();
+					final int ux = getColAnnoLength();
 					final int uy = getXmapPixel(j + 0.5);
 					ps.println(convertColor(bgColor) + " sr");
 					// ps.println("0 " + (-uy) + " moveto");
@@ -292,8 +292,8 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 
 			for (int i = minArray(); i <= max; i++) {
 				final int ux = getXmapPixel(i + 0.25);
-				final String out = getArrayAnno(i);
-				final Color color = getArrayFgColor(i);
+				final String out = getColAnno(i);
+				final Color color = getColFgColor(i);
 				if (out != null) {
 					if (color != null) {
 						ps.println(convertColor(color) + " sr");
@@ -346,16 +346,16 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 		private void writeGTR(final PrintStream ps) {
 			if (includeGtr() == false)
 				return;
-			corrGTR = getMinGeneCorr();
+			corrGTR = getMinRowCorr();
 			scaleGTR = (getGtrWidth() - offsetGTR) / (1.0 - corrGTR);
 
 			ps.println((offsetGTR / 2) + " 0 translate");
 
-			final int yoff = getYmapPixel(minGene() - 0.5);
+			final int yoff = getYmapPixel(minRow() - 0.5);
 			final int xoff = 0;
 			ps.println("% account for offset into data matrix");
 			ps.println(xoff + " " + yoff + " translate");
-			interateGTR(ps, getGeneNode());
+			interateGTR(ps, getRowNode());
 			ps.println(convertColor(Color.black) + " sr");
 			ps.println((-xoff) + " " + (-yoff) + " translate");
 
@@ -369,18 +369,18 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 		private void writeATR(final PrintStream ps) {
 			if (includeAtr() == false)
 				return;
-			corrATR = getMinArrayCorr();
+			corrATR = getMinColCorr();
 			scaleATR = (getAtrHeight() - offsetATR) / (1.0 - corrATR);
 			int widthOffset = 0;
 			int heightOffset = 0;
 			if (includeGtr()) {
 				widthOffset += getGtrWidth();
 			}
-			if (includeGeneMap()) {
+			if (includeRowMap()) {
 				heightOffset += getYmapHeight();
 			}
-			if (getArrayAnnoInside()) {
-				heightOffset += getArrayAnnoLength();
+			if (getColAnnoInside()) {
+				heightOffset += getColAnnoLength();
 			}
 
 			ps.println(widthOffset + " " + (heightOffset - offsetATR / 2)
@@ -390,7 +390,7 @@ public class PostscriptExportPanel extends ExportPanel implements SettingsPanel 
 			final int yoff = 0;
 			ps.println("% account for offset into data matrix");
 			ps.println(xoff + " " + yoff + " translate");
-			recurseATR(ps, getArrayNode());
+			recurseATR(ps, getColNode());
 			ps.println(convertColor(Color.black) + " sr");
 
 			ps.println((-xoff) + " " + (-yoff) + " translate");

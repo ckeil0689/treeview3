@@ -74,7 +74,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/* Required label data */
 	protected LabelInfo headerInfo;
-	protected LabelSummary headerSummary;
+	protected LabelSummary labelSummary;
 
 	/* Maps label position to GlobalView */
 	protected MapContainer map;
@@ -353,8 +353,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		this.secondaryPaneSize     = -1;
 		this.secondaryViewportSize = -1;
 		
-		if(headerSummary != null) {
-			headerSummary.resetDefaults();
+		if(labelSummary != null) {
+			labelSummary.resetDefaults();
 		}
 	}
 
@@ -403,13 +403,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		
 		this.headerInfo = headerInfo;
 		
-		if(headerSummary == null) {
+		if(labelSummary == null) {
 			LogBuffer.println("Could not update headers for headerSummary"
 					+ " in " + getName());
 			return;
 		}
 		
-		headerSummary.setPrefixes(headerInfo.getPrefixes());
+		labelSummary.setPrefixes(headerInfo.getPrefixes());
 	}
 
 	public LabelInfo getHeaderInfo() {
@@ -417,12 +417,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	public void setHeaderSummary(final LabelSummary newHeaderSummary) {
-		this.headerSummary = newHeaderSummary;
-		headerSummary.addObserver(this);
+		this.labelSummary = newHeaderSummary;
+		labelSummary.addObserver(this);
 	}
 
 	public LabelSummary getLabelSummary() {
-		return headerSummary;
+		return labelSummary;
 	}
 
 	public void setUrlExtractor(final UrlExtractor urlExtractor) {
@@ -492,12 +492,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		
 		resetSecondaryScroll();
 		
-		if(headerSummary == null) {
+		if(labelSummary == null) {
 			LogBuffer.println("Could not restore headerSummary state.");
 			return;
 		}
 		
-		headerSummary.requestStoredState();
+		labelSummary.requestStoredState();
 	}
 	
 	@Override
@@ -1115,7 +1115,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//where the mouse is
 		for(int j = getPrimaryHoverIndex();j >= start;j--) {
 			try {
-				String out = headerSummary.getSummary(headerInfo,j);
+				String out = labelSummary.getSummary(headerInfo,j);
 				final String[] headers = headerInfo.getLabels(j);
 
 				if(out == null) {
@@ -1224,7 +1224,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		g2d.setFont(new Font(face,style,size));
 		for(int j = getPrimaryHoverIndex() + 1;j <= end;j++) {
 			try {
-				String out = headerSummary.getSummary(headerInfo,j);
+				String out = labelSummary.getSummary(headerInfo,j);
 				final String[] headers = headerInfo.getLabels(j);
 
 				if(out == null) {
@@ -1428,7 +1428,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			debug("Getting data index [" + j + "]",1);
 
 			try {
-				String out = headerSummary.getSummary(headerInfo,j);
+				String out = labelSummary.getSummary(headerInfo,j);
 				final String[] headers = headerInfo.getLabels(j);
 
 				if(out == null) {
@@ -1864,7 +1864,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//position and there exists a longer label elsewhere
 		if((longest_str_index > -1 && longest_str_index > map.getMaxIndex()) ||
 			longest_str == null ||
-			!longest_str.equals(headerSummary.getSummary(headerInfo,
+			!longest_str.equals(labelSummary.getSummary(headerInfo,
 				longest_str_index))) {
 
 			longest_str_index = -1;
@@ -1875,11 +1875,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//longest string
 		if(lastDrawnFace == face   && lastDrawnStyle == style &&
 			longest_str_index > -1 && lastDrawnSize == size   &&
-			longest_str.equals(headerSummary.getSummary(headerInfo,
+			longest_str.equals(labelSummary.getSummary(headerInfo,
 				longest_str_index))) {
 
 			debug("Regurgitating maxstrlen",1);
-			maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
+			maxStr = labelSummary.getSummary(headerInfo,longest_str_index);
 			maxStrLen = longest_str_length;
 			debug("Everything fontwise is the same, including size [" + size +
 				"]. returning saved maxStrLen [" + maxStrLen + "]",18);
@@ -1888,11 +1888,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//string's length
 		else if(lastDrawnFace == face && lastDrawnStyle == style &&
 			longest_str_index > -1    && lastDrawnSize != size   &&
-			longest_str.equals(headerSummary.getSummary(headerInfo,
+			longest_str.equals(labelSummary.getSummary(headerInfo,
 				longest_str_index))) {
 
 			debug("Refining maxstrlen",1);
-			maxStr = headerSummary.getSummary(headerInfo,longest_str_index);
+			maxStr = labelSummary.getSummary(headerInfo,longest_str_index);
 			maxStrLen = metrics.stringWidth(maxStr);
 			debug("Font size only changed. Recalculating length of longest " +
 				"string [" + maxStr + "] & returning maxStrLen [" +
@@ -1912,7 +1912,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				longest_str_index + "))]",18);
 			for(int j = 0;j <= end;j++) {
 				try {
-					String out = headerSummary.getSummary(headerInfo,j);
+					String out = labelSummary.getSummary(headerInfo,j);
 
 					if(out == null) {
 						out = "No Label";

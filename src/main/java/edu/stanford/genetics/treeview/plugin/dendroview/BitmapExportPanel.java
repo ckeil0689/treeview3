@@ -41,29 +41,29 @@ public class BitmapExportPanel extends ExportPanel implements SettingsPanel {
 	/**
 	 * Default is no char data.
 	 */
-	public BitmapExportPanel(final LabelInfo arrayHeaderInfo,
-			final LabelInfo geneHeaderInfo,
-			final TreeSelectionI geneSelection,
-			final TreeSelectionI arraySelection,
-			final TreePainter arrayTreeDrawer,
-			final TreePainter geneTreeDrawer, final ArrayDrawer arrayDrawer,
-			final MapContainer arrayMap, final MapContainer geneMap) {
-		this(arrayHeaderInfo, geneHeaderInfo, geneSelection, arraySelection,
-				arrayTreeDrawer, geneTreeDrawer, arrayDrawer, arrayMap,
-				geneMap, false);
+	public BitmapExportPanel(final LabelInfo colLabelInfo,
+			final LabelInfo rowLabelInfo,
+			final TreeSelectionI rowSelection,
+			final TreeSelectionI colSelection,
+			final TreePainter colTreeDrawer,
+			final TreePainter rowTreeDrawer, final ArrayDrawer arrayDrawer,
+			final MapContainer colMap, final MapContainer rowMap) {
+		this(colLabelInfo, rowLabelInfo, rowSelection, colSelection,
+				colTreeDrawer, rowTreeDrawer, arrayDrawer, colMap,
+				rowMap, false);
 	}
 
-	public BitmapExportPanel(final LabelInfo arrayHeaderInfo,
-			final LabelInfo geneHeaderInfo,
-			final TreeSelectionI geneSelection,
-			final TreeSelectionI arraySelection,
-			final TreePainter arrayTreeDrawer,
-			final TreePainter geneTreeDrawer, final ArrayDrawer arrayDrawer,
-			final MapContainer arrayMap, final MapContainer geneMap,
+	public BitmapExportPanel(final LabelInfo colLabelInfo,
+			final LabelInfo rowLabelInfo,
+			final TreeSelectionI rowSelection,
+			final TreeSelectionI colSelection,
+			final TreePainter colTreeDrawer,
+			final TreePainter rowTreeDrawer, final ArrayDrawer arrayDrawer,
+			final MapContainer colMap, final MapContainer rowMap,
 			final boolean hasChar) {
-		super(arrayHeaderInfo, geneHeaderInfo, geneSelection, arraySelection,
-				arrayTreeDrawer, geneTreeDrawer, arrayDrawer, arrayMap,
-				geneMap, hasChar);
+		super(colLabelInfo, rowLabelInfo, rowSelection, colSelection,
+				colTreeDrawer, rowTreeDrawer, arrayDrawer, colMap,
+				rowMap, hasChar);
 		final JPanel holder = new JPanel();
 		final JCheckBox appendExt = new JCheckBox("Append Extension?", true);
 		formatPulldown.addActionListener(new ActionListener() {

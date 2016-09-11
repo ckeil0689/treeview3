@@ -11,8 +11,8 @@ public class DendroviewArgs {
 	private String sResource;
 	private String sExportType;
 	private String[] remaining;
-	private int[] arrayHeaders = null;
-	private int[] geneHeaders = null;
+	private int[] colLabels = null;
+	private int[] rowLabels = null;
 	private Double xScale = null;
 	private Double yScale = null;
 	private Double dContrast;
@@ -24,8 +24,8 @@ public class DendroviewArgs {
 	final private CmdLineParser.Option filePath;
 	final private CmdLineParser.Option exportType;
 	final private CmdLineParser.Option scaling;
-	final private CmdLineParser.Option aHeaders;
-	final private CmdLineParser.Option gHeaders;
+	final private CmdLineParser.Option cLabels;
+	final private CmdLineParser.Option rLabels;
 	final private CmdLineParser.Option contrast;
 	final private CmdLineParser.Option atrHeight;
 	final private CmdLineParser.Option gtrWidth;
@@ -37,8 +37,8 @@ public class DendroviewArgs {
 		filePath = parser.addStringOption('o', "output");
 		exportType = parser.addStringOption('f', "format");
 		scaling = parser.addStringOption('s', "scaling");
-		aHeaders = parser.addStringOption('a', "arrayHeaders");
-		gHeaders = parser.addStringOption('g', "geneHeaders");
+		cLabels = parser.addStringOption('a', "arrayHeaders");
+		rLabels = parser.addStringOption('g', "geneHeaders");
 		contrast = parser.addDoubleOption('c', "contrast");
 		atrHeight = parser.addDoubleOption('h', "atrHeight");
 		gtrWidth = parser.addDoubleOption('w', "gtrWidth");
@@ -55,9 +55,9 @@ public class DendroviewArgs {
 					defaultType);
 			parseScaling((String) parser.getOptionValue(scaling, null));
 			remaining = parser.getRemainingArgs();
-			arrayHeaders = parseHeaders((String) parser.getOptionValue(
-					aHeaders, null));
-			geneHeaders = parseHeaders((String) parser.getOptionValue(gHeaders,
+			colLabels = parseLabels((String) parser.getOptionValue(
+					cLabels, null));
+			rowLabels = parseLabels((String) parser.getOptionValue(rLabels,
 					null));
 			dContrast = (Double) parser.getOptionValue(contrast, null);
 			dAtrHeight = (Double) parser.getOptionValue(atrHeight, null);
@@ -89,7 +89,7 @@ public class DendroviewArgs {
 
 	private static int[] emptyIntArray = new int[0];
 
-	private int[] parseHeaders(final String optionValue) {
+	private int[] parseLabels(final String optionValue) {
 		if (optionValue == null)
 			return emptyIntArray;
 		final String[] numbers = optionValue.split(",");
@@ -138,15 +138,15 @@ public class DendroviewArgs {
 						+ ": string indicating pixel scaling, i.e. 10x2 for 10 pixels horizontal, 2 vertical.");
 		System.err
 				.println(" -"
-						+ aHeaders.shortForm()
+						+ cLabels.shortForm()
 						+ "/--"
-						+ aHeaders.longForm()
+						+ cLabels.longForm()
 						+ ": comma separated list of array headers to include (default is none).");
 		System.err
 				.println(" -"
-						+ gHeaders.shortForm()
+						+ rLabels.shortForm()
 						+ "/--"
-						+ gHeaders.longForm()
+						+ rLabels.longForm()
 						+ ": comma separated list of gene headers to include (default is none).");
 		System.err.println(" -" + atrHeight.shortForm() + "/--"
 				+ atrHeight.longForm()
@@ -183,12 +183,12 @@ public class DendroviewArgs {
 		return sExportType;
 	}
 
-	public int[] getArrayHeaders() {
-		return arrayHeaders;
+	public int[] getColLabels() {
+		return colLabels;
 	}
 
-	public int[] getGeneHeaders() {
-		return geneHeaders;
+	public int[] getRowLabels() {
+		return rowLabels;
 	}
 
 	public Double getXScale() {

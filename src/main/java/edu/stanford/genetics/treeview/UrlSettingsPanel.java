@@ -75,7 +75,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 
 		final UrlPresets p = new UrlPresets("UrlSettingsPanel");
 		p.setConfigNode(null);
-		final LabelInfo hi = new DummyHeaderInfo();
+		final LabelInfo hi = new DummyLabelInfo();
 		final UrlExtractor ue = new UrlExtractor(hi);
 
 		final UrlSettingsPanel e = new UrlSettingsPanel(ue, hi, p);
