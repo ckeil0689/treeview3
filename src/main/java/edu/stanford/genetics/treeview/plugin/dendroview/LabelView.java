@@ -40,8 +40,8 @@ import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataTicker;
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LabelInfo;
+import edu.stanford.genetics.treeview.LabelSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -73,8 +73,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	protected DataTicker ticker;
 
 	/* Required label data */
-	protected HeaderInfo headerInfo;
-	protected HeaderSummary headerSummary;
+	protected LabelInfo headerInfo;
+	protected LabelSummary headerSummary;
 
 	/* Maps label position to GlobalView */
 	protected MapContainer map;
@@ -174,7 +174,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		setLayout(new MigLayout());
 
-		setHeaderSummary(new HeaderSummary(getSummaryName()));
+		setHeaderSummary(new LabelSummary(getSummaryName()));
 
 		//this.urlExtractor = uExtractor;
 
@@ -399,7 +399,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		repaint();
 	}
 
-	public void setHeaderInfo(final HeaderInfo headerInfo) {
+	public void setLabelInfo(final LabelInfo headerInfo) {
 		
 		this.headerInfo = headerInfo;
 		
@@ -409,19 +409,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			return;
 		}
 		
-		headerSummary.setHeaders(headerInfo.getNames());
+		headerSummary.setPrefixes(headerInfo.getPrefixes());
 	}
 
-	public HeaderInfo getHeaderInfo() {
+	public LabelInfo getHeaderInfo() {
 		return headerInfo;
 	}
 
-	public void setHeaderSummary(final HeaderSummary newHeaderSummary) {
+	public void setHeaderSummary(final LabelSummary newHeaderSummary) {
 		this.headerSummary = newHeaderSummary;
 		headerSummary.addObserver(this);
 	}
 
-	public HeaderSummary getHeaderSummary() {
+	public LabelSummary getLabelSummary() {
 		return headerSummary;
 	}
 
@@ -464,7 +464,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 		
 		this.configNode = parentNode;
-		getHeaderSummary().setConfigNode(configNode);
+		getLabelSummary().setConfigNode(configNode);
 	}
 	
 	@Override
@@ -551,7 +551,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				summaryNode = null;
 			}
 			
-			getHeaderSummary().importStateFrom(summaryNode);
+			getLabelSummary().importStateFrom(summaryNode);
 			
 		} catch (BackingStoreException e) {
 			LogBuffer.logException(e);
@@ -1116,7 +1116,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		for(int j = getPrimaryHoverIndex();j >= start;j--) {
 			try {
 				String out = headerSummary.getSummary(headerInfo,j);
-				final String[] headers = headerInfo.getHeader(j);
+				final String[] headers = headerInfo.getLabels(j);
 
 				if(out == null) {
 					out = "No Label";
@@ -1225,7 +1225,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		for(int j = getPrimaryHoverIndex() + 1;j <= end;j++) {
 			try {
 				String out = headerSummary.getSummary(headerInfo,j);
-				final String[] headers = headerInfo.getHeader(j);
+				final String[] headers = headerInfo.getLabels(j);
 
 				if(out == null) {
 					out = "No Label";
@@ -1429,7 +1429,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			try {
 				String out = headerSummary.getSummary(headerInfo,j);
-				final String[] headers = headerInfo.getHeader(j);
+				final String[] headers = headerInfo.getLabels(j);
 
 				if(out == null) {
 					out = "No Label";
@@ -1570,12 +1570,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	public Color drawLabelBackground(final Graphics g,int j,int yPos) {
 		
-		if(j > headerInfo.getNumHeaders() - 1) {
+		if(j > headerInfo.getNumLabels() - 1) {
 			return Color.black;
 		}
 		
 		final int bgColorIndex = headerInfo.getIndex("BGCOLOR");
-		final String[] strings = headerInfo.getHeader(j);
+		final String[] strings = headerInfo.getLabels(j);
 		Color bgColor = textBGColor;
 		boolean isSelecting =
 			(map.isSelecting() &&

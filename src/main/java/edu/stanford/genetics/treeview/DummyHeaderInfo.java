@@ -8,13 +8,13 @@ package edu.stanford.genetics.treeview;
 
 import java.util.Observer;
 
-public class DummyHeaderInfo implements HeaderInfo {
+public class DummyHeaderInfo implements LabelInfo {
 	String[] header1 = new String[] { "Bob1", "Alice1" };
 	String[] header2 = new String[] { "Bob2", "Alice2" };
 	String[] header3 = new String[] { "Bob3", "Alice3" };
 
 	@Override
-	public String[] getHeader(final int i) {
+	public String[] getLabels(final int i) {
 		if (i == 1)
 			return header1;
 		if (i == 2)
@@ -30,8 +30,8 @@ public class DummyHeaderInfo implements HeaderInfo {
 	 * @return The array of header values
 	 */
 	@Override
-	public String getHeader(final int i, final String name) {
-		return (getHeader(i))[getIndex(name)];
+	public String getLabel(final int i, final String name) {
+		return (getLabels(i))[getIndex(name)];
 	}
 
 	String[] names = new String[] { "Bob", "Alice" };
@@ -42,17 +42,17 @@ public class DummyHeaderInfo implements HeaderInfo {
 	 * @return The list of names
 	 */
 	@Override
-	public String[] getNames() {
+	public String[] getPrefixes() {
 		return names;
 	}
 
 	@Override
-	public int getNumNames() {
+	public int getNumPrefixes() {
 		return names.length;
 	}
 
 	@Override
-	public int getNumHeaders() {
+	public int getNumLabels() {
 		return 3;
 	}
 
@@ -64,9 +64,9 @@ public class DummyHeaderInfo implements HeaderInfo {
 	}
 
 	@Override
-	public int getHeaderIndex(final String id) {
-		for (int i = 0; i < getNumHeaders(); i++) {
-			if ((getHeader(i)[0]).equals(id))
+	public int getLabelIndex(final String id) {
+		for (int i = 0; i < getNumLabels(); i++) {
+			if ((getLabels(i)[0]).equals(id))
 				return i;
 		}
 		return -1;
@@ -84,12 +84,12 @@ public class DummyHeaderInfo implements HeaderInfo {
 	}
 
 	@Override
-	public boolean addName(final String name, final int location) {
+	public boolean addPrefix(final String name, final int location) {
 		return false;
 	}
 
 	@Override
-	public boolean setHeader(final int i, final String name, final String value) {
+	public boolean setLabel(final int i, final String name, final String value) {
 		return false;
 	}
 
@@ -108,12 +108,12 @@ public class DummyHeaderInfo implements HeaderInfo {
 	}
 
 	@Override
-	public String getHeader(final int rowIndex, final int columnIndex) {
-		return (getHeader(rowIndex))[columnIndex];
+	public String getLabel(final int rowIndex, final int columnIndex) {
+		return (getLabels(rowIndex))[columnIndex];
 	}
 
 	@Override
-	public String[][] getHeaderArray() {
+	public String[][] getLabelArray() {
 		// TODO Auto-generated method stub
 		return null;
 	}

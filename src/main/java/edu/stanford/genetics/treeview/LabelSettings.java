@@ -35,8 +35,8 @@ public class LabelSettings extends CustomDialog {
 
 	private final TreeViewFrame tvFrame;
 	private String menu;
-	private HeaderInfo rowHI;
-	private HeaderInfo colHI;
+	private LabelInfo rowHI;
+	private LabelInfo colHI;
 
 	private final DendroView dendroView;
 	private JButton okBtn;
@@ -56,7 +56,7 @@ public class LabelSettings extends CustomDialog {
 		this.dendroView = tvFrame.getDendroView();
 	}
 
-	public void setHeaderInfo(final HeaderInfo rowHI, final HeaderInfo colHI) {
+	public void setLabelInfo(final LabelInfo rowHI, final LabelInfo colHI) {
 
 		this.rowHI = rowHI;
 		this.colHI = colHI;
@@ -237,8 +237,8 @@ public class LabelSettings extends CustomDialog {
 					GUIFactory.NO_INSETS);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
-			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
-			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
+			final JLabel rows = GUIFactory.setupPrefix(StringRes.main_rows);
+			final JLabel cols = GUIFactory.setupPrefix(StringRes.main_cols);
 
 			/* Label alignment */
 			JPanel justifyPanel = GUIFactory.createJPanel(false,

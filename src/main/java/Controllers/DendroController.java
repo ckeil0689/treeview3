@@ -39,8 +39,8 @@ import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.CopyType;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LabelInfo;
+import edu.stanford.genetics.treeview.LabelSummary;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.MatrixViewController;
@@ -90,8 +90,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 	protected Preferences configNode;
 
-	private int[] arrayIndex = null;
-	private int[] geneIndex = null;
+	private int[] colIndex = null;
+	private int[] rowIndex = null;
 
 	// Drawers
 	protected ArrayDrawer arrayDrawer;
@@ -184,11 +184,11 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		/* Assign Preferences nodes to components */
 		setComponentPreferences();
 
-		updateHeaderInfo();
+		updateLabelInfo();
 		bindComponentFunctions();
 		
-		dendroView.setupSearch(tvModel.getRowHeaderInfo(),
-						tvModel.getColHeaderInfo(), interactiveXmap,
+		dendroView.setupSearch(tvModel.getRowLabelInfo(),
+						tvModel.getColLabelInfo(), interactiveXmap,
 						interactiveYmap);
 		
 		dendroView.setupLayout();
@@ -276,8 +276,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	private void setObservables() {
 
 		/* Label views */
-		dendroView.getRowLabelView().getHeaderSummary().addObserver(this);
-		dendroView.getColLabelView().getHeaderSummary().addObserver(this);
+		dendroView.getRowLabelView().getLabelSummary().addObserver(this);
+		dendroView.getColLabelView().getLabelSummary().addObserver(this);
 
 		/* MapContainers */
 		interactiveXmap.addObserver(this);
@@ -783,30 +783,30 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	public void setKMeansIndexes() {
 
-		if (tvModel.getColHeaderInfo().getIndex("GROUP") != -1) {
-			final HeaderInfo headerInfo = tvModel.getColHeaderInfo();
-			final int groupIndex = headerInfo.getIndex("GROUP");
+		if (tvModel.getColLabelInfo().getIndex("GROUP") != -1) {
+			final LabelInfo labelInfo = tvModel.getColLabelInfo();
+			final int groupIndex = labelInfo.getIndex("GROUP");
 
-			arrayIndex = getGroupVector(headerInfo, groupIndex);
+			colIndex = getGroupVector(labelInfo, groupIndex);
 
 		} else {
-			arrayIndex = null;
+			colIndex = null;
 		}
 
-		if (tvModel.getRowHeaderInfo().getIndex("GROUP") != -1) {
-			System.err.println("got gene group header");
-			final HeaderInfo headerInfo = tvModel.getRowHeaderInfo();
-			final int groupIndex = headerInfo.getIndex("GROUP");
-			geneIndex = getGroupVector(headerInfo, groupIndex);
+		if (tvModel.getRowLabelInfo().getIndex("GROUP") != -1) {
+			System.err.println("got gene group prefix");
+			final LabelInfo labelInfo = tvModel.getRowLabelInfo();
+			final int groupIndex = labelInfo.getIndex("GROUP");
+			rowIndex = getGroupVector(labelInfo, groupIndex);
 
 		} else {
-			geneIndex = null;
+			rowIndex = null;
 		}
 
 		// ISSUE: Needs DataModel, not TVModel. Should dataModel be used
 		// in this class rather than TVModel?
-		if ((arrayIndex != null) || (geneIndex != null)) {
-			tvModel = new ReorderedDataModel(tvModel, geneIndex, arrayIndex);
+		if ((colIndex != null) || (rowIndex != null)) {
+			tvModel = new ReorderedDataModel(tvModel, rowIndex, colIndex);
 			LogBuffer.println("DataModel issue in DendroController.");
 		}
 	}
@@ -814,32 +814,32 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	/**
 	 * Returns an array of indexes of K-Means groups.
 	 *
-	 * @param headerInfo
+	 * @param labelInfo
 	 * @param groupIndex
 	 * @return
 	 */
-	private static int[] getGroupVector(final HeaderInfo headerInfo,
+	private static int[] getGroupVector(final LabelInfo labelInfo,
 			final int groupIndex) {
 
 		int ngroup = 0;
-		String cur = headerInfo.getHeader(0, groupIndex);
+		String cur = labelInfo.getLabel(0, groupIndex);
 
-		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
+		for (int i = 0; i < labelInfo.getNumLabels(); i++) {
 
-			final String test = headerInfo.getHeader(i, groupIndex);
+			final String test = labelInfo.getLabel(i, groupIndex);
 			if (!cur.equals(test)) {
 				cur = test;
 				ngroup++;
 			}
 		}
 
-		final int[] groupVector = new int[ngroup + headerInfo.getNumHeaders()];
+		final int[] groupVector = new int[ngroup + labelInfo.getNumLabels()];
 		ngroup = 0;
-		cur = headerInfo.getHeader(0, groupIndex);
+		cur = labelInfo.getLabel(0, groupIndex);
 
-		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
+		for (int i = 0; i < labelInfo.getNumLabels(); i++) {
 
-			final String test = headerInfo.getHeader(i, groupIndex);
+			final String test = labelInfo.getLabel(i, groupIndex);
 			if (!cur.equals(test)) {
 				groupVector[i + ngroup] = -1;
 				cur = test;
@@ -875,17 +875,17 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	private void setupSelectionHandlers() {
 		
-		if (geneIndex != null) {
+		if (rowIndex != null) {
 			setRowSelection(new ReorderedTreeSelection(
-					tvFrame.getRowSelection(), geneIndex));
+					tvFrame.getRowSelection(), rowIndex));
 
 		} else {
 			setRowSelection(tvFrame.getRowSelection());
 		}
 
-		if (arrayIndex != null) {
+		if (colIndex != null) {
 			setColumnSelection(new ReorderedTreeSelection(
-					tvFrame.getColSelection(), arrayIndex));
+					tvFrame.getColSelection(), colIndex));
 
 		} else {
 			setColumnSelection(tvFrame.getColSelection());
@@ -997,12 +997,12 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	}
 
 	/**
-	 * Updates all headerInfo instances for all the label views.
+	 * Updates all LabelInfo instances for all the label views.
 	 */
-	private void updateHeaderInfo() {
+	private void updateLabelInfo() {
 
-		dendroView.getRowLabelView().setHeaderInfo(tvModel.getRowHeaderInfo());
-		dendroView.getColLabelView().setHeaderInfo(tvModel.getColHeaderInfo());
+		dendroView.getRowLabelView().setLabelInfo(tvModel.getRowLabelInfo());
+		dendroView.getColLabelView().setLabelInfo(tvModel.getColLabelInfo());
 	}
 
 	/**
@@ -1038,14 +1038,14 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	private void updateATRDrawer(final String selectedID) {
 
 		try {
-			invertedTreeDrawer.setData(tvModel.getAtrHeaderInfo(),
-					tvModel.getColHeaderInfo());
-			final HeaderInfo trHeaderInfo = tvModel.getAtrHeaderInfo();
+			invertedTreeDrawer.setData(tvModel.getAtrLabelInfo(),
+					tvModel.getColLabelInfo());
+			final LabelInfo trLabelInfo = tvModel.getAtrLabelInfo();
 
-			if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
+			if (trLabelInfo.getIndex("NODECOLOR") >= 0) {
 
-				TreeColorer.colorUsingHeader(invertedTreeDrawer.getRootNode(),
-						trHeaderInfo, trHeaderInfo.getIndex("NODECOLOR"));
+				TreeColorer.colorUsingPrefix(invertedTreeDrawer.getRootNode(),
+						trLabelInfo, trLabelInfo.getIndex("NODECOLOR"));
 			}
 		} catch (final DendroException e) {
 
@@ -1176,9 +1176,9 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			}
 
 			int[] ordering;
-			ordering = AtrAligner.align(tvModel.getAtrHeaderInfo(),
-					tvModel.getColHeaderInfo(), model.getAtrHeaderInfo(),
-					model.getColHeaderInfo());
+			ordering = AtrAligner.align(tvModel.getAtrLabelInfo(),
+					tvModel.getColLabelInfo(), model.getAtrLabelInfo(),
+					model.getColLabelInfo());
 
 			/*
 			 * System.out.print("New ordering: "); for(int i = 0; i <
@@ -1186,7 +1186,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			 * System.out.println();
 			 */
 
-			((TVModel) tvModel).reorderArrays(ordering);
+			((TVModel) tvModel).reorderColumns(ordering);
 			((TVModel) tvModel).notifyObservers();
 
 			if (selectedID != null) {
@@ -1349,14 +1349,14 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			try {
 				dendroView.getColumnTreeView().setEnabled(true);
 
-				invertedTreeDrawer.setData(tvModel.getAtrHeaderInfo(),
-						tvModel.getColHeaderInfo());
-				final HeaderInfo trHeaderInfo = tvModel.getAtrHeaderInfo();
+				invertedTreeDrawer.setData(tvModel.getAtrLabelInfo(),
+						tvModel.getColLabelInfo());
+				final LabelInfo trLabelInfo = tvModel.getAtrLabelInfo();
 
-				if (trHeaderInfo.getIndex("NODECOLOR") >= 0) {
-					TreeColorer.colorUsingHeader(
-							invertedTreeDrawer.getRootNode(), trHeaderInfo,
-							trHeaderInfo.getIndex("NODECOLOR"));
+				if (trLabelInfo.getIndex("NODECOLOR") >= 0) {
+					TreeColorer.colorUsingPrefix(
+							invertedTreeDrawer.getRootNode(), trLabelInfo,
+							trLabelInfo.getIndex("NODECOLOR"));
 				}
 
 			} catch (final DendroException e) {
@@ -1406,19 +1406,19 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			try {
 				dendroView.getRowTreeView().setEnabled(true);
 
-				leftTreeDrawer.setData(tvModel.getGtrHeaderInfo(),
-						tvModel.getRowHeaderInfo());
-				final HeaderInfo gtrHeaderInfo = tvModel.getGtrHeaderInfo();
+				leftTreeDrawer.setData(tvModel.getGtrLabelInfo(),
+						tvModel.getRowLabelInfo());
+				final LabelInfo gtrLabelInfo = tvModel.getGtrLabelInfo();
 
-				if (gtrHeaderInfo.getIndex("NODECOLOR") >= 0) {
-					TreeColorer.colorUsingHeader(leftTreeDrawer.getRootNode(),
-							tvModel.getGtrHeaderInfo(),
-							gtrHeaderInfo.getIndex("NODECOLOR"));
+				if (gtrLabelInfo.getIndex("NODECOLOR") >= 0) {
+					TreeColorer.colorUsingPrefix(leftTreeDrawer.getRootNode(),
+							tvModel.getGtrLabelInfo(),
+							gtrLabelInfo.getIndex("NODECOLOR"));
 
 				} else {
 					TreeColorer.colorUsingLeaf(leftTreeDrawer.getRootNode(),
-							tvModel.getRowHeaderInfo(), tvModel
-									.getRowHeaderInfo().getIndex("FGCOLOR"));
+							tvModel.getRowLabelInfo(), tvModel
+									.getRowLabelInfo().getIndex("FGCOLOR"));
 				}
 
 			} catch (final DendroException e) {
@@ -1568,19 +1568,19 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 	public void setNewIncluded(final int[] gIncluded, final int[] aIncluded) {
 
-		dendroView.getRowLabelView().getHeaderSummary().setIncluded(gIncluded);
-		dendroView.getColLabelView().getHeaderSummary()
+		dendroView.getRowLabelView().getLabelSummary().setIncluded(gIncluded);
+		dendroView.getColLabelView().getLabelSummary()
 				.setIncluded(aIncluded);
 	}
 
 	public int[] getColumnIncluded() {
 
-		return dendroView.getColLabelView().getHeaderSummary().getIncluded();
+		return dendroView.getColLabelView().getLabelSummary().getIncluded();
 	}
 
 	public int[] getRowIncluded() {
 
-		return dendroView.getRowLabelView().getHeaderSummary().getIncluded();
+		return dendroView.getRowLabelView().getLabelSummary().getIncluded();
 	}
 
 	public boolean hasDendroView() {
@@ -1621,7 +1621,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	@Override
 	public void update(final Observable o, final Object arg) {
 
-		if (o instanceof HeaderSummary) {
+		if (o instanceof LabelSummary) {
 			updateSearchBoxes();
 
 		} else if (o instanceof MapContainer) {
@@ -1637,8 +1637,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	private void updateSearchBoxes() {
 
-		dendroView.updateSearchTermBoxes(tvModel.getRowHeaderInfo(),
-						tvModel.getColHeaderInfo(), interactiveXmap,
+		dendroView.updateSearchTermBoxes(tvModel.getRowLabelInfo(),
+						tvModel.getColLabelInfo(), interactiveXmap,
 						interactiveYmap);
 	}
 
@@ -1716,22 +1716,22 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		}
 		
 		String labels = "";
-		HeaderSummary axisSummary;
-		HeaderInfo axisInfo;
+		LabelSummary axisSummary;
+		LabelInfo axisInfo;
 		TreeSelectionI treeSelection;
 		MapContainer map;
 		
 		if(isRows) {
 			axisSummary = tvFrame.getDendroView().getRowLabelView()
-					.getHeaderSummary();
-			axisInfo = tvModel.getRowHeaderInfo();
+					.getLabelSummary();
+			axisInfo = tvModel.getRowLabelInfo();
 			treeSelection = tvFrame.getRowSelection();
 			map = interactiveYmap;
 			
 		} else {
 			axisSummary = tvFrame.getDendroView().getColLabelView()
-					.getHeaderSummary();
-			axisInfo = tvModel.getColHeaderInfo();
+					.getLabelSummary();
+			axisInfo = tvModel.getColLabelInfo();
 			treeSelection = tvFrame.getColSelection();
 			map = interactiveXmap;
 		}
@@ -1748,7 +1748,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Construct a clipboard string from the labels according to the 
 	 * CopyType and axis.
 	 * @param axisSummary - Has the included labels.
-	 * @param axisInfo - Needed to retrieve labels from HeaderSummary.
+	 * @param axisInfo - Needed to retrieve labels from LabelSummary.
 	 * @param treeSelection - Needed for copying selected labels.
 	 * @param map - The IMV map for the specific axis. Needed to find out
 	 * which range of indices is visible.
@@ -1756,13 +1756,13 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * @param isRows - A flag which indicates the target axis.
 	 * @return A constructed string for the clipboard.
 	 */
-	private static String constructLabelString(final HeaderSummary axisSummary, 
-			final HeaderInfo axisInfo, final TreeSelectionI treeSelection, 
+	private static String constructLabelString(final LabelSummary axisSummary, 
+			final LabelInfo axisInfo, final TreeSelectionI treeSelection, 
 			final MapContainer map, final CopyType copyType, 
 			final boolean isRows) {
 		
 		String seperator = "\t";
-		int labelNum = axisInfo.getNumHeaders();
+		int labelNum = axisInfo.getNumLabels();
 		final StringBuilder sb = new StringBuilder();
 		
 		if(isRows) {

@@ -12,20 +12,20 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * this class generates a single string summary of a HeaderInfo.
+ * this class generates a single string summary of a LabelInfo.
  */
-public class HeaderSummary extends Observable 
+public class LabelSummary extends Observable 
 implements ConfigNodePersistent, ModelLoadReset {
 
 	private final int[] d_included = new int[] { 0 };
-	private final String[] d_headers = new String[]{"default"};
+	private final String[] d_prefixes = new String[]{"default"};
 	private final String type;
 	
 	private Preferences configNode;
-	private String[] headers;
+	private String[] prefixes;
 	private int[] included;
 
-	public HeaderSummary(final String type) {
+	public LabelSummary(final String type) {
 
 		super();
 		this.type = type;
@@ -36,7 +36,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 	public void resetDefaults() {
 		
 		this.included = d_included;
-		this.headers = d_headers;
+		this.prefixes = d_prefixes;
 	}
 	
 	@Override
@@ -75,17 +75,17 @@ implements ConfigNodePersistent, ModelLoadReset {
 		final int[] vec = getIncluded();
 		configNode.put("included", Arrays.toString(vec));
 		
-		if(headers == null) {
-			LogBuffer.println("Could not store headers. "
-					+ "No headers defined yet.");
+		if(prefixes == null) {
+			LogBuffer.println("Could not store label prefixes. "
+					+ "No label prefixes defined yet.");
 			return;
 		}
 		
 		final String[] names = new String[vec.length];
 		for(int i = 0; i < names.length; i++) {
 			int idx = vec[i];
-			if(idx < headers.length) {
-				names[i] = headers[idx];
+			if(idx < prefixes.length) {
+				names[i] = prefixes[idx];
 			}
 		}
 		configNode.put("includedNames", Arrays.toString(names));
@@ -133,7 +133,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 				array = adjustIncl(array);
 				setIncluded(array);
 			}
-		} else if(headers != null && headers.length > 0) {
+		} else if(prefixes != null && prefixes.length > 0) {
 			LogBuffer.println("There are headers defined but no key stored "
 					+ "for included indices. Setting a default. "
 					+ "(" + type + ")");
@@ -167,11 +167,11 @@ implements ConfigNodePersistent, ModelLoadReset {
 	 * headers is vital for ensuring label header selection consistency because
 	 * a purely index-based approach does not account for headers that moved
 	 * their position in the header list, for example after clustering.
-	 * @param headers - The current headers of a loaded file.
+	 * @param prefixes - The current headers of a loaded file.
 	 */
-	public void setHeaders(final String[] headers) {
+	public void setPrefixes(final String[] prefixes) {
 		
-		this.headers = headers;
+		this.prefixes = prefixes;
 		int[] adjustedIncluded = adjustIncl(getIncluded());
 		setIncluded(adjustedIncluded);
 		storeState();
@@ -191,17 +191,17 @@ implements ConfigNodePersistent, ModelLoadReset {
 	 * @return the best possible summary for the specified index.
 	 * If no headers are applicable, will return the empty string.
 	 */
-	public String getSummary(final HeaderInfo headerInfo, final int index) {
+	public String getSummary(final LabelInfo labelInfo, final int index) {
 
 		String[] strings = null;
 		try {
-			strings = headerInfo.getHeader(index);
+			strings = labelInfo.getLabels(index);
 
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			LogBuffer.println("index " + index
-					+ " out of bounds on headers, continuing");
+					+ " out of bounds on labels, continuing");
 			LogBuffer.println("ArrayIndexOutOfBoundsException in "
-					+ "getSummary() in HeaderSummary: " + e.getMessage());
+					+ "getSummary() in LabelSummary: " + e.getMessage());
 			return null;
 		}
 
@@ -237,15 +237,15 @@ implements ConfigNodePersistent, ModelLoadReset {
 	/**
 	 * Retrieves a String array containing the labels for all included 
 	 * headers at a certain index.
-	 * @param hI The HeaderInfo object from which to take the labels.
+	 * @param labelInfo The HeaderInfo object from which to take the labels.
 	 * @param idx The axis index of the label to be returned. 
 	 * @return A String array of labels at a defined index.
 	 */
-	public String[] getSummaryArray(final HeaderInfo hI, final int idx) {
+	public String[] getSummaryArray(final LabelInfo labelInfo, final int idx) {
 
 		String[] strings = null;
 		try {
-			strings = hI.getHeader(idx);
+			strings = labelInfo.getLabels(idx);
 
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			LogBuffer.logException(e);
@@ -315,7 +315,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 	 */
 	private int[] adjustIncl(int[] included) {
 		
-		if(headers == null) {
+		if(prefixes == null) {
 			LogBuffer.println("headers are null in " + type);
 			return new int[0];
 		}
@@ -332,8 +332,8 @@ implements ConfigNodePersistent, ModelLoadReset {
 			
 			for(int i = 0; i < inclNames.length; i++) {
 				String name = inclNames[i];
-				for(int j = 0; j < headers.length; j++) {
-					if(name.equals(headers[j])) {
+				for(int j = 0; j < prefixes.length; j++) {
+					if(name.equals(prefixes[j])) {
 						newIncluded[i] = j;
 						break;
 					}
@@ -346,7 +346,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 	        int maxSize = 0;
 	        /* Shrink if necessary */
 			for(int i = 0; i < included.length; i++) {
-				if(included[i] >= headers.length) {
+				if(included[i] >= prefixes.length) {
 					maxSize = i + 1;
 					break;
 				}
@@ -366,7 +366,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 		
 		/* Make sure to display first header as default. Note, this must
 		 * still allow the user to explicitly included nothing. */
-		if(headers.length > 0 && newIncluded.length == 0 && inclNames == null) {
+		if(prefixes.length > 0 && newIncluded.length == 0 && inclNames == null) {
 			newIncluded = new int[]{0};
 		}
 		
@@ -408,7 +408,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 				+ "included_stored (" + configNode.get("included", "default") 
 				+ ")/ includedNames_stored (" + configNode.get("includedNames", 
 						"default") + ")/ headers_class (" 
-				+ Arrays.toString(headers) + ")";
+				+ Arrays.toString(prefixes) + ")";
 		return str;
 	}
 }

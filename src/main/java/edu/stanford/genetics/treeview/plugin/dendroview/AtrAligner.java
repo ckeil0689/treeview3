@@ -18,7 +18,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 
 public class AtrAligner {
 
@@ -35,11 +35,11 @@ public class AtrAligner {
 	 * @return a new ordering of arrayHeader1
 	 * @throws DendroException
 	 */
-	public static int[] align(final HeaderInfo atrHeader1,
-			final HeaderInfo arrayHeader1, final HeaderInfo atrHeader2,
-			final HeaderInfo arrayHeader2) throws DendroException {
+	public static int[] align(final LabelInfo atrHeader1,
+			final LabelInfo arrayHeader1, final LabelInfo atrHeader2,
+			final LabelInfo arrayHeader2) throws DendroException {
 
-		final int numArrays = arrayHeader1.getNumHeaders();
+		final int numArrays = arrayHeader1.getNumLabels();
 		final int[] newOrder = new int[numArrays];
 		AtrAnalysisNode root1;
 
@@ -65,23 +65,23 @@ public class AtrAligner {
 	 * @throws DendroException
 	 */
 	private static AtrAnalysisNode createAnalysisTree(
-			final HeaderInfo atrHeader, final HeaderInfo arrayHeader)
+			final LabelInfo atrHeader, final LabelInfo arrayHeader)
 			throws DendroException {
 
-		final int numArrays = arrayHeader.getNumHeaders();
+		final int numArrays = arrayHeader.getNumLabels();
 
 		final AtrAnalysisNode[] leafNodes = new AtrAnalysisNode[numArrays];
 		final Hashtable id2node = new Hashtable(
-				((atrHeader.getNumHeaders() * 4) / 3) / 2, .75f);
+				((atrHeader.getNumLabels() * 4) / 3) / 2, .75f);
 
 		String newId, leftId, rightId;
 
 		AtrAnalysisNode newN, leftN, rightN;
 
-		for (int i = 0; i < atrHeader.getNumHeaders(); i++) {
-			newId = atrHeader.getHeader(i, "NODEID");
-			leftId = atrHeader.getHeader(i, "LEFT");
-			rightId = atrHeader.getHeader(i, "RIGHT");
+		for (int i = 0; i < atrHeader.getNumLabels(); i++) {
+			newId = atrHeader.getLabel(i, "NODEID");
+			leftId = atrHeader.getLabel(i, "LEFT");
+			rightId = atrHeader.getLabel(i, "RIGHT");
 
 			newN = (AtrAnalysisNode) id2node.get(newId);
 			leftN = (AtrAnalysisNode) id2node.get(leftId);
@@ -98,7 +98,7 @@ public class AtrAligner {
 			if (leftN == null) {
 				// this means that the identifier for leftn is a new leaf
 				int val; // stores index (y location)
-				val = arrayHeader.getHeaderIndex(leftId);
+				val = arrayHeader.getLabelIndex(leftId);
 
 				if (val == -1)
 					throw new DendroException("Identifier " + leftId
@@ -106,7 +106,7 @@ public class AtrAligner {
 
 				leftN = new AtrAnalysisNode(leftId, newN);
 				leftN.setIndex(val);
-				leftN.setName(arrayHeader.getHeader(val, "GID"));
+				leftN.setName(arrayHeader.getLabel(val, "GID"));
 
 				leafNodes[val] = leftN;
 				id2node.put(leftId, leftN);
@@ -116,7 +116,7 @@ public class AtrAligner {
 				// this means that the identifier for rightn is a new leaf
 				// System.out.println("Looking up " + rightId);
 				int val; // stores index (y location)
-				val = arrayHeader.getHeaderIndex(rightId);
+				val = arrayHeader.getLabelIndex(rightId);
 
 				if (val == -1)
 					throw new DendroException("Identifier " + rightId
@@ -124,7 +124,7 @@ public class AtrAligner {
 
 				rightN = new AtrAnalysisNode(rightId, newN);
 				rightN.setIndex(val);
-				rightN.setName(arrayHeader.getHeader(val, "GID"));
+				rightN.setName(arrayHeader.getLabel(val, "GID"));
 
 				leafNodes[val] = rightN;
 				id2node.put(rightId, rightN);
@@ -159,16 +159,16 @@ public class AtrAligner {
 	 *            the ordering array which this method will fill
 	 */
 	private static void alignTree(final AtrAnalysisNode root1,
-			final HeaderInfo arrayHeader1, final HeaderInfo arrayHeader2,
+			final LabelInfo arrayHeader1, final LabelInfo arrayHeader2,
 			final int[] ordering) {
 
 		final Vector v1 = new Vector();
 		final Hashtable gid2index = new Hashtable();
 		final int gidIndex = arrayHeader2.getIndex("GID");
 
-		for (int i = 0; i < arrayHeader2.getNumHeaders(); i++) {
+		for (int i = 0; i < arrayHeader2.getNumLabels(); i++) {
 
-			gid2index.put(arrayHeader2.getHeader(i)[gidIndex], new Integer(i));
+			gid2index.put(arrayHeader2.getLabels(i)[gidIndex], new Integer(i));
 		}
 
 		root1.indexTree(arrayHeader2, gid2index);
@@ -177,7 +177,7 @@ public class AtrAligner {
 
 		for (int i = 0; i < v1.size(); i++) {
 
-			ordering[i] = arrayHeader1.getHeaderIndex(((AtrAnalysisNode) v1
+			ordering[i] = arrayHeader1.getLabelIndex(((AtrAnalysisNode) v1
 					.get(i)).getID());
 		}
 	}

@@ -194,19 +194,17 @@ public class DataImportDialog extends CustomDialog {
 	}
 
 	/**
-	 * Generates an array of Strings which serve has headers for the JTable
+	 * Generates an array of Strings which serve as headers for the JTable
 	 * constructor.
 	 * 
 	 * @param Number
 	 *            of columns.
 	 * @return An array of numbers as Strings.
 	 */
-	private static String[] getColumnNames(int columnNum) {
+	private static String[] getColumnNames(final int colNum) {
 
-		final int colNum = columnNum;
 		String[] columnNames = new String[colNum];
 		for (int i = 0; i < colNum; i++) {
-
 			columnNames[i] = Integer.toString(i + 1);
 		}
 

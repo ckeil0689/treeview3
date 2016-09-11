@@ -25,7 +25,7 @@ import java.util.Observer;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.12 $ $Date: 2005-11-25 07:24:08 $
  */
-public interface HeaderInfo {
+public interface LabelInfo {
 	/**
 	 * Gets the header info for gene/array/node i
 	 *
@@ -33,7 +33,7 @@ public interface HeaderInfo {
 	 *            index of the gene/array/node for which to get headers
 	 * @return The array of header values
 	 */
-	public String[] getHeader(int i);
+	public String[] getLabels(int i);
 
 	/**
 	 * Gets the header info for gene/array/node i, col name
@@ -44,25 +44,25 @@ public interface HeaderInfo {
 	 *            name of the header to get
 	 * @return header value
 	 */
-	public String getHeader(int i, String name);
+	public String getLabel(int i, String name);
 
 	/**
 	 * Gets the names of the headers
 	 *
 	 * @return The array of header names
 	 */
-	public String[] getNames();
+	public String[] getPrefixes();
 
 	/**
 	 * The number of headers.
 	 */
-	public int getNumNames();
+	public int getNumPrefixes();
 
 	/**
 	 * Gets the number of sets of headers. This will generally be the number
 	 * things which have headers, i.e. number of genes/arrays/nodes.
 	 */
-	public int getNumHeaders();
+	public int getNumLabels();
 
 	/**
 	 * Gets the index associated with a particular header name.
@@ -76,22 +76,22 @@ public interface HeaderInfo {
 	 *
 	 * Should have been called "getNameIndex".
 	 *
-	 * @param name
+	 * @param prefix
 	 *            A name to find the index of
 	 * @return The index value
 	 */
-	public int getIndex(String name);
+	public int getIndex(String prefix);
 
 	/**
 	 * gets the index of a gene/array/node given a value from the first column
 	 * (the id column). Should have been called "getIndexById" or something.
 	 *
-	 * @param id
+	 * @param label
 	 *            a particular id for a gene or array or node
 	 * @return The index value, for use with getHeader() or similar thing.
 	 *         Returns -1 if no header matching "id" can be found.
 	 */
-	public int getHeaderIndex(String id);
+	public int getLabelIndex(String label);
 
 	/**
 	 * This is used by HeaderInfo objects that may change over time. If your
@@ -113,26 +113,26 @@ public interface HeaderInfo {
 	 * Adds a new named "column" of headers to this object Just return false if
 	 * your header info is read only.
 	 *
-	 * @param name
+	 * @param prefix
 	 *            name of column to add
 	 * @param location
 	 *            0 means make it first, getNumNames() means make it last
 	 * @return true if successfully added, false if not.
 	 */
-	public boolean addName(String name, int location);
+	public boolean addPrefix(String prefix, int location);
 
 	/**
 	 * Sets indicated header to specified value Just return false if your header
 	 * info is read only.
 	 *
-	 * @param name
+	 * @param prefix
 	 *            name of column to change
-	 * @param value
-	 *            new value for header.
+	 * @param newLabel
+	 *            new value for label.
 	 *
 	 * @return true if successfully modified, false if not.
 	 */
-	public boolean setHeader(int i, String name, String value);
+	public boolean setLabel(int i, String prefix, String newLabel);
 
 	public void setPrefixArray(String[] newPrefixArray);
 
@@ -157,7 +157,7 @@ public interface HeaderInfo {
 	 * @param columnIndex
 	 * @return
 	 */
-	public String getHeader(int rowIndex, int columnIndex);
+	public String getLabel(int rowIndex, int columnIndex);
 
-	public String[][] getHeaderArray();
+	public String[][] getLabelArray();
 }

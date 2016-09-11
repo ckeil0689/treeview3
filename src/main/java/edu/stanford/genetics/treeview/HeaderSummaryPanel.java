@@ -29,18 +29,18 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 
 	private static final long serialVersionUID = 1L;
 
-	private HeaderInfo headerInfo;
-	private HeaderSummary headerSummary;
+	private LabelInfo headerInfo;
+	private LabelSummary headerSummary;
 	private final JList<String> headerList = new JList<String>(new String[0]);
 
 	//Hook to be able to reset the label view scrollbar
 	private final LabelView labelView;
 
-	public HeaderSummaryPanel(final HeaderInfo headerInfo,
+	public HeaderSummaryPanel(final LabelInfo headerInfo,
 		LabelView labelView) {
 
 		this.headerInfo = headerInfo;
-		this.headerSummary = labelView.getHeaderSummary();
+		this.headerSummary = labelView.getLabelSummary();
 		this.labelView = labelView;
 
 		setLayout(new MigLayout());
@@ -50,7 +50,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 				+ "display:", GUIFactory.FONTS);
 		add(label, "span, wrap");
 
-		setHeaderList(headerInfo.getNames());
+		setHeaderList(headerInfo.getPrefixes());
 		headerList.setVisibleRowCount(5);
 		headerList.setFont(GUIFactory.FONTS);
 		add(new JScrollPane(getHeaderList()), "push, grow, wrap");
@@ -69,7 +69,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	}
 
 	/** Setter for headerInfo */
-	public void setHeaderInfo(final HeaderInfo headerInfo) {
+	public void setHeaderInfo(final LabelInfo headerInfo) {
 
 		if (this.headerInfo != null) {
 			this.headerInfo.deleteObserver(this);
@@ -80,20 +80,20 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	}
 
 	/** Getter for headerInfo */
-	public HeaderInfo getHeaderInfo() {
+	public LabelInfo getHeaderInfo() {
 
 		return headerInfo;
 	}
 
 	/** Setter for headerSummary */
-	public void setHeaderSummary(final HeaderSummary headerSummary) {
+	public void setHeaderSummary(final LabelSummary headerSummary) {
 
 		this.headerSummary = headerSummary;
 		synchronizeFrom();
 	}
 
 	/** Getter for headerSummary */
-	public HeaderSummary getHeaderSummary() {
+	public LabelSummary getHeaderSummary() {
 
 		return headerSummary;
 	}
@@ -157,7 +157,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	public void update(final Observable o, final Object arg) {
 
 		if (o == headerInfo) {
-			setHeaderList(headerInfo.getNames());
+			setHeaderList(headerInfo.getPrefixes());
 			synchronizeFrom();
 			repaint();
 		} else {

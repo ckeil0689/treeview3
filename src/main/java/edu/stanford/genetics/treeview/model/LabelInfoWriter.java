@@ -10,19 +10,19 @@ package edu.stanford.genetics.treeview.model;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 
 /**
  * class that write out header info to flat file.
  */
-public class HeaderInfoWriter {
-	private final HeaderInfo headerInfo;
+public class LabelInfoWriter {
+	private final LabelInfo headerInfo;
 
 	/**
 	 * @param atrHeaderInfo
 	 *            headerInfo to write out
 	 */
-	public HeaderInfoWriter(final HeaderInfo atrHeaderInfo) {
+	public LabelInfoWriter(final LabelInfo atrHeaderInfo) {
 		headerInfo = atrHeaderInfo;
 	}
 
@@ -36,7 +36,7 @@ public class HeaderInfoWriter {
 		try {
 			out = new FileWriter(atr);
 			// first, the header.
-			final String[] names = headerInfo.getNames();
+			final String[] names = headerInfo.getPrefixes();
 			if (names.length > 0) {
 				out.write(names[0]);
 			}
@@ -45,9 +45,9 @@ public class HeaderInfoWriter {
 				out.write(names[i]);
 			}
 			out.write("\n");
-			final int rows = headerInfo.getNumHeaders();
+			final int rows = headerInfo.getNumLabels();
 			for (int row = 0; row < rows; row++) {
-				final String[] headers = headerInfo.getHeader(row);
+				final String[] headers = headerInfo.getLabels(row);
 				if (headers.length > 0) {
 					out.write(headers[0]);
 				}

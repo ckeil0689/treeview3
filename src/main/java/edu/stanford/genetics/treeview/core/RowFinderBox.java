@@ -11,7 +11,7 @@ package edu.stanford.genetics.treeview.core;
  * @author aloksaldanha
  *
  */
-public class RowFinderBox extends HeaderFinderBox {
+public class RowFinderBox extends LabelFinderBox {
 
 	/**
 	 * @param f

@@ -19,7 +19,7 @@ import com.gurge.amd.GIFEncoder;
 import com.gurge.amd.Quantize;
 import com.gurge.amd.TestQuantize;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.SettingsPanel;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -31,8 +31,8 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 public class GifExportPanel extends ExportPanel implements SettingsPanel {
 
 	// I wish I could just inherit this...
-	public GifExportPanel(final HeaderInfo arrayHeaderInfo,
-			final HeaderInfo geneHeaderInfo,
+	public GifExportPanel(final LabelInfo arrayHeaderInfo,
+			final LabelInfo geneHeaderInfo,
 			final TreeSelectionI geneSelection,
 			final TreeSelectionI arraySelection,
 			final TreePainter arrayTreeDrawer,

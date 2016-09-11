@@ -10,18 +10,18 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LabelSummary;
 
 public class HeaderSummaryTest {
 
 	private final String NAME = "TestSummary";
 	private final String ROOT_NODE = "testNode";
-	private HeaderSummary headerSummary;
+	private LabelSummary headerSummary;
 	
 	@Before
 	public void setUp() throws Exception {
 		
-		this.headerSummary = new HeaderSummary(NAME);
+		this.headerSummary = new LabelSummary(NAME);
 	}
 
 	@After

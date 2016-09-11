@@ -26,7 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import edu.stanford.genetics.treeview.BitmapWriter;
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.SettingsPanel;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -41,8 +41,8 @@ public class BitmapExportPanel extends ExportPanel implements SettingsPanel {
 	/**
 	 * Default is no char data.
 	 */
-	public BitmapExportPanel(final HeaderInfo arrayHeaderInfo,
-			final HeaderInfo geneHeaderInfo,
+	public BitmapExportPanel(final LabelInfo arrayHeaderInfo,
+			final LabelInfo geneHeaderInfo,
 			final TreeSelectionI geneSelection,
 			final TreeSelectionI arraySelection,
 			final TreePainter arrayTreeDrawer,
@@ -53,8 +53,8 @@ public class BitmapExportPanel extends ExportPanel implements SettingsPanel {
 				geneMap, false);
 	}
 
-	public BitmapExportPanel(final HeaderInfo arrayHeaderInfo,
-			final HeaderInfo geneHeaderInfo,
+	public BitmapExportPanel(final LabelInfo arrayHeaderInfo,
+			final LabelInfo geneHeaderInfo,
 			final TreeSelectionI geneSelection,
 			final TreeSelectionI arraySelection,
 			final TreePainter arrayTreeDrawer,

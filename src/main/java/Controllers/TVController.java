@@ -336,14 +336,14 @@ public class TVController implements Observer {
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
 
-			if (tvModel.getColHeaderInfo().getNumHeaders() == 0) {
+			if (tvModel.getColLabelInfo().getNumLabels() == 0) {
 				/* ------ Load Process -------- */
 				final ModelLoader loader = new ModelLoader(tvModel, this,
 						dataInfo);
 				loader.execute();
 
 			} else {
-				LogBuffer.println("ColumnHeaders not reset, aborted loading.");
+				LogBuffer.println("ColumnLabels not reset, aborted loading.");
 			}
 
 		} catch (final OutOfMemoryError e) {
@@ -653,7 +653,7 @@ public class TVController implements Observer {
         DataLoadInfo dataInfo;
 		String delimiter = node.get("delimiter", ModelLoader.DEFAULT_DELIM);
 		
-		// Amount of label headers may vary, they have to be re-detected
+		// Amount of label prefixes may vary, they have to be re-detected
 		DataImportController importController = 
 				new DataImportController(delimiter);
 		importController.setFileSet(fileSet);
@@ -714,14 +714,14 @@ public class TVController implements Observer {
 
 		// extractors...
 		final UrlPresets genePresets = tvFrame.getGeneUrlPresets();
-		final UrlExtractor urlExtractor = new UrlExtractor(model.getRowHeaderInfo(), genePresets);
+		final UrlExtractor urlExtractor = new UrlExtractor(model.getRowLabelInfo(), genePresets);
 
 		urlExtractor.bindConfig(documentConfig.node("UrlExtractor"));
 		tvFrame.setUrlExtractor(urlExtractor);
 
 		final UrlPresets arrayPresets = tvFrame.getArrayUrlPresets();
 		final UrlExtractor arrayUrlExtractor = new UrlExtractor(
-				model.getColHeaderInfo(), arrayPresets);
+				model.getColLabelInfo(), arrayPresets);
 
 		arrayUrlExtractor.bindConfig(documentConfig.node("ArrayUrlExtractor"));
 		tvFrame.setArrayUrlExtractor(arrayUrlExtractor);
@@ -801,9 +801,9 @@ public class TVController implements Observer {
 
 			final GeneListMaker t = new GeneListMaker(
 					(JFrame) Frame.getFrames()[0], tvFrame.getRowSelection(),
-					model.getRowHeaderInfo(), def);
+					model.getRowLabelInfo(), def);
 
-			t.setDataMatrix(model.getDataMatrix(), model.getColHeaderInfo(),
+			t.setDataMatrix(model.getDataMatrix(), model.getColLabelInfo(),
 					DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
@@ -822,10 +822,10 @@ public class TVController implements Observer {
 			final FileSet source = model.getFileSet();
 			final GeneListMaker t = new GeneListMaker(
 					(JFrame) Frame.getFrames()[0], tvFrame.getRowSelection(),
-					model.getRowHeaderInfo(), source.getDir()
+					model.getRowLabelInfo(), source.getDir()
 							+ source.getRoot() + "_data.cdt");
 
-			t.setDataMatrix(model.getDataMatrix(), model.getColHeaderInfo(),
+			t.setDataMatrix(model.getDataMatrix(), model.getColLabelInfo(),
 					DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
@@ -991,14 +991,12 @@ public class TVController implements Observer {
 		final LabelSettings labelSettingsView = new LabelSettings(tvFrame);
 
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
-			labelSettingsView.setHeaderInfo(model.getRowHeaderInfo(),
-					model.getColHeaderInfo());
+			labelSettingsView.setLabelInfo(model.getRowLabelInfo(),
+					model.getColLabelInfo());
 		}
 
 		labelSettingsView.setMenu(menu);
-
 		new LabelSettingsController(tvFrame, model, labelSettingsView);
-
 		labelSettingsView.setVisible(true);
 	}
 	

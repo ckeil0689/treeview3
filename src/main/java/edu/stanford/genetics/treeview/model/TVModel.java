@@ -17,7 +17,7 @@ import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.FileSetListener;
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class TVModel extends Observable implements DataModel {
@@ -29,10 +29,10 @@ public class TVModel extends Observable implements DataModel {
 
 	protected TVDataMatrix dataMatrix;
 
-	protected IntHeaderInfo arrayHeaderInfo;
-	protected GeneHeaderInfo geneHeaderInfo;
-	protected IntHeaderInfo atrHeaderInfo;
-	protected IntHeaderInfo gtrHeaderInfo;
+	protected IntLabelInfo colLabelInfo;
+	protected RowLabelInfo rowLabelInfo;
+	protected IntLabelInfo atrLabelInfo;
+	protected IntLabelInfo gtrLabelInfo;
 
 	protected boolean aidFound = false;
 	protected boolean gidFound = false;
@@ -55,10 +55,10 @@ public class TVModel extends Observable implements DataModel {
 
 		super();
 		/* build TVModel, initially empty... */
-		geneHeaderInfo = new GeneHeaderInfo();
-		arrayHeaderInfo = new IntHeaderInfo();
-		atrHeaderInfo = new IntHeaderInfo();
-		gtrHeaderInfo = new IntHeaderInfo();
+		rowLabelInfo = new RowLabelInfo();
+		colLabelInfo = new IntLabelInfo();
+		atrLabelInfo = new IntLabelInfo();
+		gtrLabelInfo = new IntLabelInfo();
 		dataMatrix = new TVDataMatrix();
 	}
 
@@ -81,22 +81,22 @@ public class TVModel extends Observable implements DataModel {
 
 		} else {
 			compareModel = (TVModel) m;
-			extraCompareExpr = compareModel.nExpr() + 2;
+			extraCompareExpr = compareModel.nCols() + 2;
 		}
 		hasChanged();
 	}
 
 	// accessor methods
 	@Override
-	public IntHeaderInfo getRowHeaderInfo() {
+	public IntLabelInfo getRowLabelInfo() {
 
-		return geneHeaderInfo;
+		return rowLabelInfo;
 	}
 
 	@Override
-	public IntHeaderInfo getColHeaderInfo() {
+	public IntLabelInfo getColLabelInfo() {
 
-		return arrayHeaderInfo;
+		return colLabelInfo;
 	}
 
 	@Override
@@ -109,15 +109,15 @@ public class TVModel extends Observable implements DataModel {
 	}
 
 	@Override
-	public HeaderInfo getAtrHeaderInfo() {
+	public LabelInfo getAtrLabelInfo() {
 
-		return atrHeaderInfo;
+		return atrLabelInfo;
 	}
 
 	@Override
-	public HeaderInfo getGtrHeaderInfo() {
+	public LabelInfo getGtrLabelInfo() {
 
-		return gtrHeaderInfo;
+		return gtrLabelInfo;
 	}
 
 	public boolean gweightFound() {
@@ -125,14 +125,14 @@ public class TVModel extends Observable implements DataModel {
 		return gweightFound;
 	}
 
-	public int nGene() {
+	public int nRows() {
 
-		return geneHeaderInfo.getNumHeaders();
+		return rowLabelInfo.getNumLabels();
 	}
 
-	public int nExpr() {
+	public int nCols() {
 
-		return arrayHeaderInfo.getNumHeaders() + extraCompareExpr;
+		return colLabelInfo.getNumLabels() + extraCompareExpr;
 	}
 
 	public void setExprData(final double[][] newData) {
@@ -142,20 +142,20 @@ public class TVModel extends Observable implements DataModel {
 
 	public double getValue(final int x, final int y) {
 
-		final int nexpr = nExpr();
-		final int ngene = nGene();
+		final int nCols = nCols();
+		final int nRows = nRows();
 		
-		if (x >= nexpr + 2) {
+		if (x >= nCols + 2) {
 			if (compareModel != null) {
-				return compareModel.getValue(x - (nexpr + 2), y); // check
+				return compareModel.getValue(x - (nCols + 2), y); // check
 			// offsets
 			}
 
-		} else if (x >= nexpr && y < ngene) {
+		} else if (x >= nCols && y < nRows) {
 			return 0; // gray border
 		}
 
-		if ((x < nexpr && y < ngene) && (x >= 0 && y >= 0)) {
+		if ((x < nCols && y < nRows) && (x >= 0 && y >= 0)) {
 			return dataMatrix.getValue(x, y);
 		}
 
@@ -264,40 +264,40 @@ public class TVModel extends Observable implements DataModel {
 
 	protected void hashAIDs() {
 
-		arrayHeaderInfo.hashIDs("AID");
+		colLabelInfo.hashIDs("AID");
 	}
 
 	protected void hashGIDs() {
 
-		geneHeaderInfo.hashIDs("GID");
+		rowLabelInfo.hashIDs("GID");
 	}
 
 	protected void hashATRs() {
 
-		atrHeaderInfo.hashIDs("NODEID");
+		atrLabelInfo.hashIDs("NODEID");
 	}
 
 	protected void hashGTRs() {
 
-		gtrHeaderInfo.hashIDs("NODEID");
+		gtrLabelInfo.hashIDs("NODEID");
 	}
 
 	protected static Hashtable<String, Integer> populateHash(
-			final HeaderInfo source, final String headerName,
+			final LabelInfo source, final String prefix,
 			final Hashtable<String, Integer> target) {
 
-		final int indexCol = source.getIndex(headerName);
+		final int indexCol = source.getIndex(prefix);
 
 		return populateHash(source, indexCol, target);
 	}
 
 	protected static Hashtable<String, Integer> populateHash(
-			final HeaderInfo source, int indexCol,
+			final LabelInfo source, int indexCol,
 			Hashtable<String, Integer> target) {
 
 		if (target == null) {
 			target = new Hashtable<String, Integer>(
-					(source.getNumHeaders() * 4) / 3, .75f);
+					(source.getNumLabels() * 4) / 3, .75f);
 
 		} else {
 			target.clear();
@@ -307,8 +307,8 @@ public class TVModel extends Observable implements DataModel {
 			indexCol = 0;
 		}
 
-		for (int i = 0; i < source.getNumHeaders(); i++) {
-			target.put(source.getHeader(i)[indexCol], new Integer(i));
+		for (int i = 0; i < source.getNumLabels(); i++) {
+			target.put(source.getLabels(i)[indexCol], new Integer(i));
 		}
 
 		return target;
@@ -321,7 +321,7 @@ public class TVModel extends Observable implements DataModel {
 	 *            the new ordering of arrays, must have size equal to number of
 	 *            arrays.
 	 */
-	public void reorderArrays(final int[] ordering) {
+	public void reorderColumns(final int[] ordering) {
 		if (ordering == null
 				|| ordering.length != dataMatrix.getNumUnappendedCol())
 			return;
@@ -339,19 +339,19 @@ public class TVModel extends Observable implements DataModel {
 			}
 		}
 
-		final String[][] aHeaders = arrayHeaderInfo.getHeaderArray();
-		final String[][] temp2 = new String[aHeaders.length][];
+		final String[][] colLabels = colLabelInfo.getLabelArray();
+		final String[][] temp2 = new String[colLabels.length][];
 
-		for (int i = 0; i < aHeaders.length; i++) {
+		for (int i = 0; i < colLabels.length; i++) {
 			if (i < ordering.length) {
-				temp2[i] = aHeaders[ordering[i]];
+				temp2[i] = colLabels[ordering[i]];
 
 			} else {
-				temp2[i] = aHeaders[i];
+				temp2[i] = colLabels[i];
 			}
 		}
 
-		setArrayHeaders(temp2);
+		setColumnLabels(temp2);
 		hashAIDs();
 		setChanged();
 	}
@@ -363,7 +363,7 @@ public class TVModel extends Observable implements DataModel {
 	 *            the new ordering of arrays, must have size equal to number of
 	 *            arrays
 	 */
-	public void reorderGenes(final int[] ordering) {
+	public void reorderRows(final int[] ordering) {
 
 		if (ordering == null || ordering.length != dataMatrix.getNumRow()) {
 			return;
@@ -380,7 +380,7 @@ public class TVModel extends Observable implements DataModel {
 				data.setValue(temp[i], j, i);
 			}
 		}
-		geneHeaderInfo.reorderHeaders(ordering);
+		rowLabelInfo.reorderLabels(ordering);
 		hashGIDs();
 		setChanged();
 	}
@@ -401,10 +401,10 @@ public class TVModel extends Observable implements DataModel {
 		eweightFound = false;
 		gweightFound = false;
 
-		geneHeaderInfo.clear();
-		arrayHeaderInfo.clear();
-		atrHeaderInfo.clear();
-		gtrHeaderInfo.clear();
+		rowLabelInfo.clear();
+		colLabelInfo.clear();
+		atrLabelInfo.clear();
+		gtrLabelInfo.clear();
 		dataMatrix.clear();
 	}
 
@@ -422,9 +422,9 @@ public class TVModel extends Observable implements DataModel {
 	public String[] toStrings() {
 
 		final String[] msg = { "Selected TVModel Stats",
-				"Source = " + getSource(), "Nexpr   = " + nExpr(),
-				"NGeneHeader = " + getRowHeaderInfo().getNumNames(),
-				"Ngene   = " + nGene(), "eweight  = " + eweightFound,
+				"Source = " + getSource(), "NCols   = " + nCols(),
+				"NRowPrefixes = " + getRowLabelInfo().getNumPrefixes(),
+				"NRows   = " + nRows(), "eweight  = " + eweightFound,
 				"gweight  = " + gweightFound, "aid  = " + aidFound,
 				"gid  = " + gidFound };
 
@@ -586,8 +586,8 @@ public class TVModel extends Observable implements DataModel {
 		public void calculateBaseValues() {
 
 			if (exprData != null) {
-				final int nGene = nGene();
-				final int nExpr = nExpr();
+				final int nGene = nRows();
+				final int nExpr = nCols();
 				
 				double sum = 0;
 				int skipped = 0;
@@ -633,8 +633,8 @@ public class TVModel extends Observable implements DataModel {
 			
 			double result = Double.NaN;
 			
-			final int nGene = nGene();
-			final int nExpr = nExpr();
+			final int nGene = nRows();
+			final int nExpr = nCols();
 			
 			/* ROW ORDER 
 			 * Although allocating a second array kills RAM for large
@@ -719,8 +719,8 @@ public class TVModel extends Observable implements DataModel {
 		@Override
 		public double getValue(final int x, final int y) {
 
-			final int nexpr = nExpr();
-			final int ngene = nGene();
+			final int nexpr = nCols();
+			final int ngene = nRows();
 			
 			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)) {
 				return exprData[y][x];
@@ -750,13 +750,13 @@ public class TVModel extends Observable implements DataModel {
 		@Override
 		public int getNumRow() {
 
-			return nGene();
+			return nRows();
 		}
 
 		@Override
 		public int getNumCol() {
 
-			return nExpr();
+			return nCols();
 		}
 
 		@Override
@@ -791,7 +791,7 @@ public class TVModel extends Observable implements DataModel {
 		public double getRowAverage(int fromRowId, int toRowId){
 			double sum = 0;
 			int count = 0;
-			final int numOfCols = nExpr();
+			final int numOfCols = nCols();
 			for( int j=fromRowId ; j<=toRowId; j++ ){
 				for(int i=0 ; i<numOfCols ; i++){
 					double value = getValue(i, j);
@@ -818,7 +818,7 @@ public class TVModel extends Observable implements DataModel {
 		public double getColAverage(int fromColId, int toColId){
 			double sum = 0;
 			int count = 0;
-			final int numOfRows = nGene();
+			final int numOfRows = nRows();
 			for( int j=fromColId ; j<=toColId; j++ ){
 				for(int i=0 ; i<numOfRows ; i++){
 					double value = getValue(j, i);
@@ -837,40 +837,40 @@ public class TVModel extends Observable implements DataModel {
 		}
 	}
 
-	/** holds actual node information for array tree */
-	public void setAtrHeaders(final String[][] atrHeaders) {
+	/** holds actual node information for column tree */
+	public void setAtrLabels(final String[][] atrLabels) {
 
-		atrHeaderInfo.setHeaderArray(atrHeaders);
+		atrLabelInfo.setLabelArray(atrLabels);
 	}
 
-	/** holds header row from atr file */
-	public void setAtrPrefix(final String[] atrPrefix) {
+	/** holds prefixes from atr file */
+	public void setAtrPrefixes(final String[] atrPrefixes) {
 
-		atrHeaderInfo.setPrefixArray(atrPrefix);
+		atrLabelInfo.setPrefixArray(atrPrefixes);
 	}
 
-	/** holds actual node information for gene tree */
-	public void setGtrHeaders(final String[][] gtrHeaders) {
+	/** holds actual node information for row tree */
+	public void setGtrLabels(final String[][] gtrLabels) {
 
-		gtrHeaderInfo.setHeaderArray(gtrHeaders);
+		gtrLabelInfo.setLabelArray(gtrLabels);
 	}
 
-	public void setGtrPrefix(final String[] gtrPrefix) {
+	public void setGtrPrefixes(final String[] gtrPrefixes) {
 
-		gtrHeaderInfo.setPrefixArray(gtrPrefix);
+		gtrLabelInfo.setPrefixArray(gtrPrefixes);
 	}
 
-	public void setArrayHeaders(final String[][] newHeaders) {
+	public void setColumnLabels(final String[][] newLabels) {
 
-		arrayHeaderInfo.setHeaderArray(newHeaders);
+		colLabelInfo.setLabelArray(newLabels);
 	}
 
-	public void setArrayPrefix(final String[] newPrefix) {
+	public void setColumnPrefixes(final String[] newPrefixes) {
 
-		arrayHeaderInfo.setPrefixArray(newPrefix);
+		colLabelInfo.setPrefixArray(newPrefixes);
 	}
 
-	class GeneHeaderInfo extends IntHeaderInfo {
+	class RowLabelInfo extends IntLabelInfo {
 
 		/*
 		TODO ... oh god this all just throws out fixed values.
@@ -907,19 +907,19 @@ public class TVModel extends Observable implements DataModel {
 		 * There are two special indexes, YORF and NAME.
 		 */
 		@Override
-		public int getIndex(final String header) {
+		public int getIndex(final String prefix) {
 
-			final int retval = super.getIndex(header);
+			final int retval = super.getIndex(prefix);
 
 			if (retval != -1) {
 				return retval;
 			}
 
-			if (header.equals("YORF")) {
+			if (prefix.equals("YORF")) {
 				return getYorfIndex();
 			}
 
-			if (header.equals("NAME")) {
+			if (prefix.equals("NAME")) {
 				return getNameIndex();
 			}
 
@@ -927,14 +927,14 @@ public class TVModel extends Observable implements DataModel {
 		}
 	}
 
-	public void setGenePrefix(final String[] newVal) {
+	public void setRowPrefixes(final String[] newPrefixes) {
 
-		geneHeaderInfo.setPrefixArray(newVal);
+		rowLabelInfo.setPrefixArray(newPrefixes);
 	}
 
-	public void setGeneHeaders(final String[][] newVal) {
+	public void setRowLabels(final String[][] newLabels) {
 
-		geneHeaderInfo.setHeaderArray(newVal);
+		rowLabelInfo.setLabelArray(newLabels);
 	}
 
 	/**
@@ -956,10 +956,8 @@ public class TVModel extends Observable implements DataModel {
 	@Override
 	public boolean getModified() {
 
-		return getGtrHeaderInfo().getModified() ||
-		// getGeneHeaderInfo().getModified() ||
-		// getArrayHeaderInfo().getModified() ||
-				getAtrHeaderInfo().getModified();
+		return getGtrLabelInfo().getModified() 
+				|| getAtrLabelInfo().getModified();
 	}
 
 	@Override

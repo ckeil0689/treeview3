@@ -14,7 +14,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Stack;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.SettingsPanel;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
@@ -27,8 +27,8 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 public class PostscriptExportPanel extends ExportPanel implements SettingsPanel {
 
 	// I wish I could just inherit this...
-	public PostscriptExportPanel(final HeaderInfo arrayHeaderInfo,
-			final HeaderInfo geneHeaderInfo,
+	public PostscriptExportPanel(final LabelInfo arrayHeaderInfo,
+			final LabelInfo geneHeaderInfo,
 			final TreeSelectionI geneSelection,
 			final TreeSelectionI arraySelection,
 			final TreePainter arrayTreeDrawer,

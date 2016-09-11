@@ -29,7 +29,7 @@ public class UrlExtractor {
 	private int index;
 	private int dindex = 1;
 
-	private HeaderInfo headerInfo;
+	private LabelInfo headerInfo;
 
 	private Preferences root;
 	UrlPresets uPresets;
@@ -37,7 +37,7 @@ public class UrlExtractor {
 	/**
 	 * This class must be constructed around gene header info
 	 */
-	public UrlExtractor(final HeaderInfo hI) {
+	public UrlExtractor(final LabelInfo hI) {
 
 		this.headerInfo = hI;
 		this.urlTemplate = dUrlTemplate;
@@ -46,7 +46,7 @@ public class UrlExtractor {
 		this.uPresets = null;
 	}
 
-	public UrlExtractor(final HeaderInfo hI, final UrlPresets uPresets) {
+	public UrlExtractor(final LabelInfo hI, final UrlPresets uPresets) {
 
 		this.headerInfo = hI;
 		this.urlTemplate = dUrlTemplate;
@@ -81,7 +81,7 @@ public class UrlExtractor {
 	public String getUrl(final int i) {
 		if (isEnabled() == false)
 			return null;
-		final String[] headers = headerInfo.getHeader(i);
+		final String[] headers = headerInfo.getLabels(i);
 		if (headers == null)
 			return null;
 		return substitute(urlTemplate, headers[index]);
@@ -93,7 +93,7 @@ public class UrlExtractor {
 			return null;
 		if (isEnabled() == false)
 			return null;
-		final String[] headers = headerInfo.getHeader(i);
+		final String[] headers = headerInfo.getLabels(i);
 		if (headers == null)
 			return null;
 		String tmpTemplate = uPresets.getTemplateByHeader(header);
@@ -188,12 +188,12 @@ public class UrlExtractor {
 	}
 
 	/** Setter for headerInfo */
-	public void setHeaderInfo(final HeaderInfo headerInfo) {
+	public void setHeaderInfo(final LabelInfo headerInfo) {
 		this.headerInfo = headerInfo;
 	}
 
 	/** Getter for headerInfo */
-	public HeaderInfo getHeaderInfo() {
+	public LabelInfo getHeaderInfo() {
 		return headerInfo;
 	}
 }

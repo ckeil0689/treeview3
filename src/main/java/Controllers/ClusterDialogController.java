@@ -32,7 +32,7 @@ import Views.ClusterView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.model.IntHeaderInfo;
+import edu.stanford.genetics.treeview.model.IntLabelInfo;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
@@ -206,10 +206,10 @@ public class ClusterDialogController {
 				processor = new ClusterProcessor(originalMatrix);
 				
 			} else {
-				final IntHeaderInfo rowHeaderI = tvModel.getRowHeaderInfo();
-				final IntHeaderInfo colHeaderI = tvModel.getColHeaderInfo();
+				final IntLabelInfo rowLabelI = tvModel.getRowLabelInfo();
+				final IntLabelInfo colLabelI = tvModel.getColLabelInfo();
 				
-				processor = new ClusterProcessor(originalMatrix, oldFileName, rowHeaderI, colHeaderI);
+				processor = new ClusterProcessor(originalMatrix, oldFileName, rowLabelI, colLabelI);
 			}
 
 			// Set zeroes invalid if they should be ignored.
@@ -301,29 +301,29 @@ public class ClusterDialogController {
 		
 		/**
 		 * Checks if the arrays of reordered labels are the same size as
-		 * the header arrays for each axis.
+		 * the label arrays for each axis.
 		 * @return True if reordered arrays are the same size as the axis 
-		 * header arrays and the specific axis is supposed to be clustered.
+		 * label arrays and the specific axis is supposed to be clustered.
 		 */
 		private boolean isReorderingValid(boolean[] shouldClusterAxis) {
 			
 			boolean rowsValid;
 			boolean colsValid;
 			
-			int numRowHeaders = tvModel.getRowHeaderInfo().getNumHeaders();
-			int numColHeaders = tvModel.getColHeaderInfo().getNumHeaders();
+			int numRowLabels = tvModel.getRowLabelInfo().getNumLabels();
+			int numColLabels = tvModel.getColLabelInfo().getNumLabels();
 			
 			int numReorderedRowIDs = rowClusterData.getReorderedIDs().length;
 			int numReorderedColIDs = colClusterData.getReorderedIDs().length;
 			
 			if(shouldClusterAxis[ROW_IDX] || tvModel.gidFound()) {
-				rowsValid = (numReorderedRowIDs == numRowHeaders); 
+				rowsValid = (numReorderedRowIDs == numRowLabels); 
 			} else {
 				rowsValid = (numReorderedRowIDs == 0);
 			}
 			
 			if(shouldClusterAxis[COL_IDX] || tvModel.aidFound()) {
-				colsValid = (numReorderedColIDs == numColHeaders); 
+				colsValid = (numReorderedColIDs == numColLabels); 
 			} else {
 				colsValid = (numReorderedColIDs == 0);
 			}
@@ -338,13 +338,13 @@ public class ClusterDialogController {
 		 */
 		private String[] getOldIDs(final int axisID) {
 			
-			String[][] headerArray;
+			String[][] labelArray;
 			String[] oldIDs; 
 			Pattern p;
 			int pos = 0;
 			
             if(axisID == ROW_IDX) {
-            	headerArray = tvModel.getRowHeaderInfo().getHeaderArray();
+            	labelArray = tvModel.getRowLabelInfo().getLabelArray();
             	
             	if(!tvModel.gidFound()) {
             		return new String[]{};
@@ -353,7 +353,7 @@ public class ClusterDialogController {
             	p = Pattern.compile("ROW\\d+X");
             	
             } else {
-            	headerArray = tvModel.getColHeaderInfo().getHeaderArray();
+            	labelArray = tvModel.getColLabelInfo().getLabelArray();
             	
             	if(!tvModel.aidFound()) {
             		return new String[]{};
@@ -362,18 +362,18 @@ public class ClusterDialogController {
             }
 			
             /* Find ID index */
-        	for(int i = 0; i < headerArray[0].length; i++) {
-        		Matcher m = p.matcher(headerArray[0][i]);
+        	for(int i = 0; i < labelArray[0].length; i++) {
+        		Matcher m = p.matcher(labelArray[0][i]);
         		if(m.find()) {
         			pos = i;
         			break;
         		}
         	}
         	
-			oldIDs = new String[headerArray.length];
+			oldIDs = new String[labelArray.length];
 			
-			for(int i = 0; i < headerArray.length; i++) {
-				oldIDs[i] = headerArray[i][pos];
+			for(int i = 0; i < labelArray.length; i++) {
+				oldIDs[i] = labelArray[i][pos];
 			}
 			
 			return oldIDs;
@@ -509,8 +509,8 @@ public class ClusterDialogController {
 		private void setupClusterViewProgressBar(final boolean clusterRows, 
 				final boolean clusterCols) {
 			
-			final int rows = tvModel.getRowHeaderInfo().getNumHeaders();
-			final int cols = tvModel.getColHeaderInfo().getNumHeaders();
+			final int rows = tvModel.getRowLabelInfo().getNumLabels();
+			final int cols = tvModel.getColLabelInfo().getNumLabels();
 
 			/*
 			 * Set maximum for JProgressBar before any clustering!
@@ -656,10 +656,10 @@ public class ClusterDialogController {
 
 			cdtGen.setupWriter(cdtFile);
 
-			final IntHeaderInfo rowHeaderI = tvModel.getRowHeaderInfo();
-			final IntHeaderInfo colHeaderI = tvModel.getColHeaderInfo();
+			final IntLabelInfo rowLabelI = tvModel.getRowLabelInfo();
+			final IntLabelInfo colLabelI = tvModel.getColLabelInfo();
 
-			cdtGen.prepare(rowHeaderI, colHeaderI);
+			cdtGen.prepare(rowLabelI, colLabelI);
 			cdtGen.generateCDT();
 
 			filePath = cdtGen.finish();

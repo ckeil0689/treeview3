@@ -41,12 +41,12 @@ import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.ExportPreviewMatrix;
 import edu.stanford.genetics.treeview.ExportPreviewTrees;
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
-import edu.stanford.genetics.treeview.core.HeaderFinderBox;
+import edu.stanford.genetics.treeview.core.LabelFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
 
 /**
@@ -131,8 +131,8 @@ public class DendroView implements Observer, DendroPanel {
 	/* TODO: This needs to be better integrated into the interface */
 //	private JButton exportBtn;
 
-	private HeaderFinderBox rowFinderBox;
-	private HeaderFinderBox colFinderBox;
+	private LabelFinderBox rowFinderBox;
+	private LabelFinderBox colFinderBox;
 
 	/**
 	 * Chained constructor for the DendroView object without a name.
@@ -263,7 +263,7 @@ public class DendroView implements Observer, DendroPanel {
 	 * @param xmap
 	 * @param ymap
 	 */
-	public void setupSearch(final HeaderInfo geneHI, final HeaderInfo arrayHI,
+	public void setupSearch(final LabelInfo geneHI, final LabelInfo arrayHI,
 			final MapContainer xmap, final MapContainer ymap) {
 
 		setSearchTermBoxes();
@@ -1371,19 +1371,19 @@ public class DendroView implements Observer, DendroPanel {
 			.getEditorComponent().isFocusOwner());
 	}
 
-	public void updateSearchTermBoxes(final HeaderInfo rowHI,
-			final HeaderInfo columnHI, final MapContainer xmap,
+	public void updateSearchTermBoxes(final LabelInfo rowHI,
+			final LabelInfo columnHI, final MapContainer xmap,
 			final MapContainer ymap) {
 
-		rowFinderBox.setHeaderInfo(rowHI);
-		rowFinderBox.setHeaderSummary(getRowLabelView().getHeaderSummary());
+		rowFinderBox.setLabelInfo(rowHI);
+		rowFinderBox.setLabelSummary(getRowLabelView().getLabelSummary());
 		rowFinderBox.setMapContainers(ymap, xmap);
 		rowFinderBox.setSelection(tvFrame.getRowSelection(),
 				tvFrame.getColSelection());
 		rowFinderBox.setNewSearchTermBox();
 
-		colFinderBox.setHeaderInfo(columnHI);
-		colFinderBox.setHeaderSummary(getColLabelView().getHeaderSummary());
+		colFinderBox.setLabelInfo(columnHI);
+		colFinderBox.setLabelSummary(getColLabelView().getLabelSummary());
 		colFinderBox.setMapContainers(xmap, ymap);
 		colFinderBox.setSelection(tvFrame.getColSelection(),
 				tvFrame.getRowSelection());

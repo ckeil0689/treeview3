@@ -12,7 +12,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -85,7 +85,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	 * @param name
 	 *            The name of the column
 	 */
-	public void setHeaderInfo(final HeaderInfo info, final String name) {
+	public void setHeaderInfo(final LabelInfo info, final String name) {
 		if ((headerInfo != info) || !(headerName.equalsIgnoreCase(name))) {
 			headerInfo = info;
 			headerName = name;
@@ -240,7 +240,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	 * @return value of array element, or nodata if not found
 	 */
 	public char getChar(final int x, final int y) {
-		final String aln = headerInfo.getHeader(y, headerName);
+		final String aln = headerInfo.getLabel(y, headerName);
 		try {
 			if (aln != null)
 				return aln.charAt(x);
@@ -260,7 +260,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	@Override
 	public boolean isMissing(final int x, final int y) {
 
-		final String aln = headerInfo.getHeader(y, headerName);
+		final String aln = headerInfo.getLabel(y, headerName);
 		try {
 			if (aln != null) {
 				aln.charAt(x);
@@ -282,7 +282,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	@Override
 	public int getNumRow() {
 		if ((headerInfo != null) && (headerName != null))
-			return headerInfo.getNumHeaders();
+			return headerInfo.getNumLabels();
 		return 0;
 	}
 
@@ -292,8 +292,8 @@ public class CharArrayDrawer extends ArrayDrawer {
 		try {
 			if ((headerInfo != null) && (headerName != null)) {
 				int max = 0;
-				for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
-					final String header = headerInfo.getHeader(i, headerName);
+				for (int i = 0; i < headerInfo.getNumLabels(); i++) {
+					final String header = headerInfo.getLabel(i, headerName);
 					if (header != null) {
 						final int length = header.length();
 						if (length > max) {
@@ -333,6 +333,6 @@ public class CharArrayDrawer extends ArrayDrawer {
 	/** Used to convert data values into colors */
 	protected CharColorExtractor colorExtractor;
 	/** The column of aligned sequence to be rendered. */
-	protected HeaderInfo headerInfo;
+	protected LabelInfo headerInfo;
 	protected String headerName;
 }

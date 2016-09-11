@@ -17,7 +17,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 
 public class AtrAnalysisNode extends TreeAnalysisNode {
 
@@ -146,7 +146,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 	 *            hashtable for reverse index look up (by array name)
 	 * @return the average index for this subtree
 	 */
-	private double computeAverageIndexTree(final HeaderInfo arrayHeader,
+	private double computeAverageIndexTree(final LabelInfo arrayHeader,
 			final Hashtable gid2index) {
 
 		double leftSum = 0, rightSum = 0;
@@ -209,7 +209,7 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 	 * @param gid2index
 	 *            hashtable for reverse index look up (by array name)
 	 */
-	public void indexTree(final HeaderInfo arrayHeader,
+	public void indexTree(final LabelInfo arrayHeader,
 			final Hashtable gid2index) {
 		computeAverageIndexTree(arrayHeader, gid2index);
 		arrangeByAverageIndex();

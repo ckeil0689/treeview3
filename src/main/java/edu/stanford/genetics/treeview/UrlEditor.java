@@ -36,13 +36,13 @@ public class UrlEditor {
 	private final UrlExtractor extractor;
 	private final UrlPresets presets;
 	private Window window;
-	private final HeaderInfo headerInfo;
+	private final LabelInfo headerInfo;
 
 	/**
 	 * This class must be constructed around a HeaderInfo
 	 */
 	public UrlEditor(final UrlExtractor ue, final UrlPresets up,
-			final HeaderInfo hI) {
+			final LabelInfo hI) {
 
 		super();
 		extractor = ue;
@@ -237,7 +237,7 @@ public class UrlEditor {
 				int lastI;
 
 				if (headerInfo != null) {
-					headers = headerInfo.getNames();
+					headers = headerInfo.getPrefixes();
 					lastI = headers.length;
 
 					if (headerInfo.getIndex("GWEIGHT") != -1) {

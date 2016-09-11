@@ -545,16 +545,16 @@ public class GUIFactory {
 	}
 
 	/**
-	 * Creates a header label.
+	 * Creates a prefix label.
 	 *
 	 * @param title
 	 * @return
 	 */
-	public static JLabel setupHeader(final String title) {
+	public static JLabel setupPrefix(final String title) {
 
-		final JLabel header = new JLabel(title);
-		header.setFont(FONTL);
+		final JLabel prefix = new JLabel(title);
+		prefix.setFont(FONTL);
 
-		return header;
+		return prefix;
 	}
 }

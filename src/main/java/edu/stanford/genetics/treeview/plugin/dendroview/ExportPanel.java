@@ -42,8 +42,8 @@ import javax.swing.event.ListSelectionListener;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.DummyHeaderInfo;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LabelInfo;
+import edu.stanford.genetics.treeview.LabelSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
@@ -62,8 +62,8 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	private Preferences root;
 
 	// external links
-	private final HeaderInfo arrayHeaderInfo; // allows access to array headers.
-	private final HeaderInfo geneHeaderInfo; // allows access to gene headers.
+	private final LabelInfo arrayHeaderInfo; // allows access to array headers.
+	private final LabelInfo geneHeaderInfo; // allows access to gene headers.
 	private FileSet sourceSet; // FileSet from which current data was
 	// constructed.
 	private final TreeSelectionI geneSelection;
@@ -77,11 +77,11 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	private Double explicitAtrHeight = null;
 
 	// accessors
-	protected HeaderInfo getArrayHeaderInfo() {
+	protected LabelInfo getArrayHeaderInfo() {
 		return arrayHeaderInfo;
 	}
 
-	protected HeaderInfo getGeneHeaderInfo() {
+	protected LabelInfo getGeneHeaderInfo() {
 		return geneHeaderInfo;
 	}
 
@@ -273,19 +273,19 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		return headerSelectionPanel.getArrayAnno(i);
 	}
 
-	private Color getFgColor(final HeaderInfo headerInfo, final int index) {
+	private Color getFgColor(final LabelInfo headerInfo, final int index) {
 		final int colorIndex = headerInfo.getIndex("FGCOLOR");
 		if (colorIndex > 0) {
-			final String[] headers = headerInfo.getHeader(index);
+			final String[] headers = headerInfo.getLabels(index);
 			return TreeColorer.getColor(headers[colorIndex]);
 		}
 		return null;
 	}
 
-	private Color getBgColor(final HeaderInfo headerInfo, final int index) {
+	private Color getBgColor(final LabelInfo headerInfo, final int index) {
 		final int colorIndex = headerInfo.getIndex("BGCOLOR");
 		if (colorIndex > 0) {
-			final String[] headers = headerInfo.getHeader(index);
+			final String[] headers = headerInfo.getLabels(index);
 			return TreeColorer.getColor(headers[colorIndex]);
 		}
 		return null;
@@ -377,8 +377,8 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	 * hasChar - indicates whether or not there are characters in the data area.
 	 * Used when we have a CharArrayDrawer.
 	 */
-	public ExportPanel(final HeaderInfo arrayHeaderInfo,
-			final HeaderInfo geneHeaderInfo,
+	public ExportPanel(final LabelInfo arrayHeaderInfo,
+			final LabelInfo geneHeaderInfo,
 			final TreeSelectionI geneSelection,
 			final TreeSelectionI arraySelection,
 			final TreePainter arrayTreeDrawer,
@@ -412,18 +412,18 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 	public static final void main(final String[] argv) {
 
-		final HeaderInfo aH = new DummyHeaderInfo();
-		final HeaderInfo gH = new DummyHeaderInfo();
+		final LabelInfo aH = new DummyHeaderInfo();
+		final LabelInfo gH = new DummyHeaderInfo();
 		final MapContainer aMap = new MapContainer(IntegerMap.FIXED, "FixedMap");
 		// aMap.setMap("Fixed");
 		aMap.setScale(10);
-		aMap.setIndexRange(0, aH.getNumHeaders());
+		aMap.setIndexRange(0, aH.getNumLabels());
 		final MapContainer gMap = new MapContainer(IntegerMap.FIXED, "FixedMap");
 		// gMap.setMap("Fixed");
 		gMap.setScale(12);
-		gMap.setIndexRange(0, gH.getNumHeaders());
-		final TreeSelectionI gsel = new TreeSelection(gH.getNumHeaders());
-		final TreeSelectionI asel = new TreeSelection(aH.getNumHeaders());
+		gMap.setIndexRange(0, gH.getNumLabels());
+		final TreeSelectionI gsel = new TreeSelection(gH.getNumLabels());
+		final TreeSelectionI asel = new TreeSelection(aH.getNumLabels());
 		final ExportPanel testExportPanel = new TestExportPanel(aH, gH, gsel,
 				asel, aMap, gMap);
 		final JFrame test = new JFrame("Test Export Panel");
@@ -572,14 +572,14 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		if (inclusionPanel.drawSelected())
 			return geneSelection.getMaxIndex();
 		else
-			return geneHeaderInfo.getNumHeaders() - 1;
+			return geneHeaderInfo.getNumLabels() - 1;
 	}
 
 	public int maxArray() {
 		if (inclusionPanel.drawSelected())
 			return arraySelection.getMaxIndex();
 		else
-			return arrayHeaderInfo.getNumHeaders() - 1;
+			return arrayHeaderInfo.getNumLabels() - 1;
 	}
 
 	public int estimateHeight() {
@@ -978,7 +978,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		// final TextView_deprec anv = new TextView_deprec();
 		final RowLabelView anv = new RowLabelView();
 		anv.setUrlExtractor(null);
-		anv.setHeaderInfo(geneHeaderInfo);
+		anv.setLabelInfo(geneHeaderInfo);
 		anv.setMap(tempMap);
 		anv.setHeaderSummary(headerSelectionPanel.getGeneSummary());
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
@@ -1019,7 +1019,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		tempMap.setAvailablePixels(width + getBorderPixels());
 		final ColumnLabelView anv = new ColumnLabelView();
 		anv.setUrlExtractor(null);
-		anv.setHeaderInfo(arrayHeaderInfo);
+		anv.setLabelInfo(arrayHeaderInfo);
 		anv.setFace(getArrayFont().getName());
 		anv.setStyle(getArrayFont().getStyle());
 		anv.setPoints(getArrayFont().getSize());
@@ -1518,17 +1518,17 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		private static final long serialVersionUID = 1L;
 
 		private final JCheckBox geneAnnoInside, arrayAnnoInside;
-		private final HeaderSummary geneSummary = new HeaderSummary(
+		private final LabelSummary geneSummary = new LabelSummary(
 				"GeneSummary");
 
-		public HeaderSummary getGeneSummary() {
+		public LabelSummary getGeneSummary() {
 			return geneSummary;
 		}
 
-		private final HeaderSummary arraySummary = new HeaderSummary(
+		private final LabelSummary arraySummary = new LabelSummary(
 				"ArraySummary");
 
-		public HeaderSummary getArraySummary() {
+		public LabelSummary getArraySummary() {
 			return arraySummary;
 		}
 
@@ -1632,7 +1632,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 			add(new JLabel("Gene Headers"));
-			final String[] geneHeaders = geneHeaderInfo.getNames();
+			final String[] geneHeaders = geneHeaderInfo.getPrefixes();
 			if (geneHeaders == null) {
 				geneList = new JList<String>(new String[0]);
 			} else {
@@ -1645,7 +1645,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			// add(geneAnnoInside);
 			add(new JLabel("Array Headers"));
 
-			final String[] arrayHeaders = arrayHeaderInfo.getNames();
+			final String[] arrayHeaders = arrayHeaderInfo.getPrefixes();
 			if (arrayHeaders == null) {
 				arrayList = new JList<String>(new String[0]);
 			} else {
@@ -1769,8 +1769,8 @@ class TestExportPanel extends ExportPanel {
 				new TreeSelection(4), new TreeSelection(5), aMap, gMap);
 	}
 
-	TestExportPanel(final HeaderInfo arrayHeaderInfo,
-			final HeaderInfo geneHeaderInfo,
+	TestExportPanel(final LabelInfo arrayHeaderInfo,
+			final LabelInfo geneHeaderInfo,
 			final TreeSelectionI geneSelection,
 			final TreeSelectionI arraySelection, final MapContainer aMap,
 			final MapContainer gMap) {

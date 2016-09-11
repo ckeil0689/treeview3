@@ -33,7 +33,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 
 	private final UrlExtractor urlExtractor;
 	private UrlPresets urlPresets = null;
-	private final HeaderInfo headerInfo;
+	private final LabelInfo headerInfo;
 
 	private JPanel mainPanel;
 
@@ -46,7 +46,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 		this(ue, ue.getHeaderInfo(), up);
 	}
 
-	public UrlSettingsPanel(final UrlExtractor ue, final HeaderInfo hi,
+	public UrlSettingsPanel(final UrlExtractor ue, final LabelInfo hi,
 			final UrlPresets up) {
 
 		super();
@@ -75,7 +75,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 
 		final UrlPresets p = new UrlPresets("UrlSettingsPanel");
 		p.setConfigNode(null);
-		final HeaderInfo hi = new DummyHeaderInfo();
+		final LabelInfo hi = new DummyHeaderInfo();
 		final UrlExtractor ue = new UrlExtractor(hi);
 
 		final UrlSettingsPanel e = new UrlSettingsPanel(ue, hi, p);
@@ -174,7 +174,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 			String[] headers;
 			int lastI;
 			if (headerInfo != null) {
-				headers = headerInfo.getNames();
+				headers = headerInfo.getPrefixes();
 				lastI = headers.length;
 				if (headerInfo.getIndex("GWEIGHT") != -1) {
 					lastI--;

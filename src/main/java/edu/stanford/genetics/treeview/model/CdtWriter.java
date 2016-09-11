@@ -21,25 +21,25 @@ public class CdtWriter {
 		try {
 			out = new FileWriter(spool);
 			// first, the array annotations.
-			for (int headerrow = 0; headerrow < dataModel.getColHeaderInfo()
-					.getNumNames(); headerrow++) {
-				for (int column = 0; column < dataModel.getColHeaderInfo()
-						.getNumHeaders()
-						+ dataModel.getRowHeaderInfo().getNumNames(); column++) {
-					if (column > 0) {
+			for (int colPrefixIdx = 0; colPrefixIdx < dataModel.getColLabelInfo()
+					.getNumPrefixes(); colPrefixIdx++) {
+				for (int colIdx = 0; colIdx < dataModel.getColLabelInfo()
+						.getNumLabels()
+						+ dataModel.getRowLabelInfo().getNumPrefixes(); colIdx++) {
+					if (colIdx > 0) {
 						out.write("\t");
 					}
-					if (column < dataModel.getRowHeaderInfo().getNumNames()) {
-						if (headerrow == 0) {
-							// we need to write out the names from the gene
-							// header info
-							printNotNull(out, dataModel.getRowHeaderInfo()
-									.getNames()[column]);
-						} else if (column == 0) {
+					if (colIdx < dataModel.getRowLabelInfo().getNumPrefixes()) {
+						if (colPrefixIdx == 0) {
+							// we need to write out the names from the row
+							// label info
+							printNotNull(out, dataModel.getRowLabelInfo()
+									.getPrefixes()[colIdx]);
+						} else if (colIdx == 0) {
 							// for the first column, write out the name from the
-							// array header info.
-							printNotNull(out, dataModel.getColHeaderInfo()
-									.getNames()[headerrow]);
+							// column label info.
+							printNotNull(out, dataModel.getColLabelInfo()
+									.getPrefixes()[colPrefixIdx]);
 						} else {
 							// otherwise, just leave empty.
 						}
@@ -47,35 +47,35 @@ public class CdtWriter {
 						// write out actual array annotation.
 						printNotNull(
 								out,
-								dataModel.getColHeaderInfo().getHeader(
-										column
-												- dataModel.getRowHeaderInfo()
-														.getNumNames(),
-										headerrow));
+								dataModel.getColLabelInfo().getLabel(
+										colIdx
+												- dataModel.getRowLabelInfo()
+														.getNumPrefixes(),
+										colPrefixIdx));
 					}
 				}
 				out.write("\n");
 			}
 			// next the data rows.
-			for (int gene = 0; gene < dataModel.getRowHeaderInfo()
-					.getNumHeaders(); gene++) {
-				for (int column = 0; column < dataModel.getColHeaderInfo()
-						.getNumHeaders()
-						+ dataModel.getRowHeaderInfo().getNumNames(); column++) {
-					if (column > 0) {
+			for (int rowIdx = 0; rowIdx < dataModel.getRowLabelInfo()
+					.getNumLabels(); rowIdx++) {
+				for (int colIdx = 0; colIdx < dataModel.getColLabelInfo()
+						.getNumLabels()
+						+ dataModel.getRowLabelInfo().getNumPrefixes(); colIdx++) {
+					if (colIdx > 0) {
 						out.write("\t");
 					}
-					if (column < dataModel.getRowHeaderInfo().getNumNames()) {
-						printNotNull(out, dataModel.getRowHeaderInfo()
-								.getHeader(gene, column));
+					if (colIdx < dataModel.getRowLabelInfo().getNumPrefixes()) {
+						printNotNull(out, dataModel.getRowLabelInfo()
+								.getLabel(rowIdx, colIdx));
 					} else {
 						// write out actual data.
 						printNotNull2(
 								out,
 								dataModel.getDataMatrix().getValue(
-										column
-												- dataModel.getRowHeaderInfo()
-														.getNumNames(), gene));
+										colIdx
+												- dataModel.getRowLabelInfo()
+														.getNumPrefixes(), rowIdx));
 					}
 				}
 				out.write("\n");

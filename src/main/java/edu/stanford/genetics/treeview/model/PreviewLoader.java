@@ -69,8 +69,8 @@ public final class PreviewLoader {
 					/*
 					 * Data found if: 1) Is numeric 2) OR found a N/A (or
 					 * equivalent) symbol) 3) current string index is bigger
-					 * than last known column header index 4) Current line does
-					 * NOT have a common known header (e.g. EWEIGHT) in the
+					 * than last known column prefix index 4) Current line does
+					 * NOT have a common known prefix (e.g. EWEIGHT) in the
 					 * line, which may be a label but contain numeric data.
 					 */
 					if (isDoubleParseable(element) || isNaN(element)) {

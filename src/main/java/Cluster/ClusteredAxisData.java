@@ -14,7 +14,7 @@ public class ClusteredAxisData {
 	private final String AXIS_BASEID;
 	
 	private String[] reorderedIDs;
-	private String[] axisHeaders;
+	private String[] axisPrefixes;
 	private String[][] axisLabels;
 	private String[][] orderedAxisLabels;
 	
@@ -36,9 +36,9 @@ public class ClusteredAxisData {
 		this.reorderedIDs = newReorderedIDs;
 	}
 	
-	public void setHeaders(final String[] newAxisHeaders) {
+	public void setPrefixes(final String[] newAxisPrefixes) {
 		
-		this.axisHeaders = newAxisHeaders;
+		this.axisPrefixes = newAxisPrefixes;
 	}
 	
 	public void setLabels(final String[][] newAxisLabels) {
@@ -77,9 +77,9 @@ public class ClusteredAxisData {
 		return reorderedIDs;
 	}
 	
-	public String[] getAxisHeaders() {
+	public String[] getAxisPrefixes() {
 		
-		return axisHeaders;
+		return axisPrefixes;
 	}
 	
 	public String[][] getAxisLabels() {

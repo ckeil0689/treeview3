@@ -49,8 +49,8 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 	private final double PRECISION_LEVEL = 0.001;
 
 	private final TreeSelectionI geneSelection;
-	private final HeaderInfo headerInfo;
-	private HeaderInfo aHeaderInfo;
+	private final LabelInfo headerInfo;
+	private LabelInfo aHeaderInfo;
 	private int nArray = 0;
 	private DataMatrix dataMatrix = null;
 	private double noData;
@@ -114,7 +114,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			final int[] selectedPrefix = fieldRow.getSelectedPrefix();
 			if (fieldRow.includeHeader()) {
 				if (rowIndex == 0) {
-					final String[] pNames = headerInfo.getNames();
+					final String[] pNames = headerInfo.getPrefixes();
 					if (columnIndex < selectedPrefix.length)
 						// gene annotation column headers
 						return pNames[selectedPrefix[columnIndex]];
@@ -125,7 +125,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 							gidRow = 0;
 						}
 						final String[] headers = aHeaderInfo
-								.getHeader(columnIndex - selectedPrefix.length);
+								.getLabels(columnIndex - selectedPrefix.length);
 						return headers[gidRow];
 					}
 				} else if (rowIndex == 1 && eRow != -1) {
@@ -136,7 +136,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 						return "";
 					else {
 						final String[] headers = aHeaderInfo
-								.getHeader(columnIndex - selectedPrefix.length);
+								.getLabels(columnIndex - selectedPrefix.length);
 						return headers[eRow];
 					}
 				} else {
@@ -144,7 +144,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 				}
 			}
 			if (columnIndex < selectedPrefix.length) {
-				final String[] headers = headerInfo.getHeader(rowIndex + top);
+				final String[] headers = headerInfo.getLabels(rowIndex + top);
 				return headers[selectedPrefix[columnIndex]];
 			} else {
 				final double val = dataMatrix.getValue(columnIndex
@@ -229,7 +229,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 	}
 
 	public GeneListMaker(final JFrame f, final TreeSelectionI n,
-			final HeaderInfo hI, final String dd) {
+			final LabelInfo hI, final String dd) {
 
 		super(f, "Gene Text Export", true);
 
@@ -244,8 +244,8 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 			top = bot;
 			bot = swap;
 		}
-		final String[] first = headerInfo.getHeader(top);
-		final String[] last = headerInfo.getHeader(bot);
+		final String[] first = headerInfo.getLabels(top);
+		final String[] last = headerInfo.getLabels(bot);
 		final int yorf = headerInfo.getIndex("YORF");
 		fieldRow = new FieldRow();
 		fieldRow.setSelectedIndex(yorf);
@@ -286,7 +286,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 	}
 
-	public void setDataMatrix(final DataMatrix data, final HeaderInfo ahi,
+	public void setDataMatrix(final DataMatrix data, final LabelInfo ahi,
 			final double noData) {
 		this.dataMatrix = data;
 		this.nArray = dataMatrix.getNumCol();
@@ -310,7 +310,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 
 			if (fieldRow.includeHeader()) {
 				// gid row...
-				final String[] pNames = headerInfo.getNames();
+				final String[] pNames = headerInfo.getPrefixes();
 				output.print(pNames[selectedPrefix[0]]);
 				for (int j = 1; j < selectedPrefix.length; j++) {
 					output.print('\t');
@@ -324,7 +324,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 					for (int j = 0; j < nArray; j++) {
 						output.print('\t');
 						try {
-							final String[] headers = aHeaderInfo.getHeader(j);
+							final String[] headers = aHeaderInfo.getLabels(j);
 							final String out = headers[gidRow];
 							output.print(out);
 
@@ -344,7 +344,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 					for (int j = 0; j < nArray; j++) {
 						output.print('\t');
 						try {
-							final String[] headers = aHeaderInfo.getHeader(j);
+							final String[] headers = aHeaderInfo.getLabels(j);
 							final String out = headers[eRow];
 							output.print(out);
 
@@ -362,7 +362,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 					continue;
 				}
 
-				final String[] headers = headerInfo.getHeader(i);
+				final String[] headers = headerInfo.getLabels(i);
 				output.print(headers[selectedPrefix[0]]);
 				for (int j = 1; j < selectedPrefix.length; j++) {
 					output.print('\t');
@@ -402,7 +402,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		JCheckBox exprBox, headerBox;
 
 		public void includeAll() {
-			list.setSelectionInterval(0, (headerInfo.getNames()).length - 1);
+			list.setSelectionInterval(0, (headerInfo.getPrefixes()).length - 1);
 			exprBox.setSelected(true);
 			headerBox.setSelected(true);
 
@@ -427,7 +427,7 @@ public class GeneListMaker extends JDialog implements ConfigNodePersistent {
 		public FieldRow() {
 			super();
 			add(new JLabel("Field(s) to print: "));
-			list = new JList<Object>(headerInfo.getNames());
+			list = new JList<Object>(headerInfo.getPrefixes());
 			list.addListSelectionListener(notifier);
 			add(list);
 			exprBox = new JCheckBox("Expression Data?");

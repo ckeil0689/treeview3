@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import edu.stanford.genetics.treeview.DendroPanel;
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.PluginFactory;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.ViewFrame;
@@ -21,7 +21,7 @@ import edu.stanford.genetics.treeview.core.PluginManager;
 
 public class AlignmentFactory extends PluginFactory {
 
-	private HeaderInfo rowHI;
+	private LabelInfo rowHI;
 
 	static {
 		PluginManager.registerPlugin(new AlignmentFactory());
@@ -87,7 +87,7 @@ public class AlignmentFactory extends PluginFactory {
 		return true;
 	}
 
-	public void setRowHeaderInfo(final HeaderInfo rowHI) {
+	public void setRowHeaderInfo(final LabelInfo rowHI) {
 
 		this.rowHI = rowHI;
 	}

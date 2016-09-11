@@ -9,7 +9,7 @@ package edu.stanford.genetics.treeview;
 
 import java.util.prefs.Preferences;
 
-import edu.stanford.genetics.treeview.model.IntHeaderInfo;
+import edu.stanford.genetics.treeview.model.IntLabelInfo;
 
 /**
  * This file defines the bare bones of what needs to be implemented by a data
@@ -89,12 +89,12 @@ public interface DataModel {
 	 * column and the description column, respectively. See
 	 * TVModel.TVModelHeaderInfo for details.
 	 */
-	public IntHeaderInfo getRowHeaderInfo();
+	public IntLabelInfo getRowLabelInfo();
 
 	/**
 	 * Gets the HeaderInfo associated with arrays for this DataModel.
 	 */
-	public IntHeaderInfo getColHeaderInfo();
+	public IntLabelInfo getColLabelInfo();
 
 	/**
 	 * Gets the HeaderInfo associated with gene tree for this DataModel.
@@ -103,12 +103,12 @@ public interface DataModel {
 	 * column and the description column, respectively. See
 	 * TVModel.TVModelHeaderInfo for details.
 	 */
-	public HeaderInfo getGtrHeaderInfo();
+	public LabelInfo getGtrLabelInfo();
 
 	/**
 	 * Gets the HeaderInfo associated with array tree for this DataModel.
 	 */
-	public HeaderInfo getAtrHeaderInfo();
+	public LabelInfo getAtrLabelInfo();
 
 	/**
 	 * This not-so-object-oriented hack is in those rare instances where it is

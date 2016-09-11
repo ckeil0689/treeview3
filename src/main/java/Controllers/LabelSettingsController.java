@@ -18,7 +18,7 @@ import javax.swing.SwingWorker;
 
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LabelLoadDialog;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -266,15 +266,15 @@ public class LabelSettingsController {
 		@Override
 		protected Void doInBackground() throws Exception {
 
-			HeaderInfo headerInfo;
+			LabelInfo labelInfo;
 			if (type.equalsIgnoreCase(StringRes.main_rows)) {
-				headerInfo = model.getRowHeaderInfo();
+				labelInfo = model.getRowLabelInfo();
 
 			} else if (type.equalsIgnoreCase(StringRes.main_cols)) {
-				headerInfo = model.getColHeaderInfo();
+				labelInfo = model.getColLabelInfo();
 				
 			} else {
-				LogBuffer.println("Could not set HeaderInfo"
+				LogBuffer.println("Could not set LabelInfo"
 						+ " when trying to load new labels.");
 				return null;
 			}
@@ -283,37 +283,37 @@ public class LabelSettingsController {
 			 * Get number of rows without GID row. Done here to avoid passing
 			 * model.
 			 */
-			int geneNum = model.getRowHeaderInfo().getNumNames();
+			int rowNum = model.getRowLabelInfo().getNumPrefixes();
 
 			if (model.gidFound()) {
-				geneNum--;
+				rowNum--;
 			}
 
 			// Load new labels
 			final CustomLabelLoader clLoader = new CustomLabelLoader(
-					headerInfo, preferences.getSelectedLabelIndexes());
+					labelInfo, preferences.getSelectedLabelIndexes());
 
-			clLoader.load(customFile, geneNum);
+			clLoader.load(customFile, rowNum);
 
-			final int headerNum = clLoader.checkForHeaders(model);
+			final int prefixNum = clLoader.checkForPrefixes(model);
 
-			// Change headerArrays (without matching actual names first)
-			final String[][] oldHeaders = headerInfo.getHeaderArray();
-			final String[] oldNames = headerInfo.getNames();
+			// Change labelArrays (without matching actual names first)
+			final String[][] oldLabels = labelInfo.getLabelArray();
+			final String[] oldPrefixes = labelInfo.getPrefixes();
 
-			final String[][] headersToAdd = new String[oldHeaders.length
-					+ headerNum][];
+			final String[][] labelsToAdd = new String[oldLabels.length
+					+ prefixNum][];
 
 			// Iterate over loadedLabels
-			for (int i = 0; i < oldHeaders.length; i++) {
+			for (int i = 0; i < oldLabels.length; i++) {
 
-				headersToAdd[i] = clLoader
-						.replaceLabel(oldHeaders[i], oldNames);
+				labelsToAdd[i] = clLoader
+						.replaceLabel(oldLabels[i], oldPrefixes);
 
-				setProgress((i + 1) * 100 / oldHeaders.length);
+				setProgress((i + 1) * 100 / oldLabels.length);
 			}
 
-			clLoader.setHeaders(model, type, headersToAdd);
+			clLoader.setLabels(model, type, labelsToAdd);
 
 			return null;
 		}

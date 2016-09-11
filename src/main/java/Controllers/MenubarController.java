@@ -153,10 +153,10 @@ public class MenubarController {
 	private void openStats() {
 
 		final String source = controller.getDataModel().getSource();
-		final int rowNum = controller.getDataModel().getRowHeaderInfo()
-				.getNumHeaders();
-		final int colNum = controller.getDataModel().getColHeaderInfo()
-				.getNumHeaders();
+		final int rowNum = controller.getDataModel().getRowLabelInfo()
+				.getNumLabels();
+		final int colNum = controller.getDataModel().getColLabelInfo()
+				.getNumLabels();
 
 		tvFrame.openStatsView(source, rowNum, colNum);
 	}
