@@ -150,7 +150,7 @@ public class UrlEditor {
 		public void redoLayout() {
 
 			String[] preset;
-			preset = presets.getPresetNames();
+			preset = presets.getPresetPrefixes();
 			final int nPresets = preset.length;
 			removeAll();
 
@@ -308,7 +308,7 @@ public class UrlEditor {
 
 			final int index = i;
 			gbc.gridx = 0;
-			add(new JLabel((presets.getPresetNames())[index]), gbc);
+			add(new JLabel((presets.getPresetPrefixes())[index]), gbc);
 			gbc.gridx = 1;
 			gbc.weightx = 100;
 			add(new JTextField(presets.getTemplate(index)), gbc);

@@ -92,7 +92,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 		columnUrlPresets = new UrlPresets("ArrayUrlPresets");
 		columnUrlPresets.setConfigNode(getGlobalConfig());
 
-		if (columnUrlPresets.getPresetNames().length == 0) {
+		if (columnUrlPresets.getPresetPrefixes().length == 0) {
 			columnUrlPresets.addPreset("Google",
 					"http://www.google.com/search?hl=en&ie=ISO-8859-1"
 							+ "&q=HEADER");

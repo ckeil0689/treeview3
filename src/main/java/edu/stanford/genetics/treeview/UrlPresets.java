@@ -43,7 +43,7 @@ public class UrlPresets implements ConfigNodePersistent {
 					+ "setting.");
 		}
 
-		if (getPresetNames().length == 0) {
+		if (getPresetPrefixes().length == 0) {
 			addDefaultGenePresets();
 		}
 	}
@@ -130,7 +130,7 @@ public class UrlPresets implements ConfigNodePersistent {
 	/**
 	 * returns String [] of preset names for display
 	 */
-	public String[] getPresetNames() {
+	public String[] getPresetPrefixes() {
 
 		try {
 			// Preferences presetNode = root.node("Preset");
@@ -184,7 +184,7 @@ public class UrlPresets implements ConfigNodePersistent {
 	 *
 	 * @return
 	 */
-	public String[] getPresetHeaders() {
+	public String[] getPresetLabels() {
 
 		final Preferences presetNode = configNode.node("Preset");
 
@@ -257,7 +257,7 @@ public class UrlPresets implements ConfigNodePersistent {
 	 *            the header for which we want a URL template
 	 * @return null if header is not specified in presets
 	 */
-	public String getTemplateByHeader(final String header) {
+	public String getTemplateByLabel(final String header) {
 
 		final Preferences presetNode = configNode.node("Preset");
 		try {

@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.prefs.Preferences;
 
 /**
- * This class extracts Urls from HeaderInfo. Also included is a class to pop up
+ * This class extracts Urls from LabelInfo. Also included is a class to pop up
  * a configuration window.
  */
 public class UrlExtractor {
@@ -29,17 +29,17 @@ public class UrlExtractor {
 	private int index;
 	private int dindex = 1;
 
-	private LabelInfo headerInfo;
+	private LabelInfo labelInfo;
 
 	private Preferences root;
 	UrlPresets uPresets;
 
 	/**
-	 * This class must be constructed around gene header info
+	 * This class must be constructed around row label info
 	 */
 	public UrlExtractor(final LabelInfo hI) {
 
-		this.headerInfo = hI;
+		this.labelInfo = hI;
 		this.urlTemplate = dUrlTemplate;
 		this.index = dindex;
 		this.isEnabled = isDefaultEnabled;
@@ -48,7 +48,7 @@ public class UrlExtractor {
 
 	public UrlExtractor(final LabelInfo hI, final UrlPresets uPresets) {
 
-		this.headerInfo = hI;
+		this.labelInfo = hI;
 		this.urlTemplate = dUrlTemplate;
 		this.index = dindex;
 		this.isEnabled = isDefaultEnabled;
@@ -76,31 +76,31 @@ public class UrlExtractor {
 
 	/**
 	 * most common use, returns a String rep of a url given an index returns
-	 * null if not enabled, or if the header for this gene is null.
+	 * null if not enabled, or if the label for this row is null.
 	 */
 	public String getUrl(final int i) {
 		if (isEnabled() == false)
 			return null;
-		final String[] headers = headerInfo.getLabels(i);
-		if (headers == null)
+		final String[] labels = labelInfo.getLabels(i);
+		if (labels == null)
 			return null;
-		return substitute(urlTemplate, headers[index]);
+		return substitute(urlTemplate, labels[index]);
 
 	}
 
-	public String getUrl(final int i, final String header) {
+	public String getUrl(final int i, final String label) {
 		if (uPresets == null)
 			return null;
 		if (isEnabled() == false)
 			return null;
-		final String[] headers = headerInfo.getLabels(i);
-		if (headers == null)
+		final String[] labels = labelInfo.getLabels(i);
+		if (labels == null)
 			return null;
-		String tmpTemplate = uPresets.getTemplateByHeader(header);
+		String tmpTemplate = uPresets.getTemplateByLabel(label);
 		if (tmpTemplate == null) {
 			tmpTemplate = urlTemplate;
 		}
-		return substitute(tmpTemplate, headers[index]);
+		return substitute(tmpTemplate, labels[index]);
 	}
 
 	public String substitute(final String val) {
@@ -187,13 +187,13 @@ public class UrlExtractor {
 		return isEnabled;
 	}
 
-	/** Setter for headerInfo */
-	public void setHeaderInfo(final LabelInfo headerInfo) {
-		this.headerInfo = headerInfo;
+	/** Setter for labelInfo */
+	public void setLabelInfo(final LabelInfo labelInfo) {
+		this.labelInfo = labelInfo;
 	}
 
-	/** Getter for headerInfo */
-	public LabelInfo getHeaderInfo() {
-		return headerInfo;
+	/** Getter for labelInfo */
+	public LabelInfo getLabelInfo() {
+		return labelInfo;
 	}
 }
