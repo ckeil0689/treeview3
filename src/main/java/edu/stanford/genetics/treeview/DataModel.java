@@ -83,21 +83,21 @@ public interface DataModel {
 	public void addFileSetListener(FileSetListener listener);
 
 	/**
-	 * Gets the HeaderInfo associated with genes for this DataModel.
+	 * Gets the LabelInfo associated with genes for this DataModel.
 	 *
 	 * There are two special indexes, YORF and NAME, which mean the unique id
 	 * column and the description column, respectively. See
-	 * TVModel.TVModelHeaderInfo for details.
+	 * TVModel.TVModelLabelInfo for details.
 	 */
 	public IntLabelInfo getRowLabelInfo();
 
 	/**
-	 * Gets the HeaderInfo associated with arrays for this DataModel.
+	 * Gets the LabelInfo associated with arrays for this DataModel.
 	 */
 	public IntLabelInfo getColLabelInfo();
 
 	/**
-	 * Gets the HeaderInfo associated with gene tree for this DataModel.
+	 * Gets the LabelInfo associated with gene tree for this DataModel.
 	 *
 	 * There are two special indexes, YORF and NAME, which mean the unique id
 	 * column and the description column, respectively. See

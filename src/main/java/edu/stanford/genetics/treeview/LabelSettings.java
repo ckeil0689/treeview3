@@ -214,8 +214,8 @@ public class LabelSettings extends CustomDialog {
 
 		private final JPanel annotationMainPanel;
 
-		private final HeaderSummaryPanel genePanel;
-		private final HeaderSummaryPanel arrayPanel;
+		private final LabelSummaryPanel genePanel;
+		private final LabelSummaryPanel arrayPanel;
 
 		private final JRadioButton rowRightJustBtn;
 		private final JRadioButton rowLeftJustBtn;
@@ -227,10 +227,10 @@ public class LabelSettings extends CustomDialog {
 			this.annotationMainPanel = GUIFactory.createJPanel(false, 
 					GUIFactory.NO_INSETS);
 
-			this.genePanel = new HeaderSummaryPanel(rowHI,
+			this.genePanel = new LabelSummaryPanel(rowHI,
 				dendroView.getRowLabelView());
 
-			this.arrayPanel = new HeaderSummaryPanel(colHI,
+			this.arrayPanel = new LabelSummaryPanel(colHI,
 				dendroView.getColLabelView());
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,

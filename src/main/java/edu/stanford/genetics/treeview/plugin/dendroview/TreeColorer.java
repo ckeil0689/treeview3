@@ -20,21 +20,21 @@ public class TreeColorer {
 	private static int colorInd;
 	private static String[][] headers; // used when inferring node colors from
 	// gene colors
-	private static LabelInfo headerInfo; // used when coloring using column
+	private static LabelInfo labelInfo; // used when coloring using column
 
 	// from GTR.
 
 	/**
 	 *
 	 * @param rootNode
-	 * @param geneHeaderInfo
+	 * @param rowLabelInfo
 	 */
 	public static void colorUsingHeader(final TreeDrawerNode rootNode,
-			final LabelInfo geneHeaderInfo) {
-		final int index = geneHeaderInfo.getIndex("FGCOLOR");
+			final LabelInfo rowLabelInfo) {
+		final int index = rowLabelInfo.getIndex("FGCOLOR");
 		if (index < 0)
 			return;
-		colorUsingPrefix(rootNode, geneHeaderInfo, index);
+		colorUsingPrefix(rootNode, rowLabelInfo, index);
 	}
 
 	/**
@@ -50,8 +50,8 @@ public class TreeColorer {
 	public static final synchronized void colorUsingPrefix(
 			final TreeDrawerNode root, final LabelInfo h, final int ci) {
 		colorInd = ci;
-		headerInfo = h;
-		if (headerInfo == null) {
+		labelInfo = h;
+		if (labelInfo == null) {
 			LogBuffer.println("TreeColorer: headers null");
 			return;
 		}
@@ -63,27 +63,27 @@ public class TreeColorer {
 			LogBuffer.println("TreeColorer: root null");
 			return;
 		}
-		recursiveColorUsingHeader(root);
+		recursiveColorUsingLabel(root);
 	}
 
-	private static final void recursiveColorUsingHeader(
+	private static final void recursiveColorUsingLabel(
 			final TreeDrawerNode node) {
 		// wrong index
 		// String [] headers = headerInfo.getHeader((int) node.getIndex());
 		if (node.isLeaf())
 			return;
 		else {
-			final int index = headerInfo.getLabelIndex(node.getId());
+			final int index = labelInfo.getLabelIndex(node.getId());
 			if (index < 0) {
 				LogBuffer.println("Problem finding node " + node.getId());
 			}
-			final String[] headers = headerInfo.getLabels(index);
+			final String[] labels = labelInfo.getLabels(index);
 
-			final String color = headers[colorInd];
+			final String color = labels[colorInd];
 			node.setColor(parseColor(color));
 
-			recursiveColorUsingHeader(node.getLeft());
-			recursiveColorUsingHeader(node.getRight());
+			recursiveColorUsingLabel(node.getLeft());
+			recursiveColorUsingLabel(node.getRight());
 		}
 	}
 
@@ -97,8 +97,8 @@ public class TreeColorer {
 	public static final synchronized void colorUsingLeaf(
 			final TreeDrawerNode root, final LabelInfo h, final int ci) {
 		colorInd = ci;
-		headerInfo = h;
-		if (headerInfo == null) {
+		labelInfo = h;
+		if (labelInfo == null) {
 			LogBuffer.println("headers null");
 			return;
 		}
@@ -124,7 +124,7 @@ public class TreeColorer {
 	private static final void recursiveColorUsingLeaf(final TreeDrawerNode node) {
 		if (node.isLeaf()) {
 			// System.out.println("coloring leaf");
-			node.setColor(parseColor(headerInfo.getLabel(
+			node.setColor(parseColor(labelInfo.getLabel(
 					(int) node.getIndex(), colorInd)));
 		} else {
 			recursiveColorUsingLeaf(node.getLeft());
@@ -156,7 +156,7 @@ public class TreeColorer {
 		for (int i = min; i < max; i++) {
 			String color;
 			if (headers == null) {
-				color = headerInfo.getLabel(i, colorInd);
+				color = labelInfo.getLabel(i, colorInd);
 			} else {
 				color = headers[i][colorInd];
 			}

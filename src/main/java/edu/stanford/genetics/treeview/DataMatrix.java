@@ -11,7 +11,7 @@ package edu.stanford.genetics.treeview;
  * Description of the Interface
  *
  * Provides a simple interface to the actual gene expression data, using the
- * same indexes as the corresponding HeaderInfo objects.
+ * same indexes as the corresponding LabelInfo objects.
  *
  *
  * @author aloksaldanha

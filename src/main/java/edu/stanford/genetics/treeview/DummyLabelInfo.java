@@ -23,11 +23,11 @@ public class DummyLabelInfo implements LabelInfo {
 	}
 
 	/**
-	 * Gets the header info for gene/array i, col name
+	 * Gets the label info for gene/array i, col name
 	 *
 	 * @param i
-	 *            index of the header to get
-	 * @return The array of header values
+	 *            index of the label to get
+	 * @return The array of label values
 	 */
 	@Override
 	public String getLabel(final int i, final String name) {

@@ -980,7 +980,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		anv.setUrlExtractor(null);
 		anv.setLabelInfo(rowLabelInfo);
 		anv.setMap(tempMap);
-		anv.setHeaderSummary(prefixSelectionPanel.getGeneSummary());
+		anv.setLabelSummary(prefixSelectionPanel.getGeneSummary());
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
 				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB);
 		LogBuffer.println("setting font for genes to " + getRowFont());
@@ -1023,7 +1023,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		anv.setFace(getColFont().getName());
 		anv.setStyle(getColFont().getStyle());
 		anv.setPoints(getColFont().getSize());
-		anv.setHeaderSummary(prefixSelectionPanel.getArraySummary());
+		anv.setLabelSummary(prefixSelectionPanel.getArraySummary());
 		anv.setMap(tempMap);
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
 				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB);
