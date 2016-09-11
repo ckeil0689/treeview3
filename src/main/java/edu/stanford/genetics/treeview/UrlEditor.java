@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 /**
- * This class extracts Urls from HeaderInfo. Also included is a class to pop up
+ * This class extracts Urls from LabelInfo. Also included is a class to pop up
  * a configuration window.
  */
 public class UrlEditor {
@@ -36,10 +36,10 @@ public class UrlEditor {
 	private final UrlExtractor extractor;
 	private final UrlPresets presets;
 	private Window window;
-	private final LabelInfo headerInfo;
+	private final LabelInfo labelInfo;
 
 	/**
-	 * This class must be constructed around a HeaderInfo
+	 * This class must be constructed around a LabelInfo
 	 */
 	public UrlEditor(final UrlExtractor ue, final UrlPresets up,
 			final LabelInfo hI) {
@@ -47,7 +47,7 @@ public class UrlEditor {
 		super();
 		extractor = ue;
 		presets = up;
-		headerInfo = hI;
+		labelInfo = hI;
 	}
 
 	/**
@@ -136,14 +136,14 @@ public class UrlEditor {
 		private static final long serialVersionUID = 1L;
 
 		private GridBagConstraints gbc;
-		private HeaderChoice headerChoice;
+		private LabelChoice labelChoice;
 		private TemplateField templateField;
 
 		public UrlEditPanel() {
 
 			redoLayout();
 			templateField.setText(extractor.getUrlTemplate());
-			headerChoice.select(extractor.getIndex());
+			labelChoice.select(extractor.getIndex());
 			updatePreview();
 		}
 
@@ -211,7 +211,7 @@ public class UrlEditor {
 		private void updatePreview() {
 
 			extractor.setUrlTemplate(templateField.getText());
-			extractor.setIndex(headerChoice.getSelectedIndex());
+			extractor.setIndex(labelChoice.getSelectedIndex());
 			previewField.setText(extractor.getUrl(0));
 		}
 
@@ -222,35 +222,35 @@ public class UrlEditor {
 			add(new JLabel("Header:"), gbc);
 			gbc.gridx = 1;
 			gbc.weightx = 100;
-			headerChoice = new HeaderChoice();
-			add(headerChoice, gbc);
+			labelChoice = new LabelChoice();
+			add(labelChoice, gbc);
 		}
 
-		private class HeaderChoice extends Choice implements ItemListener {
+		private class LabelChoice extends Choice implements ItemListener {
 
 			private static final long serialVersionUID = 1L;
 
-			public HeaderChoice() {
+			public LabelChoice() {
 
 				super();
-				String[] headers;
+				String[] prefixes;
 				int lastI;
 
-				if (headerInfo != null) {
-					headers = headerInfo.getPrefixes();
-					lastI = headers.length;
+				if (labelInfo != null) {
+					prefixes = labelInfo.getPrefixes();
+					lastI = prefixes.length;
 
-					if (headerInfo.getIndex("GWEIGHT") != -1) {
+					if (labelInfo.getIndex("GWEIGHT") != -1) {
 						lastI--;
 					}
 				} else {
-					headers = new String[] { "Dummy1", "Dummy2", "Dummy3" };
-					lastI = headers.length;
+					prefixes = new String[] { "Dummy1", "Dummy2", "Dummy3" };
+					lastI = prefixes.length;
 				}
 
 				for (int i = 0; i < lastI; i++) {
 
-					add(headers[i]);
+					add(prefixes[i]);
 				}
 				addItemListener(this);
 			}

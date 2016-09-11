@@ -39,7 +39,7 @@ import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialogController;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.GeneListMaker;
+import edu.stanford.genetics.treeview.RowListMaker;
 import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -799,7 +799,7 @@ public class TVController implements Observer {
 				def = source.getDir() + source.getRoot() + "_list.txt";
 			}
 
-			final GeneListMaker t = new GeneListMaker(
+			final RowListMaker t = new RowListMaker(
 					(JFrame) Frame.getFrames()[0], tvFrame.getRowSelection(),
 					model.getRowLabelInfo(), def);
 
@@ -820,7 +820,7 @@ public class TVController implements Observer {
 
 		if (warnSelectionEmpty()) {
 			final FileSet source = model.getFileSet();
-			final GeneListMaker t = new GeneListMaker(
+			final RowListMaker t = new RowListMaker(
 					(JFrame) Frame.getFrames()[0], tvFrame.getRowSelection(),
 					model.getRowLabelInfo(), source.getDir()
 							+ source.getRoot() + "_data.cdt");

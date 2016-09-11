@@ -123,7 +123,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 
 				} catch (final NumberFormatException e) {
 					LogBuffer.logException(e);
-					LogBuffer.println("HeaderSummary has trouble "
+					LogBuffer.println("LabelSummary has trouble "
 							+ "restoring included list from " 
 							+ Arrays.toString(inclArray));
 					setIncluded(new int[0]);
@@ -134,13 +134,13 @@ implements ConfigNodePersistent, ModelLoadReset {
 				setIncluded(array);
 			}
 		} else if(prefixes != null && prefixes.length > 0) {
-			LogBuffer.println("There are headers defined but no key stored "
+			LogBuffer.println("There are labels defined but no key stored "
 					+ "for included indices. Setting a default. "
 					+ "(" + type + ")");
 			setIncluded(new int[]{0});
 			
 		} else {
-			LogBuffer.println("There are no headers defined. "
+			LogBuffer.println("There are no labels defined. "
 					+ "Including nothing. (" + type + ")");
 			setIncluded(new int[0]);
 		}
@@ -150,9 +150,8 @@ implements ConfigNodePersistent, ModelLoadReset {
 	 * Setter for the list of indices describing which labels should be 
 	 * included when returning a "summary" string. For LabelView this would
 	 * mean that a summary of labels at a certain index will be returned based
-	 * on which label headers the user selected.
-	 * @param newIncluded - An array of indices describing the selected label 
-	 * headers.
+	 * on which prefixes the user selected.
+	 * @param newIncluded - An array of indices describing the selected prefixes.
 	 */
 	public void setIncluded(final int[] newIncluded) {
 
@@ -163,11 +162,11 @@ implements ConfigNodePersistent, ModelLoadReset {
 	}
 	
 	/**
-	 * Setter for the current available headers in a loaded file. Setting the
-	 * headers is vital for ensuring label header selection consistency because
-	 * a purely index-based approach does not account for headers that moved
-	 * their position in the header list, for example after clustering.
-	 * @param prefixes - The current headers of a loaded file.
+	 * Setter for the current available prefixes in a loaded file. Setting the
+	 * prefixes is vital for ensuring prefix selection consistency because
+	 * a purely index-based approach does not account for prefixes that moved
+	 * their position in the prefix list, for example after clustering.
+	 * @param prefixes - The current prefixes of a loaded file.
 	 */
 	public void setPrefixes(final String[] prefixes) {
 		
@@ -180,7 +179,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 	}
 
 	/**
-	 * @return included - A list of included label header indices.
+	 * @return included - A list of included prefix indices.
 	 */
 	public int[] getIncluded() {
 
@@ -189,7 +188,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 
 	/**
 	 * @return the best possible summary for the specified index.
-	 * If no headers are applicable, will return the empty string.
+	 * If no prefixes are applicable, will return the empty string.
 	 */
 	public String getSummary(final LabelInfo labelInfo, final int index) {
 
@@ -236,8 +235,8 @@ implements ConfigNodePersistent, ModelLoadReset {
 
 	/**
 	 * Retrieves a String array containing the labels for all included 
-	 * headers at a certain index.
-	 * @param labelInfo The HeaderInfo object from which to take the labels.
+	 * prefixes at a certain index.
+	 * @param labelInfo The LabelInfo object from which to take the labels.
 	 * @param idx The axis index of the label to be returned. 
 	 * @return A String array of labels at a defined index.
 	 */
@@ -307,16 +306,16 @@ implements ConfigNodePersistent, ModelLoadReset {
 	}
 	
 	/**
-	 * Checks if the included indices match with the stored header Strings.
-	 * During clustering or reworking a file, actual header names may shift in
+	 * Checks if the included indices match with the stored prefix strings.
+	 * During clustering or reworking a file, actual prefixes may shift in
 	 * their position and the stored index alone may not be representative
-	 * for the last selected header.
+	 * for the last selected prefix.
 	 * @param included The included indices.
 	 */
 	private int[] adjustIncl(int[] included) {
 		
 		if(prefixes == null) {
-			LogBuffer.println("headers are null in " + type);
+			LogBuffer.println("prefixes are null in " + type);
 			return new int[0];
 		}
 		
@@ -339,7 +338,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 					}
 				}
 			}
-		/* If no included headers were found, at least ensure 
+		/* If no included prefixes were found, at least ensure 
 		 * that included[] is not out of bounds */
 		} else {
 			inclNames = null;
@@ -364,7 +363,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 		/* Ensure ascending order, just in case */
 		Arrays.sort(newIncluded);
 		
-		/* Make sure to display first header as default. Note, this must
+		/* Make sure to display first prefix as default. Note, this must
 		 * still allow the user to explicitly included nothing. */
 		if(prefixes.length > 0 && newIncluded.length == 0 && inclNames == null) {
 			newIncluded = new int[]{0};
