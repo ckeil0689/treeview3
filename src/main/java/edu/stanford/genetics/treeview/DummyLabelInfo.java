@@ -8,6 +8,12 @@ package edu.stanford.genetics.treeview;
 
 import java.util.Observer;
 
+/**
+ * This class is a dummy which can be used for testing in place of LabelInfo.
+ * @deprecated - unused remnant of Java TreeView 
+ * @TODO - check if removal is beneficial
+ *
+ */
 public class DummyLabelInfo implements LabelInfo {
 	String[] header1 = new String[] { "Bob1", "Alice1" };
 	String[] header2 = new String[] { "Bob2", "Alice2" };
