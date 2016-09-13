@@ -21,25 +21,25 @@ public class CdtWriter {
 		try {
 			out = new FileWriter(spool);
 			// first, the array annotations.
-			for (int colPrefixIdx = 0; colPrefixIdx < dataModel.getColLabelInfo()
-					.getNumPrefixes(); colPrefixIdx++) {
+			for (int colLabelTypeIdx = 0; colLabelTypeIdx < dataModel.getColLabelInfo()
+					.getNumLabelTypes(); colLabelTypeIdx++) {
 				for (int colIdx = 0; colIdx < dataModel.getColLabelInfo()
 						.getNumLabels()
-						+ dataModel.getRowLabelInfo().getNumPrefixes(); colIdx++) {
+						+ dataModel.getRowLabelInfo().getNumLabelTypes(); colIdx++) {
 					if (colIdx > 0) {
 						out.write("\t");
 					}
-					if (colIdx < dataModel.getRowLabelInfo().getNumPrefixes()) {
-						if (colPrefixIdx == 0) {
+					if (colIdx < dataModel.getRowLabelInfo().getNumLabelTypes()) {
+						if (colLabelTypeIdx == 0) {
 							// we need to write out the names from the row
 							// label info
 							printNotNull(out, dataModel.getRowLabelInfo()
-									.getPrefixes()[colIdx]);
+									.getLabelTypes()[colIdx]);
 						} else if (colIdx == 0) {
 							// for the first column, write out the name from the
 							// column label info.
 							printNotNull(out, dataModel.getColLabelInfo()
-									.getPrefixes()[colPrefixIdx]);
+									.getLabelTypes()[colLabelTypeIdx]);
 						} else {
 							// otherwise, just leave empty.
 						}
@@ -50,8 +50,8 @@ public class CdtWriter {
 								dataModel.getColLabelInfo().getLabel(
 										colIdx
 												- dataModel.getRowLabelInfo()
-														.getNumPrefixes(),
-										colPrefixIdx));
+														.getNumLabelTypes(),
+										colLabelTypeIdx));
 					}
 				}
 				out.write("\n");
@@ -61,11 +61,11 @@ public class CdtWriter {
 					.getNumLabels(); rowIdx++) {
 				for (int colIdx = 0; colIdx < dataModel.getColLabelInfo()
 						.getNumLabels()
-						+ dataModel.getRowLabelInfo().getNumPrefixes(); colIdx++) {
+						+ dataModel.getRowLabelInfo().getNumLabelTypes(); colIdx++) {
 					if (colIdx > 0) {
 						out.write("\t");
 					}
-					if (colIdx < dataModel.getRowLabelInfo().getNumPrefixes()) {
+					if (colIdx < dataModel.getRowLabelInfo().getNumLabelTypes()) {
 						printNotNull(out, dataModel.getRowLabelInfo()
 								.getLabel(rowIdx, colIdx));
 					} else {
@@ -75,7 +75,7 @@ public class CdtWriter {
 								dataModel.getDataMatrix().getValue(
 										colIdx
 												- dataModel.getRowLabelInfo()
-														.getNumPrefixes(), rowIdx));
+														.getNumLabelTypes(), rowIdx));
 					}
 				}
 				out.write("\n");

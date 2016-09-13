@@ -248,10 +248,10 @@ public abstract class LabelFinderBox {
 
 		primarySearchIndex = labelSummary.getIncluded()[0];
 
-		//If the saved label prefix to use (e.g. GID, UID, NAME, etc.) does
-		//not exist among the prefixes in the file (which can be the case if
-		//you had a file open with a bunch of prefixes and the last one
-		//was selected, and then you open a new file with fewer prefixes), 
+		//If the saved label type to use (e.g. GID, UID, NAME, etc.) does
+		//not exist among the label types in the file (which can be the case if
+		//you had a file open with a bunch of label types and the last one
+		//was selected, and then you open a new file with fewer label types), 
 		//revert the saved index to 0
 		if(primarySearchIndex >= searchDataList[0].length) {
 			primarySearchIndex = 0;

@@ -114,7 +114,7 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 			final int[] selectedPrefix = fieldRow.getSelectedPrefix();
 			if (fieldRow.includeHeader()) {
 				if (rowIndex == 0) {
-					final String[] pNames = labelInfo.getPrefixes();
+					final String[] pNames = labelInfo.getLabelTypes();
 					if (columnIndex < selectedPrefix.length)
 						// gene annotation column headers
 						return pNames[selectedPrefix[columnIndex]];
@@ -310,7 +310,7 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 
 			if (fieldRow.includeHeader()) {
 				// gid row...
-				final String[] pNames = labelInfo.getPrefixes();
+				final String[] pNames = labelInfo.getLabelTypes();
 				output.print(pNames[selectedPrefix[0]]);
 				for (int j = 1; j < selectedPrefix.length; j++) {
 					output.print('\t');
@@ -402,7 +402,7 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 		JCheckBox exprBox, labelBox;
 
 		public void includeAll() {
-			list.setSelectionInterval(0, (labelInfo.getPrefixes()).length - 1);
+			list.setSelectionInterval(0, (labelInfo.getLabelTypes()).length - 1);
 			exprBox.setSelected(true);
 			labelBox.setSelected(true);
 
@@ -427,7 +427,7 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 		public FieldRow() {
 			super();
 			add(new JLabel("Field(s) to print: "));
-			list = new JList<Object>(labelInfo.getPrefixes());
+			list = new JList<Object>(labelInfo.getLabelTypes());
 			list.addListSelectionListener(notifier);
 			add(list);
 			exprBox = new JCheckBox("Expression Data?");

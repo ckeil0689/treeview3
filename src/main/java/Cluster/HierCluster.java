@@ -34,7 +34,7 @@ public class HierCluster {
 	 * arrays and column access doesn't always need to jump between arrays.
 	 */
 	private Linker linker;
-	private final String axisPrefix;
+	private final String axisLabelType;
 	private final int initial_matrix_size;
 	private int iterNum;
 
@@ -91,7 +91,7 @@ public class HierCluster {
 		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
-		this.axisPrefix = (axis == ClusterDialogController.ROW) ? 
+		this.axisLabelType = (axis == ClusterDialogController.ROW) ? 
 						ClusterFileGenerator.ROW_AXIS_BASEID : 
 							ClusterFileGenerator.COL_AXIS_BASEID;
 
@@ -592,8 +592,8 @@ public class HierCluster {
 		 * file.
 		 */
 		if (newCluster.length == 2) {
-			geneRow = axisPrefix + currentClusters.get(row).get(0) + "X";
-			geneCol = axisPrefix + currentClusters.get(column).get(0) + "X";
+			geneRow = axisLabelType + currentClusters.get(row).get(0) + "X";
+			geneCol = axisLabelType + currentClusters.get(column).get(0) + "X";
 
 		}
 		/* If size of new cluster exceeds 2 */
@@ -652,7 +652,7 @@ public class HierCluster {
 				 * If the current fusedGroup in geneIntegerTable does not have
 				 * any elements in common with geneGroups.get(column).
 				 */
-				name = axisPrefix + currentClusters.get(index).get(0) + "X";
+				name = axisLabelType + currentClusters.get(index).get(0) + "X";
 			}
 		}
 
@@ -674,7 +674,7 @@ public class HierCluster {
 
 		for (int i = 0; i < limit; i++) {
 
-			element = axisPrefix + finalCluster.get((limit - 1) - i) + "X";
+			element = axisLabelType + finalCluster.get((limit - 1) - i) + "X";
 			reorderedRows[i] = element;
 		}
 	}

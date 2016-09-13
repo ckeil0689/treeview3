@@ -50,7 +50,7 @@ public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 				+ "display:", GUIFactory.FONTS);
 		add(label, "span, wrap");
 
-		setPrefixList(labelInfo.getPrefixes());
+		setPrefixList(labelInfo.getLabelTypes());
 		prefixList.setVisibleRowCount(5);
 		prefixList.setFont(GUIFactory.FONTS);
 		add(new JScrollPane(getPrefixList()), "push, grow, wrap");
@@ -157,7 +157,7 @@ public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 	public void update(final Observable o, final Object arg) {
 
 		if (o == labelInfo) {
-			setPrefixList(labelInfo.getPrefixes());
+			setPrefixList(labelInfo.getLabelTypes());
 			synchronizeFrom();
 			repaint();
 		} else {

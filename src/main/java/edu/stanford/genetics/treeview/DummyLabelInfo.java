@@ -48,12 +48,12 @@ public class DummyLabelInfo implements LabelInfo {
 	 * @return The list of names
 	 */
 	@Override
-	public String[] getPrefixes() {
+	public String[] getLabelTypes() {
 		return names;
 	}
 
 	@Override
-	public int getNumPrefixes() {
+	public int getNumLabelTypes() {
 		return names.length;
 	}
 
@@ -90,7 +90,7 @@ public class DummyLabelInfo implements LabelInfo {
 	}
 
 	@Override
-	public boolean addPrefix(final String name, final int location) {
+	public boolean addLabelType(final String name, final int location) {
 		return false;
 	}
 
@@ -100,7 +100,7 @@ public class DummyLabelInfo implements LabelInfo {
 	}
 
 	@Override
-	public void setPrefixArray(final String[] newPrefixArray) {
+	public void setLabelTypeArray(final String[] newPrefixArray) {
 
 	}
 

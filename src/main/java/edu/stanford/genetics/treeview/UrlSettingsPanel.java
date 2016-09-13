@@ -174,7 +174,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 			String[] headers;
 			int lastI;
 			if (labelInfo != null) {
-				headers = labelInfo.getPrefixes();
+				headers = labelInfo.getLabelTypes();
 				lastI = headers.length;
 				if (labelInfo.getIndex("GWEIGHT") != -1) {
 					lastI--;

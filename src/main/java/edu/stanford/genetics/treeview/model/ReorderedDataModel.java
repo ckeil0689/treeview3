@@ -260,15 +260,15 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		}
 
 		@Override
-		public String[] getPrefixes() {
+		public String[] getLabelTypes() {
 
-			return parentLabelInfo.getPrefixes();
+			return parentLabelInfo.getLabelTypes();
 		}
 
 		@Override
-		public int getNumPrefixes() {
+		public int getNumLabelTypes() {
 
-			return parentLabelInfo.getNumPrefixes();
+			return parentLabelInfo.getNumLabelTypes();
 		}
 
 		@Override
@@ -312,7 +312,7 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		}
 
 		@Override
-		public boolean addPrefix(final String name, final int location) {
+		public boolean addLabelType(final String name, final int location) {
 
 			return false;
 		}

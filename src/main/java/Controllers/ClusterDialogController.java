@@ -567,10 +567,10 @@ public class ClusterDialogController {
 			
 			/* Row axis cluster */
 			final DistanceMatrix distMatrix = new DistanceMatrix(0);
-			final String axisPrefix = (isRow) ? "row" : "column";
+			final String axisType = (isRow) ? "row" : "column";
 
 			/* ProgressBar label */
-			publish("Calculating " + axisPrefix + " distances...");
+			publish("Calculating " + axisType + " distances...");
 
 			/* Calculating the distance matrix */
 			distMatrix.setMatrix(processor.calcDistance(similarity, axis));
@@ -579,7 +579,7 @@ public class ClusterDialogController {
 				return new String[] {};
 			}
 
-			publish("Clustering " + axisPrefix + " data...");
+			publish("Clustering " + axisType + " data...");
 
 			String[] reorderedAxisLabels =  processor.clusterAxis(distMatrix,
 					clusterView.getLinkMethod(),

@@ -409,7 +409,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			return;
 		}
 		
-		labelSummary.setPrefixes(labelInfo.getPrefixes());
+		labelSummary.setPrefixes(labelInfo.getLabelTypes());
 	}
 
 	public LabelInfo getLabelInfo() {

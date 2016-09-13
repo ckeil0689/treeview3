@@ -237,7 +237,7 @@ public class UrlEditor {
 				int lastI;
 
 				if (labelInfo != null) {
-					prefixes = labelInfo.getPrefixes();
+					prefixes = labelInfo.getLabelTypes();
 					lastI = prefixes.length;
 
 					if (labelInfo.getIndex("GWEIGHT") != -1) {

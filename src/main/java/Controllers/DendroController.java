@@ -1044,7 +1044,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 			if (trLabelInfo.getIndex("NODECOLOR") >= 0) {
 
-				TreeColorer.colorUsingPrefix(invertedTreeDrawer.getRootNode(),
+				TreeColorer.colorUsingLabelType(invertedTreeDrawer.getRootNode(),
 						trLabelInfo, trLabelInfo.getIndex("NODECOLOR"));
 			}
 		} catch (final DendroException e) {
@@ -1354,7 +1354,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				final LabelInfo trLabelInfo = tvModel.getAtrLabelInfo();
 
 				if (trLabelInfo.getIndex("NODECOLOR") >= 0) {
-					TreeColorer.colorUsingPrefix(
+					TreeColorer.colorUsingLabelType(
 							invertedTreeDrawer.getRootNode(), trLabelInfo,
 							trLabelInfo.getIndex("NODECOLOR"));
 				}
@@ -1411,7 +1411,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				final LabelInfo gtrLabelInfo = tvModel.getGtrLabelInfo();
 
 				if (gtrLabelInfo.getIndex("NODECOLOR") >= 0) {
-					TreeColorer.colorUsingPrefix(leftTreeDrawer.getRootNode(),
+					TreeColorer.colorUsingLabelType(leftTreeDrawer.getRootNode(),
 							tvModel.getGtrLabelInfo(),
 							gtrLabelInfo.getIndex("NODECOLOR"));
 

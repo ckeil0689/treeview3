@@ -35,14 +35,14 @@ public class LabelInfoWriter {
 		FileWriter out = null;
 		try {
 			out = new FileWriter(atr);
-			// first, the prefix.
-			final String[] prefixes = labelInfo.getPrefixes();
-			if (prefixes.length > 0) {
-				out.write(prefixes[0]);
+			// first, the label type
+			final String[] labelTypes = labelInfo.getLabelTypes();
+			if (labelTypes.length > 0) {
+				out.write(labelTypes[0]);
 			}
-			for (int i = 1; i < prefixes.length; i++) {
+			for (int i = 1; i < labelTypes.length; i++) {
 				out.write("\t");
-				out.write(prefixes[i]);
+				out.write(labelTypes[i]);
 			}
 			out.write("\n");
 			final int rows = labelInfo.getNumLabels();

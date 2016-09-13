@@ -237,8 +237,8 @@ public class LabelSettings extends CustomDialog {
 					GUIFactory.NO_INSETS);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
-			final JLabel rows = GUIFactory.setupPrefix(StringRes.main_rows);
-			final JLabel cols = GUIFactory.setupPrefix(StringRes.main_cols);
+			final JLabel rows = GUIFactory.setupLabelType(StringRes.main_rows);
+			final JLabel cols = GUIFactory.setupLabelType(StringRes.main_cols);
 
 			/* Label alignment */
 			JPanel justifyPanel = GUIFactory.createJPanel(false,

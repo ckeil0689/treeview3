@@ -19,8 +19,8 @@ public class ClusterFileGenerator {
 	public final static String ROW_AXIS_BASEID = "ROW";
 	public final static String COL_AXIS_BASEID = "COL";
 	
-	public final static String ROW_ID_PREFIX = "GID";
-	public final static String COL_ID_PREFIX = "AID";
+	public final static String ROW_ID_LABELTYPE = "GID";
+	public final static String COL_ID_LABELTYPE = "AID";
 	
 	public final static String ROW_WEIGHT_ID = "GWEIGHT";
 	public final static String COL_WEIGHT_ID = "EWEIGHT";
@@ -88,8 +88,8 @@ public class ClusterFileGenerator {
 	public void prepare(final IntLabelInfo rowLabelI,
 			final IntLabelInfo colLabelI) {
 
-		this.rowClusterData.setPrefixes(rowLabelI.getPrefixes());
-		this.colClusterData.setPrefixes(colLabelI.getPrefixes());
+		this.rowClusterData.setLabelTypes(rowLabelI.getLabelTypes());
+		this.colClusterData.setLabelTypes(colLabelI.getLabelTypes());
 
 		/* The list containing all the reorganized row-data */
 	//	this.cdtData_s = new String[origMatrix.length][];
@@ -252,14 +252,14 @@ public class ClusterFileGenerator {
 	 * Setting the ordered names depending on the axis to be ordered.
 	 * 
 	 * @param orderedNames
-	 * @param axisPrefix
+	 * @param axisLabelType
 	 */
-	private void setReorderedNames(String[][] orderedNames, String axisPrefix) {
+	private void setReorderedNames(String[][] orderedNames, String axisLabelType) {
 
-		if (axisPrefix.equals(rowClusterData.getAxisBaseID())) {
+		if (axisLabelType.equals(rowClusterData.getAxisBaseID())) {
 			this.rowClusterData.setOrderedAxisLabels(orderedNames);
 			
-		} else if (axisPrefix.equals(colClusterData.getAxisBaseID())) {
+		} else if (axisLabelType.equals(colClusterData.getAxisBaseID())) {
 			this.colClusterData.setOrderedAxisLabels(orderedNames);
 		}
 	}
@@ -305,16 +305,16 @@ public class ClusterFileGenerator {
 	 */
 	private void createHierCDT() {
 
-		final String[] rowPrefixes = rowClusterData.getAxisPrefixes();
-		final String[] colPrefixes = colClusterData.getAxisPrefixes();
+		final String[] rowLabelTypes = rowClusterData.getAxisLabelTypes();
+		final String[] colLabelTypes = colClusterData.getAxisLabelTypes();
 		
-		final boolean foundGIDs = findIndex(rowPrefixes, ROW_ID_PREFIX) != -1;
+		final boolean foundGIDs = findIndex(rowLabelTypes, ROW_ID_LABELTYPE) != -1;
 		
 		final String[] orderedGIDs = rowClusterData.getReorderedIDs();
 		final String[] orderedAIDs = colClusterData.getReorderedIDs();
     
 		// Define how long a single matrix row needs to be
-		int rowLength = rowPrefixes.length + colClusterData.getNumLabels();
+		int rowLength = rowLabelTypes.length + colClusterData.getNumLabels();
 		
 		if (rowClusterData.isAxisClustered() && !foundGIDs) {
 			// a clustered row axis without GID column needs one added, so increment
@@ -330,12 +330,12 @@ public class ClusterFileGenerator {
 		
 		// >>> Adding data to String arrays representing rows starts here <<<
 		if (rowClusterData.isAxisClustered() && !foundGIDs) {
-			cdtRow[idxTracker] = ROW_ID_PREFIX;
+			cdtRow[idxTracker] = ROW_ID_LABELTYPE;
 			idxTracker++;
 		}
 
-		System.arraycopy(rowPrefixes, 0, cdtRow, idxTracker, rowPrefixes.length);
-		idxTracker += rowPrefixes.length;
+		System.arraycopy(rowLabelTypes, 0, cdtRow, idxTracker, rowLabelTypes.length);
+		idxTracker += rowLabelTypes.length;
 
 		// Adding column names to first row
 		for (final String[] labels : colClusterData.getOrderedLabels()) {
@@ -349,7 +349,7 @@ public class ClusterFileGenerator {
 		// next row
 		// if columns were clustered, make AID row
 		if (colClusterData.isAxisClustered()) {
-			cdtRow[0] = COL_ID_PREFIX;
+			cdtRow[0] = COL_ID_LABELTYPE;
 
 			// Fill with AIDs ("COL3X")
 			System.arraycopy(orderedAIDs, 0, cdtRow, dataStartCol, 
@@ -359,15 +359,15 @@ public class ClusterFileGenerator {
 		}
 
 		// remaining label rows
-		for (int i = 1; i < colPrefixes.length; i++) {
+		for (int i = 1; i < colLabelTypes.length; i++) {
 			
-			if (colPrefixes[i].equals(COL_ID_PREFIX)) {
+			if (colLabelTypes[i].equals(COL_ID_LABELTYPE)) {
 				continue;
 			}
 
 			idxTracker = 0;
 			
-			cdtRow[idxTracker] = colPrefixes[i];
+			cdtRow[idxTracker] = colLabelTypes[i];
 			idxTracker++;
 			
 			while (idxTracker < dataStartCol) {
@@ -442,7 +442,7 @@ public class ClusterFileGenerator {
 	 */
 	private void createKMeansCDT() {
 
-		final String[] rowLabels = rowClusterData.getAxisPrefixes();
+		final String[] rowLabels = rowClusterData.getAxisLabelTypes();
 		final int rowLength = rowLabels.length 
 				+ colClusterData.getNumLabels();
 		final String[] cdtRow1 = new String[rowLength];

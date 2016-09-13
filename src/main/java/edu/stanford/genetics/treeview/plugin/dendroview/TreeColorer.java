@@ -34,7 +34,7 @@ public class TreeColorer {
 		final int index = rowLabelInfo.getIndex("FGCOLOR");
 		if (index < 0)
 			return;
-		colorUsingPrefix(rootNode, rowLabelInfo, index);
+		colorUsingLabelType(rootNode, rowLabelInfo, index);
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class TreeColorer {
 	 * @param ci
 	 *            index into columns of tree's header info
 	 */
-	public static final synchronized void colorUsingPrefix(
+	public static final synchronized void colorUsingLabelType(
 			final TreeDrawerNode root, final LabelInfo h, final int ci) {
 		colorInd = ci;
 		labelInfo = h;

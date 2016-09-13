@@ -545,16 +545,16 @@ public class GUIFactory {
 	}
 
 	/**
-	 * Creates a prefix label.
+	 * Creates a JLabel for a data label type.
 	 *
 	 * @param title
-	 * @return
+	 * @return A JLabel with a large font.
 	 */
-	public static JLabel setupPrefix(final String title) {
+	public static JLabel setupLabelType(final String title) {
 
-		final JLabel prefix = new JLabel(title);
-		prefix.setFont(FONTL);
+		final JLabel labelType = new JLabel(title);
+		labelType.setFont(FONTL);
 
-		return prefix;
+		return labelType;
 	}
 }

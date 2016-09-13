@@ -653,7 +653,7 @@ public class TVController implements Observer {
         DataLoadInfo dataInfo;
 		String delimiter = node.get("delimiter", ModelLoader.DEFAULT_DELIM);
 		
-		// Amount of label prefixes may vary, they have to be re-detected
+		// Amount of label types may vary when loading, so they have to be re-detected
 		DataImportController importController = 
 				new DataImportController(delimiter);
 		importController.setFileSet(fileSet);

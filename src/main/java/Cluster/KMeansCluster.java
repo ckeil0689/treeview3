@@ -144,7 +144,7 @@ public class KMeansCluster {
 
 		int addIndex = 0;
 
-		/* Setting up prefix line */
+		/* Setting up label type line */
 		initial[addIndex] = (axis == ClusterDialogController.ROW) ? "ORF" : "ARRAY";
 		addIndex++;
 

@@ -12,29 +12,29 @@ import edu.stanford.genetics.treeview.LogBuffer;
  */
 public class IntLabelInfo extends Observable implements LabelInfo {
 
-	private String[] prefixArray = new String[0];
+	private String[] labelTypeArray = new String[0];
 	private String[][] labelArray = new String[0][];
 	private Hashtable<String, Integer> id2row = new Hashtable<String, Integer>();
 
 	private boolean modified = false;
 
-	public void hashIDs(final String prefix) {
+	public void hashIDs(final String labelType) {
 
-		final int index = getIndex(prefix);
+		final int index = getIndex(labelType);
 		id2row = TVModel.populateHash(this, index, id2row);
 	}
 
 	public void clear() {
 
-		prefixArray = new String[0];
+		labelTypeArray = new String[0];
 		setLabelArray(new String[0][]);
 		id2row.clear();
 	}
 
 	@Override
-	public void setPrefixArray(final String[] newVal) {
+	public void setLabelTypeArray(final String[] newVal) {
 
-		prefixArray = newVal;
+		labelTypeArray = newVal;
 	}
 
 	public void setLabelArray(final String[][] newVal) {
@@ -43,15 +43,15 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 	}
 
 	@Override
-	public String[] getPrefixes() {
+	public String[] getLabelTypes() {
 
-		return prefixArray;
+		return labelTypeArray;
 	}
 
 	@Override
-	public int getNumPrefixes() {
+	public int getNumLabelTypes() {
 
-		return prefixArray.length;
+		return labelTypeArray.length;
 	}
 
 	@Override
@@ -83,16 +83,16 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 	}
 
 	/**
-	 * Returns the label for a given row index and prefix, or null if not
+	 * Returns the label for a given row index and label type, or null if not
 	 * present.
 	 * @param rowIdx - The index of the row for which to retrieve the label.
-	 * @param prefix - The name of the prefix column for which to retrieve the label.
+	 * @param labelType - The name of the label type column for which to retrieve the label.
 	 * @return A label.
 	 */
 	@Override
-	public String getLabel(final int rowIdx, final String prefix) {
+	public String getLabel(final int rowIdx, final String labelType) {
 
-		final int index = getIndex(prefix);
+		final int index = getIndex(labelType);
 		if (index == -1)
 			return null;
 		return getLabel(rowIdx, index);
@@ -105,12 +105,17 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 	}
 
 	@Override
-	public int getIndex(final String prefix) {
+	public int getIndex(final String labelType) {
 
-		for (int i = 0; i < prefixArray.length; i++) {
-			if (prefix.equalsIgnoreCase(prefixArray[i]))
+		if(labelType == null) {
+			return -1;
+		}
+		
+		for (int i = 0; i < labelTypeArray.length; i++) {
+			if (labelType.equalsIgnoreCase(labelTypeArray[i]))
 				return i;
 		}
+		
 		return -1;
 	}
 
@@ -127,37 +132,36 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 	/**
 	 * adds new label column of specified name at specified index.
 	 *
-	 * @param prefix
+	 * @param labelType
 	 * @param idx
 	 * @return
 	 */
 	@Override
-	public boolean addPrefix(final String prefix, final int idx) {
+	public boolean addLabelType(final String labelType, final int idx) {
 
-		final int existing = getIndex(prefix);
-		// already have this prefix
+		final int existing = getIndex(labelType);
+		// already have this labelType
 		if (existing != -1)
 			return false;
 
-		final int newNumPrefixes = getNumPrefixes() + 1;
+		final int newNumLabelTypes = getNumLabelTypes() + 1;
 		for (int row = 0; row < getNumLabels(); row++) {
-
 			final String[] from = getLabelArray()[row];
-			final String[] to = new String[newNumPrefixes];
+			final String[] to = new String[newNumLabelTypes];
 
 			System.arraycopy(from, 0, to, 0, idx);
-			System.arraycopy(from, idx, to, idx + 1, newNumPrefixes);
+			System.arraycopy(from, idx, to, idx + 1, newNumLabelTypes);
 
 			getLabelArray()[row] = to;
 		}
 
-		final String[] newPrefix = new String[newNumPrefixes];
-		System.arraycopy(prefixArray, 0, newPrefix, 0, idx);
+		final String[] newLabelType = new String[newNumLabelTypes];
+		System.arraycopy(labelTypeArray, 0, newLabelType, 0, idx);
 
-		newPrefix[idx] = prefix;
-		System.arraycopy(prefixArray, idx, newPrefix, idx + 1, newNumPrefixes);
+		newLabelType[idx] = labelType;
+		System.arraycopy(labelTypeArray, idx, newLabelType, idx + 1, newNumLabelTypes);
 
-		prefixArray = newPrefix;
+		labelTypeArray = newLabelType;
 		setModified(true);
 		
 		return true;
@@ -187,19 +191,19 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 	}
 
 	@Override
-	public boolean setLabel(final int i, final String prefix, final String newLabel) {
+	public boolean setLabel(final int i, final String labelType, final String newLabel) {
 
 		if (getLabelArray().length < i)
 			return false;
 
-		final int prefixIdx = getIndex(prefix);
-		if (prefixIdx == -1)
+		final int labelTypeIdx = getIndex(labelType);
+		if (labelTypeIdx == -1)
 			return false;
 
-		if (getLabelArray()[i][prefixIdx].equalsIgnoreCase(newLabel))
+		if (getLabelArray()[i][labelTypeIdx].equalsIgnoreCase(newLabel))
 			return false;
 
-		getLabelArray()[i][prefixIdx] = newLabel;
+		getLabelArray()[i][labelTypeIdx] = newLabel;
 		setModified(true);
 		return true;
 	}

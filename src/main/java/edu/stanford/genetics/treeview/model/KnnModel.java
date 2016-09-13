@@ -102,7 +102,7 @@ public class KnnModel extends TVModel implements DataModel {
 
 		final String[] msg = { "Selected KnnModel Stats",
 				"Source = " + source.getCdt(), "NCols   = " + nCols(),
-				"NrowPrefix = " + getRowLabelInfo().getNumPrefixes(),
+				"NrowLabelType = " + getRowLabelInfo().getNumLabelTypes(),
 				"NRows   = " + nRows(), "eweight  = " + eweightFound,
 				"gweight  = " + gweightFound, "aid  = " + aidFound,
 				"gid  = " + gidFound };
@@ -161,7 +161,7 @@ public class KnnModel extends TVModel implements DataModel {
 		final boolean result = checkCorrespondence(labels, rowLabelI, ptype);
 
 		if (result) {
-			rowLabelI.addPrefix("GROUP", rowLabelI.getNumPrefixes() - 1);
+			rowLabelI.addLabelType("GROUP", rowLabelI.getNumLabelTypes() - 1);
 
 			for (int row = 0; row < rowLabelI.getNumLabels(); row++) {
 
@@ -181,7 +181,7 @@ public class KnnModel extends TVModel implements DataModel {
 				kagparse);
 
 		if (result) {
-			colLabelI.addPrefix("GROUP", colLabelI.getNumPrefixes() - 1);
+			colLabelI.addLabelType("GROUP", colLabelI.getNumLabelTypes() - 1);
 
 			for (int row = 0; row < colLabelI.getNumLabels(); row++) {
 

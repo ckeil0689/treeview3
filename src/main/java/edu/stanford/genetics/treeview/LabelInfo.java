@@ -45,12 +45,12 @@ public interface LabelInfo {
 	 *
 	 * @return The array of label prefixes
 	 */
-	public String[] getPrefixes();
+	public String[] getLabelTypes();
 
 	/**
 	 * The number of prefixes.
 	 */
-	public int getNumPrefixes();
+	public int getNumLabelTypes();
 
 	/**
 	 * Gets the number of sets of labels. This will generally be the number
@@ -113,7 +113,7 @@ public interface LabelInfo {
 	 *            0 means make it first, getNumPrefixes() means make it last
 	 * @return true if successfully added, false if not.
 	 */
-	public boolean addPrefix(String prefix, int location);
+	public boolean addLabelType(String prefix, int location);
 
 	/**
 	 * Sets indicated label to specified value Just return false if your label
@@ -128,7 +128,7 @@ public interface LabelInfo {
 	 */
 	public boolean setLabel(int i, String prefix, String newLabel);
 
-	public void setPrefixArray(String[] newPrefixArray);
+	public void setLabelTypeArray(String[] newPrefixArray);
 
 	/**
 	 * @return true if the LabelInfo has been modified since last save

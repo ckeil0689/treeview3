@@ -283,7 +283,7 @@ public class LabelSettingsController {
 			 * Get number of rows without GID row. Done here to avoid passing
 			 * model.
 			 */
-			int rowNum = model.getRowLabelInfo().getNumPrefixes();
+			int rowNum = model.getRowLabelInfo().getNumLabelTypes();
 
 			if (model.gidFound()) {
 				rowNum--;
@@ -295,21 +295,19 @@ public class LabelSettingsController {
 
 			clLoader.load(customFile, rowNum);
 
-			final int prefixNum = clLoader.checkForPrefixes(model);
+			final int labelTypeNum = clLoader.checkForLabelTypes(model);
 
 			// Change labelArrays (without matching actual names first)
 			final String[][] oldLabels = labelInfo.getLabelArray();
-			final String[] oldPrefixes = labelInfo.getPrefixes();
+			final String[] oldLabelTypes = labelInfo.getLabelTypes();
 
 			final String[][] labelsToAdd = new String[oldLabels.length
-					+ prefixNum][];
+					+ labelTypeNum][];
 
 			// Iterate over loadedLabels
 			for (int i = 0; i < oldLabels.length; i++) {
-
-				labelsToAdd[i] = clLoader
-						.replaceLabel(oldLabels[i], oldPrefixes);
-
+				labelsToAdd[i] = clLoader.replaceLabel(oldLabels[i], 
+													   oldLabelTypes);
 				setProgress((i + 1) * 100 / oldLabels.length);
 			}
 

@@ -1632,7 +1632,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 			add(new JLabel("Row Prefixes"));
-			final String[] rowPrefixes = rowLabelInfo.getPrefixes();
+			final String[] rowPrefixes = rowLabelInfo.getLabelTypes();
 			if (rowPrefixes == null) {
 				rowPrefixList = new JList<String>(new String[0]);
 			} else {
@@ -1645,7 +1645,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			// add(geneAnnoInside);
 			add(new JLabel("Column Prefixes"));
 
-			final String[] colPrefixes = colLabelInfo.getPrefixes();
+			final String[] colPrefixes = colLabelInfo.getLabelTypes();
 			if (colPrefixes == null) {
 				colPrefixList = new JList<String>(new String[0]);
 			} else {

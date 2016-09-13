@@ -283,10 +283,10 @@ public class TVModel extends Observable implements DataModel {
 	}
 
 	protected static Hashtable<String, Integer> populateHash(
-			final LabelInfo source, final String prefix,
+			final LabelInfo source, final String labelType,
 			final Hashtable<String, Integer> target) {
 
-		final int indexCol = source.getIndex(prefix);
+		final int indexCol = source.getIndex(labelType);
 
 		return populateHash(source, indexCol, target);
 	}
@@ -423,7 +423,7 @@ public class TVModel extends Observable implements DataModel {
 
 		final String[] msg = { "Selected TVModel Stats",
 				"Source = " + getSource(), "NCols   = " + nCols(),
-				"NRowPrefixes = " + getRowLabelInfo().getNumPrefixes(),
+				"NRowLabelTypes = " + getRowLabelInfo().getNumLabelTypes(),
 				"NRows   = " + nRows(), "eweight  = " + eweightFound,
 				"gweight  = " + gweightFound, "aid  = " + aidFound,
 				"gid  = " + gidFound };
@@ -843,10 +843,10 @@ public class TVModel extends Observable implements DataModel {
 		atrLabelInfo.setLabelArray(atrLabels);
 	}
 
-	/** holds prefixes from atr file */
-	public void setAtrPrefixes(final String[] atrPrefixes) {
+	/** holds label types from atr file */
+	public void setAtrLabelTypes(final String[] atrLabelTypes) {
 
-		atrLabelInfo.setPrefixArray(atrPrefixes);
+		atrLabelInfo.setLabelTypeArray(atrLabelTypes);
 	}
 
 	/** holds actual node information for row tree */
@@ -855,9 +855,9 @@ public class TVModel extends Observable implements DataModel {
 		gtrLabelInfo.setLabelArray(gtrLabels);
 	}
 
-	public void setGtrPrefixes(final String[] gtrPrefixes) {
+	public void setGtrLabelTypes(final String[] gtrLabelTypes) {
 
-		gtrLabelInfo.setPrefixArray(gtrPrefixes);
+		gtrLabelInfo.setLabelTypeArray(gtrLabelTypes);
 	}
 
 	public void setColumnLabels(final String[][] newLabels) {
@@ -865,9 +865,9 @@ public class TVModel extends Observable implements DataModel {
 		colLabelInfo.setLabelArray(newLabels);
 	}
 
-	public void setColumnPrefixes(final String[] newPrefixes) {
+	public void setColumnLabelTypes(final String[] newLabelTypes) {
 
-		colLabelInfo.setPrefixArray(newPrefixes);
+		colLabelInfo.setLabelTypeArray(newLabelTypes);
 	}
 
 	class RowLabelInfo extends IntLabelInfo {
@@ -907,19 +907,19 @@ public class TVModel extends Observable implements DataModel {
 		 * There are two special indexes, YORF and NAME.
 		 */
 		@Override
-		public int getIndex(final String prefix) {
+		public int getIndex(final String labelType) {
 
-			final int retval = super.getIndex(prefix);
+			final int retval = super.getIndex(labelType);
 
 			if (retval != -1) {
 				return retval;
 			}
 
-			if (prefix.equals("YORF")) {
+			if (labelType.equals("YORF")) {
 				return getYorfIndex();
 			}
 
-			if (prefix.equals("NAME")) {
+			if (labelType.equals("NAME")) {
 				return getNameIndex();
 			}
 
@@ -927,9 +927,9 @@ public class TVModel extends Observable implements DataModel {
 		}
 	}
 
-	public void setRowPrefixes(final String[] newPrefixes) {
+	public void setRowLabelTypes(final String[] newLabelTypes) {
 
-		rowLabelInfo.setPrefixArray(newPrefixes);
+		rowLabelInfo.setLabelTypeArray(newLabelTypes);
 	}
 
 	public void setRowLabels(final String[][] newLabels) {

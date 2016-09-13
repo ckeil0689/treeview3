@@ -21,13 +21,13 @@ public class CustomLabelLoader {
 
 	private final LabelInfo labelInfo;
 	private String[][] labels;
-	private String[] newPrefixes;
+	private String[] newLabelTypes;
 	private boolean[] labelMatches;
 	private final int[] selectedIndeces;
 	private int misses;
 	private int lineNum;
 
-	boolean prefixesFound = false;
+	boolean labelTypesFound = false;
 
 	public CustomLabelLoader(final LabelInfo labelInfo,
 			final int[] selectedIndeces) {
@@ -94,14 +94,14 @@ public class CustomLabelLoader {
 	}
 
 	/**
-	 * Searches the loaded labels for prefixes such as ORF. If they are
+	 * Searches the loaded labels for label types such as ORF. If they are
 	 * present, the newly loaded labels will later replace the old labels.
 	 */
-	public int checkForPrefixes(final DataModel model) {
+	public int checkForLabelTypes(final DataModel model) {
 
 		int checkLimit = labelInfo.getNumLabels() / 100;
 
-		newPrefixes = new String[labels[0].length];
+		newLabelTypes = new String[labels[0].length];
 
 		if (checkLimit > 5) {
 			checkLimit = 5;
@@ -135,23 +135,23 @@ public class CustomLabelLoader {
 				final String yorf = labels[i][j];
 
 				if (!yorf.equalsIgnoreCase("")) {
-					newPrefixes[j] = yorf;
-					prefixesFound = true;
+					newLabelTypes[j] = yorf;
+					labelTypesFound = true;
 				}
 			}
 		}
 
 		// Check if old model already contains labels from the new list.
 		final List<String> existingLabels = Arrays
-				.asList(labelInfo.getPrefixes());
+				.asList(labelInfo.getLabelTypes());
 
-		labelMatches = new boolean[newPrefixes.length];
+		labelMatches = new boolean[newLabelTypes.length];
 
 		misses = 0;
 		if (existingLabels != null) {
-			for (int i = 0; i < newPrefixes.length; i++) {
+			for (int i = 0; i < newLabelTypes.length; i++) {
 
-				if (existingLabels.contains(newPrefixes[i])) {
+				if (existingLabels.contains(newLabelTypes[i])) {
 					labelMatches[i] = true;
 
 				} else {
@@ -169,15 +169,15 @@ public class CustomLabelLoader {
 		for (int i = 0; i < labelMatches.length; i++) {
 
 			if (!labelMatches[i]) {
-				finalNames[addIndex] = newPrefixes[i];
+				finalNames[addIndex] = newLabelTypes[i];
 				addIndex++;
 			}
 		}
 
-		newPrefixes = finalNames;
+		newLabelTypes = finalNames;
 
 		LogBuffer.println("Old Labels: " + existingLabels.toString());
-		LogBuffer.println("New Labels: " + Arrays.toString(newPrefixes));
+		LogBuffer.println("New Labels: " + Arrays.toString(newLabelTypes));
 		LogBuffer.println("Selected Indeces: "
 				+ Arrays.toString(selectedIndeces));
 		LogBuffer.println("Match List: " + Arrays.toString(labelMatches));
@@ -209,12 +209,12 @@ public class CustomLabelLoader {
 	 * @param loadedLabels
 	 */
 	public String[] replaceLabel(final String[] oldLabels,
-			final String oldPrefixes[]) {
+			final String oldLabelTypes[]) {
 
 		String[] newLabels = null;
 		String[] labelsToAdd;
 
-		newLabels = findNewLabel(oldLabels, oldPrefixes, labels);
+		newLabels = findNewLabel(oldLabels, oldLabelTypes, labels);
 		labelsToAdd = concatArrays(oldLabels, newLabels);
 
 		return labelsToAdd;
@@ -296,32 +296,31 @@ public class CustomLabelLoader {
 
 		tvModel.notifyObservers();
 
-		// Set the new Labels for the headers
-		final String[] oldPrefixes = labelInfo.getPrefixes();
-		String[] prefixesToAdd = null;
-		// Change model prefix array
-		if (prefixesFound) {
-			prefixesToAdd = concatArrays(oldPrefixes, newPrefixes);
+		// Set the new labels for the headers
+		final String[] oldLabelTypes = labelInfo.getLabelTypes();
+		String[] labelTypesToAdd = null;
+		// Change model label type array
+		if (labelTypesFound) {
+			labelTypesToAdd = concatArrays(oldLabelTypes, newLabelTypes);
 
 			// Check for empty or null value
-			for (int i = 0; i < prefixesToAdd.length; i++) {
-
-				if (prefixesToAdd[i] == null || prefixesToAdd[i].equalsIgnoreCase("")) {
-					prefixesToAdd[i] = "CUSTOM " + (i + 1);
+			for (int i = 0; i < labelTypesToAdd.length; i++) {
+				if (labelTypesToAdd[i] == null || "".equalsIgnoreCase(labelTypesToAdd[i])) {
+					labelTypesToAdd[i] = "CUSTOM " + (i + 1);
 				}
 			}
 
 		} else {
 			// Make headers for custom labels
-			for (int i = 0; i < newPrefixes.length; i++) {
+			for (int i = 0; i < newLabelTypes.length; i++) {
 
-				newPrefixes[i] = "CUSTOM " + (i + 1);
+				newLabelTypes[i] = "CUSTOM " + (i + 1);
 			}
 
-			prefixesToAdd = concatArrays(oldPrefixes, newPrefixes);
+			labelTypesToAdd = concatArrays(oldLabelTypes, newLabelTypes);
 		}
 
-		labelInfo.setPrefixArray(prefixesToAdd);
+		labelInfo.setLabelTypeArray(labelTypesToAdd);
 	}
 
 	/**
