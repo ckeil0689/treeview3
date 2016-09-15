@@ -11,7 +11,7 @@ import javax.swing.SwingWorker;
 import Controllers.ClusterDialogController;
 import Views.ClusterView;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.model.IntHeaderInfo;
+import edu.stanford.genetics.treeview.model.IntLabelInfo;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
@@ -26,8 +26,8 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 public class ClusterProcessor {
 
 	private final TVDataMatrix originalMatrix;
-	private final IntHeaderInfo rowHeaderI;
-	private final IntHeaderInfo colHeaderI;
+	private final IntLabelInfo rowLabelI;
+	private final IntLabelInfo colLabelI;
 
 //	private final String fileName;
 	private int pBarCount;
@@ -36,7 +36,7 @@ public class ClusterProcessor {
 
 	/**
 	 * Hierarchical Clustering constructor for the ClusterProcessor. 
-	 * HeaderInfo not needed for this version of clustering.
+	 * LabelInfo not needed for this version of clustering.
 	 * Sets the pBarCount to 0, which is the value that stores progress 
 	 * between multiple tasks, so that a single progress bar for the entire 
 	 * process can be displayed.
@@ -47,30 +47,30 @@ public class ClusterProcessor {
 	public ClusterProcessor(final TVDataMatrix dataMatrix) {
 
 		this.originalMatrix = dataMatrix;
-		this.rowHeaderI = null;
-		this.colHeaderI = null;
+		this.rowLabelI = null;
+		this.colLabelI = null;
 		this.pBarCount = 0;
 	}
 	
 	/**
 	 * K-Means constructor for the ClusterProcessor. 
-	 * HeaderInfo not needed for this version of clustering.
+	 * LabelInfo not needed for this version of clustering.
 	 * Sets the pBarCount to 0, which is the value that stores progress 
 	 * between multiple tasks, so that a single progress bar for the entire 
 	 * process can be displayed.
 	 *
 	 * @param dataMatrix The original data matrix to be clustered.
 	 * @param fileName The name of the file to which the data matrix belongs.
-	 * @param rowHeaderI The row HeaderInfo object.
-	 * @param colHeaderI The column HeaderInfo object.
+	 * @param rowLabelI The row LabelInfo object.
+	 * @param colLabelI The column LabelInfo object.
 	 */
 	public ClusterProcessor(final TVDataMatrix dataMatrix,
-			final String fileName, final IntHeaderInfo rowHeaderI,
-			final IntHeaderInfo colHeaderI) {
+			final String fileName, final IntLabelInfo rowLabelI,
+			final IntLabelInfo colLabelI) {
 
 		this.originalMatrix = dataMatrix;
-		this.rowHeaderI = rowHeaderI;
-		this.colHeaderI = colHeaderI;
+		this.rowLabelI = rowLabelI;
+		this.colLabelI = colLabelI;
 		this.pBarCount = 0;
 	}
 
@@ -112,7 +112,7 @@ public class ClusterProcessor {
 	 * @param hierarchical
 	 * @param axis
 	 * 
-	 * @return Reordered matrix headers.
+	 * @return Reordered matrix labels.
 	 */
 	public String[] clusterAxis(final DistanceMatrix distMatrix,
 			final int linkMethod, final Integer[] spinnerInput,
@@ -350,7 +350,7 @@ public class ClusterProcessor {
 		 * Initializes the hierarchical clustering process, 
 		 * starts and finishes the tree file writer, and keeps tracks of
 		 * the GUI aspects such as updating the progress bar for ClusterView.
-		 * @return A reordered list of headers (labels).
+		 * @return A reordered list of labels.
 		 */
 		private String[] doHierarchicalCluster() {
 			
@@ -396,7 +396,7 @@ public class ClusterProcessor {
 		/**
 		 * Initializes the K-Means clustering process, and keeps tracks of
 		 * the GUI aspects such as updating the progress bar for ClusterView.
-		 * @return A reordered list of headers (labels).
+		 * @return A reordered list of labels.
 		 */
 		private String[] doKMeansCluster() {
 			
@@ -427,25 +427,25 @@ public class ClusterProcessor {
 			}
 
 			/* Get axis labels */
-			String[][] headerArray;
+			String[][] labelArray;
 			if (axis == ClusterDialogController.ROW) {
-				headerArray = rowHeaderI.getHeaderArray();
+				labelArray = rowLabelI.getLabelArray();
 
 			} else {
-				headerArray = colHeaderI.getHeaderArray();
+				labelArray = colLabelI.getLabelArray();
 			}
 
-			if (headerArray.length != distMatrix.getSize()) {
+			if (labelArray.length != distMatrix.getSize()) {
 				LogBuffer.println("Label array length does not match "
 						+ "size of distance matrix.");
-				LogBuffer.println("HeaderArray: " + headerArray.length);
+				LogBuffer.println("Length: " + labelArray.length);
 				LogBuffer.println("Distance Matrix: "
 						+ distMatrix.getSize());
 				return new String[] {};
 			}
 
 			/* Write data and close writer */
-			clusterer.finish(headerArray);
+			clusterer.finish(labelArray);
 
 			return clusterer.getReorderedList();
 		}

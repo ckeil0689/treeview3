@@ -33,7 +33,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 
 	private final UrlExtractor urlExtractor;
 	private UrlPresets urlPresets = null;
-	private final HeaderInfo headerInfo;
+	private final LabelInfo labelInfo;
 
 	private JPanel mainPanel;
 
@@ -43,16 +43,16 @@ public class UrlSettingsPanel implements SettingsPanel {
 
 	public UrlSettingsPanel(final UrlExtractor ue, final UrlPresets up) {
 
-		this(ue, ue.getHeaderInfo(), up);
+		this(ue, ue.getLabelInfo(), up);
 	}
 
-	public UrlSettingsPanel(final UrlExtractor ue, final HeaderInfo hi,
+	public UrlSettingsPanel(final UrlExtractor ue, final LabelInfo hi,
 			final UrlPresets up) {
 
 		super();
 		urlExtractor = ue;
 		urlPresets = up;
-		headerInfo = hi;
+		labelInfo = hi;
 		templateField = new TemplateField();
 		templateField.setText(urlExtractor.getUrlTemplate());
 		templateField.setMinimumSize(new Dimension(300, templateField
@@ -75,7 +75,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 
 		final UrlPresets p = new UrlPresets("UrlSettingsPanel");
 		p.setConfigNode(null);
-		final HeaderInfo hi = new DummyHeaderInfo();
+		final LabelInfo hi = new DummyLabelInfo();
 		final UrlExtractor ue = new UrlExtractor(hi);
 
 		final UrlSettingsPanel e = new UrlSettingsPanel(ue, hi, p);
@@ -133,7 +133,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 		// mainPanel.add(previewLabel, "w 100%, wrap");
 
 		final JComboBox<String> options = new JComboBox<String>(
-				urlPresets.getPresetNames());
+				urlPresets.getPresetLabelTypes());
 
 		options.addActionListener(new ActionListener() {
 
@@ -173,10 +173,10 @@ public class UrlSettingsPanel implements SettingsPanel {
 			super();
 			String[] headers;
 			int lastI;
-			if (headerInfo != null) {
-				headers = headerInfo.getNames();
+			if (labelInfo != null) {
+				headers = labelInfo.getLabelTypes();
 				lastI = headers.length;
-				if (headerInfo.getIndex("GWEIGHT") != -1) {
+				if (labelInfo.getIndex("GWEIGHT") != -1) {
 					lastI--;
 				}
 			} else {

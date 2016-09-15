@@ -545,16 +545,16 @@ public class GUIFactory {
 	}
 
 	/**
-	 * Creates a header label.
+	 * Creates a JLabel for a data label type.
 	 *
 	 * @param title
-	 * @return
+	 * @return A JLabel with a large font.
 	 */
-	public static JLabel setupHeader(final String title) {
+	public static JLabel setupLabelType(final String title) {
 
-		final JLabel header = new JLabel(title);
-		header.setFont(FONTL);
+		final JLabel labelType = new JLabel(title);
+		labelType.setFont(FONTL);
 
-		return header;
+		return labelType;
 	}
 }

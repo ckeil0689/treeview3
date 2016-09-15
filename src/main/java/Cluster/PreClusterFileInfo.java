@@ -2,7 +2,7 @@ package Cluster;
 
 import java.util.prefs.Preferences;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 
 /**
  * This class stores some useful data of a file that is about to be clustered. 
@@ -17,29 +17,29 @@ public class PreClusterFileInfo {
 	private Preferences colorNode;
 	private Preferences labelNode;
 	
-	private HeaderInfo rowHeaderInfo;
-	private HeaderInfo colHeaderInfo;
+	private LabelInfo rowLabelInfo;
+	private LabelInfo colLabelInfo;
 	
 	public PreClusterFileInfo() {
 		
 		
 	}
 	
-	public void setHeaderInfo(final HeaderInfo rowHeaderInfo, 
-			final HeaderInfo colHeaderInfo) {
+	public void setLabelInfo(final LabelInfo rowLabelInfo, 
+			final LabelInfo colLabelInfo) {
 		
-		this.rowHeaderInfo = rowHeaderInfo;
-		this.colHeaderInfo = colHeaderInfo;
+		this.rowLabelInfo = rowLabelInfo;
+		this.colLabelInfo = colLabelInfo;
 	}
 	
-	public HeaderInfo getRowHeaderInfo() {
+	public LabelInfo getRowLabelInfo() {
 		
-		return rowHeaderInfo;
+		return rowLabelInfo;
 	}
 	
-	public HeaderInfo getColHeaderInfo() {
+	public LabelInfo getColLabelInfo() {
 		
-		return colHeaderInfo;
+		return colLabelInfo;
 	}
 	
 	/**

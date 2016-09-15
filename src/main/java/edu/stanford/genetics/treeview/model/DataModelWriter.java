@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 
 /**
  *
@@ -56,19 +56,19 @@ public class DataModelWriter {
 	public Set<DataModelFileType> writeIncremental(final FileSet fileSet) {
 		final EnumSet<DataModelFileType> written = EnumSet
 				.noneOf(DataModelFileType.class);
-		if (dataModel.aidFound() && dataModel.getAtrHeaderInfo().getModified()) {
+		if (dataModel.aidFound() && dataModel.getAtrLabelInfo().getModified()) {
 			if (writeAtr(fileSet.getAtr())) {
 				written.add(DataModelFileType.ATR);
 			}
 		}
-		if (dataModel.gidFound() && dataModel.getGtrHeaderInfo().getModified()) {
+		if (dataModel.gidFound() && dataModel.getGtrLabelInfo().getModified()) {
 			if (writeGtr(fileSet.getGtr())) {
 				written.add(DataModelFileType.GTR);
 			}
 		}
 		if (dataModel.getDataMatrix().getModified()
-				|| dataModel.getColHeaderInfo().getModified()
-				|| dataModel.getRowHeaderInfo().getModified()) {
+				|| dataModel.getColLabelInfo().getModified()
+				|| dataModel.getRowLabelInfo().getModified()) {
 			if (writeCdt(fileSet.getCdt())) {
 				written.add(DataModelFileType.CDT);
 			}
@@ -83,7 +83,7 @@ public class DataModelWriter {
 	 *            complete path of file to write to
 	 */
 	private boolean writeAtr(final String atr) {
-		return writeTree(dataModel.getAtrHeaderInfo(), atr);
+		return writeTree(dataModel.getAtrLabelInfo(), atr);
 	}
 
 	/**
@@ -93,25 +93,25 @@ public class DataModelWriter {
 	 *            complete path of file to write to
 	 */
 	private boolean writeGtr(final String gtr) {
-		return writeTree(dataModel.getGtrHeaderInfo(), gtr);
+		return writeTree(dataModel.getGtrLabelInfo(), gtr);
 	}
 
 	/**
-	 * write out HeaderInfo of tree to file
+	 * write out LabelInfo of tree to file
 	 *
-	 * @param info
-	 *            HeaderInfo to write out
+	 * @param labelInfo
+	 *            LabelInfo to write out
 	 * @param filePath
 	 *            complete path of file to write to
 	 */
-	private boolean writeTree(final HeaderInfo info, final String file) {
-		final HeaderInfoWriter writer = new HeaderInfoWriter(info);
+	private boolean writeTree(final LabelInfo labelInfo, final String file) {
+		final LabelInfoWriter writer = new LabelInfoWriter(labelInfo);
 		try {
 			final String spool = file + ".spool";
 			writer.write(spool);
 			final File f = new File(spool);
 			if (f.renameTo(new File(file))) {
-				info.setModified(false);
+				labelInfo.setModified(false);
 			}
 			return true;
 		} catch (final IOException e) {
@@ -130,8 +130,8 @@ public class DataModelWriter {
 			final File f = new File(spool);
 			if (f.renameTo(new File(file))) {
 				dataModel.getDataMatrix().setModified(false);
-				dataModel.getColHeaderInfo().setModified(false);
-				dataModel.getRowHeaderInfo().setModified(false);
+				dataModel.getColLabelInfo().setModified(false);
+				dataModel.getRowLabelInfo().setModified(false);
 			}
 			return true;
 		} catch (final IOException e) {

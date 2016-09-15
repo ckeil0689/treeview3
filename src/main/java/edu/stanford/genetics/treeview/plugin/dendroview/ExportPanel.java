@@ -40,10 +40,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.DummyHeaderInfo;
+import edu.stanford.genetics.treeview.DummyLabelInfo;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LabelInfo;
+import edu.stanford.genetics.treeview.LabelSummary;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
@@ -62,35 +62,35 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	private Preferences root;
 
 	// external links
-	private final HeaderInfo arrayHeaderInfo; // allows access to array headers.
-	private final HeaderInfo geneHeaderInfo; // allows access to gene headers.
+	private final LabelInfo colLabelInfo; // allows access to column labels.
+	private final LabelInfo rowLabelInfo; // allows access to row labels.
 	private FileSet sourceSet; // FileSet from which current data was
 	// constructed.
-	private final TreeSelectionI geneSelection;
-	private final TreeSelectionI arraySelection;
-	private final TreePainter arrayTreeDrawer;
-	private final TreePainter geneTreeDrawer;
+	private final TreeSelectionI rowSelection;
+	private final TreeSelectionI colSelection;
+	private final TreePainter colTreeDrawer;
+	private final TreePainter rowTreeDrawer;
 	private final ArrayDrawer arrayDrawer;
-	private final MapContainer geneMap;
-	private final MapContainer arrayMap;
+	private final MapContainer rowMap;
+	private final MapContainer colMap;
 	private Double explicitGtrWidth = null;
 	private Double explicitAtrHeight = null;
 
 	// accessors
-	protected HeaderInfo getArrayHeaderInfo() {
-		return arrayHeaderInfo;
+	protected LabelInfo getColLabelInfo() {
+		return colLabelInfo;
 	}
 
-	protected HeaderInfo getGeneHeaderInfo() {
-		return geneHeaderInfo;
+	protected LabelInfo getRowLabelInfo() {
+		return rowLabelInfo;
 	}
 
-	protected TreeSelectionI getGeneSelection() {
-		return geneSelection;
+	protected TreeSelectionI getRowSelection() {
+		return rowSelection;
 	}
 
-	protected TreeSelectionI getArraySelection() {
-		return arraySelection;
+	protected TreeSelectionI getColSelection() {
+		return colSelection;
 	}
 
 	protected ArrayDrawer getArrayDrawer() {
@@ -143,34 +143,34 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	// components
 	private FilePanel filePanel;
 	private InclusionPanel inclusionPanel;
-	private HeaderSelectionPanel headerSelectionPanel;
+	private LabelTypeSelectionPanel labelTypeSelectionPanel;
 	private PreviewPanel previewPanel;
 
 	// accessors for configuration information
 	/**
 	 * returns the font for gene annotation information
 	 */
-	private Font geneFont = new Font("Courier", 0, 12);
+	private Font rowFont = new Font("Courier", 0, 12);
 
-	protected Font getGeneFont() {
-		return geneFont;
+	protected Font getRowFont() {
+		return rowFont;
 	}
 
-	public void setGeneFont(final Font f) {
+	public void setRowFont(final Font f) {
 		if (f != null) {
-			geneFont = f;
+			rowFont = f;
 		}
 	}
 
-	private Font arrayFont = new Font("Courier", 0, 12);
+	private Font colFont = new Font("Courier", 0, 12);
 
-	protected Font getArrayFont() {
-		return arrayFont;
+	protected Font getColFont() {
+		return colFont;
 	}
 
-	public void setArrayFont(final Font f) {
+	public void setColFont(final Font f) {
 		if (f != null) {
-			arrayFont = f;
+			colFont = f;
 		}
 	}
 
@@ -185,25 +185,25 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	}
 
 	/**
-	 * This method returns the minimum correlation for the gene nodes which will
+	 * This method returns the minimum correlation for the row nodes which will
 	 * be drawn.
 	 */
-	protected double getMinGeneCorr() {
+	protected double getMinRowCorr() {
 		if (drawSelected()) {
-			if (geneTreeDrawer == null) {
+			if (rowTreeDrawer == null) {
 				LogBuffer
-						.println("ExportPanel.getMinGeneCorr: geneTreeDrawer null");
+						.println("ExportPanel.getMinGeneCorr: rowTreeDrawer null");
 			}
-			final TreeSelectionI selection = getGeneSelection();
+			final TreeSelectionI selection = getRowSelection();
 			if (selection == null) {
-				LogBuffer.println("ExportPanel.getMinGeneCorr: selection null");
+				LogBuffer.println("ExportPanel.getMinRowCorr: selection null");
 			}
 			final String selectedId = selection.getSelectedNode();
 			if (selectedId == null) {
 				LogBuffer
-						.println("ExportPanel.getMinGeneCorr: selectedId null");
+						.println("ExportPanel.getMinRowCorr: selectedId null");
 			}
-			final TreeDrawerNode selectedNode = geneTreeDrawer
+			final TreeDrawerNode selectedNode = rowTreeDrawer
 					.getNodeById(selectedId);
 			if (selectedNode == null) {
 				LogBuffer
@@ -212,19 +212,19 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			}
 			return selectedNode.getCorr();
 		} else
-			return geneTreeDrawer.getCorrMin();
+			return rowTreeDrawer.getCorrMin();
 	}
 
 	/**
-	 * This method returns the minimum correlation for the gene nodes which will
+	 * This method returns the minimum correlation for the column nodes which will
 	 * be drawn.
 	 */
-	protected double getMinArrayCorr() {
+	protected double getMinColCorr() {
 		if (drawSelected())
-			return arrayTreeDrawer.getNodeById(
-					getArraySelection().getSelectedNode()).getCorr();
+			return colTreeDrawer.getNodeById(
+					getColSelection().getSelectedNode()).getCorr();
 		else
-			return arrayTreeDrawer.getCorrMin();
+			return colTreeDrawer.getCorrMin();
 	}
 
 	/**
@@ -234,9 +234,9 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	 * the geneIndex where the first block (index 0) always has an offset of
 	 * zero.
 	 */
-	protected int getYmapPixel(final double geneIndex) {
-		final double dp = geneMap.getPixel(geneIndex) - geneMap.getPixel(0);
-		final double ret = (int) (dp * getYscale() / geneMap.getScale());
+	protected int getYmapPixel(final double rowIdx) {
+		final double dp = rowMap.getPixel(rowIdx) - rowMap.getPixel(0);
+		final double ret = (int) (dp * getYscale() / rowMap.getScale());
 		return (int) ret;
 	}
 
@@ -247,81 +247,81 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	 * the arrayIndex where the first block (index 0) always has an offset of
 	 * zero.
 	 */
-	protected int getXmapPixel(final double geneIndex) {
-		final double dp = arrayMap.getPixel(geneIndex) - arrayMap.getPixel(0);
-		final int ret = (int) (dp * getXscale() / arrayMap.getScale());
+	protected int getXmapPixel(final double rowIdx) {
+		final double dp = colMap.getPixel(rowIdx) - colMap.getPixel(0);
+		final int ret = (int) (dp * getXscale() / colMap.getScale());
 		return ret;
 	}
 
-	protected boolean geneAnnoInside() {
-		return headerSelectionPanel.geneAnnoInside();
+	protected boolean rowAnnoInside() {
+		return labelTypeSelectionPanel.rowAnnoInside();
 	}
 
-	protected boolean getArrayAnnoInside() {
-		return headerSelectionPanel.getArrayAnnoInside();
+	protected boolean getColAnnoInside() {
+		return labelTypeSelectionPanel.getColAnnoInside();
 	}
 
-	protected void setArrayAnnoInside(final boolean newval) {
-		headerSelectionPanel.setArrayAnnoInside(newval);
+	protected void setColAnnoInside(final boolean newval) {
+		labelTypeSelectionPanel.setColAnnoInside(newval);
 	}
 
-	protected String getGeneAnno(final int i) {
-		return headerSelectionPanel.getGeneAnno(i);
+	protected String getRowAnno(final int i) {
+		return labelTypeSelectionPanel.getRowAnno(i);
 	}
 
-	protected String getArrayAnno(final int i) {
-		return headerSelectionPanel.getArrayAnno(i);
+	protected String getColAnno(final int i) {
+		return labelTypeSelectionPanel.getColAnno(i);
 	}
 
-	private Color getFgColor(final HeaderInfo headerInfo, final int index) {
-		final int colorIndex = headerInfo.getIndex("FGCOLOR");
+	private Color getFgColor(final LabelInfo labelInfo, final int index) {
+		final int colorIndex = labelInfo.getIndex("FGCOLOR");
 		if (colorIndex > 0) {
-			final String[] headers = headerInfo.getHeader(index);
-			return TreeColorer.getColor(headers[colorIndex]);
+			final String[] labels = labelInfo.getLabels(index);
+			return TreeColorer.getColor(labels[colorIndex]);
 		}
 		return null;
 	}
 
-	private Color getBgColor(final HeaderInfo headerInfo, final int index) {
-		final int colorIndex = headerInfo.getIndex("BGCOLOR");
+	private Color getBgColor(final LabelInfo labelInfo, final int index) {
+		final int colorIndex = labelInfo.getIndex("BGCOLOR");
 		if (colorIndex > 0) {
-			final String[] headers = headerInfo.getHeader(index);
-			return TreeColorer.getColor(headers[colorIndex]);
+			final String[] labels = labelInfo.getLabels(index);
+			return TreeColorer.getColor(labels[colorIndex]);
 		}
 		return null;
 	}
 
-	protected Color getGeneFgColor(final int i) {
-		return getFgColor(geneHeaderInfo, i);
+	protected Color getRowFgColor(final int i) {
+		return getFgColor(rowLabelInfo, i);
 	}
 
-	protected Color getArrayFgColor(final int i) {
-		return getFgColor(arrayHeaderInfo, i);
+	protected Color getColFgColor(final int i) {
+		return getFgColor(colLabelInfo, i);
 	}
 
-	protected Color getGeneBgColor(final int i) {
-		return getBgColor(geneHeaderInfo, i);
+	protected Color getRowBgColor(final int i) {
+		return getBgColor(rowLabelInfo, i);
 	}
 
-	protected Color getArrayBgColor(final int i) {
-		return getBgColor(arrayHeaderInfo, i);
+	protected Color getColBgColor(final int i) {
+		return getBgColor(colLabelInfo, i);
 	}
 
 	// gene node to actually draw
-	protected TreeDrawerNode getGeneNode() {
+	protected TreeDrawerNode getRowNode() {
 		if (inclusionPanel.drawSelected())
-			return geneTreeDrawer.getNodeById(geneSelection.getSelectedNode());
+			return rowTreeDrawer.getNodeById(rowSelection.getSelectedNode());
 		else
-			return getGeneRootNode();
+			return getRowRootNode();
 	}
 
 	// array node to actually draw
-	protected TreeDrawerNode getArrayNode() {
+	protected TreeDrawerNode getColNode() {
 		if (inclusionPanel.drawSelected())
-			return arrayTreeDrawer
-					.getNodeById(arraySelection.getSelectedNode());
+			return colTreeDrawer
+					.getNodeById(colSelection.getSelectedNode());
 		else
-			return getArrayRootNode();
+			return getColRootNode();
 	}
 
 	protected File getFile() {
@@ -336,16 +336,16 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		filePanel.setFilePath(newFile);
 	}
 
-	protected TreeDrawerNode getGeneRootNode() {
-		if (geneTreeDrawer == null)
+	protected TreeDrawerNode getRowRootNode() {
+		if (rowTreeDrawer == null)
 			return null;
-		return geneTreeDrawer.getRootNode();
+		return rowTreeDrawer.getRootNode();
 	}
 
-	protected TreeDrawerNode getArrayRootNode() {
-		if (arrayTreeDrawer == null)
+	protected TreeDrawerNode getColRootNode() {
+		if (colTreeDrawer == null)
 			return null;
-		return arrayTreeDrawer.getRootNode();
+		return colTreeDrawer.getRootNode();
 	}
 
 	protected String getInitialExtension() {
@@ -377,54 +377,54 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	 * hasChar - indicates whether or not there are characters in the data area.
 	 * Used when we have a CharArrayDrawer.
 	 */
-	public ExportPanel(final HeaderInfo arrayHeaderInfo,
-			final HeaderInfo geneHeaderInfo,
-			final TreeSelectionI geneSelection,
-			final TreeSelectionI arraySelection,
-			final TreePainter arrayTreeDrawer,
-			final TreePainter geneTreeDrawer, final ArrayDrawer arrayDrawer,
-			final MapContainer arrayMap, final MapContainer geneMap,
+	public ExportPanel(final LabelInfo colLabelInfo,
+			final LabelInfo rowLabelInfo,
+			final TreeSelectionI rowSelection,
+			final TreeSelectionI colSelection,
+			final TreePainter rowTreeDrawer,
+			final TreePainter colTreeDrawer, final ArrayDrawer arrayDrawer,
+			final MapContainer colMap, final MapContainer rowMap,
 			final boolean hasChar) {
-		this.arrayHeaderInfo = arrayHeaderInfo;
-		this.geneHeaderInfo = geneHeaderInfo;
-		this.geneSelection = geneSelection;
-		this.arraySelection = arraySelection;
-		this.arrayTreeDrawer = arrayTreeDrawer;
-		this.geneTreeDrawer = geneTreeDrawer;
+		this.colLabelInfo = colLabelInfo;
+		this.rowLabelInfo = rowLabelInfo;
+		this.rowSelection = rowSelection;
+		this.colSelection = colSelection;
+		this.colTreeDrawer = colTreeDrawer;
+		this.rowTreeDrawer = colTreeDrawer;
 		this.arrayDrawer = arrayDrawer;
-		this.arrayMap = arrayMap;
-		this.geneMap = geneMap;
+		this.colMap = colMap;
+		this.rowMap = rowMap;
 		this.hasChar = hasChar;
 		setupWidgets();
 		inclusionPanel.synchSelected();
 		inclusionPanel.synchEnabled();
 	}
 
-	public void setIncludedGeneHeaders(final int[] newSelected) {
-		headerSelectionPanel.geneList.setSelectedIndices(newSelected);
-		headerSelectionPanel.setupSelected();
+	public void setIncludedRowLabels(final int[] newSelected) {
+		labelTypeSelectionPanel.rowLabelTypeList.setSelectedIndices(newSelected);
+		labelTypeSelectionPanel.setupSelected();
 	}
 
-	public void setIncludedArrayHeaders(final int[] newSelected) {
-		headerSelectionPanel.arrayList.setSelectedIndices(newSelected);
-		headerSelectionPanel.setupSelected();
+	public void setIncludedColLabels(final int[] newSelected) {
+		labelTypeSelectionPanel.colLabelTypeList.setSelectedIndices(newSelected);
+		labelTypeSelectionPanel.setupSelected();
 	}
 
 	public static final void main(final String[] argv) {
 
-		final HeaderInfo aH = new DummyHeaderInfo();
-		final HeaderInfo gH = new DummyHeaderInfo();
+		final LabelInfo colLabelInfo = new DummyLabelInfo();
+		final LabelInfo rowLabelInfo = new DummyLabelInfo();
 		final MapContainer aMap = new MapContainer(IntegerMap.FIXED, "FixedMap");
 		// aMap.setMap("Fixed");
 		aMap.setScale(10);
-		aMap.setIndexRange(0, aH.getNumHeaders());
+		aMap.setIndexRange(0, colLabelInfo.getNumLabels());
 		final MapContainer gMap = new MapContainer(IntegerMap.FIXED, "FixedMap");
 		// gMap.setMap("Fixed");
 		gMap.setScale(12);
-		gMap.setIndexRange(0, gH.getNumHeaders());
-		final TreeSelectionI gsel = new TreeSelection(gH.getNumHeaders());
-		final TreeSelectionI asel = new TreeSelection(aH.getNumHeaders());
-		final ExportPanel testExportPanel = new TestExportPanel(aH, gH, gsel,
+		gMap.setIndexRange(0, rowLabelInfo.getNumLabels());
+		final TreeSelectionI gsel = new TreeSelection(rowLabelInfo.getNumLabels());
+		final TreeSelectionI asel = new TreeSelection(colLabelInfo.getNumLabels());
+		final ExportPanel testExportPanel = new TestExportPanel(colLabelInfo, rowLabelInfo, gsel,
 				asel, aMap, gMap);
 		final JFrame test = new JFrame("Test Export Panel");
 		test.getContentPane().add(testExportPanel);
@@ -449,8 +449,8 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	private void setupWidgets() {
 		Box upperPanel; // holds major widget panels
 		upperPanel = new Box(BoxLayout.X_AXIS);
-		headerSelectionPanel = new HeaderSelectionPanel();
-		upperPanel.add(headerSelectionPanel);
+		labelTypeSelectionPanel = new LabelTypeSelectionPanel();
+		upperPanel.add(labelTypeSelectionPanel);
 		inclusionPanel = new InclusionPanel();
 		upperPanel.add(inclusionPanel);
 		previewPanel = new PreviewPanel();
@@ -495,23 +495,23 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		return inclusionPanel.drawSelected();
 	}
 
-	protected boolean includeGeneMap() {
-		return (includeGtr() || includeData() || (numGeneHeaders() > 0));
+	protected boolean includeRowMap() {
+		return (includeGtr() || includeData() || (numRowLabels() > 0));
 	}
 
-	protected boolean includeArrayMap() {
-		return (includeAtr() || includeData() || (numArrayHeaders() > 0));
+	protected boolean includeColMap() {
+		return (includeAtr() || includeData() || (numColLabels() > 0));
 	}
 
 	public double getXmapWidth() {
 		// HACK, doesn't account for discontinuous selection
-		return (int) ((arrayMap.getPixel(maxArray() + 1) - arrayMap
-				.getPixel(minArray())) * getXscale() / arrayMap.getScale());
+		return (int) ((colMap.getPixel(maxCol() + 1) - colMap
+				.getPixel(minArray())) * getXscale() / colMap.getScale());
 	}
 
 	public double getGtrWidth() {
 		if (explicitGtrWidth == null)
-			return 150 * getXscale() / arrayMap.getScale();
+			return 150 * getXscale() / colMap.getScale();
 		else
 			return explicitGtrWidth;
 	}
@@ -526,14 +526,14 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 
 	public double getYmapHeight() {
 		// HACK, doesn't account for discontinuous selection
-		final double ret = (geneMap.getPixel(maxGene() + 1) - geneMap
-				.getPixel(minGene())) * getYscale() / geneMap.getScale();
+		final double ret = (rowMap.getPixel(maxRow() + 1) - rowMap
+				.getPixel(minRow())) * getYscale() / rowMap.getScale();
 		return ret;
 	}
 
 	public double getAtrHeight() {
 		if (explicitAtrHeight == null)
-			return 150 * getYscale() / geneMap.getScale();
+			return 150 * getYscale() / rowMap.getScale();
 		else
 			return explicitAtrHeight;
 	}
@@ -554,38 +554,38 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		return inclusionPanel.getBboxHeight();
 	}
 
-	public int minGene() {
+	public int minRow() {
 		if (inclusionPanel.drawSelected())
-			return geneSelection.getMinIndex();
+			return rowSelection.getMinIndex();
 		else
 			return 0;
 	}
 
 	public int minArray() {
 		if (inclusionPanel.drawSelected())
-			return arraySelection.getMinIndex();
+			return colSelection.getMinIndex();
 		else
 			return 0;
 	}
 
-	public int maxGene() {
+	public int maxRow() {
 		if (inclusionPanel.drawSelected())
-			return geneSelection.getMaxIndex();
+			return rowSelection.getMaxIndex();
 		else
-			return geneHeaderInfo.getNumHeaders() - 1;
+			return rowLabelInfo.getNumLabels() - 1;
 	}
 
-	public int maxArray() {
+	public int maxCol() {
 		if (inclusionPanel.drawSelected())
-			return arraySelection.getMaxIndex();
+			return colSelection.getMaxIndex();
 		else
-			return arrayHeaderInfo.getNumHeaders() - 1;
+			return colLabelInfo.getNumLabels() - 1;
 	}
 
 	public int estimateHeight() {
 		int height = 2 * getBorderPixels();
 		// do we need to include the height of the map?
-		if (includeGeneMap()) {
+		if (includeRowMap()) {
 			height += (int) getYmapHeight();
 		} else {
 		}
@@ -593,14 +593,14 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		if (includeAtr()) {
 			height += (int) getAtrHeight();
 		}
-		height += getArrayAnnoLength();
+		height += getColAnnoLength();
 		return height;
 	}
 
 	public int estimateWidth() {
 		int width = 2 * getBorderPixels();
 		// do we need to include the width of the map?
-		if (includeArrayMap()) {
+		if (includeColMap()) {
 			width += (int) getXmapWidth();
 		} else {
 		}
@@ -608,15 +608,15 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		if (includeGtr()) {
 			width += (int) getGtrWidth();
 		}
-		width += getGeneAnnoLength();
+		width += getRowAnnoLength();
 		return width;
 	}
 
-	protected int getGeneAnnoLength() {
+	protected int getRowAnnoLength() {
 		// deal with text length...
 		if ((inclusionPanel == null) || (inclusionPanel.useBbox() == false)) {
 			// no bounding box, have to wing it...
-			final Integer rawMaxLength = headerSelectionPanel.geneMaxLength();
+			final Integer rawMaxLength = labelTypeSelectionPanel.geneMaxLength();
 			if (rawMaxLength != null)
 				return rawMaxLength + textSpacing;
 			else
@@ -626,25 +626,25 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			return getBboxWidth();
 	}
 
-	protected int getArrayAnnoLength() {
+	protected int getColAnnoLength() {
 		// deal with text length...
 		if ((inclusionPanel == null) || (inclusionPanel.useBbox() == false))
 			// no bounding box, have to wing it...
-			return headerSelectionPanel.arrayMaxLength() + textSpacing;
+			return labelTypeSelectionPanel.arrayMaxLength() + textSpacing;
 		else
 			return getBboxHeight();
 	}
 
-	public int numArrayHeaders() {
-		return headerSelectionPanel.numArrayHeaders();
+	public int numColLabels() {
+		return labelTypeSelectionPanel.numColLabels();
 	}
 
-	public int numGeneHeaders() {
-		return headerSelectionPanel.numGeneHeaders();
+	public int numRowLabels() {
+		return labelTypeSelectionPanel.numRowLabels();
 	}
 
-	public void deselectHeaders() {
-		headerSelectionPanel.deselectHeaders();
+	public void deselectLabels() {
+		labelTypeSelectionPanel.deselectLabels();
 	}
 
 	class PreviewPanel extends JPanel {
@@ -724,7 +724,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 					drawGtr(g, 0, dataY, scale);
 
 					if (includeAtr()) {
-						if (headerSelectionPanel.getArrayAnnoInside()) {
+						if (labelTypeSelectionPanel.getColAnnoInside()) {
 							drawAtr(g, dataX, 0, scale);
 							drawArrayAnnoBox(g, dataX,
 									(int) (scale * getAtrHeight()), scale);
@@ -737,7 +737,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 						drawArrayAnnoBox(g, dataX, 0, scale);
 					}
 					drawData(g, dataX, dataY, scale);
-					if (includeArrayMap()) {
+					if (includeColMap()) {
 						drawGeneAnnoBox(g, dataX
 								+ (int) (getXmapWidth() * scale), dataY, scale);
 					} else {
@@ -792,7 +792,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		if (includeAtr()) {
 			dataY += getAtrHeight();
 		}
-		dataY += getArrayAnnoLength();
+		dataY += getColAnnoLength();
 		return dataY;
 	}
 
@@ -811,7 +811,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		drawGtr(g, scaleP, dataY, scale);
 
 		if (includeAtr()) {
-			if (getArrayAnnoInside()) {
+			if (getColAnnoInside()) {
 				drawAtr(g, dataX, scaleP, scale);
 				drawArrayAnno(g, dataX,
 						scaleP + (int) (scale * getAtrHeight()), scale);
@@ -823,7 +823,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			drawArrayAnno(g, dataX, scaleP, scale);
 		}
 		drawData(g, dataX, dataY, scale);
-		if (includeArrayMap()) {
+		if (includeColMap()) {
 			drawGeneAnno(g, dataX + (int) (getXmapWidth() * scale), dataY,
 					scale);
 		} else {
@@ -850,18 +850,18 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		final Rectangle destRect = new Rectangle();
 		destRect.setBounds(x, y, width, height);
 
-		final double minCorr = getMinGeneCorr();
+		final double minCorr = getMinRowCorr();
 		final LinearTransformation xScaleEq = new LinearTransformation(minCorr,
-				destRect.x, geneTreeDrawer.getCorrMax(), destRect.x
+				destRect.x, rowTreeDrawer.getCorrMax(), destRect.x
 						+ destRect.width);
 
 		final LinearTransformation yScaleEq = new LinearTransformation(
-				minGene(), destRect.y, maxGene() + 1, destRect.y
+				minRow(), destRect.y, maxRow() + 1, destRect.y
 						+ destRect.height);
 
 		// draw
-		geneTreeDrawer.paintSubtree(g,xScaleEq,yScaleEq,destRect,
-			getGeneNode(),true,-1,geneSelection,null);
+		rowTreeDrawer.paintSubtree(g,xScaleEq,yScaleEq,destRect,
+			getRowNode(),true,-1,rowSelection,null);
 	}
 
 	/**
@@ -882,20 +882,20 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		final Rectangle destRect = new Rectangle();
 		destRect.setBounds(x, y, width, height);
 		final LinearTransformation xScaleEq = new LinearTransformation(
-				minArray(), destRect.x, maxArray() + 1, destRect.x
+				minArray(), destRect.x, maxCol() + 1, destRect.x
 						+ destRect.width);
-		double minCorr = arrayTreeDrawer.getCorrMin();
+		double minCorr = colTreeDrawer.getCorrMin();
 		if (drawSelected()) {
-			minCorr = arrayTreeDrawer.getNodeById(
-					getArraySelection().getSelectedNode()).getCorr();
+			minCorr = colTreeDrawer.getNodeById(
+					getColSelection().getSelectedNode()).getCorr();
 		}
 		final LinearTransformation yScaleEq = new LinearTransformation(minCorr,
-				destRect.y, arrayTreeDrawer.getCorrMax(), destRect.y
+				destRect.y, colTreeDrawer.getCorrMax(), destRect.y
 						+ destRect.height);
 
 		// draw
-		arrayTreeDrawer.paintSubtree(g,xScaleEq,yScaleEq,destRect,
-			getArrayNode(),false,-1,arraySelection,null);
+		colTreeDrawer.paintSubtree(g,xScaleEq,yScaleEq,destRect,
+			getColNode(),false,-1,colSelection,null);
 	}
 
 	/**
@@ -905,13 +905,13 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	protected void drawGeneAnnoBox(final Graphics g, final int x, final int y,
 			final double scale) {
 		// HACK doesn't deal with discontinuous selection right.
-		final int width = (int) (getGeneAnnoLength() * scale);
+		final int width = (int) (getRowAnnoLength() * scale);
 		final int height = (int) (getYmapHeight() * scale);
 		g.setColor(Color.black);
-		final FontMetrics fontMetrics = getFontMetrics(getGeneFont());
+		final FontMetrics fontMetrics = getFontMetrics(getRowFont());
 		final int geneHeight = (int) (fontMetrics.getAscent() * scale);
-		final int min = minGene();
-		final int max = maxGene();
+		final int min = minRow();
+		final int max = maxRow();
 		final double spacing = (double) height / (max - min + 1);
 		for (int i = min; i <= max; i++) {
 			/*
@@ -933,14 +933,14 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			final double scale) {
 
 		// HACK doesn't deal with discontinuous selection right.
-		final int height = (int) (getArrayAnnoLength() * scale);
+		final int height = (int) (getColAnnoLength() * scale);
 		final int width = (int) (getXmapWidth() * scale);
 
 		g.setColor(Color.black);
-		final FontMetrics fontMetrics = getFontMetrics(getArrayFont());
+		final FontMetrics fontMetrics = getFontMetrics(getColFont());
 		final int arrayWidth = (int) (fontMetrics.getAscent() * scale);
 		final int min = minArray();
-		final int max = maxArray();
+		final int max = maxCol();
 		final double spacing = (double) width / (max - min + 1);
 		for (int i = min; i <= max; i++) {
 			// int arrayHeight = (int) (scale *
@@ -949,7 +949,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			final int thisx = x
 					+ (int) ((i - min) * spacing + (spacing - arrayWidth) / 2);
 			int thisy = y + height - arrayHeight;
-			if (headerSelectionPanel.getArrayAnnoInside()) {
+			if (labelTypeSelectionPanel.getColAnnoInside()) {
 				thisy = y;
 			}
 			g.fillRect(thisx, thisy, arrayWidth, arrayHeight);
@@ -963,12 +963,12 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			final double scale) {
 
 		// HACK doesn't deal with discontinuous selection right.
-		final int width = (int) (getGeneAnnoLength() * scale);
+		final int width = (int) (getRowAnnoLength() * scale);
 		final int height = (int) (getYmapHeight() * scale);
 		if ((height == 0) || (width == 0))
 			return;
-		final int min = minGene();
-		final int max = maxGene();
+		final int min = minRow();
+		final int max = maxRow();
 		final double spacing = (double) height / (max - min + 1);
 
 		final MapContainer tempMap = new MapContainer("Fixed");
@@ -978,15 +978,15 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		// final TextView_deprec anv = new TextView_deprec();
 		final RowLabelView anv = new RowLabelView();
 		anv.setUrlExtractor(null);
-		anv.setHeaderInfo(geneHeaderInfo);
+		anv.setLabelInfo(rowLabelInfo);
 		anv.setMap(tempMap);
-		anv.setHeaderSummary(headerSelectionPanel.getGeneSummary());
+		anv.setLabelSummary(labelTypeSelectionPanel.getGeneSummary());
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
 				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB);
-		LogBuffer.println("setting font for genes to " + getGeneFont());
-		anv.setFace(getGeneFont().getName());
-		anv.setStyle(getGeneFont().getStyle());
-		anv.setPoints(getGeneFont().getSize());
+		LogBuffer.println("setting font for genes to " + getRowFont());
+		anv.setFace(getRowFont().getName());
+		anv.setStyle(getRowFont().getStyle());
+		anv.setPoints(getRowFont().getSize());
 		anv.updateBuffer(buf);
 		g.drawImage(buf, x + textSpacing, y, null);
 
@@ -1005,12 +1005,12 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	 */
 	public void drawArrayAnno(final Graphics real, final int x, final int y,
 			final double scale) {
-		final int height = (int) (getArrayAnnoLength() * scale);
+		final int height = (int) (getColAnnoLength() * scale);
 		final int width = (int) (getXmapWidth() * scale);
 		if ((height == 0) || (width == 0))
 			return;
 		final int min = minArray();
-		final int max = maxArray();
+		final int max = maxCol();
 		final double spacing = (double) width / (max - min + 1);
 
 		final MapContainer tempMap = new MapContainer("Fixed");
@@ -1019,15 +1019,15 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		tempMap.setAvailablePixels(width + getBorderPixels());
 		final ColumnLabelView anv = new ColumnLabelView();
 		anv.setUrlExtractor(null);
-		anv.setHeaderInfo(arrayHeaderInfo);
-		anv.setFace(getArrayFont().getName());
-		anv.setStyle(getArrayFont().getStyle());
-		anv.setPoints(getArrayFont().getSize());
-		anv.setHeaderSummary(headerSelectionPanel.getArraySummary());
+		anv.setLabelInfo(colLabelInfo);
+		anv.setFace(getColFont().getName());
+		anv.setStyle(getColFont().getStyle());
+		anv.setPoints(getColFont().getSize());
+		anv.setLabelSummary(labelTypeSelectionPanel.getArraySummary());
 		anv.setMap(tempMap);
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
 				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB);
-		buf.getGraphics().setFont(getArrayFont());
+		buf.getGraphics().setFont(getColFont());
 		anv.updateBuffer(buf);
 		real.drawImage(buf, x, y - getBorderPixels() - textSpacing, null);
 	}
@@ -1043,8 +1043,8 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		final int width = (int) (getXmapWidth() * scale);
 
 		final Rectangle sourceRect = new Rectangle();
-		sourceRect.setBounds(minArray(), minGene(),
-				(maxArray() + 1 - minArray()), (maxGene() + 1 - minGene()));
+		sourceRect.setBounds(minArray(), minRow(),
+				(maxCol() + 1 - minArray()), (maxRow() + 1 - minRow()));
 		final Rectangle destRect = new Rectangle();
 
 		// HACK does not deal with discontinuous selection...
@@ -1185,17 +1185,17 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		}
 
 		public void synchEnabled() {
-			selectionBox.setEnabled((geneSelection.getNSelectedIndexes() != 0)
-					|| (arraySelection.getNSelectedIndexes() != 0));
+			selectionBox.setEnabled((rowSelection.getNSelectedIndexes() != 0)
+					|| (colSelection.getNSelectedIndexes() != 0));
 			bboxRow.setEnabled(bboxBox.isSelected());
 
 			// deal with array tree...
-			if (getArrayRootNode() == null) { // no array clustering...
+			if (getColRootNode() == null) { // no array clustering...
 				atrBox.setSelected(false);
 				atrBox.setEnabled(false);
 			} else {
 				if (selectionBox.isSelected()) { // outputting selection...
-					if (arraySelection.getSelectedNode() == null) { // no array
+					if (colSelection.getSelectedNode() == null) { // no array
 						// node
 						// selected...
 						atrBox.setSelected(false);
@@ -1209,12 +1209,12 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			}
 
 			// deal with gene tree...
-			if (getGeneRootNode() == null) { // no gene clustering...
+			if (getRowRootNode() == null) { // no gene clustering...
 				gtrBox.setSelected(false);
 				gtrBox.setEnabled(false);
 			} else {
 				if (selectionBox.isSelected()) { // outputting selection...
-					if (geneSelection.getSelectedNode() == null) { // no gene
+					if (rowSelection.getSelectedNode() == null) { // no gene
 						// node
 						// selected...
 						gtrBox.setSelected(false);
@@ -1244,17 +1244,17 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		 */
 		public void synchSelected() {
 			// do we output selected or the whole thing?
-			selectionBox.setSelected((geneSelection.getNSelectedIndexes() != 0)
-					|| (arraySelection.getNSelectedIndexes() != 0));
+			selectionBox.setSelected((rowSelection.getNSelectedIndexes() != 0)
+					|| (colSelection.getNSelectedIndexes() != 0));
 
 			if (selectionBox.isSelected()) {
 				// outputting selected...
-				atrBox.setSelected(arraySelection.getSelectedNode() != null);
-				gtrBox.setSelected(geneSelection.getSelectedNode() != null);
+				atrBox.setSelected(colSelection.getSelectedNode() != null);
+				gtrBox.setSelected(rowSelection.getSelectedNode() != null);
 			} else {
 				// outputing everything
-				atrBox.setSelected(getArrayRootNode() != null);
-				gtrBox.setSelected(getGeneRootNode() != null);
+				atrBox.setSelected(getColRootNode() != null);
+				gtrBox.setSelected(getRowRootNode() != null);
 			}
 			// always inlcude the data by default... if you have the drawer,
 			// that is.
@@ -1269,14 +1269,14 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		}
 
 		public void recalculateBbox() {
-			if (headerSelectionPanel == null) {
+			if (labelTypeSelectionPanel == null) {
 				bboxRow.setXsize(2);
 				bboxRow.setYsize(2);
 			} else {
-				final Integer rawMaxLength = headerSelectionPanel
+				final Integer rawMaxLength = labelTypeSelectionPanel
 						.geneMaxLength();
 				bboxRow.setXsize(rawMaxLength == null ? 0 : rawMaxLength);
-				bboxRow.setYsize(headerSelectionPanel.arrayMaxLength());
+				bboxRow.setYsize(labelTypeSelectionPanel.arrayMaxLength());
 			}
 		}
 
@@ -1367,12 +1367,12 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			final JPanel scalePanel = new JPanel();
 			scalePanel.setLayout(new BoxLayout(scalePanel, BoxLayout.Y_AXIS));
 			final JPanel Xsub = new JPanel();
-			xScaleField = new JTextField(Double.toString(arrayMap.getScale()));
+			xScaleField = new JTextField(Double.toString(colMap.getScale()));
 			Xsub.add(new JLabel("x scale"));
 			Xsub.add(xScaleField);
 			scalePanel.add(Xsub);
 
-			yScaleField = new JTextField(Double.toString(geneMap.getScale()));
+			yScaleField = new JTextField(Double.toString(rowMap.getScale()));
 			final JPanel Ysub = new JPanel();
 			Ysub.add(new JLabel("y scale"));
 			Ysub.add(yScaleField);
@@ -1513,35 +1513,35 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		}
 	}
 
-	class HeaderSelectionPanel extends JPanel {
+	class LabelTypeSelectionPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
-		private final JCheckBox geneAnnoInside, arrayAnnoInside;
-		private final HeaderSummary geneSummary = new HeaderSummary(
+		private final JCheckBox rowAnnoInside, colAnnoInside;
+		private final LabelSummary rowSummary = new LabelSummary(
 				"GeneSummary");
 
-		public HeaderSummary getGeneSummary() {
-			return geneSummary;
+		public LabelSummary getGeneSummary() {
+			return rowSummary;
 		}
 
-		private final HeaderSummary arraySummary = new HeaderSummary(
+		private final LabelSummary colSummary = new LabelSummary(
 				"ArraySummary");
 
-		public HeaderSummary getArraySummary() {
-			return arraySummary;
+		public LabelSummary getArraySummary() {
+			return colSummary;
 		}
 
-		public JList<String> geneList, arrayList;
+		public JList<String> rowLabelTypeList, colLabelTypeList;
 
-		public String getGeneAnno(final int i) {
-			return geneSummary.getSummary(geneHeaderInfo, i);
+		public String getRowAnno(final int i) {
+			return rowSummary.getSummary(rowLabelInfo, i);
 			// return assembleAnno(i, geneHeaderInfo,
 			// geneList.getSelectedIndices());
 		}
 
-		public String getArrayAnno(final int i) {
-			return arraySummary.getSummary(arrayHeaderInfo, i);
+		public String getColAnno(final int i) {
+			return colSummary.getSummary(colLabelInfo, i);
 
 			// return assembleAnno(i, arrayHeaderInfo,
 			// arrayList.getSelectedIndices());
@@ -1550,15 +1550,15 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		public int arrayMaxLength() {
 			if (inclusionPanel == null)
 				return 100;
-			final FontMetrics fontMetrics = getFontMetrics(getArrayFont());
+			final FontMetrics fontMetrics = getFontMetrics(getColFont());
 			int max = 0;
 			final boolean drawSelected = inclusionPanel.drawSelected();
-			for (int i = minArray(); i < maxArray(); i++) {
+			for (int i = minArray(); i < maxCol(); i++) {
 				if (drawSelected
-						&& (arraySelection.isIndexSelected(i) == false)) {
+						&& (colSelection.isIndexSelected(i) == false)) {
 					continue;
 				}
-				final String anno = getArrayAnno(i);
+				final String anno = getColAnno(i);
 				if (anno == null) {
 					continue;
 				}
@@ -1574,13 +1574,13 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		private Integer geneMaxLength() {
 			if (inclusionPanel == null)
 				return 100;
-			final FontMetrics fontMetrics = getFontMetrics(getGeneFont());
+			final FontMetrics fontMetrics = getFontMetrics(getRowFont());
 			Integer max = null;
 			// boolean drawSelected = inclusionPanel.drawSelected();
-			for (int i = minGene(); i < maxGene(); i++) {
+			for (int i = minRow(); i < maxRow(); i++) {
 				// if (drawSelected && (geneSelection.isIndexSelected(i) ==
 				// false)) continue;
-				final int length = fontMetrics.stringWidth(getGeneAnno(i));
+				final int length = fontMetrics.stringWidth(getRowAnno(i));
 				if (length > 0 && (max == null || length > max)) {
 					max = length;
 				}
@@ -1593,33 +1593,33 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 				return 0;
 			// FontMetrics fontMetrics =
 			// getFontMetrics(getGraphics().getFont());
-			final FontMetrics fontMetrics = getFontMetrics(getGeneFont());
+			final FontMetrics fontMetrics = getFontMetrics(getRowFont());
 			return fontMetrics.stringWidth(txt);
 		}
 
-		public int numArrayHeaders() {
-			return arrayList.getSelectedIndices().length;
+		public int numColLabels() {
+			return colLabelTypeList.getSelectedIndices().length;
 		}
 
-		public int numGeneHeaders() {
-			return geneList.getSelectedIndices().length;
+		public int numRowLabels() {
+			return rowLabelTypeList.getSelectedIndices().length;
 		}
 
-		public void deselectHeaders() {
-			arrayList.clearSelection();
-			geneList.clearSelection();
+		public void deselectLabels() {
+			colLabelTypeList.clearSelection();
+			rowLabelTypeList.clearSelection();
 		}
 
-		public boolean geneAnnoInside() {
-			return geneAnnoInside.isSelected();
+		public boolean rowAnnoInside() {
+			return rowAnnoInside.isSelected();
 		}
 
-		public boolean getArrayAnnoInside() {
-			return arrayAnnoInside.isSelected();
+		public boolean getColAnnoInside() {
+			return colAnnoInside.isSelected();
 		}
 
-		public void setArrayAnnoInside(final boolean newval) {
-			arrayAnnoInside.setSelected(newval);
+		public void setColAnnoInside(final boolean newval) {
+			colAnnoInside.setSelected(newval);
 		}
 
 		@Override
@@ -1628,34 +1628,34 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			inclusionPanel.recalculateBbox();
 		}
 
-		HeaderSelectionPanel() {
+		LabelTypeSelectionPanel() {
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-			add(new JLabel("Gene Headers"));
-			final String[] geneHeaders = geneHeaderInfo.getNames();
-			if (geneHeaders == null) {
-				geneList = new JList<String>(new String[0]);
+			add(new JLabel("Row Label Types"));
+			final String[] rowLabelTypes = rowLabelInfo.getLabelTypes();
+			if (rowLabelTypes == null) {
+				rowLabelTypeList = new JList<String>(new String[0]);
 			} else {
-				geneList = new JList<String>(geneHeaders);
+				rowLabelTypeList = new JList<String>(rowLabelTypes);
 			}
-			geneList.setVisibleRowCount(5);
-			add(new JScrollPane(geneList));
+			rowLabelTypeList.setVisibleRowCount(5);
+			add(new JScrollPane(rowLabelTypeList));
 
-			geneAnnoInside = new JCheckBox("Right of Tree?");
+			rowAnnoInside = new JCheckBox("Right of Tree?");
 			// add(geneAnnoInside);
-			add(new JLabel("Array Headers"));
+			add(new JLabel("Column Label Types"));
 
-			final String[] arrayHeaders = arrayHeaderInfo.getNames();
-			if (arrayHeaders == null) {
-				arrayList = new JList<String>(new String[0]);
+			final String[] colLabelTypes = colLabelInfo.getLabelTypes();
+			if (colLabelTypes == null) {
+				colLabelTypeList = new JList<String>(new String[0]);
 			} else {
-				arrayList = new JList<String>(arrayHeaders);
+				colLabelTypeList = new JList<String>(colLabelTypes);
 			}
-			arrayList.setVisibleRowCount(5);
-			add(new JScrollPane(arrayList));
+			colLabelTypeList.setVisibleRowCount(5);
+			add(new JScrollPane(colLabelTypeList));
 
-			arrayAnnoInside = new JCheckBox("Below Tree?");
-			arrayAnnoInside.addActionListener(new ActionListener() {
+			colAnnoInside = new JCheckBox("Below Tree?");
+			colAnnoInside.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					inclusionPanel.updateSize();
@@ -1664,7 +1664,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 					}
 				}
 			});
-			add(arrayAnnoInside);
+			add(colAnnoInside);
 
 			final ListSelectionListener tmp = new ListSelectionListener() {
 				@Override
@@ -1672,25 +1672,25 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 					if (inclusionPanel != null) {
 						inclusionPanel.recalculateBbox();
 						inclusionPanel.updateSize();
-						geneSummary.setIncluded(geneList.getSelectedIndices());
-						arraySummary
-								.setIncluded(arrayList.getSelectedIndices());
+						rowSummary.setIncluded(rowLabelTypeList.getSelectedIndices());
+						colSummary
+								.setIncluded(colLabelTypeList.getSelectedIndices());
 					}
 					if (previewPanel != null) {
 						previewPanel.updatePreview();
 					}
 				}
 			};
-			geneList.addListSelectionListener(tmp);
-			arrayList.addListSelectionListener(tmp);
-			arrayList.setSelectedIndex(0);
-			geneList.setSelectedIndex(1);
+			rowLabelTypeList.addListSelectionListener(tmp);
+			colLabelTypeList.addListSelectionListener(tmp);
+			colLabelTypeList.setSelectedIndex(0);
+			rowLabelTypeList.setSelectedIndex(1);
 			setupSelected();
 		}
 
 		public void setupSelected() {
-			geneSummary.setIncluded(geneList.getSelectedIndices());
-			arraySummary.setIncluded(arrayList.getSelectedIndices());
+			rowSummary.setIncluded(rowLabelTypeList.getSelectedIndices());
+			colSummary.setIncluded(colLabelTypeList.getSelectedIndices());
 			if (inclusionPanel != null) {
 				inclusionPanel.updateSize();
 			}
@@ -1765,16 +1765,16 @@ class TestExportPanel extends ExportPanel {
 	private static final long serialVersionUID = 1L;
 
 	TestExportPanel(final MapContainer aMap, final MapContainer gMap) {
-		this(new DummyHeaderInfo(), new DummyHeaderInfo(),
+		this(new DummyLabelInfo(), new DummyLabelInfo(),
 				new TreeSelection(4), new TreeSelection(5), aMap, gMap);
 	}
 
-	TestExportPanel(final HeaderInfo arrayHeaderInfo,
-			final HeaderInfo geneHeaderInfo,
-			final TreeSelectionI geneSelection,
-			final TreeSelectionI arraySelection, final MapContainer aMap,
+	TestExportPanel(final LabelInfo colLabelInfo,
+			final LabelInfo rowLabelInfo,
+			final TreeSelectionI rowSelection,
+			final TreeSelectionI colSelection, final MapContainer aMap,
 			final MapContainer gMap) {
-		super(arrayHeaderInfo, geneHeaderInfo, geneSelection, arraySelection,
+		super(colLabelInfo, rowLabelInfo, rowSelection, colSelection,
 				null, null, null, aMap, gMap, false);
 	}
 

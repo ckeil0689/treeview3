@@ -122,10 +122,10 @@ public class KMeansCluster {
 	 *
 	 * @param kClusters
 	 *            The k-clusters formed by the calculation.
-	 * @param headerArray
+	 * @param labelArray
 	 *            Matrix labels from the tvModel.
 	 */
-	public void writeData(final int[][] kClusters, final String[][] headerArray) {
+	public void writeData(final int[][] kClusters, final String[][] labelArray) {
 
 		if (bufferedWriter == null) {
 			LogBuffer.println("Cannot write KMeans clustering data.");
@@ -137,21 +137,21 @@ public class KMeansCluster {
 
 		String[][] kClusters_string = new String[kClusters.length][];
 
-		kClusters_string = indexToString(kClusters, headerArray);
+		kClusters_string = indexToString(kClusters, labelArray);
 
 		final int pairSize = 2;
 		final String[] initial = new String[pairSize];
 
 		int addIndex = 0;
 
-		/* Setting up header line */
+		/* Setting up label type line */
 		initial[addIndex] = (axis == ClusterDialogController.ROW) ? "ORF" : "ARRAY";
 		addIndex++;
 
 		initial[addIndex] = "GROUP";
 		addIndex++;
 
-		/* Writing the header line */
+		/* Writing the label line */
 		bufferedWriter.writeData(initial);
 
 		/* Write the calculated data */
@@ -181,9 +181,9 @@ public class KMeansCluster {
 		}
 	}
 
-	public void finish(final String[][] headerArray) {
+	public void finish(final String[][] labelArray) {
 
-		writeData(kClusters, headerArray);
+		writeData(kClusters, labelArray);
 		bufferedWriter.closeWriter();
 	}
 
@@ -426,14 +426,14 @@ public class KMeansCluster {
 	}
 
 	/**
-	 * This method uses the list of clusters composed of gene indexes to find
-	 * the appropriate ORF names from the loaded model's headers.
+	 * This method uses the list of clusters composed of row indexes to find
+	 * the appropriate ORF names from the loaded model's labels.
 	 *
 	 * @param kClusters
 	 * @return
 	 */
 	private static String[][] indexToString(final int[][] kClusters,
-			final String[][] headerArray) {
+			final String[][] labelArray) {
 
 		final String[][] kClusters_string = new String[kClusters.length][];
 
@@ -441,15 +441,15 @@ public class KMeansCluster {
 		int addIndex = 0;
 		for (final int[] cluster : kClusters) {
 
-			final String[] geneNames = new String[cluster.length];
+			final String[] rowNames = new String[cluster.length];
 
 			int addIndexInner = 0;
 			for (final int mean : cluster) {
-				geneNames[addIndexInner] = headerArray[mean][0]; // label;
+				rowNames[addIndexInner] = labelArray[mean][0]; // label;
 				addIndexInner++;
 			}
 
-			kClusters_string[addIndex] = geneNames;
+			kClusters_string[addIndex] = rowNames;
 			addIndex++;
 		}
 

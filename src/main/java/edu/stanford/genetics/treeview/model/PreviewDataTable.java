@@ -23,9 +23,9 @@ public class PreviewDataTable extends JTable {
 
 	private final LabelCellRenderer renderer;
 
-	public PreviewDataTable(String[][] previewData, Object[] headers) {
+	public PreviewDataTable(String[][] previewData, Object[] labels) {
 
-		super(getNewDefaultTableModel(headers, 0));
+		super(getNewDefaultTableModel(labels, 0));
 
 		this.renderer = new LabelCellRenderer();
 
@@ -77,9 +77,9 @@ public class PreviewDataTable extends JTable {
 	}
 
 	private static DefaultTableModel getNewDefaultTableModel(
-			final Object[] headers, final int rowCount) {
+			final Object[] labels, final int rowCount) {
 
-		DefaultTableModel defaultModel = new DefaultTableModel(headers,
+		DefaultTableModel defaultModel = new DefaultTableModel(labels,
 				rowCount) {
 
 			/** Keeping Eclipse happy... */

@@ -170,8 +170,8 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 		private GridBagConstraints gbc;
 		private JCheckBox[] presetEnablings;
 		private JRadioButton[] defaultButtons;
-		private JTextField[] presetNames;
-		private JTextField[] presetHeaders;
+		private JTextField[] presetLabelTypes;
+		private JTextField[] presetLabels;
 		private JTextField[] presetTemplates;
 
 		public PresetEditPanel() {
@@ -182,7 +182,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 		public void redoLayout() {
 
 			String[] preset;
-			preset = presets.getPresetNames();
+			preset = presets.getPresetLabelTypes();
 			final int nPresets = preset.length;
 			removeAll();
 			setLayout(new GridBagLayout());
@@ -219,8 +219,8 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 
 			defaultButtons = new JRadioButton[nPresets + 1];
 			presetEnablings = new JCheckBox[nPresets + 1];
-			presetNames = new JTextField[nPresets + 1];
-			presetHeaders = new JTextField[nPresets + 1];
+			presetLabelTypes = new JTextField[nPresets + 1];
+			presetLabels = new JTextField[nPresets + 1];
 			presetTemplates = new JTextField[nPresets + 1];
 
 			final ButtonGroup bob = new ButtonGroup();
@@ -243,9 +243,9 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 
 		private void saveAll() {
 
-			final int n = presetNames.length - 1; // for null...
+			final int n = presetLabelTypes.length - 1; // for null...
 			for (int i = 0; i < n; i++) {
-				presets.setPresetHeader(i, presetHeaders[i].getText());
+				presets.setPresetHeader(i, presetLabels[i].getText());
 			}
 
 			// for (int i = 0; i < n; i++) {
@@ -266,8 +266,8 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 
 			final int index = i;
 			final JTextField templateField = new JTextField(50);
-			final JTextField nameField = new JTextField();
-			final JTextField headerField = new JTextField();
+			final JTextField labelTypeField = new JTextField();
+			final JTextField labelField = new JTextField();
 			final JCheckBox enabledField = new JCheckBox();
 
 			gbc.gridx = 0;
@@ -277,14 +277,14 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 
 			gbc.gridx = 1;
 			gbc.weightx = 100;
-			headerField.setText((presets.getPresetHeaders())[index]);
-			presetHeaders[index] = headerField;
-			add(headerField, gbc);
+			labelField.setText((presets.getPresetLabels())[index]);
+			presetLabels[index] = labelField;
+			add(labelField, gbc);
 
 			gbc.gridx = 2;
-			nameField.setText((presets.getPresetNames())[index]);
-			presetNames[index] = nameField;
-			add(nameField, gbc);
+			labelTypeField.setText((presets.getPresetLabelTypes())[index]);
+			presetLabelTypes[index] = labelTypeField;
+			add(labelTypeField, gbc);
 
 			gbc.gridx = 3;
 			gbc.weightx = 100;
@@ -316,7 +316,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 			gbc.gridx = 2;
 			nameField.setText("None");
 			nameField.setEditable(false);
-			presetNames[index] = nameField;
+			presetLabelTypes[index] = nameField;
 			add(nameField, gbc);
 
 			gbc.gridx = 3;

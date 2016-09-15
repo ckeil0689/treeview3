@@ -10,18 +10,18 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LabelSummary;
 
-public class HeaderSummaryTest {
+public class LabelSummaryTest {
 
 	private final String NAME = "TestSummary";
 	private final String ROOT_NODE = "testNode";
-	private HeaderSummary headerSummary;
+	private LabelSummary labelSummary;
 	
 	@Before
 	public void setUp() throws Exception {
 		
-		this.headerSummary = new HeaderSummary(NAME);
+		this.labelSummary = new LabelSummary(NAME);
 	}
 
 	@After
@@ -31,7 +31,7 @@ public class HeaderSummaryTest {
 	}
 
 	@Test
-	public void testHeaderSummary() {
+	public void testLabelSummary() {
 		fail("Not yet implemented");
 	}
 
@@ -40,9 +40,9 @@ public class HeaderSummaryTest {
 		
 		/* Testing this setter because it contains some logic */
 		Preferences parentNode = Preferences.userRoot().node(ROOT_NODE);
-		headerSummary.setConfigNode(parentNode);
+		labelSummary.setConfigNode(parentNode);
 		
-		Preferences hsNode = headerSummary.getConfigNode();
+		Preferences hsNode = labelSummary.getConfigNode();
 		assertNotNull("ConfigNode was set", hsNode);
 		assertTrue("ConfigNode has name " + NAME, NAME.equals(hsNode.name()));
 	}

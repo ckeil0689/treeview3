@@ -12,20 +12,20 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * this class generates a single string summary of a HeaderInfo.
+ * this class generates a single string summary of a LabelInfo.
  */
-public class HeaderSummary extends Observable 
+public class LabelSummary extends Observable 
 implements ConfigNodePersistent, ModelLoadReset {
 
 	private final int[] d_included = new int[] { 0 };
-	private final String[] d_headers = new String[]{"default"};
+	private final String[] d_labelTypes = new String[]{"default"};
 	private final String type;
 	
 	private Preferences configNode;
-	private String[] headers;
+	private String[] labelTypes;
 	private int[] included;
 
-	public HeaderSummary(final String type) {
+	public LabelSummary(final String type) {
 
 		super();
 		this.type = type;
@@ -36,7 +36,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 	public void resetDefaults() {
 		
 		this.included = d_included;
-		this.headers = d_headers;
+		this.labelTypes = d_labelTypes;
 	}
 	
 	@Override
@@ -75,17 +75,17 @@ implements ConfigNodePersistent, ModelLoadReset {
 		final int[] vec = getIncluded();
 		configNode.put("included", Arrays.toString(vec));
 		
-		if(headers == null) {
-			LogBuffer.println("Could not store headers. "
-					+ "No headers defined yet.");
+		if(labelTypes == null) {
+			LogBuffer.println("Could not store label types. "
+					+ "No label types defined yet.");
 			return;
 		}
 		
 		final String[] names = new String[vec.length];
 		for(int i = 0; i < names.length; i++) {
 			int idx = vec[i];
-			if(idx < headers.length) {
-				names[i] = headers[idx];
+			if(idx < labelTypes.length) {
+				names[i] = labelTypes[idx];
 			}
 		}
 		configNode.put("includedNames", Arrays.toString(names));
@@ -123,7 +123,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 
 				} catch (final NumberFormatException e) {
 					LogBuffer.logException(e);
-					LogBuffer.println("HeaderSummary has trouble "
+					LogBuffer.println("LabelSummary has trouble "
 							+ "restoring included list from " 
 							+ Arrays.toString(inclArray));
 					setIncluded(new int[0]);
@@ -133,14 +133,14 @@ implements ConfigNodePersistent, ModelLoadReset {
 				array = adjustIncl(array);
 				setIncluded(array);
 			}
-		} else if(headers != null && headers.length > 0) {
-			LogBuffer.println("There are headers defined but no key stored "
+		} else if(labelTypes != null && labelTypes.length > 0) {
+			LogBuffer.println("There are labels defined but no key stored "
 					+ "for included indices. Setting a default. "
 					+ "(" + type + ")");
 			setIncluded(new int[]{0});
 			
 		} else {
-			LogBuffer.println("There are no headers defined. "
+			LogBuffer.println("There are no labels defined. "
 					+ "Including nothing. (" + type + ")");
 			setIncluded(new int[0]);
 		}
@@ -150,9 +150,8 @@ implements ConfigNodePersistent, ModelLoadReset {
 	 * Setter for the list of indices describing which labels should be 
 	 * included when returning a "summary" string. For LabelView this would
 	 * mean that a summary of labels at a certain index will be returned based
-	 * on which label headers the user selected.
-	 * @param newIncluded - An array of indices describing the selected label 
-	 * headers.
+	 * on which label types the user selected.
+	 * @param newIncluded - An array of indices describing the selected label types.
 	 */
 	public void setIncluded(final int[] newIncluded) {
 
@@ -163,15 +162,15 @@ implements ConfigNodePersistent, ModelLoadReset {
 	}
 	
 	/**
-	 * Setter for the current available headers in a loaded file. Setting the
-	 * headers is vital for ensuring label header selection consistency because
-	 * a purely index-based approach does not account for headers that moved
-	 * their position in the header list, for example after clustering.
-	 * @param headers - The current headers of a loaded file.
+	 * Setter for the current available label types in a loaded file. Setting the
+	 * label types is vital for ensuring label type selection consistency because
+	 * a purely index-based approach does not account for label types that moved
+	 * their position in the label type list, for example after clustering.
+	 * @param label types - The current label types of a loaded file.
 	 */
-	public void setHeaders(final String[] headers) {
+	public void setLabelTypes(final String[] labelTypes) {
 		
-		this.headers = headers;
+		this.labelTypes = labelTypes;
 		int[] adjustedIncluded = adjustIncl(getIncluded());
 		setIncluded(adjustedIncluded);
 		storeState();
@@ -180,7 +179,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 	}
 
 	/**
-	 * @return included - A list of included label header indices.
+	 * @return included - A list of included label type indices.
 	 */
 	public int[] getIncluded() {
 
@@ -189,19 +188,19 @@ implements ConfigNodePersistent, ModelLoadReset {
 
 	/**
 	 * @return the best possible summary for the specified index.
-	 * If no headers are applicable, will return the empty string.
+	 * If no label types are applicable, will return the empty string.
 	 */
-	public String getSummary(final HeaderInfo headerInfo, final int index) {
+	public String getSummary(final LabelInfo labelInfo, final int index) {
 
 		String[] strings = null;
 		try {
-			strings = headerInfo.getHeader(index);
+			strings = labelInfo.getLabels(index);
 
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			LogBuffer.println("index " + index
-					+ " out of bounds on headers, continuing");
+					+ " out of bounds on labels, continuing");
 			LogBuffer.println("ArrayIndexOutOfBoundsException in "
-					+ "getSummary() in HeaderSummary: " + e.getMessage());
+					+ "getSummary() in LabelSummary: " + e.getMessage());
 			return null;
 		}
 
@@ -236,16 +235,16 @@ implements ConfigNodePersistent, ModelLoadReset {
 
 	/**
 	 * Retrieves a String array containing the labels for all included 
-	 * headers at a certain index.
-	 * @param hI The HeaderInfo object from which to take the labels.
-	 * @param idx The axis index of the label to be returned. 
+	 * label types at a certain index.
+	 * @param labelInfo - The LabelInfo object from which to take the labels.
+	 * @param idx - The axis index of the label to be returned. 
 	 * @return A String array of labels at a defined index.
 	 */
-	public String[] getSummaryArray(final HeaderInfo hI, final int idx) {
+	public String[] getSummaryArray(final LabelInfo labelInfo, final int idx) {
 
 		String[] strings = null;
 		try {
-			strings = hI.getHeader(idx);
+			strings = labelInfo.getLabels(idx);
 
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 			LogBuffer.logException(e);
@@ -307,16 +306,16 @@ implements ConfigNodePersistent, ModelLoadReset {
 	}
 	
 	/**
-	 * Checks if the included indices match with the stored header Strings.
-	 * During clustering or reworking a file, actual header names may shift in
+	 * Checks if the included indices match with the stored label type strings.
+	 * During clustering or reworking a file, actual label types may shift in
 	 * their position and the stored index alone may not be representative
-	 * for the last selected header.
+	 * for the last selected label type.
 	 * @param included The included indices.
 	 */
 	private int[] adjustIncl(int[] included) {
 		
-		if(headers == null) {
-			LogBuffer.println("headers are null in " + type);
+		if(labelTypes == null) {
+			LogBuffer.println("label types are null in " + type);
 			return new int[0];
 		}
 		
@@ -332,41 +331,41 @@ implements ConfigNodePersistent, ModelLoadReset {
 			
 			for(int i = 0; i < inclNames.length; i++) {
 				String name = inclNames[i];
-				for(int j = 0; j < headers.length; j++) {
-					if(name.equals(headers[j])) {
+				for(int j = 0; j < labelTypes.length; j++) {
+					if(name.equals(labelTypes[j])) {
 						newIncluded[i] = j;
 						break;
 					}
 				}
 			}
-		/* If no included headers were found, at least ensure 
+		/* If no included label types were found, at least ensure 
 		 * that included[] is not out of bounds */
 		} else {
 			inclNames = null;
 	        int maxSize = 0;
-	        /* Shrink if necessary */
+	        // Shrink if necessary
 			for(int i = 0; i < included.length; i++) {
-				if(included[i] >= headers.length) {
+				if(included[i] >= labelTypes.length) {
 					maxSize = i + 1;
 					break;
 				}
 			}
 			
-			/* Create adjusted array */
+			// Create adjusted array
 			newIncluded = new int[maxSize];
 			
-			/* Fill with pre-included values that may be included again */
+			// Fill with pre-included values that may be included again
 			for(int i = 0; i < newIncluded.length; i++) {
 				newIncluded[i] = included[i];
 			}
 		}
 		
-		/* Ensure ascending order, just in case */
+		// Ensure ascending order, just in case
 		Arrays.sort(newIncluded);
 		
-		/* Make sure to display first header as default. Note, this must
+		/* Make sure to display first label type as default. Note, this must
 		 * still allow the user to explicitly included nothing. */
-		if(headers.length > 0 && newIncluded.length == 0 && inclNames == null) {
+		if(labelTypes.length > 0 && newIncluded.length == 0 && inclNames == null) {
 			newIncluded = new int[]{0};
 		}
 		
@@ -375,7 +374,8 @@ implements ConfigNodePersistent, ModelLoadReset {
 
 	/**
 	 * Checks if a Preferences node contains the key name.
-	 * @param name The key to check for.
+	 * @param name - The key to check for.
+	 * @param node - The Preferences node to check.
 	 * @return boolean Whether key exists or not.
 	 */
 	public boolean nodeHasAttribute(final String name, final Preferences node) {
@@ -408,7 +408,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 				+ "included_stored (" + configNode.get("included", "default") 
 				+ ")/ includedNames_stored (" + configNode.get("includedNames", 
 						"default") + ")/ headers_class (" 
-				+ Arrays.toString(headers) + ")";
+				+ Arrays.toString(labelTypes) + ")";
 		return str;
 	}
 }

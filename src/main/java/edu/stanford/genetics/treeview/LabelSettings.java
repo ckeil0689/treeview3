@@ -35,8 +35,8 @@ public class LabelSettings extends CustomDialog {
 
 	private final TreeViewFrame tvFrame;
 	private String menu;
-	private HeaderInfo rowHI;
-	private HeaderInfo colHI;
+	private LabelInfo rowLabelInfo;
+	private LabelInfo colLabelInfo;
 
 	private final DendroView dendroView;
 	private JButton okBtn;
@@ -56,10 +56,10 @@ public class LabelSettings extends CustomDialog {
 		this.dendroView = tvFrame.getDendroView();
 	}
 
-	public void setHeaderInfo(final HeaderInfo rowHI, final HeaderInfo colHI) {
+	public void setLabelInfo(final LabelInfo rowLabelInfo, final LabelInfo colLabelInfo) {
 
-		this.rowHI = rowHI;
-		this.colHI = colHI;
+		this.rowLabelInfo = rowLabelInfo;
+		this.colLabelInfo = colLabelInfo;
 	}
 	
 	public void setMenu(final String menu) {
@@ -102,8 +102,8 @@ public class LabelSettings extends CustomDialog {
 			return null;
 		}
 
-		return new int[] { annotationSettings.getSelectedGeneIndex(),
-				annotationSettings.getSelectedArrayIndex() };
+		return new int[] { annotationSettings.getSelectedRowIndex(),
+				annotationSettings.getSelectedColIndex() };
 	}
 
 	/* >>>>>> GUI component listeners <<<<< */
@@ -214,8 +214,8 @@ public class LabelSettings extends CustomDialog {
 
 		private final JPanel annotationMainPanel;
 
-		private final HeaderSummaryPanel genePanel;
-		private final HeaderSummaryPanel arrayPanel;
+		private final LabelSummaryPanel rowPanel;
+		private final LabelSummaryPanel colPanel;
 
 		private final JRadioButton rowRightJustBtn;
 		private final JRadioButton rowLeftJustBtn;
@@ -227,18 +227,18 @@ public class LabelSettings extends CustomDialog {
 			this.annotationMainPanel = GUIFactory.createJPanel(false, 
 					GUIFactory.NO_INSETS);
 
-			this.genePanel = new HeaderSummaryPanel(rowHI,
+			this.rowPanel = new LabelSummaryPanel(rowLabelInfo,
 				dendroView.getRowLabelView());
 
-			this.arrayPanel = new HeaderSummaryPanel(colHI,
+			this.colPanel = new LabelSummaryPanel(colLabelInfo,
 				dendroView.getColLabelView());
 
 			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,
 					GUIFactory.NO_INSETS);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
-			final JLabel rows = GUIFactory.setupHeader(StringRes.main_rows);
-			final JLabel cols = GUIFactory.setupHeader(StringRes.main_cols);
+			final JLabel rows = GUIFactory.setupLabelType(StringRes.main_rows);
+			final JLabel cols = GUIFactory.setupLabelType(StringRes.main_cols);
 
 			/* Label alignment */
 			JPanel justifyPanel = GUIFactory.createJPanel(false,
@@ -288,8 +288,8 @@ public class LabelSettings extends CustomDialog {
 
 			annotationMainPanel.add(rows, "pushx, alignx 50%");
 			annotationMainPanel.add(cols, "pushx, alignx 50%, wrap");
-			annotationMainPanel.add(genePanel, "pushx, alignx 50%, w 45%");
-			annotationMainPanel.add(arrayPanel, "pushx, alignx 50%, w 45%, wrap");
+			annotationMainPanel.add(rowPanel, "pushx, alignx 50%, w 45%");
+			annotationMainPanel.add(colPanel, "pushx, alignx 50%, w 45%, wrap");
 			justifyPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
 			justifyPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%");
 			annotationMainPanel.add(justifyPanel, "push, grow, alignx 50%, span, wrap");
@@ -309,8 +309,8 @@ public class LabelSettings extends CustomDialog {
 
 		public void synchronize() {
 
-			genePanel.synchronizeTo();
-			arrayPanel.synchronizeTo();
+			rowPanel.synchronizeTo();
+			colPanel.synchronizeTo();
 		}
 
 		public void addJustifyListener(final ActionListener l) {
@@ -321,14 +321,14 @@ public class LabelSettings extends CustomDialog {
 			colRightJustBtn.addActionListener(l);
 		}
 
-		public int getSelectedGeneIndex() {
+		public int getSelectedRowIndex() {
 
-			return genePanel.getSmallestSelectedIndex();
+			return rowPanel.getSmallestSelectedIndex();
 		}
 
-		public int getSelectedArrayIndex() {
+		public int getSelectedColIndex() {
 
-			return arrayPanel.getSmallestSelectedIndex();
+			return colPanel.getSmallestSelectedIndex();
 		}
 	}
 

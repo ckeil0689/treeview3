@@ -10,7 +10,7 @@ package edu.stanford.genetics.treeview.model;
 import java.util.Vector;
 
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LoadException;
 
 public class KnnModel extends TVModel implements DataModel {
@@ -101,20 +101,11 @@ public class KnnModel extends TVModel implements DataModel {
 	public String[] toStrings() {
 
 		final String[] msg = { "Selected KnnModel Stats",
-				"Source = " + source.getCdt(), "Nexpr   = " + nExpr(),
-				"NGeneHeader = " + getRowHeaderInfo().getNumNames(),
-				"Ngene   = " + nGene(), "eweight  = " + eweightFound,
+				"Source = " + source.getCdt(), "NCols   = " + nCols(),
+				"NrowLabelType = " + getRowLabelInfo().getNumLabelTypes(),
+				"NRows   = " + nRows(), "eweight  = " + eweightFound,
 				"gweight  = " + gweightFound, "aid  = " + aidFound,
 				"gid  = " + gidFound };
-
-		/*
-		 * Enumeration e = genePrefix.elements(); msg += "GPREFIX: " +
-		 * e.nextElement(); for (; e.hasMoreElements() ;) { msg += " " +
-		 * e.nextElement(); }
-		 * 
-		 * e = aHeaders.elements(); msg += "\naHeaders: " + e.nextElement(); for
-		 * (; e.hasMoreElements() ;) { msg += ":" + e.nextElement(); }
-		 */
 
 		return msg;
 	}
@@ -164,73 +155,73 @@ public class KnnModel extends TVModel implements DataModel {
 
 	public void setGClusters(final String[][] labels, final int ptype) {
 
-		final HeaderInfo geneHeader = getRowHeaderInfo();
+		final LabelInfo rowLabelI = getRowLabelInfo();
 		// final boolean result = checkCorrespondence(tempTable, geneHeader,
 		// ptype);
-		final boolean result = checkCorrespondence(labels, geneHeader, ptype);
+		final boolean result = checkCorrespondence(labels, rowLabelI, ptype);
 
 		if (result) {
-			geneHeader.addName("GROUP", geneHeader.getNumNames() - 1);
+			rowLabelI.addLabelType("GROUP", rowLabelI.getNumLabelTypes() - 1);
 
-			for (int row = 0; row < geneHeader.getNumHeaders(); row++) {
+			for (int row = 0; row < rowLabelI.getNumLabels(); row++) {
 
 				// geneHeader.setHeader(row, "GROUP", tempTable.getString(row,
 				// 1));
-				geneHeader.setHeader(row, "GROUP", labels[row][1]);
+				rowLabelI.setLabel(row, "GROUP", labels[row][1]);
 			}
 		}
 	}
 
 	public void setAClusters(final String[][] labels, final int kagparse) {
 
-		final HeaderInfo arrayHeader = getColHeaderInfo();
+		final LabelInfo colLabelI = getColLabelInfo();
 		// final boolean result = checkCorrespondence(tempTable, arrayHeader,
 		// kagparse);
-		final boolean result = checkCorrespondence(labels, arrayHeader,
+		final boolean result = checkCorrespondence(labels, colLabelI,
 				kagparse);
 
 		if (result) {
-			arrayHeader.addName("GROUP", arrayHeader.getNumNames() - 1);
+			colLabelI.addLabelType("GROUP", colLabelI.getNumLabelTypes() - 1);
 
-			for (int row = 0; row < arrayHeader.getNumHeaders(); row++) {
+			for (int row = 0; row < colLabelI.getNumLabels(); row++) {
 
 				// arrayHeader.setHeader(row, "GROUP",
 				// tempTable.getString(row, 1));
-				arrayHeader.setHeader(row, "GROUP", labels[row][1]);
+				colLabelI.setLabel(row, "GROUP", labels[row][1]);
 			}
 		}
 	}
 
 	public void parseClusters() throws LoadException {
 
-		gClusterMembers = calculateMembership(getRowHeaderInfo(), "GROUP");
-		aClusterMembers = calculateMembership(getColHeaderInfo(), "GROUP");
+		gClusterMembers = calculateMembership(getRowLabelInfo(), "GROUP");
+		aClusterMembers = calculateMembership(getColLabelInfo(), "GROUP");
 	}
 
-	public int[][] calculateMembership(final HeaderInfo headerInfo,
+	public int[][] calculateMembership(final LabelInfo labelInfo,
 			final String column) {
 
-		final int groupIndex = headerInfo.getIndex(column);
+		final int groupIndex = labelInfo.getIndex(column);
 		if (groupIndex < 0)
 			return null;
-		final int[] counts = getCountVector(headerInfo, groupIndex);
+		final int[] counts = getCountVector(labelInfo, groupIndex);
 		final int[][] members = new int[counts.length][];
 		for (int i = 0; i < counts.length; i++) {
 			members[i] = new int[counts[i]];
 		}
-		populateMembers(members, headerInfo, groupIndex);
+		populateMembers(members, labelInfo, groupIndex);
 		return members;
 	}
 
 	private void populateMembers(final int[][] members,
-			final HeaderInfo headerInfo, final int index) {
+			final LabelInfo labelInfo, final int index) {
 
 		final int[] counts = new int[members.length];
 		for (int i = 0; i < counts.length; i++) {
 			counts[i] = 0;
 		}
-		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
-			final Integer group = new Integer(headerInfo.getHeader(i, index));
+		for (int i = 0; i < labelInfo.getNumLabels(); i++) {
+			final Integer group = new Integer(labelInfo.getLabel(i, index));
 			final int g = group.intValue();
 			members[g][counts[g]] = i;
 			counts[g]++;
@@ -241,16 +232,16 @@ public class KnnModel extends TVModel implements DataModel {
 	 * For a column of ints, returns the number of occurrences of each int in
 	 * the column.
 	 *
-	 * @param headerInfo
+	 * @param labelInfo
 	 * @param columnIndex
 	 * @return
 	 */
-	private int[] getCountVector(final HeaderInfo headerInfo,
+	private int[] getCountVector(final LabelInfo labelInfo,
 			final int columnIndex) {
 
 		final Vector<Integer> counts = new Vector<Integer>();
-		for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
-			final Integer group = new Integer(headerInfo.getHeader(i,
+		for (int i = 0; i < labelInfo.getNumLabels(); i++) {
+			final Integer group = new Integer(labelInfo.getLabel(i,
 					columnIndex));
 			final Integer current = counts.elementAt(group.intValue());
 			Integer insertElement = new Integer(1);
@@ -271,18 +262,18 @@ public class KnnModel extends TVModel implements DataModel {
 	 * matches the headerinfo.
 	 *
 	 * @param tempTable
-	 * @param headerInfo
+	 * @param labelInfo
 	 * @param ptype
 	 * @return true if it matches
 	 */
 	// private boolean checkCorrespondence(final RectData tempTable,
-	// final HeaderInfo headerInfo, final int ptype) {
+	// final LabelInfo labelInfo, final int ptype) {
 	//
 	// return true;
 	// }
 
 	private boolean checkCorrespondence(final String[][] labels,
-			final HeaderInfo headerInfo, final int ptype) {
+			final LabelInfo labelInfo, final int ptype) {
 
 		return true;
 	}

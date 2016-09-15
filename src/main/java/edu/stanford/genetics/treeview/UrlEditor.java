@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 /**
- * This class extracts Urls from HeaderInfo. Also included is a class to pop up
+ * This class extracts Urls from LabelInfo. Also included is a class to pop up
  * a configuration window.
  */
 public class UrlEditor {
@@ -36,18 +36,18 @@ public class UrlEditor {
 	private final UrlExtractor extractor;
 	private final UrlPresets presets;
 	private Window window;
-	private final HeaderInfo headerInfo;
+	private final LabelInfo labelInfo;
 
 	/**
-	 * This class must be constructed around a HeaderInfo
+	 * This class must be constructed around a LabelInfo
 	 */
 	public UrlEditor(final UrlExtractor ue, final UrlPresets up,
-			final HeaderInfo hI) {
+			final LabelInfo hI) {
 
 		super();
 		extractor = ue;
 		presets = up;
-		headerInfo = hI;
+		labelInfo = hI;
 	}
 
 	/**
@@ -136,21 +136,21 @@ public class UrlEditor {
 		private static final long serialVersionUID = 1L;
 
 		private GridBagConstraints gbc;
-		private HeaderChoice headerChoice;
+		private LabelChoice labelChoice;
 		private TemplateField templateField;
 
 		public UrlEditPanel() {
 
 			redoLayout();
 			templateField.setText(extractor.getUrlTemplate());
-			headerChoice.select(extractor.getIndex());
+			labelChoice.select(extractor.getIndex());
 			updatePreview();
 		}
 
 		public void redoLayout() {
 
 			String[] preset;
-			preset = presets.getPresetNames();
+			preset = presets.getPresetLabelTypes();
 			final int nPresets = preset.length;
 			removeAll();
 
@@ -211,7 +211,7 @@ public class UrlEditor {
 		private void updatePreview() {
 
 			extractor.setUrlTemplate(templateField.getText());
-			extractor.setIndex(headerChoice.getSelectedIndex());
+			extractor.setIndex(labelChoice.getSelectedIndex());
 			previewField.setText(extractor.getUrl(0));
 		}
 
@@ -222,35 +222,35 @@ public class UrlEditor {
 			add(new JLabel("Header:"), gbc);
 			gbc.gridx = 1;
 			gbc.weightx = 100;
-			headerChoice = new HeaderChoice();
-			add(headerChoice, gbc);
+			labelChoice = new LabelChoice();
+			add(labelChoice, gbc);
 		}
 
-		private class HeaderChoice extends Choice implements ItemListener {
+		private class LabelChoice extends Choice implements ItemListener {
 
 			private static final long serialVersionUID = 1L;
 
-			public HeaderChoice() {
+			public LabelChoice() {
 
 				super();
-				String[] headers;
+				String[] labelTypes;
 				int lastI;
 
-				if (headerInfo != null) {
-					headers = headerInfo.getNames();
-					lastI = headers.length;
+				if (labelInfo != null) {
+					labelTypes = labelInfo.getLabelTypes();
+					lastI = labelTypes.length;
 
-					if (headerInfo.getIndex("GWEIGHT") != -1) {
+					if (labelInfo.getIndex("GWEIGHT") != -1) {
 						lastI--;
 					}
 				} else {
-					headers = new String[] { "Dummy1", "Dummy2", "Dummy3" };
-					lastI = headers.length;
+					labelTypes = new String[] { "Dummy1", "Dummy2", "Dummy3" };
+					lastI = labelTypes.length;
 				}
 
 				for (int i = 0; i < lastI; i++) {
 
-					add(headers[i]);
+					add(labelTypes[i]);
 				}
 				addItemListener(this);
 			}
@@ -308,7 +308,7 @@ public class UrlEditor {
 
 			final int index = i;
 			gbc.gridx = 0;
-			add(new JLabel((presets.getPresetNames())[index]), gbc);
+			add(new JLabel((presets.getPresetLabelTypes())[index]), gbc);
 			gbc.gridx = 1;
 			gbc.weightx = 100;
 			add(new JTextField(presets.getTemplate(index)), gbc);

@@ -319,45 +319,45 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	}
 
 	/**
-	 * Parses the prefixes for the labels from the header data collected until
+	 * Parses the label types from the label data collected until
 	 * this point.
 	 *
 	 * @param stringLabels
 	 */
-	private void parsePrefixes(final String[][] stringLabels) {
+	private void parseLabelTypes(final String[][] stringLabels) {
 
-		/* lengths of prefix arrays */
-		final int nGenePrefix = dataStartColumn;
-		final int nExprPrefix = dataStartRow;
+		// lengths of label type arrays
+		final int nRowLabelType = dataStartColumn;
+		final int nColLabelType = dataStartRow;
 
-		final String[] readGPrefixes = new String[nGenePrefix];
-		final String[] readAPrefixes = new String[nExprPrefix];
+		final String[] readRowLabelTypes = new String[nRowLabelType];
+		final String[] readColLabelTypes = new String[nColLabelType];
 
-		/* read gene prefixes */
-		System.arraycopy(stringLabels[0], 0, readGPrefixes, 0, nGenePrefix);
+		// read gene label types
+		System.arraycopy(stringLabels[0], 0, readRowLabelTypes, 0, nRowLabelType);
 
-		/* read array prefixes */
-		for (int i = 0; i < nExprPrefix; i++) {
-			readAPrefixes[i] = stringLabels[i][0];
+		// read array label types
+		for (int i = 0; i < nColLabelType; i++) {
+			readColLabelTypes[i] = stringLabels[i][0];
 		}
 
 		/*
 		 * The regex assurance is needed because the CDT-format is completely
 		 * inconsistent and we wanna keep backwards compatibility.
 		 */
-		if (readAPrefixes[0].equalsIgnoreCase("GID")) {
-			readAPrefixes[0] = assurePrefixNames(readGPrefixes);
+		if (readColLabelTypes[0].equalsIgnoreCase("GID")) {
+			readColLabelTypes[0] = assureLabelTypeNames(readRowLabelTypes);
 		}
 		
-		/* Replacing empty or whitespace-only labels */
-		replaceEmptyLabels(readGPrefixes, "ROW");
-		replaceEmptyLabels(readAPrefixes, "COLUMN");
+		// Replacing empty or whitespace-only labels
+		replaceEmptyLabels(readRowLabelTypes, "ROW");
+		replaceEmptyLabels(readColLabelTypes, "COLUMN");
 		
-		/* set the prefixes */
-		targetModel.setGenePrefix(readGPrefixes);
-		targetModel.setArrayPrefix(readAPrefixes);
+		// set the label types
+		targetModel.setRowLabelTypes(readRowLabelTypes);
+		targetModel.setColumnLabelTypes(readColLabelTypes);
 
-		/* set weight status */
+		// set weight status
 		targetModel.setEweightFound(hasEWeight);
 		targetModel.setGweightFound(hasGWeight);
 	}
@@ -381,61 +381,59 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	/**
 	 * Switches out false axis labeling due to inconsistent CDT format.
 	 *
-	 * @param gPrefixes
-	 *            The row prefixes contain the right label.
-	 * @return The correct prefix
+	 * @param rowLabelTypes
+	 *            The row label types contain the right label.
+	 * @return The correct labnel type
 	 */
-	private static String assurePrefixNames(final String[] gPrefixes) {
+	private static String assureLabelTypeNames(final String[] rowLabelTypes) {
 
-		String finalPrefix = "OTHER";
+		String finalLabelType = "OTHER";
 
-		for (int i = 0; i < gPrefixes.length; i++) {
-
-			if (!gPrefixes[i].equalsIgnoreCase("YORF")
-					&& !gPrefixes[i].equalsIgnoreCase("GID")
-					&& !gPrefixes[i].equalsIgnoreCase("GWEIGHT")) {
-				finalPrefix = gPrefixes[i];
+		for (int i = 0; i < rowLabelTypes.length; i++) {
+			if (!rowLabelTypes[i].equalsIgnoreCase("YORF")
+					&& !rowLabelTypes[i].equalsIgnoreCase("GID")
+					&& !rowLabelTypes[i].equalsIgnoreCase("GWEIGHT")) {
+				finalLabelType = rowLabelTypes[i];
 				break;
 			}
 		}
 
-		return finalPrefix;
+		return finalLabelType;
 	}
 
 	/**
-	 * Reads the label prefixes and headers from the data and stores the data in
+	 * Reads the label types and labels from the data and stores the data in
 	 * the TVModel.
 	 *
 	 * @param stringLabels
 	 */
 	private void parseCDT(final String[][] stringLabels) {
 
-		parsePrefixes(stringLabels);
+		parseLabelTypes(stringLabels);
 
-		/* # of headers */
-		final int nGene = doubleData.length;
-		final int nExpr = doubleData[0].length;
+		/* # of labels */
+		final int nRows = doubleData.length;
+		final int nCols = doubleData[0].length;
 
-		/* fill row header array */
-		final String[][] gHeaders = new String[nGene][dataStartColumn];
+		/* fill row label array */
+		final String[][] rowLabels = new String[nRows][dataStartColumn];
 
-		for (int i = 0; i < nGene; i++) {
-
-			gHeaders[i] = stringLabels[i + dataStartRow];
+		for (int i = 0; i < nRows; i++) {
+			rowLabels[i] = stringLabels[i + dataStartRow];
 		}
-		targetModel.setGeneHeaders(gHeaders);
+		
+		targetModel.setRowLabels(rowLabels);
 
-		/* fill column header array */
-		final String[][] aHeaders = new String[nExpr][dataStartRow];
+		/* fill column label array */
+		final String[][] colLabels = new String[nCols][dataStartRow];
 
 		for (int i = 0; i < dataStartRow; i++) {
-
-			for (int j = 0; j < nExpr; j++) {
-
-				aHeaders[j][i] = stringLabels[i][j + dataStartColumn];
+			for (int j = 0; j < nCols; j++) {
+				colLabels[j][i] = stringLabels[i][j + dataStartColumn];
 			}
 		}
-		targetModel.setArrayHeaders(aHeaders);
+		
+		targetModel.setColumnLabels(colLabels);
 
 		/* set data in TVModel */
 		targetModel.setExprData(doubleData);
@@ -458,24 +456,24 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		if ( // decide if this is not an extended file..
 		(firstRow.length == 4)// is the length classic?
 				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
-			// okay, need to assign headers...
-			targetModel.setGtrPrefix(new String[] { "NODEID", "LEFT", "RIGHT",
+			// okay, need to assign label types...
+			targetModel.setGtrLabelTypes(new String[] { "NODEID", "LEFT", "RIGHT",
 					"CORRELATION" });
 
-			final String[][] gtrHeaders = new String[gtrData.size()][];
-			for (int i = 0; i < gtrHeaders.length; i++) {
-				gtrHeaders[i] = gtrData.get(i);
+			final String[][] gtrLabels = new String[gtrData.size()][];
+			for (int i = 0; i < gtrLabels.length; i++) {
+				gtrLabels[i] = gtrData.get(i);
 			}
-			targetModel.setGtrHeaders(gtrHeaders);
+			targetModel.setGtrLabels(gtrLabels);
 
-		} else {// first row of tempVector is actual header names...
-			targetModel.setGtrPrefix(firstRow);
+		} else {// first row of tempVector is actual label type names...
+			targetModel.setGtrLabelTypes(firstRow);
 
-			final String[][] gtrHeaders = new String[gtrData.size() - 1][];
-			for (int i = 0; i < gtrHeaders.length; i++) {
-				gtrHeaders[i] = gtrData.get(i + 1);
+			final String[][] gtrLabels = new String[gtrData.size() - 1][];
+			for (int i = 0; i < gtrLabels.length; i++) {
+				gtrLabels[i] = gtrData.get(i + 1);
 			}
-			targetModel.setGtrHeaders(gtrHeaders);
+			targetModel.setGtrLabels(gtrLabels);
 		}
 
 		targetModel.hashGIDs();
@@ -500,23 +498,23 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		(firstRow.length == 4)// is the length classic?
 				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
 
-			// okay, need to assign headers...
-			targetModel.setAtrPrefix(new String[] { "NODEID", "LEFT", "RIGHT",
+			// okay, need to assign label types...
+			targetModel.setAtrLabelTypes(new String[] { "NODEID", "LEFT", "RIGHT",
 					"CORRELATION" });
 
-			final String[][] atrHeaders = new String[atrData.size()][];
-			for (int i = 0; i < atrHeaders.length; i++) {
-				atrHeaders[i] = atrData.get(i);
+			final String[][] atrLabels = new String[atrData.size()][];
+			for (int i = 0; i < atrLabels.length; i++) {
+				atrLabels[i] = atrData.get(i);
 			}
-			targetModel.setAtrHeaders(atrHeaders);
-		} else {// first row of tempVector is actual header names...
-			targetModel.setAtrPrefix(firstRow);
+			targetModel.setAtrLabels(atrLabels);
+		} else {// first row of tempVector is actual label type names...
+			targetModel.setAtrLabelTypes(firstRow);
 
-			final String[][] atrHeaders = new String[atrData.size() - 1][];
-			for (int i = 0; i < atrHeaders.length; i++) {
-				atrHeaders[i] = atrData.get(i + 1);
+			final String[][] atrLabels = new String[atrData.size() - 1][];
+			for (int i = 0; i < atrLabels.length; i++) {
+				atrLabels[i] = atrData.get(i + 1);
 			}
-			targetModel.setAtrHeaders(atrHeaders);
+			targetModel.setAtrLabels(atrLabels);
 		}
 
 		targetModel.hashAIDs();

@@ -12,7 +12,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -80,15 +80,25 @@ public class CharArrayDrawer extends ArrayDrawer {
 	/**
 	 * Set the source of the data.
 	 *
-	 * @param info
-	 *            A HeaderInfo containing the column of aligned sequence
-	 * @param name
+	 * @param newLabelInfo
+	 *            A LabelInfo containing the column of aligned sequence
+	 * @param newLabelType
 	 *            The name of the column
 	 */
-	public void setHeaderInfo(final HeaderInfo info, final String name) {
-		if ((headerInfo != info) || !(headerName.equalsIgnoreCase(name))) {
-			headerInfo = info;
-			headerName = name;
+	public void setLabelInfo(final LabelInfo newLabelInfo, final String newLabelType) {
+		if(newLabelType == null) {
+			LogBuffer.println("Could not set new label type.");
+			return;
+		}
+		
+		if(newLabelInfo == null) {
+			LogBuffer.println("Could not set new label info.");
+			return;
+		}
+		
+		if ((labelInfo != newLabelInfo) || !(newLabelType.equalsIgnoreCase(labelType))) {
+			this.labelInfo = newLabelInfo;
+			this.labelType = newLabelType;
 			setChanged();
 		}
 	}
@@ -119,8 +129,8 @@ public class CharArrayDrawer extends ArrayDrawer {
 		/* Selection dimming */
 		// , int[] geneSelection, int[] arraySelection) {
 
-		if (headerInfo == null) {
-			System.out.println("header info wasn't set");
+		if (labelInfo == null) {
+			System.out.println("label info wasn't set");
 		}
 		// ynext will hold the first pixel of the next block.
 		int ynext = dest.y;
@@ -240,7 +250,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	 * @return value of array element, or nodata if not found
 	 */
 	public char getChar(final int x, final int y) {
-		final String aln = headerInfo.getHeader(y, headerName);
+		final String aln = labelInfo.getLabel(y, labelType);
 		try {
 			if (aln != null)
 				return aln.charAt(x);
@@ -260,7 +270,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	@Override
 	public boolean isMissing(final int x, final int y) {
 
-		final String aln = headerInfo.getHeader(y, headerName);
+		final String aln = labelInfo.getLabel(y, labelType);
 		try {
 			if (aln != null) {
 				aln.charAt(x);
@@ -281,8 +291,8 @@ public class CharArrayDrawer extends ArrayDrawer {
 	/** how many rows are there to draw? */
 	@Override
 	public int getNumRow() {
-		if ((headerInfo != null) && (headerName != null))
-			return headerInfo.getNumHeaders();
+		if ((labelInfo != null) && (labelType != null))
+			return labelInfo.getNumLabels();
 		return 0;
 	}
 
@@ -290,12 +300,12 @@ public class CharArrayDrawer extends ArrayDrawer {
 	@Override
 	public int getNumCol() {
 		try {
-			if ((headerInfo != null) && (headerName != null)) {
+			if ((labelInfo != null) && (labelType != null)) {
 				int max = 0;
-				for (int i = 0; i < headerInfo.getNumHeaders(); i++) {
-					final String header = headerInfo.getHeader(i, headerName);
-					if (header != null) {
-						final int length = header.length();
+				for (int i = 0; i < labelInfo.getNumLabels(); i++) {
+					final String label = labelInfo.getLabel(i, labelType);
+					if (label != null) {
+						final int length = label.length();
 						if (length > max) {
 							max = length;
 						}
@@ -327,12 +337,12 @@ public class CharArrayDrawer extends ArrayDrawer {
 	/** resets the ArrayDrawer to a default state. */
 	@Override
 	protected void setDefaults() {
-		headerInfo = null;
+		labelInfo = null;
 	}
 
 	/** Used to convert data values into colors */
 	protected CharColorExtractor colorExtractor;
 	/** The column of aligned sequence to be rendered. */
-	protected HeaderInfo headerInfo;
-	protected String headerName;
+	protected LabelInfo labelInfo;
+	protected String labelType;
 }

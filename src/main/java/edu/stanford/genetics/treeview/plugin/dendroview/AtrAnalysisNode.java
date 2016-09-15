@@ -17,7 +17,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 
 public class AtrAnalysisNode extends TreeAnalysisNode {
 
@@ -140,13 +140,13 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 	/**
 	 * Calculates the average index of all nodes.
 	 *
-	 * @param arrayHeader
+	 * @param colLabelInfo
 	 *            the arrayHeader to use for index look up
 	 * @param gid2index
 	 *            hashtable for reverse index look up (by array name)
 	 * @return the average index for this subtree
 	 */
-	private double computeAverageIndexTree(final HeaderInfo arrayHeader,
+	private double computeAverageIndexTree(final LabelInfo colLabelInfo,
 			final Hashtable gid2index) {
 
 		double leftSum = 0, rightSum = 0;
@@ -164,9 +164,9 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 			averageIndex = val;
 		} else {
 			leftSum = ((AtrAnalysisNode) left).computeAverageIndexTree(
-					arrayHeader, gid2index);
+					colLabelInfo, gid2index);
 			rightSum = ((AtrAnalysisNode) right).computeAverageIndexTree(
-					arrayHeader, gid2index);
+					colLabelInfo, gid2index);
 
 			leftSum *= ((AtrAnalysisNode) left).getLeafCount();
 			rightSum *= ((AtrAnalysisNode) right).getLeafCount();
@@ -204,14 +204,14 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 	/**
 	 * Calculates all the indecies.
 	 *
-	 * @param arrayHeader
+	 * @param colLabelInfo
 	 *            the arrayHeader to use for index look up
 	 * @param gid2index
 	 *            hashtable for reverse index look up (by array name)
 	 */
-	public void indexTree(final HeaderInfo arrayHeader,
+	public void indexTree(final LabelInfo colLabelInfo,
 			final Hashtable gid2index) {
-		computeAverageIndexTree(arrayHeader, gid2index);
+		computeAverageIndexTree(colLabelInfo, gid2index);
 		arrangeByAverageIndex();
 	}
 
@@ -227,5 +227,4 @@ public class AtrAnalysisNode extends TreeAnalysisNode {
 	int leafCount;
 	double averageIndex;
 	String name;
-
 }

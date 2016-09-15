@@ -9,7 +9,7 @@ package edu.stanford.genetics.treeview;
 
 import java.util.prefs.Preferences;
 
-import edu.stanford.genetics.treeview.model.IntHeaderInfo;
+import edu.stanford.genetics.treeview.model.IntLabelInfo;
 
 /**
  * This file defines the bare bones of what needs to be implemented by a data
@@ -83,32 +83,32 @@ public interface DataModel {
 	public void addFileSetListener(FileSetListener listener);
 
 	/**
-	 * Gets the HeaderInfo associated with genes for this DataModel.
+	 * Gets the LabelInfo associated with genes for this DataModel.
+	 *
+	 * There are two special indexes, YORF and NAME, which mean the unique id
+	 * column and the description column, respectively. See
+	 * TVModel.TVModelLabelInfo for details.
+	 */
+	public IntLabelInfo getRowLabelInfo();
+
+	/**
+	 * Gets the LabelInfo associated with arrays for this DataModel.
+	 */
+	public IntLabelInfo getColLabelInfo();
+
+	/**
+	 * Gets the LabelInfo associated with gene tree for this DataModel.
 	 *
 	 * There are two special indexes, YORF and NAME, which mean the unique id
 	 * column and the description column, respectively. See
 	 * TVModel.TVModelHeaderInfo for details.
 	 */
-	public IntHeaderInfo getRowHeaderInfo();
-
-	/**
-	 * Gets the HeaderInfo associated with arrays for this DataModel.
-	 */
-	public IntHeaderInfo getColHeaderInfo();
-
-	/**
-	 * Gets the HeaderInfo associated with gene tree for this DataModel.
-	 *
-	 * There are two special indexes, YORF and NAME, which mean the unique id
-	 * column and the description column, respectively. See
-	 * TVModel.TVModelHeaderInfo for details.
-	 */
-	public HeaderInfo getGtrHeaderInfo();
+	public LabelInfo getGtrLabelInfo();
 
 	/**
 	 * Gets the HeaderInfo associated with array tree for this DataModel.
 	 */
-	public HeaderInfo getAtrHeaderInfo();
+	public LabelInfo getAtrLabelInfo();
 
 	/**
 	 * This not-so-object-oriented hack is in those rare instances where it is

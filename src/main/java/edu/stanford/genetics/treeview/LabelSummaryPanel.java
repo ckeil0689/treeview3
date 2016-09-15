@@ -24,23 +24,23 @@ import Utilities.GUIFactory;
 /**
  * enables editing of a headerSummary object.
  */
-public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
+public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 		Observer {
 
 	private static final long serialVersionUID = 1L;
 
-	private HeaderInfo headerInfo;
-	private HeaderSummary headerSummary;
-	private final JList<String> headerList = new JList<String>(new String[0]);
+	private LabelInfo labelInfo;
+	private LabelSummary labelSummary;
+	private final JList<String> labelTypeList = new JList<String>(new String[0]);
 
 	//Hook to be able to reset the label view scrollbar
 	private final LabelView labelView;
 
-	public HeaderSummaryPanel(final HeaderInfo headerInfo,
+	public LabelSummaryPanel(final LabelInfo labelInfo,
 		LabelView labelView) {
 
-		this.headerInfo = headerInfo;
-		this.headerSummary = labelView.getHeaderSummary();
+		this.labelInfo = labelInfo;
+		this.labelSummary = labelView.getLabelSummary();
 		this.labelView = labelView;
 
 		setLayout(new MigLayout());
@@ -50,10 +50,10 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 				+ "display:", GUIFactory.FONTS);
 		add(label, "span, wrap");
 
-		setHeaderList(headerInfo.getNames());
-		headerList.setVisibleRowCount(5);
-		headerList.setFont(GUIFactory.FONTS);
-		add(new JScrollPane(getHeaderList()), "push, grow, wrap");
+		setLabelTypeList(labelInfo.getLabelTypes());
+		labelTypeList.setVisibleRowCount(5);
+		labelTypeList.setFont(GUIFactory.FONTS);
+		add(new JScrollPane(getLabelTypeList()), "push, grow, wrap");
 
 		final ListSelectionListener tmp = new ListSelectionListener() {
 
@@ -64,54 +64,54 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 			}
 		};
 
-		getHeaderList().addListSelectionListener(tmp);
+		getLabelTypeList().addListSelectionListener(tmp);
 		synchronizeFrom();
 	}
 
 	/** Setter for headerInfo */
-	public void setHeaderInfo(final HeaderInfo headerInfo) {
+	public void setLabelInfo(final LabelInfo labelInfo) {
 
-		if (this.headerInfo != null) {
-			this.headerInfo.deleteObserver(this);
+		if (this.labelInfo != null) {
+			this.labelInfo.deleteObserver(this);
 		}
-		this.headerInfo = headerInfo;
-		headerInfo.addObserver(this);
+		this.labelInfo = labelInfo;
+		labelInfo.addObserver(this);
 		synchronizeFrom();
 	}
 
 	/** Getter for headerInfo */
-	public HeaderInfo getHeaderInfo() {
+	public LabelInfo getLabelInfo() {
 
-		return headerInfo;
+		return labelInfo;
 	}
 
 	/** Setter for headerSummary */
-	public void setHeaderSummary(final HeaderSummary headerSummary) {
+	public void setLabelSummary(final LabelSummary labelSummary) {
 
-		this.headerSummary = headerSummary;
+		this.labelSummary = labelSummary;
 		synchronizeFrom();
 	}
 
 	/** Getter for headerSummary */
-	public HeaderSummary getHeaderSummary() {
+	public LabelSummary getLabelSummary() {
 
-		return headerSummary;
+		return labelSummary;
 	}
 
-	/** Setter for headerList */
-	public void setHeaderList(final String[] headers) {
+	/** Setter for labelTypeList */
+	public void setLabelTypeList(final String[] labelTypes) {
 
-		if (headers == null) {
-			headerList.setListData(new String[0]);
+		if (labelTypes == null) {
+			labelTypeList.setListData(new String[0]);
 		} else {
-			headerList.setListData(headers);
+			labelTypeList.setListData(labelTypes);
 		}
 	}
 
-	/** Getter for headerList */
-	public JList<String> getHeaderList() {
+	/** Getter for labelTypeList */
+	public JList<String> getLabelTypeList() {
 
-		return headerList;
+		return labelTypeList;
 	}
 
 	/**
@@ -121,14 +121,14 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	 */
 	public int getSmallestSelectedIndex() {
 
-		return getHeaderList().getSelectedIndex();
+		return getLabelTypeList().getSelectedIndex();
 	}
 
 	@Override
 	public void synchronizeFrom() {
 
-		final int[] included = getHeaderSummary().getIncluded();
-		final JList<String> list = getHeaderList();
+		final int[] included = getLabelSummary().getIncluded();
+		final JList<String> list = getLabelTypeList();
 
 		if (list == null)
 			return;
@@ -144,7 +144,7 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	@Override
 	public void synchronizeTo() {
 
-		getHeaderSummary().setIncluded(getHeaderList().getSelectedIndices());
+		getLabelSummary().setIncluded(getLabelTypeList().getSelectedIndices());
 		labelView.resetSecondaryScroll();
 	}
 
@@ -156,12 +156,12 @@ public class HeaderSummaryPanel extends JPanel implements SettingsPanel,
 	@Override
 	public void update(final Observable o, final Object arg) {
 
-		if (o == headerInfo) {
-			setHeaderList(headerInfo.getNames());
+		if (o == labelInfo) {
+			setLabelTypeList(labelInfo.getLabelTypes());
 			synchronizeFrom();
 			repaint();
 		} else {
-			LogBuffer.println("HeaderSummaryPanel got update from unexpected "
+			LogBuffer.println("LabelSummaryPanel got update from unexpected "
 					+ "observable " + o);
 		}
 	}

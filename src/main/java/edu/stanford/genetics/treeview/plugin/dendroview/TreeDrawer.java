@@ -14,7 +14,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Stack;
 
-import edu.stanford.genetics.treeview.HeaderInfo;
+import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
@@ -62,7 +62,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 	 * used to keep track of the HeaderInfo we're observing, so we can stop
 	 * observing if someone calls setData to a new HeaderInfo.
 	 */
-	private HeaderInfo nodeInfo = null;
+	private LabelInfo nodeInfo = null;
 
 	private double corrMin;
 	private double corrMax;
@@ -237,7 +237,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 	 *            tree are supposed to line up with
 	 *
 	 */
-	public void setData(final HeaderInfo nodeInfo, final HeaderInfo rowInfo)
+	public void setData(final LabelInfo nodeInfo, final LabelInfo rowInfo)
 			throws DendroException {
 
 		if (nodeInfo == null) {
@@ -252,21 +252,21 @@ abstract class TreeDrawer extends Observable implements Observer {
 		this.nodeInfo = nodeInfo;
 		nodeInfo.addObserver(this);
 
-		leafList = new TreeDrawerNode[rowInfo.getNumHeaders()];
+		leafList = new TreeDrawerNode[rowInfo.getNumLabels()];
 		id2node = new Hashtable<String, TreeDrawerNode>(
-				((nodeInfo.getNumHeaders() * 4) / 3) / 2, .75f);
+				((nodeInfo.getNumLabels() * 4) / 3) / 2, .75f);
 
 		final int nodeIndex = nodeInfo.getIndex("NODEID");
 		if (nodeIndex == -1)
 			throw new DendroException("Could not find header NODEID "
 					+ "in tree header info");
 
-		for (int j = 0; j < nodeInfo.getNumHeaders(); j++) {
+		for (int j = 0; j < nodeInfo.getNumLabels(); j++) {
 
 			// extract the things we need from the enumeration
-			final String newId = nodeInfo.getHeader(j, nodeIndex);
-			final String leftId = nodeInfo.getHeader(j, "LEFT");
-			final String rightId = nodeInfo.getHeader(j, "RIGHT");
+			final String newId = nodeInfo.getLabel(j, nodeIndex);
+			final String leftId = nodeInfo.getLabel(j, "LEFT");
+			final String rightId = nodeInfo.getLabel(j, "RIGHT");
 
 			// setup the kids
 			final TreeDrawerNode newn = id2node.get(newId);
@@ -281,7 +281,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 			if (leftn == null) {
 				// this means that the identifier for leftn is a new leaf
 				int val; // stores index (y location)
-				val = rowInfo.getHeaderIndex(leftId);
+				val = rowInfo.getLabelIndex(leftId);
 
 				if (val == -1)
 					throw new DendroException("Identifier " + leftId
@@ -296,7 +296,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 				// this means that the identifier for rightn is a new leaf
 				// System.out.println("Looking up " + rightId);
 				int val; // stores index (y location)
-				val = rowInfo.getHeaderIndex(rightId);
+				val = rowInfo.getLabelIndex(rightId);
 				if (val == -1)
 					throw new DendroException("Identifier " + rightId
 							+ " from tree file not found in CDT!");
@@ -323,8 +323,8 @@ abstract class TreeDrawer extends Observable implements Observer {
 		setChanged();
 	}
 
-	public void setBranchHeights(final HeaderInfo nodeInfo,
-			final HeaderInfo rowInfo) {
+	public void setBranchHeights(final LabelInfo nodeInfo,
+			final LabelInfo rowInfo) {
 
 		if (rootNode == null)
 			return;
@@ -352,7 +352,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 
 				double leaf = rootNode.getCorr();
 				try {
-					leaf = parseDouble(rowInfo.getHeader(
+					leaf = parseDouble(rowInfo.getLabel(
 							(int) element.getIndex(), "LEAF"));
 
 				} catch (final Exception e) {
@@ -369,7 +369,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 				// all the way to the end.
 				double leaf = getCorrMax();
 				try {
-					leaf = parseDouble(rowInfo.getHeader(
+					leaf = parseDouble(rowInfo.getLabel(
 							(int) element.getIndex(), "LEAF"));
 				} catch (final Exception e) {
 				}
@@ -387,7 +387,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 		}
 	}
 
-	public void setBranchHeightsIter(final HeaderInfo nodeInfo,
+	public void setBranchHeightsIter(final LabelInfo nodeInfo,
 			final int nameIndex, final int type, final TreeDrawerNode start) {
 
 		final Stack<TreeDrawerNode> remaining = new Stack<TreeDrawerNode>();
@@ -400,8 +400,8 @@ abstract class TreeDrawer extends Observable implements Observer {
 				// will get handled in a linear-time routine...
 
 			} else {
-				final int j = nodeInfo.getHeaderIndex(current.getId());
-				final Double d = new Double(nodeInfo.getHeader(j)[nameIndex]);
+				final int j = nodeInfo.getLabelIndex(current.getId());
+				final Double d = new Double(nodeInfo.getLabels(j)[nameIndex]);
 				final double corr = d.doubleValue();
 				if (type == CORRELATION) {
 					if ((corr < -1.0) || (corr > 1.0)) {

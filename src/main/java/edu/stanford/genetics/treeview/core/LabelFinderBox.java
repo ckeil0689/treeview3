@@ -40,8 +40,8 @@ import javax.swing.text.JTextComponent;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.HeaderInfo;
-import edu.stanford.genetics.treeview.HeaderSummary;
+import edu.stanford.genetics.treeview.LabelInfo;
+import edu.stanford.genetics.treeview.LabelSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.WideComboBox;
@@ -50,19 +50,19 @@ import net.miginfocom.swing.MigLayout;
 
 /**
  * This class allows users to look for row or column elements by choosing them
- * in a drop down menu. The menu is populated with headers from the loaded data
+ * in a drop down menu. The menu is populated with labels from the loaded data
  * matrix. The class is abstract and a basis for the GeneFinderPanel class
  * as well as the ArrayFinderPanel class.
  *
  * It extends JPanel and can be used as a Swing component.
  *
  */
-public abstract class HeaderFinderBox {
+public abstract class LabelFinderBox {
 
 	protected TreeSelectionI searchSelection;
 
-	private HeaderInfo headerInfo;
-	private HeaderSummary headerSummary;
+	private LabelInfo labelInfo;
+	private LabelSummary labelSummary;
 
 	private String[][] searchDataList;
 	private int primarySearchIndex;
@@ -82,7 +82,7 @@ public abstract class HeaderFinderBox {
 
 	//Handle into the other search box in order to have a single search box be
 	//able to initiate the search using the contents of both boxes
-	protected HeaderFinderBox companionBox;
+	protected LabelFinderBox companionBox;
 
 	//defaultText is what's in the finder box before a term is entered.
 	//This variable must not be static so that this box and the contained
@@ -93,7 +93,7 @@ public abstract class HeaderFinderBox {
 	 * Constructor
 	 * @param type - A string describing what's searched (e.g. Row or Column)
 	 */
-	public HeaderFinderBox(final String type) {
+	public LabelFinderBox(final String type) {
 
 		this.type = type;
 	}
@@ -105,7 +105,7 @@ public abstract class HeaderFinderBox {
 	 * @author rleach
 	 * @param companionBox the companionBox to set
 	 */
-	public void setCompanionBox(HeaderFinderBox companionBox) {
+	public void setCompanionBox(LabelFinderBox companionBox) {
 		this.companionBox = companionBox;
 	}
 
@@ -117,14 +117,14 @@ public abstract class HeaderFinderBox {
 		this.otherSelection = otherSelection;
 	}
 
-	public void setHeaderSummary(final HeaderSummary headerSummary) {
+	public void setLabelSummary(final LabelSummary labelSummary) {
 
-		this.headerSummary = headerSummary;
+		this.labelSummary = labelSummary;
 	}
 
-	public void setHeaderInfo(final HeaderInfo searchHI) {
+	public void setLabelInfo(final LabelInfo searchLI) {
 
-		this.headerInfo = searchHI;
+		this.labelInfo = searchLI;
 	}
 
 	public void setMapContainers(final MapContainer searchMap,
@@ -136,7 +136,7 @@ public abstract class HeaderFinderBox {
 
 	public void setNewSearchTermBox() {
 
-		if (headerSummary == null || headerInfo == null) {
+		if (labelSummary == null || labelInfo == null) {
 			setEmptySearchTermBox();
 			return;
 		}
@@ -239,23 +239,23 @@ public abstract class HeaderFinderBox {
 
 	public void updateSearchIndexes() {
 		if(searchDataList == null || searchDataList.length == 0
-				|| headerSummary.getIncluded().length == 0) {
+				|| labelSummary.getIncluded().length == 0) {
 			setEmptySearchTermBox();
 			primarySearchIndex = -1;
 			maxSearchIndex = -1;
 			return;
 		}
 
-		primarySearchIndex = headerSummary.getIncluded()[0];
+		primarySearchIndex = labelSummary.getIncluded()[0];
 
-		//If the saved label index to use (e.g. GID, UID, NAME, etc.) does
-		//not exist among the headers in the file (which can be the case if
-		//you had a file open with a bunch of header labels and the last one
-		//was selected, and then you open a new file with fewer header
-		//labels), revert the saved index to 0
+		//If the saved label type to use (e.g. GID, UID, NAME, etc.) does
+		//not exist among the label types in the file (which can be the case if
+		//you had a file open with a bunch of label types and the last one
+		//was selected, and then you open a new file with fewer label types), 
+		//revert the saved index to 0
 		if(primarySearchIndex >= searchDataList[0].length) {
 			primarySearchIndex = 0;
-			headerSummary.setIncluded(new int[] {0});
+			labelSummary.setIncluded(new int[] {0});
 		}
 
 		maxSearchIndex = searchDataList[0].length - 1;
@@ -277,19 +277,19 @@ public abstract class HeaderFinderBox {
 
 	private String[] setupData() {
 
-		final String[][] hA = headerInfo.getHeaderArray();
+		final String[][] labelArray = labelInfo.getLabelArray();
 
 		defaultText = "Search " + type + "s...";
 
-		searchDataList    = copy2DStringArray(hA);
-		String[] searchDataHeaders = { "" };
+		searchDataList    = copy2DStringArray(labelArray);
+		String[] searchDataLabels = { "" };
 		updateSearchIndexes();
 
 		//Determine which label types to skip
 		searchExclusions = new boolean[maxSearchIndex + 1];
 		int numExclusions = 0;
 		for(int i = 0;i <= maxSearchIndex;i++) {
-			if(allStringsEqual(hA,i) && i != primarySearchIndex) {
+			if(allStringsEqual(labelArray,i) && i != primarySearchIndex) {
 				searchExclusions[i] = true;
 				numExclusions++;
 				continue;
@@ -306,9 +306,9 @@ public abstract class HeaderFinderBox {
 			//For the "Search rows..." default text
 			1;
 
-		final String[] labeledHeaders = new String[dropdownSize];
+		final String[] labels = new String[dropdownSize];
 
-		labeledHeaders[0] = defaultText;
+		labels[0] = defaultText;
 
 		int startIndex = 1;
 
@@ -317,31 +317,31 @@ public abstract class HeaderFinderBox {
 				continue;
 			}
 
-			searchDataHeaders = getHeaders(hA,i);
+			searchDataLabels = getLabels(labelArray,i);
 
-			Arrays.sort(searchDataHeaders,Collator.getInstance());
+			Arrays.sort(searchDataLabels,Collator.getInstance());
 
-			System.arraycopy(searchDataHeaders, 0, labeledHeaders, startIndex,
-					searchDataHeaders.length);
+			System.arraycopy(searchDataLabels, 0, labels, startIndex,
+					searchDataLabels.length);
 
-			startIndex += searchDataHeaders.length;
+			startIndex += searchDataLabels.length;
 		}
 
 		//Returns an array of labels for use by the combobox's dropdown list
-		return(labeledHeaders);
+		return(labels);
 	}
 
 	/**
-	 * Determines whether all strings located at hA[*][i] are equal so that
+	 * Determines whether all strings located at labelArray[*][i] are equal so that
 	 * label types which have no discerning search power do not waste space in
 	 * the combobox.
 	 * @author rleach
-	 * @param hA, i
+	 * @param labelArray, i
 	 * @return boolean
 	 */
-	public boolean allStringsEqual(String[][] hA,int i) {
-		for(int j = 1;j < hA.length;j++) {
-			if(!hA[0][i].equals(hA[j][i])) {
+	public boolean allStringsEqual(String[][] labelArray,int i) {
+		for(int j = 1;j < labelArray.length;j++) {
+			if(!labelArray[0][i].equals(labelArray[j][i])) {
 				return(false);
 			}
 		}
@@ -377,35 +377,35 @@ public abstract class HeaderFinderBox {
 	/**
 	 * Obtains the visible column/row labels.
 	 *
-	 * @param hA
+	 * @param labelArray
 	 * @return
 	 */
-	public String[] getHeaders(final String[][] hA) {
-		return(getHeaders(hA,primarySearchIndex));
+	public String[] getLabels(final String[][] labelArray) {
+		return(getLabels(labelArray,primarySearchIndex));
 	}
 
 	/**
 	 * Obtains all column/row labels.
 	 *
-	 * @param hA
+	 * @param labelArray
 	 * @return
 	 */
-	public String[] getHeaders(final String[][] hA,int index) {
+	public String[] getLabels(final String[][] labelArray,int index) {
 
-		final String[] headerArray = new String[hA.length];
+		final String[] labels = new String[labelArray.length];
 		updateSearchIndexes();
 
-		if(hA.length == 0 || (index + 1) > hA[0].length) {
-			return(headerArray);
+		if(labelArray.length == 0 || (index + 1) > labelArray[0].length) {
+			return(labels);
 		}
 
-		for (int i = 0; i < hA.length; i++) {
+		for (int i = 0; i < labelArray.length; i++) {
 
-			final String yorf = hA[i][index];
-			headerArray[i] = yorf;
+			final String yorf = labelArray[i][index];
+			labels[i] = yorf;
 		}
 
-		return(headerArray);
+		return(labels);
 	}
 
 	/**
@@ -577,11 +577,11 @@ public abstract class HeaderFinderBox {
 		}
 
 		for(int i = 0; i < searchDataList.length;i++) {
-			String header = searchDataList[i][primarySearchIndex];
-			if(wildCardMatch(header, sub)) {
+			String label = searchDataList[i][primarySearchIndex];
+			if(wildCardMatch(label, sub)) {
 				primaryIndexList.add(i);
 			}
-			if(wildCardMatch(header, wildcardsub)) {
+			if(wildCardMatch(label, wildcardsub)) {
 				primarySubstrList.add(i);
 			}
 
@@ -590,12 +590,12 @@ public abstract class HeaderFinderBox {
 				if(j == primarySearchIndex || searchExclusions[j]) {
 					continue;
 				}
-				header = searchDataList[i][j];
-				if(wildCardMatch(header, sub)) {
+				label = searchDataList[i][j];
+				if(wildCardMatch(label, sub)) {
 					secondaryIndexList.add(i);
 					break;
 				}
-				if(wildCardMatch(header, wildcardsub)) {
+				if(wildCardMatch(label, wildcardsub)) {
 					secondarySubstrList.add(i);
 					break;
 				}
