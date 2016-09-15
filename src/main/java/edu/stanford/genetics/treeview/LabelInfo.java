@@ -11,9 +11,9 @@ import java.util.Observer;
 /**
  * Interface to access label info about genes or arrays or treenodes This
  * interface is used many ways. The basic idea is that the "label" refers to
- * which row, column, or node you want information about, whereas the "prefix" is
+ * which row, column, or node you want information about, whereas the "label type" is
  * which header you want. Thus, getNumLabels() is the number of rows, whereas
- * getNumPrefixes() is the number of headers for each row.
+ * getNumLabelTypes() is the number of headers for each row.
  *
  * Conceptually, the objects that are annotated (rows, columns, nodes) can be
  * thought of as rows, and the various names as the headers of columns of
@@ -43,12 +43,12 @@ public interface LabelInfo {
 	/**
 	 * Gets the names of the labels
 	 *
-	 * @return The array of label prefixes
+	 * @return The array of label types
 	 */
 	public String[] getLabelTypes();
 
 	/**
-	 * The number of prefixes.
+	 * The number of label types.
 	 */
 	public int getNumLabelTypes();
 
@@ -70,11 +70,11 @@ public interface LabelInfo {
 	 *
 	 * Should have been called "getNameIndex".
 	 *
-	 * @param prefix
+	 * @param labelType
 	 *            A name to find the index of
 	 * @return The index value
 	 */
-	public int getIndex(String prefix);
+	public int getIndex(final String labelType);
 
 	/**
 	 * gets the index of a row/column/node given a value from the first column
@@ -85,7 +85,7 @@ public interface LabelInfo {
 	 * @return The index value, for use with getLabel() or similar thing.
 	 *         Returns -1 if no label matching "id" can be found.
 	 */
-	public int getLabelIndex(String label);
+	public int getLabelIndex(final String label);
 
 	/**
 	 * This is used by LabelInfo objects that may change over time. If your
@@ -107,28 +107,28 @@ public interface LabelInfo {
 	 * Adds a new named "column" of labels to this object Just return false if
 	 * your label info is read only.
 	 *
-	 * @param prefix
+	 * @param labelType
 	 *            name of column to add
 	 * @param location
 	 *            0 means make it first, getNumPrefixes() means make it last
 	 * @return true if successfully added, false if not.
 	 */
-	public boolean addLabelType(String prefix, int location);
+	public boolean addLabelType(String labelType, int location);
 
 	/**
 	 * Sets indicated label to specified value Just return false if your label
 	 * info is read only.
 	 *
-	 * @param prefix
+	 * @param labelType
 	 *            name of column to change
 	 * @param newLabel
 	 *            new value for label.
 	 *
 	 * @return true if successfully modified, false if not.
 	 */
-	public boolean setLabel(int i, String prefix, String newLabel);
+	public boolean setLabel(int i, String labelType, String newLabel);
 
-	public void setLabelTypeArray(String[] newPrefixArray);
+	public void setLabelTypeArray(String[] newLabelTypeArray);
 
 	/**
 	 * @return true if the LabelInfo has been modified since last save
@@ -145,7 +145,7 @@ public interface LabelInfo {
 
 	/**
 	 * lookup by row and column, which should correspond to position in the
-	 * prefixes array.
+	 * label types array.
 	 *
 	 * @param rowIndex
 	 * @param columnIndex

@@ -133,7 +133,7 @@ public class UrlSettingsPanel implements SettingsPanel {
 		// mainPanel.add(previewLabel, "w 100%, wrap");
 
 		final JComboBox<String> options = new JComboBox<String>(
-				urlPresets.getPresetPrefixes());
+				urlPresets.getPresetLabelTypes());
 
 		options.addActionListener(new ActionListener() {
 

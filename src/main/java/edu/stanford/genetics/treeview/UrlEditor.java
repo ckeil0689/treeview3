@@ -150,7 +150,7 @@ public class UrlEditor {
 		public void redoLayout() {
 
 			String[] preset;
-			preset = presets.getPresetPrefixes();
+			preset = presets.getPresetLabelTypes();
 			final int nPresets = preset.length;
 			removeAll();
 
@@ -233,24 +233,24 @@ public class UrlEditor {
 			public LabelChoice() {
 
 				super();
-				String[] prefixes;
+				String[] labelTypes;
 				int lastI;
 
 				if (labelInfo != null) {
-					prefixes = labelInfo.getLabelTypes();
-					lastI = prefixes.length;
+					labelTypes = labelInfo.getLabelTypes();
+					lastI = labelTypes.length;
 
 					if (labelInfo.getIndex("GWEIGHT") != -1) {
 						lastI--;
 					}
 				} else {
-					prefixes = new String[] { "Dummy1", "Dummy2", "Dummy3" };
-					lastI = prefixes.length;
+					labelTypes = new String[] { "Dummy1", "Dummy2", "Dummy3" };
+					lastI = labelTypes.length;
 				}
 
 				for (int i = 0; i < lastI; i++) {
 
-					add(prefixes[i]);
+					add(labelTypes[i]);
 				}
 				addItemListener(this);
 			}
@@ -308,7 +308,7 @@ public class UrlEditor {
 
 			final int index = i;
 			gbc.gridx = 0;
-			add(new JLabel((presets.getPresetPrefixes())[index]), gbc);
+			add(new JLabel((presets.getPresetLabelTypes())[index]), gbc);
 			gbc.gridx = 1;
 			gbc.weightx = 100;
 			add(new JTextField(presets.getTemplate(index)), gbc);

@@ -100,7 +100,7 @@ public class DummyLabelInfo implements LabelInfo {
 	}
 
 	@Override
-	public void setLabelTypeArray(final String[] newPrefixArray) {
+	public void setLabelTypeArray(final String[] newLabelTypeArray) {
 
 	}
 

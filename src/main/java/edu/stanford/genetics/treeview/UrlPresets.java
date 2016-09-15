@@ -43,7 +43,7 @@ public class UrlPresets implements ConfigNodePersistent {
 					+ "setting.");
 		}
 
-		if (getPresetPrefixes().length == 0) {
+		if (getPresetLabelTypes().length == 0) {
 			addDefaultGenePresets();
 		}
 	}
@@ -130,7 +130,7 @@ public class UrlPresets implements ConfigNodePersistent {
 	/**
 	 * returns String [] of preset names for display
 	 */
-	public String[] getPresetPrefixes() {
+	public String[] getPresetLabelTypes() {
 
 		try {
 			// Preferences presetNode = root.node("Preset");

@@ -143,7 +143,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	// components
 	private FilePanel filePanel;
 	private InclusionPanel inclusionPanel;
-	private PrefixSelectionPanel prefixSelectionPanel;
+	private LabelTypeSelectionPanel labelTypeSelectionPanel;
 	private PreviewPanel previewPanel;
 
 	// accessors for configuration information
@@ -254,23 +254,23 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	}
 
 	protected boolean rowAnnoInside() {
-		return prefixSelectionPanel.rowAnnoInside();
+		return labelTypeSelectionPanel.rowAnnoInside();
 	}
 
 	protected boolean getColAnnoInside() {
-		return prefixSelectionPanel.getColAnnoInside();
+		return labelTypeSelectionPanel.getColAnnoInside();
 	}
 
 	protected void setColAnnoInside(final boolean newval) {
-		prefixSelectionPanel.setColAnnoInside(newval);
+		labelTypeSelectionPanel.setColAnnoInside(newval);
 	}
 
 	protected String getRowAnno(final int i) {
-		return prefixSelectionPanel.getRowAnno(i);
+		return labelTypeSelectionPanel.getRowAnno(i);
 	}
 
 	protected String getColAnno(final int i) {
-		return prefixSelectionPanel.getColAnno(i);
+		return labelTypeSelectionPanel.getColAnno(i);
 	}
 
 	private Color getFgColor(final LabelInfo labelInfo, final int index) {
@@ -401,13 +401,13 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	}
 
 	public void setIncludedRowLabels(final int[] newSelected) {
-		prefixSelectionPanel.rowPrefixList.setSelectedIndices(newSelected);
-		prefixSelectionPanel.setupSelected();
+		labelTypeSelectionPanel.rowLabelTypeList.setSelectedIndices(newSelected);
+		labelTypeSelectionPanel.setupSelected();
 	}
 
 	public void setIncludedColLabels(final int[] newSelected) {
-		prefixSelectionPanel.colPrefixList.setSelectedIndices(newSelected);
-		prefixSelectionPanel.setupSelected();
+		labelTypeSelectionPanel.colLabelTypeList.setSelectedIndices(newSelected);
+		labelTypeSelectionPanel.setupSelected();
 	}
 
 	public static final void main(final String[] argv) {
@@ -449,8 +449,8 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 	private void setupWidgets() {
 		Box upperPanel; // holds major widget panels
 		upperPanel = new Box(BoxLayout.X_AXIS);
-		prefixSelectionPanel = new PrefixSelectionPanel();
-		upperPanel.add(prefixSelectionPanel);
+		labelTypeSelectionPanel = new LabelTypeSelectionPanel();
+		upperPanel.add(labelTypeSelectionPanel);
 		inclusionPanel = new InclusionPanel();
 		upperPanel.add(inclusionPanel);
 		previewPanel = new PreviewPanel();
@@ -616,7 +616,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		// deal with text length...
 		if ((inclusionPanel == null) || (inclusionPanel.useBbox() == false)) {
 			// no bounding box, have to wing it...
-			final Integer rawMaxLength = prefixSelectionPanel.geneMaxLength();
+			final Integer rawMaxLength = labelTypeSelectionPanel.geneMaxLength();
 			if (rawMaxLength != null)
 				return rawMaxLength + textSpacing;
 			else
@@ -630,21 +630,21 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		// deal with text length...
 		if ((inclusionPanel == null) || (inclusionPanel.useBbox() == false))
 			// no bounding box, have to wing it...
-			return prefixSelectionPanel.arrayMaxLength() + textSpacing;
+			return labelTypeSelectionPanel.arrayMaxLength() + textSpacing;
 		else
 			return getBboxHeight();
 	}
 
 	public int numColLabels() {
-		return prefixSelectionPanel.numColLabels();
+		return labelTypeSelectionPanel.numColLabels();
 	}
 
 	public int numRowLabels() {
-		return prefixSelectionPanel.numRowLabels();
+		return labelTypeSelectionPanel.numRowLabels();
 	}
 
 	public void deselectLabels() {
-		prefixSelectionPanel.deselectLabels();
+		labelTypeSelectionPanel.deselectLabels();
 	}
 
 	class PreviewPanel extends JPanel {
@@ -724,7 +724,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 					drawGtr(g, 0, dataY, scale);
 
 					if (includeAtr()) {
-						if (prefixSelectionPanel.getColAnnoInside()) {
+						if (labelTypeSelectionPanel.getColAnnoInside()) {
 							drawAtr(g, dataX, 0, scale);
 							drawArrayAnnoBox(g, dataX,
 									(int) (scale * getAtrHeight()), scale);
@@ -949,7 +949,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			final int thisx = x
 					+ (int) ((i - min) * spacing + (spacing - arrayWidth) / 2);
 			int thisy = y + height - arrayHeight;
-			if (prefixSelectionPanel.getColAnnoInside()) {
+			if (labelTypeSelectionPanel.getColAnnoInside()) {
 				thisy = y;
 			}
 			g.fillRect(thisx, thisy, arrayWidth, arrayHeight);
@@ -980,7 +980,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		anv.setUrlExtractor(null);
 		anv.setLabelInfo(rowLabelInfo);
 		anv.setMap(tempMap);
-		anv.setLabelSummary(prefixSelectionPanel.getGeneSummary());
+		anv.setLabelSummary(labelTypeSelectionPanel.getGeneSummary());
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
 				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB);
 		LogBuffer.println("setting font for genes to " + getRowFont());
@@ -1023,7 +1023,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		anv.setFace(getColFont().getName());
 		anv.setStyle(getColFont().getStyle());
 		anv.setPoints(getColFont().getSize());
-		anv.setLabelSummary(prefixSelectionPanel.getArraySummary());
+		anv.setLabelSummary(labelTypeSelectionPanel.getArraySummary());
 		anv.setMap(tempMap);
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
 				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB);
@@ -1269,14 +1269,14 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		}
 
 		public void recalculateBbox() {
-			if (prefixSelectionPanel == null) {
+			if (labelTypeSelectionPanel == null) {
 				bboxRow.setXsize(2);
 				bboxRow.setYsize(2);
 			} else {
-				final Integer rawMaxLength = prefixSelectionPanel
+				final Integer rawMaxLength = labelTypeSelectionPanel
 						.geneMaxLength();
 				bboxRow.setXsize(rawMaxLength == null ? 0 : rawMaxLength);
-				bboxRow.setYsize(prefixSelectionPanel.arrayMaxLength());
+				bboxRow.setYsize(labelTypeSelectionPanel.arrayMaxLength());
 			}
 		}
 
@@ -1513,7 +1513,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		}
 	}
 
-	class PrefixSelectionPanel extends JPanel {
+	class LabelTypeSelectionPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
@@ -1532,7 +1532,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			return colSummary;
 		}
 
-		public JList<String> rowPrefixList, colPrefixList;
+		public JList<String> rowLabelTypeList, colLabelTypeList;
 
 		public String getRowAnno(final int i) {
 			return rowSummary.getSummary(rowLabelInfo, i);
@@ -1598,16 +1598,16 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		}
 
 		public int numColLabels() {
-			return colPrefixList.getSelectedIndices().length;
+			return colLabelTypeList.getSelectedIndices().length;
 		}
 
 		public int numRowLabels() {
-			return rowPrefixList.getSelectedIndices().length;
+			return rowLabelTypeList.getSelectedIndices().length;
 		}
 
 		public void deselectLabels() {
-			colPrefixList.clearSelection();
-			rowPrefixList.clearSelection();
+			colLabelTypeList.clearSelection();
+			rowLabelTypeList.clearSelection();
 		}
 
 		public boolean rowAnnoInside() {
@@ -1628,31 +1628,31 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 			inclusionPanel.recalculateBbox();
 		}
 
-		PrefixSelectionPanel() {
+		LabelTypeSelectionPanel() {
 			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-			add(new JLabel("Row Prefixes"));
-			final String[] rowPrefixes = rowLabelInfo.getLabelTypes();
-			if (rowPrefixes == null) {
-				rowPrefixList = new JList<String>(new String[0]);
+			add(new JLabel("Row Label Types"));
+			final String[] rowLabelTypes = rowLabelInfo.getLabelTypes();
+			if (rowLabelTypes == null) {
+				rowLabelTypeList = new JList<String>(new String[0]);
 			} else {
-				rowPrefixList = new JList<String>(rowPrefixes);
+				rowLabelTypeList = new JList<String>(rowLabelTypes);
 			}
-			rowPrefixList.setVisibleRowCount(5);
-			add(new JScrollPane(rowPrefixList));
+			rowLabelTypeList.setVisibleRowCount(5);
+			add(new JScrollPane(rowLabelTypeList));
 
 			rowAnnoInside = new JCheckBox("Right of Tree?");
 			// add(geneAnnoInside);
-			add(new JLabel("Column Prefixes"));
+			add(new JLabel("Column Label Types"));
 
-			final String[] colPrefixes = colLabelInfo.getLabelTypes();
-			if (colPrefixes == null) {
-				colPrefixList = new JList<String>(new String[0]);
+			final String[] colLabelTypes = colLabelInfo.getLabelTypes();
+			if (colLabelTypes == null) {
+				colLabelTypeList = new JList<String>(new String[0]);
 			} else {
-				colPrefixList = new JList<String>(colPrefixes);
+				colLabelTypeList = new JList<String>(colLabelTypes);
 			}
-			colPrefixList.setVisibleRowCount(5);
-			add(new JScrollPane(colPrefixList));
+			colLabelTypeList.setVisibleRowCount(5);
+			add(new JScrollPane(colLabelTypeList));
 
 			colAnnoInside = new JCheckBox("Below Tree?");
 			colAnnoInside.addActionListener(new ActionListener() {
@@ -1672,25 +1672,25 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 					if (inclusionPanel != null) {
 						inclusionPanel.recalculateBbox();
 						inclusionPanel.updateSize();
-						rowSummary.setIncluded(rowPrefixList.getSelectedIndices());
+						rowSummary.setIncluded(rowLabelTypeList.getSelectedIndices());
 						colSummary
-								.setIncluded(colPrefixList.getSelectedIndices());
+								.setIncluded(colLabelTypeList.getSelectedIndices());
 					}
 					if (previewPanel != null) {
 						previewPanel.updatePreview();
 					}
 				}
 			};
-			rowPrefixList.addListSelectionListener(tmp);
-			colPrefixList.addListSelectionListener(tmp);
-			colPrefixList.setSelectedIndex(0);
-			rowPrefixList.setSelectedIndex(1);
+			rowLabelTypeList.addListSelectionListener(tmp);
+			colLabelTypeList.addListSelectionListener(tmp);
+			colLabelTypeList.setSelectedIndex(0);
+			rowLabelTypeList.setSelectedIndex(1);
 			setupSelected();
 		}
 
 		public void setupSelected() {
-			rowSummary.setIncluded(rowPrefixList.getSelectedIndices());
-			colSummary.setIncluded(colPrefixList.getSelectedIndices());
+			rowSummary.setIncluded(rowLabelTypeList.getSelectedIndices());
+			colSummary.setIncluded(colLabelTypeList.getSelectedIndices());
 			if (inclusionPanel != null) {
 				inclusionPanel.updateSize();
 			}

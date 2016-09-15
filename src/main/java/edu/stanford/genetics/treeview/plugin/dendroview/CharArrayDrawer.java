@@ -80,15 +80,25 @@ public class CharArrayDrawer extends ArrayDrawer {
 	/**
 	 * Set the source of the data.
 	 *
-	 * @param labelInfo
+	 * @param newLabelInfo
 	 *            A LabelInfo containing the column of aligned sequence
-	 * @param prefix
+	 * @param newLabelType
 	 *            The name of the column
 	 */
-	public void setLabelInfo(final LabelInfo labelInfo, final String prefix) {
-		if ((labelInfo != labelInfo) || !(prefix.equalsIgnoreCase(prefix))) {
-			this.labelInfo = labelInfo;
-			this.prefix = prefix;
+	public void setLabelInfo(final LabelInfo newLabelInfo, final String newLabelType) {
+		if(newLabelType == null) {
+			LogBuffer.println("Could not set new label type.");
+			return;
+		}
+		
+		if(newLabelInfo == null) {
+			LogBuffer.println("Could not set new label info.");
+			return;
+		}
+		
+		if ((labelInfo != newLabelInfo) || !(newLabelType.equalsIgnoreCase(labelType))) {
+			this.labelInfo = newLabelInfo;
+			this.labelType = newLabelType;
 			setChanged();
 		}
 	}
@@ -240,7 +250,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	 * @return value of array element, or nodata if not found
 	 */
 	public char getChar(final int x, final int y) {
-		final String aln = labelInfo.getLabel(y, prefix);
+		final String aln = labelInfo.getLabel(y, labelType);
 		try {
 			if (aln != null)
 				return aln.charAt(x);
@@ -260,7 +270,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	@Override
 	public boolean isMissing(final int x, final int y) {
 
-		final String aln = labelInfo.getLabel(y, prefix);
+		final String aln = labelInfo.getLabel(y, labelType);
 		try {
 			if (aln != null) {
 				aln.charAt(x);
@@ -281,7 +291,7 @@ public class CharArrayDrawer extends ArrayDrawer {
 	/** how many rows are there to draw? */
 	@Override
 	public int getNumRow() {
-		if ((labelInfo != null) && (prefix != null))
+		if ((labelInfo != null) && (labelType != null))
 			return labelInfo.getNumLabels();
 		return 0;
 	}
@@ -290,10 +300,10 @@ public class CharArrayDrawer extends ArrayDrawer {
 	@Override
 	public int getNumCol() {
 		try {
-			if ((labelInfo != null) && (prefix != null)) {
+			if ((labelInfo != null) && (labelType != null)) {
 				int max = 0;
 				for (int i = 0; i < labelInfo.getNumLabels(); i++) {
-					final String label = labelInfo.getLabel(i, prefix);
+					final String label = labelInfo.getLabel(i, labelType);
 					if (label != null) {
 						final int length = label.length();
 						if (length > max) {
@@ -334,5 +344,5 @@ public class CharArrayDrawer extends ArrayDrawer {
 	protected CharColorExtractor colorExtractor;
 	/** The column of aligned sequence to be rendered. */
 	protected LabelInfo labelInfo;
-	protected String prefix;
+	protected String labelType;
 }

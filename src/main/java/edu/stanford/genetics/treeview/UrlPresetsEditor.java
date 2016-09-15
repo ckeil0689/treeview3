@@ -170,7 +170,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 		private GridBagConstraints gbc;
 		private JCheckBox[] presetEnablings;
 		private JRadioButton[] defaultButtons;
-		private JTextField[] presetPrefixes;
+		private JTextField[] presetLabelTypes;
 		private JTextField[] presetLabels;
 		private JTextField[] presetTemplates;
 
@@ -182,7 +182,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 		public void redoLayout() {
 
 			String[] preset;
-			preset = presets.getPresetPrefixes();
+			preset = presets.getPresetLabelTypes();
 			final int nPresets = preset.length;
 			removeAll();
 			setLayout(new GridBagLayout());
@@ -219,7 +219,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 
 			defaultButtons = new JRadioButton[nPresets + 1];
 			presetEnablings = new JCheckBox[nPresets + 1];
-			presetPrefixes = new JTextField[nPresets + 1];
+			presetLabelTypes = new JTextField[nPresets + 1];
 			presetLabels = new JTextField[nPresets + 1];
 			presetTemplates = new JTextField[nPresets + 1];
 
@@ -243,7 +243,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 
 		private void saveAll() {
 
-			final int n = presetPrefixes.length - 1; // for null...
+			final int n = presetLabelTypes.length - 1; // for null...
 			for (int i = 0; i < n; i++) {
 				presets.setPresetHeader(i, presetLabels[i].getText());
 			}
@@ -266,7 +266,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 
 			final int index = i;
 			final JTextField templateField = new JTextField(50);
-			final JTextField prefixField = new JTextField();
+			final JTextField labelTypeField = new JTextField();
 			final JTextField labelField = new JTextField();
 			final JCheckBox enabledField = new JCheckBox();
 
@@ -282,9 +282,9 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 			add(labelField, gbc);
 
 			gbc.gridx = 2;
-			prefixField.setText((presets.getPresetPrefixes())[index]);
-			presetPrefixes[index] = prefixField;
-			add(prefixField, gbc);
+			labelTypeField.setText((presets.getPresetLabelTypes())[index]);
+			presetLabelTypes[index] = labelTypeField;
+			add(labelTypeField, gbc);
 
 			gbc.gridx = 3;
 			gbc.weightx = 100;
@@ -316,7 +316,7 @@ public class UrlPresetsEditor extends JPanel implements SettingsPanel {
 			gbc.gridx = 2;
 			nameField.setText("None");
 			nameField.setEditable(false);
-			presetPrefixes[index] = nameField;
+			presetLabelTypes[index] = nameField;
 			add(nameField, gbc);
 
 			gbc.gridx = 3;

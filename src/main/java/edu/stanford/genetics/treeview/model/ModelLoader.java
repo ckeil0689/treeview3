@@ -349,15 +349,15 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			readColLabelTypes[0] = assureLabelTypeNames(readRowLabelTypes);
 		}
 		
-		/* Replacing empty or whitespace-only labels */
+		// Replacing empty or whitespace-only labels
 		replaceEmptyLabels(readRowLabelTypes, "ROW");
 		replaceEmptyLabels(readColLabelTypes, "COLUMN");
 		
-		/* set the prefixes */
+		// set the label types
 		targetModel.setRowLabelTypes(readRowLabelTypes);
 		targetModel.setColumnLabelTypes(readColLabelTypes);
 
-		/* set weight status */
+		// set weight status
 		targetModel.setEweightFound(hasEWeight);
 		targetModel.setGweightFound(hasGWeight);
 	}

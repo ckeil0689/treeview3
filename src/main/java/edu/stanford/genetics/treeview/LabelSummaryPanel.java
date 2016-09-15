@@ -31,7 +31,7 @@ public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 
 	private LabelInfo labelInfo;
 	private LabelSummary labelSummary;
-	private final JList<String> prefixList = new JList<String>(new String[0]);
+	private final JList<String> labelTypeList = new JList<String>(new String[0]);
 
 	//Hook to be able to reset the label view scrollbar
 	private final LabelView labelView;
@@ -50,10 +50,10 @@ public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 				+ "display:", GUIFactory.FONTS);
 		add(label, "span, wrap");
 
-		setPrefixList(labelInfo.getLabelTypes());
-		prefixList.setVisibleRowCount(5);
-		prefixList.setFont(GUIFactory.FONTS);
-		add(new JScrollPane(getPrefixList()), "push, grow, wrap");
+		setLabelTypeList(labelInfo.getLabelTypes());
+		labelTypeList.setVisibleRowCount(5);
+		labelTypeList.setFont(GUIFactory.FONTS);
+		add(new JScrollPane(getLabelTypeList()), "push, grow, wrap");
 
 		final ListSelectionListener tmp = new ListSelectionListener() {
 
@@ -64,7 +64,7 @@ public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 			}
 		};
 
-		getPrefixList().addListSelectionListener(tmp);
+		getLabelTypeList().addListSelectionListener(tmp);
 		synchronizeFrom();
 	}
 
@@ -98,20 +98,20 @@ public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 		return labelSummary;
 	}
 
-	/** Setter for prefixList */
-	public void setPrefixList(final String[] prefixes) {
+	/** Setter for labelTypeList */
+	public void setLabelTypeList(final String[] labelTypes) {
 
-		if (prefixes == null) {
-			prefixList.setListData(new String[0]);
+		if (labelTypes == null) {
+			labelTypeList.setListData(new String[0]);
 		} else {
-			prefixList.setListData(prefixes);
+			labelTypeList.setListData(labelTypes);
 		}
 	}
 
-	/** Getter for prefixList */
-	public JList<String> getPrefixList() {
+	/** Getter for labelTypeList */
+	public JList<String> getLabelTypeList() {
 
-		return prefixList;
+		return labelTypeList;
 	}
 
 	/**
@@ -121,14 +121,14 @@ public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 	 */
 	public int getSmallestSelectedIndex() {
 
-		return getPrefixList().getSelectedIndex();
+		return getLabelTypeList().getSelectedIndex();
 	}
 
 	@Override
 	public void synchronizeFrom() {
 
 		final int[] included = getLabelSummary().getIncluded();
-		final JList<String> list = getPrefixList();
+		final JList<String> list = getLabelTypeList();
 
 		if (list == null)
 			return;
@@ -144,7 +144,7 @@ public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 	@Override
 	public void synchronizeTo() {
 
-		getLabelSummary().setIncluded(getPrefixList().getSelectedIndices());
+		getLabelSummary().setIncluded(getLabelTypeList().getSelectedIndices());
 		labelView.resetSecondaryScroll();
 	}
 
@@ -157,7 +157,7 @@ public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 	public void update(final Observable o, final Object arg) {
 
 		if (o == labelInfo) {
-			setPrefixList(labelInfo.getLabelTypes());
+			setLabelTypeList(labelInfo.getLabelTypes());
 			synchronizeFrom();
 			repaint();
 		} else {

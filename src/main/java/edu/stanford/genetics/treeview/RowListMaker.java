@@ -97,11 +97,11 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 		@Override
 		public int getColumnCount() {
 
-			final int[] selectedPrefix = fieldRow.getSelectedPrefix();
+			final int[] selectedLabelType = fieldRow.getSelectedLabelType();
 			if (fieldRow.includeExpr())
-				return nCols + selectedPrefix.length;
+				return nCols + selectedLabelType.length;
 			else
-				return selectedPrefix.length;
+				return selectedLabelType.length;
 		}
 
 		/*
@@ -111,13 +111,14 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 		 */
 		@Override
 		public Object getValueAt(int rowIndex, final int columnIndex) {
-			final int[] selectedPrefix = fieldRow.getSelectedPrefix();
+			
+			final int[] selectedLabelType = fieldRow.getSelectedLabelType();
 			if (fieldRow.includeHeader()) {
 				if (rowIndex == 0) {
 					final String[] pNames = labelInfo.getLabelTypes();
-					if (columnIndex < selectedPrefix.length)
+					if (columnIndex < selectedLabelType.length)
 						// gene annotation column headers
-						return pNames[selectedPrefix[columnIndex]];
+						return pNames[selectedLabelType[columnIndex]];
 					else if (fieldRow.includeExpr()) {
 						// array headers
 						int gidRow = colLabelInfo.getIndex("GID");
@@ -125,30 +126,30 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 							gidRow = 0;
 						}
 						final String[] labels = colLabelInfo
-								.getLabels(columnIndex - selectedPrefix.length);
+								.getLabels(columnIndex - selectedLabelType.length);
 						return labels[gidRow];
 					}
 				} else if (rowIndex == 1 && eRow != -1) {
 					// eweight
-					if ((selectedPrefix.length > 0) && (columnIndex == 0))
+					if ((selectedLabelType.length > 0) && (columnIndex == 0))
 						return "EWEIGHT";
-					else if (columnIndex < selectedPrefix.length)
+					else if (columnIndex < selectedLabelType.length)
 						return "";
 					else {
 						final String[] labels = colLabelInfo
-								.getLabels(columnIndex - selectedPrefix.length);
+								.getLabels(columnIndex - selectedLabelType.length);
 						return labels[eRow];
 					}
 				} else {
 					rowIndex--;
 				}
 			}
-			if (columnIndex < selectedPrefix.length) {
+			if (columnIndex < selectedLabelType.length) {
 				final String[] labels = labelInfo.getLabels(rowIndex + top);
-				return labels[selectedPrefix[columnIndex]];
+				return labels[selectedLabelType[columnIndex]];
 			} else {
 				final double val = dataMatrix.getValue(columnIndex
-						- selectedPrefix.length, rowIndex + top);
+						- selectedLabelType.length, rowIndex + top);
 				if (Math.abs(val - DataModel.NAN) < PRECISION_LEVEL)
 					return null;
 				if (Math.abs(val - DataModel.EMPTY) < PRECISION_LEVEL)
@@ -159,9 +160,9 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 			 * for (int i = top; i <= bot; i++) { if
 			 * (geneSelection.isIndexSelected(i) == false) continue; String []
 			 * headers = headerInfo.getHeader(i);
-			 * output.print(headers[selectedPrefix[0]]); for (int j = 1; j <
-			 * selectedPrefix.length; j++) { output.print("\t");
-			 * output.print(headers[selectedPrefix[j]]); } if
+			 * output.print(headers[selectedLabelType[0]]); for (int j = 1; j <
+			 * selectedLabelType.length; j++) { output.print("\t");
+			 * output.print(headers[selectedLabelType[j]]); } if
 			 * (fieldRow.includeExpr()) { for (int j = 0; j < nArray; j++) {
 			 * output.print("\t"); double val = dataMatrix.getValue(j, i); if
 			 * (val != noData) output.print(val); } } output.print("\n");
@@ -300,8 +301,8 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 
 	private void saveList() {
 		try {
-			final int[] selectedPrefix = fieldRow.getSelectedPrefix();
-			if (selectedPrefix.length == 0)
+			final int[] selectedLabelType = fieldRow.getSelectedLabelType();
+			if (selectedLabelType.length == 0)
 				return;
 			setFile(fileRow.getFile());
 			final PrintStream output = new PrintStream(
@@ -311,10 +312,10 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 			if (fieldRow.includeHeader()) {
 				// gid row...
 				final String[] pNames = labelInfo.getLabelTypes();
-				output.print(pNames[selectedPrefix[0]]);
-				for (int j = 1; j < selectedPrefix.length; j++) {
+				output.print(pNames[selectedLabelType[0]]);
+				for (int j = 1; j < selectedLabelType.length; j++) {
 					output.print('\t');
-					output.print(pNames[selectedPrefix[j]]);
+					output.print(pNames[selectedLabelType[j]]);
 				}
 				if (fieldRow.includeExpr()) {
 					int gidRow = colLabelInfo.getIndex("GID");
@@ -337,7 +338,7 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 
 					// EWEIGHT row
 					output.print("EWEIGHT");
-					for (int j = 1; j < selectedPrefix.length; j++) {
+					for (int j = 1; j < selectedLabelType.length; j++) {
 						output.print('\t');
 					}
 					final int eRow = colLabelInfo.getIndex("EWEIGHT");
@@ -363,10 +364,10 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 				}
 
 				final String[] labels = labelInfo.getLabels(i);
-				output.print(labels[selectedPrefix[0]]);
-				for (int j = 1; j < selectedPrefix.length; j++) {
+				output.print(labels[selectedLabelType[0]]);
+				for (int j = 1; j < selectedLabelType.length; j++) {
 					output.print('\t');
-					output.print(labels[selectedPrefix[j]]);
+					output.print(labels[selectedLabelType[j]]);
 				}
 				if (fieldRow.includeExpr()) {
 					for (int j = 0; j < nCols; j++) {
@@ -408,7 +409,7 @@ public class RowListMaker extends JDialog implements ConfigNodePersistent {
 
 		}
 
-		public int[] getSelectedPrefix() {
+		public int[] getSelectedLabelType() {
 			return list.getSelectedIndices();
 		}
 
