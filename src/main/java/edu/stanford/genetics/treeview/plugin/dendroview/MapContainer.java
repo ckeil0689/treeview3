@@ -2012,6 +2012,16 @@ public class MapContainer extends Observable implements Observer,
 
 		return current.getMinIndex();
 	}
+	
+	/**
+	 * Checks if a given index is within the defined bounds of this MapContainer.
+	 * @param idx - The index to check.
+	 * @return Whether the index is within the bounds defined by getMinIndex() and getMaxIndex().
+	 */
+	public boolean isWithinBounds(final int idx) {
+		
+		return (idx >= getMinIndex() && idx <= getMaxIndex());
+	}
 
 	public TreeDrawerNode getSelectedNode() {
 
