@@ -1014,7 +1014,6 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		// accommodate a fixed-font-size (if the font has a fixed size) or the
 		// label port is enabled
 		if (doDrawLabels()) {
-
 			// This is Changed in getMaxStringLength
 			// Must set before either of those methods is called and use this
 			// saved value to test if the font has changed since it was last
@@ -1026,7 +1025,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 			final FontMetrics metrics = getFontMetrics(g.getFont());
 			int realMaxStrLen = getMaxStringLength(metrics);
 			int paneSizeShouldBe = getLabelPaneContentSize(metrics);
-			int offscreenMatrixSize = map.getPixel(map.getMaxIndex() + 1) - 1 - map.getPixel(0);
+			int offscreenMatrixSize = map.getPixel(map.getTotalTileNum()) - 1 - map.getPixel(0);
 
 			map.setWhizMode(drawLabelPort);
 
@@ -1727,14 +1726,22 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		int end = map.getMaxIndex();
 		int maxStrLen = 0;
 		String maxStr = "";
+		
+		// No labels have been loaded for this LabelView's axis
+		if(labelInfo.getNumLabelTypes() == 0) {
+			longest_str_index = -1;
+			longest_str = "";
+			return maxStrLen;
+		}
 
+		// TODO - ideally this code would not be necessary because a data change should prompt a state reset of the
+		// entire class.
 		// If we detect that the data has changed, re-initialize the last drawn
 		// longest string variables. Note, this can be thwarted in the rare case
 		// that 2 different data files happen to have the same label in the same
 		// position and there exists a longer label elsewhere
 		if ((longest_str_index > -1 && longest_str_index > map.getMaxIndex()) || longest_str == null
 				|| !longest_str.equals(labelSummary.getSummary(labelInfo, longest_str_index))) {
-
 			longest_str_index = -1;
 			longest_str = "";
 		}

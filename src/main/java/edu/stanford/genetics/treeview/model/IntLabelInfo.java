@@ -80,27 +80,6 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 			LogBuffer.logException(e);
 			return new String[0];
 		}
-		
-//        // if normal, within bounds
-//        if(idx > -1 && idx < getNumLabels()) {
-//        	if (getLabelArray()[idx] == null) {
-//    			return new String[0];
-//    		}
-//        	return getLabelArray()[idx];
-//        }
-//        
-//        // no labels defined
-//        if(getNumLabelTypes() == 0) {
-//        	return new String[0];
-//        }
-//        
-//        // otherwise
-//        String[] faultyLabels = new String[getNumLabelTypes()];
-//        for(int i = 0; i < faultyLabels.length; i++) {
-//        	faultyLabels[i] = "-";
-//        }
-//        
-//        return faultyLabels;
 	}
 
 	/**
