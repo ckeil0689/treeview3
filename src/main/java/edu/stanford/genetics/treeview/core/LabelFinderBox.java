@@ -557,9 +557,16 @@ public abstract class LabelFinderBox {
 		return(true);
 	}
 
+	/**
+	 * Scans searchDataArray for labels which match the search term. The indexes of these labels will be added to a
+	 * list.
+	 * @return the list of indexes which match the search term. 
+	 */
 	private List<Integer> findSelected() {
 
-		if(primarySearchIndex == -1) {
+		if(primarySearchIndex < 0) {
+			LogBuffer.println("No search results because no labels have been chosen for " 
+					+ this.getSearchTermBox().getName());
 			return new ArrayList<Integer>(0);
 		}
 		
