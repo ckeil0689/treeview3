@@ -64,7 +64,7 @@ public abstract class LabelFinderBox {
 	private LabelInfo labelInfo;
 	private LabelSummary labelSummary;
 
-	private String[][] searchDataList;
+	private String[][] searchDataArray;
 	private int primarySearchIndex;
 	private int maxSearchIndex;
 	private boolean[] searchExclusions;
@@ -238,7 +238,7 @@ public abstract class LabelFinderBox {
 	}
 
 	public void updateSearchIndexes() {
-		if(searchDataList == null || searchDataList.length == 0
+		if(searchDataArray == null || searchDataArray.length == 0
 				|| labelSummary.getIncluded().length == 0) {
 			setEmptySearchTermBox();
 			primarySearchIndex = -1;
@@ -253,12 +253,12 @@ public abstract class LabelFinderBox {
 		//you had a file open with a bunch of label types and the last one
 		//was selected, and then you open a new file with fewer label types), 
 		//revert the saved index to 0
-		if(primarySearchIndex >= searchDataList[0].length) {
+		if(primarySearchIndex >= searchDataArray[0].length) {
 			primarySearchIndex = 0;
 			labelSummary.setIncluded(new int[] {0});
 		}
 
-		maxSearchIndex = searchDataList[0].length - 1;
+		maxSearchIndex = searchDataArray[0].length - 1;
 	}
 
 	/**
@@ -281,7 +281,7 @@ public abstract class LabelFinderBox {
 
 		defaultText = "Search " + type + "s...";
 
-		searchDataList    = copy2DStringArray(labelArray);
+		searchDataArray    = copy2DStringArray(labelArray);
 		String[] searchDataLabels = { "" };
 		updateSearchIndexes();
 
@@ -300,9 +300,9 @@ public abstract class LabelFinderBox {
 
 		int dropdownSize =
 			//Full number of all labels
-			(searchDataList.length * (maxSearchIndex + 1)) -
+			(searchDataArray.length * (maxSearchIndex + 1)) -
 			//Number of excluded labels
-			searchDataList.length * numExclusions +
+			searchDataArray.length * numExclusions +
 			//For the "Search rows..." default text
 			1;
 
@@ -489,7 +489,7 @@ public abstract class LabelFinderBox {
 	public boolean seekAllHelper() {
 
 		searchSelection.deselectAllIndexes();
-
+		
 		final List<Integer> indexList = findSelected();
 
 		// Initialize the min and max index used to determine whether result is
@@ -559,6 +559,10 @@ public abstract class LabelFinderBox {
 
 	private List<Integer> findSelected() {
 
+		if(primarySearchIndex == -1) {
+			return new ArrayList<Integer>(0);
+		}
+		
 		final List<Integer> primaryIndexList    = new ArrayList<Integer>();
 		final List<Integer> primarySubstrList   = new ArrayList<Integer>();
 		final List<Integer> secondaryIndexList  = new ArrayList<Integer>();
@@ -576,8 +580,8 @@ public abstract class LabelFinderBox {
 			wildcardsub = wildcardsub + "*";
 		}
 
-		for(int i = 0; i < searchDataList.length;i++) {
-			String label = searchDataList[i][primarySearchIndex];
+		for(int i = 0; i < searchDataArray.length;i++) {
+			String label = searchDataArray[i][primarySearchIndex];
 			if(wildCardMatch(label, sub)) {
 				primaryIndexList.add(i);
 			}
@@ -590,7 +594,7 @@ public abstract class LabelFinderBox {
 				if(j == primarySearchIndex || searchExclusions[j]) {
 					continue;
 				}
-				label = searchDataList[i][j];
+				label = searchDataArray[i][j];
 				if(wildCardMatch(label, sub)) {
 					secondaryIndexList.add(i);
 					break;
