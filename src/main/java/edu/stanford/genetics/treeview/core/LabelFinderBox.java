@@ -565,8 +565,7 @@ public abstract class LabelFinderBox {
 	private List<Integer> findSelected() {
 
 		if(primarySearchIndex < 0) {
-			LogBuffer.println("No search results because no labels have been chosen for " 
-					+ this.getSearchTermBox().getName());
+			LogBuffer.println("No search results because no labels have been chosen for " + type);
 			return new ArrayList<Integer>(0);
 		}
 		
