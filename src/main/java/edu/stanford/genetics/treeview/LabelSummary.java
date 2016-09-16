@@ -197,7 +197,7 @@ implements ConfigNodePersistent, ModelLoadReset {
 			strings = labelInfo.getLabels(index);
 
 		} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
-			LogBuffer.println("index " + index
+			LogBuffer.println("index: " + index
 					+ " out of bounds on labels, continuing");
 			LogBuffer.println("ArrayIndexOutOfBoundsException in "
 					+ "getSummary() in LabelSummary: " + e.getMessage());
@@ -316,7 +316,12 @@ implements ConfigNodePersistent, ModelLoadReset {
 		
 		if(labelTypes == null) {
 			LogBuffer.println("label types are null in " + type);
-			return new int[0];
+			return new int[]{};
+		}
+		
+		if(labelTypes.length == 0) {
+			LogBuffer.println("No label types set, cannot include any labels.");
+			return new int[]{};
 		}
 		
 		String[] inclNames;
