@@ -460,7 +460,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		
 		targetModel.setColumnLabels(colLabels);
 
-		/* set data in TVModel */
+		// set data in TVModel
 		targetModel.setExprData(doubleData);
 		targetModel.getDataMatrix().calculateBaseValues();
 	}
@@ -470,7 +470,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		// First, load the GTR File
 		final List<String[]> gtrData = loadTreeSet(fileSet.getGtr());
 
-		/* In case an gtr file exists but is empty */
+		// In case an gtr file exists but is empty
 		if (gtrData.isEmpty()) {
 			LogBuffer.println("GTR file empty.");
 			targetModel.gidFound(false);
