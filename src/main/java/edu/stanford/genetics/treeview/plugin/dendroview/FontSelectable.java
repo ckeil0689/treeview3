@@ -33,12 +33,12 @@ public abstract interface FontSelectable {
 	/**
 	 * @return The current minimum font size.
 	 */
-	public abstract int getMin();
+	public abstract int getMinSize();
 
 	/**
 	 * @return The current maximum font size.
 	 */
-	public abstract int getMax();
+	public abstract int getMaxSize();
 
 	/**
 	 * @return The current style

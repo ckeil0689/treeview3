@@ -315,9 +315,9 @@ public class FontSettings implements SettingsPanel {
 
 		SpinnerModel size_model = new SpinnerNumberModel(rowLabelView.getPoints(), 0, 
 				50, 1);
-		SpinnerModel min_model = new SpinnerNumberModel(rowLabelView.getMin(), 0, 
+		SpinnerModel min_model = new SpinnerNumberModel(rowLabelView.getMinSize(), 0, 
 				50, 1);
-		SpinnerModel max_model = new SpinnerNumberModel(rowLabelView.getMax(), 0, 
+		SpinnerModel max_model = new SpinnerNumberModel(rowLabelView.getMaxSize(), 0, 
 				50, 1);
 		
 		/* Font size */

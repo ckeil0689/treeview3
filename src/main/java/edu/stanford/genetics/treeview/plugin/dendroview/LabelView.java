@@ -506,8 +506,8 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 			return;
 		}
 
-		configNode.putInt("min", getMin());
-		configNode.putInt("max", getMax());
+		configNode.putInt("min", getMinSize());
+		configNode.putInt("max", getMaxSize());
 		configNode.put("face", face);
 		configNode.putInt("style", style);
 		configNode.putInt("size", size);
@@ -574,12 +574,12 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	}
 
 	@Override
-	public int getMin() {
+	public int getMinSize() {
 		return min;
 	}
 
 	@Override
-	public int getMax() {
+	public int getMaxSize() {
 		return max;
 	}
 
@@ -1815,6 +1815,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		return (maxStrLen);
 	}
 
+	// FIXME -- Remove for LabelAttributes
 	private void saveLastDrawnFontDetails(int maxStrLen) {
 		// Save the state to detect changes upon the next call of this method
 		this.lastDrawnFace = face;
@@ -1824,6 +1825,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	}
 
 	/**
+	 * FIXME - Consider moving to LabelAttributes
 	 * Dynamic update of font size based on size setting or map scale
 	 * 
 	 * @author rleach
@@ -1840,15 +1842,16 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	}
 
 	/**
+	 * FIXME - Consider moving to LabelAttributes
 	 * Sets a dynamic font size based on current scale of the dependent axis
 	 * map.
 	 */
 	private void adaptFontSizeToMapScale() {
 		int newPoints = (int) map.getScale() - SQUEEZE;
-		if (newPoints > getMax()) {
-			newPoints = getMax();
-		} else if (newPoints < getMin()) {
-			newPoints = getMin();
+		if (newPoints > getMaxSize()) {
+			newPoints = getMaxSize();
+		} else if (newPoints < getMinSize()) {
+			newPoints = getMinSize();
 		}
 
 		if (!isFixed && newPoints != getPoints()) {
@@ -2218,12 +2221,12 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	 * @return
 	 */
 	public boolean doDrawLabelPort() {
-		return (inLabelPortMode() && map.overALabelLinkedView() && ((!isFixed && map.getScale() < (getMin() + SQUEEZE))
+		return (inLabelPortMode() && map.overALabelLinkedView() && ((!isFixed && map.getScale() < (getMinSize() + SQUEEZE))
 				|| (isFixed && map.getScale() < (last_size + SQUEEZE))));
 	}
 
 	public boolean doDrawLabels() {
-		return (doDrawLabelPort() || (!isFixed && map.getScale() >= (getMin() + SQUEEZE))
+		return (doDrawLabelPort() || (!isFixed && map.getScale() >= (getMinSize() + SQUEEZE))
 				|| (isFixed && map.getScale() >= (last_size + SQUEEZE)));
 	}
 
