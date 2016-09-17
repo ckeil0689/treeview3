@@ -251,7 +251,7 @@ public class LabelSettings extends CustomDialog {
 			this.rowLeftJustBtn = GUIFactory.createRadioBtn("Left");
 			this.rowRightJustBtn = GUIFactory.createRadioBtn("Right");
 
-			if (dendroView.getRowLabelView().getJustifyOption()) {
+			if (dendroView.getRowLabelView().getLabelAttributes().isRightJustified()) {
 				rowRightJustBtn.setSelected(true);
 			} else {
 				rowLeftJustBtn.setSelected(true);
@@ -271,7 +271,7 @@ public class LabelSettings extends CustomDialog {
 			this.colRightJustBtn = GUIFactory.createRadioBtn("Top");
 			this.colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
 
-			if (dendroView.getColLabelView().getJustifyOption()) {
+			if (dendroView.getColLabelView().getLabelAttributes().isRightJustified()) {
 				colRightJustBtn.setSelected(true);
 			} else {
 				colLeftJustBtn.setSelected(true);

@@ -12,7 +12,6 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
@@ -884,8 +883,8 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	public boolean[] getLabelAligns() {
 
-		final boolean[] alignments = { getRowLabelView().getJustifyOption(),
-				getColLabelView().getJustifyOption() };
+		final boolean[] alignments = { getRowLabelView().getLabelAttributes().isRightJustified(),
+				getColLabelView().getLabelAttributes().isRightJustified() };
 
 		return alignments;
 	}
@@ -901,11 +900,12 @@ public class DendroView implements Observer, DendroPanel {
 	public void setLabelAlignment(final boolean isRowRight,
 			final boolean isColRight) {
 
-		if (getRowLabelView() == null || getColLabelView() == null)
+		if (getRowLabelView() == null || getColLabelView() == null) {
 			return;
+		}
 
-		getRowLabelView().setJustifyOption(isRowRight);
-		getColLabelView().setJustifyOption(isColRight);
+		getRowLabelView().getLabelAttributes().setRightJustified(isRowRight);
+		getColLabelView().getLabelAttributes().setRightJustified(isColRight);
 	}
 
 	// @Override

@@ -50,6 +50,8 @@ public class FontSettings implements SettingsPanel {
 
 	private final LabelView rowLabelView;
 	private final LabelView colLabelView;
+	private final LabelAttributes rowLabelAttr;
+	private final LabelAttributes colLabelAttr;
 	
 	private JPanel fontPanel;
 	private JComboBox<String> font_choice;
@@ -64,6 +66,9 @@ public class FontSettings implements SettingsPanel {
 
 		rowLabelView = rows;
 		colLabelView = cols;
+		
+		rowLabelAttr = rows.getLabelAttributes();
+		colLabelAttr = cols.getLabelAttributes();
 	}
 
 	/**
@@ -222,14 +227,14 @@ public class FontSettings implements SettingsPanel {
 		font_choice = GUIFactory.createComboBox(fontNames);
 		font_choice.setEditable(true);
 		AutoCompleteDecorator.decorate(font_choice);
-		font_choice.setSelectedItem(rowLabelView.getFace());
+		font_choice.setSelectedItem(rowLabelAttr.getFace());
 		font_choice.addActionListener(new SelectionListener());
 	}
 
 	private void setupStyleChoice() {
 
 		style_choice = GUIFactory.createComboBox(styles);
-		style_choice.setSelectedItem(decode_style(rowLabelView.getStyle()));
+		style_choice.setSelectedItem(decode_style(rowLabelAttr.getStyle()));
 		style_choice.addActionListener(new SelectionListener());
 	}
 
@@ -245,20 +250,20 @@ public class FontSettings implements SettingsPanel {
 		size = correctSize(size, min, max);
 		updateSpinnerModels(size, min, max);
 
-		rowLabelView.setFace(string);
-		rowLabelView.setStyle(i);
-		rowLabelView.setFixed(isFixed);
-		rowLabelView.setLastSize(size);
-		rowLabelView.setMin(min);
-		rowLabelView.setMax(max);
+		rowLabelAttr.setFace(string);
+		rowLabelAttr.setStyle(i);
+		rowLabelAttr.setFixed(isFixed);
+		rowLabelAttr.setLastSize(size);
+		rowLabelAttr.setMinSize(min);
+		rowLabelAttr.setMaxSize(max);
 		rowLabelView.resetSecondaryScroll();
 
-		colLabelView.setFace(string);
-		colLabelView.setStyle(i);
-		colLabelView.setFixed(isFixed);
-		colLabelView.setLastSize(size);
-		colLabelView.setMin(min);
-		colLabelView.setMax(max);
+		colLabelAttr.setFace(string);
+		colLabelAttr.setStyle(i);
+		colLabelAttr.setFixed(isFixed);
+		colLabelAttr.setLastSize(size);
+		colLabelAttr.setMinSize(min);
+		colLabelAttr.setMaxSize(max);
 		colLabelView.resetSecondaryScroll();
 	}
 	
@@ -313,12 +318,9 @@ public class FontSettings implements SettingsPanel {
 		setupStyleChoice();
 		fontPanel.add(style_choice, "span, wrap");
 
-		SpinnerModel size_model = new SpinnerNumberModel(rowLabelView.getPoints(), 0, 
-				50, 1);
-		SpinnerModel min_model = new SpinnerNumberModel(rowLabelView.getMinSize(), 0, 
-				50, 1);
-		SpinnerModel max_model = new SpinnerNumberModel(rowLabelView.getMaxSize(), 0, 
-				50, 1);
+		SpinnerModel size_model = new SpinnerNumberModel(rowLabelAttr.getPoints(), 0, 50, 1);
+		SpinnerModel min_model = new SpinnerNumberModel(rowLabelAttr.getMinSize(), 0, 50, 1);
+		SpinnerModel max_model = new SpinnerNumberModel(rowLabelAttr.getMaxSize(), 0, 50, 1);
 		
 		/* Font size */
 		// getLastSize() to avoid issues with hint label font size.
@@ -327,7 +329,7 @@ public class FontSettings implements SettingsPanel {
 		fontPanel.add(size_field);
 
 		fixedBox = new JCheckBox("Keep fixed");
-		fixedBox.setSelected(rowLabelView.getFixed());
+		fixedBox.setSelected(rowLabelAttr.isFixed());
 		fixedBox.addActionListener(new SelectionListener());
 		fontPanel.add(fixedBox, "wrap");
 

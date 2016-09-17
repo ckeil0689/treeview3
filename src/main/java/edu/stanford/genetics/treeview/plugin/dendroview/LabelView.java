@@ -48,7 +48,7 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.UrlExtractor;
 import net.miginfocom.swing.MigLayout;
 
-public abstract class LabelView extends ModelView implements MouseListener, MouseMotionListener, FontSelectable,
+public abstract class LabelView extends ModelView implements MouseListener, MouseMotionListener,
 		ConfigNodePersistent, MouseWheelListener, AdjustmentListener {
 
 	private static final long serialVersionUID = 1L;
@@ -81,32 +81,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	/* Use labels to generate URLs for look-up */
 	protected UrlExtractor urlExtractor;
 
-	/* Default label settings */
-	protected final String d_face = "Courier";
-	protected final int d_style = 0;
-	protected final int d_size = 14;
-	protected final int d_min = 11;
-	protected final int d_max = 30;
-	protected boolean d_justified = false;
-	protected boolean d_fixed = false;
-	protected int longest_str_index;
-	protected int longest_str_length;
-	protected String longest_str;
-
-	/* Custom label settings */
-	protected String face;
-	protected int style;
-	protected int size;
-	protected String lastDrawnFace; // used only by getMaxStringLength
-	protected int lastDrawnStyle; // used only by getMaxStringLength
-	protected int lastDrawnSize; // used only by getMaxStringLength
-	protected int min;
-	protected int max;
-	protected int last_size;
-	protected boolean isFixed;
-
-	/* Alignment status */
-	protected boolean isRightJustified;
+	protected LabelAttributes labelAttr;
 
 	/*
 	 * Stores a reference to the TreeSelection relevant for drawing and the
@@ -173,7 +148,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		setLayout(new MigLayout());
 
 		setLabelSummary(new LabelSummary(getSummaryName()));
-
+        this.labelAttr = new LabelAttributes(this);
 		// this.urlExtractor = uExtractor;
 
 		addMouseMotionListener(this);
@@ -334,22 +309,15 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 
 		super.resetDefaults();
 
-		this.face = d_face;
-		this.style = d_style;
-		this.size = d_size;
-		this.min = d_min;
-		this.max = d_max;
-		this.isRightJustified = d_justified;
-		this.isFixed = d_fixed;
-
-		this.longest_str_index = -1;
-		this.longest_str_length = -1;
-
 		this.lastScrollEndGap = -1;
 		this.lastScrollPos = -1;
 		this.lastScrollEndPos = -1;
 		this.secondaryPaneSize = -1;
 		this.secondaryViewportSize = -1;
+		
+		if(labelAttr != null) {
+			labelAttr.resetDefaults();
+		}
 
 		if (labelSummary != null) {
 			labelSummary.resetDefaults();
@@ -464,6 +432,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 
 		this.configNode = parentNode;
 		getLabelSummary().setConfigNode(configNode);
+		getLabelAttributes().setConfigNode(configNode);
 	}
 
 	@Override
@@ -480,13 +449,12 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 			return;
 		}
 
-		setMin(configNode.getInt("min", d_min));
-		setMax(configNode.getInt("max", d_max));
-		setFace(configNode.get("face", d_face));
-		setStyle(configNode.getInt("style", d_style));
-		setLastSize(configNode.getInt("size", d_size));
-		setJustifyOption(configNode.getBoolean("isRightJustified", d_justified));
-		setFixed(configNode.getBoolean("isFixed", d_fixed));
+		if (labelAttr == null) {
+			LogBuffer.println("Could not restore labelAttributes state.");
+			return;
+		}
+		
+		labelAttr.requestStoredState();
 
 		resetSecondaryScroll();
 
@@ -501,19 +469,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	@Override
 	public void storeState() {
 
-		if (configNode == null) {
-			LogBuffer.println("Could not store state for " + getName() + " because configNode was null.");
-			return;
-		}
-
-		configNode.putInt("min", getMinSize());
-		configNode.putInt("max", getMaxSize());
-		configNode.put("face", face);
-		configNode.putInt("style", style);
-		configNode.putInt("size", size);
-		configNode.putBoolean("isRightJustified", d_justified);
-		configNode.putBoolean("isFixed", d_fixed);
-
+		labelAttr.storeState();
 		resetSecondaryScroll();
 	}
 
@@ -525,13 +481,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	 */
 	public void importStateFrom(final Preferences node) {
 
-		setMin(node.getInt("min", d_min));
-		setMax(node.getInt("max", d_max));
-		setFace(node.get("face", d_face));
-		setStyle(node.getInt("style", d_style));
-		setLastSize(node.getInt("size", d_size));
-		setJustifyOption(node.getBoolean("isRightJustified", d_justified));
-		setFixed(node.getBoolean("isFixed", d_fixed));
+		labelAttr.importStateFrom(node);
 
 		// Signal that the secondary scroll position should be reset the next
 		// time it is needed
@@ -558,44 +508,13 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		}
 	}
 
-	@Override
-	public String getFace() {
-		return face;
-	}
-
-	@Override
-	public int getPoints() {
-		return size;
-	}
-
-	@Override
-	public int getLastSize() {
-		return last_size;
-	}
-
-	@Override
-	public int getMinSize() {
-		return min;
-	}
-
-	@Override
-	public int getMaxSize() {
-		return max;
-	}
-
-	@Override
-	public int getStyle() {
-		return style;
-	}
-
-	@Override
-	public boolean getFixed() {
-		return isFixed;
-	}
-
-	@Override
-	public boolean getJustifyOption() {
-		return isRightJustified;
+	/**
+	 * 
+	 * @return The LabelView's instance of LabelAttributes.
+	 */
+	public LabelAttributes getLabelAttributes() {
+		
+		return labelAttr;
 	}
 
 	/**
@@ -639,127 +558,9 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		}
 	}
 
-	@Override
-	public void setFace(final String string) {
-		if (face == null || !face.equals(string)) {
-			face = string;
-			if (configNode != null) {
-				configNode.put("face", face);
-			}
-			setFont(new Font(face, style, size));
-			resetSecondaryScroll();
-			repaint();
-		}
-	}
-
-	/**
-	 * Wrapper for setPoints which allows to save the newly set points to an
-	 * instance variable.
-	 * 
-	 * @param i
-	 */
-	@Override
-	public void setLastSize(final int i) {
-		/* Stay within boundaries */
-		int new_i = i;
-
-		last_size = new_i;
-		setPoints(new_i);
-	}
-
-	@Override
-	public void setPoints(final int i) {
-		if (size != i) {
-			this.size = i;
-			if (configNode != null) {
-				configNode.putInt("size", size);
-			}
-			setFont(new Font(face, style, size));
-			resetSecondaryScroll();
-			repaint();
-		}
-	}
-
 	public void setTemporaryPoints(final int i) {
 		debug("Setting temporary points", 2);
-		setFont(new Font(face, style, i));
-	}
-
-	@Override
-	public void setStyle(final int i) {
-		if (style != i) {
-			this.style = i;
-
-			if (configNode != null) {
-				configNode.putInt("style", style);
-			}
-
-			setFont(new Font(face, style, size));
-			resetSecondaryScroll();
-			repaint();
-		}
-	}
-
-	@Override
-	public void setMin(final int i) {
-		if (i < 1 || max > 0 && i > max) {
-			return;
-		}
-
-		if (min != i) {
-			this.min = i;
-
-			if (configNode != null) {
-				configNode.putInt("min", min);
-			}
-
-			setFont(new Font(face, style, size));
-			resetSecondaryScroll();
-			repaint();
-		}
-	}
-
-	@Override
-	public void setMax(final int i) {
-		if (i < 1 || min > 0 && i < min) {
-			return;
-		}
-
-		if (max != i) {
-			this.max = i;
-
-			if (configNode != null) {
-				configNode.putInt("max", max);
-			}
-
-			setFont(new Font(face, style, size));
-			resetSecondaryScroll();
-			repaint();
-		}
-	}
-
-	@Override
-	public void setJustifyOption(final boolean isRightJustified) {
-		this.isRightJustified = isRightJustified;
-
-		if (configNode != null) {
-			configNode.putBoolean("isRightJustified", isRightJustified);
-		}
-
-		resetSecondaryScroll();
-		repaint();
-	}
-
-	@Override
-	public void setFixed(boolean fixed) {
-		this.isFixed = fixed;
-
-		if (configNode != null) {
-			configNode.putBoolean("isFixed", fixed);
-		}
-
-		resetSecondaryScroll();
-		repaint();
+		setFont(new Font(labelAttr.getFace(), labelAttr.getStyle(), i));
 	}
 
 	@Override
@@ -1018,7 +819,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 			// Must set before either of those methods is called and use this
 			// saved value to test if the font has changed since it was last
 			// drawn
-			int lastFontSize = lastDrawnSize;
+			int lastFontSize = labelAttr.getLastDrawnSize();
 			updateFontSize(g);
 
 			boolean drawLabelPort = doDrawLabelPort();
@@ -1031,7 +832,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 
 			// If the label pane's secondary dimension changed sizes or if the
 			// font size has changed
-			if (secondaryViewportSizeChanged() || lastFontSize != size) {
+			if (secondaryViewportSizeChanged() || lastFontSize != labelAttr.getPoints()) {
 				debug("Viewport size change detected. Previous scroll " + "positions: lastScrollPos [" + lastScrollPos
 						+ "] lastScrollEndPos [" + lastScrollEndPos + "] lastScrollEndGap [" + lastScrollEndGap + "]",
 						10);
@@ -1058,7 +859,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 			} else {
 				drawFittedLabels(g, g2d);
 			}
-			saveLastDrawnFontDetails(realMaxStrLen);
+			labelAttr.saveLastDrawnFontDetails(realMaxStrLen);
 
 			g2d.setTransform(orig);
 
@@ -1100,7 +901,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		int maxPortLabel = getPrimaryHoverIndex();
 		int minPortLabelOffset = 0;
 		int maxPortLabelOffset = 0;
-		int hoverStyle = Font.BOLD | style;
+		int hoverStyle = Font.BOLD | labelAttr.getStyle();
 
 		// See if the labels are going to be offset because they are near
 		// an edge
@@ -1151,7 +952,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 				debug("Label offset 1: [" + getLabelStartOffset(metrics.stringWidth(out)) + "]", 11);
 
 				int indexDiff = j - getPrimaryHoverIndex();
-				int yPos = hoverYPos + indexDiff * (size + SQUEEZE);
+				int yPos = hoverYPos + indexDiff * (labelAttr.getPoints() + SQUEEZE);
 				// Account for offsets from being near an edge
 				debug("edgeOffset: [" + edgeOffset + "]", 3);
 				yPos -= edgeOffset;
@@ -1178,11 +979,11 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 					if (j == getPrimaryHoverIndex()) {
 						// Just in case the hovered label is the right-most
 						// label
-						maxPortLabelOffset = getPrimaryViewportSize() - (yPos - ascent + size);
+						maxPortLabelOffset = getPrimaryViewportSize() - (yPos - ascent + labelAttr.getPoints());
 						debug("Drawing " + getPaneType() + " hover font BOLD [" + hoverStyle + "].", 5);
-						g2d.setFont(new Font(face, hoverStyle, size));
+						g2d.setFont(new Font(labelAttr.getFace(), hoverStyle, labelAttr.getPoints()));
 					} else {
-						g2d.setFont(new Font(face, style, size));
+						g2d.setFont(labelAttr.getFont());
 					}
 
 					debug("Printing label [" + out + "] starting at labelStrStart [" + labelStrStart + "] (originally ["
@@ -1194,8 +995,8 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 
 					g2d.drawString(out, labelStrStart, yPos);
 
-					drawOverrunArrows(metrics.stringWidth(out), g, yPos - ascent, size, g2d.getColor(), bgColor,
-							labelStrStart);
+					drawOverrunArrows(metrics.stringWidth(out), g, yPos - ascent, labelAttr.getPoints(), 
+							g2d.getColor(), bgColor, labelStrStart);
 				}
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 				debug("There was a problem setting the font to bold", 4);
@@ -1204,7 +1005,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 			}
 		}
 		// For hovering over the left-most index, we must do this:
-		g2d.setFont(new Font(face, style, size));
+		g2d.setFont(labelAttr.getFont());
 		for (int j = getPrimaryHoverIndex() + 1; j <= end; j++) {
 			try {
 				String out = labelSummary.getSummary(labelInfo, j);
@@ -1242,14 +1043,14 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 				debug("Label offset 2: [" + getLabelStartOffset(metrics.stringWidth(out)) + "]", 11);
 
 				int indexDiff = j - getPrimaryHoverIndex();
-				int yPos = hoverYPos + indexDiff * (size + SQUEEZE);
+				int yPos = hoverYPos + indexDiff * (labelAttr.getPoints() + SQUEEZE);
 				debug("edgeOffset: [" + edgeOffset + "]", 3);
 				yPos -= edgeOffset;
 				if (yPos < offscreenMatrixSize + ascent / 2) {
 					bgColor = drawLabelBackground(g, j, yPos - ascent);
 					if (yPos <= getPrimaryViewportSize()) {
 						maxPortLabel = j;
-						maxPortLabelOffset = getPrimaryViewportSize() - (yPos - ascent + size);
+						maxPortLabelOffset = getPrimaryViewportSize() - (yPos - ascent + labelAttr.getPoints());
 						/*
 						 * TODO: If anastasia doesn't like labels being colored
 						 * red on tree node hover, uncomment, otherwise delete.
@@ -1267,8 +1068,8 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 
 					g2d.drawString(out, labelStrStart, yPos);
 
-					drawOverrunArrows(metrics.stringWidth(out), g, yPos - ascent, size, labelColor, bgColor,
-							labelStrStart);
+					drawOverrunArrows(metrics.stringWidth(out), g, yPos - ascent, labelAttr.getPoints(), 
+							labelColor, bgColor, labelStrStart);
 				}
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 				LogBuffer.logException(e);
@@ -1360,7 +1161,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		final Color fore = GUIFactory.MAIN;
 		final FontMetrics metrics = getFontMetrics(g2d.getFont());
 		final int ascent = metrics.getAscent();
-		int hoverStyle = Font.BOLD | style;
+		int hoverStyle = Font.BOLD | labelAttr.getStyle();
 
 		// Set the first and last visible label for the tree drawing positions
 		map.setFirstVisibleLabel(start);
@@ -1392,13 +1193,13 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 							&& j >= map.getHoverTreeMinIndex() && j <= map.getHoverTreeMaxIndex())) {
 						g2d.setColor(hoverTextFGColor);
 						if (j == getPrimaryHoverIndex()) {
-							g2d.setFont(new Font(face, hoverStyle, size));
+							g2d.setFont(labelAttr.getTempStyleFont(hoverStyle));
 						} else {
-							g2d.setFont(new Font(face, style, size));
+							g2d.setFont(labelAttr.getFont());
 						}
 					} else {
 						g2d.setColor(fore);
-						g2d.setFont(new Font(face, style, size));
+						g2d.setFont(labelAttr.getFont());
 					}
 
 					if (colorIndex > 0) {
@@ -1407,7 +1208,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 
 				} else {
 					g2d.setColor(Color.black);
-					g2d.setFont(new Font(face, style, size));
+					g2d.setFont(labelAttr.getFont());
 				}
 
 				/* Finally draw label (alignment-dependent) */
@@ -1416,8 +1217,8 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 
 				g2d.drawString(out, labelStrStart, map.getMiddlePixel(j) + ascent / 2);
 
-				drawOverrunArrows(metrics.stringWidth(out), g, map.getMiddlePixel(j) - ascent / 2, size, g2d.getColor(),
-						bgColor, labelStrStart);
+				drawOverrunArrows(metrics.stringWidth(out), g, map.getMiddlePixel(j) - ascent / 2, 
+						labelAttr.getPoints(), g2d.getColor(), bgColor, labelStrStart);
 			} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
 				LogBuffer.logException(e);
 				break;
@@ -1443,7 +1244,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		// prefs file. Besides, this font size would be saved as a new font
 		// size and the scrollbars would be re-justified and not remember
 		// their position
-		g.setFont(new Font(face, style, HINTFONTSIZE));
+		g.setFont(labelAttr.getTempSizeFont(HINTFONTSIZE));
 		g2d.setColor(Color.black);
 
 		final FontMetrics metrics = getFontMetrics(g2d.getFont());
@@ -1525,12 +1326,12 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 
 		if (drawingSelectColor) {
 			g.fillRect(0, yPos, getSavedSecondaryPaneSize(),
-					(doDrawLabelPort() ? size + SQUEEZE : map.getPixel(j + 1) - map.getPixel(j)));
+					(doDrawLabelPort() ? labelAttr.getPoints() + SQUEEZE : map.getPixel(j + 1) - map.getPixel(j)));
 
 			debug("Drawing select color from x|y [0|" + yPos
 					+ "] to x|y (secondaryPaneSize|(doDrawLabelPort() ? size + "
 					+ "SQUEEZE : map.getPixel(j + 1) - map.getPixel(j))) [" + getSavedSecondaryPaneSize() + "|"
-					+ (doDrawLabelPort() ? size + SQUEEZE : map.getPixel(j + 1) - map.getPixel(j)) + "]", 17);
+					+ (doDrawLabelPort() ? labelAttr.getPoints() + SQUEEZE : map.getPixel(j + 1) - map.getPixel(j)) + "]", 17);
 		}
 
 		return (bgColor);
@@ -1561,7 +1362,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		/*
 		 * Scroll to the position that is equivalent to the previous position
 		 */
-		if (isRightJustified) {
+		if (labelAttr.isRightJustified()) {
 			// See if we need to initialize the scroll positions
 			if (lastScrollPos == -1) {
 				if (labelAndScrollCoordsAreOpposite()) {
@@ -1703,7 +1504,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	 * @return
 	 */
 	public int getLabelPaneContentSize(FontMetrics metrics) {
-		debug("Max string length for font size [" + size + "]: [" + getMaxStringLength(metrics)
+		debug("Max string length for font size [" + labelAttr.getPoints() + "]: [" + getMaxStringLength(metrics)
 				+ "] and the viewport dimension: [" + getSecondaryViewportSize() + "]", 18);
 		int len = getMaxStringLength(metrics) + getLabelShiftSize();
 		return (len > getSecondaryViewportSize() ? len : getSecondaryViewportSize());
@@ -1725,12 +1526,11 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	public int getMaxStringLength(FontMetrics metrics) {
 		int end = map.getMaxIndex();
 		int maxStrLen = 0;
-		String maxStr = "";
 		
 		// No labels have been loaded for this LabelView's axis
 		if(labelInfo.getNumLabelTypes() == 0) {
-			longest_str_index = -1;
-			longest_str = "";
+			labelAttr.setLongestStrIdx(-1);
+			labelAttr.setLongestStr("");
 			return maxStrLen;
 		}
 
@@ -1740,46 +1540,51 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		// longest string variables. Note, this can be thwarted in the rare case
 		// that 2 different data files happen to have the same label in the same
 		// position and there exists a longer label elsewhere
-		if (longest_str_index > -1 && (longest_str_index > map.getMaxIndex() || longest_str == null
-				|| !longest_str.equals(labelSummary.getSummary(labelInfo, longest_str_index)))) {
+		if (labelAttr.isLongestStrIdxDefined() && (labelAttr.getLongestStrIdx() > map.getMaxIndex() 
+				|| labelAttr.getLongestStr() == null
+				|| !labelAttr.isLongestStrEqualTo(labelSummary.getSummary(labelInfo, labelAttr.getLongestStrIdx())))) {
 			LogBuffer.println("Data changed. Prompting recalculation of max string length.");
-			longest_str_index = -1;
-			longest_str = "";
+			labelAttr.setLongestStrIdx(-1);
+			labelAttr.setLongestStr("");
 		}
 
+		boolean isLongestStrEqual = false;
+		String tempLongest = null;
+		if(labelAttr.isLongestStrIdxDefined()) {
+			tempLongest = labelSummary.getSummary(labelInfo, labelAttr.getLongestStrIdx());
+			isLongestStrEqual = labelAttr.isLongestStrEqualTo(tempLongest);
+		}
+		
 		// If nothing about the font has changed, calculate the length of the
 		// longest string
-		if (longest_str_index > -1 && lastDrawnFace == face && lastDrawnStyle == style && lastDrawnSize == size
-				&& longest_str.equals(labelSummary.getSummary(labelInfo, longest_str_index))) {
+		if (isLongestStrEqual && !labelAttr.hasFontChanged()) {
 
 			debug("Regurgitating maxstrlen", 1);
-			maxStr = labelSummary.getSummary(labelInfo, longest_str_index);
-			maxStrLen = longest_str_length;
-			debug("Everything fontwise is the same, including size [" + size + "]. returning saved maxStrLen ["
+			labelAttr.setLongestStr(tempLongest);
+			maxStrLen = labelAttr.getLongestStrLen();
+			debug("Everything fontwise is the same, including size [" + labelAttr.getPoints() + "]. returning saved maxStrLen ["
 					+ maxStrLen + "]", 18);
 		}
-		// Else if the font size only has changed, recalculate the longest
-		// string's length
-		else if (longest_str_index > -1 && lastDrawnFace == face && lastDrawnStyle == style && lastDrawnSize != size
-				&& longest_str.equals(labelSummary.getSummary(labelInfo, longest_str_index))) {
+		// Else if the font attributes have changed, recalculate the longest string's length
+		else if (isLongestStrEqual && labelAttr.hasFontChanged()) {
 
 			debug("Refining maxstrlen", 1);
-			maxStr = labelSummary.getSummary(labelInfo, longest_str_index);
-			maxStrLen = metrics.stringWidth(maxStr);
-			debug("Font size only changed. Recalculating length of longest " + "string [" + maxStr
+			labelAttr.setLongestStr(tempLongest);
+			maxStrLen = metrics.stringWidth(tempLongest);
+			debug("Font size only changed. Recalculating length of longest " + "string [" + labelAttr.getLongestStr()
 					+ "] & returning maxStrLen [" + maxStrLen + "]", 18);
 		}
 		// Else find the longest string and return its length
 		else {
-			LogBuffer.println("Recalculating longest_str. Idx: " + longest_str_index);
+			LogBuffer.println("Recalculating longest_str. Idx: " + labelAttr.getLongestStrIdx());
 			
 			debug("Calculating maxstrlen because not [lastDrawnFace == face "
 					+ "&& lastDrawnStyle == style && longest_str_index > -1 && "
 					+ "lastDrawnSize != size && longest_str.equals(labelSummary."
 					+ "getSummary(labelInfo,longest_str_index))]", 18);
-			debug("Calculating maxstrlen because not [" + lastDrawnFace + " == " + face + " && " + lastDrawnStyle
-					+ " == " + style + " && " + longest_str_index + " > -1 && " + lastDrawnSize + " != " + size + " && "
-					+ longest_str + ".equals(labelSummary.getSummary(labelInfo," + longest_str_index + "))]", 18);
+			debug("Calculating maxstrlen because not [" + labelAttr.getLastDrawnFace() + " == " + labelAttr.getFace() + " && " + labelAttr.getLastDrawnStyle()
+					+ " == " + labelAttr.getStyle() + " && " + labelAttr.getLastDrawnStyle() + " > -1 && " + labelAttr.getLastDrawnSize() + " != " + labelAttr.getPoints() + " && "
+					+ labelAttr.getLongestStr() + ".equals(labelSummary.getSummary(labelInfo," + labelAttr.getLongestStrIdx() + "))]", 18);
 			for (int j = 0; j <= end; j++) {
 				try {
 					String out = labelSummary.getSummary(labelInfo, j);
@@ -1790,11 +1595,8 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 
 					if (maxStrLen < metrics.stringWidth(out)) {
 						maxStrLen = metrics.stringWidth(out);
-						longest_str_index = j;
-						longest_str = out;
-//						if (debug != 0) {
-//							maxStr = out;
-//						}
+						labelAttr.setLongestStrIdx(j);
+						labelAttr.setLongestStr(out);
 					}
 
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
@@ -1802,30 +1604,19 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 					break;
 				}
 			}
-			//longest_str = maxStr;
 
-			debug("Full-on recalculating [" + maxStr + "] maxStrLen [" + maxStrLen + "] at face [" + face + "] style ["
-					+ style + "] size [" + size + "]", 12);
+			debug("Full-on recalculating [" + labelAttr.getLongestStr() + "] maxStrLen [" + maxStrLen + "] at face [" + labelAttr.getFace() + "] style ["
+					+ labelAttr.getStyle() + "] size [" + labelAttr.getPoints() + "]", 12);
 		}
 
-		debug(getPaneType() + ": MaxStrLen: [" + maxStrLen + "] MaxStr: [" + maxStr + "] Start Index: [" + 0
+		debug(getPaneType() + ": MaxStrLen: [" + maxStrLen + "] MaxStr: [" + labelAttr.getLongestStr() + "] Start Index: [" + 0
 				+ "] End Index: [" + end + "] height [" + offscreenSize.height + "] width [" + offscreenSize.width
 				+ "]", 1);
 
 		return (maxStrLen);
 	}
 
-	// FIXME -- Remove for LabelAttributes
-	private void saveLastDrawnFontDetails(int maxStrLen) {
-		// Save the state to detect changes upon the next call of this method
-		this.lastDrawnFace = face;
-		this.lastDrawnStyle = style;
-		this.lastDrawnSize = size;
-		this.longest_str_length = maxStrLen;
-	}
-
 	/**
-	 * FIXME - Consider moving to LabelAttributes
 	 * Dynamic update of font size based on size setting or map scale
 	 * 
 	 * @author rleach
@@ -1833,11 +1624,9 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	 * @return
 	 */
 	private void updateFontSize(final Graphics g) {
-		if (isFixed) {
-			setLastSize(last_size);
-		} else {
+		if (!labelAttr.isFixed()) {
 			adaptFontSizeToMapScale();
-			g.setFont(new Font(face, style, size));
+			g.setFont(labelAttr.getFont());
 		}
 	}
 
@@ -1848,16 +1637,16 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	 */
 	private void adaptFontSizeToMapScale() {
 		int newPoints = (int) map.getScale() - SQUEEZE;
-		if (newPoints > getMaxSize()) {
-			newPoints = getMaxSize();
-		} else if (newPoints < getMinSize()) {
-			newPoints = getMinSize();
+		if (newPoints > labelAttr.getMaxSize()) {
+			newPoints = labelAttr.getMaxSize();
+		} else if (newPoints < labelAttr.getMinSize()) {
+			newPoints = labelAttr.getMinSize();
 		}
 
-		if (!isFixed && newPoints != getPoints()) {
-			debug("Adapting to new font size from [" + getPoints() + "] to [" + newPoints + "] for [" + getPaneType()
+		if (!labelAttr.isFixed() && newPoints != labelAttr.getPoints()) {
+			debug("Adapting to new font size from [" + labelAttr.getPoints() + "] to [" + newPoints + "] for [" + getPaneType()
 					+ "s]", 1);
-			setLastSize(newPoints);
+			labelAttr.setLastSize(newPoints);
 		}
 	}
 
@@ -2221,13 +2010,13 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	 * @return
 	 */
 	public boolean doDrawLabelPort() {
-		return (inLabelPortMode() && map.overALabelLinkedView() && ((!isFixed && map.getScale() < (getMinSize() + SQUEEZE))
-				|| (isFixed && map.getScale() < (last_size + SQUEEZE))));
+		return (inLabelPortMode() && map.overALabelLinkedView() && ((!labelAttr.isFixed() && map.getScale() < (labelAttr.getMinSize() + SQUEEZE))
+				|| (labelAttr.isFixed() && map.getScale() < (labelAttr.getLastSize() + SQUEEZE))));
 	}
 
 	public boolean doDrawLabels() {
-		return (doDrawLabelPort() || (!isFixed && map.getScale() >= (getMinSize() + SQUEEZE))
-				|| (isFixed && map.getScale() >= (last_size + SQUEEZE)));
+		return (doDrawLabelPort() || (!labelAttr.isFixed() && map.getScale() >= (labelAttr.getMinSize() + SQUEEZE))
+				|| (labelAttr.isFixed() && map.getScale() >= (labelAttr.getLastSize() + SQUEEZE)));
 	}
 
 	/**
@@ -2264,7 +2053,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		}
 
 		if (labelAndScrollCoordsAreOpposite()) {
-			if (isRightJustified) {
+			if (labelAttr.isRightJustified()) {
 				// Top Justified, but note that scroll position 0 is at the top
 				// and that's the end/right-side of the string
 				// lastScrollPos should not change unless the viewport is now
@@ -2294,7 +2083,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 				lastScrollPos = lastScrollEndPos - extent;
 			}
 		} else {
-			if (isRightJustified) {
+			if (labelAttr.isRightJustified()) {
 				// lastScrollEndGap should not change unless the viewport is
 				// now larger than the content minus the previous gap size
 				if (lastScrollEndGap > 0 && extent > (maxContentLen - lastScrollEndGap)) {
@@ -2371,7 +2160,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		int offset = 0;
 		int indent = getLabelShiftSize();
 		if (labelAndScrollCoordsAreOpposite()) {
-			if (isRightJustified) {
+			if (labelAttr.isRightJustified()) {
 				debug("Top justified columns. Extent: [" + getSecondaryScrollBar().getModel().getExtent()
 						+ "] Pane Size: [" + getSavedSecondaryPaneSize() + "]", 11);
 				if (lastScrollEndPos != -1 && lastScrollPos != -1
@@ -2422,7 +2211,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 				}
 			}
 		} else {
-			if (isRightJustified) {
+			if (labelAttr.isRightJustified()) {
 				debug("Right justified rows. Extent: [" + getSecondaryScrollBar().getModel().getExtent()
 						+ "] Pane Size: [" + getSavedSecondaryPaneSize() + "]", 11);
 				if (lastScrollEndPos != -1 && lastScrollPos != -1

@@ -54,6 +54,7 @@ import edu.stanford.genetics.treeview.TreeSelectionI;
  * This class is a superclass which implements a GUI for selection of options
  * relating to output. It makes most of the relevant variables accessible to
  * subclasses through protected methods.
+ * @deprecated - Replaced by new ExportDialog
  */
 public abstract class ExportPanel extends javax.swing.JPanel {
 
@@ -984,9 +985,9 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
 				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB);
 		LogBuffer.println("setting font for genes to " + getRowFont());
-		anv.setFace(getRowFont().getName());
-		anv.setStyle(getRowFont().getStyle());
-		anv.setPoints(getRowFont().getSize());
+		anv.getLabelAttributes().setFace(getRowFont().getName());
+		anv.getLabelAttributes().setStyle(getRowFont().getStyle());
+		anv.getLabelAttributes().setPoints(getRowFont().getSize());
 		anv.updateBuffer(buf);
 		g.drawImage(buf, x + textSpacing, y, null);
 
@@ -1020,9 +1021,9 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		final ColumnLabelView anv = new ColumnLabelView();
 		anv.setUrlExtractor(null);
 		anv.setLabelInfo(colLabelInfo);
-		anv.setFace(getColFont().getName());
-		anv.setStyle(getColFont().getStyle());
-		anv.setPoints(getColFont().getSize());
+		anv.getLabelAttributes().setFace(getColFont().getName());
+		anv.getLabelAttributes().setStyle(getColFont().getStyle());
+		anv.getLabelAttributes().setPoints(getColFont().getSize());
 		anv.setLabelSummary(labelTypeSelectionPanel.getArraySummary());
 		anv.setMap(tempMap);
 		final Image buf = new BufferedImage(width + getBorderPixels(), height

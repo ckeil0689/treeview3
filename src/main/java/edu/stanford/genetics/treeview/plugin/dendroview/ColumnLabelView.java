@@ -21,7 +21,7 @@ public class ColumnLabelView extends LabelView {
 	public ColumnLabelView() {
 
 		super();
-		d_justified = false;
+		labelAttr.setDefaultJustified(false);
 		zoomHint = StringRes.lbl_ZoomColLabels;
 	}
 
@@ -113,7 +113,7 @@ public class ColumnLabelView extends LabelView {
 	 */
 	@Override
 	protected boolean isMatrixJustified() {
-		return(!isRightJustified);
+		return(!labelAttr.isRightJustified());
 	}
 
 	/**

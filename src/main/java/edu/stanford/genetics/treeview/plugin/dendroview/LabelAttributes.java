@@ -12,7 +12,7 @@ import edu.stanford.genetics.treeview.ModelLoadReset;
  * @author ckeil0689
  *
  */
-public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
+public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, FontSelectable {
 
 	protected Preferences configNode;
 	protected final LabelView labelView;
@@ -23,30 +23,30 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 	protected final int d_size = 14;
 	protected final int d_minSize = 11;
 	protected final int d_maxSize = 30;
-	protected final boolean d_justified = false;
 	protected final boolean d_fixed = false;
+	protected boolean d_justified = false; // may be changed by LabelView children
 
 	// Custom label settings
-	protected String face;
-	protected int style;
-	protected int size;
+	private String face;
+	private int style;
+	private int size;
 	
-	protected String lastDrawnFace; // used only by getMaxStringLength
-	protected int lastDrawnStyle; // used only by getMaxStringLength
-	protected int lastDrawnSize; // used only by getMaxStringLength
+	private String lastDrawnFace; // used only by getMaxStringLength
+	private int lastDrawnStyle; // used only by getMaxStringLength
+	private int lastDrawnSize; // used only by getMaxStringLength
 	
-	protected int minSize;
-	protected int maxSize;
-	protected int lastSize;
-	protected boolean isFixed;
+	private int minSize;
+	private int maxSize;
+	private int lastSize;
+	private boolean isFixed;
 	
 	// Important to maintain scrolling behavior
-	protected int longest_str_index;
-	protected int longest_str_length;
-	protected String longest_str;
+	private int longest_str_index;
+	private int longest_str_length;
+	private String longest_str;
 
 	// Alignment status
-	protected boolean isRightJustified;
+	private boolean isRightJustified;
 	
 	public LabelAttributes(final LabelView labelView) {
 
@@ -151,9 +151,12 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 				+ ", longest_str=" + longest_str + ", isRightJustified=" + isRightJustified + "]";
 	}
 	
+	/**
+	 * Saves the current state to detect changes later.
+	 * @param maxStrLen - Length of the longest string in the labels.
+	 */
 	public void saveLastDrawnFontDetails(int maxStrLen) {
 		
-		// Save the state to detect changes upon the next call of this method
 		this.lastDrawnFace = face;
 		this.lastDrawnStyle = style;
 		this.lastDrawnSize = size;
@@ -170,30 +173,36 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 		labelView.repaint();
 	}
 
+	@Override
 	public String getFace() {
 		return face;
 	}
 
+	@Override
 	public void setFace(String face) {
 		this.face = face;
 		storeState();
 		updateLabelView();
 	}
 
+	@Override
 	public int getStyle() {
 		return style;
 	}
 
+	@Override
 	public void setStyle(int style) {
 		this.style = style;
 		storeState();
 		updateLabelView();
 	}
 
-	public int getSize() {
+	@Override
+	public int getPoints() {
 		return size;
 	}
 
+	@Override
 	public void setPoints(int size) {
 		this.size = size;
 		storeState();
@@ -224,10 +233,12 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 		this.lastDrawnSize = lastDrawnSize;
 	}
 
+	@Override
 	public int getMinSize() {
 		return minSize;
 	}
 
+	@Override
 	public void setMinSize(int minSize) {
 		
 		// Remain within bounds
@@ -240,10 +251,12 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 		updateLabelView();
 	}
 
+	@Override
 	public int getMaxSize() {
 		return maxSize;
 	}
 
+	@Override
 	public void setMaxSize(int maxSize) {
 		
 		// Remain within bounds
@@ -256,56 +269,112 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 		updateLabelView();
 	}
 
+	@Override
 	public int getLastSize() {
 		return lastSize;
 	}
 
+	@Override
 	public void setLastSize(int lastSize) {
 		this.lastSize = lastSize;
 		setPoints(lastSize);
 	}
 
+	@Override
 	public boolean isFixed() {
 		return isFixed;
 	}
 
+	@Override
 	public void setFixed(boolean isFixed) {
 		this.isFixed = isFixed;
 		storeState();
 		updateLabelView();
 	}
 
-	public int getLongest_str_index() {
+	public int getLongestStrIdx() {
 		return longest_str_index;
 	}
 
-	public void setLongest_str_index(int longest_str_index) {
+	public void setLongestStrIdx(int longest_str_index) {
 		this.longest_str_index = longest_str_index;
 	}
 
-	public int getLongest_str_length() {
+	public int getLongestStrLen() {
 		return longest_str_length;
 	}
 
-	public void setLongest_str_length(int longest_str_length) {
+	public void setLongestStrLen(int longest_str_length) {
 		this.longest_str_length = longest_str_length;
 	}
 
-	public String getLongest_str() {
+	public String getLongestStr() {
 		return longest_str;
 	}
 
-	public void setLongest_str(String longest_str) {
+	public void setLongestStr(String longest_str) {
 		this.longest_str = longest_str;
 	}
 
+	@Override
 	public boolean isRightJustified() {
 		return isRightJustified;
 	}
 
+	@Override
 	public void setRightJustified(boolean isRightJustified) {
 		this.isRightJustified = isRightJustified;
 		storeState();
 		updateLabelView();
+	}
+	
+	/**
+	 * Necessary default justification change depending on LabelView axis. Should ONLY be called in child class of
+	 * LabelView (RowLabelView, ColumnLabelView).
+	 * @param isRightJustified
+	 */
+	public void setDefaultJustified(boolean isRightJustified) {
+		
+		this.d_justified = isRightJustified;
+	}
+
+	@Override
+	public Font getFont() {
+		return new Font(face, style, size);
+	}
+	
+	/**
+	 * 
+	 * @param tempStyle - A temporary font style.
+	 * @return A font with only the style attribute temporarily changed (not stored in state).
+	 */
+	public Font getTempStyleFont(int tempStyle) {
+		return new Font(face, tempStyle, size);
+	}
+	
+	/**
+	 * 
+	 * @param tempSize - A temporary font size.
+	 * @return A font with only the size attribute temporarily changed (not stored in state).
+	 */
+	public Font getTempSizeFont(int tempSize) {
+		return new Font(face, style, tempSize);
+	}
+	
+	/**
+	 * Tests if the currently stored font attributes (face, style, size) have changed compared to when they were last
+	 * stored by saveLastDrawnFontDetails().
+	 * @return True if the font attributes have changed, false otherwise.
+	 */
+	public boolean hasFontChanged() {
+		 return (lastDrawnFace != face || lastDrawnStyle != style || lastDrawnSize != size);
+	}
+	
+	public boolean isLongestStrIdxDefined() {
+		return longest_str_index > -1;
+	}
+	
+	public boolean isLongestStrEqualTo(String otherStr) {
+		return longest_str.equals(otherStr);
 	}
 }

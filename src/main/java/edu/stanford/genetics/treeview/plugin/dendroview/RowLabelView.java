@@ -22,7 +22,7 @@ public class RowLabelView extends LabelView {
 		
 		super();
 		
-		d_justified = true;
+		labelAttr.setDefaultJustified(true);
 		zoomHint = StringRes.lbl_ZoomRowLabels;
 	}
 
@@ -88,7 +88,7 @@ public class RowLabelView extends LabelView {
 	@Override
 	protected boolean isMatrixJustified() {
 		
-		return(isRightJustified);
+		return(labelAttr.isRightJustified());
 	}
 
 	@Override

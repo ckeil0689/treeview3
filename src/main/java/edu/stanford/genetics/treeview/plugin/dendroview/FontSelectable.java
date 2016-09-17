@@ -49,12 +49,12 @@ public abstract interface FontSelectable {
 	 * 
 	 * @return Whether fonts size is fixed.
 	 */
-	public abstract boolean getFixed();
+	public abstract boolean isFixed();
 
 	/**
 	 * @return gets label justification
 	 */
-	public abstract boolean getJustifyOption();
+	public abstract boolean isRightJustified();
 
 	public abstract java.awt.Font getFont();
 
@@ -88,7 +88,7 @@ public abstract interface FontSelectable {
 	 * @param i
 	 *            The new points value
 	 */
-	public abstract void setMin(int i);
+	public abstract void setMinSize(int i);
 
 	/**
 	 * Sets a maximum point size
@@ -96,7 +96,7 @@ public abstract interface FontSelectable {
 	 * @param i
 	 *            The new points value
 	 */
-	public abstract void setMax(int i);
+	public abstract void setMaxSize(int i);
 
 	/**
 	 * Sets whether the font size changes dynamically or remains fixed.
@@ -119,6 +119,6 @@ public abstract interface FontSelectable {
 	 * @param i
 	 *            The new style value
 	 */
-	public abstract void setJustifyOption(boolean isRightJustified);
+	public abstract void setRightJustified(boolean isRightJustified);
 
 }
