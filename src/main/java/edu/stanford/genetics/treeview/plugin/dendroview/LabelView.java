@@ -1740,15 +1740,16 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		// longest string variables. Note, this can be thwarted in the rare case
 		// that 2 different data files happen to have the same label in the same
 		// position and there exists a longer label elsewhere
-		if ((longest_str_index > -1 && longest_str_index > map.getMaxIndex()) || longest_str == null
-				|| !longest_str.equals(labelSummary.getSummary(labelInfo, longest_str_index))) {
+		if (longest_str_index > -1 && (longest_str_index > map.getMaxIndex() || longest_str == null
+				|| !longest_str.equals(labelSummary.getSummary(labelInfo, longest_str_index)))) {
+			LogBuffer.println("Data changed. Prompting recalculation of max string length.");
 			longest_str_index = -1;
 			longest_str = "";
 		}
 
 		// If nothing about the font has changed, calculate the length of the
 		// longest string
-		if (lastDrawnFace == face && lastDrawnStyle == style && longest_str_index > -1 && lastDrawnSize == size
+		if (longest_str_index > -1 && lastDrawnFace == face && lastDrawnStyle == style && lastDrawnSize == size
 				&& longest_str.equals(labelSummary.getSummary(labelInfo, longest_str_index))) {
 
 			debug("Regurgitating maxstrlen", 1);
@@ -1759,7 +1760,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		}
 		// Else if the font size only has changed, recalculate the longest
 		// string's length
-		else if (lastDrawnFace == face && lastDrawnStyle == style && longest_str_index > -1 && lastDrawnSize != size
+		else if (longest_str_index > -1 && lastDrawnFace == face && lastDrawnStyle == style && lastDrawnSize != size
 				&& longest_str.equals(labelSummary.getSummary(labelInfo, longest_str_index))) {
 
 			debug("Refining maxstrlen", 1);
@@ -1770,6 +1771,8 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		}
 		// Else find the longest string and return its length
 		else {
+			LogBuffer.println("Recalculating longest_str. Idx: " + longest_str_index);
+			
 			debug("Calculating maxstrlen because not [lastDrawnFace == face "
 					+ "&& lastDrawnStyle == style && longest_str_index > -1 && "
 					+ "lastDrawnSize != size && longest_str.equals(labelSummary."
@@ -1788,9 +1791,10 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 					if (maxStrLen < metrics.stringWidth(out)) {
 						maxStrLen = metrics.stringWidth(out);
 						longest_str_index = j;
-						if (debug != 0) {
-							maxStr = out;
-						}
+						longest_str = out;
+//						if (debug != 0) {
+//							maxStr = out;
+//						}
 					}
 
 				} catch (final java.lang.ArrayIndexOutOfBoundsException e) {
@@ -1798,7 +1802,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 					break;
 				}
 			}
-			longest_str = maxStr;
+			//longest_str = maxStr;
 
 			debug("Full-on recalculating [" + maxStr + "] maxStrLen [" + maxStrLen + "] at face [" + face + "] style ["
 					+ style + "] size [" + size + "]", 12);
