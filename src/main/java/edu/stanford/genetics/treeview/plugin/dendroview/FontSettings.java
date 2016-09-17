@@ -248,7 +248,7 @@ public class FontSettings implements SettingsPanel {
 		rowLabelView.setFace(string);
 		rowLabelView.setStyle(i);
 		rowLabelView.setFixed(isFixed);
-		rowLabelView.setSavedPoints(size);
+		rowLabelView.setLastSize(size);
 		rowLabelView.setMin(min);
 		rowLabelView.setMax(max);
 		rowLabelView.resetSecondaryScroll();
@@ -256,7 +256,7 @@ public class FontSettings implements SettingsPanel {
 		colLabelView.setFace(string);
 		colLabelView.setStyle(i);
 		colLabelView.setFixed(isFixed);
-		colLabelView.setSavedPoints(size);
+		colLabelView.setLastSize(size);
 		colLabelView.setMin(min);
 		colLabelView.setMax(max);
 		colLabelView.resetSecondaryScroll();

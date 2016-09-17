@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Font;
 import java.util.prefs.Preferences;
 
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
@@ -14,6 +15,7 @@ import edu.stanford.genetics.treeview.ModelLoadReset;
 public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 
 	protected Preferences configNode;
+	protected final LabelView labelView;
 	
 	// Default label settings
 	protected final String d_face = "Courier";
@@ -46,8 +48,9 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 	// Alignment status
 	protected boolean isRightJustified;
 	
-	public LabelAttributes() {
+	public LabelAttributes(final LabelView labelView) {
 
+		this.labelView = labelView;
 		resetDefaults();
 	}
 
@@ -156,6 +159,16 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 		this.lastDrawnSize = size;
 		this.longest_str_length = maxStrLen;
 	}
+	
+	/**
+	 * Updates the font, secondary scrollbar of the LabelView and initiates a repaint.
+	 */
+	private void updateLabelView() {
+		
+		labelView.setFont(new Font(face, style, size));
+		labelView.resetSecondaryScroll();
+		labelView.repaint();
+	}
 
 	public String getFace() {
 		return face;
@@ -164,6 +177,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 	public void setFace(String face) {
 		this.face = face;
 		storeState();
+		updateLabelView();
 	}
 
 	public int getStyle() {
@@ -173,15 +187,17 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 	public void setStyle(int style) {
 		this.style = style;
 		storeState();
+		updateLabelView();
 	}
 
 	public int getSize() {
 		return size;
 	}
 
-	public void setSize(int size) {
+	public void setPoints(int size) {
 		this.size = size;
 		storeState();
+		updateLabelView();
 	}
 
 	public String getLastDrawnFace() {
@@ -221,6 +237,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 		
 		this.minSize = minSize;
 		storeState();
+		updateLabelView();
 	}
 
 	public int getMaxSize() {
@@ -236,6 +253,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 		
 		this.maxSize = maxSize;
 		storeState();
+		updateLabelView();
 	}
 
 	public int getLastSize() {
@@ -244,7 +262,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 
 	public void setLastSize(int lastSize) {
 		this.lastSize = lastSize;
-		setSize(lastSize);
+		setPoints(lastSize);
 	}
 
 	public boolean isFixed() {
@@ -254,6 +272,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 	public void setFixed(boolean isFixed) {
 		this.isFixed = isFixed;
 		storeState();
+		updateLabelView();
 	}
 
 	public int getLongest_str_index() {
@@ -287,5 +306,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset {
 	public void setRightJustified(boolean isRightJustified) {
 		this.isRightJustified = isRightJustified;
 		storeState();
+		updateLabelView();
 	}
 }

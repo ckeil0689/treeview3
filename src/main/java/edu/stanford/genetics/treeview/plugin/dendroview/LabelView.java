@@ -484,7 +484,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		setMax(configNode.getInt("max", d_max));
 		setFace(configNode.get("face", d_face));
 		setStyle(configNode.getInt("style", d_style));
-		setSavedPoints(configNode.getInt("size", d_size));
+		setLastSize(configNode.getInt("size", d_size));
 		setJustifyOption(configNode.getBoolean("isRightJustified", d_justified));
 		setFixed(configNode.getBoolean("isFixed", d_fixed));
 
@@ -529,7 +529,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		setMax(node.getInt("max", d_max));
 		setFace(node.get("face", d_face));
 		setStyle(node.getInt("style", d_style));
-		setSavedPoints(node.getInt("size", d_size));
+		setLastSize(node.getInt("size", d_size));
 		setJustifyOption(node.getBoolean("isRightJustified", d_justified));
 		setFixed(node.getBoolean("isFixed", d_fixed));
 
@@ -659,7 +659,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	 * @param i
 	 */
 	@Override
-	public void setSavedPoints(final int i) {
+	public void setLastSize(final int i) {
 		/* Stay within boundaries */
 		int new_i = i;
 
@@ -1834,7 +1834,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 	 */
 	private void updateFontSize(final Graphics g) {
 		if (isFixed) {
-			setSavedPoints(last_size);
+			setLastSize(last_size);
 		} else {
 			adaptFontSizeToMapScale();
 			g.setFont(new Font(face, style, size));
@@ -1857,7 +1857,7 @@ public abstract class LabelView extends ModelView implements MouseListener, Mous
 		if (!isFixed && newPoints != getPoints()) {
 			debug("Adapting to new font size from [" + getPoints() + "] to [" + newPoints + "] for [" + getPaneType()
 					+ "s]", 1);
-			setSavedPoints(newPoints);
+			setLastSize(newPoints);
 		}
 	}
 

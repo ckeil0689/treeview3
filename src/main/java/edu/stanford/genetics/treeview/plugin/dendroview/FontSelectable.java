@@ -72,7 +72,7 @@ public abstract interface FontSelectable {
 	 * @param i
 	 *            The new points value
 	 */
-	public abstract void setSavedPoints(int i);
+	public abstract void setLastSize(int i);
 
 	/**
 	 * Sets the point size
