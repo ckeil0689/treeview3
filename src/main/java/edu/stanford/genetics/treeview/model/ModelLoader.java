@@ -111,7 +111,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		ls.setStatus("Loading...");
 
-		/* Read all lines and parse the data */
+		// Read all lines and parse the data (creates a String matrix)
 		while ((line = reader.readLine()) != null) {
 
 			String[] lineAsStrings = line.split(delimiter, -1);
@@ -133,7 +133,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		analyzeLabels(stringLabels);
 
-		/* Parse tree and config files */
+		// Parse tree and config files
 		assignDataToModel(stringLabels);
 
 		ls.setStatus("Done!");
@@ -148,7 +148,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		doubleData = null;
 
-		/* Update GUI, set new DendroView */
+		// Update GUI, set new DendroView
 		controller.finishLoading(dataInfo);
 	}
 
@@ -174,13 +174,17 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		}
 	}
 
-	private String[] partitionRow(final String[] lineAsStrings,
-			final int row_idx) {
+	/**
+	 * Splits a row into labels and data. 
+	 * @param lineAsStrings - The line in the file after it has been split into a String array.
+	 * @param row_idx - The index of the current row.
+	 * @return An array of labels of the current row at index row_idx
+	 */
+	private String[] partitionRow(final String[] lineAsStrings, final int row_idx) {
 
 		// load line as String array
 		final String[] labels = new String[dataStartColumn];
-		final double[] dataValues = new double[lineAsStrings.length
-				- dataStartColumn];
+		final double[] dataValues = new double[lineAsStrings.length - dataStartColumn];
 
 		System.arraycopy(lineAsStrings, 0, labels, 0, dataStartColumn);
 
@@ -193,6 +197,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			labels[i] += "";
 		}
 
+		// Iterate over row data values (after labels)
 		for (int i = 0; i < lineAsStrings.length - dataStartColumn; i++) {
 
 			String element = lineAsStrings[i + dataStartColumn];
@@ -203,15 +208,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 				element += "+00";
 			}
 
-			/* Trying to parse the String. If not possible add 0. */
+			// Trying to parse the String. If not possible add defined NAN.
 			try {
-				double val = Double.parseDouble(element);
-				
-//				/* NaN and Infinite treated as non-data values */
-//				if(Double.isNaN(val) || Double.isInfinite(val)) {
-//					val = DataModel.NAN;
-//				} 
-//				
+				double val = Double.parseDouble(element);		
 				dataValues[i] = val;
 
 			} catch (final NumberFormatException e) {
@@ -330,28 +329,39 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final int nRowLabelType = dataStartColumn;
 		final int nColLabelType = dataStartRow;
 
-		final String[] readRowLabelTypes = new String[nRowLabelType];
-		final String[] readColLabelTypes = new String[nColLabelType];
+		String[] readRowLabelTypes = new String[nRowLabelType];
+		String[] readColLabelTypes = new String[nColLabelType];
 
-		// read gene label types
-		System.arraycopy(stringLabels[0], 0, readRowLabelTypes, 0, nRowLabelType);
-
-		// read array label types
-		for (int i = 0; i < nColLabelType; i++) {
-			readColLabelTypes[i] = stringLabels[i][0];
+		if(nRowLabelType > 0) {
+			// read row label types
+			System.arraycopy(stringLabels[0], 0, readRowLabelTypes, 0, nRowLabelType);
+	
+		} else {
+			// set a default empty label type
+			readRowLabelTypes = new String[]{""};
 		}
-
-		/*
-		 * The regex assurance is needed because the CDT-format is completely
-		 * inconsistent and we wanna keep backwards compatibility.
-		 */
-		if (readColLabelTypes[0].equalsIgnoreCase("GID")) {
-			readColLabelTypes[0] = assureLabelTypeNames(readRowLabelTypes);
+		
+		if(nColLabelType > 0) {
+			// read column label types
+			for (int i = 0; i < nColLabelType; i++) {
+				readColLabelTypes[i] = stringLabels[i][0];
+			}
+	
+			/*
+			 * The regex assurance is needed because the CDT-format is completely
+			 * inconsistent and we wanna keep backwards compatibility.
+			 */
+			if (readColLabelTypes[0].equalsIgnoreCase("GID")) {
+				readColLabelTypes[0] = assureLabelTypeNames(readRowLabelTypes);
+			}
+		} else {
+			// set a default empty label type
+			readColLabelTypes = new String[]{""};
 		}
 		
 		// Replacing empty or whitespace-only labels
-		replaceEmptyLabels(readRowLabelTypes, "ROW");
-		replaceEmptyLabels(readColLabelTypes, "COLUMN");
+	    replaceEmptyLabels(readRowLabelTypes, "ROW");
+	    replaceEmptyLabels(readColLabelTypes, "COLUMN");
 		
 		// set the label types
 		targetModel.setRowLabelTypes(readRowLabelTypes);
@@ -364,8 +374,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	
 	private String[] replaceEmptyLabels(String[] original, final String axis) {
 		
-		Pattern p = Pattern.compile("(^\\s*$)", 
-				Pattern.UNICODE_CHARACTER_CLASS);
+		Pattern p = Pattern.compile("(^\\s*$)", Pattern.UNICODE_CHARACTER_CLASS);
 		
 		for(int i = 0; i < original.length; i++) {
 			Matcher m = p.matcher(original[i]);
@@ -411,25 +420,41 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		parseLabelTypes(stringLabels);
 
-		/* # of labels */
+		// # of labels
 		final int nRows = doubleData.length;
 		final int nCols = doubleData[0].length;
 
-		/* fill row label array */
-		final String[][] rowLabels = new String[nRows][dataStartColumn];
-
-		for (int i = 0; i < nRows; i++) {
-			rowLabels[i] = stringLabels[i + dataStartRow];
+		// fill row label array
+		String[][] rowLabels;
+		if(dataStartColumn > 0) {
+			rowLabels = new String[nRows][dataStartColumn];
+			for (int i = 0; i < nRows; i++) {
+				rowLabels[i] = stringLabels[i + dataStartRow];
+			}
+		} else {
+			// default row labels
+			rowLabels = new String[nRows][1];
+			for (int i = 0; i < nRows; i++) {
+				rowLabels[i] = new String[]{"Row " + (i + 1)};
+			}
 		}
 		
 		targetModel.setRowLabels(rowLabels);
 
-		/* fill column label array */
-		final String[][] colLabels = new String[nCols][dataStartRow];
-
-		for (int i = 0; i < dataStartRow; i++) {
-			for (int j = 0; j < nCols; j++) {
-				colLabels[j][i] = stringLabels[i][j + dataStartColumn];
+		// fill column label array
+		final String[][] colLabels;
+		if(dataStartRow > 0) {
+			colLabels = new String[nCols][dataStartRow];
+			for (int i = 0; i < dataStartRow; i++) {
+				for (int j = 0; j < nCols; j++) {
+					colLabels[j][i] = stringLabels[i][j + dataStartColumn];
+				}
+			}
+		} else {
+			// default column labels
+			colLabels = new String[nCols][1];
+			for (int i = 0; i < nCols; i++) {
+				colLabels[i] = new String[]{"Column " + (i + 1)};
 			}
 		}
 		
