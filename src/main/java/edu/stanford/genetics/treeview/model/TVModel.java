@@ -555,9 +555,17 @@ public class TVModel extends Observable implements DataModel {
 		private double mean = Double.NaN;
 		private double median = Double.NaN;
 
+		/**
+		 * Sets all member variables of the DataMatrix instance to their initial default values.
+		 */
 		public void clear() {
 
+			modified = false;
 			exprData = null;
+			minVal = Double.MAX_VALUE;
+			maxVal = Double.MIN_VALUE;
+			mean = Double.NaN;
+			median = Double.NaN;
 		}
 
 		/**

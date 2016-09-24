@@ -167,6 +167,11 @@ public class MapContainer extends Observable implements Observer,
 	@Override
 	public void importStateFrom(final Preferences oldNode) {
 		
+		if(oldNode == null) {
+			LogBuffer.println("Could not import from undefined node in " + this.getClass().getName() + ".");
+			return;
+		}
+		
 		setMap(oldNode.getInt("current", default_map));
 		setScale(oldNode.getDouble("scale", default_scale));
 	}
@@ -2147,8 +2152,13 @@ public class MapContainer extends Observable implements Observer,
 	 */
 	public boolean nodeHasAttribute(final String nodeName, final String key) {
 
+		if(configNode == null) {
+			LogBuffer.println("Could not find " + key + ". No preferences node defined for " 
+					+ this.getClass().getName());
+			return false;
+		}
+		
 		boolean hasAttribute = false;
-
 		try {
 			final String[] keys = configNode.node(nodeName).keys();
 			for (final String key2 : keys) {

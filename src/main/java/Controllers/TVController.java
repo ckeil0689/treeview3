@@ -520,7 +520,7 @@ public class TVController implements Observer {
 			newFs =  fs;
 			
 		} else {
-			newFs = tvFrame.getFileSet(file);
+			newFs = ViewFrame.getFileSet(file);
 		}
 		
 		this.fileMenuSet = newFs;
@@ -548,7 +548,7 @@ public class TVController implements Observer {
 					return;
 				}
 				
-				loadFileSet = tvFrame.getFileSet(file);
+				loadFileSet = ViewFrame.getFileSet(file);
 			}
 			
 			getDataInfoAndLoad(loadFileSet, null, null, false, shouldUseImport);
@@ -1041,17 +1041,20 @@ public class TVController implements Observer {
 		final double mean = model.getDataMatrix().getMean();
 		final double median = model.getDataMatrix().getMedian();
 
-		/* View */
+		LogBuffer.println("Model MIN: " + min);
+		LogBuffer.println("Model MAX: " + max);
+		
+		// View
 		ColorExtractor colorExtractor = dendroController.getColorExtractor();
 
 		final ColorChooserUI gradientPick = new ColorChooserUI(colorExtractor, 
 				min, max, mean, median);
 
-		/* Controller */
+		// Controller
 		ColorChooserController controller = new ColorChooserController(
 				gradientPick);
 
-		/* Adding GradientColorChooser configurations to DendroView node. */
+		// Adding GradientColorChooser configurations to DendroView node.
 		controller.setConfigNode(((TVModel) model).getDocumentConfig());
 		
 		controller.addObserver(dendroController.getInteractiveMatrixView());
