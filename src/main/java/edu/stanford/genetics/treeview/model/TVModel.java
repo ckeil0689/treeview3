@@ -593,6 +593,11 @@ public class TVModel extends Observable implements DataModel {
 		@Override
 		public void calculateBaseValues() {
 
+			double maxVal = Double.MIN_VALUE;
+			double minVal = Double.MAX_VALUE;
+			double mean = Double.NaN;
+			double median = Double.NaN;
+			
 			if (exprData != null) {
 				final int nGene = nRows();
 				final int nExpr = nCols();
@@ -623,9 +628,13 @@ public class TVModel extends Observable implements DataModel {
 				}
 				
 				double val = sum / ((nGene * nExpr) - skipped);
-				
 				mean = Helper.roundDouble(val, 4);
 				median = calculateMedian(exprData);
+				
+				setMinVal(minVal);
+				setMaxVal(maxVal);
+				setMean(mean);
+				setMedian(median);
 				
 			} else {
 				LogBuffer.println("ExprData in TVDataMatrix is null.");
@@ -698,6 +707,30 @@ public class TVModel extends Observable implements DataModel {
 			Arrays.copyOfRange(data, 0, idx);
 			
 			return correctedData;
+		}
+		
+		@Override
+		public void setMinVal(final double newMinVal) {
+
+			this.minVal = newMinVal;
+		}
+
+		@Override
+		public void setMaxVal(final double newMaxVal) {
+
+			this.maxVal = newMaxVal;
+		}
+		
+		@Override
+		public void setMean(final double newMeanVal) {
+
+			this.mean = newMeanVal;
+		}
+		
+		@Override
+		public void setMedian(final double newMedianVal) {
+
+			this.median = newMedianVal;
 		}
 
 		@Override
