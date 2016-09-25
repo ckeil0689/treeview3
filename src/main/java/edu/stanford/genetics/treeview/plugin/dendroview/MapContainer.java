@@ -148,6 +148,12 @@ public class MapContainer extends Observable implements Observer,
 	@Override
 	public void requestStoredState() {
 		
+		if (configNode == null) {
+			LogBuffer.println("Unable to get stored MapContainer state. ConfigNode"
+					+ " was null.");
+			return;
+		}
+		
 		importStateFrom(configNode);
 	}
 
@@ -211,6 +217,9 @@ public class MapContainer extends Observable implements Observer,
 		
 	}
 	
+	/**
+	 * Attaches Preferences node to all map objects and sets their specific type.
+	 */
 	private void setupMaps() {
 		
 		// first bind subordinate maps...

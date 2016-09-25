@@ -137,6 +137,7 @@ public class TVModel extends Observable implements DataModel {
 
 	public void setExprData(final double[][] newData) {
 
+		LogBuffer.println("Adding data to model...");
 		dataMatrix.setExprData(newData);
 	}
 
@@ -593,52 +594,56 @@ public class TVModel extends Observable implements DataModel {
 		@Override
 		public void calculateBaseValues() {
 
-			double maxVal = Double.MIN_VALUE;
-			double minVal = Double.MAX_VALUE;
-			double mean = Double.NaN;
-			double median = Double.NaN;
+			LogBuffer.println("Calculating base values.");
 			
-			if (exprData != null) {
-				final int nGene = nRows();
-				final int nExpr = nCols();
-				
-				double sum = 0;
-				int skipped = 0;
+			double maxVal = -1.0 * Double.MAX_VALUE;
+			double minVal = Double.MAX_VALUE;
+			double roundedMean = Double.NaN;
+			double roundedMedian = Double.NaN;
+			
+			if (exprData == null) {
+			    LogBuffer.println("Could not calculate base values for data (min, max, median, mean). "
+			    		+ "Data matrix was null.");
+			    return;
+			}
+			
+			final int nRows = nRows();
+			final int nCols = nCols();
+			
+			double sum = 0;
+			int skipped = 0;
 
-				for (int i = 0; i < nGene; i++) {
-					for (int j = 0; j < nExpr; j++) {
+			int i = 0, j = 0;
+			for (i = 0; i < nRows; i++) {
+				for (j = 0; j < nCols; j++) {
+					
+					final double dataPoint = exprData[i][j];
+					
+					if(!Double.isNaN(dataPoint) 
+							&& !Double.isInfinite(dataPoint)) {
+						sum += dataPoint;
 						
-						final double dataPoint = exprData[i][j];
-						
-						if(!Double.isNaN(dataPoint) 
-								&& !Double.isInfinite(dataPoint)) {
-							sum += dataPoint;
-							
-							if (dataPoint > maxVal) {
-								maxVal = dataPoint;
-							}
-							
-							if (dataPoint < minVal) {
-								minVal = dataPoint;
-							}
-						} else {
-							skipped++;
+						if (dataPoint > maxVal) {
+							maxVal = dataPoint;
 						}
+						
+						if (dataPoint < minVal) {
+							minVal = dataPoint;
+						}
+					} else {
+						skipped++;
 					}
 				}
-				
-				double val = sum / ((nGene * nExpr) - skipped);
-				mean = Helper.roundDouble(val, 4);
-				median = calculateMedian(exprData);
-				
-				setMinVal(minVal);
-				setMaxVal(maxVal);
-				setMean(mean);
-				setMedian(median);
-				
-			} else {
-				LogBuffer.println("ExprData in TVDataMatrix is null.");
 			}
+				
+			roundedMean = calculateMean(sum, skipped);
+			roundedMedian = calculateMedian(exprData);
+			
+			LogBuffer.println("Setting base values.");
+			setMinVal(minVal);
+			setMaxVal(maxVal);
+			setMean(roundedMean);
+			setMedian(roundedMedian);
 		}
 		
 		/**
@@ -648,26 +653,28 @@ public class TVModel extends Observable implements DataModel {
 		 */
 		private double calculateMedian(double[][] data) {
 			
+			LogBuffer.println("Calculating median.");
+			
 			double result = Double.NaN;
 			
-			final int nGene = nRows();
-			final int nExpr = nCols();
+			final int nRows = nRows();
+			final int nCols = nCols();
 			
 			/* ROW ORDER 
 			 * Although allocating a second array kills RAM for large
 			 * matrices it needs to be done. Sorting the data is required
 			 * for median and the original data cannot be disturbed...
 			 */
-			double[] newData = new double[nGene * nExpr];
+			double[] newData = new double[nRows * nCols];
 			
-			for (int i = 0; i < nGene; i++) {
-				for (int j = 0; j < nExpr; j++) {
-					newData[nExpr * i + j] = exprData[i][j];
+			for (int i = 0; i < nRows; i++) {
+				for (int j = 0; j < nCols; j++) {
+					newData[nCols * i + j] = exprData[i][j];
 				}
 			}
 			Arrays.sort(newData); /* Good night cpu...*/
 			
-			newData = correctData(newData);
+			newData = truncateSortedData(newData);
 			
 			/* Even length case */
 			if(newData.length % 2 == 0) {
@@ -688,11 +695,13 @@ public class TVModel extends Observable implements DataModel {
 		 * @param data
 		 * @return A truncated data array.
 		 */
-		private double[] correctData(final double[] data) {
+		private double[] truncateSortedData(final double[] data) {
+			
+			LogBuffer.println("Truncating sorted data array.");
 			
 			int idx = data.length;
 			
-			/* find first NaN or Infinity value */
+			// find first NaN or Infinity value
 			for(int i = 0; i < data.length; i++) {
 				
 				double dataPoint = data[i];
@@ -703,10 +712,35 @@ public class TVModel extends Observable implements DataModel {
 				}
 			}
 			
-			double[] correctedData = new double[idx];
-			Arrays.copyOfRange(data, 0, idx);
+			double[] correctedData = Arrays.copyOfRange(data, 0, idx);
 			
 			return correctedData;
+		}
+		
+		/**
+		 * Helper for calculateBaseValues().
+		 * Finds the mean value of a 2D double array given the sum of the data values and the amount of skipped values.
+		 * This doesn't calculate the mean from the data itself because during search min and max values, the sum is
+		 * already created. This way, another walk of the data arrays can be avoided.
+		 * @param sum - Sum of all data values.
+		 * @param skipped - Amount of skipped data array entries.
+		 * @return Mean value.
+		 */
+		private double calculateMean(double sum, int skipped) {
+			
+			LogBuffer.println("Calculating mean.");
+			
+			double mean;
+			int numDataPoints = (nRows() * nCols()) - skipped;
+			
+			if(numDataPoints < 1) {
+				LogBuffer.println("Not enough data points for calculation of mean: " + numDataPoints);
+				return Double.NaN;
+			}
+			
+			mean = sum / numDataPoints;
+			
+			return Helper.roundDouble(mean, 4);
 		}
 		
 		@Override
