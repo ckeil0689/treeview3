@@ -56,6 +56,8 @@ public class ColorPicker {
 	private final double dataMinVal;
 	private final double dataMaxVal;
 	
+	// TODO Create a class related to TVModel for these measures, so an object of it can be passed here 
+	// rather than making them members...
 	/* These can change and be adjusted by the user */
 	private double minVal;
 	private double maxVal;
@@ -177,7 +179,6 @@ public class ColorPicker {
 		}
 
 		final String[] colors = activeColorSet.getColors();
-
 		for (final String color : colors) {
 			colorList.add(Color.decode(color));
 		}

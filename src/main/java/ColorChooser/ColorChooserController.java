@@ -7,6 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
@@ -27,10 +30,11 @@ implements ConfigNodePersistent {
 	private final ColorChooserUI colorChooserUI;
 	private final ColorPicker colorPicker;
 
-	/* Node for saved data */
+	// Node for saved data
 	private Preferences configNode;
+	private boolean wasApplied;
 
-	/* Holds all preset color data */
+	// Holds all preset color data
 	private final ColorPresets colorPresets;
 	private final ColorSchemeType d_colorScheme = ColorSchemeType.REDGREEN;
 	private ColorSchemeType colorScheme;
@@ -41,6 +45,7 @@ implements ConfigNodePersistent {
 		this.colorPicker = colorChooserUI.getColorPicker();
 		this.colorPresets = DendrogramFactory.getColorPresets();
 		this.colorScheme = d_colorScheme;
+		this.wasApplied = false;
 
 		addAllListeners();
 	}
@@ -66,14 +71,13 @@ implements ConfigNodePersistent {
 	public void setConfigNode(final Preferences parentNode) {
 
 		if (parentNode == null) {
-			LogBuffer.println("Could not find or create GradientChooser "
-					+ "node because parentNode was null.");
+			LogBuffer.println("Could not find or create GradientChooser node because parentNode was null.");
 			return;
 		}
 		
 		this.configNode = parentNode.node("GradientChooser");
 		requestStoredState();
-		setPresets();
+		updateUIWithActiveColorSet();
 		colorChooserUI.getColorPicker().loadPresets();
 	}
 	
@@ -93,8 +97,7 @@ implements ConfigNodePersistent {
 	public void storeState() {
 		
 		if(configNode == null) {
-			LogBuffer.println("Could not store state. " 
-					+ this.getClass().toString());
+			LogBuffer.println("Could not store state. " + this.getClass().toString());
 			return;
 		}
 		
@@ -121,11 +124,10 @@ implements ConfigNodePersistent {
 	/**
 	 * Set all default color values.
 	 */
-	protected void setPresets() {
+	private void updateUIWithActiveColorSet() {
 
 		// Choose ColorSet according to name
-		final ColorSet selectedColorSet = colorPresets.getColorSet(
-				colorScheme.toString());
+		final ColorSet selectedColorSet = colorPresets.getColorSet(colorScheme.toString());
 		
 		colorChooserUI.getPresetChoices().setSelectedItem(colorScheme);
 		colorChooserUI.getColorPicker().setActiveColorSet(selectedColorSet);
@@ -136,38 +138,42 @@ implements ConfigNodePersistent {
 	 */
 	private void generateAndStoreColorSet() {
 
+		LogBuffer.println("Generating and storing custom ColorSet.");
 		ColorSet colorSet = colorChooserUI.getColorPicker().generateCustomColorSet();
 		colorPresets.addColorSet(colorSet);
 	}
 
-	public void setActiveColorSet(final String name) {
+	public void setActiveColorSet(final ColorSchemeType scheme) {
 
-		final ColorSet set = colorPresets.getColorSet(name);
+		LogBuffer.println("Setting active ColorSet: " + scheme.toString());
+		final ColorSet set = colorPresets.getColorSet(scheme.toString());
 		colorChooserUI.getColorPicker().setActiveColorSet(set);
 
-		if (ColorSchemeType.CUSTOM.toString().equals(name)) {
-			colorChooserUI.getPresetChoices().setSelectedItem(
-					ColorSchemeType.CUSTOM.toString());
-		}
+//		if (ColorSchemeType.CUSTOM == scheme) {
+//			LogBuffer.println("Selecting Custom profile.");
+//			colorChooserUI.getPresetChoices().setSelectedItem(ColorSchemeType.CUSTOM.toString());
+//		}
 		
-		setColorScheme(name);
+		setColorScheme(scheme);
+		updateUIWithActiveColorSet();
 	}
 	
-	private void setColorScheme(final String colorScheme) {
+	private void setColorScheme(final ColorSchemeType scheme) {
 		
-		this.colorScheme = ColorSchemeType.getMemberFromKey(colorScheme);
+		this.colorScheme = scheme;
 	}
 
 	/**
 	 * Switched the currently used ColorSet to the one that matches the
 	 * specified entered name key in its 'ColorSet' configNode.
 	 */
-	private void switchColorSet(final String name) {
+	private void switchColorSet(final ColorSchemeType scheme) {
 
-		setActiveColorSet(name);
+		LogBuffer.println("Switching active ColorSet to " + scheme.toString());
+		setActiveColorSet(scheme);
 //		storeState();
 		
-		/* Load and set data accordingly */
+		// Load and set data accordingly
 		colorChooserUI.getColorPicker().loadPresets();
 	}
 
@@ -186,6 +192,10 @@ implements ConfigNodePersistent {
 		return multiClickInterval;
 	}
 	
+	/**
+	 * This listener is fired when the Apply-button is clicked. It translates the chosen colors in the ColorPicker to
+	 * the matrix and stores associated values, such as thumb positions and colors.
+	 */
 	private class ApplyChangeListener implements ActionListener {
 
 		@Override
@@ -230,7 +240,7 @@ implements ConfigNodePersistent {
 						.getSelectedThumbIndex();
 				gBox.changeColor(lastEvent.getPoint());
 				colorChooserUI.setCustomSelected(true);
-				setActiveColorSet("Custom");
+				setActiveColorSet(ColorSchemeType.CUSTOM);
 
 				if (selectedThumb > -1) {
 					Thumb t_selected = colorPicker.getThumb(selectedThumb);
@@ -252,7 +262,7 @@ implements ConfigNodePersistent {
 
 			colorPicker.getThumbBox().editClickedThumb(lastEvent.getPoint());
 			colorChooserUI.setCustomSelected(true);
-			setActiveColorSet("Custom");
+			setActiveColorSet(ColorSchemeType.CUSTOM);
 		}
 
 		@Override
@@ -324,7 +334,7 @@ implements ConfigNodePersistent {
 			if (!colorChooserUI.isCustomSelected() && dragged) {
 				colorPicker.getThumbBox().dragInnerThumbTo(e.getX());
 				colorChooserUI.setCustomSelected(true);
-				setActiveColorSet("Custom");
+				setActiveColorSet(ColorSchemeType.CUSTOM);
 				dragged = false;
 			}
 		}
@@ -397,6 +407,11 @@ implements ConfigNodePersistent {
 		colorChooserUI.setSelectionDependentBtnStatus(isEditAllowed,
 				isRemoveAllowed);
 	}
+	
+	protected void setApplied() {
+		
+		this.wasApplied = true;
+	}
 
 	/**
 	 * Radio-button controls over which ColorSet is active.
@@ -409,37 +424,37 @@ implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			boolean isCustom = colorChooserUI.isCustomSelected();
-			String colorSetName = "";
+			LogBuffer.println("Setting up ColorSet.");
+//			boolean isCustom = colorChooserUI.isCustomSelected();
+			ColorSchemeType colorScheme;
 
-			/* Save if switching from 'Custom' */
-			if (isCustom) {
-				generateAndStoreColorSet();
-			}
+			// Save if switching from 'Custom'
+//			if (isCustom) {
+//				generateAndStoreColorSet();
+//			}
 
 			@SuppressWarnings("unchecked")
 			ColorSchemeType selected = 
-			(ColorSchemeType) ((JComboBox<ColorSchemeType>) arg0.getSource())
-					.getSelectedItem();
+			(ColorSchemeType) ((JComboBox<ColorSchemeType>) arg0.getSource()).getSelectedItem();
 
 			if (selected == (ColorSchemeType.REDGREEN)) {
-				/* Switch to RedGreen */
-				colorSetName = ColorSchemeType.REDGREEN.toString();
+				// Switch to RedGreen
+				colorScheme = ColorSchemeType.REDGREEN;
 				colorChooserUI.setCustomSelected(false);
 				//TODO reset values!
 
 			} else if (selected == ColorSchemeType.YELLOWBLUE) {
-				/* Switch to YellowBlue */
-				colorSetName = ColorSchemeType.YELLOWBLUE.toString();
+				// Switch to YellowBlue
+				colorScheme = ColorSchemeType.YELLOWBLUE;
 				colorChooserUI.setCustomSelected(false);
 
 			} else {
-				/* Switch to Custom */
-				colorSetName = ColorSchemeType.CUSTOM.toString();
+				// Switch to Custom
+				colorScheme = ColorSchemeType.CUSTOM;
 				colorChooserUI.setCustomSelected(true);
 			}
 
-			switchColorSet(colorSetName);
+			switchColorSet(colorScheme);
 		}
 	}
 
@@ -457,6 +472,22 @@ implements ConfigNodePersistent {
 				/* update the color icon */
 				colorChooserUI.updateMissingColorIcon(missing);
 			}
+		}
+	}
+	
+	private class DialogCloseListener extends WindowAdapter {
+
+		@Override
+		public void windowClosing(WindowEvent e) {
+			// TODO Auto-generated method stub
+			LogBuffer.println("Window closing event.");
+			
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {
+			// TODO Auto-generated method stub
+			LogBuffer.println("Window closed event.");
 		}
 	}
 }
