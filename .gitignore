@@ -14,7 +14,10 @@ LinkedView/docbook
 
 # Gradle
 .gradle
-build/
+build/classes
+build/dependency-cache
+build/resources
+build/tmp
 
 # Preferences
 prefs.xml
