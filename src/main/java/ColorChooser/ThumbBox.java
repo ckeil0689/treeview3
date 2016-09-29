@@ -248,6 +248,10 @@ public class ThumbBox {
 
 		// get position of previous thumb
 		int selectedIndex = thumbs.indexOf(selectedThumb);
+		if(selectedIndex == -1) {
+			LogBuffer.println("Could not find selected thumb in thumb list. Not moving thumb.");
+			return;
+		}
 
 		/* define the boundaries around active thumb's fraction */
 		/* defined out of range in case no previous/ next thumb exists */

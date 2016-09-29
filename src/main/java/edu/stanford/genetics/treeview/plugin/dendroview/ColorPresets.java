@@ -258,11 +258,10 @@ public class ColorPresets implements ConfigNodePersistent {
 	 * attributes.
 	 */
 	public void addColorSet(final String name, final List<Color> colors,
-			final List<Double> fractions, final double min, final double max,
+			final List<Float> fractions, final double min, final double max,
 			final String missing, final String empty) {
 
-		final ColorSet newColorSet = new ColorSet(name, colors, fractions, min,
-				max, missing, empty);
+		final ColorSet newColorSet = new ColorSet(name, colors, fractions, min, max, missing, empty);
 		addColorSet(newColorSet);
 	}
 
@@ -308,6 +307,12 @@ public class ColorPresets implements ConfigNodePersistent {
 	public void removeColorSet(final int i) {
 
 		final String[] childrenNames = getRootChildrenNodes();
+		
+		if(i < 0 || i >= childrenNames.length) {
+			LogBuffer.println("Cannot remove child node from ColorPresets node because index is out of bounds.");
+			return;
+		}
+		
 		configNode.remove(childrenNames[i]);
 	}
 

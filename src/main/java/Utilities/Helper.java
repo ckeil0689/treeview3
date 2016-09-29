@@ -13,9 +13,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
 /**
  * Class that is supposed to contain a bunch of static general helper methods,
  * which are usually operations that aren't necessarily unique to one class.
- *
- * @author CKeil
- *
  */
 public final class Helper {
 
@@ -56,7 +53,6 @@ public final class Helper {
 		int[] intArray = new int[intList.size()];
 		
 		for (int i = 0; i < intArray.length; i++) {
-
 			intArray[i] = intList.get(i);
 		}
 		

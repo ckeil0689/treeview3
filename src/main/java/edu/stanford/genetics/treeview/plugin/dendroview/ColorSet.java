@@ -50,7 +50,7 @@ public class ColorSet {
 
 	private final String name;
 	private List<Color> colorList = new ArrayList<Color>();
-	private List<Double> fractionList = new ArrayList<Double>();
+	private List<Float> fractionList = new ArrayList<Float>();
 	private double min;
 	private double max;
 	private Color missing;
@@ -71,7 +71,7 @@ public class ColorSet {
 	 *            string representing initial empty color
 	 */
 	public ColorSet(final String name, final List<Color> colorList,
-			final List<Double> fractionList, final double min,
+			final List<Float> fractionList, final double min,
 			final double max, final String missing, final String empty) {
 
 		this.name = name;
@@ -93,27 +93,22 @@ public class ColorSet {
 	public ColorSet(final Preferences colorSetNode) {
 
 		this.name = colorSetNode.get("name", default_name);
-
 		int colorNum = colorSetNode.getInt("colorNum", default_colors.length);
 
 		try {
 			for (int i = 0; i < colorNum; i++) {
-
-				colorList.add(decodeColor(colorSetNode.get("Color" + i + 1,
-						default_colors[0])));// default_colors[i])));
-				fractionList.add(new Double(colorSetNode.getFloat("Fraction"
-						+ i + 1, default_fractions[1])));
+				colorList.add(decodeColor(colorSetNode.get("Color" + i + 1, default_colors[0])));// default_colors[i])));
+				fractionList.add(colorSetNode.getFloat("Fraction" + i + 1, default_fractions[1]));
 			}
 
 		} catch (ArrayIndexOutOfBoundsException e) {
 			LogBuffer.logException(e);
 
-			/* Add defaults if there's an issue */
+			// Add defaults if there's an issue
 			colorNum = default_colors.length;
 			for (int i = 0; i < colorNum; i++) {
-
 				colorList.add(decodeColor(default_colors[i]));// default_colors[i])));
-				fractionList.add(new Double(default_fractions[i]));
+				fractionList.add(default_fractions[i]);
 			}
 		}
 
@@ -153,9 +148,9 @@ public class ColorSet {
 			newColorList.add(decodeColor(color)); /* min in ColorChooser */
 		}
 
-		final List<Double> newFractionList = new ArrayList<Double>();
+		final List<Float> newFractionList = new ArrayList<Float>();
 		for (int i = 0; i < default_fractions.length; i++) {
-			newFractionList.add((double) default_fractions[i]);
+			newFractionList.add(default_fractions[i]);
 		}
 
 		this.name = name;
@@ -263,7 +258,7 @@ public class ColorSet {
 		return colorList;
 	}
 
-	public List<Double> getFractionList() {
+	public List<Float> getFractionList() {
 
 		return fractionList;
 	}

@@ -183,8 +183,9 @@ public class GradientBox {
 	 *
 	 * @param newCol
 	 * @param point
+	 * @return 
 	 */
-	protected void changeColor(final Point point) {
+	protected boolean changeColor(final Point point) {
 
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		List<Color> colorList = colorPicker.getColorList();
@@ -196,7 +197,6 @@ public class GradientBox {
 		int distance = ColorPicker.WIDTH;
 
 		for (final Thumb t : thumbs) {
-
 			if (Math.abs(t.getX() - clickPos) < distance) {
 				distance = Math.abs(t.getX() - clickPos);
 				index = thumbs.indexOf(t);
@@ -205,18 +205,21 @@ public class GradientBox {
 		
 		if(!(index < colorList.size())) {
 			LogBuffer.println("Tried to remove color outside of color list bounds.");
-			return;
+			return false;
 		}
 
 		JPanel panel = colorPicker.getContainerPanel();
-		newCol = JColorChooser.showDialog(panel, "Pick a Color",
-				thumbs.get(index).getColor());
+		Color oldColor = thumbs.get(index).getColor();
+		newCol = JColorChooser.showDialog(panel, "Pick a Color", oldColor);
 
-		if (newCol != null) {
+		boolean changed = false;
+		if (newCol != null && !newCol.equals(oldColor)) {
 			colorList.set(index, newCol);
 			thumbs.get(index).setColor(newCol);
-
 			colorPicker.updateColors();
+			changed = true;
 		}
+		
+		return changed;
 	}
 }

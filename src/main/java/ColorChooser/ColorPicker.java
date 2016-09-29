@@ -202,10 +202,9 @@ public class ColorPicker {
 			return null;
 		}
 
-		final List<Double> fractionList = new ArrayList<Double>();
-
+		final List<Float> fractionList = new ArrayList<Float>();
 		for (final float f : fractions) {
-			fractionList.add((double) f);
+			fractionList.add(f);
 		}
 
 		final String name = "Custom";
@@ -215,8 +214,7 @@ public class ColorPicker {
 		String empty = Integer.toHexString(colorExtractor.getEmpty().getRGB());
 		empty = "#" + empty.substring(2, empty.length());
 
-		return new ColorSet(name, colorList, fractionList, minVal, maxVal,
-				missing, empty);
+		return (new ColorSet(name, colorList, fractionList, minVal, maxVal, missing, empty));
 	}
 
 	/**
@@ -311,7 +309,7 @@ public class ColorPicker {
 
 		/* TODO simplify */
 		this.colors = new Color[colorList.size()];
-    colorList.toArray(colors);
+		colorList.toArray(colors);
 	}
 
 	/**
