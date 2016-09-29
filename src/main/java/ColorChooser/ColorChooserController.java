@@ -83,7 +83,7 @@ implements ConfigNodePersistent {
 		this.configNode = parentNode.node("GradientChooser");
 		requestStoredState();
 		switchColorSet(colorScheme);
-		colorChooserUI.getColorPicker().loadPresets();
+		colorChooserUI.getColorPicker().loadActiveColorSetValues();
 	}
 	
 	@Override
@@ -149,7 +149,7 @@ implements ConfigNodePersistent {
 //		colorChooserUI.getPresetChoices().setSelectedItem(colorScheme);
 		
 		// Load and set data accordingly
-		colorChooserUI.getColorPicker().loadPresets();
+		colorChooserUI.getColorPicker().loadActiveColorSetValues();
 	}
 
 	/**
@@ -301,12 +301,9 @@ implements ConfigNodePersistent {
 		@Override
 		public void mouseMoved(final MouseEvent e) {
 
-			Cursor cursor;
+			Cursor cursor = new Cursor(Cursor.DEFAULT_CURSOR);;
 			if (colorPicker.getThumbBox().isPointInThumb(e.getPoint())) {
 				cursor = new Cursor(Cursor.HAND_CURSOR);
-
-			} else {
-				cursor = new Cursor(Cursor.DEFAULT_CURSOR);
 			}
 
 			colorPicker.getContainerPanel().setCursor(cursor);
@@ -326,9 +323,6 @@ implements ConfigNodePersistent {
 
 	/**
 	 * Adds a user-selected color to the colorList in the gradientBox.
-	 *
-	 * @author chris0689
-	 *
 	 */
 	private class AddButtonListener implements ActionListener {
 
@@ -347,10 +341,7 @@ implements ConfigNodePersistent {
 	}
 
 	/**
-	 * Removes a color from colorList in the gradientBox.
-	 *
-	 * @author chris0689
-	 *
+	 * Opens the an edit dialog for the selected thumb.
 	 */
 	private class EditButtonListener implements ActionListener {
 
@@ -365,9 +356,6 @@ implements ConfigNodePersistent {
 
 	/**
 	 * Removes a color from colorList in the gradientBox.
-	 *
-	 * @author chris0689
-	 *
 	 */
 	private class RemoveButtonListener implements ActionListener {
 

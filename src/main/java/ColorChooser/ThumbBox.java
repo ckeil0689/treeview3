@@ -133,12 +133,8 @@ public class ThumbBox {
 
 		// Loop excludes boundary thumbs
 		for (int i = 1; i < fractions.length - 1; i++) {
-			boolean needsThumbo = !hasThumbForFraction(i);
-			boolean isOutOfSync = !colorPicker.isSynced();
-			
-			if (!hasThumbForFraction(i) && !colorPicker.isSynced()) {
+			if (!hasThumbForFraction(i) && !colorPicker.areFracsAndThumbsSynced()) {
 				insertThumbForFrac(fractions[i], i, colorPicker.getColorList().get(i));
-				LogBuffer.println("Inserted thumb. Thumbs: " + colorPicker.getThumbNumber());
 			}
 		}
 	}
@@ -741,7 +737,7 @@ public class ThumbBox {
 		float[] fractions = colorPicker.getFractions();
 
 		if (thumbs.size() > fracIndex) {
-			double frac = (thumbs.get(fracIndex).getX() - ColorPicker.OFFSET) / thumbRect.getWidth();
+			double frac = (thumbs.get(fracIndex).getX() - ColorPicker.OFFSET)/ ColorPicker.WIDTH;
 			double frac2 = fractions[fracIndex];
 
 			if (Helper.nearlyEqual(frac, frac2)) {

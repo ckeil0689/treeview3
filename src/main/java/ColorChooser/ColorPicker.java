@@ -150,11 +150,20 @@ public class ColorPicker {
 
 	/**
 	 * Loads the values from a given ColorSet into colorList and fractionList.
-	 *
-	 * @param colorSet
 	 */
-	protected void loadPresets() {
+	protected void loadActiveColorSetValues() {
 
+		if(colorList == null || thumbList == null || colorExtractor == null) {
+			LogBuffer.println("Cannot load active ColorSet. Important members of ColorPicker "
+					+ "have not been initialized.");
+			return;
+		}
+		
+		if(activeColorSet == null) {
+			LogBuffer.println("Cannot load active ColorSet. It has not been defined.");
+			return;
+		}
+		
 		// clearing all data
 		colorList.clear();
 		thumbList.clear();
@@ -533,12 +542,11 @@ public class ColorPicker {
 	}
 
 	/**
-	 * The color, fraction, and thumb list should always be the same size. This
-	 * method gives information whether this condition is currently fulfilled.
+	 * The fractions and thumb list should always be the same size.
 	 * 
-	 * @return boolean
+	 * @return whether this condition is currently fulfilled.
 	 */
-	protected boolean isSynced() {
+	protected boolean areFracsAndThumbsSynced() {
 
 		return (fractions.length == thumbList.size());
 	}
@@ -550,8 +558,8 @@ public class ColorPicker {
 	 */
 	protected boolean isRemovalAllowed() {
 		
-		if(!isSynced()) {
-			LogBuffer.println("Fractions, colors and the list of thumbs are not synced.");
+		if(!areFracsAndThumbsSynced()) {
+			LogBuffer.println("Fractions and the list of thumbs are not synced. Removal of thumb not allowed.");
 			return false;
 		}
 		
