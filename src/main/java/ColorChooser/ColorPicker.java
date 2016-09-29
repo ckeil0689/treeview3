@@ -542,4 +542,22 @@ public class ColorPicker {
 
 		return (fractions.length == thumbList.size());
 	}
+	
+	/**
+	 * Tests if a removal of thumbs can be done. This requires the fractions, colors and thumb list to be in sync
+	 * and be larger in size than 2 (the boundary thumbs).
+	 * @return
+	 */
+	protected boolean isRemovalAllowed() {
+		
+		if(!isSynced()) {
+			LogBuffer.println("Fractions, colors and the list of thumbs are not synced.");
+			return false;
+		}
+		
+		boolean isNonBoundary = !(getThumbBox().isBoundaryThumbSelected());
+		boolean isEditAllowed = getThumbBox().hasSelectedThumb();
+		
+		return isNonBoundary && isEditAllowed && (getColorList().size() > 2);
+	}
 }

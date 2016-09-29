@@ -133,9 +133,12 @@ public class ThumbBox {
 
 		// Loop excludes boundary thumbs
 		for (int i = 1; i < fractions.length - 1; i++) {
+			boolean needsThumbo = !hasThumbForFraction(i);
+			boolean isOutOfSync = !colorPicker.isSynced();
+			
 			if (!hasThumbForFraction(i) && !colorPicker.isSynced()) {
-				insertThumbForFrac(fractions[i], i, colorPicker.getColorList()
-						.get(i));
+				insertThumbForFrac(fractions[i], i, colorPicker.getColorList().get(i));
+				LogBuffer.println("Inserted thumb. Thumbs: " + colorPicker.getThumbNumber());
 			}
 		}
 	}
@@ -484,8 +487,7 @@ public class ThumbBox {
 	 * @param bT - The boundary thumb to be moved.
 	 * @param dataVal - The data value at which to place the boundary thumb.
 	 */
-	protected void manageBoundaryThumbMoveTo(final BoundaryThumb bT, 
-	                                   final double dataVal) {
+	protected void manageBoundaryThumbMoveTo(final BoundaryThumb bT, final double dataVal) {
 		
 		if(colorPicker == null) {
 			LogBuffer.println("ColorPicker was null. Could not move BoundaryThumb.");
@@ -682,17 +684,21 @@ public class ThumbBox {
 	}
 
 	/**
-	 * Calculates the data value which the thumb at the given index represents.
+	 * Calculates the data value which the thumb at the given index represents using its corresponding fraction.
 	 *
-	 * @param t
-	 * @return A double value between minimum and maximum of the currently
-	 *         relevant data range for coloring.
+	 * @param thumbIndex - The index of the thumb for which to calculate the value in the data range.
+	 * @return A double value between minimum and maximum of the currently relevant data range for coloring.
 	 */
 	protected double calcThumbVal(final int thumbIndex) {
 
 		double range = colorPicker.getRange();
 		double minVal = colorPicker.getMinVal();
 
+		if(thumbIndex >= colorPicker.getFractions().length) {
+			LogBuffer.println("Cannot calculate value of thumb because the index is out of bounds.");
+			return Double.NaN;
+		}
+		
 		final float fraction = colorPicker.getFractions()[thumbIndex];
 		final double value = Math.abs((range) * fraction) + minVal;
 
@@ -735,7 +741,7 @@ public class ThumbBox {
 		float[] fractions = colorPicker.getFractions();
 
 		if (thumbs.size() > fracIndex) {
-			double frac = thumbs.get(fracIndex).getX() / thumbRect.getWidth();
+			double frac = (thumbs.get(fracIndex).getX() - ColorPicker.OFFSET) / thumbRect.getWidth();
 			double frac2 = fractions[fracIndex];
 
 			if (Helper.nearlyEqual(frac, frac2)) {
@@ -1064,7 +1070,7 @@ public class ThumbBox {
 	 * 
 	 * @return
 	 */
-	protected boolean isSelectedBoundaryThumb() {
+	protected boolean isBoundaryThumbSelected() {
 
 		/* could be done with instanceof but rather not... */
 		int thumbNum = colorPicker.getThumbNumber();

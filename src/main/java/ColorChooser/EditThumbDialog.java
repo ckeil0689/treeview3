@@ -255,8 +255,8 @@ public class EditThumbDialog extends CustomDialog {
 		
 		valueStatus = GUIFactory.createWrappableTextArea();
 		valueStatus.setForeground(GUIFactory.RED1);
-
-		/* default */
+ 
+		// default
 		startX = thumbBox.calcThumbVal(thumbIndex);
 		finalX = startX;
 
@@ -265,9 +265,8 @@ public class EditThumbDialog extends CustomDialog {
 		inputField = new JTextField();
 		inputField.setEditable(true);
 
-		/* Initially display thumb position */
-		inputField
-				.setText(Double.toString(thumbBox.calcThumbVal(thumbIndex)));
+		// Initially display thumb position
+		inputField.setText(Double.toString(startX));
 		inputField.addActionListener(new SetValueListener());
 
 		colorIcon = new ColorIcon(t.getColor());

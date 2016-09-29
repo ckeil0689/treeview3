@@ -22,6 +22,10 @@ import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 
+/**
+ * Controls user actions for the ColorChooser dialog. It is responsible to initiate the actions conferred by the user.
+ * Additionally, it delegates methods necessary to created user expected behavior.
+ */
 public class ColorChooserController extends Observable 
 implements ConfigNodePersistent {
 
@@ -338,7 +342,6 @@ implements ConfigNodePersistent {
 				colorPicker.getGradientBox().addColor(newCol);
 				updateSelectionBtnStatus();
 				colorChooserUI.setCustomSelected(true);
-				
 			}
 		}
 	}
@@ -371,7 +374,7 @@ implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			if (colorPicker.getColorList().size() > 2) {
+			if (colorPicker.isRemovalAllowed()) {
 				LogBuffer.println("Removed button");
 				colorPicker.getGradientBox().removeColor();
 				colorChooserUI.setSelectionDependentBtnStatus(false, false);
@@ -380,15 +383,16 @@ implements ConfigNodePersistent {
 		}
 	}
 
+	/**
+	 * The buttons for editing or removal can be grayed out if the specific action is not allowed. This method
+	 * delegates the status update to these buttons.
+	 */
 	private void updateSelectionBtnStatus() {
 
-		ThumbBox tb = colorPicker.getThumbBox();
+		boolean isEditAllowed = colorPicker.getThumbBox().hasSelectedThumb();
+		boolean isRemovalAllowed = colorPicker.isRemovalAllowed();
 
-		boolean isBoundary = tb.isSelectedBoundaryThumb();
-		boolean isEditAllowed = tb.hasSelectedThumb();
-		boolean isRemoveAllowed = !isBoundary && isEditAllowed && colorPicker.getThumbNumber() > 2;
-
-		colorChooserUI.setSelectionDependentBtnStatus(isEditAllowed, isRemoveAllowed);
+		colorChooserUI.setSelectionDependentBtnStatus(isEditAllowed, isRemovalAllowed);
 	}
 
 	/**
@@ -400,7 +404,6 @@ implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			
 			if(colorChooserUI.isCustomSelected()) {
 				LogBuffer.println("Storing custom color set before switching.");
 				colorPresets.addColorSet(getCurrentCustomColorSet());
