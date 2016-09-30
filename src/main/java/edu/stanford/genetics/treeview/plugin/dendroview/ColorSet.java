@@ -97,8 +97,8 @@ public class ColorSet {
 
 		try {
 			for (int i = 0; i < colorNum; i++) {
-				colorList.add(decodeColor(colorSetNode.get("Color" + i + 1, default_colors[0])));// default_colors[i])));
-				fractionList.add(colorSetNode.getFloat("Fraction" + i + 1, default_fractions[1]));
+				colorList.add(decodeColor(colorSetNode.get("Color" + (i + 1), default_colors[0])));
+				fractionList.add(colorSetNode.getFloat("Fraction" + (i + 1), default_fractions[1]));
 			}
 
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -107,7 +107,7 @@ public class ColorSet {
 			// Add defaults if there's an issue
 			colorNum = default_colors.length;
 			for (int i = 0; i < colorNum; i++) {
-				colorList.add(decodeColor(default_colors[i]));// default_colors[i])));
+				colorList.add(decodeColor(default_colors[i]));
 				fractionList.add(default_fractions[i]);
 			}
 		}
@@ -186,7 +186,7 @@ public class ColorSet {
 	 */
 	public void save(final Preferences colorSetNode) {
 
-		LogBuffer.println("Saving the ColorSet with name: " + name);
+		LogBuffer.println("Saving the ColorSet with name: " + name);	
 		colorSetNode.put("name", this.name);
 
 		final int colorNum = colorList.size();
