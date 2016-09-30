@@ -16,6 +16,8 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import edu.stanford.genetics.treeview.LogBuffer;
+
 /**
  * A dialog window class that has an expandable Details pane
  * Original code from:
@@ -65,8 +67,14 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 			labelSize.setSize(500,labelSize.height);
 			message.setPreferredSize(labelSize);
 		}
+		//message.getPreferredSize() returns a good size, but after alpha03, a
+		//change somewhere inexplicably makes the message height very much over-
+		//sized. Setting the maximum size to the preferred size seems to be the
+		//only thing that fixes it.
+		message.setMaximumSize(labelSize);
+
 		mainPanel.add(message,"wrap");
-	
+
 		//Create the details pane with inserted line wraps
 		final JTextArea textArea = new JTextArea();
 		textArea.setLineWrap(true);
