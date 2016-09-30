@@ -40,14 +40,14 @@ implements ConfigNodePersistent {
 	// Holds all preset color data
 	private final ColorPresets colorPresets;
 	private final ColorSchemeType d_colorScheme = ColorSchemeType.REDGREEN;
-	private ColorSchemeType colorScheme;
+//	private ColorSchemeType activeColorScheme;
 
 	public ColorChooserController(final ColorChooserUI colorChooserUI) {
 
 		this.colorChooserUI = colorChooserUI;
 		this.colorPicker = colorChooserUI.getColorPicker();
 		this.colorPresets = DendrogramFactory.getColorPresets();
-		this.colorScheme = d_colorScheme;
+//		this.activeColorScheme = d_colorScheme;
 
 		addAllListeners();
 	}
@@ -82,7 +82,7 @@ implements ConfigNodePersistent {
 		
 		this.configNode = parentNode.node("GradientChooser");
 		requestStoredState();
-		switchColorSet(colorScheme);
+		switchColorSet();
 		colorChooserUI.getColorPicker().loadActiveColorSetValues();
 	}
 	
@@ -106,7 +106,8 @@ implements ConfigNodePersistent {
 			return;
 		}
 		
-		configNode.put("activeColors", colorScheme.toString());
+		ColorSchemeType activeColorScheme = (ColorSchemeType) colorChooserUI.getPresetChoices().getSelectedItem();
+		configNode.put("activeColors", activeColorScheme.toString());
 		colorPresets.addColorSet(getCurrentCustomColorSet());
 	}
 	
@@ -119,7 +120,8 @@ implements ConfigNodePersistent {
 		}
 		
 		String colorSchemeKey = oldNode.get("activeColors", d_colorScheme.toString());
-		this.colorScheme = ColorSchemeType.getMemberFromKey(colorSchemeKey);
+//		this.activeColorScheme = ColorSchemeType.getMemberFromKey(colorSchemeKey);
+		setActiveColorScheme(ColorSchemeType.getMemberFromKey(colorSchemeKey));
 	}
 	
 	private ColorSet getCurrentCustomColorSet() {
@@ -128,9 +130,23 @@ implements ConfigNodePersistent {
 		return colorChooserUI.getColorPicker().generateCustomColorSet();
 	}
 	
-	private void setColorScheme(final ColorSchemeType scheme) {
+	/**
+	 * Define which ColorSchemeType is currently active.
+	 * @param scheme
+	 */
+	private void setActiveColorScheme(final ColorSchemeType scheme) {
 		
-		this.colorScheme = scheme;
+//		this.activeColorScheme = scheme;
+		colorChooserUI.getPresetChoices().setSelectedItem(scheme);
+	}
+	
+	/**
+	 * Define which ColorSchemeType is currently active.
+	 * @param scheme
+	 */
+	private ColorSchemeType getActiveColorScheme() {
+		
+		return ((ColorSchemeType) colorChooserUI.getPresetChoices().getSelectedItem());
 	}
 
 
@@ -138,15 +154,15 @@ implements ConfigNodePersistent {
 	 * Switched the currently used ColorSet to the one that matches the
 	 * specified entered name key in its 'ColorSet' configNode.
 	 */
-	private void switchColorSet(final ColorSchemeType scheme) {
+	private void switchColorSet() {
 		
+		ColorSchemeType scheme = getActiveColorScheme();
 		LogBuffer.println("Updating ColorPicker to: " + scheme.toString());
 		
 		final ColorSet set = colorPresets.getColorSet(scheme.toString());
 		colorChooserUI.getColorPicker().setActiveColorSet(set);
 		
-		setColorScheme(scheme);
-//		colorChooserUI.getPresetChoices().setSelectedItem(colorScheme);
+		setActiveColorScheme(scheme);
 		
 		// Load and set data accordingly
 		colorChooserUI.getColorPicker().loadActiveColorSetValues();
@@ -404,7 +420,7 @@ implements ConfigNodePersistent {
 			boolean customSelected = (selectedScheme == ColorSchemeType.CUSTOM);
 			colorChooserUI.setCustomSelected(customSelected);
 			LogBuffer.println("Changed presetChoice");
-			switchColorSet(selectedScheme);
+			switchColorSet();
 		}
 	}
 

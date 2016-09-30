@@ -977,8 +977,6 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		mvController.requestStoredState();
 		
 		dendroView.restoreLabelViewStates();
-		
-		DendrogramFactory.getColorPresets().requestStoredState();
 	}
 
 	/**

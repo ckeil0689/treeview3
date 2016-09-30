@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import ColorChooser.ColorSchemeType;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
@@ -38,10 +39,9 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class ColorSet {
 
 	/* Default values for a ColorSet. */
-	private final static String default_name = "RedGreen";
+	private final static String default_name = ColorSchemeType.REDGREEN.toString();
 	private final static float[] default_fractions = { 0.0f, 0.5f, 1.0f };
-	private final static String[] default_colors = { "#FF0000", "#000000",
-			"#00FF00" };
+	private final static String[] default_colors = { "#FF0000", "#000000", "#00FF00" };
 	private final static String default_missingColor = "#FFFFFF";
 	private final static String default_emptyColor = "#FFFFFF";
 
@@ -186,18 +186,18 @@ public class ColorSet {
 	 */
 	public void save(final Preferences colorSetNode) {
 
+		LogBuffer.println("Saving the ColorSet with name: " + name);
 		colorSetNode.put("name", this.name);
 
 		final int colorNum = colorList.size();
 		colorSetNode.putInt("colorNum", colorNum);
 
 		for (int i = 0; i < colorNum; i++) {
-			colorSetNode.put("Color" + i + 1, encodeColor(colorList.get(i)));
+			colorSetNode.put("Color" + (i + 1), encodeColor(colorList.get(i)));
 		}
 
 		for (int i = 0; i < colorNum; i++) {
-			colorSetNode.putFloat("Fraction" + i + 1, fractionList.get(i)
-					.floatValue());
+			colorSetNode.putFloat("Fraction" + (i + 1), fractionList.get(i).floatValue());
 		}
 
 		colorSetNode.putDouble("min", min);
