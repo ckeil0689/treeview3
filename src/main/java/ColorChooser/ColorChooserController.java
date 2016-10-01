@@ -27,10 +27,10 @@ implements ConfigNodePersistent {
 	private final ColorChooserUI colorChooserUI;
 	private final ColorPicker colorPicker;
 
-	/* Node for saved data */
+	// Node for saved data
 	private Preferences configNode;
 
-	/* Holds all preset color data */
+	// Holds all preset color data
 	private final ColorPresets colorPresets;
 	private final ColorSchemeType d_colorScheme = ColorSchemeType.REDGREEN;
 	private ColorSchemeType colorScheme;
