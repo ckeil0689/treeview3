@@ -314,7 +314,7 @@ public class TVController implements Observer {
 	 * Load data into the model.
 	 * 
 	 * @param fileSet - The fileSet to be loaded.
-	 * @param dataInfo - Contains information how the data should be loaded. This information is determined by the
+	 * @param dataInfo - Contains information on how the data should be loaded. This information is determined by the
 	 * user in the import dialog. If the file has been loaded before, the information can come from stored preferences
 	 * data.
 	 */

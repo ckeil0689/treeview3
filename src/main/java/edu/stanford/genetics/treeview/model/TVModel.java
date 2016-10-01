@@ -594,8 +594,9 @@ public class TVModel extends Observable implements DataModel {
 		@Override
 		public void calculateBaseValues() {
 
-			LogBuffer.println("Calculating base values.");
-			
+			// Double.MAX_VALUE is multiplied by -1 because data can be negative and we want to start with the 
+			// smallest value possible for finding a maximum in a data array. Double.MIN_VALUE is the smallest
+			// positive value.
 			double maxVal = -1.0 * Double.MAX_VALUE;
 			double minVal = Double.MAX_VALUE;
 			double roundedMean = Double.NaN;
