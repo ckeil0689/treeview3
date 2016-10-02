@@ -267,31 +267,21 @@ public class ColorPresets implements ConfigNodePersistent {
 	 */
 	public void addColorSet(final ColorSet set) {
 
-		LogBuffer.println("Adding ColorSet: " + set.getName());
 		// Make the children of ColorSet here by adding an int to the name?
 		final String[] childrenNodes = getRootChildrenNodes();
-		boolean isCustomFound = false;
-		String customNode = "";
 
-		// Seek existing 'Custom' node
-		for (final String node : childrenNodes) {
-			final String nodeName = configNode.node(node).get("name", ColorSchemeType.REDGREEN.toString());
-			if (nodeName.equalsIgnoreCase(ColorSchemeType.CUSTOM.toString())) {
-				isCustomFound = true;
-				customNode = node;
-			}
-		}
-
+		// Seek existing 'Custom' node first
+		int customIdx = checkNodeExists(ColorSchemeType.CUSTOM.toString());
 		final ColorSet newColorSet = new ColorSet(set);
-		if (isCustomFound) {
-			LogBuffer.println("Custom node found. Saving to Custom ColorPresets node...");
-			newColorSet.save(configNode.node(customNode));
-
-		} else {
-			int setNodeIndex = getRootChildrenNodes().length + 1;
-			LogBuffer.println("Saving to ColorSet" + setNodeIndex);
-			newColorSet.save(configNode.node("ColorSet" + setNodeIndex));
-		}
+		String addNodeName = newColorSet.getName();
+		
+		if (customIdx > -1) {
+			addNodeName = childrenNodes[customIdx];
+		} 
+		
+		LogBuffer.println("Saving to ColorSet " + addNodeName);
+		
+		newColorSet.saveTo(configNode.node(addNodeName));
 	}
 
 	/**

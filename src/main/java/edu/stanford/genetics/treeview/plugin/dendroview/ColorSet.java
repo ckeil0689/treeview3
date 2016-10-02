@@ -187,7 +187,7 @@ public class ColorSet {
 	 * @param Preferences
 	 *            colorSetNode Preferences node to store ColorSet in
 	 */
-	public void save(final Preferences colorSetNode) {
+	public void saveTo(final Preferences colorSetNode) {
 
 		LogBuffer.println("Saving the ColorSet with name: " + this.name);	
 		
