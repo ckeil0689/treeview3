@@ -217,19 +217,20 @@ public class ColorPresets implements ConfigNodePersistent {
 	}
 
 	/**
+	 * @param colorSchemeName - The name of the ColorSchemeType which a ColorSet represents.
 	 * @return the color set for this name or null, if name not found in kids
 	 */
-	public ColorSet getColorSet(final String name) {
+	public ColorSet getColorSet(final String colorSchemeName) {
 
-		if(name == null) {
+		if(colorSchemeName == null) {
 			LogBuffer.println("ColorSet could not be returned because 'name' was null. Returned default Red-Green.");
 			return defaultColorSets[0];
 		}
 		
 		// Checking the defaults
 		for (final ColorSet defaultColorSet : defaultColorSets) {
-			if (defaultColorSet.getName().equals(name)) {
-				LogBuffer.println("Found default ColorSet with name: " + name);
+			if (defaultColorSet.getColorSchemeName().equals(colorSchemeName)) {
+				LogBuffer.println("Found default ColorSet with name: " + colorSchemeName);
 				return defaultColorSet;
 			}
 		}
@@ -238,26 +239,33 @@ public class ColorPresets implements ConfigNodePersistent {
 		final String[] childrenNodes = getRootChildrenNodes();
 		for (final String childrenNode : childrenNodes) {
 			final ColorSet ret = new ColorSet(configNode.node(childrenNode));
-			if (name.equals(ret.getName())) {
-				LogBuffer.println("Found child ColorSet with name: " + name);
+			if (colorSchemeName.equals(ret.getColorSchemeName())) {
+				LogBuffer.println("Found child ColorSet with name: " + colorSchemeName);
 				return ret;
 			}
 		}
 
 		// Default to first defaultColorSet (Red-Green)
-		LogBuffer.println("ColorSet (" + name + ") not found. Returned default Red-Green instead.");
+		LogBuffer.println("ColorSet (" + colorSchemeName + ") not found. Returned default Red-Green instead.");
 		return defaultColorSets[0];
 	}
 
-	/**
-	 * constructs and adds a <code>ColorSet</code> with the specified
+    /**
+     * Constructs and adds a <code>ColorSet</code> with the specified
 	 * attributes.
-	 */
-	public void addColorSet(final String name, final List<Color> colors,
+     * @param colorSchemeName - The name of the ColorSchemeType this node represents.
+     * @param colors - The array of colors for this ColorSet
+     * @param fractions - The array of thumb fractions for this ColorSet
+     * @param min - The minimum value of the ColorSet
+     * @param max - The maximum value of the ColorSet
+     * @param missing - The hex string which represents the missing data color
+     * @param empty - The hex string which represents the empty data color
+     */
+	public void addColorSet(final String colorSchemeName, final List<Color> colors,
 			final List<Float> fractions, final double min, final double max,
 			final String missing, final String empty) {
 
-		final ColorSet newColorSet = new ColorSet(name, colors, fractions, min, max, missing, empty);
+		final ColorSet newColorSet = new ColorSet(colorSchemeName, colors, fractions, min, max, missing, empty);
 		addColorSet(newColorSet);
 	}
 
@@ -273,7 +281,7 @@ public class ColorPresets implements ConfigNodePersistent {
 		// Seek existing 'Custom' node first
 		int customIdx = checkNodeExists(ColorSchemeType.CUSTOM.toString());
 		final ColorSet newColorSet = new ColorSet(set);
-		String addNodeName = newColorSet.getName();
+		String addNodeName = newColorSet.getColorSchemeName();
 		
 		if (customIdx > -1) {
 			addNodeName = childrenNodes[customIdx];
@@ -337,7 +345,8 @@ public class ColorPresets implements ConfigNodePersistent {
 		
 		for (int i = 0; i < childrenNodes.length; i++) {
 			String nodeName = childrenNodes[i];
-			final String nodeScheme = configNode.node(nodeName).get("name", ColorSchemeType.REDGREEN.toString());
+			final String nodeScheme = configNode.node(nodeName).get("colorSchemeType", 
+					ColorSchemeType.REDGREEN.toString());
 			if (nodeScheme.equalsIgnoreCase(scheme)) {
 				nodeIdx = i;
 			}

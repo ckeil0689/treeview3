@@ -150,7 +150,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		setNewParams(colorSet.getFractions(), cList);
 
 		if ((ColorSchemeType.CUSTOM.toString()).equalsIgnoreCase(
-				colorSet.getName())) {
+				colorSet.getColorSchemeName())) {
 			setMin(colorSet.getMin());
 			setMax(colorSet.getMax());
 		}
@@ -184,7 +184,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 			boolean foundColorSet = false;
 
 			for (final ColorSet defaultColorSet2 : ColorPresets.defaultColorSets) {
-				if (defaultColorSet2.getName().equalsIgnoreCase(lastActive)) {
+				if (defaultColorSet2.getColorSchemeName().equalsIgnoreCase(lastActive)) {
 					nodeColorSet = new ColorSet(defaultColorSet2);
 					foundColorSet = true;
 					break;
@@ -217,7 +217,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 			if (!foundColorSet) {
 				nodeColorSet = new ColorSet(ColorPresets.defaultColorSets[0]);
 				LogBuffer.println("Unable to find last used colorset: "
-						+ lastActive + "; using " + nodeColorSet.getName());
+						+ lastActive + "; using " + nodeColorSet.getColorSchemeName());
 			}
 		} catch (final BackingStoreException e) {
 			LogBuffer.logException(e);

@@ -177,8 +177,8 @@ public class ColorPicker {
 		// Only load non-dataset min/max if custom colorset is loaded
 		String rg = ColorSchemeType.REDGREEN.toString();
 		String yb = ColorSchemeType.YELLOWBLUE.toString();
-		if (!(rg.equalsIgnoreCase(activeColorSet.getName()) 
-				|| yb.equalsIgnoreCase(activeColorSet.getName()))) {
+		if (!(rg.equalsIgnoreCase(activeColorSet.getColorSchemeName()) 
+				|| yb.equalsIgnoreCase(activeColorSet.getColorSchemeName()))) {
 			setMinVal(activeColorSet.getMin());
 			setMaxVal(activeColorSet.getMax());
 			

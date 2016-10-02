@@ -39,7 +39,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class ColorSet {
 
 	/* Default values for a ColorSet. */
-	private final static String default_name = ColorSchemeType.REDGREEN.toString();
+	private final static String default_colorSchemeType = ColorSchemeType.REDGREEN.toString();
 	private final static float[] default_fractions = { 0.0f, 0.5f, 1.0f };
 	private final static String[] default_colors = { "#FF0000", "#000000", "#00FF00" };
 	private final static String default_missingColor = "#FFFFFF";
@@ -48,7 +48,7 @@ public class ColorSet {
 	private final static double default_min = -1.0;
 	private final static double default_max = 1.0;
 
-	private final String name;
+	private final String colorSchemeType;
 	private List<Color> colorList = new ArrayList<Color>();
 	private List<Float> fractionList = new ArrayList<Float>();
 	private double min;
@@ -59,7 +59,7 @@ public class ColorSet {
 	/**
 	 * Constructor for the ColorSet object
 	 *
-	 * @param name
+	 * @param colorSchemeType
 	 *            initial name
 	 * @param List
 	 *            <Color> colorList List of initial colors
@@ -70,11 +70,11 @@ public class ColorSet {
 	 * @param empty
 	 *            string representing initial empty color
 	 */
-	public ColorSet(final String name, final List<Color> colorList,
+	public ColorSet(final String colorSchemeType, final List<Color> colorList,
 			final List<Float> fractionList, final double min,
 			final double max, final String missing, final String empty) {
 
-		this.name = name;
+		this.colorSchemeType = colorSchemeType;
 		this.colorList = colorList;
 		this.fractionList = fractionList;
 		this.min = min;
@@ -92,7 +92,7 @@ public class ColorSet {
 	 */
 	public ColorSet(final Preferences colorSetNode) {
 
-		this.name = colorSetNode.get("name", default_name);
+		this.colorSchemeType = colorSetNode.get("colorSchemeType", default_colorSchemeType);
 		int colorNum = colorSetNode.getInt("colorNum", default_colors.length);
 
 		try {
@@ -126,23 +126,23 @@ public class ColorSet {
 	/**
 	 * Constructor for the ColorSet object
 	 *
-	 * @param name
-	 *            inital name
+	 * @param colorSchemeType
+	 *            initial colorSchemeType
 	 * @param color1
-	 *            string representing inital color1
+	 *            string representing initial color1
 	 * @param color2
-	 *            string representing inital color2
+	 *            string representing initial color2
 	 * @param color3
-	 *            string representing inital color3
+	 *            string representing initial color3
 	 * @param missing
-	 *            string representing inital missing color
+	 *            string representing initial missing color
 	 * @param empty
-	 *            string representing inital empty color
+	 *            string representing initial empty color
 	 */
-	public ColorSet(final String name, final String[] colors,
+	public ColorSet(final String colorSchemeType, final String[] colors,
 			final String missing, final String empty) {
 
-		LogBuffer.println("New ColorSet: " + name);
+		LogBuffer.println("New ColorSet: " + colorSchemeType);
 		
 		final List<Color> newColorList = new ArrayList<Color>();
 		for (String color : colors) {
@@ -154,7 +154,7 @@ public class ColorSet {
 			newFractionList.add(default_fractions[i]);
 		}
 
-		this.name = name;
+		this.colorSchemeType = colorSchemeType;
 		this.colorList = newColorList;
 		this.fractionList = newFractionList;
 		this.min = default_min;
@@ -170,9 +170,9 @@ public class ColorSet {
 	 */
 	public ColorSet(final ColorSet another) {
 
-		LogBuffer.println("Copying new ColorSet: " + another.name);
+		LogBuffer.println("Copying new ColorSet: " + another.colorSchemeType);
 		
-		this.name = another.name;
+		this.colorSchemeType = another.colorSchemeType;
 		this.colorList = another.colorList;
 		this.fractionList = another.fractionList;
 		this.min = another.min;
@@ -189,9 +189,9 @@ public class ColorSet {
 	 */
 	public void saveTo(final Preferences colorSetNode) {
 
-		LogBuffer.println("Saving the ColorSet with name: " + this.name);	
+		LogBuffer.println("Saving the ColorSet with scheme: " + this.colorSchemeType);	
 		
-		colorSetNode.put("name", this.name);
+		colorSetNode.put("colorSchemeType", this.colorSchemeType);
 
 		final int colorNum = colorList.size();
 		colorSetNode.putInt("colorNum", colorNum);
@@ -227,7 +227,7 @@ public class ColorSet {
 			colorString = "No colors in node.";
 		}
 
-		return "ColorSet " + getName() + "\n" + "Colors: " + colorString
+		return "ColorSet " + getColorSchemeName() + "\n" + "Colors: " + colorString
 				+ " missing: " + getMissing().toString() + "\t" + "empty: "
 				+ getEmpty().toString() + "\t";
 	}
@@ -314,8 +314,8 @@ public class ColorSet {
 	/**
 	 * The name of this color set
 	 */
-	public String getName() {
-		return name;
+	public String getColorSchemeName() {
+		return colorSchemeType;
 	}
 
 	/**
