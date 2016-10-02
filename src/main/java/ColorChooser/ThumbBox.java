@@ -456,12 +456,12 @@ public class ThumbBox {
 			colorPicker.getDataMin(),colorPicker.getDataMax());
 		
 		double initVal = t.getDataValue();
-		double dataVal = posInputDialog.showDialog(colorPicker
-				.getContainerPanel());
+		double dataVal = posInputDialog.showDialog(colorPicker.getContainerPanel());
 		
-		// No position change occurred
+		// No position change occurred, but colors may have changed.
 		if(dataVal == initVal) {
-			LogBuffer.println("Value has not changed. Doing nothing.");
+			LogBuffer.println("Value has not changed. Not moving thumb.");
+			colorPicker.updateColors();
 			return;
 		}
 

@@ -185,6 +185,7 @@ public class ColorPresets implements ConfigNodePersistent {
 	public ColorSet getColorSet(final int index) {
 
 		if (index < defaultColorSets.length) {
+			LogBuffer.println("Returnung default ColorSet at " + index);
 			return defaultColorSets[index];
 		}
 
@@ -217,6 +218,7 @@ public class ColorPresets implements ConfigNodePersistent {
 			}
 		}
 		
+		// Checking existing nodes
 		final String[] childrenNodes = getRootChildrenNodes();
 		for (final String childrenNode : childrenNodes) {
 			final ColorSet ret = new ColorSet(configNode.node(childrenNode));
@@ -265,10 +267,12 @@ public class ColorPresets implements ConfigNodePersistent {
 
 		final ColorSet newColorSet = new ColorSet(set);
 		if (isCustomFound) {
+			LogBuffer.println("Custom node found. Saving to Custom ColorPresets node...");
 			newColorSet.save(configNode.node(customNode));
 
 		} else {
 			int setNodeIndex = getRootChildrenNodes().length + 1;
+			LogBuffer.println("Saving to ColorSet" + setNodeIndex);
 			newColorSet.save(configNode.node("ColorSet" + setNodeIndex));
 		}
 	}

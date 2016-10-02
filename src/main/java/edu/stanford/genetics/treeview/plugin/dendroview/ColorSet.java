@@ -119,8 +119,7 @@ public class ColorSet {
 		this.min = colorSetNode.getDouble("min", default_min);
 		this.max = colorSetNode.getDouble("max", default_max);
 
-		this.missing = decodeColor(colorSetNode.get("missing",
-				default_missingColor));
+		this.missing = decodeColor(colorSetNode.get("missing", default_missingColor));
 		this.empty = decodeColor(colorSetNode.get("empty", default_emptyColor));
 	}
 
@@ -143,6 +142,8 @@ public class ColorSet {
 	public ColorSet(final String name, final String[] colors,
 			final String missing, final String empty) {
 
+		LogBuffer.println("New ColorSet: " + name);
+		
 		final List<Color> newColorList = new ArrayList<Color>();
 		for (String color : colors) {
 			newColorList.add(decodeColor(color)); /* min in ColorChooser */
@@ -169,6 +170,8 @@ public class ColorSet {
 	 */
 	public ColorSet(final ColorSet another) {
 
+		LogBuffer.println("Copying new ColorSet: " + another.name);
+		
 		this.name = another.name;
 		this.colorList = another.colorList;
 		this.fractionList = another.fractionList;
@@ -186,7 +189,8 @@ public class ColorSet {
 	 */
 	public void save(final Preferences colorSetNode) {
 
-		LogBuffer.println("Saving the ColorSet with name: " + name);	
+		LogBuffer.println("Saving the ColorSet with name: " + this.name);	
+		
 		colorSetNode.put("name", this.name);
 
 		final int colorNum = colorList.size();
