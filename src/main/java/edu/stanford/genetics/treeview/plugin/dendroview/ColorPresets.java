@@ -206,6 +206,7 @@ public class ColorPresets implements ConfigNodePersistent {
 				ret = new ColorSet(configNode.node(childrenNodes[index]));
 			}
 			
+			LogBuffer.println("Returning default Red-Green.");
 			return ret;
 
 		} catch (final Exception e) {
@@ -228,6 +229,7 @@ public class ColorPresets implements ConfigNodePersistent {
 		// Checking the defaults
 		for (final ColorSet defaultColorSet : defaultColorSets) {
 			if (defaultColorSet.getName().equals(name)) {
+				LogBuffer.println("Found default ColorSet with name: " + name);
 				return defaultColorSet;
 			}
 		}
@@ -237,6 +239,7 @@ public class ColorPresets implements ConfigNodePersistent {
 		for (final String childrenNode : childrenNodes) {
 			final ColorSet ret = new ColorSet(configNode.node(childrenNode));
 			if (name.equals(ret.getName())) {
+				LogBuffer.println("Found child ColorSet with name: " + name);
 				return ret;
 			}
 		}
@@ -299,14 +302,21 @@ public class ColorPresets implements ConfigNodePersistent {
 	 */
 	public void removeColorSet(final int i) {
 
-		final String[] childrenNames = getRootChildrenNodes();
+		final String[] childrenNodeNames = getRootChildrenNodes();
 		
-		if(i < 0 || i >= childrenNames.length) {
+		if(i < 0 || i >= childrenNodeNames.length) {
 			LogBuffer.println("Cannot remove child node from ColorPresets node because index is out of bounds.");
 			return;
 		}
 		
-		configNode.remove(childrenNames[i]);
+		try {
+			configNode.node(childrenNodeNames[i]).removeNode();
+			
+		} catch (BackingStoreException e) {
+			LogBuffer.println("Something happened when trying to remove node: " + childrenNodeNames[i] + " Aborting.");
+			LogBuffer.logException(e);
+			return;
+		}
 	}
 
 //	/**
@@ -324,6 +334,27 @@ public class ColorPresets implements ConfigNodePersistent {
 //		 }
 //		 addDefaultPresets();
 //	 }
+	
+	/**
+	 * Searches the children nodes of the ColorPresets Preferences node for a node with the given <code>scheme</scheme>.
+	 * @param scheme - The scheme to search for.
+	 * @return If a node exists with the given scheme, return its index. If it doesn't -1 will be returned.
+	 */
+	public int checkNodeExists(final String scheme) {
+		
+		String[] childrenNodes = getRootChildrenNodes();
+		int nodeIdx = -1;
+		
+		for (int i = 0; i < childrenNodes.length; i++) {
+			String nodeName = childrenNodes[i];
+			final String nodeScheme = configNode.node(nodeName).get("name", ColorSchemeType.REDGREEN.toString());
+			if (nodeScheme.equalsIgnoreCase(scheme)) {
+				nodeIdx = i;
+			}
+		}
+		
+		return nodeIdx;
+	}
 
 	/**
 	 * Returns the names of the current children of this class' root node.

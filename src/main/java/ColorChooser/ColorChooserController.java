@@ -40,14 +40,12 @@ implements ConfigNodePersistent {
 	// Holds all preset color data
 	private final ColorPresets colorPresets;
 	private final ColorSchemeType d_colorScheme = ColorSchemeType.REDGREEN;
-//	private ColorSchemeType activeColorScheme;
 
 	public ColorChooserController(final ColorChooserUI colorChooserUI) {
 
 		this.colorChooserUI = colorChooserUI;
 		this.colorPicker = colorChooserUI.getColorPicker();
 		this.colorPresets = DendrogramFactory.getColorPresets();
-//		this.activeColorScheme = d_colorScheme;
 
 		addAllListeners();
 	}
@@ -189,8 +187,23 @@ implements ConfigNodePersistent {
 	 */
 	private class ApplyChangeListener implements ActionListener {
 
+		private boolean wasCustomInitiallyPresent = false;
 		private boolean wasApplied = false;
 		
+		public ApplyChangeListener() {
+			
+			if(colorPresets == null) {
+				LogBuffer.println("Cannot check ColorPreset nodes for existing Custom node "
+						+ "because the member is null.");
+				return;
+			}
+			
+			if(colorPresets.checkNodeExists(ColorSchemeType.CUSTOM.toString()) > -1) {
+				wasCustomInitiallyPresent = true;
+			}
+			
+			
+		}
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
@@ -203,6 +216,11 @@ implements ConfigNodePersistent {
 		public boolean wasApplied() {
 			
 			return wasApplied;
+		}
+		
+		public boolean wasCustomInitiallyPresent() {
+			
+			return wasCustomInitiallyPresent;
 		}
 		
 		public void reset() {
@@ -461,6 +479,11 @@ implements ConfigNodePersistent {
 				LogBuffer.println("Saving applied changes.");
 				storeState();
 				applyChangeListener.reset();
+				return;
+			}
+			
+			if(applyChangeListener.wasCustomInitiallyPresent()) {
+				LogBuffer.println("Custom was already present.");
 				return;
 			}
 			
