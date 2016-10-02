@@ -182,16 +182,30 @@ public class ColorPresets implements ConfigNodePersistent {
 	 * @return the color set for the i'th preset or null, if any exceptions are
 	 * thrown.
 	 */
-	public ColorSet getColorSet(final int index) {
+	private ColorSet getColorSet(final int index) {
 
+		// Init to Red-Green ColorSet
+		ColorSet ret = defaultColorSets[0];
+		
+		// In case of a bad index
+		if(index < 0) {
+			LogBuffer.println("Cannot return ColorSet at " + index + " Returning default Red-Green.");
+			return ret;
+		}
+		
+		// Getting any of the default ColorSets
 		if (index < defaultColorSets.length) {
-			LogBuffer.println("Returnung default ColorSet at " + index);
+			LogBuffer.println("Returning default ColorSet at " + index);
 			return defaultColorSets[index];
 		}
 
+		// Getting a stored ColorSet
 		try {
 			final String[] childrenNodes = getRootChildrenNodes();
-			final ColorSet ret = new ColorSet(configNode.node(childrenNodes[index]));
+			if(index < childrenNodes.length) {
+				ret = new ColorSet(configNode.node(childrenNodes[index]));
+			}
+			
 			return ret;
 
 		} catch (final Exception e) {

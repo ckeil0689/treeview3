@@ -421,7 +421,7 @@ implements ConfigNodePersistent {
 			colorChooserUI.setCustomSelected(customSelected);
 			LogBuffer.println("Changed presetChoice");
 			switchColorSet();
-		}
+		}	
 	}
 
 	/**
