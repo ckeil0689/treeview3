@@ -16,8 +16,6 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import edu.stanford.genetics.treeview.LogBuffer;
-
 /**
  * A dialog window class that has an expandable Details pane
  * Original code from:
@@ -67,13 +65,8 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 			labelSize.setSize(500,labelSize.height);
 			message.setPreferredSize(labelSize);
 		}
-		//message.getPreferredSize() returns a good size, but after alpha03, a
-		//change somewhere inexplicably makes the message height very much over-
-		//sized. Setting the maximum size to the preferred size seems to be the
-		//only thing that fixes it.
-		message.setMaximumSize(labelSize);
 
-		mainPanel.add(message,"wrap");
+		mainPanel.add(message,"wrap, hmax " + labelSize.height);
 
 		//Create the details pane with inserted line wraps
 		final JTextArea textArea = new JTextArea();
@@ -81,7 +74,7 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 		textArea.setWrapStyleWord(true);
 		textArea.setText(details);
 		textArea.setEditable(false);
-	
+
 		//The message may be too big to fit in a dialog window, so we will throw
 		//it in a scrollpane.
 		final JScrollPane scrollPane = new JScrollPane(textArea);
@@ -94,9 +87,9 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 		//Create the details checkbox with a listener that adds/removes the
 		//detail message and updates the window size to accommodate it
 		JCheckBox cb = new JCheckBox(new AbstractAction() {
-	
+
 			private static final long serialVersionUID = 1L;
-	
+
 			//I'm not sure I understand why this needs to be in an anonymous
 			//code block, but it doesn't compile without it.
 			//Apparently it's an anonymous subclass to give the parent class an
@@ -107,7 +100,7 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 				this.putValue(Action.SELECTED_KEY,false);
 				this.putValue(Action.NAME,"Details");
 			}
-	
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if ((Boolean) this.getValue(Action.SELECTED_KEY)) {
