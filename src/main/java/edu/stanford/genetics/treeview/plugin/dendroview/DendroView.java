@@ -48,6 +48,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.LabelFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
+import edu.stanford.genetics.treeview.DragGridPanel;
 
 /**
  * TODO Refactor this JavaDoc. It's not applicable to the current program
@@ -635,23 +636,43 @@ public class DendroView implements Observer, DendroPanel {
 	 */
 	private JPanel createMatrixPanel() {
 		
-		JPanel matrixPanel;
-		
+		DragGridPanel matrixPanel = new DragGridPanel(2,2);
+
+		matrixPanel.setName("MatrixPanel");
+		matrixPanel.setBorderWidth(2);
+		matrixPanel.setBorderHeight(2);
+		matrixPanel.setMinimumWidth(1);
+		matrixPanel.setMinimumHeight(1);
+		matrixPanel.setFocusWidth(1);
+		matrixPanel.setFocusHeight(1);
+		float mheights []  = new float[2];
+		mheights [0] = (float) .2;
+		mheights[1] = (float) .8;
+		matrixPanel.setHeights(mheights);
+		float mwidths []  = new float[2];
+		mwidths [0] = (float) .2;
+		mwidths[1] = (float) .8;
+		matrixPanel.setWidths(mwidths);
+
 		JPanel globalOverviewPanel;
 		JPanel interactiveMatrixPanel;
 		
 		globalOverviewPanel = createGlobalOverviewPanel();
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
 		
-		matrixPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.TINY_GAPS_AND_INSETS);
-		matrixPanel.add(globalOverviewPanel, "h 180!, w 180!, grow 0");
-		matrixPanel.add(colDataPane, "h 180!, pushx, "
-				+ "growx, growy 0, wrap");
-		matrixPanel.add(rowDataPane, "w 180!, pushy, growy, "
-				+ "growx 0");
-		matrixPanel.add(interactiveMatrixPanel, "grow");
-		
+//		matrixPanel = GUIFactory.createJPanel(false, 
+//				GUIFactory.TINY_GAPS_AND_INSETS);
+//		matrixPanel.add(globalOverviewPanel, "h 180!, w 180!, grow 0");
+//		matrixPanel.add(colDataPane, "h 180!, pushx, "
+//				+ "growx, growy 0, wrap");
+//		matrixPanel.add(rowDataPane, "w 180!, pushy, growy, "
+//				+ "growx 0");
+//		matrixPanel.add(interactiveMatrixPanel, "grow");
+		matrixPanel.addComponent(globalOverviewPanel,0,0);
+		matrixPanel.addComponent(colDataPane,1,0);
+		matrixPanel.addComponent(rowDataPane,0,1);
+		matrixPanel.addComponent(interactiveMatrixPanel,1,1);
+
 		return matrixPanel;
 	}
 	
