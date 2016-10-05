@@ -749,7 +749,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 			// Save dragging borders
 			coldrag = curscol;
 			rowdrag = cursrow;
-			setCursor(handCursor);
+			//setCursor(handCursor);
 			dragBar = new DragBar();
 			dragBar.setBounds(0, 0, getWidth(), getHeight());
 			dragBar.setMouse(e.getX(), e.getY());
@@ -768,7 +768,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 			// Reset dragging borders
 			coldrag = rowdrag = 0;
 			// Set mouse cursor to correct shape
-			onDragBorder(e.getX(), e.getY());
+			setCursor(originalCursor);
 			remove(dragBar);
 		}
 		if (resize) {
@@ -788,7 +788,6 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	public void mouseEntered(final MouseEvent e) {
 
 		debug("mouseEntered", e);
-		// Set mouse cursor to correct shape
 		onDragBorder(e.getX(), e.getY());
 	}
 
@@ -991,8 +990,9 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		for (col = 1; col < xsizes.length; col++) {
 			if (x <= xpos[col]) { // In column col - 1, or its border
 
-				if (x >= xpos[col] - bwidth)
+				if (x >= xpos[col] - bwidth) {
 					curscol = col; // In border, so set curscol
+				}
 				break;
 			}
 		}
@@ -1081,7 +1081,9 @@ public class DragGridPanel extends JPanel implements MouseListener,
 				// Want to set cursor to new shape
 				if (originalCursor == null || currentCursor != newcursor) { // Save original shape
 
-					originalCursor = getCursor();
+					if(originalCursor == null) {
+						originalCursor = getCursor();
+					}
 
 					switch (newcursor) {
 
@@ -1214,7 +1216,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	/** Hand cursor */
 	static final int handCursor = 4;
 
-	static final boolean trace = true;
+	static final boolean trace = false;
 	DragBar dragBar = new DragBar();
 
 }
