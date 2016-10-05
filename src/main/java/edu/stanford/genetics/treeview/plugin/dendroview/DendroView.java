@@ -639,12 +639,12 @@ public class DendroView implements Observer, DendroPanel {
 		DragGridPanel matrixPanel = new DragGridPanel(2,2);
 
 		matrixPanel.setName("MatrixPanel");
-		matrixPanel.setBorderWidth(2);
-		matrixPanel.setBorderHeight(2);
-		matrixPanel.setMinimumWidth(1);
-		matrixPanel.setMinimumHeight(1);
-		matrixPanel.setFocusWidth(1);
-		matrixPanel.setFocusHeight(1);
+		matrixPanel.setBorderWidth(1);
+		matrixPanel.setBorderHeight(1);
+		matrixPanel.setMinimumWidth(10);
+		matrixPanel.setMinimumHeight(10);
+		matrixPanel.setFocusWidth(0);
+		matrixPanel.setFocusHeight(0);
 		float mheights []  = new float[2];
 		mheights [0] = (float) .2;
 		mheights[1] = (float) .8;

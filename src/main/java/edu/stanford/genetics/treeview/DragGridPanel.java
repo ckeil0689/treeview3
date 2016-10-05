@@ -28,6 +28,7 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.core.Debug;
 
 /**
@@ -557,9 +558,14 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		// " clip " + clip);
 		final Dimension newsize = getSize();
 
-		g.setColor(Color.white);
+		//g.setColor(Color.white);
+		g.setColor(GUIFactory.DEFAULT_BG);
 		g.fillRect(0, 0, newsize.width, newsize.height);
-		g.setColor(Color.black);
+		if(dragging()) {
+			g.setColor(Color.BLACK);
+			LogBuffer.println("Painting dragbar a new color.");
+		}
+		//g.setColor(Color.black);
 
 		int x, y;
 
@@ -1238,11 +1244,11 @@ class DragBar extends JComponent {
 		mouse.y = y;
 	}
 
-	@Override
-	public void paintComponent(final Graphics g) {
-
-		g.setColor(Color.green);
-		g.fillRect(mouse.x, 0, 2, getHeight());
-		g.fillRect(0, mouse.y, getWidth(), 2);
-	}
+//	@Override
+//	public void paintComponent(final Graphics g) {
+//
+//		g.setColor(Color.green);
+//		g.fillRect(mouse.x, 0, 2, getHeight());
+//		g.fillRect(0, mouse.y, getWidth(), 2);
+//	}
 }
