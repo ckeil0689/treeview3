@@ -26,7 +26,7 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 
 	public void clear() {
 
-		labelTypeArray = new String[0];
+		setLabelTypeArray(new String[0]);
 		setLabelArray(new String[0][]);
 		id2row.clear();
 	}
@@ -34,12 +34,12 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 	@Override
 	public void setLabelTypeArray(final String[] newVal) {
 
-		labelTypeArray = newVal;
+		this.labelTypeArray = newVal;
 	}
 
 	public void setLabelArray(final String[][] newVal) {
 
-		labelArray = newVal;
+		this.labelArray = newVal;
 	}
 
 	@Override

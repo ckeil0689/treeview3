@@ -30,14 +30,14 @@ public class ColorChooserUI extends CustomDialog {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/* GUI components */
+	// GUI components
 	private JPanel contentPanel;
 	private JPanel mainPanel;
 
 	private ColorPicker colorPicker;
 	private JPanel gradientPanel;
 
-	/* For custom ColorSet manipulation */
+	// For custom ColorSet manipulation
 	private JButton addBtn;
 	private JButton editBtn;
 	private JButton removeBtn;
@@ -46,10 +46,10 @@ public class ColorChooserUI extends CustomDialog {
 
 	private ColorIcon missingColorIcon;
 
-	/* ColorSet choices */
+	// ColorSet choices
 	private JComboBox<ColorSchemeType> presetChoice;
 
-	/* Stores whether custom ColorSet is selected or not */
+	// Stores whether custom ColorSet is selected or not
 	private boolean isCustomSelected;
 
 	/**
@@ -97,7 +97,7 @@ public class ColorChooserUI extends CustomDialog {
 		this.presetChoice = new JComboBox<ColorSchemeType>(
 				ColorSchemeType.values());
 
-		/* Preset choice panel */
+		// Preset choice panel
 		final JPanel presetChoicePanel = GUIFactory.createJPanel(false,
 				GUIFactory.DEFAULT);
 
