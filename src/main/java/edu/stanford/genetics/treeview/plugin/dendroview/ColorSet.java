@@ -48,7 +48,7 @@ public class ColorSet {
 	private final static double default_min = -1.0;
 	private final static double default_max = 1.0;
 
-	private final String colorSchemeType;
+	private String colorSchemeType;
 	private List<Color> colorList = new ArrayList<Color>();
 	private List<Float> fractionList = new ArrayList<Float>();
 	private double min;
@@ -238,6 +238,10 @@ public class ColorSet {
 
 	public void setEmpty(final Color empty) {
 		this.empty = empty;
+	}
+	
+	public void setColorSchemeType(final String name) {
+		this.colorSchemeType = name;
 	}
 
 	/**

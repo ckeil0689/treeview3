@@ -2,6 +2,7 @@ package ColorChooser;
 
 import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowListener;
@@ -49,9 +50,6 @@ public class ColorChooserUI extends CustomDialog {
 	// ColorSet choices
 	private JComboBox<ColorSchemeType> presetChoice;
 
-	// Stores whether custom ColorSet is selected or not
-	private boolean isCustomSelected;
-
 	/**
 	 * Constructs a ColorChooser object.
 	 *
@@ -66,8 +64,7 @@ public class ColorChooserUI extends CustomDialog {
 			final double maxVal, final double mean, final double median) {
 
 		super(StringRes.dlg_Colors);
-		this.colorPicker = new ColorPicker(drawer, minVal, maxVal, 
-				mean, median);
+		this.colorPicker = new ColorPicker(drawer, minVal, maxVal, mean, median);
 		this.gradientPanel = colorPicker.getContainerPanel();
 
 		setupLayout();
@@ -178,14 +175,9 @@ public class ColorChooserUI extends CustomDialog {
 		return presetChoice;
 	}
 
-	protected void setCustomSelected(boolean isCustom) {
-
-		this.isCustomSelected = isCustom;
-	}
-
 	protected boolean isCustomSelected() {
 
-		return isCustomSelected;
+		return (getPresetChoices().getSelectedItem() == ColorSchemeType.CUSTOM);
 	}
 
 	/* ------- GUI component listeners ------------ */
@@ -211,9 +203,9 @@ public class ColorChooserUI extends CustomDialog {
 		removeBtn.addActionListener(l);
 	}
 
-	protected void addPresetChoiceListener(final ActionListener l) {
+	protected void addPresetChoiceListener(final ItemListener l) {
 
-		presetChoice.addActionListener(l);
+		presetChoice.addItemListener(l);
 	}
 
 	protected void addMissingListener(final ActionListener l) {

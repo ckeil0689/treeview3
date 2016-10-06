@@ -60,7 +60,7 @@ public class GradientBox {
 			g2.setPaint(gradient);
 			g2.fillRect((int) startX, (int) startY, width, height);
 			
-		} catch(IllegalArgumentException e) {
+		} catch(IllegalArgumentException | NullPointerException e) {
 			/* 
 			 * The LinearGradientPaint class needs an ascending list of 
 			 * fractions to generate the gradient.

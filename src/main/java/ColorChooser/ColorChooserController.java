@@ -5,6 +5,8 @@ import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -12,7 +14,6 @@ import java.awt.event.WindowEvent;
 import java.util.Observable;
 
 import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
 import javax.swing.Timer;
 
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -77,9 +78,8 @@ public class ColorChooserController extends Observable {
 		}
 		
 		ColorSchemeType colorSchemeKey = colorPresets.getLastActiveColorScheme();
-		setSelectedColorScheme(colorSchemeKey);
+		setActiveColorScheme(colorSchemeKey);
 		switchColorSet();
-		colorChooserUI.getColorPicker().loadActiveColorSetValues();
 	}
 
 	/**
@@ -103,17 +103,19 @@ public class ColorChooserController extends Observable {
 		colorPresets.storeState();
 	}
 	
+	/**
+	 * @return a ColorSet from current values and colors, tagged as Custom.
+	 */
 	private ColorSet getCurrentCustomColorSet() {
 		
-		LogBuffer.println("Generating custom ColorSet...");
 		return colorChooserUI.getColorPicker().generateCustomColorSet();
 	}
 	
 	/**
 	 * Define which ColorSchemeType is currently active.
-	 * @param scheme
+	 * @param scheme - The new active scheme
 	 */
-	private void setSelectedColorScheme(final ColorSchemeType scheme) {
+	private void setActiveColorScheme(final ColorSchemeType scheme) {
 		
 		colorChooserUI.getPresetChoices().setSelectedItem(scheme);
 	}
@@ -135,12 +137,9 @@ public class ColorChooserController extends Observable {
 	private void switchColorSet() {
 		
 		ColorSchemeType scheme = getSelectedColorScheme();
-		LogBuffer.println("Updating ColorPicker to: " + scheme.toString());
 		
 		final ColorSet set = colorPresets.getColorSet(scheme.toString());
 		colorChooserUI.getColorPicker().setActiveColorSet(set);
-		
-		setSelectedColorScheme(scheme);
 		
 		// Load and set data accordingly
 		colorChooserUI.getColorPicker().loadActiveColorSetValues();
@@ -181,15 +180,19 @@ public class ColorChooserController extends Observable {
 			if(colorPresets.checkNodeExists(ColorSchemeType.CUSTOM.toString()) > -1) {
 				wasCustomInitiallyPresent = true;
 			}
-			
-			
 		}
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
+			if(!colorChooserUI.isCustomSelected() && hasChanged()) {
+				addCurrentSettingsTo(ColorSchemeType.CUSTOM);
+				colorChooserUI.getPresetChoices().setSelectedItem(ColorSchemeType.CUSTOM);
+			}
+			
 			colorPicker.setGradientColors();
-			saveColorSettings();//wasApplied = true;
+			saveColorSettings();
+			wasApplied = true;
 			setChanged();
 			notifyObservers();
 		}
@@ -208,6 +211,15 @@ public class ColorChooserController extends Observable {
 			
 			this.wasApplied = false;
 		}
+	}
+	
+	protected void addCurrentSettingsTo(final ColorSchemeType scheme) {
+		
+		String name = scheme.toString();
+		ColorSet currentCustom = getCurrentCustomColorSet();
+		currentCustom.setColorSchemeType(name);
+		
+		colorPresets.addColorSet(currentCustom);
 	}
 
 	/**
@@ -233,13 +245,11 @@ public class ColorChooserController extends Observable {
 		private void clickOrPress() {
 
 			GradientBox gBox = colorPicker.getGradientBox();
-			LogBuffer.println("clickOrPress()");
 			if (gBox.isGradientArea(lastEvent.getPoint())) {
 				/* loading new presets erases selected thumb... */
-				LogBuffer.println("in gradient area");
 				int selectedThumb = colorPicker.getThumbBox().getSelectedThumbIndex();
 				gBox.changeColor(lastEvent.getPoint());
-				colorChooserUI.setCustomSelected(true);
+				setChanged();
 
 				if (selectedThumb > -1) {
 					Thumb t_selected = colorPicker.getThumb(selectedThumb);
@@ -247,7 +257,6 @@ public class ColorChooserController extends Observable {
 				}
 
 			} else {
-				LogBuffer.println("Outside gradient box");
 				ThumbBox tb = colorPicker.getThumbBox();
 				tb.deselectAllThumbs();
 				tb.selectThumbAtPoint(lastEvent.getPoint());
@@ -260,9 +269,8 @@ public class ColorChooserController extends Observable {
 		 */
 		private void doubleClick() {
 
-			LogBuffer.println("doubleClick()");
 			colorPicker.getThumbBox().editClickedThumb(lastEvent.getPoint());
-			colorChooserUI.setCustomSelected(true);
+			setChanged();
 		}
 
 		@Override
@@ -285,7 +293,6 @@ public class ColorChooserController extends Observable {
 		public void mousePressed(final MouseEvent e) {
 
 			lastEvent = e;
-			LogBuffer.println("mousePressed");
 			clickOrPress();
 		}
 
@@ -293,7 +300,6 @@ public class ColorChooserController extends Observable {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			timer.stop();
-			LogBuffer.println("actionPerformed");
 			clickOrPress();
 		}
 	}
@@ -327,11 +333,10 @@ public class ColorChooserController extends Observable {
 		@Override
 		public void mouseReleased(final MouseEvent e) {
 
-			if (!colorChooserUI.isCustomSelected() && dragged) {
-				LogBuffer.println("ThumbMoion.mouseReleased()");
+			if (dragged) {
 				colorPicker.getThumbBox().dragInnerThumbTo(e.getX());
-				colorChooserUI.setCustomSelected(true);
 				dragged = false;
+				setChanged();
 			}
 		}
 	}
@@ -347,10 +352,9 @@ public class ColorChooserController extends Observable {
 			final Color newCol = JColorChooser.showDialog(colorPicker.getContainerPanel(), "Pick a Color", Color.black);
 
 			if (newCol != null) {
-				LogBuffer.println("Added button");
 				colorPicker.getGradientBox().addColor(newCol);
 				updateSelectionBtnStatus();
-				colorChooserUI.setCustomSelected(true);
+				setChanged();
 			}
 		}
 	}
@@ -363,9 +367,8 @@ public class ColorChooserController extends Observable {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			LogBuffer.println("Editing button");
 			colorPicker.getThumbBox().editSelectedThumb();
-			colorChooserUI.setCustomSelected(true);
+			setChanged();
 		}
 	}
 
@@ -378,10 +381,9 @@ public class ColorChooserController extends Observable {
 		public void actionPerformed(final ActionEvent arg0) {
 
 			if (colorPicker.isRemovalAllowed()) {
-				LogBuffer.println("Removed button");
 				colorPicker.getGradientBox().removeColor();
 				colorChooserUI.setSelectionDependentBtnStatus(false, false);
-				colorChooserUI.setCustomSelected(true);
+				setChanged();
 			}
 		}
 	}
@@ -402,23 +404,10 @@ public class ColorChooserController extends Observable {
 	 * Drop-down menu listener checks if the custom color scheme is selected and initiates the switch of the 
 	 * active ColorSet.
 	 */
-	private class PresetChoiceListener implements ActionListener {
+	private class PresetChoiceListener implements ItemListener {
 
 		@Override
-		public void actionPerformed(final ActionEvent arg0) {
-
-//			if(colorChooserUI.isCustomSelected()) {
-//				LogBuffer.println("Storing custom color set before switching.");
-//				colorPresets.addColorSet(getCurrentCustomColorSet());
-//			}
-			
-			@SuppressWarnings("unchecked")
-			Object selectedItem = ((JComboBox<ColorSchemeType>) arg0.getSource()).getSelectedItem();
-			ColorSchemeType selectedScheme = (ColorSchemeType) selectedItem;
-
-			boolean customSelected = (selectedScheme == ColorSchemeType.CUSTOM);
-			colorChooserUI.setCustomSelected(customSelected);
-			LogBuffer.println("Changed presetChoice");
+		public void itemStateChanged(ItemEvent e) {
 			switchColorSet();
 		}	
 	}
@@ -436,10 +425,9 @@ public class ColorChooserController extends Observable {
 					colorChooserUI.getMainPanel(), "Pick Color for Missing", colorPicker.getMissing());
 
 			if (missing != null) {
-				LogBuffer.println("Updated missing color");
 				colorPicker.setMissing(missing);
 				colorChooserUI.updateMissingColorIcon(missing);
-				colorChooserUI.setCustomSelected(true);
+				setChanged();
 			}
 		}
 	}
@@ -455,16 +443,9 @@ public class ColorChooserController extends Observable {
 		@Override
 		public void windowClosed(WindowEvent e) {
 			
-			LogBuffer.println("Window closed event.");
-			if(applyChangeListener.wasApplied()) {
-				LogBuffer.println("Saving applied changes.");
-				saveColorSettings();
+			if(applyChangeListener.wasCustomInitiallyPresent() || applyChangeListener.wasApplied()) {
+				LogBuffer.println("Custom was already present or changes were applied.");
 				applyChangeListener.reset();
-				return;
-			}
-			
-			if(applyChangeListener.wasCustomInitiallyPresent()) {
-				LogBuffer.println("Custom was already present.");
 				return;
 			}
 			

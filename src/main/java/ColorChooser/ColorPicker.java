@@ -217,8 +217,7 @@ public class ColorPicker {
 		}
 
 		final String name = "Custom";
-		String missing = Integer.toHexString(colorExtractor.getMissing()
-				.getRGB());
+		String missing = Integer.toHexString(colorExtractor.getMissing().getRGB());
 		missing = "#" + missing.substring(2, missing.length());
 		String empty = Integer.toHexString(colorExtractor.getEmpty().getRGB());
 		empty = "#" + empty.substring(2, empty.length());

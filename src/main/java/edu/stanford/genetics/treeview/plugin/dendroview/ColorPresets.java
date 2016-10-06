@@ -145,9 +145,18 @@ public class ColorPresets implements ConfigNodePersistent {
 		return configNode.getInt("default", dIndex);
 	}
 	
+	/**
+	 * @return The <code>ColorSchemeType</code> stored as the last active one. Default Red-Green if none wass stored.
+	 */
 	public ColorSchemeType getLastActiveColorScheme() {
 		
-		return ColorSchemeType.getMemberFromKey(lastActiveColorScheme);
+		ColorSchemeType lastActive = ColorSchemeType.getMemberFromKey(lastActiveColorScheme);
+		
+		if(lastActive == null) {
+			return ColorSchemeType.REDGREEN;
+		}
+		
+		return lastActive;
 	}
 	
 	public void setLastActiveColorScheme(ColorSchemeType scheme) {
