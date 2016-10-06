@@ -191,20 +191,20 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		for (i = 0; i < xsizes.length; i++) {
 
 			max += xsizes[i];
+		}
 
-			if (max == 0) {
+		if (max == 0) {
 
-				for (i = 0; i < xsizes.length; i++) {
+			for (i = 0; i < xsizes.length; i++) {
 
-					xsizes[i] = 1.0f / xsizes.length; // Silly value - space
-														// evenly instead
-				}
-			} else if (max != 1) {
+				xsizes[i] = 1.0f / xsizes.length; // Silly value - space
+													// evenly instead
+			}
+		} else if (max != 1) {
 
-				for (i = 0; i < xsizes.length; i++) {
+			for (i = 0; i < xsizes.length; i++) {
 
-					xsizes[i] /= max;// Normalize so they add up to 1
-				}
+				xsizes[i] /= max;// Normalize so they add up to 1
 			}
 		}
 
@@ -247,20 +247,20 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		for (i = 0; i < ysizes.length; i++) {
 
 			max += ysizes[i];
+		}
 
-			if (max == 0) {
+		if (max == 0) {
 
-				for (i = 0; i < ysizes.length; i++) {
+			for (i = 0; i < ysizes.length; i++) {
 
-					ysizes[i] = 1.0f / ysizes.length;// Silly value - space
-														// evenly instead
-				}
-			} else if (max != 1) {
+				ysizes[i] = 1.0f / ysizes.length;// Silly value - space
+													// evenly instead
+			}
+		} else if (max != 1) {
 
-				for (i = 0; i < ysizes.length; i++) {
+			for (i = 0; i < ysizes.length; i++) {
 
-					ysizes[i] /= max;// Normalise so they add up to 1
-				}
+				ysizes[i] /= max;// Normalise so they add up to 1
 			}
 		}
 
@@ -523,12 +523,14 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 		int x, y;
 		final Dimension s = getSize();
+		LogBuffer.println("Current layout width/height: [" + s.width + "/" + s.height + "].");
 
 		// Do columns - start at left edge
 		xpos[0] = 0;
 		for (x = 0; x < xsizes.length; x++) {
 
 			xpos[x + 1] = xpos[x] + (int) (s.width * xsizes[x]);
+			LogBuffer.println("Width of column [" + (x + 1) + "] = [" + xpos[x] + " + (int) (" + s.width + " * " + xsizes[x] + ")] = [" + xpos[x + 1] + "].");
 		}
 
 		// Fudge right edge in case of rounding errors
@@ -561,8 +563,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		//g.setColor(Color.white);
 		g.setColor(GUIFactory.DEFAULT_BG);
 		g.fillRect(0, 0, newsize.width, newsize.height);
-		if(dragging()) {
-			g.setColor(Color.BLACK);
+		if(dragging() || overHorizDragBar || overVertDragBar) {
+			g.setColor(Color.WHITE);
 			LogBuffer.println("Painting dragbar a new color.");
 		}
 		//g.setColor(Color.black);
@@ -1032,11 +1034,15 @@ public class DragGridPanel extends JPanel implements MouseListener,
 						|| (row < ysizes.length && components[curscol][row] != components[col - 1][row])) {
 
 					newcursor = leftRightCursor;
+					overVertDragBar = true;
 					both++;
 				} else {
+					overVertDragBar = false;
 					curscol = 0; // In the middle of a component that takes more
-									// than 1 cell
+								 // than 1 cell
 				}
+			} else {
+				overVertDragBar = false;
 			}
 
 			if (cursrow > 0) { // May be in a row border
@@ -1047,17 +1053,24 @@ public class DragGridPanel extends JPanel implements MouseListener,
 						|| (col < xsizes.length && components[col][cursrow] != components[col][row - 1])) {
 
 					newcursor = upDownCursor;
+					overHorizDragBar = true;
 					both++;
 				} else {
 
+					overHorizDragBar = false;
 					cursrow = 0; // In the middle of a component that takes more
-									// than 1 cell
+								 // than 1 cell
 				}
+			} else {
+				overHorizDragBar = false;
 			}
 
 			if(both == 2) {
 				newcursor = crossHairCursor;
 			}
+		} else {
+			overVertDragBar = false;
+			overHorizDragBar = false;
 		}
 
 		if (newcursor != currentCursor) {
@@ -1207,6 +1220,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	Cursor originalCursor;
 	/** current cursor type. */
 	int currentCursor = -1;
+	boolean overHorizDragBar = false;
+	boolean overVertDragBar = false;
 	/*
 	 * ContainerFocusTracker to pass focus on to appropriate sub-component.
 	 * removed by alok 9/12/2001, as doesn't seem necessary.
