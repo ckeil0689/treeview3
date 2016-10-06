@@ -645,13 +645,11 @@ public class DendroView implements Observer, DendroPanel {
 		matrixPanel.setMinimumHeight(10);
 		matrixPanel.setFocusWidth(0);
 		matrixPanel.setFocusHeight(0);
-		float mheights []  = new float[2];
-		mheights [0] = (float) .2;
-		mheights[1] = (float) .8;
+		int mheights []  = new int[1];
+		mheights[0] = (int) 180; //must be less than pane size!!!
 		matrixPanel.setHeights(mheights);
-		float mwidths []  = new float[2];
-		mwidths [0] = (float) .2;
-		mwidths[1] = (float) .8;
+		int mwidths []  = new int[1];
+		mwidths[0] = (int) 180; //must be less than pane size!!!
 		matrixPanel.setWidths(mwidths);
 
 		JPanel globalOverviewPanel;
@@ -675,7 +673,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		return matrixPanel;
 	}
-	
+
 	/**
 	 * Looks up the stored location values for the JSplitPane dividers.
 	 * This is needed for "Show-Hide" trees. It determines how much of

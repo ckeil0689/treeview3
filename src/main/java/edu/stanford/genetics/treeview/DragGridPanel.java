@@ -68,6 +68,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		ypos = new int[y + 1];
 		xsizes = new float[x];
 		ysizes = new float[y];
+		xintsizes = new int[x - 1];
+		yintsizes = new int[y - 1];
+		staticxsizes = false;
+		staticysizes = false;
 		// Space everything evenly
 		for (int i = 0; i < x; i++)
 			xsizes[i] = 1.0f / x;
@@ -214,6 +218,25 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	}
 
 	/**
+	 * Set the pixel widths of each column.
+	 * 
+	 * @param widths
+	 *            the widths.
+	 */
+	public void setWidths(final int widths[]) {
+
+		// Copy provided array into class variable
+		// This will give the documented exception if the parameter is too small
+		System.arraycopy(widths, 0, xintsizes, 0, xintsizes.length);
+
+		staticxsizes = true;
+
+		// Resize all the cells accordingly
+		doLayout();
+		repaint();
+	}
+
+	/**
 	 * Get the proportional widths of each column.
 	 * 
 	 * @return a float array containing the proportions (adds up to 1).
@@ -263,6 +286,25 @@ public class DragGridPanel extends JPanel implements MouseListener,
 				ysizes[i] /= max;// Normalise so they add up to 1
 			}
 		}
+
+		// Resize all the cells accordingly
+		doLayout();
+		repaint();
+	}
+
+	/**
+	 * Set the pixel heights of each column.
+	 * 
+	 * @param widths
+	 *            the widths.
+	 */
+	public void setHeights(final int heights[]) {
+
+		// Copy provided array into class variable
+		// This will give the documented exception if the parameter is too small
+		System.arraycopy(heights, 0, yintsizes, 0, yintsizes.length);
+
+		staticysizes = true;
 
 		// Resize all the cells accordingly
 		doLayout();
@@ -525,6 +567,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		final Dimension s = getSize();
 		LogBuffer.println("Current layout width/height: [" + s.width + "/" + s.height + "].");
 
+		checkPopulateSizes();
+
 		// Do columns - start at left edge
 		xpos[0] = 0;
 		for (x = 0; x < xsizes.length; x++) {
@@ -546,6 +590,54 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		// Fudge bottom edge in case of rounding errors
 		ypos[ysizes.length] = s.height;
 		resizeComponents();
+	}
+
+	private void checkPopulateSizes() {
+
+		final Dimension s = getSize();
+		int pxsum = 0;
+
+		if(staticxsizes && xsizes.length > 0 &&
+			xintsizes.length > 0 && xintsizes[0] != 0 &&
+			s.width > 0) {
+
+			int i = 0;
+			for(i = 0;i < xintsizes.length;i++) {
+				pxsum += xintsizes[i];
+				xsizes[i] = (float) xintsizes[i] / (float) s.width;
+			}
+			//See if the xintsizes are too big
+			if(pxsum > s.width) {
+				xsizes[i] = 1.0f;
+				//This will normalize the sizes
+				setWidths(xsizes);
+			} else {
+				xsizes[i] = 1.0f - (float) pxsum / (float) s.width;
+			}
+			staticxsizes = false;
+		}
+
+		pxsum = 0;
+
+		if(staticysizes && ysizes.length > 0 &&
+			yintsizes.length > 0 && yintsizes[0] != 0 &&
+			s.height > 0) {
+
+			int i = 0;
+			for(i = 0;i < yintsizes.length;i++) {
+				pxsum += yintsizes[i];
+				ysizes[i] = (float) yintsizes[i] / (float) s.height;
+			}
+			//See if the xintsizes are too big
+			if(pxsum > s.height) {
+				ysizes[i] = 1.0f;
+				//This will normalize the sizes
+				setHeights(ysizes);
+			} else {
+				xsizes[i] = 1.0f - (float) pxsum / (float) s.height;
+			}
+			staticysizes = false;
+		}
 	}
 
 	// ****************************
@@ -871,6 +963,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 		dragBar.setMouse(e.getX(), e.getY());
 		repaint();
+	}
+
+	public Dimension getGridSize() {
+		return(getSize());
 	}
 
 	/** Called when this container gets resized. */
@@ -1208,6 +1304,12 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	float xsizes[];
 	/** The relative sizes of the cell rows. Add up to 1. */
 	float ysizes[];
+	/** The absolute sizes of the all but the last cell columns. */
+	int xintsizes[];
+	boolean staticxsizes = false;
+	/** The absolute sizes of the all but the last cell rows. */
+	int yintsizes[];
+	boolean staticysizes = false;
 	/** column divider being dragged by mouse, or 0. */
 	int coldrag;
 	/** row divider being dragged by mouse, or 0. */
