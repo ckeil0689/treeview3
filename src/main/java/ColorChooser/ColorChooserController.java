@@ -10,13 +10,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Observable;
-import java.util.prefs.Preferences;
 
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.Timer;
 
-import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;
@@ -26,20 +24,16 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
  * Controls user actions for the ColorChooser dialog. It is responsible to initiate the actions conferred by the user.
  * Additionally, it delegates methods necessary to created user expected behavior.
  */
-public class ColorChooserController extends Observable 
-implements ConfigNodePersistent {
+public class ColorChooserController extends Observable {
 
 	public static final Integer DEFAULT_MULTI_CLICK_INTERVAL = 300;
 	private final ColorChooserUI colorChooserUI;
 	private final ColorPicker colorPicker;
 
 	// Node for saved data
-	private Preferences configNode;
 	private ApplyChangeListener applyChangeListener;
-
 	// Holds all preset color data
 	private final ColorPresets colorPresets;
-	private final ColorSchemeType d_colorScheme = ColorSchemeType.REDGREEN;
 
 	public ColorChooserController(final ColorChooserUI colorChooserUI) {
 
@@ -48,6 +42,7 @@ implements ConfigNodePersistent {
 		this.colorPresets = DendrogramFactory.getColorPresets();
 
 		addAllListeners();
+		restoreStateFromColorPresets();
 	}
 
 	/**
@@ -69,57 +64,43 @@ implements ConfigNodePersistent {
 			colorChooserUI.addApplyChangeListener(applyChangeListener);
 		}
 	}
-
-	@Override
-	public void setConfigNode(final Preferences parentNode) {
-
-		if (parentNode == null) {
-			LogBuffer.println("Could not find or create GradientChooser node because parentNode was null.");
+	
+	/**
+	 * Asks the ColorPresets for the last active ColorSet and adapts the GUI to it.
+	 */
+	private void restoreStateFromColorPresets() {
+		
+		if(colorPresets == null) {
+			LogBuffer.println("Could not restore state in " + this.getClass().getSimpleName() 
+					+ " because ColorPresets were null.");
 			return;
 		}
 		
-		this.configNode = parentNode.node("GradientChooser");
-		requestStoredState();
+		ColorSchemeType colorSchemeKey = colorPresets.getLastActiveColorScheme();
+		setSelectedColorScheme(colorSchemeKey);
 		switchColorSet();
 		colorChooserUI.getColorPicker().loadActiveColorSetValues();
 	}
-	
-	@Override
-	public Preferences getConfigNode() {
 
-		return configNode;
-	}
-	
-	@Override
-	public void requestStoredState() {
+	/**
+	 * Stores the active <code>ColorSet</code> in the <code>ColorPresets</code> node. Generates a <code>ColorSet</code> 
+	 * from custom settings, if currently selected. Calls storeState() in <code>ColorPresets</code>.
+	 */
+	public void saveColorSettings() {
 		
-		importStateFrom(configNode);
-	}
-
-	@Override
-	public void storeState() {
-		
-		if(configNode == null || colorPresets == null) {
-			LogBuffer.println("Could not store state in ColorChooserController.");
+		if(colorPresets == null) {
+			LogBuffer.println("Could not save color settings.");
 			return;
 		}
 		
 		ColorSchemeType activeColorScheme = (ColorSchemeType) colorChooserUI.getPresetChoices().getSelectedItem();
-		configNode.put("activeColors", activeColorScheme.toString());
-		colorPresets.addColorSet(getCurrentCustomColorSet());
-	}
-	
-	@Override
-	public void importStateFrom(Preferences oldNode) {
+		colorPresets.setLastActiveColorScheme(activeColorScheme);
 		
-		if(oldNode == null) {
-			LogBuffer.println("Could not restore saved state. " + this.getClass().toString());
-			return;
+		if(colorChooserUI.isCustomSelected()) {
+			colorPresets.addColorSet(getCurrentCustomColorSet());
 		}
 		
-		String colorSchemeKey = oldNode.get("activeColors", d_colorScheme.toString());
-//		this.activeColorScheme = ColorSchemeType.getMemberFromKey(colorSchemeKey);
-		setActiveColorScheme(ColorSchemeType.getMemberFromKey(colorSchemeKey));
+		colorPresets.storeState();
 	}
 	
 	private ColorSet getCurrentCustomColorSet() {
@@ -132,9 +113,8 @@ implements ConfigNodePersistent {
 	 * Define which ColorSchemeType is currently active.
 	 * @param scheme
 	 */
-	private void setActiveColorScheme(final ColorSchemeType scheme) {
+	private void setSelectedColorScheme(final ColorSchemeType scheme) {
 		
-//		this.activeColorScheme = scheme;
 		colorChooserUI.getPresetChoices().setSelectedItem(scheme);
 	}
 	
@@ -142,7 +122,7 @@ implements ConfigNodePersistent {
 	 * Define which ColorSchemeType is currently active.
 	 * @param scheme
 	 */
-	private ColorSchemeType getActiveColorScheme() {
+	private ColorSchemeType getSelectedColorScheme() {
 		
 		return ((ColorSchemeType) colorChooserUI.getPresetChoices().getSelectedItem());
 	}
@@ -154,13 +134,13 @@ implements ConfigNodePersistent {
 	 */
 	private void switchColorSet() {
 		
-		ColorSchemeType scheme = getActiveColorScheme();
+		ColorSchemeType scheme = getSelectedColorScheme();
 		LogBuffer.println("Updating ColorPicker to: " + scheme.toString());
 		
 		final ColorSet set = colorPresets.getColorSet(scheme.toString());
 		colorChooserUI.getColorPicker().setActiveColorSet(set);
 		
-		setActiveColorScheme(scheme);
+		setSelectedColorScheme(scheme);
 		
 		// Load and set data accordingly
 		colorChooserUI.getColorPicker().loadActiveColorSetValues();
@@ -204,11 +184,12 @@ implements ConfigNodePersistent {
 			
 			
 		}
+		
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
 			colorPicker.setGradientColors();
-			wasApplied = true;
+			saveColorSettings();//wasApplied = true;
 			setChanged();
 			notifyObservers();
 		}
@@ -426,10 +407,10 @@ implements ConfigNodePersistent {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			if(colorChooserUI.isCustomSelected()) {
-				LogBuffer.println("Storing custom color set before switching.");
-				colorPresets.addColorSet(getCurrentCustomColorSet());
-			}
+//			if(colorChooserUI.isCustomSelected()) {
+//				LogBuffer.println("Storing custom color set before switching.");
+//				colorPresets.addColorSet(getCurrentCustomColorSet());
+//			}
 			
 			@SuppressWarnings("unchecked")
 			Object selectedItem = ((JComboBox<ColorSchemeType>) arg0.getSource()).getSelectedItem();
@@ -477,7 +458,7 @@ implements ConfigNodePersistent {
 			LogBuffer.println("Window closed event.");
 			if(applyChangeListener.wasApplied()) {
 				LogBuffer.println("Saving applied changes.");
-				storeState();
+				saveColorSettings();
 				applyChangeListener.reset();
 				return;
 			}

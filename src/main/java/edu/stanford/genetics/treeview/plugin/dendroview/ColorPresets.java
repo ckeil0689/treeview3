@@ -45,6 +45,7 @@ public class ColorPresets implements ConfigNodePersistent {
 	}
 
 	private Preferences configNode;
+	private String lastActiveColorScheme;
 
 	/**
 	 * creates a new ColorPresets object and binds it to the node adds default
@@ -63,6 +64,8 @@ public class ColorPresets implements ConfigNodePersistent {
 		
 		defaultColorSets[0].setMissing(sysBackground);
 		defaultColorSets[1].setMissing(sysBackground);
+		
+		this.lastActiveColorScheme = ColorSchemeType.REDGREEN.toString();
 	}
 
 	/** Constructor for the ColorPresets object */
@@ -81,6 +84,7 @@ public class ColorPresets implements ConfigNodePersistent {
 		}
 		
 		this.configNode = parentNode.node(this.getClass().getSimpleName());
+		requestStoredState();
 	}
 	
 	/**
@@ -93,18 +97,40 @@ public class ColorPresets implements ConfigNodePersistent {
 
 	@Override
 	public void requestStoredState() {
-		LogBuffer.println("No state to restore in " + this.getClass().getName());
+		
+		if(configNode == null) {
+			LogBuffer.println("Could not get stored state of " + getClass().getSimpleName() 
+					+ " because Preferences node was null.");
+			return;
+		}
+		
+		this.lastActiveColorScheme = configNode.get("lastActiveColorScheme", ColorSchemeType.REDGREEN.toString());
 	}
 
 	@Override
 	public void storeState() {
-		LogBuffer.println("No state to store in " + this.getClass().getName());
 		
+		if(configNode == null) {
+			LogBuffer.println("Could not store state of " + getClass().getSimpleName() 
+					+ " because Preferences node was null.");
+			return;
+		}
+		
+		configNode.put("lastActiveColorScheme", lastActiveColorScheme);
 	}
 
 	@Override
 	public void importStateFrom(final Preferences oldNode) {
-		LogBuffer.println("No state to import in " + this.getClass().getName());
+		
+		if(oldNode == null) {
+			LogBuffer.println("Could not import state to " + getClass().getSimpleName() 
+					+ " because the old Preferences node was null.");
+			return;
+		}
+		
+		String oldLastActiveScheme = oldNode.get("lastActiveColorScheme", ColorSchemeType.REDGREEN.toString());
+		configNode.put("lastActiveColorScheme", oldLastActiveScheme);
+		this.lastActiveColorScheme = oldLastActiveScheme;
 	}
 
 	/**
@@ -113,7 +139,20 @@ public class ColorPresets implements ConfigNodePersistent {
 	 */
 	public int getDefaultIndex() {
 
+		if(configNode == null) {
+			LogBuffer.println("No Preferences node in ColorPresets defined.");
+		}
 		return configNode.getInt("default", dIndex);
+	}
+	
+	public ColorSchemeType getLastActiveColorScheme() {
+		
+		return ColorSchemeType.getMemberFromKey(lastActiveColorScheme);
+	}
+	
+	public void setLastActiveColorScheme(ColorSchemeType scheme) {
+		
+		this.lastActiveColorScheme = scheme.toString();
 	}
 
 	/**
@@ -146,6 +185,11 @@ public class ColorPresets implements ConfigNodePersistent {
 	 */
 	public void setDefaultIndex(final int i) {
 
+		if(configNode == null) {
+			LogBuffer.println("Cannot store default index. ColorPresets Preferences node is undefined.");
+			return;
+		}
+		
 		configNode.putInt("default", i);
 	}
 
@@ -227,6 +271,12 @@ public class ColorPresets implements ConfigNodePersistent {
 			return defaultColorSets[0];
 		}
 		
+		if(configNode == null) {
+			LogBuffer.println("ColorSet could not be returned because no Preferences node was defined. "
+					+ "Returned default Red-Green.");
+			return defaultColorSets[0];
+		}
+		
 		// Checking the defaults
 		for (final ColorSet defaultColorSet : defaultColorSets) {
 			if (defaultColorSet.getColorSchemeName().equals(colorSchemeName)) {
@@ -247,7 +297,16 @@ public class ColorPresets implements ConfigNodePersistent {
 
 		// Default to first defaultColorSet (Red-Green)
 		LogBuffer.println("ColorSet (" + colorSchemeName + ") not found. Returned default Red-Green instead.");
-		return defaultColorSets[0];
+		return defaultColorSets[0];	
+	}
+	
+	/**
+	 * @return the last active <code>ColorSet</code> or the default Red-Green, if none is defined.
+	 */
+	public ColorSet getLastActiveColorSet() {
+		
+		String lastActiveScheme = getLastActiveColorScheme().toString();
+		return getColorSet(lastActiveScheme);
 	}
 
     /**

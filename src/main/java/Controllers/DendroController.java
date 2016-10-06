@@ -1489,19 +1489,22 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		try {
 			Preferences labelViewNode;
-			if(!oldNode.nodeExists("RowLabelView")) {
+			String rowLabelNode = dendroView.getRowLabelView().getClass().getSimpleName();
+			String colLabelNode = dendroView.getColLabelView().getClass().getSimpleName();
+			
+			if(!oldNode.nodeExists(rowLabelNode)) {
 				LogBuffer.println("Missing node in parent. Could not import "
 						+ "row label settings.");
 			} else {
-				labelViewNode = oldNode.node("RowLabelView");
+				labelViewNode = oldNode.node(rowLabelNode);
 				dendroView.getRowLabelView().importStateFrom(labelViewNode);
 			}
 		
-			if(!oldNode.nodeExists("ColLabelView")) {
+			if(!oldNode.nodeExists(colLabelNode)) {
 				LogBuffer.println("Missing node in parent. Could not import "
 						+ "column label settings.");
 			} else {
-				labelViewNode = oldNode.node("ColLabelView");
+				labelViewNode = oldNode.node(colLabelNode);
 				dendroView.getColLabelView().importStateFrom(labelViewNode);
 			}
 		} catch (BackingStoreException e) {

@@ -28,8 +28,7 @@ import edu.stanford.genetics.treeview.model.TVModel;
  * @version @version $Revision: 1.2 $ $Date: 2007-07-13 02:33:47 $
  */
 
-public class ColorExtractor extends Observable implements ConfigNodePersistent,
-		ContrastSelectable {
+public class ColorExtractor extends Observable implements ConfigNodePersistent, ContrastSelectable {
 
 	private ColorSet defaultColorSet;
 	private final double default_contrast = 3.0;
@@ -64,12 +63,9 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 		setMin(min);
 		setMax(max);
+		
+		setDefaultColorSet(DendrogramFactory.getColorPresets().getColorSet(ColorSchemeType.REDGREEN.toString()));
 
-		// set a default defaultColorSet... should be superceded by a user
-		// setting...
-		// defaultColorSet = new ColorSet();
-		// defaultColorSet.setMissing(ColorSet.decodeColor("#909090"));
-		// defaultColorSet.setEmpty(ColorSet.decodeColor("#FFFFFF"));
 		this.colorList_default = new ArrayList<Color>();
 		this.colorList_default.add(Color.red);
 		this.colorList_default.add(Color.black);
@@ -137,9 +133,15 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	}
 	
 	@Override
-	public void importStateFrom(Preferences oldNode) {
+	public void importStateFrom(final Preferences oldNode) {
 
-		this.colorSet = findColorSetFromNode(oldNode);
+		if(oldNode == null) {
+			LogBuffer.println("Cannot import color settings from old node, because it was null.");
+			return;
+		}
+		
+		ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+		this.colorSet = colorPresets.getLastActiveColorSet();
 
 		final String[] colors = colorSet.getColors();
 		final List<Color> cList = new ArrayList<Color>(colors.length);
@@ -149,8 +151,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 		setNewParams(colorSet.getFractions(), cList);
 
-		if ((ColorSchemeType.CUSTOM.toString()).equalsIgnoreCase(
-				colorSet.getColorSchemeName())) {
+		if ((ColorSchemeType.CUSTOM.toString()).equalsIgnoreCase(colorSet.getColorSchemeName())) {
 			setMin(colorSet.getMin());
 			setMax(colorSet.getMax());
 		}
@@ -161,70 +162,6 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 		setLogBase(oldNode.getDouble("logbase", 2.0));
 		this.m_logTranform = (oldNode.getBoolean("logtransform", false));
 		setChanged();
-	}
-
-	/**
-	 * Find the last active colorset from a supplied Preferences node.
-	 * 
-	 * @param node
-	 * @return The last active colorset or a default in case it cannot be found.
-	 */
-	private ColorSet findColorSetFromNode(final Preferences node) {
-
-		ColorSet nodeColorSet = defaultColorSet;
-
-		String lastActive = ColorSchemeType.REDGREEN.toString();
-		try {
-			/* Check old Preferences for data */
-			if (node.nodeExists("GradientChooser")) {
-				lastActive = node.node("GradientChooser").get("activeColors",
-						lastActive);
-			}
-
-			boolean foundColorSet = false;
-
-			for (final ColorSet defaultColorSet2 : ColorPresets.defaultColorSets) {
-				if (defaultColorSet2.getColorSchemeName().equalsIgnoreCase(lastActive)) {
-					nodeColorSet = new ColorSet(defaultColorSet2);
-					foundColorSet = true;
-					break;
-				}
-			}
-
-			if (!foundColorSet) {
-				// Set colorList and fractionList here, based on what the last
-				// active
-				// node was in GradientColorChooser. Otherwise keep defaults?
-				final Preferences colorPresetNode = node.node("ColorPresets");
-				final String[] childrenNodes = colorPresetNode.childrenNames();
-
-				for (final String childNode : childrenNodes) {
-					/*
-					 * TODO second argument here needs to be a default, not the
-					 * local variable
-					 */
-					if (colorPresetNode.node(childNode).get("name", lastActive)
-							.equalsIgnoreCase(lastActive)) {
-						nodeColorSet = new ColorSet(
-								colorPresetNode.node(childNode));
-						foundColorSet = true;
-						break;
-					}
-				}
-			}
-			// TODO This should be a more robust way of choosing a default
-			// colorset
-			if (!foundColorSet) {
-				nodeColorSet = new ColorSet(ColorPresets.defaultColorSets[0]);
-				LogBuffer.println("Unable to find last used colorset: "
-						+ lastActive + "; using " + nodeColorSet.getColorSchemeName());
-			}
-		} catch (final BackingStoreException e) {
-			LogBuffer.logException(e);
-			nodeColorSet = defaultColorSet;
-		}
-
-		return nodeColorSet;
 	}
 
 	public void setMin(final double min) {

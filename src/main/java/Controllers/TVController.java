@@ -520,7 +520,7 @@ public class TVController implements Observer {
 			newFs =  fs;
 			
 		} else {
-			newFs = tvFrame.getFileSet(file);
+			newFs = ViewFrame.getFileSet(file);
 		}
 		
 		this.fileMenuSet = newFs;
@@ -548,7 +548,7 @@ public class TVController implements Observer {
 					return;
 				}
 				
-				loadFileSet = tvFrame.getFileSet(file);
+				loadFileSet = ViewFrame.getFileSet(file);
 			}
 			
 			getDataInfoAndLoad(loadFileSet, null, null, false, shouldUseImport);
@@ -984,10 +984,8 @@ public class TVController implements Observer {
 	 *
 	 * @param menu - The type of opened menu distinguished by its String name.
 	 */
-	@SuppressWarnings("unused") // LabelSettingsController doesn't need to be stored in a variable
 	public void openLabelMenu(final String menu) {
 
-		// View
 		final LabelSettings labelSettingsView = new LabelSettings(tvFrame);
 
 		if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
@@ -1006,7 +1004,6 @@ public class TVController implements Observer {
 	 *
 	 * @param menu
 	 */
-	@SuppressWarnings("unused") // ExportDialogController doesn't need to be stored in a variable
 	public void openExportMenu() {
 
 		if(tvFrame.getDendroView() == null || !tvFrame.isLoaded()) {
@@ -1041,23 +1038,15 @@ public class TVController implements Observer {
 		final double mean = model.getDataMatrix().getMean();
 		final double median = model.getDataMatrix().getMedian();
 
-		/* View */
 		ColorExtractor colorExtractor = dendroController.getColorExtractor();
 
-		final ColorChooserUI gradientPick = new ColorChooserUI(colorExtractor, 
-				min, max, mean, median);
-
-		/* Controller */
-		ColorChooserController controller = new ColorChooserController(
-				gradientPick);
-
-		/* Adding GradientColorChooser configurations to DendroView node. */
-		controller.setConfigNode(((TVModel) model).getDocumentConfig());
+		final ColorChooserUI colorChooserUI = new ColorChooserUI(colorExtractor, min, max, mean, median);
+		ColorChooserController controller = new ColorChooserController(colorChooserUI);
 		
 		controller.addObserver(dendroController.getInteractiveMatrixView());
 		controller.addObserver(dendroController.getGlobalMatrixView());
 
-		gradientPick.setVisible(true);
+		colorChooserUI.setVisible(true);
 	}
 	
 	private void showWarning(final String message) {

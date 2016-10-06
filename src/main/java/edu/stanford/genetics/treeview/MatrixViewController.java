@@ -23,6 +23,7 @@ import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import ColorChooser.ColorChooserController;
 import ColorChooser.ColorSchemeType;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSNumber;
@@ -132,8 +133,7 @@ ConfigNodePersistent, Controller {
 	public void setConfigNode(final Preferences parentNode) {
 
 		if (parentNode == null) {
-			LogBuffer.println("Could not find or create IMViewController "
-					+ "node because parentNode was null.");
+			LogBuffer.println("Could not find or create MatrixViewController node because parentNode was null.");
 			return;
 		} 
 		
@@ -176,26 +176,21 @@ ConfigNodePersistent, Controller {
 			throws BackingStoreException {
 
 		LogBuffer.println("Importing color settings...");
-
-		if (!oldNode.nodeExists("ColorPresets")) {
-			LogBuffer.println("ColorPresets node not found when trying" 
-					+ " to import previous color settings. Aborting import"
-					+ "attempt.");
+		
+		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+		String colorPresetsNode = colorPresets.getClass().getSimpleName();
+		
+		if (!oldNode.nodeExists(colorPresetsNode)) {
+			LogBuffer.println("ColorPresets node not found when trying to import previous color settings. "
+					+ "Aborting import attempt.");
 			return;
 		}
 
-		LogBuffer.println("OldNode: " + oldNode.toString());
-		colorExtractor.importStateFrom(oldNode);
+		colorExtractor.importStateFrom(oldNode.node(colorPresetsNode));
 
-		/* Update GradientChooser node */
-		String lastActive = oldNode.node("GradientChooser").get("activeColors",
-				ColorSchemeType.REDGREEN.toString());
-		configNode.node("GradientChooser").put("activeColors", lastActive);
-
-		/* Store copied node in new ColorPresets node */
-		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
+		// Store copied node in new ColorPresets node
 		colorPresets.setConfigNode(configNode);
-		colorPresets.addColorSet(colorExtractor.getActiveColorSet());
+		colorPresets.importStateFrom(oldNode.node(colorPresetsNode));
 	}
 
 	@Override // Observer code
