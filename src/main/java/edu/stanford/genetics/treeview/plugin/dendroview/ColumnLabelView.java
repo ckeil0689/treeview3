@@ -45,12 +45,12 @@ public class ColumnLabelView extends LabelView {
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode != null) {
-			super.setConfigNode(parentNode.node("ColLabelView"));
-		} else {
+		if (parentNode == null) {
 			LogBuffer.println("Error: Could not find or create ColumnLabelView node because parentNode was null.");
 			return;
 		}
+		
+		super.setConfigNode(parentNode.node(this.getClass().getSimpleName()));
 	}
 
 	@Override
