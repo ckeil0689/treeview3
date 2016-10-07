@@ -402,9 +402,10 @@ public class ColorPresets implements ConfigNodePersistent {
 //	 }
 	
 	/**
-	 * Searches the children nodes of the ColorPresets Preferences node for a node with the given <code>scheme</scheme>.
-	 * @param scheme - The scheme to search for.
-	 * @return If a node exists with the given scheme, return its index. If it doesn't -1 will be returned.
+	 * Searches the children nodes of the <code>ColorPresets</code> <code>Preferences</code> node for a node 
+	 * with the given scheme name.
+	 * @param scheme - The scheme name to search for.
+	 * @return If a node exists with the given scheme name, return its index. If it doesn't -1 will be returned.
 	 */
 	public int checkNodeExists(final String scheme) {
 		
