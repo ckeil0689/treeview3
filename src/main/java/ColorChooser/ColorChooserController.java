@@ -305,8 +305,8 @@ public class ColorChooserController extends Observable {
 	}
 
 	/**
-	 * This listener defines the behavior of ColorGradientChooser when the user
-	 * moves the mouse on top a thumb or drags it in a certain direction.
+	 * This listener defines the behavior of <code>ColorPicker</code> when the user moves the mouse on top a 
+	 * thumb or drags it in a certain direction.
 	 */
 	private class ThumbMotionListener extends MouseAdapter {
 
@@ -342,7 +342,7 @@ public class ColorChooserController extends Observable {
 	}
 
 	/**
-	 * Adds a user-selected color to the colorList in the gradientBox.
+	 * Adds a user-selected color to the color list in the <code>GradientBox</code>.
 	 */
 	private class AddButtonListener implements ActionListener {
 
@@ -360,7 +360,7 @@ public class ColorChooserController extends Observable {
 	}
 
 	/**
-	 * Opens the an edit dialog for the selected thumb.
+	 * Opens an edit dialog for the selected thumb.
 	 */
 	private class EditButtonListener implements ActionListener {
 
