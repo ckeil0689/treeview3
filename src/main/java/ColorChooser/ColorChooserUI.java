@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 
 /**
@@ -88,11 +89,9 @@ public class ColorChooserUI extends CustomDialog {
 		setSelectionDependentBtnStatus(false, false);
 
 		this.missingColorIcon = new ColorIcon();
-		this.missingBtn = GUIFactory.createColorIconBtn("Missing Data",
-				missingColorIcon);
+		this.missingBtn = GUIFactory.createColorIconBtn("Missing Data", missingColorIcon);
 
-		this.presetChoice = new JComboBox<ColorSchemeType>(
-				ColorSchemeType.values());
+		this.presetChoice = new JComboBox<ColorSchemeType>(ColorSchemeType.values());
 
 		// Preset choice panel
 		final JPanel presetChoicePanel = GUIFactory.createJPanel(false,
@@ -137,7 +136,13 @@ public class ColorChooserUI extends CustomDialog {
 	 */
 	protected void updateMissingColorIcon(Color newColor) {
 
+		if(missingColorIcon == null || missingBtn == null) {
+			LogBuffer.println("Could not update the color icon of the 'Missing Color' button.");
+			return;
+		}
+		
 		missingColorIcon.setColor(newColor);
+		missingBtn.repaint();
 	}
 
 	/**

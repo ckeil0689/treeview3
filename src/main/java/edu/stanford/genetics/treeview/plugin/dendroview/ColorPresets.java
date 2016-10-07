@@ -289,7 +289,6 @@ public class ColorPresets implements ConfigNodePersistent {
 		// Checking the defaults
 		for (final ColorSet defaultColorSet : defaultColorSets) {
 			if (defaultColorSet.getColorSchemeName().equals(colorSchemeName)) {
-				LogBuffer.println("Found default ColorSet with name: " + colorSchemeName);
 				return defaultColorSet;
 			}
 		}
@@ -299,7 +298,6 @@ public class ColorPresets implements ConfigNodePersistent {
 		for (final String childrenNode : childrenNodes) {
 			final ColorSet ret = new ColorSet(configNode.node(childrenNode));
 			if (colorSchemeName.equals(ret.getColorSchemeName())) {
-				LogBuffer.println("Found child ColorSet with name: " + colorSchemeName);
 				return ret;
 			}
 		}

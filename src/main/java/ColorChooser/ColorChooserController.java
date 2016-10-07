@@ -139,6 +139,7 @@ public class ColorChooserController extends Observable {
 		ColorSchemeType scheme = getSelectedColorScheme();
 		
 		final ColorSet set = colorPresets.getColorSet(scheme.toString());
+		colorChooserUI.updateMissingColorIcon(set.getMissing());
 		colorChooserUI.getColorPicker().setActiveColorSet(set);
 		
 		// Load and set data accordingly

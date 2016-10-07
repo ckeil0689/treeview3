@@ -170,8 +170,6 @@ public class ColorSet {
 	 */
 	public ColorSet(final ColorSet another) {
 
-		LogBuffer.println("Copying new ColorSet: " + another.colorSchemeType);
-		
 		this.colorSchemeType = another.colorSchemeType;
 		this.colorList = another.colorList;
 		this.fractionList = another.fractionList;
@@ -189,8 +187,6 @@ public class ColorSet {
 	 */
 	public void saveTo(final Preferences colorSetNode) {
 
-		LogBuffer.println("Saving the ColorSet with scheme: " + this.colorSchemeType);	
-		
 		colorSetNode.put("colorSchemeType", this.colorSchemeType);
 
 		final int colorNum = colorList.size();
