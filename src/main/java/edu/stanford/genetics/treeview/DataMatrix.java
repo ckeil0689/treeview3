@@ -123,4 +123,12 @@ public interface DataMatrix {
 	
 	public double getColAverage(int fromColId, int toColId);
 
+	void setMinVal(double newMinVal);
+
+	void setMaxVal(double newMaxVal);
+
+	void setMean(double newMeanVal);
+
+	void setMedian(double newMedianVal);
+
 }

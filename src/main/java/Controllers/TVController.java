@@ -313,38 +313,28 @@ public class TVController implements Observer {
 	/**
 	 * Load data into the model.
 	 * 
-	 * @param fileSet
-	 *            The fileSet to be loaded.
-	 * @param isClusterFile
-	 *            Whether a clustered file is loaded or not. This is important
-	 *            when figuring out whether preferences from the previous file
-	 *            should be copied to the new one. It should only occur when a
-	 *            file is being clustered.
+	 * @param fileSet - The fileSet to be loaded.
+	 * @param dataInfo - Contains information on how the data should be loaded. This information is determined by the
+	 * user in the import dialog. If the file has been loaded before, the information can come from stored preferences
+	 * data.
 	 */
 	public void loadData(final FileSet fileSet, final DataLoadInfo dataInfo) {
 
-		/* Setting loading screen */
+		// Setting loading screen
 		tvFrame.generateView(ViewType.PROGRESS_VIEW);
 
-		/* Loading TVModel */
+		// Loading TVModel
 		final TVModel tvModel = (TVModel) model;
-		
+	
 		setFileMenuSet(fileSet);
 
 		try {
-			/* ensure reset of the model data */
+			// first, ensure reset of the model data
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
-
-			if (tvModel.getColLabelInfo().getNumLabels() == 0) {
-				/* ------ Load Process -------- */
-				final ModelLoader loader = new ModelLoader(tvModel, this,
-						dataInfo);
-				loader.execute();
-
-			} else {
-				LogBuffer.println("ColumnLabels not reset, aborted loading.");
-			}
+			
+			final ModelLoader loader = new ModelLoader(tvModel, this, dataInfo);
+			loader.execute();
 
 		} catch (final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. "
@@ -581,35 +571,35 @@ public class TVController implements Observer {
 		
 		Preferences oldNode;
 		
-		/* Transfer settings to clustered file */
+		// Transfer settings to clustered file
 		if(isFromCluster && oldRoot != null && oldExt != null) {
-			LogBuffer.println("Loading clustered file.");
+			LogBuffer.println("Getting preferences for transfer to clustered file.");
 			oldNode = getOldPreferences(oldRoot, oldExt);
-		/* Check if file was loaded before */
+			
+		// Check if file was loaded before
 		} else {
-			LogBuffer.println("Loading normal file.");
-			oldNode = getOldPreferences(newFileSet.getRoot(), 
-					newFileSet.getExt());
+			LogBuffer.println("Checking if preferences exist for the new file.");
+			oldNode = getOldPreferences(newFileSet.getRoot(), newFileSet.getExt());
 		}
 
 		DataLoadInfo dataInfo;
 		if (oldNode == null || shouldUseImport) {
-			LogBuffer.println(">>>>>>>> No old node found. Import.");
+			LogBuffer.println("Using import dialog.");
 			dataInfo = useImportDialog(newFileSet);
 			
 		} else {
-			LogBuffer.println(">>>>>>>> Loading with old node.");
+			LogBuffer.println("Loading with info from existing node.");
 			dataInfo = getDataLoadInfo(newFileSet, oldNode);
 		}
 
-		if (dataInfo != null) {
-			dataInfo.setIsClusteredFile(isFromCluster);
-			loadData(newFileSet, dataInfo);
-			
-		} else {
+		if (dataInfo == null) {
 			String message = "Data loading was interrupted.";
 			LogBuffer.println(message);
+			return;
 		}
+		
+		dataInfo.setIsClusteredFile(isFromCluster);
+		loadData(newFileSet, dataInfo);
 	}
 
 	/**
@@ -651,11 +641,10 @@ public class TVController implements Observer {
 	public static DataLoadInfo getDataLoadInfo(FileSet fileSet, Preferences node) {
 		
         DataLoadInfo dataInfo;
-		String delimiter = node.get("delimiter", ModelLoader.DEFAULT_DELIM);
+		String delimiter = node.get("delimiter", DataLoadInfo.DEFAULT_DELIM);
 		
 		// Amount of label types may vary when loading, so they have to be re-detected
-		DataImportController importController = 
-				new DataImportController(delimiter);
+		DataImportController importController = new DataImportController(delimiter);
 		importController.setFileSet(fileSet);
 		
 		int[] dataCoords = importController.detectDataBoundaries();
