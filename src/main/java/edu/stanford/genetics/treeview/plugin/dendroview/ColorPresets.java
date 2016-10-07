@@ -146,7 +146,7 @@ public class ColorPresets implements ConfigNodePersistent {
 	}
 	
 	/**
-	 * @return The <code>ColorSchemeType</code> stored as the last active one. Default Red-Green if none wass stored.
+	 * @return The <code>ColorSchemeType</code> stored as the last active one. Default Red-Green if none was stored.
 	 */
 	public ColorSchemeType getLastActiveColorScheme() {
 		
