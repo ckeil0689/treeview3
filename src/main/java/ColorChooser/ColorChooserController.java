@@ -30,9 +30,9 @@ public class ColorChooserController extends Observable {
 	public static final Integer DEFAULT_MULTI_CLICK_INTERVAL = 300;
 	private final ColorChooserUI colorChooserUI;
 	private final ColorPicker colorPicker;
-
-	// Node for saved data
+	
 	private ApplyChangeListener applyChangeListener;
+	
 	// Holds all preset color data
 	private final ColorPresets colorPresets;
 
