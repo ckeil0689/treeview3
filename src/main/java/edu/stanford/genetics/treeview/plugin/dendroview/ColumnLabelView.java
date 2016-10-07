@@ -34,9 +34,6 @@ public class ColumnLabelView extends LabelView {
 	/**
 	 * This is only here for use by fudge factors that I suspect have to do with
 	 * the rotation of the graphics.
-	 * 
-	 * @author rleach
-	 * @param
 	 * @return boolean
 	 */
 	@Override
@@ -51,7 +48,7 @@ public class ColumnLabelView extends LabelView {
 		if (parentNode != null) {
 			super.setConfigNode(parentNode.node("ColLabelView"));
 		} else {
-			LogBuffer.println("Error: Could not find or create ArrayameView" + "node because parentNode was null.");
+			LogBuffer.println("Error: Could not find or create ColumnLabelView node because parentNode was null.");
 			return;
 		}
 	}
