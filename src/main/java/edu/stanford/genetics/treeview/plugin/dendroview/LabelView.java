@@ -332,10 +332,6 @@ public abstract class LabelView extends ModelView
 	 * pane is rotated: if the start of the label is at the bottom of the pane
 	 * and the label reads vertically upward, then the coordinates of the label
 	 * versus the scroll will be opposite.
-	 * 
-	 * @author rleach
-	 * @param
-	 * @return
 	 * @return
 	 */
 	protected abstract boolean labelAndScrollCoordsAreOpposite();
@@ -343,8 +339,6 @@ public abstract class LabelView extends ModelView
 	/**
 	 * Returns a summary string of what the labels represent (e.g. a row or
 	 * column summary)
-	 * 
-	 * @author rleach
 	 * @return String
 	 */
 	protected abstract String getSummaryName();
@@ -372,7 +366,7 @@ public abstract class LabelView extends ModelView
 		this.labelInfo = labelInfo;
 
 		if (labelSummary == null) {
-			LogBuffer.println("Could not update labels for labelSummary" + " in " + getName());
+			LogBuffer.println("Could not update labels for labelSummary in " + getName());
 			return;
 		}
 
@@ -520,7 +514,6 @@ public abstract class LabelView extends ModelView
 	/**
 	 * Rotates the pane content as necessary
 	 * 
-	 * @author rleach
 	 * @return void
 	 * @param g2d
 	 */
@@ -673,7 +666,7 @@ public abstract class LabelView extends ModelView
 				// slowDownRepaintTimer = null;
 				// }
 			} else {
-				debug("The repaint timer is not running. This updateBuffer " + "call was initiated by something else.",
+				debug("The repaint timer is not running. This updateBuffer call was initiated by something else.",
 						9);
 			}
 		}
@@ -797,7 +790,7 @@ public abstract class LabelView extends ModelView
 
 		/* Shouldn't draw if there's no TreeSelection defined */
 		if (drawSelection == null) {
-			LogBuffer.println("Error: drawSelection not defined. Can't draw " + "labels.");
+			LogBuffer.println("Error: drawSelection not defined. Can't draw labels.");
 			return;
 		}
 
@@ -833,13 +826,13 @@ public abstract class LabelView extends ModelView
 			// If the label pane's secondary dimension changed sizes or if the
 			// font size has changed
 			if (secondaryViewportSizeChanged() || lastFontSize != labelAttr.getPoints()) {
-				debug("Viewport size change detected. Previous scroll " + "positions: lastScrollPos [" + lastScrollPos
+				debug("Viewport size change detected. Previous scroll positions: lastScrollPos [" + lastScrollPos
 						+ "] lastScrollEndPos [" + lastScrollEndPos + "] lastScrollEndGap [" + lastScrollEndGap + "]",
 						10);
 
 				adjustSecondaryScroll(realMaxStrLen + getLabelShiftSize());
 
-				debug("Viewport size change detected. New scroll " + "positions: lastScrollPos [" + lastScrollPos
+				debug("Viewport size change detected. New scroll positions: lastScrollPos [" + lastScrollPos
 						+ "] lastScrollEndPos [" + lastScrollEndPos + "] lastScrollEndGap [" + lastScrollEndGap + "]",
 						10);
 			}
@@ -987,7 +980,7 @@ public abstract class LabelView extends ModelView
 					}
 
 					debug("Printing label [" + out + "] starting at labelStrStart [" + labelStrStart + "] (originally ["
-							+ labelStrStart + "] before " + "offset for right-just.) and length ["
+							+ labelStrStart + "] before offset for right-just.) and length ["
 							+ metrics.stringWidth(out) + "], which has been offset by ["
 							+ (isMatrixJustified() ? getLabelShift() : 0) + "] and is inside the offscreen pane size ["
 							+ getLabelPaneContentSize(metrics) + "] Saved secondaryPaneSize: ["
@@ -1145,7 +1138,6 @@ public abstract class LabelView extends ModelView
 	 * Lightens a color by simply making it transparent (with an arbitrary alpha
 	 * value)
 	 * 
-	 * @author rleach
 	 * @param aColor
 	 * @return newColor
 	 */
@@ -1381,7 +1373,7 @@ public abstract class LabelView extends ModelView
 							+ (getSecondaryScrollBar().getMaximum() - getSecondaryScrollBar().getModel().getExtent())
 							+ "] max - extent [" + getSecondaryScrollBar().getMaximum() + " - "
 							+ getSecondaryScrollBar().getModel().getExtent() + "] after drawing - first time "
-							+ getPaneType() + "s right " + "justified", 6);
+							+ getPaneType() + "s right justified", 6);
 
 					// It seems that the scrollbar max and extent are not
 					// updated in this scenario when the app first opens a
@@ -1411,7 +1403,7 @@ public abstract class LabelView extends ModelView
 						newSecondaryPaneSize);
 
 				debug("ReScroll " + getPaneType() + "s values, pane size: [" + newSecondaryPaneSize + "] pos ["
-						+ lastScrollPos + "] extent [" + (lastScrollEndPos - lastScrollPos) + "] min [" + "0"
+						+ lastScrollPos + "] extent [" + (lastScrollEndPos - lastScrollPos) + "] min [0"
 						+ "] max [" + (newSecondaryPaneSize - (lastScrollEndPos - lastScrollPos)) + "]", 6);
 			} else if (curPos != lastScrollPos) {
 				getSecondaryScrollBar().setValue(lastScrollPos);
@@ -1464,13 +1456,13 @@ public abstract class LabelView extends ModelView
 				getSecondaryScrollBar().setValues(lastScrollPos, lastScrollEndPos - lastScrollPos, 0,
 						newSecondaryPaneSize);
 
-				debug("ReScroll " + getPaneType() + "s left just. values, " + "pane size: [" + newSecondaryPaneSize
+				debug("ReScroll " + getPaneType() + "s left just. values, pane size: [" + newSecondaryPaneSize
 						+ "] pos [" + lastScrollPos + "] extent [" + (lastScrollEndPos - lastScrollPos)
 						+ "] min [0] max [" + (newSecondaryPaneSize - (lastScrollEndPos - lastScrollPos)) + "]", 6);
 			} else if (curPos != lastScrollPos) {
 				getSecondaryScrollBar().setValue(lastScrollPos);
 
-				debug("ReScroll " + getPaneType() + "s left just. to pos, " + "pane size: [" + newSecondaryPaneSize
+				debug("ReScroll " + getPaneType() + "s left just. to pos, pane size: [" + newSecondaryPaneSize
 						+ "] pos [" + lastScrollPos + "] extent [" + (lastScrollEndPos - lastScrollPos)
 						+ "] min [0] max [" + (newSecondaryPaneSize - (lastScrollEndPos - lastScrollPos)) + "]", 6);
 			} else {
@@ -1574,7 +1566,7 @@ public abstract class LabelView extends ModelView
 			debug("Refining maxstrlen", 1);
 			labelAttr.setLongestStr(tempLongest);
 			maxStrLen = metrics.stringWidth(tempLongest);
-			debug("Font size only changed. Recalculating length of longest " + "string [" + labelAttr.getLongestStr()
+			debug("Font size only changed. Recalculating length of longest string [" + labelAttr.getLongestStr()
 					+ "] & returning maxStrLen [" + maxStrLen + "]", 18);
 		}
 		// Else find the longest string and return its length
@@ -1623,8 +1615,7 @@ public abstract class LabelView extends ModelView
 	/**
 	 * Dynamic update of font size based on size setting or map scale
 	 * 
-	 * @author rleach
-	 * @param
+	 * @param g - <code>Graphics</code> object for which to update the font.
 	 * @return
 	 */
 	private void updateFontSize(final Graphics g) {
@@ -1741,7 +1732,7 @@ public abstract class LabelView extends ModelView
 
 		if (!enclosingWindow().isActive() || (SwingUtilities.isLeftMouseButton(e) && e.isControlDown())
 				|| !SwingUtilities.isLeftMouseButton(e)) {
-			debug("Window inactive, control is down, or not left mouse " + "button - do nothing on release", 23);
+			debug("Window inactive, control is down, or not left mouse button - do nothing on release", 23);
 			return;
 		}
 
@@ -1953,7 +1944,6 @@ public abstract class LabelView extends ModelView
 	 * Gets the data index that is hovered over, or -1 if not a valid hover
 	 * position
 	 * 
-	 * @author rleach
 	 * @return data index
 	 */
 	public int getAbsolutePrimaryHoverIndex() {
@@ -1975,7 +1965,7 @@ public abstract class LabelView extends ModelView
 		// be off by 1 in the y direction for whatever reason
 		int hPI = determineCursorPixelIndex(p); // Hover Pixel Index
 		if (debug > 0) {
-			debug("Hover Pixel as determined by: MouseInfo.getPointerInfo()." + "getLocation(): [" + hPI
+			debug("Hover Pixel as determined by: MouseInfo.getPointerInfo(). getLocation(): [" + hPI
 					+ "] map.getHoverPixel(): [" + map.getHoverPixel() + "]", 21);
 		}
 		int hDI = map.getIndex(hPI); // Hover Data Index
@@ -2177,14 +2167,14 @@ public abstract class LabelView extends ModelView
 							debug("Case 1.", 20);
 					} else if (lastScrollEndGap != -1) {
 						offset = lastScrollEndGap + indent;
-						debug("Setting offset to (lastScrollEndGap + " + "indent) [" + lastScrollEndGap + " + " + indent
+						debug("Setting offset to (lastScrollEndGap + indent) [" + lastScrollEndGap + " + " + indent
 								+ "] = [" + offset + "]", 16);
 						if (offset < 0)
 							debug("Case 2.", 20);
 					}
 				} else if (lastScrollEndPos != -1 && lastScrollPos != -1 && lastScrollEndGap != -1) {
 					offset = lastScrollEndGap + (/* Extent */ lastScrollEndPos - lastScrollPos) - labelLen;
-					debug("Setting offset to (lastScrollEndGap + (" + "lastScrollEndPos - lastScrollPos) - "
+					debug("Setting offset to (lastScrollEndGap + (lastScrollEndPos - lastScrollPos) - "
 							+ "labelLen) [" + lastScrollEndGap + " + (" + lastScrollEndPos + " - " + lastScrollPos
 							+ ") - " + labelLen + "] = [" + offset + "]", 16);
 					if (offset < 0)
@@ -2318,11 +2308,11 @@ public abstract class LabelView extends ModelView
 							fgColor, bgColor);
 
 					debug("Drawing column left overrun arrow at position ("
-							+ "paneSize - (lastScrollEndPos - indentsize - 1)" + ") [" + getSavedSecondaryPaneSize()
+							+ "paneSize - (lastScrollEndPos - indentsize - 1)) [" + getSavedSecondaryPaneSize()
 							+ " - (" + lastScrollEndPos + " - " + indentsize + " - 1)] = ["
 							+ (getSavedSecondaryPaneSize() - (lastScrollEndPos - indentsize - 1)) + "]", 15);
 				} else {
-					debug("No overrun arrow drawn because (" + "lastScrollEndGap != 0 && lastScrollEndGap > "
+					debug("No overrun arrow drawn because (lastScrollEndGap != 0 && lastScrollEndGap > "
 							+ "xPos) [" + lastScrollEndGap + " != 0 && " + lastScrollEndGap + " > " + xPos
 							+ "] lastScrollEndPos [" + lastScrollEndPos + "] lastScrollPos [" + lastScrollPos + "]",
 							10);
@@ -2344,7 +2334,7 @@ public abstract class LabelView extends ModelView
 							+ lastScrollEndGap + "]", 10);
 				} else {
 					debug("No overrun right " + getPaneType() + " arrow drawn because NOT ("
-							+ "lastScrollEndPos < (xPos + labelLen + indent) " + "|| lastScrollPos == 0) ["
+							+ "lastScrollEndPos < (xPos + labelLen + indent) || lastScrollPos == 0) ["
 							+ lastScrollEndPos + " < (" + xPos + " + " + labelLen + " + " + indent + ") || "
 							+ lastScrollPos + " == 0] lastScrollEndGap [" + lastScrollEndGap + "]", 10);
 				}
@@ -2476,7 +2466,7 @@ public abstract class LabelView extends ModelView
 		public void actionPerformed(ActionEvent evt) {
 			if (evt.getSource() == overScrollLabelPortOffTimer) {
 				debug("You hovered off the secondary row scrollbar 1s ago, "
-						+ "so the label port might turn off unless you're over " + "another pane that activates it", 2);
+						+ "so the label port might turn off unless you're over another pane that activates it", 2);
 				/* Stop timer */
 				overScrollLabelPortOffTimer.stop();
 				overScrollLabelPortOffTimer = null;
@@ -2497,7 +2487,7 @@ public abstract class LabelView extends ModelView
 		public void actionPerformed(ActionEvent evt) {
 			if (evt.getSource() == activeScrollLabelPortOffTimer) {
 				debug("You released the secondary scrollbar 1s ago, so "
-						+ "the label port might turn off unless you're over " + "another pane that activates it", 2);
+						+ "the label port might turn off unless you're over another pane that activates it", 2);
 				/* Stop timer */
 				activeScrollLabelPortOffTimer.stop();
 				activeScrollLabelPortOffTimer = null;
@@ -2692,12 +2682,12 @@ public abstract class LabelView extends ModelView
 					debug("Scrollbar was decreased by one block", 1);
 					break;
 				case AdjustmentEvent.TRACK:
-					debug("A non-scrollbar scroll event was detected (a " + "call from code or a mouse wheel event)",
+					debug("A non-scrollbar scroll event was detected (a call from code or a mouse wheel event)",
 							1);
 					updateScroll = false;
 					break;
 				}
-				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")" + "] to: [" + newvalue
+				debug("Scrolling from: [" + source.getValue() + " or (" + oldvalue + ")] to: [" + newvalue
 						+ "] via [" + evt.getSource() + "]", 7);
 				if (updateScroll) {
 					explicitSecondaryScrollTo(newvalue, -1, -1);

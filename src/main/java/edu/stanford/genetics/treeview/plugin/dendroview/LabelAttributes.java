@@ -8,9 +8,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelLoadReset;
 
 /**
- * A container which is explicitly responsible for the management of all defined label attributes. 
- * @author ckeil0689
- *
+ * A container which is explicitly responsible for the management of all defined label attributes.
  */
 public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, FontSelectable {
 
