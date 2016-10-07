@@ -238,10 +238,12 @@ public class ColorPicker {
 	}
 
 	/**
-	 * Updates the missing color object in active ColorExtractor.
+	 * Updates the missing <code>Color</code> object in the active <code>ColorExtractor</code>.
+	 * @param color - The new missing <code>Color</code>
 	 */
 	protected void setMissing(final Color color) {
 
+		activeColorSet.setMissing(color);
 		colorExtractor.setMissingColor(color);
 		colorExtractor.notifyObservers();
 	}
