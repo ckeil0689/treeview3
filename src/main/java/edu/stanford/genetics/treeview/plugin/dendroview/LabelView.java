@@ -78,6 +78,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/* Maps label position to GlobalView */
 	protected MapContainer map;
+	/*The other orthogonal map, used only once while calculating Zoomed Averages
+	 */
+	protected MapContainer map2;
 
 	/* Use labels to generate URLs for look-up */
 	protected UrlExtractor urlExtractor;
@@ -386,8 +389,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 *
 	 * @param im
 	 *            A new mapcontainer.
+	 * @param m2 The other orthogonal map, used only once while calculating
+	 *            Zoomed Averages
 	 */
-	public void setMap(final MapContainer im) {
+	public void setMap(final MapContainer im, final MapContainer m2) {
+		map2 = m2;
 		if(map != null) {
 			map.deleteObserver(this);
 		}
@@ -2951,10 +2957,35 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		map.unsetHoverPixel();
 		unsetPrimaryHoverIndex();
-		setMeanDataTickerValue();
+		if(isZoomed()){
+			/* This is not a recommended way of setting Zoomed Mean values
+			 * Parent should never no its child
+			 */
+			if(this instanceof RowLabelView)
+				setZoomMeanDataTickerValue(map.getFirstVisible(), 
+				                           map.getLastVisible(),
+				                           map2.getFirstVisible(),
+				                           map2.getLastVisible());
+			else if(this instanceof ColumnLabelView)
+				setZoomMeanDataTickerValue(map2.getFirstVisible(), 
+				                           map2.getLastVisible(),
+				                           map.getFirstVisible(),
+				                           map.getLastVisible());
+			else
+				LogBuffer.println("ERROR: Could not set Zoom Average value.");
+		}else
+		  setMeanDataTickerValue();
 		repaint();
 	}
 
+	/**
+	 * Set the data ticker to Zoomed matrix average
+	 */
+	private void setZoomMeanDataTickerValue(int startingRow, int endingRow, int startingCol, int endingCol) {
+		ticker.setText("Zoom Average:");
+		ticker.setValue( dataModel.getDataMatrix().getZoomedMean(startingRow, endingRow, startingCol, endingCol));
+	}
+	
 	/**
 	 * Set the data ticker to matrix average
 	 * Rounding off to 4 decimals
@@ -3224,5 +3255,20 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		
 		this.dataModel = dataModel;
 	}
+    
+    /**
+  	 * Returns true if the visible area is a part of the matrix, 
+  	 * false if whole matrix is visible
+  	 * @author smd.faizan
+  	 * @return boolean
+  	 */
+  	private boolean isZoomed() {
+  	
+  		return(
+  			!(map.getMaxIndex()+1 ==
+  			map.getNumVisible() &&
+  			map2.getMaxIndex()+1 ==
+  			map2.getNumVisible()));
+  	}
     
 }

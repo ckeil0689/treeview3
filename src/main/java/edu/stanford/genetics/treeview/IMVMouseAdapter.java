@@ -362,7 +362,13 @@ public class IMVMouseAdapter extends MouseAdapter {
 		}
 
 		imView.setHasMouse(false);
-		mvController.setMeanDataValue();
+		if(isZoomed()){
+			mvController.setZoomedMeanDataValue(ymap.getFirstVisible(),
+			                                    ymap.getLastVisible(), 
+			                                    xmap.getFirstVisible(),
+			                                    xmap.getLastVisible());
+		}else
+		  mvController.setMeanDataValue();
 
 		xmap.setHoverIndex(-1);
 		ymap.setHoverIndex(-1);
@@ -1495,6 +1501,21 @@ public class IMVMouseAdapter extends MouseAdapter {
 		return new Rectangle(x, y, w, h);
 	}
 
+	/**
+	 * Returns true if the visible area is a part of the matrix, 
+	 * false if whole matrix is visible
+	 * @author smd.faizan
+	 * @return boolean
+	 */
+	private boolean isZoomed() {
+	
+		return(
+			!(ymap.getMaxIndex()+1 ==
+			ymap.getNumVisible() &&
+			xmap.getMaxIndex()+1 ==
+			xmap.getNumVisible()));
+	}
+	
 	private void debug(String msg,int level) {
 		if(level == debug) {
 			LogBuffer.println(msg);

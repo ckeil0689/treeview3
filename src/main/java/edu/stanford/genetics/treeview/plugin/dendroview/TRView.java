@@ -42,6 +42,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	protected TreeSelectionI treeSelection;
 	protected LinearTransformation xScaleEq, yScaleEq;
 	protected MapContainer map;
+	/*The other orthogonal map, used only once while calculating Zoomed Averages
+	 */
+	protected MapContainer map2;
+	
 
 	protected final JScrollPane scrollPane;
 
@@ -127,9 +131,11 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * @param m
 	 *            The new map to be used for determining the spacing between
 	 *            indexes.
+	 * @param m2 The other orthogonal map, used only once while calculating
+	 *            Zoomed Averages
 	 */
-	public void setMap(final MapContainer m) {
-
+	public void setMap(final MapContainer m, final MapContainer m2) {
+    map2 = m2;
 		if (map != null) {
 			map.deleteObserver(this);
 		}
@@ -985,9 +991,34 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		map.setOverTree(false);
 		unsetHoveredNode();
-		setMeanDataTickerValue();
+		if(isZoomed()){
+			/* This is not a recommended way of setting Zoomed Mean values
+			 * Parent should never no its child
+			 */
+			if(this instanceof RowTreeView)
+				setZoomMeanDataTickerValue(map.getFirstVisible(), 
+				                           map.getLastVisible(),
+				                           map2.getFirstVisible(),
+				                           map2.getLastVisible());
+			else if(this instanceof ColumnTreeView)
+				setZoomMeanDataTickerValue(map2.getFirstVisible(), 
+				                           map2.getLastVisible(),
+				                           map.getFirstVisible(),
+				                           map.getLastVisible());
+			else
+				LogBuffer.println("ERROR: Could not set Zoom Average value.");
+		}else
+		  setMeanDataTickerValue();
 	}
 
+	/**
+	 * Set the data ticker to Zoomed matrix average
+	 */
+	private void setZoomMeanDataTickerValue(int startingRow, int endingRow, int startingCol, int endingCol) {
+		ticker.setText("Zoom Average:");
+		ticker.setValue( dataModel.getDataMatrix().getZoomedMean(startingRow, endingRow, startingCol, endingCol));
+	}
+	
 	/**
 	 * Set the data ticker to matrix average
 	 * Rounding off to 4 decimals
@@ -1140,4 +1171,19 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		
 		this.dataModel = dataModel;
 	}
+    
+  	/**
+  	 * Returns true if the visible area is a part of the matrix, 
+  	 * false if whole matrix is visible
+  	 * @author smd.faizan
+  	 * @return boolean
+  	 */
+  	private boolean isZoomed() {
+  	
+  		return(
+  			!(map.getMaxIndex()+1 ==
+  			map.getNumVisible() &&
+  			map2.getMaxIndex()+1 ==
+  			map2.getNumVisible()));
+  	}
 }

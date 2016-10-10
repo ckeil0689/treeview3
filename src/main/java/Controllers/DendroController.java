@@ -987,10 +987,10 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 */
 	private void setupMapContainers() {
 
-		dendroView.getColumnTreeView().setMap(interactiveXmap);
-		dendroView.getColLabelView().setMap(interactiveXmap);
-		dendroView.getRowTreeView().setMap(interactiveYmap);
-		dendroView.getRowLabelView().setMap(interactiveYmap);
+		dendroView.getColumnTreeView().setMap(interactiveXmap, interactiveYmap);
+		dendroView.getColLabelView().setMap(interactiveXmap, interactiveYmap);
+		dendroView.getRowTreeView().setMap(interactiveYmap, interactiveXmap);
+		dendroView.getRowLabelView().setMap(interactiveYmap, interactiveXmap);
 
 		mvController.setInteractiveMapContainers(interactiveXmap, 
 				interactiveYmap);

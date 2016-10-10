@@ -979,7 +979,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		final RowLabelView anv = new RowLabelView();
 		anv.setUrlExtractor(null);
 		anv.setLabelInfo(rowLabelInfo);
-		anv.setMap(tempMap);
+		anv.setMap(tempMap, tempMap);
 		anv.setLabelSummary(labelTypeSelectionPanel.getGeneSummary());
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
 				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB);
@@ -1024,7 +1024,7 @@ public abstract class ExportPanel extends javax.swing.JPanel {
 		anv.setStyle(getColFont().getStyle());
 		anv.setPoints(getColFont().getSize());
 		anv.setLabelSummary(labelTypeSelectionPanel.getArraySummary());
-		anv.setMap(tempMap);
+		anv.setMap(tempMap, tempMap);
 		final Image buf = new BufferedImage(width + getBorderPixels(), height
 				+ getBorderPixels(), BufferedImage.TYPE_INT_ARGB);
 		buf.getGraphics().setFont(getColFont());
