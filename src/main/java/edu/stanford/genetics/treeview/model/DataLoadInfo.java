@@ -3,6 +3,7 @@ package edu.stanford.genetics.treeview.model;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
 
+import Utilities.Helper;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -194,11 +195,11 @@ public class DataLoadInfo {
 		this.dataCoords[1] = node.getInt("colCoord", 0);
 		
 		String dLabelTypes = Arrays.toString(DataLoadInfo.DEFAULT_LABEL_TYPES);
-		String rowLabelTypesAsString = node.get("rowLabelTypes", dLabelTypes);
-		String colLabelTypesAsString = node.get("rowLabelTypes", dLabelTypes);
+		String rowLabelTypes = node.get("rowLabelTypes", dLabelTypes);
+		String colLabelTypes = node.get("colLabelTypes", dLabelTypes);
 		
-		this.rowLabelTypes = Helper.splitStringArray(rowLabelTypesAsString);
-		this.colLabelTypes = Helper.splitStringArray(colLabelTypesAsString);
+		this.rowLabelTypes = Helper.getStringValuesFromKeyString(rowLabelTypes);
+		this.colLabelTypes = Helper.getStringValuesFromKeyString(colLabelTypes);
 	}
 
 	public void setDelimiter(final String newDelimiter) {

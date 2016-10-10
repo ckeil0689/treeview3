@@ -8,14 +8,11 @@ import java.util.regex.Pattern;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
-/**
- * Static class (java way...) to be used for loading read-only preview data for
+/** Static class (java way...) to be used for loading read-only preview data for
  * the user. The information can then be used to specify parameters and option
  * for the real loading process.
  * 
- * @author chris0689
- *
- */
+ * @author chris0689 */
 public final class PreviewLoader {
 
 	/*
@@ -23,8 +20,8 @@ public final class PreviewLoader {
 	 * YORF, ORF, EWEIGHT, GWEIGHT, WEIGHT, COMPLEX, NAME, GID, UID, AID, ID,
 	 * ROWID, COLID
 	 */
-	private final static String COMMON_LABELS = "(?i)(COMPLEX|NAME|^Y?ORF$|"
-			+ "^(GENE|G|ARRAY|A|U|ROW|COL)?ID$|^.*WEIGHT$)";
+	private final static String COMMON_LABELS = "(?i)(COMPLEX|NAME|^Y?ORF$|" +
+																							"^(GENE|G|ARRAY|A|U|ROW|COL)?ID$|^.*WEIGHT$)";
 
 	/*
 	 * For recognizing supposed numeric data in a file. Matches (non
@@ -39,46 +36,45 @@ public final class PreviewLoader {
 		/* prevent instantiation */
 	}
 
-	/**
-	 * Reads the file defined by the <code>filename</code> line by line and 
+	/** Reads the file defined by the <code>filename</code> line by line and
 	 * searches for the starting coordinates of the numeric data. Elements
 	 * are distinguished by the <code>delimiter</code>. If label types were
 	 * already defined, for example in a previous load, they can assist in
 	 * correctly identifying the data starting coordinates.
+	 * 
 	 * @param filename - The file to read line by line
 	 * @param delimiter - Separator of elements in the file
 	 * @param rowLabelTypes - If defined, row label types that were defined in
-	 * a previous load.
+	 *          a previous load.
 	 * @param colLabelTypes - If defined, column label types that were defined in
-	 * a previous load.
+	 *          a previous load.
 	 * @return an integer array with two elements which describe the coordinates
-	 * of the data starting point in file
-	 */
+	 *         of the data starting point in file */
 	public static int[] findDataStartCoords(final String filename,
-			final String delimiter, final String[] rowLabelTypes, 
-			final String[] colLabelTypes) {
+																					final String delimiter,
+																					final String[] rowLabelTypes,
+																					final String[] colLabelTypes) {
 
 		int[] dataStartCoords = new int[2];
 
 		try {
-			final BufferedReader br = new BufferedReader(new FileReader(
-					filename));
+			final BufferedReader br = new BufferedReader(new FileReader(filename));
 
 			String line;
 			int count = 0;
 			int lastCommonLabelColumn = -1;
 
 			/* read all lines */
-			while ((line = br.readLine()) != null && count < LIMIT) {
+			while((line = br.readLine()) != null && count < LIMIT) {
 
 				final String[] lineAsStrings = line.split(delimiter, -1);
 
 				/* read all strings in a line */
-				for (int i = 0; i < lineAsStrings.length; i++) {
+				for(int i = 0; i < lineAsStrings.length; i++) {
 
 					String element = lineAsStrings[i];
 
-					if (element.endsWith("e") || element.endsWith("E")) {
+					if(element.endsWith("e") || element.endsWith("E")) {
 						String trimmedElem = element.substring(0, element.length() - 2);
 						// only do this if original is numeric with trailing 'e' 
 						if(isDoubleParseable(trimmedElem)) {
@@ -87,19 +83,22 @@ public final class PreviewLoader {
 					}
 
 					/*
-					 * Data found if: 1) Is numeric 2) OR found a N/A (or
-					 * equivalent) symbol) 3) current string index is bigger
-					 * than last known column label type index 4) Current line does
-					 * NOT have a common known label type (e.g. EWEIGHT) in the
-					 * line, which may be a label but contain numeric data.
+					 * Data found if: 
+					 * 1) Is numeric OR found a N/A (or equivalent) symbol) AND
+					 * 2) current string index is bigger than last known 
+					 * column label type index OR current line does not have a 
+					 * common known label type (e.g. EWEIGHT) in the line, which may be 
+					 * a label but contain numeric data.
 					 */
-					if (isDoubleParseable(element) || isNaN(element)) {
-						if (lastCommonLabelColumn < i
-								&& hasCommonLabel(lineAsStrings)) {
+					if(isDoubleParseable(element) || isNaN(element)) {
+						// Numerics
+						// skip to next line
+						if(lastCommonLabelColumn < i && hasCommonLabel(lineAsStrings)) {
 							break;
 						}
 
-						if (i <= lastCommonLabelColumn) {
+						// skip to next element in line
+						if(i <= lastCommonLabelColumn) {
 							continue;
 						}
 
@@ -108,8 +107,22 @@ public final class PreviewLoader {
 						count = LIMIT;
 						break;
 					}
+					else {
+						// Non-numeric
+						// if a known row label type is encountered, skip to next line
+						if(Arrays.asList(rowLabelTypes).contains(element)) {
+							LogBuffer.println("Found " + element + " from row label types.");
+							continue;
+						}
 
-					if (isCommonLabel(element) && lastCommonLabelColumn < i) {
+						// if a known column label type is encountered, skip to next element
+						if(Arrays.asList(colLabelTypes).contains(element)) {
+							LogBuffer.println("Found " + element + " from col label types.");
+							break;
+						}
+					}
+
+					if(isCommonLabel(element) && lastCommonLabelColumn < i) {
 						lastCommonLabelColumn = i;
 					}
 				}
@@ -118,98 +131,84 @@ public final class PreviewLoader {
 
 			br.close();
 
-		} catch (final IOException e) {
+		}
+		catch(final IOException e) {
 			LogBuffer.logException(e);
 			LogBuffer.println("Could not find data start coordinates.");
-			return new int[] { 0, 0 };
+			return new int[] {0, 0};
 		}
 
 		return dataStartCoords;
 	}
 
-	/**
-	 * Check the current line for any sort of common label.
+	/** Check the current line for any sort of common label.
 	 * 
 	 * @param line
-	 * @return Whether line includes a common label or not.
-	 */
+	 * @return Whether line includes a common label or not. */
 	private static boolean hasCommonLabel(final String[] line) {
 
-		for (String token : line) {
-			if (Pattern.matches(PreviewLoader.COMMON_LABELS, token)) {
-				return true;
-			}
+		for(String token : line) {
+			if(Pattern.matches(PreviewLoader.COMMON_LABELS, token)) { return true; }
 		}
 		return false;
 	}
 
-	/**
-	 * Check a string if it is part of the recognized common labels.
+	/** Check a string if it is part of the recognized common labels.
 	 * 
 	 * @param token
-	 * @return Whether token is a common label or not.
-	 */
+	 * @return Whether token is a common label or not. */
 	private static boolean isCommonLabel(final String token) {
 
-		if (Pattern.matches(PreviewLoader.COMMON_LABELS, token)) {
-			return true;
-		}
+		if(Pattern.matches(PreviewLoader.COMMON_LABELS, token)) { return true; }
 		return false;
 	}
 
-	/**
-	 * Check if a string is a supposed numeric string that has been substituted
+	/** Check if a string is a supposed numeric string that has been substituted
 	 * due to missing/ non-available data etc.
 	 * 
 	 * @param token
-	 * @return Whether token is a supposed-numeric string.
-	 */
+	 * @return Whether token is a supposed-numeric string. */
 	private static boolean isNaN(final String token) {
 
-		if (Pattern.matches(PreviewLoader.MISSING, token)) {
-			return true;
-		}
+		if(Pattern.matches(PreviewLoader.MISSING, token)) { return true; }
 		return false;
 	}
 
-	/**
-	 * Check if the current string is numeric and can be parsed into a double.
+	/** Check if the current string is numeric and can be parsed into a double.
 	 * 
 	 * @param token
-	 * @return Whether token is parseable to double.
-	 */
+	 * @return Whether token is parseable to double. */
 	private static boolean isDoubleParseable(final String token) {
 
 		try {
 			Double.parseDouble(token);
 			return true;
 
-		} catch (NumberFormatException e) {
+		}
+		catch(NumberFormatException e) {
 			return false;
 		}
 	}
 
-	/**
-	 * Small wrapper for <extractPreviewData>
+	/** Small wrapper for <extractPreviewData>
 	 * 
 	 * @param filename
-	 *            The path/ name of the file to be loaded.
-	 * @return String[][] The preview data in array format for use in JTable.
-	 */
-	public static String[][] loadPreviewData(final String filename,
-			final String delimiter) {
+	 *          The path/ name of the file to be loaded.
+	 * @return String[][] The preview data in array format for use in JTable. */
+	public static String[][] loadPreviewData(	final String filename,
+																						final String delimiter) {
 
 		String[][] previewData;
 
 		try {
-			final BufferedReader br = new BufferedReader(new FileReader(
-					filename));
+			final BufferedReader br = new BufferedReader(new FileReader(filename));
 
 			previewData = extractPreviewData(br, delimiter);
 
 			br.close();
 
-		} catch (final IOException e) {
+		}
+		catch(final IOException e) {
 			LogBuffer.logException(e);
 			return new String[0][];
 		}
@@ -217,34 +216,32 @@ public final class PreviewLoader {
 		return previewData;
 	}
 
-	/**
-	 * TODO put this into a PreviewLoader subclass which extends SwingWorker Get
+	/** TODO put this into a PreviewLoader subclass which extends SwingWorker Get
 	 * a String array representation of the first <LIMIT> elements of data. This
 	 * is for use in the data preview dialog only. The data
 	 * 
 	 * @param A
-	 *            BufferedReader object to read through the file.
+	 *          BufferedReader object to read through the file.
 	 * @return String[][] The preview data in array format for use in JTable.
-	 * @author chris0689
-	 */
-	private static String[][] extractPreviewData(final BufferedReader reader,
-			final String delimiter) {
+	 * @author chris0689 */
+	private static String[][] extractPreviewData(	final BufferedReader reader,
+																								final String delimiter) {
 
 		final String[][] previewData = new String[LIMIT][];
 		String line;
 		int count = 0;
 
 		try {
-			while ((line = reader.readLine()) != null && count < LIMIT) {
+			while((line = reader.readLine()) != null && count < LIMIT) {
 
 				// load line as String array
 				final String[] lineAsStrings = line.split(delimiter, -1);
-				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 0,
-						LIMIT);
+				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 0, LIMIT);
 			}
-		} catch (final IOException e) {
+		}
+		catch(final IOException e) {
 			LogBuffer.logException(e);
-			return new String[][] { { "N/A" } };
+			return new String[][] {{"N/A"}};
 		}
 
 		return previewData;

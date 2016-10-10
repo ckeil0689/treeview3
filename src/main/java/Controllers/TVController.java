@@ -616,6 +616,7 @@ public class TVController implements Observer {
 
 		int[] newDataCoords = importController.detectDataBoundaries(dataInfo);
 
+		// the number of label types may have been altered, e.g. by clustering
 		if(dataInfo.needsDataCoordsUpdate(newDataCoords)) {
 			LogBuffer.println("Data start coordinates have shifted because more " +
 												"label types were added.");
