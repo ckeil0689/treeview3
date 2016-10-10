@@ -592,7 +592,7 @@ public class TVController implements Observer {
 		importController.initDialog();
 
 		/* Auto run before showing dialog */
-		importController.detectDataBoundaries();
+		importController.detectDataBoundaries(null);
 
 		DataLoadInfo dataInfo = loadPreview.showDialog();
 
@@ -614,15 +614,12 @@ public class TVController implements Observer {
 																																							.getDelimiter());
 		importController.setFileSet(fileSet);
 
-		int[] oldDataCoords = dataInfo.getDataCoords();
-		int[] newDataCoords = importController.detectDataBoundaries();
+		int[] newDataCoords = importController.detectDataBoundaries(dataInfo);
 
-		if((newDataCoords[0] > oldDataCoords[0]) ||
-				(newDataCoords[1] > oldDataCoords[1])) {
+		if(dataInfo.needsDataCoordsUpdate(newDataCoords)) {
 			LogBuffer.println("Data start coordinates have shifted because more " +
 												"label types were added.");
 			dataInfo.setDataStartCoords(newDataCoords);
-//			dataInfo = useImportDialog(fileSet);
 		}
 
 		return dataInfo;

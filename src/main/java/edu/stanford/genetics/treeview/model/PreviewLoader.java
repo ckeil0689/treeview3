@@ -39,8 +39,24 @@ public final class PreviewLoader {
 		/* prevent instantiation */
 	}
 
+	/**
+	 * Reads the file defined by the <code>filename</code> line by line and 
+	 * searches for the starting coordinates of the numeric data. Elements
+	 * are distinguished by the <code>delimiter</code>. If label types were
+	 * already defined, for example in a previous load, they can assist in
+	 * correctly identifying the data starting coordinates.
+	 * @param filename - The file to read line by line
+	 * @param delimiter - Separator of elements in the file
+	 * @param rowLabelTypes - If defined, row label types that were defined in
+	 * a previous load.
+	 * @param colLabelTypes - If defined, column label types that were defined in
+	 * a previous load.
+	 * @return an integer array with two elements which describe the coordinates
+	 * of the data starting point in file
+	 */
 	public static int[] findDataStartCoords(final String filename,
-			final String delimiter) {
+			final String delimiter, final String[] rowLabelTypes, 
+			final String[] colLabelTypes) {
 
 		int[] dataStartCoords = new int[2];
 
@@ -63,7 +79,11 @@ public final class PreviewLoader {
 					String element = lineAsStrings[i];
 
 					if (element.endsWith("e") || element.endsWith("E")) {
-						element += "+00";
+						String trimmedElem = element.substring(0, element.length() - 2);
+						// only do this if original is numeric with trailing 'e' 
+						if(isDoubleParseable(trimmedElem)) {
+							element += "+00";
+						}
 					}
 
 					/*

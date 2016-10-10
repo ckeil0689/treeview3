@@ -289,12 +289,10 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 				documentConfig = fileNode.node("Model" + (childrenNodes.length + 1));
 				documentConfig.put("name", fileName);
 				documentConfig.put("extension", fileExt);
-				storeDataLoadInfo(documentConfig);
 			}
 
-			LogBuffer.println("Setting model config data: " + documentConfig);
+			storeDataLoadInfo(documentConfig);
 			targetModel.setDocumentConfig(documentConfig);
-
 		}
 		catch(final Exception e) {
 			LogBuffer.logException(e);
@@ -312,8 +310,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		node.put("delimiter", dataInfo.getDelimiter());
 		node.putInt("rowCoord", dataInfo.getDataStartRow());
 		node.putInt("colCoord", dataInfo.getDataStartCol());
-		node.put("rowLabelTypes", dataInfo.getRowLabelTypes().toString());
-		node.put("colLabelTypes", dataInfo.getColLabelTypes().toString());
+		node.put("rowLabelTypes", dataInfo.getRowLabelTypesAsString());
+		node.put("colLabelTypes", dataInfo.getColLabelTypesAsString());
 	}
 
 	/** Parses the label types from the label data collected until
@@ -366,20 +364,24 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			readColLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
 		}
 
-		// Replacing empty or whitespace-only labels
-		replaceEmptyLabels(readRowLabelTypes, "ROW");
-		replaceEmptyLabels(readColLabelTypes, "COLUMN");
+		// Replacing empty or whitespace-only label types
+		replaceEmptyLabelTypes(readRowLabelTypes, "ROW");
+		replaceEmptyLabelTypes(readColLabelTypes, "COLUMN");
 
 		// set the label types
 		targetModel.setRowLabelTypes(readRowLabelTypes);
+		dataInfo.setRowLabelTypes(readRowLabelTypes);
+
 		targetModel.setColumnLabelTypes(readColLabelTypes);
+		dataInfo.setColLabelTypes(readColLabelTypes);
 
 		// set weight status
 		targetModel.setEweightFound(hasEWeight);
 		targetModel.setGweightFound(hasGWeight);
 	}
 
-	private String[] replaceEmptyLabels(String[] original, final String axis) {
+	private String[] replaceEmptyLabelTypes(String[] original,
+																					final String axis) {
 
 		Pattern p = Pattern.compile("(^\\s*$)", Pattern.UNICODE_CHARACTER_CLASS);
 

@@ -136,6 +136,14 @@ public class DataLoadInfo {
 		return colLabelTypes;
 	}
 
+	public String getRowLabelTypesAsString() {
+		return Arrays.toString(rowLabelTypes);
+	}
+
+	public String getColLabelTypesAsString() {
+		return Arrays.toString(colLabelTypes);
+	}
+
 	public void setRowLabelTypes(String[] newRowLabelTypes) {
 		this.rowLabelTypes = newRowLabelTypes;
 	}
@@ -146,6 +154,22 @@ public class DataLoadInfo {
 
 	public String getDelimiter() {
 		return delimiter;
+	}
+
+	/** Based on the supplied coordinate array it tests whether an update to the
+	 * data coordinate array might be necessary.
+	 * 
+	 * @param newCoords - The new coordinate array which is checked against the
+	 *          existing coordinate array.
+	 * @return Whether the coordinate array should be updated. */
+	public boolean needsDataCoordsUpdate(final int[] newCoords) {
+
+		if(newCoords == null || newCoords.length != 2) { return false; }
+
+		if((newCoords[0] > dataCoords[0]) ||
+				(newCoords[1] > dataCoords[1])) { return true; }
+
+		return false;
 	}
 
 	/** Imports delimiter and data start coordinates from a supplied
@@ -168,6 +192,13 @@ public class DataLoadInfo {
 
 		this.dataCoords[0] = node.getInt("rowCoord", 0);
 		this.dataCoords[1] = node.getInt("colCoord", 0);
+		
+		String dLabelTypes = Arrays.toString(DataLoadInfo.DEFAULT_LABEL_TYPES);
+		String rowLabelTypesAsString = node.get("rowLabelTypes", dLabelTypes);
+		String colLabelTypesAsString = node.get("rowLabelTypes", dLabelTypes);
+		
+		this.rowLabelTypes = Helper.splitStringArray(rowLabelTypesAsString);
+		this.colLabelTypes = Helper.splitStringArray(colLabelTypesAsString);
 	}
 
 	public void setDelimiter(final String newDelimiter) {
