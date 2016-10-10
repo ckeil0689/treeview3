@@ -9,12 +9,15 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class DataLoadInfo {
 
 	public final static String DEFAULT_DELIM = "\\t";
+	public final static String[] DEFAULT_LABEL_TYPES = {""};
 
 	private Preferences oldNode;
 	private FileSet oldFileSet;
 
 	private boolean isClusteredFile = false;
 	private int[] dataCoords;
+	private String[] rowLabelTypes;
+	private String[] colLabelTypes;
 	private String delimiter;
 
 	/** Derive a <code>DataLoadInfo</code> object from a <code>Preferences</code>
@@ -102,6 +105,45 @@ public class DataLoadInfo {
 		dataCoords[1] = dataStartCol;
 	}
 
+	/** Update the data start coordinate information.
+	 * 
+	 * @param newDataCoords - The new data start coordinates. */
+	public void setDataStartCoords(final int[] newDataCoords) {
+
+		if(dataCoords == null || dataCoords.length != 2) {
+			LogBuffer.println("Problem with the data coordinates array in " +
+												"DataLoadInfo. Cannot update the array.");
+		}
+
+		this.dataCoords = newDataCoords;
+
+		if(oldNode == null) {
+			LogBuffer.println("Could not update new data start coordinates " +
+												"information in the Preferences because no node was defined in " +
+												"the DataLoadInfo object for this file.");
+			return;
+		}
+
+		oldNode.putInt("rowCoord", dataCoords[0]);
+		oldNode.putInt("colCoord", dataCoords[1]);
+	}
+
+	public String[] getRowLabelTypes() {
+		return rowLabelTypes;
+	}
+
+	public String[] getColLabelTypes() {
+		return colLabelTypes;
+	}
+
+	public void setRowLabelTypes(String[] newRowLabelTypes) {
+		this.rowLabelTypes = newRowLabelTypes;
+	}
+
+	public void setColLabelTypes(String[] newColLabelTypes) {
+		this.colLabelTypes = newColLabelTypes;
+	}
+
 	public String getDelimiter() {
 		return delimiter;
 	}
@@ -137,6 +179,8 @@ public class DataLoadInfo {
 		return "DataLoadInfo [oldNode=" +	oldNode + ", oldFileSet=" + oldFileSet +
 						", isClusteredFile=" + isClusteredFile + ", dataCoords=" + Arrays
 																																							.toString(dataCoords) +
+						", rowLabelTypes=" + Arrays.toString(rowLabelTypes) +
+						", colLabelTypes=" + Arrays.toString(colLabelTypes) +
 						", delimiter=" + delimiter + "]";
 	}
 }

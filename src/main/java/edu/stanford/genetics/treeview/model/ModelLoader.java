@@ -312,6 +312,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		node.put("delimiter", dataInfo.getDelimiter());
 		node.putInt("rowCoord", dataInfo.getDataStartRow());
 		node.putInt("colCoord", dataInfo.getDataStartCol());
+		node.put("rowLabelTypes", dataInfo.getRowLabelTypes().toString());
+		node.put("colLabelTypes", dataInfo.getColLabelTypes().toString());
 	}
 
 	/** Parses the label types from the label data collected until
@@ -322,7 +324,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		LogBuffer.println("Parsing label types.");
 
-		// lengths of label type arrays
+		// lengths of required label type arrays (by detection or selection)
 		final int nRowLabelType = dataInfo.getDataStartCol();
 		final int nColLabelType = dataInfo.getDataStartRow();
 
@@ -336,18 +338,24 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		}
 		else {
 			// set a default empty label type
-			readRowLabelTypes = new String[] {""};
+			readRowLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
 		}
 
 		if(nColLabelType > 0) {
 			// read column label types
 			for(int i = 0; i < nColLabelType; i++) {
-				readColLabelTypes[i] = stringLabels[i][0];
+				// labels for columns would shift the row data start index
+				if(dataInfo.getDataStartCol() > 0) {
+					readColLabelTypes[i] = stringLabels[i][0];
+				}
+				else {
+					readColLabelTypes[i] = "";
+				}
 			}
 
 			/*
 			 * The regex assurance is needed because the CDT-format is completely
-			 * inconsistent and we wanna keep backwards compatibility.
+			 * inconsistent and we want to keep backwards compatibility.
 			 */
 			if(readColLabelTypes[0].equalsIgnoreCase("GID")) {
 				readColLabelTypes[0] = assureLabelTypeNames(readRowLabelTypes);
@@ -355,7 +363,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		}
 		else {
 			// set a default empty label type
-			readColLabelTypes = new String[] {""};
+			readColLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
 		}
 
 		// Replacing empty or whitespace-only labels
@@ -412,8 +420,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	 *
 	 * @param stringLabels */
 	private void parseCDT(final String[][] stringLabels) {
-
-		LogBuffer.println("Parsing for CDT-format...");
 
 		parseLabelTypes(stringLabels);
 

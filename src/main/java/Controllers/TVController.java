@@ -291,11 +291,13 @@ public class TVController implements Observer {
 	}
 
 	/** Load data into the model.
+	 * 
 	 * @param fileSet - The fileSet to be loaded.
-	 * @param dataInfo - Contains information on how the data should be loaded. This information is determined by the
-	 * user in the import dialog. If the file has been loaded before, the information can come from stored preferences
-	 * data.
-	 */
+	 * @param dataInfo - Contains information on how the data should be loaded.
+	 *          This information is determined by the
+	 *          user in the import dialog. If the file has been loaded before, the
+	 *          information can come from stored preferences
+	 *          data. */
 	public void loadData(final FileSet fileSet, final DataLoadInfo dataInfo) {
 
 		// Setting loading screen
@@ -309,10 +311,9 @@ public class TVController implements Observer {
 			// first, ensure reset of the model data
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
-			
+
 			final ModelLoader loader = new ModelLoader(tvModel, this, dataInfo);
 			loader.execute();
-
 		}
 		catch(final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. " +
@@ -474,9 +475,10 @@ public class TVController implements Observer {
 		FileSet newFs;
 
 		if(fs != null) {
-			newFs =  fs;
-			
-		} else {
+			newFs = fs;
+
+		}
+		else {
 			newFs = ViewFrame.getFileSet(file);
 		}
 
@@ -502,10 +504,8 @@ public class TVController implements Observer {
 				this.file = tvFrame.selectFile();
 
 				// Only run loader, if JFileChooser wasn't canceled.
-				if (file == null) {
-					return;
-				}
-				
+				if(file == null) { return; }
+
 				loadFileSet = ViewFrame.getFileSet(file);
 			}
 
@@ -543,28 +543,30 @@ public class TVController implements Observer {
 		if(isFromCluster && oldRoot != null && oldExt != null) {
 			LogBuffer.println("Getting preferences for transfer to clustered file.");
 			oldNode = getOldPreferences(oldRoot, oldExt);
-		// Check if file was loaded before
-		} else {
+			// Check if file was loaded before
+		}
+		else {
 			LogBuffer.println("Checking if preferences exist for the new file.");
 			oldNode = getOldPreferences(newFileSet.getRoot(), newFileSet.getExt());
 		}
 
 		DataLoadInfo dataInfo;
-		if (oldNode == null || shouldUseImport) {
+		if(oldNode == null || shouldUseImport) {
 			LogBuffer.println("Using import dialog.");
 			dataInfo = useImportDialog(newFileSet);
-			
-		} else {
+
+		}
+		else {
 			LogBuffer.println("Loading with info from existing node.");
 			dataInfo = getStoredDataLoadInfo(newFileSet, oldNode);
 		}
 
-		if (dataInfo == null) {
+		if(dataInfo == null) {
 			String message = "Data loading was interrupted.";
 			LogBuffer.println(message);
 			return;
 		}
-		
+
 		dataInfo.setIsClusteredFile(isFromCluster);
 		loadData(newFileSet, dataInfo);
 	}
@@ -600,25 +602,27 @@ public class TVController implements Observer {
 	/** Load stored info for a specific file.
 	 * 
 	 * @param fileSet The <code>FileSet</code> for the file to be loaded.
-	 * @return A <code>DataLoadInfo</code> object which contains information 
-	 * relevant for setting up the <code>DataLoadDialog</code>. */
-	public static DataLoadInfo getStoredDataLoadInfo(final FileSet fileSet,
-																							final Preferences node) {
+	 * @return A <code>DataLoadInfo</code> object which contains information
+	 *         relevant for setting up the <code>DataLoadDialog</code>. */
+	public static DataLoadInfo getStoredDataLoadInfo(	final FileSet fileSet,
+																										final Preferences node) {
 
 		DataLoadInfo dataInfo = new DataLoadInfo(node);
 
 		// Amount of label types may vary when loading, so they have to be re-detected
-		DataImportController importController = 
-			new DataImportController(dataInfo.getDelimiter());
+		DataImportController importController = new DataImportController(dataInfo
+																																							.getDelimiter());
 		importController.setFileSet(fileSet);
 
 		int[] oldDataCoords = dataInfo.getDataCoords();
 		int[] newDataCoords = importController.detectDataBoundaries();
-		
-		if((newDataCoords[0] > oldDataCoords[0]) 
-			|| (newDataCoords[1] > oldDataCoords[1])) {
+
+		if((newDataCoords[0] > oldDataCoords[0]) ||
+				(newDataCoords[1] > oldDataCoords[1])) {
 			LogBuffer.println("Data start coordinates have shifted because more " +
-				"label types were added.");
+												"label types were added.");
+			dataInfo.setDataStartCoords(newDataCoords);
+//			dataInfo = useImportDialog(fileSet);
 		}
 
 		return dataInfo;
@@ -982,7 +986,7 @@ public class TVController implements Observer {
 
 		LogBuffer.println("Model MIN: " + min);
 		LogBuffer.println("Model MAX: " + max);
-		
+
 		// View
 		ColorExtractor colorExtractor = dendroController.getColorExtractor();
 
