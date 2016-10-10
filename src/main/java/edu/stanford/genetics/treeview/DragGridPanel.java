@@ -565,7 +565,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 		int x, y;
 		final Dimension s = getSize();
-		LogBuffer.println("Current layout width/height: [" + s.width + "/" + s.height + "].");
+		//LogBuffer.println("Current layout width/height: [" + s.width + "/" + s.height + "].");
 
 		checkPopulateSizes();
 
@@ -574,7 +574,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		for (x = 0; x < xsizes.length; x++) {
 
 			xpos[x + 1] = xpos[x] + (int) (s.width * xsizes[x]);
-			LogBuffer.println("Width of column [" + (x + 1) + "] = [" + xpos[x] + " + (int) (" + s.width + " * " + xsizes[x] + ")] = [" + xpos[x + 1] + "].");
+			//LogBuffer.println("Width of column [" + (x + 1) + "] = [" + xpos[x] + " + (int) (" + s.width + " * " + xsizes[x] + ")] = [" + xpos[x + 1] + "].");
 		}
 
 		// Fudge right edge in case of rounding errors
@@ -656,24 +656,30 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		g.setColor(GUIFactory.DEFAULT_BG);
 		g.fillRect(0, 0, newsize.width, newsize.height);
 		if(dragging() || overHorizDragBar || overVertDragBar) {
-			g.setColor(Color.WHITE);
-			LogBuffer.println("Painting dragbar a new color.");
+			g.setColor(Color.GRAY);
+			//LogBuffer.println("Painting dragbar a new color.");
 		}
+		//LogBuffer.println("Hovering horizontally?: [" + overHorizDragBar + "]");
+		//LogBuffer.println("Hovering vertically?: [" + overVertDragBar + "]");
 		//g.setColor(Color.black);
 
 		int x, y;
 
 		// Do horizontal lines above each component not in top row
 		for (y = 1; y < ysizes.length; y++) {
+			//LogBuffer.println("y: " + y);
 
 			for (x = 0; x < xsizes.length; x++) {
+				LogBuffer.println("x: " + x);
 
 				final Component c = components[x][y];
 
 				if (components[x][y - 1] == c) {
+					LogBuffer.println("skipping");
 
 					continue; // Same component above
 				}
+				//LogBuffer.println("drawing xpos: " + xpos[x] + " next-xpos: " + xpos[x+1] + " ypos: " + ypos[y] + " height: " + bheight);
 
 				// Draw bar above
 				g.fillRect(xpos[x], ypos[y] - bheight, xpos[x + 1] - xpos[x],
@@ -832,11 +838,18 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	public void mouseMoved(final MouseEvent e) {
 
 		debug("mouseMoved", e);
+		//LogBuffer.println("mouseMoved");
 
 		if (!dragging()) {
 
-			onDragBorder(e.getX(), e.getY());
+			boolean lastOverBorder = overVertDragBar || overHorizDragBar;
+			boolean nowOverBorder = onDragBorder(e.getX(), e.getY());
+			//LogBuffer.println("Was over border: " + lastOverBorder + " Now over border: " + nowOverBorder);
+			if(lastOverBorder != nowOverBorder) {
+				repaint();
+			}
 		}
+		//LogBuffer.println("Dragging? " + dragging());
 	}
 
 	/** Select a border to drag. */
@@ -889,6 +902,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 		debug("mouseEntered", e);
 		onDragBorder(e.getX(), e.getY());
+		repaint();
 	}
 
 	@Override
@@ -900,6 +914,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 			setCursor(0);
 		}
+
+		overVertDragBar = overHorizDragBar = false;
+
+		repaint();
 	}
 
 	boolean resize = false;
@@ -962,6 +980,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 			}
 		}
 		dragBar.setMouse(e.getX(), e.getY());
+		if(resize) {
+			//Live resizing
+			resizeComponents();
+		}
 		repaint();
 	}
 
@@ -1092,9 +1114,12 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 		// Find out which column we are in
 		for (col = 1; col < xsizes.length; col++) {
+			//LogBuffer.println("Evaluating whether we're in column [" + col + "].");
 			if (x <= xpos[col]) { // In column col - 1, or its border
 
+				//LogBuffer.println("We're in column [" + col + " - 1] or its border.");
 				if (x >= xpos[col] - bwidth) {
+					//LogBuffer.println("We're in the border of column [" + col + " - 1].");
 					curscol = col; // In border, so set curscol
 				}
 				break;
@@ -1175,6 +1200,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 
 		debug("onDragBorder(" + curscol + "," + cursrow + ")");
+		//LogBuffer.println("onDragBorder newcursor = [" + newcursor + "]");
 		return (newcursor != 0);
 	}
 
