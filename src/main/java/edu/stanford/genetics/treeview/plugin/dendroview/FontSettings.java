@@ -1,8 +1,9 @@
-/* BEGIN_HEADER                                                   TreeView 3
+/*
+ * BEGIN_HEADER TreeView 3
  *
  * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * END_HEADER 
+ * END_HEADER
  */
 
 package edu.stanford.genetics.treeview.plugin.dendroview;
@@ -36,15 +37,15 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.SettingsPanel;
 
-/**
- * This class allows selection of Fonts for a FontSelectable.
- */
+/** This class allows selection of Fonts for a FontSelectable. */
 public class FontSettings implements SettingsPanel {
 
 	private final String[] preferredFonts = {
 
-	"Arial", "Tahoma", "Verdana", "Times New Roman", "Helvetica", "Calibri",
-			"Courier", "Dialog", "Myriad" };
+																						"Arial", "Tahoma", "Verdana",
+																						"Times New Roman", "Helvetica",
+																						"Calibri", "Courier", "Dialog",
+																						"Myriad"};
 
 	private Font[] fonts;
 
@@ -52,12 +53,12 @@ public class FontSettings implements SettingsPanel {
 	private final LabelView colLabelView;
 	private final LabelAttributes rowLabelAttr;
 	private final LabelAttributes colLabelAttr;
-	
+
 	private JPanel fontPanel;
 	private JComboBox<String> font_choice;
 	private JComboBox<String> style_choice;
 	private JCheckBox fixedBox;
-	
+
 	private JSpinner size_field;
 	private JSpinner min_field;
 	private JSpinner max_field;
@@ -66,17 +67,15 @@ public class FontSettings implements SettingsPanel {
 
 		rowLabelView = rows;
 		colLabelView = cols;
-		
+
 		rowLabelAttr = rows.getLabelAttributes();
 		colLabelAttr = cols.getLabelAttributes();
 	}
 
-	/**
-	 * Makes a JPanel that includes the font selection options. Then returns
+	/** Makes a JPanel that includes the font selection options. Then returns
 	 * this JPanel.
 	 *
-	 * @return JPanel
-	 */
+	 * @return JPanel */
 	public JPanel makeFontPanel() {
 
 		fontPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
@@ -120,93 +119,86 @@ public class FontSettings implements SettingsPanel {
 	}
 
 	// the allowed font styles
-	/**
-	 * Description of the Field
-	 */
+	/** Description of the Field */
 	public final static String[] styles = {
 
-	"Plain", "Italic", "Bold", "Bold Italic" };
+																					"Plain", "Italic", "Bold",
+																					"Bold Italic"};
 
-	/**
-	 * turn a style number from class java.awt.Font into a string
+	/** turn a style number from class java.awt.Font into a string
 	 *
 	 * @param style
-	 *            style index
-	 * @return string description
-	 */
+	 *          style index
+	 * @return string description */
 	public final static String decode_style(final int style) {
 
-		switch (style) {
+		switch(style) {
 
-		case Font.PLAIN:
-			return styles[0];
+			case Font.PLAIN:
+				return styles[0];
 
-		case Font.ITALIC:
-			return styles[1];
+			case Font.ITALIC:
+				return styles[1];
 
-		case Font.BOLD:
-			return styles[2];
+			case Font.BOLD:
+				return styles[2];
 
-		default:
-			return styles[3];
+			default:
+				return styles[3];
 		}
 	}
 
-	/**
-	 * turn a string into a style number
+	/** turn a string into a style number
 	 *
 	 * @param style
-	 *            string description
-	 * @return integer encoded representation
-	 */
+	 *          string description
+	 * @return integer encoded representation */
 	public final static int encode_style(final String style) {
 
 		return style.equalsIgnoreCase(styles[0]) ? Font.PLAIN : style
-				.equalsIgnoreCase(styles[1]) ? Font.ITALIC : style
-				.equalsIgnoreCase(styles[2]) ? Font.BOLD : Font.BOLD
-				+ Font.ITALIC;
+																																	.equalsIgnoreCase(styles[1])	? Font.ITALIC
+																																																: style.equalsIgnoreCase(styles[2])	? Font.BOLD
+																																																																		: Font.BOLD +
+																																																																			Font.ITALIC;
 	}
 
-	/**
-	 * Gets all the preferred fonts from the system.
-	 */
+	/** Gets all the preferred fonts from the system. */
 	public void setupFonts() {
 
 		// Getting only preferred fonts from the system.
-		final Font[] allFonts = GraphicsEnvironment
-				.getLocalGraphicsEnvironment().getAllFonts();
+		final Font[] allFonts = GraphicsEnvironment	.getLocalGraphicsEnvironment()
+																								.getAllFonts();
 
 		final List<Font> fontList = new ArrayList<Font>();
 
-		for (final String fontName : preferredFonts) {
+		for(final String fontName : preferredFonts) {
 
-			for (final Font font : allFonts) {
+			for(final Font font : allFonts) {
 
-				if (font.getName().contains(fontName)) {
+				if(font.getName().contains(fontName)) {
 					fontList.add(font);
 				}
 			}
 		}
 
 		fonts = new Font[fontList.size()];
-		for (int i = 0; i < fontList.size(); i++) {
+		for(int i = 0; i < fontList.size(); i++) {
 
 			fonts[i] = fontList.get(i);
 		}
 	}
 
-	/**
-	 * Create a blocking dialog containing this component
+	/** Create a blocking dialog containing this component
 	 *
 	 * @param f
-	 *            frame to block
-	 */
+	 *          frame to block */
 	public void showDialog(final Frame f, final String title) {
 
 		final JDialog d = new JDialog(f, title);
 		d.setLayout(new BorderLayout());
 		d.add(fontPanel, BorderLayout.CENTER);
 		d.addWindowListener(new WindowAdapter() {
+
 			@Override
 			public void windowClosing(final WindowEvent we) {
 				we.getWindow().dispose();
@@ -219,7 +211,7 @@ public class FontSettings implements SettingsPanel {
 	private void setupFontChoice() {
 
 		final String[] fontNames = new String[fonts.length];
-		for (final Font f : fonts) {
+		for(final Font f : fonts) {
 
 			fontNames[Arrays.asList(fonts).indexOf(f)] = f.getName();
 		}
@@ -246,7 +238,7 @@ public class FontSettings implements SettingsPanel {
 		final int min = (Integer) min_field.getValue();
 		final int max = (Integer) max_field.getValue();
 		final boolean isFixed = fixedBox.isSelected();
-		
+
 		size = correctSize(size, min, max);
 		updateSpinnerModels(size, min, max);
 
@@ -266,48 +258,46 @@ public class FontSettings implements SettingsPanel {
 		colLabelAttr.setMaxSize(max);
 		colLabelView.resetSecondaryScroll();
 	}
-	
-	/**
-	 * Makes sure that size stays within boundaries.
+
+	/** Makes sure that size stays within boundaries.
+	 * 
 	 * @param size
 	 * @param min Minimum boundary for size.
 	 * @param max Maximum boundary for size.
-	 * @return The bounded value of size.
-	 */
+	 * @return The bounded value of size. */
 	private static int correctSize(final int size, final int min, final int max) {
-		
+
 		if(size > max) {
 			return max;
-			
-		} else if(size < min) {
+
+		}
+		else if(size < min) {
 			return min;
-			
-		} else {
+
+		}
+		else {
 			return size;
 		}
 	}
-	
-	/**
-	 * Updates SpinnerModel boundaries.
+
+	/** Updates SpinnerModel boundaries.
+	 * 
 	 * @param size Current font size.
 	 * @param min Set minimum font size.
-	 * @param max Set maximum font size.
-	 */
-	private void updateSpinnerModels(final int size, final int min, 
-			final int max) {
-		
+	 * @param max Set maximum font size. */
+	private void updateSpinnerModels(	final int size, final int min,
+																		final int max) {
+
 		SpinnerModel size_model = new SpinnerNumberModel(size, min, max, 1);
 		SpinnerModel min_model = new SpinnerNumberModel(min, 0, max, 1);
 		SpinnerModel max_model = new SpinnerNumberModel(max, min, 50, 1);
-		
+
 		size_field.setModel(size_model);
 		min_field.setModel(min_model);
 		max_field.setModel(max_model);
 	}
 
-	/**
-	 * Sets up widgets
-	 */
+	/** Sets up widgets */
 	private void setupWidgets() {
 
 		fontPanel.removeAll();
@@ -318,10 +308,13 @@ public class FontSettings implements SettingsPanel {
 		setupStyleChoice();
 		fontPanel.add(style_choice, "span, wrap");
 
-		SpinnerModel size_model = new SpinnerNumberModel(rowLabelAttr.getPoints(), 0, 50, 1);
-		SpinnerModel min_model = new SpinnerNumberModel(rowLabelAttr.getMinSize(), 0, 50, 1);
-		SpinnerModel max_model = new SpinnerNumberModel(rowLabelAttr.getMaxSize(), 0, 50, 1);
-		
+		SpinnerModel size_model = new SpinnerNumberModel(	rowLabelAttr.getPoints(),
+																											0, 50, 1);
+		SpinnerModel min_model = new SpinnerNumberModel(rowLabelAttr.getMinSize(),
+																										0, 50, 1);
+		SpinnerModel max_model = new SpinnerNumberModel(rowLabelAttr.getMaxSize(),
+																										0, 50, 1);
+
 		/* Font size */
 		// getLastSize() to avoid issues with hint label font size.
 		size_field = new JSpinner(size_model);
@@ -350,13 +343,10 @@ public class FontSettings implements SettingsPanel {
 		fontPanel.add(max_field);
 	}
 
-	/**
-	 * Listener to remove need for a button. When the user chooses a value for a
+	/** Listener to remove need for a button. When the user chooses a value for a
 	 * Swing component with this listener, the font is automatically updated.
 	 *
-	 * @author CKeil
-	 *
-	 */
+	 * @author CKeil */
 	class SelectionListener implements ActionListener {
 
 		@Override
@@ -370,7 +360,7 @@ public class FontSettings implements SettingsPanel {
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			
+
 			synchronizeClient();
 		}
 	}

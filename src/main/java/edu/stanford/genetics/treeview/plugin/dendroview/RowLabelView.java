@@ -29,67 +29,60 @@ public class RowLabelView extends LabelView {
 	@Override
 	protected boolean labelAndScrollCoordsAreOpposite() {
 
-		return (false);
+		return(false);
 	}
 
-	/**
-	 * This is only here for use by fudge factors that I suspect have to do with
+	/** This is only here for use by fudge factors that I suspect have to do with
 	 * the rotation of the graphics.
 	 * 
-	 * @author rleach
-	 * @param
-	 * @return boolean
-	 */
+	 * @return boolean */
 	@Override
 	protected boolean isAColumnPane() {
 
-		return (false);
+		return(false);
 	}
 
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode == null) {
-			LogBuffer.println("Error: Could not find or create ArrayameView" + "node because parentNode was null.");
+		if(parentNode == null) {
+			LogBuffer.println("Error: Could not find or create ArrayameView" +
+												"node because parentNode was null.");
 			return;
 		}
 
 		super.setConfigNode(parentNode.node("RowLabelView"));
 	}
 
-	/**
-	 * This method should return true if the start of the label string is closer
+	/** This method should return true if the start of the label string is closer
 	 * to the data matrix than the end of the label string. It is assumed that
 	 * the pre-rotated x position of the start of the string is lesser than the
 	 * pre-rotated x position of the end of the string. The value returned is
 	 * used to infer that the scroll 0 position either corresponds to the string
-	 * 0 position (true) or is oriented in the opposite direction (false).
-	 */
+	 * 0 position (true) or is oriented in the opposite direction (false). */
 	@Override
 	protected boolean isLabelStartNearMatrix() {
 
-		return (false);
+		return(false);
 	}
 
 	@Override
 	public int getPrimaryHoverPosition(final MouseEvent e) {
-		return (e.getY());
+		return(e.getY());
 	}
 
-	/**
-	 * This method is necessary to determine whether an indent offset is
+	/** This method is necessary to determine whether an indent offset is
 	 * necessary for the start coordinate of the label. It is dependent on the
 	 * isRightJustified data member of the parent class and whether the pane's
 	 * position is on the left or top of the matrix
 	 * 
 	 * @param none
 	 * @author rleach
-	 * @return boolean
-	 */
+	 * @return boolean */
 	@Override
 	protected boolean isMatrixJustified() {
 
-		return (labelAttr.isRightJustified());
+		return(labelAttr.isRightJustified());
 	}
 
 	@Override
@@ -107,11 +100,12 @@ public class RowLabelView extends LabelView {
 	@Override
 	public void update(final Observable o, final Object arg) {
 
-		if (o == map || // location changed
+		if(o == map || // location changed
 				o == drawSelection || o == otherSelection || // selection change
 				o == labelSummary) { // annotation change
 			selectionChanged();
-		} else {
+		}
+		else {
 			LogBuffer.println("Warning: LabelView got funny update!");
 		}
 	}
@@ -125,12 +119,11 @@ public class RowLabelView extends LabelView {
 	@Override
 	public int determineCursorPixelIndex(Point p) {
 		debug("Cursor y coordinate relative to column labels: [" + p.y + "]", 8);
-		return (p.y);
+		return(p.y);
 	}
 
 	@Override
-	public void orientLabelPane(Graphics2D g2d) {
-	}
+	public void orientLabelPane(Graphics2D g2d) {}
 
 	@Override
 	public void orientHintPane(Graphics2D g2d) {
@@ -140,42 +133,45 @@ public class RowLabelView extends LabelView {
 
 	@Override
 	protected int getPrimaryViewportSize() {
-		return (scrollPane.getViewport().getSize().height);
+		return(scrollPane.getViewport().getSize().height);
 	}
 
 	@Override
 	protected String getPaneType() {
-		return ("Row");
+		return("Row");
 	}
 
 	@Override
 	protected String getSummaryName() {
-		return ("RowSummary");
+		return("RowSummary");
 	}
 
 	@Override
-	protected void setLabelPaneSize(int offscreenPrimarySize, int offscreenSecondarySize) {
+	protected void setLabelPaneSize(int offscreenPrimarySize,
+																	int offscreenSecondarySize) {
 		// Set the size of the scrollpane to match the longest string
-		setPreferredSize(new Dimension(offscreenSecondarySize, offscreenPrimarySize));
-		debug("Resizing row labels panel to [" + offscreenSecondarySize + "x" + offscreenPrimarySize + "].", 2);
+		setPreferredSize(new Dimension(	offscreenSecondarySize,
+																		offscreenPrimarySize));
+		debug("Resizing row labels panel to [" +	offscreenSecondarySize + "x" +
+					offscreenPrimarySize + "].", 2);
 	}
 
 	@Override
 	protected int getSecondaryViewportSize() {
 
-		return (scrollPane.getViewport().getSize().width);
+		return(scrollPane.getViewport().getSize().width);
 	}
 
 	@Override
 	protected int getSecondaryPaneSize(final Dimension dims) {
 
-		return (dims.width);
+		return(dims.width);
 	}
 
 	@Override
 	protected int getPrimaryPaneSize(final Dimension dims) {
 
-		return (dims.height);
+		return(dims.height);
 	}
 
 	@Override
@@ -188,13 +184,13 @@ public class RowLabelView extends LabelView {
 	@Override
 	public int getLabelOrientation() {
 
-		return (Adjustable.HORIZONTAL);
+		return(Adjustable.HORIZONTAL);
 	}
 
 	@Override
 	protected boolean isASecondaryScroll(final MouseWheelEvent e) {
 
-		return (e.isShiftDown());
+		return(e.isShiftDown());
 	}
 
 	@Override

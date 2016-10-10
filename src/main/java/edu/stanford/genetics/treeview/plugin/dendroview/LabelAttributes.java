@@ -7,14 +7,14 @@ import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelLoadReset;
 
-/**
- * A container which is explicitly responsible for the management of all defined label attributes.
- */
-public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, FontSelectable {
+/** A container which is explicitly responsible for the management of all
+ * defined label attributes. */
+public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
+	FontSelectable {
 
 	protected Preferences configNode;
 	protected final LabelView labelView;
-	
+
 	// Default label settings
 	protected final String d_face = "Courier";
 	protected final int d_style = 0;
@@ -28,16 +28,16 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 	private String face;
 	private int style;
 	private int size;
-	
+
 	private String lastDrawnFace; // used only by getMaxStringLength
 	private int lastDrawnStyle; // used only by getMaxStringLength
 	private int lastDrawnSize; // used only by getMaxStringLength
-	
+
 	private int minSize;
 	private int maxSize;
 	private int lastSize;
 	private boolean isFixed;
-	
+
 	// Important to maintain scrolling behavior
 	private int longest_str_index;
 	private int longest_str_length;
@@ -45,7 +45,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 
 	// Alignment status
 	private boolean isRightJustified;
-	
+
 	public LabelAttributes(final LabelView labelView) {
 
 		this.labelView = labelView;
@@ -54,16 +54,17 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 
 	@Override
 	public Preferences getConfigNode() {
-		
+
 		return configNode;
 	}
 
 	@Override
 	public void requestStoredState() {
-		
-		if (configNode == null) {
-			LogBuffer.println("Could not synchronize state for " + this.getClass().getName() 
-					+ " because configNode was null.");
+
+		if(configNode == null) {
+			LogBuffer.println("Could not synchronize state for " +	this																			.getClass()
+																																	.getName() +
+												" because configNode was null.");
 			return;
 		}
 
@@ -78,10 +79,11 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 
 	@Override
 	public void storeState() {
-		
-		if (configNode == null) {
-			LogBuffer.println("Could not store state for " + this.getClass().getName() 
-					+ " because configNode was null.");
+
+		if(configNode == null) {
+			LogBuffer.println("Could not store state for " +	this																.getClass()
+																														.getName() +
+												" because configNode was null.");
 			return;
 		}
 
@@ -96,12 +98,14 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 
 	@Override
 	public void importStateFrom(Preferences oldNode) {
-		
+
 		if(oldNode == null) {
-			LogBuffer.println("Could not import node for " + this.getClass().getName() + ". Node not defined.");
+			LogBuffer.println("Could not import node for " +	this																.getClass()
+																														.getName() +
+												". Node not defined.");
 			return;
 		}
-		
+
 		setMinSize(oldNode.getInt("min", d_minSize));
 		setMaxSize(oldNode.getInt("max", d_maxSize));
 		setFace(oldNode.get("face", d_face));
@@ -113,9 +117,10 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 
 	@Override
 	public void setConfigNode(Preferences parentNode) {
-		
-		if (parentNode == null) {
-			LogBuffer.println("parentNode for " + this.getClass().getName() + " was null.");
+
+		if(parentNode == null) {
+			LogBuffer.println("parentNode for " +	this.getClass().getName() +
+												" was null.");
 			return;
 		}
 
@@ -125,7 +130,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 
 	@Override
 	public void resetDefaults() {
-		
+
 		this.face = d_face;
 		this.style = d_style;
 		this.size = d_size;
@@ -140,32 +145,34 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 
 	@Override
 	public String toString() {
-		return "LabelAttributes [configNode=" + configNode + ", d_face=" + d_face + ", d_style=" + d_style + ", d_size="
-				+ d_size + ", d_minSize=" + d_minSize + ", d_maxSize=" + d_maxSize + ", d_justified=" + d_justified
-				+ ", d_fixed=" + d_fixed + ", face=" + face + ", style=" + style + ", size=" + size + ", lastDrawnFace="
-				+ lastDrawnFace + ", lastDrawnStyle=" + lastDrawnStyle + ", lastDrawnSize=" + lastDrawnSize
-				+ ", minSize=" + minSize + ", maxSize=" + maxSize + ", lastSize=" + lastSize + ", isFixed=" + isFixed
-				+ ", longest_str_index=" + longest_str_index + ", longest_str_length=" + longest_str_length
-				+ ", longest_str=" + longest_str + ", isRightJustified=" + isRightJustified + "]";
+		return "LabelAttributes [configNode=" +	configNode + ", d_face=" + d_face +
+						", d_style=" + d_style + ", d_size=" + d_size + ", d_minSize=" +
+						d_minSize + ", d_maxSize=" + d_maxSize + ", d_justified=" +
+						d_justified + ", d_fixed=" + d_fixed + ", face=" + face +
+						", style=" + style + ", size=" + size + ", lastDrawnFace=" +
+						lastDrawnFace + ", lastDrawnStyle=" + lastDrawnStyle +
+						", lastDrawnSize=" + lastDrawnSize + ", minSize=" + minSize +
+						", maxSize=" + maxSize + ", lastSize=" + lastSize + ", isFixed=" +
+						isFixed + ", longest_str_index=" + longest_str_index +
+						", longest_str_length=" + longest_str_length + ", longest_str=" +
+						longest_str + ", isRightJustified=" + isRightJustified + "]";
 	}
-	
-	/**
-	 * Saves the current state to detect changes later.
-	 * @param maxStrLen - Length of the longest string in the labels.
-	 */
+
+	/** Saves the current state to detect changes later.
+	 * 
+	 * @param maxStrLen - Length of the longest string in the labels. */
 	public void saveLastDrawnFontDetails(int maxStrLen) {
-		
+
 		this.lastDrawnFace = face;
 		this.lastDrawnStyle = style;
 		this.lastDrawnSize = size;
 		this.longest_str_length = maxStrLen;
 	}
-	
-	/**
-	 * Updates the font, secondary scrollbar of the LabelView and initiates a repaint.
-	 */
+
+	/** Updates the font, secondary scrollbar of the LabelView and initiates a
+	 * repaint. */
 	private void updateLabelView() {
-		
+
 		labelView.setFont(new Font(face, style, size));
 		labelView.resetSecondaryScroll();
 		labelView.repaint();
@@ -238,12 +245,10 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 
 	@Override
 	public void setMinSize(int minSize) {
-		
+
 		// Remain within bounds
-		if (minSize < 1 || maxSize > 0 && minSize > maxSize) {
-			return;
-		}
-		
+		if(minSize < 1 || maxSize > 0 && minSize > maxSize) { return; }
+
 		this.minSize = minSize;
 		storeState();
 		updateLabelView();
@@ -256,12 +261,10 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 
 	@Override
 	public void setMaxSize(int maxSize) {
-		
+
 		// Remain within bounds
-		if (maxSize < 1 || minSize > 0 && maxSize < minSize) {
-			return;
-		}
-		
+		if(maxSize < 1 || minSize > 0 && maxSize < minSize) { return; }
+
 		this.maxSize = maxSize;
 		storeState();
 		updateLabelView();
@@ -325,14 +328,14 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 		storeState();
 		updateLabelView();
 	}
-	
-	/**
-	 * Necessary default justification change depending on LabelView axis. Should ONLY be called in child class of
+
+	/** Necessary default justification change depending on LabelView axis. Should
+	 * ONLY be called in child class of
 	 * LabelView (RowLabelView, ColumnLabelView).
-	 * @param isRightJustified
-	 */
+	 * 
+	 * @param isRightJustified */
 	public void setDefaultJustified(boolean isRightJustified) {
-		
+
 		this.d_justified = isRightJustified;
 	}
 
@@ -340,38 +343,35 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset, Fo
 	public Font getFont() {
 		return new Font(face, style, size);
 	}
-	
-	/**
-	 * 
-	 * @param tempStyle - A temporary font style.
-	 * @return A font with only the style attribute temporarily changed (not stored in state).
-	 */
+
+	/** @param tempStyle - A temporary font style.
+	 * @return A font with only the style attribute temporarily changed (not
+	 *         stored in state). */
 	public Font getTempStyleFont(int tempStyle) {
 		return new Font(face, tempStyle, size);
 	}
-	
-	/**
-	 * 
-	 * @param tempSize - A temporary font size.
-	 * @return A font with only the size attribute temporarily changed (not stored in state).
-	 */
+
+	/** @param tempSize - A temporary font size.
+	 * @return A font with only the size attribute temporarily changed (not stored
+	 *         in state). */
 	public Font getTempSizeFont(int tempSize) {
 		return new Font(face, style, tempSize);
 	}
-	
-	/**
-	 * Tests if the currently stored font attributes (face, style, size) have changed compared to when they were last
+
+	/** Tests if the currently stored font attributes (face, style, size) have
+	 * changed compared to when they were last
 	 * stored by saveLastDrawnFontDetails().
-	 * @return True if the font attributes have changed, false otherwise.
-	 */
+	 * 
+	 * @return True if the font attributes have changed, false otherwise. */
 	public boolean hasFontChanged() {
-		 return (lastDrawnFace != face || lastDrawnStyle != style || lastDrawnSize != size);
+		return(lastDrawnFace != face ||	lastDrawnStyle != style ||
+						lastDrawnSize != size);
 	}
-	
+
 	public boolean isLongestStrIdxDefined() {
 		return longest_str_index > -1;
 	}
-	
+
 	public boolean isLongestStrEqualTo(String otherStr) {
 		return longest_str.equals(otherStr);
 	}

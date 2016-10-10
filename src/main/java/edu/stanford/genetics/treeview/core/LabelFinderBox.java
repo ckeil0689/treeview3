@@ -1,8 +1,9 @@
-/* BEGIN_HEADER                                                   TreeView 3
+/*
+ * BEGIN_HEADER TreeView 3
  *
  * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * END_HEADER 
+ * END_HEADER
  */
 
 package edu.stanford.genetics.treeview.core;
@@ -48,15 +49,12 @@ import edu.stanford.genetics.treeview.WideComboBox;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import net.miginfocom.swing.MigLayout;
 
-/**
- * This class allows users to look for row or column elements by choosing them
+/** This class allows users to look for row or column elements by choosing them
  * in a drop down menu. The menu is populated with labels from the loaded data
  * matrix. The class is abstract and a basis for the GeneFinderPanel class
  * as well as the ArrayFinderPanel class.
  *
- * It extends JPanel and can be used as a Swing component.
- *
- */
+ * It extends JPanel and can be used as a Swing component. */
 public abstract class LabelFinderBox {
 
 	protected TreeSelectionI searchSelection;
@@ -77,7 +75,7 @@ public abstract class LabelFinderBox {
 	private MapContainer globalSmap;
 	private MapContainer globalOmap;
 
-	private static final Color FOUNDCOLOR    = Color.WHITE;
+	private static final Color FOUNDCOLOR = Color.WHITE;
 	private static final Color NOTFOUNDCOLOR = Color.RED;
 
 	//Handle into the other search box in order to have a single search box be
@@ -89,29 +87,27 @@ public abstract class LabelFinderBox {
 	//companion box's defaults can be distinguished.
 	protected String defaultText;
 
-	/**
-	 * Constructor
-	 * @param type - A string describing what's searched (e.g. Row or Column)
-	 */
+	/** Constructor
+	 * 
+	 * @param type - A string describing what's searched (e.g. Row or Column) */
 	public LabelFinderBox(final String type) {
 
 		this.type = type;
 	}
 
-	/**
-	 * Setting this data member allows a search initiated in 1 box to be able to
+	/** Setting this data member allows a search initiated in 1 box to be able to
 	 * trigger the search in the other box as well so that every search utilizes
 	 * the contents of both search boxes.
+	 * 
 	 * @author rleach
-	 * @param companionBox the companionBox to set
-	 */
+	 * @param companionBox the companionBox to set */
 	public void setCompanionBox(LabelFinderBox companionBox) {
 		this.companionBox = companionBox;
 	}
 
 	/* >>>> Update the object with new data <<<<<< */
-	public void setSelection(final TreeSelectionI searchSelection,
-			final TreeSelectionI otherSelection) {
+	public void setSelection(	final TreeSelectionI searchSelection,
+														final TreeSelectionI otherSelection) {
 
 		this.searchSelection = searchSelection;
 		this.otherSelection = otherSelection;
@@ -127,8 +123,8 @@ public abstract class LabelFinderBox {
 		this.labelInfo = searchLI;
 	}
 
-	public void setMapContainers(final MapContainer searchMap,
-			final MapContainer otherMap) {
+	public void setMapContainers(	final MapContainer searchMap,
+																final MapContainer otherMap) {
 
 		this.globalSmap = searchMap;
 		this.globalOmap = otherMap;
@@ -136,7 +132,7 @@ public abstract class LabelFinderBox {
 
 	public void setNewSearchTermBox() {
 
-		if (labelSummary == null || labelInfo == null) {
+		if(labelSummary == null || labelInfo == null) {
 			setEmptySearchTermBox();
 			return;
 		}
@@ -149,8 +145,8 @@ public abstract class LabelFinderBox {
 		searchTermBox.setBackground(GUIFactory.DARK_BG);
 		AutoCompleteDecorator.decorate(searchTermBox);
 
-		searchTermBox.getEditor().getEditorComponent()
-				.addKeyListener(new BoxKeyListener());
+		searchTermBox	.getEditor().getEditorComponent()
+									.addKeyListener(new BoxKeyListener());
 
 		//NOTE: This may be removed without side-effect if a better way of
 		//initiating a search upon combobox dropdown click is found
@@ -159,14 +155,13 @@ public abstract class LabelFinderBox {
 
 	//NOTE: This may be removed without side-effect if a better way of
 	//initiating a search upon combobox dropdown click is found
-	/**
-	 * This method adds a mouse listener (SearchMouseCommitListener) to the
+	/** This method adds a mouse listener (SearchMouseCommitListener) to the
 	 * dropdown menu of a combobox. Its purpose is to detect only 1 event: when
 	 * a user clicks an item in the dropdown so we can capitalize on that
 	 * trigger to initiate the search and display the results in the matrix as
 	 * a yellow highlight.
-	 * @author rleach
-	 */
+	 * 
+	 * @author rleach */
 	private void addSearchMouseCommitListener() {
 		//Support for catching a mouse-click selection from a combobox dropdown
 		//menu is not standardly supported (without inadvertently triggering
@@ -181,44 +176,42 @@ public abstract class LabelFinderBox {
 		//This solution below can be found here:
 		//http://engin-tekin.blogspot.com/2009/10/hrefhttpkfd.html
 		try {
-			Field popupInBasicComboBoxUI =
-				BasicComboBoxUI.class.getDeclaredField("popup");
+			Field popupInBasicComboBoxUI = BasicComboBoxUI.class.getDeclaredField("popup");
 			popupInBasicComboBoxUI.setAccessible(true);
 			BasicComboPopup popup = (BasicComboPopup) popupInBasicComboBoxUI
-				.get(searchTermBox.getUI());
-			
-			Field scrollerInBasicComboPopup =
-				BasicComboPopup.class.getDeclaredField("scroller");
+																																			.get(searchTermBox.getUI());
+
+			Field scrollerInBasicComboPopup = BasicComboPopup.class
+																															.getDeclaredField("scroller");
 			scrollerInBasicComboPopup.setAccessible(true);
-			JScrollPane scroller =
-				(JScrollPane) scrollerInBasicComboPopup.get(popup);
-			
+			JScrollPane scroller = (JScrollPane) scrollerInBasicComboPopup.get(popup);
+
 			scroller.getViewport().getView()
-				.addMouseListener(new SearchMouseCommitListener());
+							.addMouseListener(new SearchMouseCommitListener());
 		}
-		catch (NoSuchFieldException e) {
-			e.printStackTrace();  
+		catch(NoSuchFieldException e) {
+			e.printStackTrace();
 		}
-		catch (IllegalAccessException e) {
-			e.printStackTrace();  
+		catch(IllegalAccessException e) {
+			e.printStackTrace();
 		}
 	}
 
 	//NOTE: This may be removed without side-effect if a better way of
 	//initiating a search upon combobox dropdown click is found
-	/**
-	 * The following listener only performs 1 function: initiates a search when
+	/** The following listener only performs 1 function: initiates a search when
 	 * a user clicks a dropdown menu item from a combobox.
-	 * @author rleach
-	 */
+	 * 
+	 * @author rleach */
 	private class SearchMouseCommitListener extends MouseAdapter {
+
 		//Upon mouseReleased, it is assumed that the user has just clicked an
 		//item in a dropdown list in a combobox.  The search is initiated by
 		//simulating an enter keypress using a robot which is caught
 		//by the keyListener.  This is circuitous, but reliable, and easy to
 		//replace using another method if a better way to do this is found.
 		@Override
-		public void mouseReleased(java.awt.event.MouseEvent e){
+		public void mouseReleased(java.awt.event.MouseEvent e) {
 			//Calling seekAll() directly did not work. It worked occasionally
 			//when called from ActionListener's actionPerformed method (only
 			//when a boolean was set to true here).  It turns out that
@@ -231,15 +224,16 @@ public abstract class LabelFinderBox {
 				Robot robot = new Robot();
 				robot.keyPress(KeyEvent.VK_ENTER);
 				robot.keyRelease(KeyEvent.VK_ENTER);
-			} catch (Exception ex) {
+			}
+			catch(Exception ex) {
 				ex.printStackTrace();
 			}
 		}
 	}
 
 	public void updateSearchIndexes() {
-		if(searchDataArray == null || searchDataArray.length == 0
-				|| labelSummary.getIncluded().length == 0) {
+		if(searchDataArray == null || searchDataArray.length == 0 || labelSummary
+																																							.getIncluded().length == 0) {
 			setEmptySearchTermBox();
 			primarySearchIndex = -1;
 			maxSearchIndex = -1;
@@ -261,12 +255,10 @@ public abstract class LabelFinderBox {
 		maxSearchIndex = searchDataArray[0].length - 1;
 	}
 
-	/**
-	 * Used for errors.
-	 */
+	/** Used for errors. */
 	public void setEmptySearchTermBox() {
 
-		final String[] labels = { "No data" };
+		final String[] labels = {"No data"};
 
 		this.searchTermBox = GUIFactory.createWideComboBox(labels);
 		searchTermBox.setEditable(true);
@@ -281,30 +273,31 @@ public abstract class LabelFinderBox {
 
 		defaultText = "Search " + type + "s...";
 
-		searchDataArray    = copy2DStringArray(labelArray);
-		String[] searchDataLabels = { "" };
+		searchDataArray = copy2DStringArray(labelArray);
+		String[] searchDataLabels = {""};
 		updateSearchIndexes();
 
 		//Determine which label types to skip
 		searchExclusions = new boolean[maxSearchIndex + 1];
 		int numExclusions = 0;
-		for(int i = 0;i <= maxSearchIndex;i++) {
-			if(allStringsEqual(labelArray,i) && i != primarySearchIndex) {
+		for(int i = 0; i <= maxSearchIndex; i++) {
+			if(allStringsEqual(labelArray, i) && i != primarySearchIndex) {
 				searchExclusions[i] = true;
 				numExclusions++;
 				continue;
-			} else {
+			}
+			else {
 				searchExclusions[i] = false;
 			}
 		}
 
 		int dropdownSize =
-			//Full number of all labels
-			(searchDataArray.length * (maxSearchIndex + 1)) -
-			//Number of excluded labels
-			searchDataArray.length * numExclusions +
-			//For the "Search rows..." default text
-			1;
+											//Full number of all labels
+											(searchDataArray.length * (maxSearchIndex + 1)) -
+												//Number of excluded labels
+												searchDataArray.length * numExclusions +
+												//For the "Search rows..." default text
+												1;
 
 		final String[] labels = new String[dropdownSize];
 
@@ -312,17 +305,16 @@ public abstract class LabelFinderBox {
 
 		int startIndex = 1;
 
-		for(int i = 0;i <= maxSearchIndex;i++) {
+		for(int i = 0; i <= maxSearchIndex; i++) {
 			if(searchExclusions[i]) {
 				continue;
 			}
 
-			searchDataLabels = getLabels(labelArray,i);
+			searchDataLabels = getLabels(labelArray, i);
 
-			Arrays.sort(searchDataLabels,Collator.getInstance());
+			Arrays.sort(searchDataLabels, Collator.getInstance());
 
-			System.arraycopy(searchDataLabels, 0, labels, startIndex,
-					searchDataLabels.length);
+			System.arraycopy(searchDataLabels, 0, labels, startIndex, searchDataLabels.length);
 
 			startIndex += searchDataLabels.length;
 		}
@@ -331,75 +323,63 @@ public abstract class LabelFinderBox {
 		return(labels);
 	}
 
-	/**
-	 * Determines whether all strings located at labelArray[*][i] are equal so that
+	/** Determines whether all strings located at labelArray[*][i] are equal so
+	 * that
 	 * label types which have no discerning search power do not waste space in
 	 * the combobox.
+	 * 
 	 * @author rleach
 	 * @param labelArray, i
-	 * @return boolean
-	 */
-	public boolean allStringsEqual(String[][] labelArray,int i) {
-		for(int j = 1;j < labelArray.length;j++) {
-			if(!labelArray[0][i].equals(labelArray[j][i])) {
-				return(false);
-			}
+	 * @return boolean */
+	public boolean allStringsEqual(String[][] labelArray, int i) {
+		for(int j = 1; j < labelArray.length; j++) {
+			if(!labelArray[0][i].equals(labelArray[j][i])) { return(false); }
 		}
 		return(true);
 	}
 
-	/**
-	 * Returns the content panel which keeps the GUI components.
+	/** Returns the content panel which keeps the GUI components.
 	 *
-	 * @return JPanel
-	 */
+	 * @return JPanel */
 	public WideComboBox getSearchTermBox() {
 
 		return searchTermBox;
 	}
 
-	/**
-	 * Copies a 2D array of strings for searching.
+	/** Copies a 2D array of strings for searching.
+	 * 
 	 * @param old
-	 * @return String[][]
-	 */
+	 * @return String[][] */
 	public String[][] copy2DStringArray(String[][] old) {
-		if(old == null || old[0] == null) {
-			return(old);
-		}
+		if(old == null || old[0] == null) { return(old); }
 		String[][] copy = new String[old.length][old[0].length];
-		for(int i=0; i<old.length; i++)
-			for(int j=0; j<old[i].length; j++)
-				copy[i][j]=old[i][j];
+		for(int i = 0; i < old.length; i++)
+			for(int j = 0; j < old[i].length; j++)
+				copy[i][j] = old[i][j];
 		return(copy);
 	}
 
-	/**
-	 * Obtains the visible column/row labels.
+	/** Obtains the visible column/row labels.
 	 *
 	 * @param labelArray
-	 * @return
-	 */
+	 * @return */
 	public String[] getLabels(final String[][] labelArray) {
-		return(getLabels(labelArray,primarySearchIndex));
+		return(getLabels(labelArray, primarySearchIndex));
 	}
 
-	/**
-	 * Obtains all column/row labels.
+	/** Obtains all column/row labels.
 	 *
 	 * @param labelArray
-	 * @return
-	 */
-	public String[] getLabels(final String[][] labelArray,int index) {
+	 * @return */
+	public String[] getLabels(final String[][] labelArray, int index) {
 
 		final String[] labels = new String[labelArray.length];
 		updateSearchIndexes();
 
-		if(labelArray.length == 0 || (index + 1) > labelArray[0].length) {
-			return(labels);
-		}
+		if(labelArray.length == 0 || (index +
+																	1) > labelArray[0].length) { return(labels); }
 
-		for (int i = 0; i < labelArray.length; i++) {
+		for(int i = 0; i < labelArray.length; i++) {
 
 			final String yorf = labelArray[i][index];
 			labels[i] = yorf;
@@ -408,12 +388,11 @@ public abstract class LabelFinderBox {
 		return(labels);
 	}
 
-	/**
-	 * Initiates searches using search terms from this search term box and the
+	/** Initiates searches using search terms from this search term box and the
 	 * companion search term box. (i.e. both a row and column search)
 	 * Controls the text color in the box based on whether something was found.
-	 * @author rleach
-	 */
+	 * 
+	 * @author rleach */
 	public void seekAll() {
 		boolean gotSomething = false;
 
@@ -428,12 +407,11 @@ public abstract class LabelFinderBox {
 		if(companionBox.isSearchTermEntered()) {
 			companionBox.updateSearchTextColor(companionBox.seekAllHelper());
 
-			if(otherSelection.getNSelectedIndexes() > 0 &&
-				isSearchTermEntered()) {
+			if(otherSelection.getNSelectedIndexes() > 0 && isSearchTermEntered()) {
 
 				gotSomething = this.seekAllHelper();
 				updateSearchTextColor(gotSomething);
-				
+
 				//If this search box produced no results, default to the results
 				//from the other search box
 				if(!gotSomething) {
@@ -449,24 +427,28 @@ public abstract class LabelFinderBox {
 //				if(searchSelection.getNSelectedIndexes() == 0) {
 //					otherSelection.deselectAllIndexes();
 //				}
-			} else {
+			}
+			else {
 				if(isSearchTermEntered()) {
 					gotSomething = this.seekAllHelper();
-				} else {
+				}
+				else {
 					//The search box is empty, so there's no reason for it to
 					//possibly remain red from a previously failed search.
 					gotSomething = true;
 				}
 				updateSearchTextColor(gotSomething);
 			}
-		} else {
+		}
+		else {
 			//The companion search box is empty, so there's no reason for it to
 			//possibly remain red from a previously failed search.
 			companionBox.updateSearchTextColor(true);
 			gotSomething = this.seekAllHelper();
 			if(isSearchTermEntered()) {
 				updateSearchTextColor(gotSomething);
-			} else {
+			}
+			else {
 				updateSearchTextColor(true);
 			}
 		}
@@ -474,41 +456,39 @@ public abstract class LabelFinderBox {
 
 	public void updateSearchTextColor(final boolean gotSomething) {
 		if(gotSomething) {
-			searchTermBox.getEditor().getEditorComponent().
-				setBackground(FOUNDCOLOR);
-		} else {
-			searchTermBox.getEditor().getEditorComponent().
-				setBackground(NOTFOUNDCOLOR);
+			searchTermBox.getEditor().getEditorComponent().setBackground(FOUNDCOLOR);
+		}
+		else {
+			searchTermBox	.getEditor().getEditorComponent()
+										.setBackground(NOTFOUNDCOLOR);
 		}
 	}
 
-	/**
-	 * Searches this class's search term box.  Respects selections already found
-	 * from a companion search.
-	 */
+	/** Searches this class's search term box. Respects selections already found
+	 * from a companion search. */
 	public boolean seekAllHelper() {
 
 		searchSelection.deselectAllIndexes();
-		
+
 		final List<Integer> indexList = findSelected();
 
 		// Initialize the min and max index used to determine whether result is
 		// currently visible
 		int minIndex = 0;
 		int maxIndex = 0;
-		if (indexList.size() > 0) {
+		if(indexList.size() > 0) {
 			minIndex = indexList.get(0);
 			maxIndex = indexList.get(0);
 		}
 
 		// Set the found indexes as selected and determine min/max selected
 		// indexes
-		for (int i = 0; i < indexList.size(); i++) {
+		for(int i = 0; i < indexList.size(); i++) {
 
-			if (indexList.get(i) < minIndex) {
+			if(indexList.get(i) < minIndex) {
 				minIndex = indexList.get(i);
 			}
-			if (indexList.get(i) > maxIndex) {
+			if(indexList.get(i) > maxIndex) {
 				maxIndex = indexList.get(i);
 			}
 			searchSelection.setIndexSelection(indexList.get(i), true);
@@ -521,57 +501,54 @@ public abstract class LabelFinderBox {
 		int otherMinIndex = otherSelection.getMinIndex();
 		int otherMaxIndex = otherSelection.getMaxIndex();
 
-		if ((indexList.size() > 0) &&
-		// At least part of the found min/max selected area is not visible
-		// This assumes that min is less than max and that the visible area is a
-		// contiguous block of visible indexes
-				(minIndex < globalSmap.getFirstVisible() ||
-					maxIndex > globalSmap.getLastVisible())) {
+		if((indexList.size() > 0) &&
+				// At least part of the found min/max selected area is not visible
+				// This assumes that min is less than max and that the visible area is a
+				// contiguous block of visible indexes
+				(minIndex < globalSmap.getFirstVisible() || maxIndex > globalSmap
+																																					.getLastVisible())) {
 
 			globalSmap.setMinScale();
 		}
 
-		if ((otherSelection.getNSelectedIndexes() == 0 ||
-			otherMinIndex < globalOmap.getFirstVisible() ||
-			otherMaxIndex > globalOmap.getLastVisible())) {
+		if((otherSelection.getNSelectedIndexes() == 0 ||	otherMinIndex < globalOmap
+																																								.getFirstVisible() ||
+				otherMaxIndex > globalOmap.getLastVisible())) {
 
 			globalOmap.setMinScale();
 		}
 
-		if(indexList.size() > 0) {
-			return(true);
-		}
+		if(indexList.size() > 0) { return(true); }
 		return(false);
 	}
 
-	/**
-	 * Determines whether anything was entered into the finer box.  Returns
+	/** Determines whether anything was entered into the finer box. Returns
 	 * false if the finder box is empty or if its contents are the default text.
+	 * 
 	 * @author rleach
-	 * @return boolean
-	 */
+	 * @return boolean */
 	public boolean isSearchTermEntered() {
-		if(getSearchTerm() == "" || getSearchTerm() == defaultText) {
-			return(false);
-		}
+		if(getSearchTerm() == "" ||
+				getSearchTerm() == defaultText) { return(false); }
 		return(true);
 	}
 
-	/**
-	 * Scans searchDataArray for labels which match the search term. The indexes of these labels will be added to a
+	/** Scans searchDataArray for labels which match the search term. The indexes
+	 * of these labels will be added to a
 	 * list.
-	 * @return the list of indexes which match the search term. 
-	 */
+	 * 
+	 * @return the list of indexes which match the search term. */
 	private List<Integer> findSelected() {
 
 		if(primarySearchIndex < 0) {
-			LogBuffer.println("No search results because no labels have been chosen for " + type);
+			LogBuffer.println("No search results because no labels have been chosen for " +
+												type);
 			return new ArrayList<Integer>(0);
 		}
-		
-		final List<Integer> primaryIndexList    = new ArrayList<Integer>();
-		final List<Integer> primarySubstrList   = new ArrayList<Integer>();
-		final List<Integer> secondaryIndexList  = new ArrayList<Integer>();
+
+		final List<Integer> primaryIndexList = new ArrayList<Integer>();
+		final List<Integer> primarySubstrList = new ArrayList<Integer>();
+		final List<Integer> secondaryIndexList = new ArrayList<Integer>();
 		final List<Integer> secondarySubstrList = new ArrayList<Integer>();
 
 		final String sub = getSearchTerm();
@@ -580,13 +557,13 @@ public abstract class LabelFinderBox {
 		if(!"*".equalsIgnoreCase(wildcardsub.substring(0, 1))) {
 			wildcardsub = "*" + wildcardsub;
 		}
-		if("*".equals(wildcardsub.substring((wildcardsub.length() - 1),
-			wildcardsub.length()))) {
+		if("*".equals(wildcardsub.substring((wildcardsub.length() - 1), wildcardsub
+																																								.length()))) {
 
 			wildcardsub = wildcardsub + "*";
 		}
 
-		for(int i = 0; i < searchDataArray.length;i++) {
+		for(int i = 0; i < searchDataArray.length; i++) {
 			String label = searchDataArray[i][primarySearchIndex];
 			if(wildCardMatch(label, sub)) {
 				primaryIndexList.add(i);
@@ -596,7 +573,7 @@ public abstract class LabelFinderBox {
 			}
 
 			//This searches secondary labels (those not visible)
-			for(int j = 0; j <= maxSearchIndex;j++) {
+			for(int j = 0; j <= maxSearchIndex; j++) {
 				if(j == primarySearchIndex || searchExclusions[j]) {
 					continue;
 				}
@@ -618,42 +595,41 @@ public abstract class LabelFinderBox {
 		//substring matches to labels that are not visible
 		if(primaryIndexList.size() > 0) {
 			return(primaryIndexList);
-		} else if(primarySubstrList.size() > 0) {
+		}
+		else if(primarySubstrList.size() > 0) {
 			return(primarySubstrList);
-		} else if(secondaryIndexList.size() > 0) {
+		}
+		else if(secondaryIndexList.size() > 0) {
 			return(secondaryIndexList);
-		} else {
+		}
+		else {
 			return(secondarySubstrList);
 		}
 	}
 
-	/**
-	 * This method retrieves the search term that was entered into the finder
+	/** This method retrieves the search term that was entered into the finder
 	 * box by the user.
+	 * 
 	 * @author rleach
-	 * @return String
-	 */
+	 * @return String */
 	public String getSearchTerm() {
 		return(searchTermBox.getSelectedItem().toString());
 	}
 
-	/**
-	 * Performs a wildcard matching for the text and pattern provided. Matching
+	/** Performs a wildcard matching for the text and pattern provided. Matching
 	 * is done based on regex patterns.
 	 *
 	 * @param text
-	 *            the text to be tested for matches.
+	 *          the text to be tested for matches.
 	 *
 	 * @param pattern
-	 *            the pattern to be matched for. This can contain the wildcard
-	 *            character '*' (asterisk).
+	 *          the pattern to be matched for. This can contain the wildcard
+	 *          character '*' (asterisk).
 	 *
-	 * @return <tt>true</tt> if a match is found, <tt>false</tt> otherwise.
-	 */
+	 * @return <tt>true</tt> if a match is found, <tt>false</tt> otherwise. */
 	public static boolean wildCardMatch(final String text, String pattern) {
 
-		if (text == null || pattern == null)
-			return false;
+		if(text == null || pattern == null) return false;
 
 		// Escape all metacharacters except our supported wildcards
 		pattern = pattern.replaceAll("([^A-Za-z0-9 \\?\\*])", "\\\\$1");
@@ -662,7 +638,7 @@ public abstract class LabelFinderBox {
 		pattern = pattern.replaceAll("\\*", ".*");
 
 		//This code allows the pattern match to be case insensitive.
-		Pattern p = Pattern.compile(pattern,Pattern.CASE_INSENSITIVE);
+		Pattern p = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
 		Matcher m = p.matcher(text);
 		boolean isMatch = false;
 		if(m.find()) {
@@ -674,13 +650,10 @@ public abstract class LabelFinderBox {
 
 	abstract public void scrollToIndex(int i);
 
-	/**
-	 * KeyListener to implement search by pressing enter when the combobox has
+	/** KeyListener to implement search by pressing enter when the combobox has
 	 * focus.
 	 *
-	 * @author CKeil
-	 *
-	 */
+	 * @author CKeil */
 	class BoxKeyListener extends KeyAdapter {
 
 		private int selStartPressed = 0;
@@ -694,8 +667,8 @@ public abstract class LabelFinderBox {
 		private int selIndexTyped = -1;
 		private final boolean debug = false;
 		private boolean changed = false;
-		JTextComponent editor = ((JTextField) searchTermBox.getEditor()
-				.getEditorComponent());
+		JTextComponent editor = ((JTextField) searchTermBox	.getEditor()
+																												.getEditorComponent());
 
 		// NOTE: command-w never worked to close the search window before adding
 		// anything in this class other than the seekAll function, though
@@ -710,16 +683,15 @@ public abstract class LabelFinderBox {
 			selIndexPressed = searchTermBox.getSelectedIndex();
 			fullTextPressed = editor.getText();
 
-			if (debug) {
-				LogBuffer.println("Pressed - Selection start: ["
-						+ selStartPressed + "] " + "Selection end: ["
-						+ selEndPressed + "] " + "String length: ["
-						+ lenPressed + "]. " + "Selected text: ["
-						+ editor.getSelectedText() + "]. " + "Full text: ["
-						+ editor.getText() + "]. " + "Selected index is: ["
-						+ selIndexPressed + "]. " + "Character: ["
-						+ e.getKeyChar() + "]. " + "When cast to int: ["
-						+ (int) e.getKeyChar() + "].");
+			if(debug) {
+				LogBuffer.println("Pressed - Selection start: [" +	selStartPressed +
+													"] " + "Selection end: [" + selEndPressed + "] " +
+													"String length: [" + lenPressed + "]. " +
+													"Selected text: [" + editor.getSelectedText() +
+													"]. " + "Full text: [" + editor.getText() + "]. " +
+													"Selected index is: [" + selIndexPressed + "]. " +
+													"Character: [" + e.getKeyChar() + "]. " +
+													"When cast to int: [" + (int) e.getKeyChar() + "].");
 			}
 
 			//If the popup is visible, and the command/windows key was pressed,
@@ -748,7 +720,7 @@ public abstract class LabelFinderBox {
 		public void keyReleased(final KeyEvent e) {
 
 			/* If enter key is pressed, search */
-			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 				LogBuffer.println("search initialized");
 				seekAll();
 				return;
@@ -767,36 +739,37 @@ public abstract class LabelFinderBox {
 			//defaultText) if the cursor position is greater than 0 (i.e. text
 			//has been typed/entered) and select the first matching item after
 			//it.
-			if(searchTermBox.getSelectedIndex() == 0 &&
-				editor.getSelectionStart() > 0) {
+			if(searchTermBox.getSelectedIndex() == 0 && editor
+																												.getSelectionStart() > 0) {
 
 				int[] newRels = setNextDropDownMatch();
-				selEndRel     = newRels[0];
-				lenRel        = newRels[1];
-				selIndexRel   = newRels[2];
+				selEndRel = newRels[0];
+				lenRel = newRels[1];
+				selIndexRel = newRels[2];
 			}
 
-			if (debug) {
-				LogBuffer.println("  Relsd - Selection start: [" + selStartRel
-						+ "] " + "Selection end: [" + selEndRel + "] "
-						+ "String length: [" + lenRel + "]. "
-						+ "Selected text: [" + editor.getSelectedText() + "]. "
-						+ "Full text: [" + editor.getText() + "]. "
-						+ "Selected index is: [" + selIndexRel + "]. "
-						+ "Character typed: [" + e.getKeyChar() + "]. "
-						+ "When cast to int: [" + (int) e.getKeyChar() + "].");
+			if(debug) {
+				LogBuffer.println("  Relsd - Selection start: [" +	selStartRel + "] " +
+													"Selection end: [" + selEndRel + "] " +
+													"String length: [" + lenRel + "]. " +
+													"Selected text: [" + editor.getSelectedText() +
+													"]. " + "Full text: [" + editor.getText() + "]. " +
+													"Selected index is: [" + selIndexRel + "]. " +
+													"Character typed: [" + e.getKeyChar() + "]. " +
+													"When cast to int: [" + (int) e.getKeyChar() + "].");
 			}
 
 			// If the contents of the text field have changed and nothing in the
 			// select list is selected
-			if((changed || lenPressed != lenRel) &&
-				searchTermBox.getSelectedIndex() == -1) {
+			if((changed || lenPressed != lenRel) && searchTermBox
+																														.getSelectedIndex() == -1) {
 
-				if((e.getKeyChar()) == KeyEvent.VK_DELETE ||
-						(e.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
+				if((e.getKeyChar()) == KeyEvent.VK_DELETE || (e
+																												.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
 					editor.setSelectionStart(selStartTyped);
 					editor.setSelectionEnd(selStartTyped);
-				} else {
+				}
+				else {
 					editor.setSelectionStart(selStartRel);
 					editor.setSelectionEnd(selStartRel);
 				}
@@ -805,44 +778,51 @@ public abstract class LabelFinderBox {
 			// Else if no text changed, there was selected text, and a left or
 			// right arrow was pressed without modifiers
 			else if(!changed && lenPressed == lenRel) {
-				if(selStartPressed != selEndPressed
-						&& (e.getKeyCode() == KeyEvent.VK_RIGHT || e
-								.getKeyCode() == KeyEvent.VK_LEFT)
-						&& e.getModifiers() == 0) {
+				if(selStartPressed != selEndPressed &&	(e
+																									.getKeyCode() == KeyEvent.VK_RIGHT ||
+																								e.getKeyCode() == KeyEvent.VK_LEFT) &&
+						e.getModifiers() == 0) {
 					if(debug) {
 						LogBuffer.println("Positioning cursor at edge of " +
-							"selection...");
+															"selection...");
 					}
-					if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+					if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
 						editor.setSelectionStart(selEndPressed);
 						editor.setSelectionEnd(selEndPressed);
-					} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+					}
+					else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
 						editor.setSelectionStart(selStartPressed);
 						editor.setSelectionEnd(selStartPressed);
 					}
-				} else if ((e.getKeyCode() == KeyEvent.VK_UP ||
-					e.getKeyCode() == KeyEvent.VK_DOWN) && e.getModifiers() == 1
-					&& e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK) {
+				}
+				else if((e.getKeyCode() == KeyEvent.VK_UP || e
+																											.getKeyCode() == KeyEvent.VK_DOWN) &&
+								e.getModifiers() == 1 && e
+																					.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK) {
 
-					if (debug) {
+					if(debug) {
 						LogBuffer.println("Expanding selection to end...");
 					}
-					if (e.getKeyCode() == KeyEvent.VK_UP) {
+					if(e.getKeyCode() == KeyEvent.VK_UP) {
 						editor.setSelectionStart(0);
 						editor.setSelectionEnd(selEndPressed);
-					} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+					}
+					else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
 						editor.setSelectionStart(selStartPressed);
 						editor.setSelectionEnd(lenPressed);
 					}
 				}
-			} else {
-				if (debug) {
-					LogBuffer.println("Nothing to do because changed is "
-							+ (changed ? "" : "not ") + "true, the length has "
-							+ (lenPressed == lenRel ? "not " : "")
-							+ "changed and not sideways arrow keys were "
-							+ "pressed and there were " + e.getModifiers()
-							+ " modifiers.");
+			}
+			else {
+				if(debug) {
+					LogBuffer.println("Nothing to do because changed is " +	(changed																				? ""
+																																						: "not ") +
+														"true, the length has " + (lenPressed == lenRel
+																																							? "not "
+																																						: "") +
+														"changed and not sideways arrow keys were " +
+														"pressed and there were " + e.getModifiers() +
+														" modifiers.");
 				}
 			}
 
@@ -867,15 +847,15 @@ public abstract class LabelFinderBox {
 			// before having
 			// typed
 
-			if (debug) {
-				LogBuffer.println("  Typed - Selection start: ["
-						+ selStartTyped + "] " + "Selection end: ["
-						+ selEndTyped + "] " + "String length: [" + lenTyped
-						+ "]. " + "Selected text: [" + editor.getSelectedText()
-						+ "]. " + "Full text: [" + editor.getText() + "]. "
-						+ "Selected index is: [" + selIndexTyped + "]. "
-						+ "Character typed: [" + e.getKeyChar() + "]. "
-						+ "When cast to int: [" + (int) e.getKeyChar() + "].");
+			if(debug) {
+				LogBuffer.println("  Typed - Selection start: [" +	selStartTyped +
+													"] " + "Selection end: [" + selEndTyped + "] " +
+													"String length: [" + lenTyped + "]. " +
+													"Selected text: [" + editor.getSelectedText() +
+													"]. " + "Full text: [" + editor.getText() + "]. " +
+													"Selected index is: [" + selIndexTyped + "]. " +
+													"Character typed: [" + e.getKeyChar() + "]. " +
+													"When cast to int: [" + (int) e.getKeyChar() + "].");
 			}
 
 			// If the backspace was typed, there was a selection, and the
@@ -884,9 +864,9 @@ public abstract class LabelFinderBox {
 			// and the text will be incorrectly edited
 			// (a bug of the parent class - because they didn't anticipate text
 			// to be manipulated this way), so let's nip that in the bud
-			if ((e.getKeyChar()) == KeyEvent.VK_BACK_SPACE &&
-				selStartPressed != selEndPressed &&
-				(selStartPressed - 1) == selStartTyped) {
+			if((e.getKeyChar()) == KeyEvent.VK_BACK_SPACE &&
+					selStartPressed != selEndPressed && (selStartPressed -
+																								1) == selStartTyped) {
 
 				selStartTyped = selStartPressed;
 				editor.setSelectionStart(selStartPressed);
@@ -900,12 +880,11 @@ public abstract class LabelFinderBox {
 			// matching string
 			// and the current backspace inadvertently does nothing (a bug of
 			// the parent class as well), so let's nip that in the bud.
-			else if (selStartPressed == selStartTyped &&
-				selEndPressed == lenPressed &&
-				selEndPressed != selStartPressed &&
-				selEndTyped == selStartTyped && selIndexPressed > -1 &&
-				selIndexTyped == -1 &&
-				(e.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
+			else if(selStartPressed == selStartTyped &&	selEndPressed == lenPressed &&
+							selEndPressed != selStartPressed &&
+							selEndTyped == selStartTyped && selIndexPressed > -1 &&
+							selIndexTyped == -1 && (e
+																				.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
 
 				editor.setText(fullTextPressed);
 				selStartTyped = selStartPressed;
@@ -921,99 +900,98 @@ public abstract class LabelFinderBox {
 
 			// Perform the search to highlight the result in the main window if
 			// enter key is typed
-			if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+			if(e.getKeyChar() == KeyEvent.VK_ENTER) {
 				seekAll();
 			}
 			// If the delete or backspace is typed, set the new text content to
 			// force autocomplete to update
-			else if ((e.getKeyChar()) == KeyEvent.VK_DELETE ||
-				(e.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
+			else if((e.getKeyChar()) == KeyEvent.VK_DELETE || (e
+																													.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
 
 				// Only need to manipulate the edit action if there's a
 				// currently selected index
-				if (selIndexPressed > -1) {
-					if (lenTyped > 0) {
-						if (selEndTyped != lenTyped && selStartTyped != 0) {
-							if (debug) {
+				if(selIndexPressed > -1) {
+					if(lenTyped > 0) {
+						if(selEndTyped != lenTyped && selStartTyped != 0) {
+							if(debug) {
 								LogBuffer.println("Edited case 1a.");
 							}
-							if (selStartTyped != selEndTyped) {
+							if(selStartTyped != selEndTyped) {
 								final String editedText = editor.getText()
-										.substring(0, selStartTyped)
-										+ editor.getText().substring(
-												selEndTyped, lenTyped);
-								if (debug) {
-									LogBuffer.println("Setting text to ["
-											+ editedText + "].");
+																								.substring(0, selStartTyped) +
+																					editor.getText()
+																								.substring(selEndTyped, lenTyped);
+								if(debug) {
+									LogBuffer.println("Setting text to [" + editedText + "].");
 								}
 								editor.setText(editedText);
-							} else {
-								editor.setText(editor.getText().substring(0,
-										selStartTyped)
-										+ editor.getText().substring(
-												selEndTyped, lenTyped));
 							}
-						} else if (selEndTyped == lenTyped) {
-							if (debug) {
-								LogBuffer
-										.println("Edited case 2a: substring(0, "
-												+ selStartTyped + ").");
+							else {
+								editor.setText(editor.getText().substring(0, selStartTyped) +
+																editor.getText()
+																			.substring(selEndTyped, lenTyped));
 							}
-							if (selStartTyped == 0) {
+						}
+						else if(selEndTyped == lenTyped) {
+							if(debug) {
+								LogBuffer.println("Edited case 2a: substring(0, " +
+																	selStartTyped + ").");
+							}
+							if(selStartTyped == 0) {
 								searchTermBox.setSelectedIndex(0);
-							} else {
-								editor.setText(editor.getText().substring(0,
-										selStartTyped));
-								if (searchTermBox.getSelectedIndex() == -1) {
+							}
+							else {
+								editor.setText(editor.getText().substring(0, selStartTyped));
+								if(searchTermBox.getSelectedIndex() == -1) {
 									editor.setSelectionStart(selStartTyped);
 									editor.setSelectionEnd(selStartTyped);
 									// searchTermBox.setPopupVisible(false);
 								}
 							}
-						} else if (selStartTyped == 0) {
-							if (debug) {
+						}
+						else if(selStartTyped == 0) {
+							if(debug) {
 								LogBuffer.println("Edited case 3a.");
 							}
-							editor.setText(editor.getText().substring(
-									selEndTyped, lenTyped));
-							if (searchTermBox.getSelectedIndex() == -1) {
+							editor.setText(editor.getText().substring(selEndTyped, lenTyped));
+							if(searchTermBox.getSelectedIndex() == -1) {
 								editor.setSelectionStart(selStartTyped);
 								editor.setSelectionEnd(selStartTyped);
 								// searchTermBox.setPopupVisible(false);
 							}
 						}
-					} else {
+					}
+					else {
 						searchTermBox.setSelectedIndex(0);
 					}
 				}
 			}
 			// Else if a character was entered into the field, ensure the
 			// selected text was replaced
-			else if ((e.getKeyChar()) != 27) {
+			else if((e.getKeyChar()) != 27) {
 				// If the previous selected index is -1, make the edit manually
 				// because typing over selected text doesn't seem to work
 				// otherwise
-				if (searchTermBox.getSelectedIndex() == -1) {
-					if (debug) {
-						LogBuffer
-								.println("Trying to force editing manually " +
-									"selected text to work");
+				if(searchTermBox.getSelectedIndex() == -1) {
+					if(debug) {
+						LogBuffer.println("Trying to force editing manually " +
+															"selected text to work");
 					}
 
-					if (lenTyped > 0) {
-						if (selEndTyped != lenTyped && selStartTyped != 0) {
-							if (debug) {
+					if(lenTyped > 0) {
+						if(selEndTyped != lenTyped && selStartTyped != 0) {
+							if(debug) {
 								LogBuffer.println("Edited case 1b.");
 							}
-							if (selStartTyped != selEndTyped) {
+							if(selStartTyped != selEndTyped) {
 								// All I have to do is remove the selected text
 								// and what was typed will be inserted between
 								// here and keyReleased
-								editor.setText(editor.getText().substring(0,
-										selStartTyped)
-										+ editor.getText().substring(
-												(selEndTyped), lenTyped));
-							} else {
+								editor.setText(editor.getText().substring(0, selStartTyped) +
+																editor.getText()
+																			.substring((selEndTyped), lenTyped));
+							}
+							else {
 								// Actually the default behavior appears to work
 								// automatically in this instance - it's only
 								// when there's selected text when there's a
@@ -1023,43 +1001,45 @@ public abstract class LabelFinderBox {
 								// editor.getText().substring(selEndTyped,
 								// lenTyped));
 							}
-						} else if (selEndTyped == lenTyped) {
-							if (debug) {
-								LogBuffer
-										.println("Edited case 2b: substring(0, "
-												+ selStartTyped + ").");
+						}
+						else if(selEndTyped == lenTyped) {
+							if(debug) {
+								LogBuffer.println("Edited case 2b: substring(0, " +
+																	selStartTyped + ").");
 							}
-							if (selStartTyped == 0) {
+							if(selStartTyped == 0) {
 								searchTermBox.setSelectedIndex(0);
-							} else {
+							}
+							else {
 								// All I have to do is remove the selected text
 								// and what was typed will be inserted between
 								// here and keyReleased
-								editor.setText(editor.getText().substring(0,
-										selStartTyped));// + e.getKeyChar());
-								if (searchTermBox.getSelectedIndex() == -1) {
+								editor.setText(editor.getText().substring(0, selStartTyped));// + e.getKeyChar());
+								if(searchTermBox.getSelectedIndex() == -1) {
 									editor.setSelectionStart(selStartTyped);
 									editor.setSelectionEnd(selStartTyped);
 									// searchTermBox.setPopupVisible(false);
 								}
 							}
-						} else if (selStartTyped == 0) {
-							if (debug) {
+						}
+						else if(selStartTyped == 0) {
+							if(debug) {
 								LogBuffer.println("Edited case 3b.");
 							}
 							// The parent class will add the typed character at
 							// the beginning between keyTyped and keyReleased
 							// (but apparently we need to delete the selected
 							// text manually)
-							editor.setText(/* e.getKeyChar() + */editor
-									.getText().substring(selEndTyped,lenTyped));
-							if (searchTermBox.getSelectedIndex() == -1) {
+							editor.setText(/* e.getKeyChar() + */editor	.getText()
+																													.substring(selEndTyped, lenTyped));
+							if(searchTermBox.getSelectedIndex() == -1) {
 								editor.setSelectionStart(selStartTyped);
 								editor.setSelectionEnd(selStartTyped);
 								// searchTermBox.setPopupVisible(false);
 							}
 						}
-					} else {
+					}
+					else {
 						searchTermBox.setSelectedIndex(0);
 					}
 				}
@@ -1069,18 +1049,17 @@ public abstract class LabelFinderBox {
 			// character was not typed - assumes no other non-chars get in here)
 			// Ensure autocomplete worked, the selected index is correct, and
 			// that the text selection/cursor-placement is accurate
-			if ((e.getKeyChar()) != 27 && e.getKeyChar() != KeyEvent.VK_ENTER) {
+			if((e.getKeyChar()) != 27 && e.getKeyChar() != KeyEvent.VK_ENTER) {
 				// If the previous selected index is -1, try to force a matching
 				// index to be selected
-				if (searchTermBox.getSelectedIndex() == -1
-						&& selIndexTyped == -1) {
+				if(searchTermBox.getSelectedIndex() == -1 && selIndexTyped == -1) {
 
 					// Get the current text content
 					final String content = editor.getText();
 
-					if (debug) {
+					if(debug) {
 						LogBuffer.println("Trying to force a selection to be " +
-							"made 1.  Current text: [" + content + "].");
+															"made 1.  Current text: [" + content + "].");
 					}
 
 					// searchTermBox.setKeySelectionManager(
@@ -1095,26 +1074,27 @@ public abstract class LabelFinderBox {
 					searchTermBox.selectWithKeyChar('S');
 					// Now reset the text back to what it was to force a
 					// selection (if one exists)
-					if (content.length() > 0) {
+					if(content.length() > 0) {
 						editor.setText(content);
 					}
 					// The above puts the cursor at the end of the total text
 					// Now put the cursor back where it was
 					// If the typed key was backspace or delete
-					if ((e.getKeyChar()) == KeyEvent.VK_DELETE) {
+					if((e.getKeyChar()) == KeyEvent.VK_DELETE) {
 						// Put the cursor at the beginning of the previously
 						// selected text (because that text is now gone)
 						editor.setSelectionStart(selStartTyped);
 						// If there is still not a selected index, also set the
 						// end position there (otherwise, it will stay at the
 						// end)
-						if (searchTermBox.getSelectedIndex() == -1) {
+						if(searchTermBox.getSelectedIndex() == -1) {
 							editor.setSelectionStart(selStartTyped);
 						}
-						if (searchTermBox.getSelectedIndex() > -1) {
+						if(searchTermBox.getSelectedIndex() > -1) {
 							editor.setSelectionEnd(editor.getText().length());
 						}
-					} else if ((e.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
+					}
+					else if((e.getKeyChar()) == KeyEvent.VK_BACK_SPACE) {
 						// Put the cursor at 1 before the beginning of the
 						// previously selected text (because that text is now
 						// gone and the way this is set up to behave is that the
@@ -1125,35 +1105,38 @@ public abstract class LabelFinderBox {
 						// If there is still not a selected index, also set the
 						// end position there (otherwise, it will stay at the
 						// end)
-						if (searchTermBox.getSelectedIndex() == -1) {
+						if(searchTermBox.getSelectedIndex() == -1) {
 							editor.setSelectionStart(selStartTyped);
-						} else if (searchTermBox.getSelectedIndex() > -1) {
+						}
+						else if(searchTermBox.getSelectedIndex() > -1) {
 							editor.setSelectionEnd(editor.getText().length());
 						}
-					} else {
+					}
+					else {
 						// Put the cursor after the typed character
 						editor.setSelectionStart(selStartTyped + 1);
 						// If there is still not a selected index, also set the
 						// end position there (otherwise, it will stay at the
 						// end)
-						if (searchTermBox.getSelectedIndex() == -1) {
+						if(searchTermBox.getSelectedIndex() == -1) {
 							editor.setSelectionStart(selStartTyped);
 							editor.setSelectionEnd(selStartTyped);
 						}
-						if (searchTermBox.getSelectedIndex() > -1) {
+						if(searchTermBox.getSelectedIndex() > -1) {
 							editor.setSelectionEnd(editor.getText().length());
 						}
 					}
-				} else {
-					if ((e.getKeyChar()) == KeyEvent.VK_BACK_SPACE &&
-							searchTermBox.getSelectedIndex() > -1) {
-						if (selEndTyped == lenTyped) {
-							if (debug) {
-								LogBuffer.println("Trying to force the "
-										+ "selection to regress.  "
-										+ "Current selected index: ["
-										+ searchTermBox.getSelectedIndex()
-										+ "].");
+				}
+				else {
+					if((e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && searchTermBox
+																																				.getSelectedIndex() > -1) {
+						if(selEndTyped == lenTyped) {
+							if(debug) {
+								LogBuffer.println("Trying to force the " +
+																	"selection to regress.  " +
+																	"Current selected index: [" + searchTermBox
+																																							.getSelectedIndex() +
+																	"].");
 							}
 							// Put the cursor at 1 before the beginning of the
 							// previously selected text (because that text is
@@ -1161,31 +1144,29 @@ public abstract class LabelFinderBox {
 							// that the selected text contains autofill
 							// characters, not an explicit selection to delete
 							// without deleting a new character)
-							if (selStartTyped == selStartPressed) {
+							if(selStartTyped == selStartPressed) {
 								editor.setSelectionStart(selStartTyped - 1);
-								editor.setSelectionEnd(editor.getText()
-										.length());
+								editor.setSelectionEnd(editor.getText().length());
 
 								String content = "";
-								if (editor.getText().length() >=
-									(selStartTyped - 1) && selStartTyped > 1) {
+								if(editor.getText().length() >= (selStartTyped - 1) &&
+										selStartTyped > 1) {
 
-									if (debug) {
-										LogBuffer.println("Remaining text "
-												+ "length: ["
-												+ editor.getText().length()
-												+ "]. selStartTyped: " + "["
-												+ selStartTyped + "]");
+									if(debug) {
+										LogBuffer.println("Remaining text " +	"length: [" + editor
+																																							.getText()
+																																							.length() +
+																			"]. selStartTyped: " + "[" +
+																			selStartTyped + "]");
 									}
 									// Get the current unselected text content
-									content = editor.getText().substring(0,
-											selStartTyped - 1);
+									content = editor.getText().substring(0, selStartTyped - 1);
 								}
 
-								if (debug) {
+								if(debug) {
 									LogBuffer.println("Trying to force a " +
-										"selection to be made 2.  Current " +
-										"text: [" + content + "].");
+																		"selection to be made 2.  Current " +
+																		"text: [" + content + "].");
 								}
 
 								// searchTermBox.setKeySelectionManager(
@@ -1200,24 +1181,25 @@ public abstract class LabelFinderBox {
 								// "Search Row/Column Labels... ")
 								searchTermBox.selectWithKeyChar('S');
 								searchTermBox.setSelectedIndex(0); // We're
-																	// doing
-																	// this just
-																	// in case
-																	// there's a
-																	// different
-																	// S match
-																	// and
-																	// content
-																	// is an
-																	// empty
-																	// string
-								if (content.length() > 0) {
+								// doing
+								// this just
+								// in case
+								// there's a
+								// different
+								// S match
+								// and
+								// content
+								// is an
+								// empty
+								// string
+								if(content.length() > 0) {
 									// Now reset the text back to what it was to
 									// force a selection (if one exists)
 									editor.setText(content);
 								}
 							}
-						} else if (searchTermBox.getSelectedIndex() > -1) {
+						}
+						else if(searchTermBox.getSelectedIndex() > -1) {
 							editor.setSelectionEnd(editor.getText().length());
 						}
 					}
@@ -1228,18 +1210,17 @@ public abstract class LabelFinderBox {
 				// causes the end of the selection to decrement instead of the
 				// beginning of the selection to decrement and the character
 				// preceding the selStart isn't removed. So...
-				if (selIndexTyped == -1 && selIndexPressed > -1 &&
-						(e.getKeyChar()) == KeyEvent.VK_DELETE &&
-							selStartTyped == selStartPressed &&
-							(selEndTyped + 1) == selEndPressed) {
-					if (debug) {
-						LogBuffer.println("Trying to force a selection to be " +
-							"made 3");
+				if(selIndexTyped == -1 &&	selIndexPressed > -1 && (e
+																														.getKeyChar()) == KeyEvent.VK_DELETE &&
+						selStartTyped == selStartPressed && (selEndTyped +
+																									1) == selEndPressed) {
+					if(debug) {
+						LogBuffer.println("Trying to force a selection to be " + "made 3");
 					}
-					if ((selStartTyped - 1) > 0) {
+					if((selStartTyped - 1) > 0) {
 						// Get the current text content
-						final String content = editor.getText().substring(0,
-								selStartTyped - 1);
+						final String content = editor.getText().substring(0, selStartTyped -
+																																	1);
 						// Force entry into a mode where indexes are selected by
 						// entering an S (Corresponding to the default text
 						// field entry of "Search Row/Column Labels... "
@@ -1249,12 +1230,14 @@ public abstract class LabelFinderBox {
 						editor.setText(content);
 						// Now set the selected text properly
 						editor.setSelectionStart(selStartTyped - 1);
-						if (searchTermBox.getSelectedIndex() > -1) {
+						if(searchTermBox.getSelectedIndex() > -1) {
 							editor.setSelectionEnd(editor.getText().length());
-						} else {
+						}
+						else {
 							editor.setSelectionEnd(selStartTyped - 1);
 						}
-					} else {
+					}
+					else {
 						searchTermBox.setSelectedIndex(0);
 					}
 
@@ -1279,19 +1262,16 @@ public abstract class LabelFinderBox {
 
 			//If the text is as long as the substring position we intend to
 			//extract (i.e. the typed portion = which it should be)
-			if(lcprefix != null &&
-				lcprefix.length() >= editor.getSelectionStart()) {
+			if(lcprefix != null && lcprefix.length() >= editor.getSelectionStart()) {
 
 				//Capture the actual typed text
-				lcprefix = lcprefix.substring(0,editor.getSelectionStart());
+				lcprefix = lcprefix.substring(0, editor.getSelectionStart());
 
 				//Search the dropdown list for a matching item
-				for(int i = 1;i < searchTermBox.getItemCount();i++) {
-					String item =
-						(String) searchTermBox.getModel().getElementAt(i);
+				for(int i = 1; i < searchTermBox.getItemCount(); i++) {
+					String item = (String) searchTermBox.getModel().getElementAt(i);
 
-					if(item != null &&
-						item.toLowerCase().startsWith(lcprefix)) {
+					if(item != null && item.toLowerCase().startsWith(lcprefix)) {
 
 						//Update all the necessary values used to correct
 						//the editor later.  This should update the editor's
@@ -1309,16 +1289,14 @@ public abstract class LabelFinderBox {
 				}
 			}
 
-			int[] newRels = {selEndRel,lenRel,selIndexRel};
+			int[] newRels = {selEndRel, lenRel, selIndexRel};
 			return(newRels);
 		}
 	}
 
-	/**
-	 * Test method for wild card search.
+	/** Test method for wild card search.
 	 *
-	 * @param args
-	 */
+	 * @param args */
 	public static void main(final String[] args) {
 
 		// Swing thread
@@ -1329,8 +1307,7 @@ public abstract class LabelFinderBox {
 
 				final JDialog dialog = new JDialog();
 				dialog.setTitle("WildCard Search Test");
-				dialog.setDefaultCloseOperation(
-					WindowConstants.DISPOSE_ON_CLOSE);
+				dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 				dialog.setSize(new Dimension(400, 150));
 
 				final JPanel container = new JPanel();
@@ -1352,8 +1329,7 @@ public abstract class LabelFinderBox {
 					@Override
 					public void actionPerformed(final ActionEvent arg0) {
 
-						final boolean match = wildCardMatch(tf1.getText(),
-								tf2.getText());
+						final boolean match = wildCardMatch(tf1.getText(), tf2.getText());
 						matchStatus.setText("WildCard Match: " + match);
 					}
 				});

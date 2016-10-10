@@ -18,19 +18,13 @@ import Utilities.StringRes;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 
-/**
- * A dialog that can contain various menus, depending on which the user chooses
+/** A dialog that can contain various menus, depending on which the user chooses
  * to open. This is done by setting the contents of the dialog's contentPane
  * based on the clicked JMenuItem in the menubar.
- *
- * @author CKeil
- *
  */
 public class LabelSettings extends CustomDialog {
 
-	/**
-	 * Default serial version ID to keep Eclipse happy...
-	 */
+	/** Default serial version ID to keep Eclipse happy... */
 	private static final long serialVersionUID = 1L;
 
 	private final TreeViewFrame tvFrame;
@@ -44,11 +38,9 @@ public class LabelSettings extends CustomDialog {
 	// Menus
 	private AnnotationPanel annotationSettings;
 
-	/**
-	 * Main constructor for Preferences Menu
+	/** Main constructor for Preferences Menu
 	 *
-	 * @param tvFrame
-	 */
+	 * @param tvFrame */
 	public LabelSettings(final TreeViewFrame tvFrame) {
 
 		super(StringRes.dlg_Labels);
@@ -56,23 +48,22 @@ public class LabelSettings extends CustomDialog {
 		this.dendroView = tvFrame.getDendroView();
 	}
 
-	public void setLabelInfo(final LabelInfo rowLabelInfo, final LabelInfo colLabelInfo) {
+	public void setLabelInfo(	final LabelInfo rowLabelInfo,
+														final LabelInfo colLabelInfo) {
 
 		this.rowLabelInfo = rowLabelInfo;
 		this.colLabelInfo = colLabelInfo;
 	}
-	
+
 	public void setMenu(final String menu) {
-		
+
 		this.menu = menu;
 		setupLayout();
 	}
 
-	/**
-	 * Returns the menu frame holding all the JPanels to display to the user.
+	/** Returns the menu frame holding all the JPanels to display to the user.
 	 *
-	 * @return JDialog
-	 */
+	 * @return JDialog */
 	public JDialog getPreferencesFrame() {
 
 		return this;
@@ -80,48 +71,43 @@ public class LabelSettings extends CustomDialog {
 
 	public void synchronizeAnnotation() {
 
-		if (annotationSettings != null) {
+		if(annotationSettings != null) {
 			annotationSettings.synchronize();
 
-		} else {
-			LogBuffer.println("AnnotationSettings object was null. "
-					+ "Could not synchronize.");
+		}
+		else {
+			LogBuffer.println("AnnotationSettings object was null. " +
+												"Could not synchronize.");
 		}
 	}
 
-	/**
-	 * Returns the two indeces which represent the currently selected la
+	/** Returns the two indeces which represent the currently selected la
 	 *
-	 * @return
-	 */
+	 * @return */
 	public int[] getSelectedLabelIndexes() {
 
-		if (annotationSettings == null) {
-			LogBuffer.println("AnnotationSettings object was null. "
-					+ "Could not get selected indeces.");
+		if(annotationSettings == null) {
+			LogBuffer.println("AnnotationSettings object was null. " +
+												"Could not get selected indeces.");
 			return null;
 		}
 
-		return new int[] { annotationSettings.getSelectedRowIndex(),
-				annotationSettings.getSelectedColIndex() };
+		return new int[] {annotationSettings.getSelectedRowIndex(),
+											annotationSettings.getSelectedColIndex()};
 	}
 
 	/* >>>>>> GUI component listeners <<<<< */
-	/**
-	 * Adds an ActionListener to the ok_button.
+	/** Adds an ActionListener to the ok_button.
 	 *
-	 * @param listener
-	 */
+	 * @param listener */
 	public void addOKButtonListener(final ActionListener listener) {
 
 		okBtn.addActionListener(listener);
 	}
 
-	/**
-	 * Equips the preferences JFrame with a window listener.
+	/** Equips the preferences JFrame with a window listener.
 	 *
-	 * @param listener
-	 */
+	 * @param listener */
 	public void addSaveAndCloseListener(final WindowAdapter listener) {
 
 		addWindowListener(listener);
@@ -129,36 +115,32 @@ public class LabelSettings extends CustomDialog {
 
 	public void addJustifyListener(final ActionListener listener) {
 
-		if (annotationSettings != null) {
+		if(annotationSettings != null) {
 			annotationSettings.addJustifyListener(listener);
 		}
 	}
 
-	/**
-	 * Adds a component listener to the JDialog in which the content of this
+	/** Adds a component listener to the JDialog in which the content of this
 	 * class is held. This ensures repainting of all child components when the
 	 * JDialog is being resized.
 	 *
-	 * @param l
-	 */
+	 * @param l */
 	public void addResizeDialogListener(final ComponentListener l) {
 
 		addComponentListener(l);
 	}
 
-	/**
-	 * This class provides a JPanel which contains components to control font
-	 * settings for the label views.
-	 */
+	/** This class provides a JPanel which contains components to control font
+	 * settings for the label views. */
 	class FontPanel {
 
 		private JPanel fontMainPanel;
 
 		public FontPanel() {
 
-			final FontSettings fontSettings = new FontSettings(
-					dendroView.getRowLabelView(),
-					dendroView.getColLabelView());
+			final FontSettings fontSettings = new FontSettings(	dendroView
+																																		.getRowLabelView(),
+																													dendroView.getColLabelView());
 
 			fontMainPanel = fontSettings.makeFontPanel();
 		}
@@ -169,33 +151,30 @@ public class LabelSettings extends CustomDialog {
 		}
 	}
 
-	/**
-	 * This class provides a JPanel which contains components to select URL
+	/** This class provides a JPanel which contains components to select URL
 	 * information sources, which are used to respond in the event of a user
 	 * selecting a label in the label views, e.g. by opening a browser and
-	 * displaying additional information.
-	 */
+	 * displaying additional information. */
 	class URLSettings {
 
 		private final JPanel urlMainPanel;
 
 		public URLSettings() {
 
-			this.urlMainPanel = GUIFactory.createJPanel(false, 
-					GUIFactory.NO_INSETS);
+			this.urlMainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 
-			final UrlSettingsPanel genePanel = new UrlSettingsPanel(
-					tvFrame.getUrlExtractor(), tvFrame.getGeneUrlPresets());
+			final UrlSettingsPanel genePanel = new UrlSettingsPanel(tvFrame.getUrlExtractor(),
+																															tvFrame.getGeneUrlPresets());
 
-			final UrlSettingsPanel arrayPanel = new UrlSettingsPanel(
-					tvFrame.getArrayUrlExtractor(),
-					tvFrame.getArrayUrlPresets());
+			final UrlSettingsPanel arrayPanel = new UrlSettingsPanel(	tvFrame
+																																			.getArrayUrlExtractor(),
+																																tvFrame.getArrayUrlPresets());
 
-			urlMainPanel.add(genePanel.generate("Row URLs"), "pushx, "
-					+ "alignx 50%, w 95%, wrap");
-			urlMainPanel.add(arrayPanel.generate("Column URLs"), "pushx, "
-					+ "alignx 50%, w 95%");
-			
+			urlMainPanel.add(genePanel.generate("Row URLs"), "pushx, " +
+																												"alignx 50%, w 95%, wrap");
+			urlMainPanel.add(arrayPanel.generate("Column URLs"), "pushx, " +
+																														"alignx 50%, w 95%");
+
 			urlMainPanel.revalidate();
 			urlMainPanel.repaint();
 		}
@@ -206,10 +185,7 @@ public class LabelSettings extends CustomDialog {
 		}
 	}
 
-	/**
-	 * Subclass for the Annotation settings panel.
-	 *
-	 */
+	/** Subclass for the Annotation settings panel. */
 	class AnnotationPanel {
 
 		private final JPanel annotationMainPanel;
@@ -224,44 +200,42 @@ public class LabelSettings extends CustomDialog {
 
 		public AnnotationPanel() {
 
-			this.annotationMainPanel = GUIFactory.createJPanel(false, 
-					GUIFactory.NO_INSETS);
+			this.annotationMainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 
-			this.rowPanel = new LabelSummaryPanel(rowLabelInfo,
-				dendroView.getRowLabelView());
+			this.rowPanel = new LabelSummaryPanel(rowLabelInfo, dendroView
+																																		.getRowLabelView());
 
-			this.colPanel = new LabelSummaryPanel(colLabelInfo,
-				dendroView.getColLabelView());
+			this.colPanel = new LabelSummaryPanel(colLabelInfo, dendroView
+																																		.getColLabelView());
 
-			final JPanel loadLabelPanel = GUIFactory.createJPanel(false,
-					GUIFactory.NO_INSETS);
+			final JPanel loadLabelPanel = GUIFactory
+																							.createJPanel(false, GUIFactory.NO_INSETS);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
 			final JLabel rows = GUIFactory.setupLabelType(StringRes.main_rows);
 			final JLabel cols = GUIFactory.setupLabelType(StringRes.main_cols);
 
 			/* Label alignment */
-			JPanel justifyPanel = GUIFactory.createJPanel(false,
-					GUIFactory.DEFAULT);
-			justifyPanel.setBorder(BorderFactory
-					.createTitledBorder("Label justification"));
+			JPanel justifyPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
+			justifyPanel.setBorder(BorderFactory.createTitledBorder("Label justification"));
 
 			final ButtonGroup rowJustifyBtnGroup = new ButtonGroup();
 
 			this.rowLeftJustBtn = GUIFactory.createRadioBtn("Left");
 			this.rowRightJustBtn = GUIFactory.createRadioBtn("Right");
 
-			if (dendroView.getRowLabelView().getLabelAttributes().isRightJustified()) {
+			if(dendroView.getRowLabelView().getLabelAttributes().isRightJustified()) {
 				rowRightJustBtn.setSelected(true);
-			} else {
+			}
+			else {
 				rowLeftJustBtn.setSelected(true);
 			}
 
 			rowJustifyBtnGroup.add(rowLeftJustBtn);
 			rowJustifyBtnGroup.add(rowRightJustBtn);
 
-			final JPanel rowRadioBtnPanel = GUIFactory.createJPanel(false,
-					GUIFactory.DEFAULT);
+			final JPanel rowRadioBtnPanel = GUIFactory
+																								.createJPanel(false, GUIFactory.DEFAULT);
 
 			rowRadioBtnPanel.add(rowLeftJustBtn, "span, wrap");
 			rowRadioBtnPanel.add(rowRightJustBtn, "span");
@@ -271,17 +245,18 @@ public class LabelSettings extends CustomDialog {
 			this.colRightJustBtn = GUIFactory.createRadioBtn("Top");
 			this.colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
 
-			if (dendroView.getColLabelView().getLabelAttributes().isRightJustified()) {
+			if(dendroView.getColLabelView().getLabelAttributes().isRightJustified()) {
 				colRightJustBtn.setSelected(true);
-			} else {
+			}
+			else {
 				colLeftJustBtn.setSelected(true);
 			}
 
 			colJustifyBtnGroup.add(colRightJustBtn);
 			colJustifyBtnGroup.add(colLeftJustBtn);
 
-			final JPanel colRadioBtnPanel = GUIFactory.createJPanel(false,
-					GUIFactory.DEFAULT);
+			final JPanel colRadioBtnPanel = GUIFactory
+																								.createJPanel(false, GUIFactory.DEFAULT);
 
 			colRadioBtnPanel.add(colRightJustBtn, "span, wrap");
 			colRadioBtnPanel.add(colLeftJustBtn, "span");
@@ -332,34 +307,35 @@ public class LabelSettings extends CustomDialog {
 		}
 	}
 
-	/**
-	 * Dynamically adds JScrollPane to the frame based on the MouseListener in
+	/** Dynamically adds JScrollPane to the frame based on the MouseListener in
 	 * MenuPanel.
 	 *
-	 * @param title
-	 */
+	 * @param title */
 	@Override
 	protected void setupLayout() {
 
 		mainPanel.removeAll();
 
 		JPanel menuPanel;
-		if (menu.equalsIgnoreCase(StringRes.menu_Font) && tvFrame.isLoaded()) {
+		if(menu.equalsIgnoreCase(StringRes.menu_Font) && tvFrame.isLoaded()) {
 			menuPanel = new FontPanel().makeFontPanel();
 
-		} else if (menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
+		}
+		else if(menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
 			annotationSettings = new AnnotationPanel();
 			menuPanel = annotationSettings.makeLabelPane();
 
-		} else if (menu.equalsIgnoreCase(StringRes.menu_URL)) {
+		}
+		else if(menu.equalsIgnoreCase(StringRes.menu_URL)) {
 			menuPanel = new URLSettings().makeURLPanel();
 
-		} else {
+		}
+		else {
 			// In case menu cannot be loaded, display excuse.
 			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 
-			final JLabel hint = GUIFactory.createLabel("Menu cannot be "
-					+ "shown because it wasn't loaded.", GUIFactory.FONTS);
+			final JLabel hint = GUIFactory.createLabel("Menu cannot be " +
+																									"shown because it wasn't loaded.", GUIFactory.FONTS);
 			menuPanel.add(hint, "push, alignx 50%");
 		}
 
