@@ -39,10 +39,10 @@ import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialogController;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.RowListMaker;
 import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.RowListMaker;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -569,7 +569,7 @@ public class TVController implements Observer {
 		}
 		else {
 			LogBuffer.println(">>>>>>>> Loading with old node.");
-			dataInfo = getDataLoadInfo(newFileSet, oldNode);
+			dataInfo = getStoredDataLoadInfo(newFileSet, oldNode);
 		}
 
 		if(dataInfo != null) {
@@ -613,22 +613,27 @@ public class TVController implements Observer {
 
 	/** Load stored info for a specific file.
 	 * 
-	 * @param fileSet The FileSet for the file to be loaded.
-	 * @return A DataLoadInfo object which contains information relevant for
-	 *         setting up the DataLoadDialog. */
-	public static DataLoadInfo getDataLoadInfo(	FileSet fileSet,
-																							Preferences node) {
+	 * @param fileSet The <code>FileSet</code> for the file to be loaded.
+	 * @return A <code>DataLoadInfo</code> object which contains information 
+	 * relevant for setting up the <code>DataLoadDialog</code>. */
+	public static DataLoadInfo getStoredDataLoadInfo(final FileSet fileSet,
+																							final Preferences node) {
 
-		DataLoadInfo dataInfo;
-		String delimiter = node.get("delimiter", ModelLoader.DEFAULT_DELIM);
+		DataLoadInfo dataInfo = new DataLoadInfo(node);
 
 		// Amount of label types may vary when loading, so they have to be re-detected
-		DataImportController importController = new DataImportController(delimiter);
+		DataImportController importController = 
+			new DataImportController(dataInfo.getDelimiter());
 		importController.setFileSet(fileSet);
 
-		int[] dataCoords = importController.detectDataBoundaries();
-		dataInfo = new DataLoadInfo(dataCoords, delimiter);
-		dataInfo.setOldNode(node);
+		int[] oldDataCoords = dataInfo.getDataCoords();
+		int[] newDataCoords = importController.detectDataBoundaries();
+		
+		if((newDataCoords[0] > oldDataCoords[0]) 
+			|| (newDataCoords[1] > oldDataCoords[1])) {
+			LogBuffer.println("Data start coordinates have shifted because more " +
+				"label types were added.");
+		}
 
 		return dataInfo;
 	}
