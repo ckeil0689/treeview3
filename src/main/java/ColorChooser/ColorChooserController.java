@@ -27,10 +27,10 @@ implements ConfigNodePersistent {
 	private final ColorChooserUI colorChooserUI;
 	private final ColorPicker colorPicker;
 
-	/* Node for saved data */
+	// Node for saved data
 	private Preferences configNode;
 
-	/* Holds all preset color data */
+	// Holds all preset color data
 	private final ColorPresets colorPresets;
 	private final ColorSchemeType d_colorScheme = ColorSchemeType.REDGREEN;
 	private ColorSchemeType colorScheme;
@@ -105,14 +105,11 @@ implements ConfigNodePersistent {
 	public void importStateFrom(Preferences oldNode) {
 		
 		if(oldNode == null) {
-			LogBuffer.println("Could not restore saved state. " 
-					+ this.getClass().toString());
+			LogBuffer.println("Could not restore saved state. " + this.getClass().toString());
 			return;
 		}
 		
-		String colorSchemeKey = oldNode.get("activeColors", 
-				d_colorScheme.toString());
-		
+		String colorSchemeKey = oldNode.get("activeColors", d_colorScheme.toString());
 		this.colorScheme = ColorSchemeType.getMemberFromKey(colorSchemeKey);
 	}
 
@@ -137,7 +134,7 @@ implements ConfigNodePersistent {
 	/**
 	 * Saves the current colors and fractions as a ColorSet to the configNode.
 	 */
-	private void saveStatus() {
+	private void generateAndStoreColorSet() {
 
 		ColorSet colorSet = colorChooserUI.getColorPicker().generateCustomColorSet();
 		colorPresets.addColorSet(colorSet);
@@ -198,7 +195,7 @@ implements ConfigNodePersistent {
 			storeState();
 			setChanged();
 			notifyObservers();
-			saveStatus();
+			generateAndStoreColorSet();
 		}
 	}
 
@@ -417,7 +414,7 @@ implements ConfigNodePersistent {
 
 			/* Save if switching from 'Custom' */
 			if (isCustom) {
-				saveStatus();
+				generateAndStoreColorSet();
 			}
 
 			@SuppressWarnings("unchecked")

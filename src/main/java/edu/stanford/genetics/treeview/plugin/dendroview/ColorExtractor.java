@@ -424,6 +424,11 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	 */
 	public void setMissingColor(final Color newColor) {
 
+		if(colorSet == null) {
+			LogBuffer.println("Missing color could not be set for ColorSet because the reference was null.");
+			return;
+		}
+		
 		if (colorSet.getMissing().equals(newColor))
 			return;
 		colorSet.setMissing(newColor);
@@ -660,6 +665,10 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 	public int getARGBColor(final double dval) {
 		/* Selection Dimming */
 		// , boolean isBackground) {
+		
+		if(fractions == null || colorList == null) {
+			return 0;
+		}
 
 		final float[] comp;
 		if (fractions.length == 0 || colorList.isEmpty()) {

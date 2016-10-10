@@ -211,6 +211,30 @@ public class ReorderedDataModel extends Observable implements DataModel {
 		public double getColAverage(int fromColId, int toColId) {
 			return parent.getDataMatrix().getColAverage(fromColId, toColId);
 		}
+
+		@Override
+		public void setMinVal(double newMinVal) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void setMaxVal(double newMaxVal) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void setMean(double newMeanVal) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void setMedian(double newMedianVal) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 
 	/**

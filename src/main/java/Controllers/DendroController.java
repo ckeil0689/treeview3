@@ -181,9 +181,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		
 		mvController.setup();
 		
-		/* Assign Preferences nodes to components */
 		setComponentPreferences();
-
 		updateLabelInfo();
 		bindComponentFunctions();
 		
@@ -234,6 +232,9 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		dendroView.resetModelViewDefaults();
 	}
 	
+	/**
+	 * Delegates a reset for all used MapContainers.
+	 */
 	private void resetMapContainerDefaults() {
 		
 		interactiveXmap.resetDefaultState();
