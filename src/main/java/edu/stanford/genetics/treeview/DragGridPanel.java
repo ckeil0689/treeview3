@@ -218,7 +218,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	}
 
 	/**
-	 * Set the pixel widths of each column.
+	 * Set absolute/static pixel widths of each column.  Every manipulation of
+	 * the component sizes thereafter will always be treated as static, meaning
+	 * if the app window is resized, all but the last component will stay set at
+	 * the statically determined width. 
 	 * 
 	 * @param widths
 	 *            the widths.
@@ -592,6 +595,51 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		resizeComponents();
 	}
 
+	/**
+	 * This updates the xpos and ypos arrays based on the (presumably) changed
+	 * contents of xsizes and ysizes. Only has an effect if the sizes were
+	 * initially set as static
+	 */
+	private void updatePositions() {
+		int x, y;
+		final Dimension s = getSize();
+
+		LogBuffer.println("Updating positions based on static sizes [" + xintsizes[0] + "," + yintsizes[0] + "] and new window dimensions [" + s.width + "," + s.height + "].");
+
+		if(staticxsizes) {
+			// Do columns - start at left edge
+			int xsum = 0;
+			for (x = 0; x < xintsizes.length; x++) {
+				//Adjust the xsizes if sizes were set statically
+				xsizes[x] = (float) xintsizes[x] / (float) s.width;
+				xsum += xintsizes[x];
+			}
+			xsizes[x] = ((float) s.width - (float) xsum) / (float) s.width;
+			xpos[0] = 0;
+			for (x = 0; x < xsizes.length; x++) {
+				xpos[x + 1] = xpos[x] + (int) (s.width * xsizes[x]);
+			}
+			// Fudge right edge in case of rounding errors
+			xpos[xsizes.length] = s.width;
+		}
+		if(staticysizes) {
+			// Do rows - start at top
+			int ysum = 0;
+			for (y = 0; y < yintsizes.length; y++) {
+				//Adjust the xsizes if sizes were set statically
+				ysizes[y] = (float) yintsizes[y] / (float) s.height;
+				ysum += yintsizes[y];
+			}
+			ysizes[y] = ((float) s.height - (float) ysum) / (float) s.height;
+			ypos[0] = 0;
+			for (y = 0; y < ysizes.length; y++) {
+				ypos[y + 1] = ypos[y] + (int) (s.height * ysizes[y]);
+			}
+			// Fudge bottom edge in case of rounding errors
+			ypos[ysizes.length] = s.height;
+		}
+	}
+
 	private void checkPopulateSizes() {
 
 		final Dimension s = getSize();
@@ -603,6 +651,19 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 			int i = 0;
 			for(i = 0;i < xintsizes.length;i++) {
+
+				//If the current size sum plus the current size is too big
+				if(//The current accumulated size
+					pxsum + xintsizes[i] +
+					//The rest of the columns times the min width
+					(xintsizes.length - (i + 1) + 1) * minwidth > s.width) {
+
+					xintsizes[i] = s.width -
+						//pixel sum + remaining minimum xintsizes + minimum size
+						//of last variable cell
+						pxsum - (xintsizes.length - (i + 1) + 1) * minwidth;
+				}
+
 				pxsum += xintsizes[i];
 				xsizes[i] = (float) xintsizes[i] / (float) s.width;
 			}
@@ -614,7 +675,6 @@ public class DragGridPanel extends JPanel implements MouseListener,
 			} else {
 				xsizes[i] = 1.0f - (float) pxsum / (float) s.width;
 			}
-			staticxsizes = false;
 		}
 
 		pxsum = 0;
@@ -625,6 +685,19 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 			int i = 0;
 			for(i = 0;i < yintsizes.length;i++) {
+
+				//If the current size sum plus the current size is too big
+				if(//The current accumulated size
+					pxsum + yintsizes[i] +
+					//The rest of the columns times the min width
+					(yintsizes.length - (i + 1) + 1) * minheight > s.height) {
+
+					yintsizes[i] = s.height -
+						//pixel sum + remaining minimum yintsizes + minimum size
+						//of last variable cell
+						pxsum - (yintsizes.length - (i + 1) + 1) * minheight;
+				}
+
 				pxsum += yintsizes[i];
 				ysizes[i] = (float) yintsizes[i] / (float) s.height;
 			}
@@ -636,7 +709,6 @@ public class DragGridPanel extends JPanel implements MouseListener,
 			} else {
 				xsizes[i] = 1.0f - (float) pxsum / (float) s.height;
 			}
-			staticysizes = false;
 		}
 	}
 
@@ -670,7 +742,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 			//LogBuffer.println("y: " + y);
 
 			for (x = 0; x < xsizes.length; x++) {
-				LogBuffer.println("x: " + x);
+				//LogBuffer.println("x: " + x);
 
 				final Component c = components[x][y];
 
@@ -953,6 +1025,19 @@ public class DragGridPanel extends JPanel implements MouseListener,
 							/ (float) getSize().width;
 					xsizes[coldrag] = (xpos[coldrag + 1] - xpos[coldrag])
 							/ (float) getSize().width;
+					LogBuffer.println("New relative widths calculated");
+					//Adjust the static sizes if sizes were set statically
+					if(staticxsizes) {
+						xintsizes[coldrag - 1] =
+							Math.round((float) getSize().width *
+								xsizes[coldrag - 1]);
+						LogBuffer.println("New static width: [" + xintsizes[coldrag - 1] + "].");
+						if(coldrag < xintsizes.length) {
+							xintsizes[coldrag] =
+								Math.round((float) getSize().width *
+									xsizes[coldrag]);
+						}
+					}
 					// We must redraw
 				}
 			}
@@ -975,6 +1060,19 @@ public class DragGridPanel extends JPanel implements MouseListener,
 							/ (float) getSize().height;
 					ysizes[rowdrag] = (ypos[rowdrag + 1] - ypos[rowdrag])
 							/ (float) getSize().height;
+					LogBuffer.println("New relative heights calculated");
+					//Adjust the static sizes if sizes were set statically
+					if(staticysizes) {
+						yintsizes[rowdrag - 1] =
+							Math.round((float) getSize().height *
+								ysizes[rowdrag - 1]);
+						LogBuffer.println("New static height: [" + yintsizes[rowdrag - 1] + "].");
+						if(rowdrag < yintsizes.length) {
+							yintsizes[rowdrag] =
+								Math.round((float) getSize().height *
+									ysizes[rowdrag]);
+						}
+					}
 					// We must redraw
 				}
 			}
@@ -1045,6 +1143,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	void resizeComponents() {
 
 		int x, y;
+
+		//In case the sizes were initially set statically, update the positions
+		//based on the static values
+		updatePositions();
 
 		// Reshape the components to fit
 		// For each row
