@@ -116,7 +116,16 @@ public abstract class MatrixView extends ModelViewProduced {
 			adjustPixelsToMaps();
 			revalidateScreen();
 			setSubImage();
-			
+
+			//Added these calls so that when DragGridPanel adjusts the size of
+			//the interactive matrix, the saved pixels available in the
+			//mapcontainers will adjust to the new real estate.  This has 2
+			//practical effects: selections will sync-up, as will the labels and
+			//trees, which also base their drawing on the available pixels
+			//stored in the mapcontainers.
+			xmap.adjustToScreenChange();
+			ymap.adjustToScreenChange();
+
 			if(dataChanged) {
 				updatePixels();
 				dataChanged = false;

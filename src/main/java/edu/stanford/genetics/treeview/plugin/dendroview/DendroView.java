@@ -80,6 +80,7 @@ public class DendroView implements Observer, DendroPanel {
 
 	// Main containers
 	private final JPanel dendroPane;
+	private final DragGridPanel dragGrid;
 	private final JPanel searchPanel;
 	private final DataTicker ticker;
 
@@ -166,7 +167,9 @@ public class DendroView implements Observer, DendroPanel {
 		/* Main panel to which all components are added */
 		this.dendroPane = GUIFactory.createJPanel(false, 
 				GUIFactory.TINY_GAPS_AND_INSETS);
-		
+
+		this.dragGrid = new DragGridPanel(2,2);
+
 		/* Search panel containing the search bars */
 		this.searchPanel = GUIFactory.createJPanel(false, 
 				GUIFactory.NO_GAPS_OR_INSETS);
@@ -288,9 +291,9 @@ public class DendroView implements Observer, DendroPanel {
 		setupColDataPane();
 		setDataPaneDividers();
 
-		matrixPanel = createMatrixPanel();
-		
-		dendroPane.add(matrixPanel, "grow, push, wrap");
+		setupMatrixPanel();
+
+		dendroPane.add(dragGrid, "grow, push, wrap");
 		dendroPane.add(toolbarPanel, "growx, pushx, h 3%, wrap");
 		
 		dendroPane.revalidate();
@@ -632,46 +635,40 @@ public class DendroView implements Observer, DendroPanel {
 	 * Creates the full main matrix panel which includes all components
 	 * making up a full DendroView with the exception of the toolbar related
 	 * elements such as buttons or search.
-	 * @return A JPanel with all main views arranged in it.
+	 * @return A DragGridPanel with all main views arranged in it.
 	 */
-	private JPanel createMatrixPanel() {
-		
-		DragGridPanel matrixPanel = new DragGridPanel(2,2);
+	private void setupMatrixPanel() {
 
-		matrixPanel.setName("MatrixPanel");
-		matrixPanel.setBorderWidth(2);
-		matrixPanel.setBorderHeight(2);
-		matrixPanel.setMinimumWidth(10);
-		matrixPanel.setMinimumHeight(10);
-		matrixPanel.setFocusWidth(0);
-		matrixPanel.setFocusHeight(0);
+		dragGrid.removeAll();
+
+		dragGrid.setName("MatrixPanel");
+		dragGrid.setBorderWidth(2);
+		dragGrid.setBorderHeight(2);
+		dragGrid.setMinimumWidth(10);
+		dragGrid.setMinimumHeight(10);
+		dragGrid.setFocusWidth(0);
+		dragGrid.setFocusHeight(0);
 		int mheights []  = new int[1];
 		mheights[0] = (int) 180; //must be less than pane size!!!
-		matrixPanel.setHeights(mheights);
+		dragGrid.setHeights(mheights);
 		int mwidths []  = new int[1];
 		mwidths[0] = (int) 180; //must be less than pane size!!!
-		matrixPanel.setWidths(mwidths);
+		dragGrid.setWidths(mwidths);
 
 		JPanel globalOverviewPanel;
 		JPanel interactiveMatrixPanel;
-		
+
 		globalOverviewPanel = createGlobalOverviewPanel();
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
-		
-//		matrixPanel = GUIFactory.createJPanel(false, 
-//				GUIFactory.TINY_GAPS_AND_INSETS);
-//		matrixPanel.add(globalOverviewPanel, "h 180!, w 180!, grow 0");
-//		matrixPanel.add(colDataPane, "h 180!, pushx, "
-//				+ "growx, growy 0, wrap");
-//		matrixPanel.add(rowDataPane, "w 180!, pushy, growy, "
-//				+ "growx 0");
-//		matrixPanel.add(interactiveMatrixPanel, "grow");
-		matrixPanel.addComponent(globalOverviewPanel,0,0);
-		matrixPanel.addComponent(colDataPane,1,0);
-		matrixPanel.addComponent(rowDataPane,0,1);
-		matrixPanel.addComponent(interactiveMatrixPanel,1,1);
 
-		return matrixPanel;
+		dragGrid.addComponent(globalOverviewPanel,0,0);
+		dragGrid.addComponent(colDataPane,1,0);
+		dragGrid.addComponent(rowDataPane,0,1);
+		dragGrid.addComponent(interactiveMatrixPanel,1,1);
+	}
+
+	public DragGridPanel getDragGrid() {
+		return(dragGrid);
 	}
 
 	/**

@@ -728,7 +728,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		g.setColor(GUIFactory.DEFAULT_BG);
 		g.fillRect(0, 0, newsize.width, newsize.height);
 		if(dragging() || overHorizDragBar || overVertDragBar) {
-			g.setColor(Color.GRAY);
+			g.setColor(Color.LIGHT_GRAY);
 			//LogBuffer.println("Painting dragbar a new color.");
 		}
 		//LogBuffer.println("Hovering horizontally?: [" + overHorizDragBar + "]");
