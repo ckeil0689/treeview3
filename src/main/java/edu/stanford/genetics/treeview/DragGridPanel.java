@@ -604,8 +604,6 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		int x, y;
 		final Dimension s = getSize();
 
-		LogBuffer.println("Updating positions based on static sizes [" + xintsizes[0] + "," + yintsizes[0] + "] and new window dimensions [" + s.width + "," + s.height + "].");
-
 		if(staticxsizes) {
 			// Do columns - start at left edge
 			int xsum = 0;
@@ -1025,13 +1023,13 @@ public class DragGridPanel extends JPanel implements MouseListener,
 							/ (float) getSize().width;
 					xsizes[coldrag] = (xpos[coldrag + 1] - xpos[coldrag])
 							/ (float) getSize().width;
-					LogBuffer.println("New relative widths calculated");
+
 					//Adjust the static sizes if sizes were set statically
 					if(staticxsizes) {
 						xintsizes[coldrag - 1] =
 							Math.round((float) getSize().width *
 								xsizes[coldrag - 1]);
-						LogBuffer.println("New static width: [" + xintsizes[coldrag - 1] + "].");
+
 						if(coldrag < xintsizes.length) {
 							xintsizes[coldrag] =
 								Math.round((float) getSize().width *
@@ -1060,13 +1058,13 @@ public class DragGridPanel extends JPanel implements MouseListener,
 							/ (float) getSize().height;
 					ysizes[rowdrag] = (ypos[rowdrag + 1] - ypos[rowdrag])
 							/ (float) getSize().height;
-					LogBuffer.println("New relative heights calculated");
+
 					//Adjust the static sizes if sizes were set statically
 					if(staticysizes) {
 						yintsizes[rowdrag - 1] =
 							Math.round((float) getSize().height *
 								ysizes[rowdrag - 1]);
-						LogBuffer.println("New static height: [" + yintsizes[rowdrag - 1] + "].");
+
 						if(rowdrag < yintsizes.length) {
 							yintsizes[rowdrag] =
 								Math.round((float) getSize().height *
