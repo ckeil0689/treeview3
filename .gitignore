@@ -30,5 +30,6 @@ prefs.xml
 .project
 .settings
 .metadata
+.classpath
 /bin/
 /build/
