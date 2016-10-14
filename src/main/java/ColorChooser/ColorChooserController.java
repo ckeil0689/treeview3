@@ -224,7 +224,10 @@ public class ColorChooserController extends Observable {
 	}
 
 	/** Updates the matrix colors but does not store the changes. Makes sure that
-	 * the settings are considered 'Custom'. */
+	 * the settings are considered 'Custom'.
+	 * 
+	 * @param valuesChanged - A boolean used to signify whether color or thumb
+	 *          values have changed. */
 	private void applyChangesToMatrix(final boolean valuesChanged) {
 
 		LogBuffer.println("Updating matrix with changes.");
@@ -456,6 +459,7 @@ public class ColorChooserController extends Observable {
 				return;
 			}
 
+			// Revert process
 			colorPresets.removeColorSet(ColorSchemeType.CUSTOM);
 			if(saveChangesListener.wasCustomPresentOnLoad()) {
 				// re-add initial custom ColorSet
