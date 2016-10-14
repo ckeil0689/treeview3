@@ -31,7 +31,7 @@ public class ColorChooserController extends Observable {
 	private final ColorChooserUI colorChooserUI;
 	private final ColorPicker colorPicker;
 
-	private ApplyChangeListener applyChangeListener;
+	private SaveChangesListener saveChangesListener;
 
 	// Holds all preset color data
 	private final ColorPresets colorPresets;
@@ -60,8 +60,8 @@ public class ColorChooserController extends Observable {
 			colorChooserUI.addEditListener(new EditButtonListener());
 			colorChooserUI.addDialogCloseListener(new DialogCloseAdapter());
 
-			this.applyChangeListener = new ApplyChangeListener();
-			colorChooserUI.addApplyChangeListener(applyChangeListener);
+			this.saveChangesListener = new SaveChangesListener();
+			colorChooserUI.addSaveChangesListener(saveChangesListener);
 		}
 	}
 
@@ -155,17 +155,17 @@ public class ColorChooserController extends Observable {
 		return multiClickInterval;
 	}
 
-	/** This listener is fired when the Apply-button is clicked. It translates the
-	 * chosen colors in the ColorPicker to
-	 * the matrix and stores associated values, such as thumb positions and
-	 * colors. */
-	private class ApplyChangeListener implements ActionListener {
+	/** This listener is fired when the Save-button is clicked. It calls a store
+	 * function for associated values, such as thumb positions and colors.
+	 * It also holds the initial <code>ColorSet</code> which the program can
+	 * revert to if needed. */
+	private class SaveChangesListener implements ActionListener {
 
-		private boolean wasCustomInitiallyPresent = false;
-		private boolean wasApplied = false;
+		private boolean wasCustomPresentOnLoad = false;
+		private boolean wereChangesSaved = false;
 		private ColorSet initialCustomCopy;
 
-		public ApplyChangeListener() {
+		public SaveChangesListener() {
 
 			if(colorPresets == null) {
 				LogBuffer.println("Cannot check ColorPreset nodes for existing Custom node " +
@@ -175,7 +175,7 @@ public class ColorChooserController extends Observable {
 
 			// make a copy of the initial Custom ColorSet in case we want to revert
 			if(colorPresets.checkNodeExists(ColorSchemeType.CUSTOM.toString()) > -1) {
-				this.wasCustomInitiallyPresent = true;
+				this.wasCustomPresentOnLoad = true;
 				ColorSet initialCustomCS = colorPresets.getColorSet(ColorSchemeType.CUSTOM.toString());
 				this.initialCustomCopy = new ColorSet(initialCustomCS);
 			}
@@ -185,24 +185,23 @@ public class ColorChooserController extends Observable {
 		public void actionPerformed(ActionEvent e) {
 
 			saveColorSettings();
-			wasApplied = true;
-			setChanged();
-			notifyObservers();
+			wereChangesSaved = true;
+			colorChooserUI.dispose();
 		}
 
-		public boolean wasApplied() {
+		public boolean wereChangesSaved() {
 
-			return wasApplied;
+			return wereChangesSaved;
 		}
 
-		public boolean wasCustomInitiallyPresent() {
+		public boolean wasCustomPresentOnLoad() {
 
-			return wasCustomInitiallyPresent;
+			return wasCustomPresentOnLoad;
 		}
 
 		public void reset() {
 
-			this.wasApplied = false;
+			this.wereChangesSaved = false;
 		}
 
 		public ColorSet getInitialCustomCopy() {
@@ -440,32 +439,27 @@ public class ColorChooserController extends Observable {
 		}
 	}
 
-	/** This WindowAdapter executes an action when the ColorChooserUI dialog is
-	 * closed. It ensures that, if the
-	 * apply button was clicked, changes made to the color settings are stored in
-	 * Preferences nodes so they
-	 * can be reused later for the current file.
-	 * If the the apply button was not clicked, changes made to color settings are
+	/** This <code>WindowAdapter</code> executes an action when the
+	 * <code>ColorChooserUI</code> dialog is closed. It ensures that, if the
+	 * save button was clicked, changes made to the color settings are stored in
+	 * <code>Preferences</code> nodes so they can be reused later for the current
+	 * file.
+	 * If the the save button was not clicked, changes made to color settings are
 	 * erased. */
 	private class DialogCloseAdapter extends WindowAdapter {
 
 		@Override
 		public void windowClosed(WindowEvent e) {
 
-			if(applyChangeListener.wasApplied()) {
-				LogBuffer.println("Changes were applied.");
-				applyChangeListener.reset();
+			if(saveChangesListener.wereChangesSaved()) {
+				saveChangesListener.reset();
 				return;
 			}
 
-			if(!applyChangeListener.wasCustomInitiallyPresent()) {
-				LogBuffer.println("Not storing color changes since they were not applied.");
-				colorPresets.removeColorSet(ColorSchemeType.CUSTOM);
-			}
-			else {
-				LogBuffer.println("Reverting to initial custom ColorSettings.");
-				colorPresets.removeColorSet(ColorSchemeType.CUSTOM);
-				colorPresets.addColorSet(applyChangeListener.getInitialCustomCopy());
+			colorPresets.removeColorSet(ColorSchemeType.CUSTOM);
+			if(saveChangesListener.wasCustomPresentOnLoad()) {
+				// re-add initial custom ColorSet
+				colorPresets.addColorSet(saveChangesListener.getInitialCustomCopy());
 			}
 
 			// revert to active scheme when dialog was opened
