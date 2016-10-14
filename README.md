@@ -11,8 +11,6 @@ DOWNLOAD
 
 ** [Alpha 3 (current release)](https://bitbucket.org/TreeView3Dev/treeview3/downloads/tv3_alpha03_release.jar) ** - released on July 5, 2016
 
-** [Bleeding edge](https://bitbucket.org/TreeView3Dev/treeview3/src/37cf1e6b59426a56183f80d8dc136819eb99854f/build/libs/treeview3-all-267ff8e.jar?at=master) ** - updated with the master branch, includes latest fixes
-
 More recent "bleeding edge" releases, as well as older stable versions, are available at the [Treeview Wiki page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home).
 
 
