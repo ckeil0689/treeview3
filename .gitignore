@@ -31,3 +31,4 @@ prefs.xml
 .settings
 .metadata
 /bin/
+/build/

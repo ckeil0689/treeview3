@@ -40,149 +40,141 @@ import edu.stanford.genetics.treeview.plugin.dendroview.GlobalMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
-/**
- * This controller explicitly handles direct user interaction with the
- * InteractiveMatrixView. 
- * This can probably also be split into Parent + Interactive + Global
- */
-public class MatrixViewController implements Observer, 
-ConfigNodePersistent, Controller {
+/** This controller explicitly handles direct user interaction with the
+ * InteractiveMatrixView.
+ * This can probably also be split into Parent + Interactive + Global */
+public class MatrixViewController implements Observer, ConfigNodePersistent,
+	Controller {
 
 	private InteractiveMatrixView imView;
 	private GlobalMatrixView gmView;
-	
+
 	private TreeSelectionI rowSelection;
 	private TreeSelectionI colSelection;
-	
+
 	private MapContainer interactiveXmap;
 	private MapContainer interactiveYmap;
 
 	private MapContainer globalXmap;
 	private MapContainer globalYmap;
-	
+
 	protected ArrayDrawer arrayDrawer;
 	private ColorExtractor colorExtractor;
-	
+
 	private DataModel model;
 	protected Preferences configNode;
-	
+
 	// Data ticker reference, so it can be updated by the MouseAdapter
 	private DataTicker ticker;
-	
+
 	public MatrixViewController(final InteractiveMatrixView imView,
-			final GlobalMatrixView gmView, final DataModel model) {
-		
+															final GlobalMatrixView gmView,
+															final DataModel model) {
+
 		this.imView = imView;
 		this.gmView = gmView;
 		this.model = model;
 	}
-	
-	/**
-	 * Setting up the main components of the controller. Separate from 
-	 * constructor in order to allow for configNode setting first. 
-	 */
+
+	/** Setting up the main components of the controller. Separate from
+	 * constructor in order to allow for configNode setting first. */
 	public void setup() {
-		
+
 		setupDrawingComponents();
 		addKeyBindings();
 	}
-	
+
 
 	@Override
 	public void addListeners() {
-		
+
 		removeAllMouseListeners();
-		
-		IMVMouseAdapter mmListener = new IMVMouseAdapter(this, imView, 
-				interactiveXmap, interactiveYmap);
-		
+
+		IMVMouseAdapter mmListener = new IMVMouseAdapter(	this, imView,
+																											interactiveXmap,
+																											interactiveYmap);
+
 		imView.addMouseListener(mmListener);
 		imView.addMouseMotionListener(mmListener);
 
 		imView.addMouseWheelListener(new MatrixMouseWheelListener());
 	}
-	
-	/**
-	 * Simply ensures that no listeners are added on top of others. This is
+
+	/** Simply ensures that no listeners are added on top of others. This is
 	 * actually needed due to how InteractiveMatrixView is currently handled
-	 * when loading a new file...
-	 */
+	 * when loading a new file... */
 	private void removeAllMouseListeners() {
-		
+
 		for(MouseListener l : imView.getMouseListeners()) {
-			
+
 			imView.removeMouseListener(l);
 		}
-		
+
 		for(MouseMotionListener l : imView.getMouseMotionListeners()) {
-			
+
 			imView.removeMouseMotionListener(l);
 		}
-		
+
 		for(MouseWheelListener l : imView.getMouseWheelListeners()) {
-			
+
 			imView.removeMouseWheelListener(l);
 		}
 	}
-	
-	/**
-	 * Checks whether there is a configuration node for the current model and
-	 * DendroView. If not it creates one.
-	 */
+
+	/** Checks whether there is a configuration node for the current model and
+	 * DendroView. If not it creates one. */
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode == null) {
+		if(parentNode == null) {
 			LogBuffer.println("Could not find or create MatrixViewController node because parentNode was null.");
 			return;
-		} 
-		
+		}
+
 		this.configNode = parentNode;
 		getColorExtractor().setConfigNode(configNode);
 	}
-	
+
 	@Override
 	public Preferences getConfigNode() {
-		
+
 		return configNode;
 	}
 
 	@Override
 	public void requestStoredState() {
-		
+
 		return; // nothing stored yet.
 	}
 
 	@Override
 	public void storeState() {
-		
+
 		return; // nothing to store yet
 	}
-	
+
 	@Override
 	public void importStateFrom(final Preferences oldNode) {
-		
+
 		return; // nothing to import yet
 	}
-	
-	/**
-	 * Update the state of color extractor to reflect settings from an imported
+
+	/** Update the state of color extractor to reflect settings from an imported
 	 * node.
 	 * 
 	 * @param node
-	 * @throws BackingStoreException
-	 */
+	 * @throws BackingStoreException */
 	public void importColorPreferences(final Preferences oldNode)
-			throws BackingStoreException {
+																																throws BackingStoreException {
 
 		LogBuffer.println("Importing color settings...");
-		
+
 		final ColorPresets colorPresets = DendrogramFactory.getColorPresets();
 		String colorPresetsNode = colorPresets.getClass().getSimpleName();
-		
-		if (!oldNode.nodeExists(colorPresetsNode)) {
-			LogBuffer.println("ColorPresets node not found when trying to import previous color settings. "
-					+ "Aborting import attempt.");
+
+		if(!oldNode.nodeExists(colorPresetsNode)) {
+			LogBuffer.println("ColorPresets node not found when trying to import previous color settings. " +
+												"Aborting import attempt.");
 			return;
 		}
 
@@ -195,72 +187,65 @@ ConfigNodePersistent, Controller {
 
 	@Override // Observer code
 	public void update(Observable o, Object arg) {
-		
+
 		if(o instanceof MapContainer) {
 			updateGMVViewportRect();
 		}
 	}
-	
-	/**
-	 * Lets the GlobalMatrixView know about the current InteractiveMatrixView
+
+	/** Lets the GlobalMatrixView know about the current InteractiveMatrixView
 	 * viewport.
-	 * TODO calculate pixels from maps here and send a rectangle instead.
-	 */
+	 * TODO calculate pixels from maps here and send a rectangle instead. */
 	private void updateGMVViewportRect() {
-		
+
 		int firstXVisible = interactiveXmap.getFirstVisible();
 		int firstYVisible = interactiveYmap.getFirstVisible();
 		int numXVisible = interactiveXmap.getNumVisible();
 		int numYVisible = interactiveYmap.getNumVisible();
-		
-		gmView.setIMVViewportRange(firstXVisible, firstYVisible, 
-				numXVisible, numYVisible);
+
+		gmView.setIMVViewportRange(firstXVisible, firstYVisible, numXVisible, numYVisible);
 	}
-	
-	/**
-	 * Sets a new ColorExtractor with different data 
+
+	/** Sets a new ColorExtractor with different data
+	 * 
 	 * @param minVal - data minimum value.
-	 * @param maxVal - data maximum value.
-	 */
-	public void setColorExtractorData(final double minVal, 
-			final double maxVal) {
-		
+	 * @param maxVal - data maximum value. */
+	public void setColorExtractorData(final double minVal, final double maxVal) {
+
 		colorExtractor.setMin(minVal);
 		colorExtractor.setMax(maxVal);
 	}
-	
+
 	private void setupDrawingComponents() {
-		
-		this.colorExtractor = new ColorExtractor(
-				model.getDataMatrix().getMinVal(), model.getDataMatrix()
-						.getMaxVal());
+
+		this.colorExtractor = new ColorExtractor(	model.getDataMatrix().getMinVal(),
+																							model	.getDataMatrix()
+																										.getMaxVal());
 		colorExtractor.setMissing(DataModel.NAN, DataModel.EMPTY);
 
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
 		dArrayDrawer.setColorExtractor(colorExtractor);
 		arrayDrawer = dArrayDrawer;
 		((TVModel) model).addObserver(arrayDrawer);
-		
+
 		dArrayDrawer.setDataMatrix(model.getDataMatrix());
 		dArrayDrawer.recalculateContrast();
 		dArrayDrawer.setConfigNode("ArrayDrawer1");
-		
+
 		imView.setArrayDrawer(arrayDrawer);
 		gmView.setArrayDrawer(arrayDrawer);
 	}
-	
+
 	@Override
 	public void addKeyBindings() {
-		
-		final InputMap input_map = imView.getInputMap(
-				JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+		final InputMap input_map = imView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 		final ActionMap action_map = imView.getActionMap();
 
 		/* Gets the system's modifier key (CTRL for Windows, CMD for OS X) */
-		final int modifier = Toolkit.getDefaultToolkit()
-				.getMenuShortcutKeyMask();
+		final int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		final int shift_mask = InputEvent.SHIFT_MASK;
-		
+
 		/* Scroll through GlobalView with HOME, END, PgUP, PgDOWN */
 		input_map.put(KeyStroke.getKeyStroke("HOME"), "pageYToStart");
 		action_map.put("pageYToStart", new HomeKeyYAction());
@@ -268,12 +253,10 @@ ConfigNodePersistent, Controller {
 		input_map.put(KeyStroke.getKeyStroke("END"), "pageYToEnd");
 		action_map.put("pageYToEnd", new EndKeyYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, modifier),
-				"pageXToStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, modifier), "pageXToStart");
 		action_map.put("pageXToStart", new HomeKeyXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier),
-				"pageXToEnd");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier), "pageXToEnd");
 		action_map.put("pageXToEnd", new EndKeyXAction());
 
 		input_map.put(KeyStroke.getKeyStroke("PAGE_UP"), "pageYUp");
@@ -282,45 +265,35 @@ ConfigNodePersistent, Controller {
 		input_map.put(KeyStroke.getKeyStroke("PAGE_DOWN"), "pageYDown");
 		action_map.put("pageYDown", new PageDownYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, modifier),
-				"pageXUp");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, modifier), "pageXUp");
 		action_map.put("pageXUp", new PageUpXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, modifier),
-				"pageXDown");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, modifier), "pageXDown");
 		action_map.put("pageXDown", new PageDownXAction());
 
 		/* Scroll through GlobalView with arrow keys */
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier),
-				"arrowYToStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier), "arrowYToStart");
 		action_map.put("arrowYToStart", new HomeKeyYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier),
-				"arrowYToEnd");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier), "arrowYToEnd");
 		action_map.put("arrowYToEnd", new EndKeyYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, modifier),
-				"arrowXToStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, modifier), "arrowXToStart");
 		action_map.put("arrowXToStart", new HomeKeyXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, modifier),
-				"arrowXToEnd");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, modifier), "arrowXToEnd");
 		action_map.put("arrowXToEnd", new EndKeyXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, shift_mask),
-				"arrowYUp");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, shift_mask), "arrowYUp");
 		action_map.put("arrowYUp", new PageUpYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, shift_mask),
-				"arrowYDown");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, shift_mask), "arrowYDown");
 		action_map.put("arrowYDown", new PageDownYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, shift_mask),
-				"arrowXUp");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, shift_mask), "arrowXUp");
 		action_map.put("arrowXUp", new PageUpXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, shift_mask),
-				"arrowXDown");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, shift_mask), "arrowXDown");
 		action_map.put("arrowXDown", new PageDownXAction());
 
 		/* arrow 1-step */
@@ -343,54 +316,44 @@ ConfigNodePersistent, Controller {
 		input_map.put(KeyStroke.getKeyStroke("EQUALS"), "zoomIn");
 		action_map.put("zoomIn", new ZoomInAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier),
-				"zoomSelection");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier), "zoomSelection");
 		action_map.put("zoomSelection", new ZoomSelectionAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier),
-				"resetZoom");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier), "resetZoom");
 		action_map.put("resetZoom", new HomeAction());
 
 		//Holding control and/or shift controls a col/row highlight that follows
 		//the hover position
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,1),
-			"rowHoverStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 1), "rowHoverStart");
 		action_map.put("rowHoverStart", new RowHoverStartAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,0,true),
-			"rowHoverStop");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, true), "rowHoverStop");
 		action_map.put("rowHoverStop", new RowHoverStopAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,2),
-			"columnHoverStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, 2), "columnHoverStart");
 		action_map.put("columnHoverStart", new ColumnHoverStartAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,0,true),
-			"columnHoverStop");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, 0, true), "columnHoverStop");
 		action_map.put("columnHoverStop", new ColumnHoverStopAction());
 
 		//The following cases handle various combinations of row/col highlights
 		//occurring in different orders of both the shift and control modifiers
 		//being pressed/released
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,
-			InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK),
-			"bothHoverStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, InputEvent.SHIFT_DOWN_MASK |
+																														InputEvent.CTRL_DOWN_MASK), "bothHoverStart");
 		action_map.put("bothHoverStart", new BothHoverStartAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,2,true),
-			"rowHoverStop");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 2, true), "rowHoverStop");
 		action_map.put("rowHoverStop", new RowHoverStopAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,
-			InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK),
-			"bothHoverStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, InputEvent.SHIFT_DOWN_MASK |
+																															InputEvent.CTRL_DOWN_MASK), "bothHoverStart");
 		action_map.put("bothHoverStart", new BothHoverStartAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,1,true),
-			"columnHoverStop");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, 1, true), "columnHoverStop");
 		action_map.put("columnHoverStop", new ColumnHoverStopAction());
 	}
-	
+
 	/* -------------- Listeners --------------------- */
 	private class HomeKeyYAction extends AbstractAction {
 
@@ -424,7 +387,7 @@ ConfigNodePersistent, Controller {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			
+
 			final int min = interactiveXmap.getMinIndex();
 			interactiveXmap.scrollToIndex(min);
 		}
@@ -535,9 +498,7 @@ ConfigNodePersistent, Controller {
 		}
 	}
 
-	/**
-	 * Zooms into the selected area
-	 */
+	/** Zooms into the selected area */
 	private class ZoomSelectionAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -548,18 +509,14 @@ ConfigNodePersistent, Controller {
 			final boolean genesSelected = rowSelection.getNSelectedIndexes() > 0;
 			final boolean arraysSelected = colSelection.getNSelectedIndexes() > 0;
 
-			if (genesSelected || arraysSelected) {
+			if(genesSelected || arraysSelected) {
 				// Zoom in (or out)
-				interactiveXmap.zoomToSelected(colSelection.getMinIndex(),
-						colSelection.getMaxIndex());
-				interactiveYmap.zoomToSelected(rowSelection.getMinIndex(),
-						rowSelection.getMaxIndex());
+				interactiveXmap.zoomToSelected(colSelection.getMinIndex(), colSelection.getMaxIndex());
+				interactiveYmap.zoomToSelected(rowSelection.getMinIndex(), rowSelection.getMaxIndex());
 
 				// Then scroll
-				interactiveXmap.scrollToFirstIndex(
-						colSelection.getMinIndex());
-				interactiveYmap.scrollToFirstIndex(
-						rowSelection.getMinIndex());
+				interactiveXmap.scrollToFirstIndex(colSelection.getMinIndex());
+				interactiveYmap.scrollToFirstIndex(rowSelection.getMinIndex());
 			}
 		}
 	}
@@ -594,7 +551,7 @@ ConfigNodePersistent, Controller {
 		}
 	}
 
-	
+
 	/** Resets the GlobalView to all zoomed-out state */
 	private class HomeAction extends AbstractAction {
 
@@ -605,14 +562,11 @@ ConfigNodePersistent, Controller {
 
 			resetMatrixViews();
 			imView.setAspectRatio( //TODO move into matrixview.resetView
-					interactiveXmap.getTotalTileNum(),
-					interactiveYmap.getTotalTileNum());
+														interactiveXmap.getTotalTileNum(), interactiveYmap.getTotalTileNum());
 		}
 	}
-	
-	/**
-	 * Starts highlighting the hovered row and column
-	 */
+
+	/** Starts highlighting the hovered row and column */
 	private class BothHoverStartAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -624,9 +578,7 @@ ConfigNodePersistent, Controller {
 		}
 	}
 
-	/**
-	 * Starts highlighting the hovered row
-	 */
+	/** Starts highlighting the hovered row */
 	private class RowHoverStartAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -645,9 +597,7 @@ ConfigNodePersistent, Controller {
 		imView.repaint();
 	}
 
-	/**
-	 * Starts highlighting the hovered row
-	 */
+	/** Starts highlighting the hovered row */
 	private class RowHoverStopAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -659,9 +609,7 @@ ConfigNodePersistent, Controller {
 		}
 	}
 
-	/**
-	 * Starts highlighting the hovered column
-	 */
+	/** Starts highlighting the hovered column */
 	private class ColumnHoverStartAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -686,9 +634,7 @@ ConfigNodePersistent, Controller {
 		imView.repaint();
 	}
 
-	/**
-	 * Starts highlighting the hovered column
-	 */
+	/** Starts highlighting the hovered column */
 	private class ColumnHoverStopAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -700,12 +646,10 @@ ConfigNodePersistent, Controller {
 		}
 	}
 
-	/**
-	 * Recalculates proportions for the MapContainers, when the layout was
+	/** Recalculates proportions for the MapContainers, when the layout was
 	 * changed by removing or adding components, or resizing the TVFrame. Only
 	 * works if GlobalView is already resized (has availablePixels set to new
-	 * value!).
-	 */
+	 * value!). */
 	public void resetMatrixViews() {
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -718,7 +662,7 @@ ConfigNodePersistent, Controller {
 			}
 		});
 	}
-	
+
 	private class MatrixMouseWheelListener implements MouseWheelListener {
 
 		private boolean reverseZoomDirection;
@@ -744,9 +688,10 @@ ConfigNodePersistent, Controller {
 				/* TODO: Figure out a way to get the OS from where it was
 				 * determined in TreeView3.java instead of replicating that code
 				 * here. */
-				onamac = System.getProperty("os.name").toLowerCase().
-					startsWith("mac os x");
-			} catch (Exception ex) {
+				onamac = System	.getProperty("os.name").toLowerCase()
+												.startsWith("mac os x");
+			}
+			catch(Exception ex) {
 				LogBuffer.println("Failed to determine os: " + ex.getMessage());
 			}
 			return(onamac);
@@ -758,103 +703,99 @@ ConfigNodePersistent, Controller {
 			try {
 				if(onAMac()) {
 					File globalPref = new File(System.getProperty("user.home") +
-						"/Library/Preferences/.GlobalPreferences.plist");
+																			"/Library/Preferences/.GlobalPreferences.plist");
 
-					NSDictionary dict =
-						(NSDictionary)PropertyListParser.parse(globalPref);
+					NSDictionary dict = (NSDictionary) PropertyListParser
+																																.parse(globalPref);
 
-					NSNumber pref =
-						(NSNumber)dict.objectForKey("com.apple.swipescroll" +
-							"direction");
+					NSNumber pref = (NSNumber) dict.objectForKey("com.apple.swipescroll" +
+																												"direction");
 
 					if(pref.boolValue()) {
 						natural = true;
 					}
 				}
-			} catch (Exception ex) {
+			}
+			catch(Exception ex) {
 				LogBuffer.println("Failed to parse plist: " + ex.getMessage());
 			}
 
 			return(natural);
 		}
 
-		/**
-		 * Zooming when the mouse wheel is used in conjunction with the alt/
-		 * option key.  Vertical scrolling if the shift key is not pressed.
-		 */
+		/** Zooming when the mouse wheel is used in conjunction with the alt/
+		 * option key. Vertical scrolling if the shift key is not pressed. */
 		@Override
 		public void mouseWheelMoved(final MouseWheelEvent e) {
 
-			if(!imView.hasMouse()) {
-				return;
-			}
-			
+			if(!imView.hasMouse()) { return; }
+
 			final int notches = e.getWheelRotation();
 			final int shift = (notches < 0) ? -3 : 3;
 
 			//On macs' magic mouse, horizontal scroll comes in as if the shift
 			//was down
 			if(e.isAltDown()) {
-				if((!reverseZoomDirection && notches < 0) ||
-					(reverseZoomDirection && notches > 0)) {
+				if((!reverseZoomDirection && notches < 0) || (reverseZoomDirection &&
+																											notches > 0)) {
 
 					//This ensures we only zoom toward the cursor when the
 					//cursor is over the map
-					if (imView.hasMouse()) {
-						imView.smoothZoomTowardPixel(e.getX(),e.getY());
+					if(imView.hasMouse()) {
+						imView.smoothZoomTowardPixel(e.getX(), e.getY());
 					}
 					//This should happen when the mouse is not over the heatmap
 					else {
 						interactiveXmap.zoomInBegin();
 						interactiveYmap.zoomInBegin();
 					}
-				} else {
-					if (imView.hasMouse()) {
-						imView.smoothZoomFromPixel(e.getX(),e.getY());
-					} else {
+				}
+				else {
+					if(imView.hasMouse()) {
+						imView.smoothZoomFromPixel(e.getX(), e.getY());
+					}
+					else {
 						interactiveXmap.zoomOutBegin();
 						interactiveYmap.zoomOutBegin();
 					}
 				}
-			} else if(e.isShiftDown()) {
+			}
+			else if(e.isShiftDown()) {
 				interactiveXmap.scrollBy(shift);
 				//Now we are hovered over a new index
-				interactiveXmap.setHoverIndex(
-					interactiveXmap.getIndex(e.getX()));
-				
-			} else {
+				interactiveXmap.setHoverIndex(interactiveXmap.getIndex(e.getX()));
+
+			}
+			else {
 				interactiveYmap.scrollBy(shift);
 				//Now we are hovered over a new index
-				interactiveYmap.setHoverIndex(
-					interactiveYmap.getIndex(e.getY()));
+				interactiveYmap.setHoverIndex(interactiveYmap.getIndex(e.getY()));
 			}
 
 			imView.repaint();
 		}
 	}
 
-	
-	/**
-	 * Selecting a rectangular area in InteractiveMatrixView
+
+	/** Selecting a rectangular area in InteractiveMatrixView
 	 *
 	 * @param start A Point representing the first index of each axis to be
-	 * selected.
+	 *          selected.
 	 * @param end A Point representing the last index of each axis to be
-	 * selected.
-	 */
+	 *          selected. */
 	public void selectRectangle(final Point start, final Point end) {
 
 //		LogBuffer.println("Selecting a rectangle: " + start.toString() 
 //				+ ", " + end.toString());
-		
+
 		// sort so that ep is upper left corner
-		if (end.x < start.x) {
+		if(end.x < start.x) {
 			final int x = end.x;
 			end.x = start.x;
 			start.x = x;
 		}
 
-		if (end.y < start.y) {
+		if(end.y < start.y) {
 			final int y = end.y;
 			end.y = start.y;
 			start.y = y;
@@ -866,213 +807,190 @@ ConfigNodePersistent, Controller {
 		rowSelection.notifyObservers();
 		colSelection.notifyObservers();
 	}
-	
-	/**
-	 * Empties the selection for both axis selection objects.
-	 */
+
+	/** Empties the selection for both axis selection objects. */
 	public void deselectAll() {
-		
+
 		rowSelection.deselectAllIndexes();
 		colSelection.deselectAllIndexes();
-		
+
 		rowSelection.notifyObservers();
 		colSelection.notifyObservers();
 	}
-	
-	/**
-	 * Zooms on a selection. The type of zooming is dependent on input 
+
+	/** Zooms on a selection. The type of zooming is dependent on input
 	 * modifiers used when executing the zoom.
-	 * @param modifiers Input modifiers when pressing a button.
-	 */
+	 * 
+	 * @param modifiers Input modifiers when pressing a button. */
 	public void zoomOnSelection(final int modifiers) {
-		
+
 		final boolean rowsSelected = rowSelection.getNSelectedIndexes() > 0;
 
-		if (rowsSelected) {
-			if ((modifiers & InputEvent.SHIFT_MASK) != 0
-					|| (modifiers & InputEvent.META_MASK) != 0) {
+		if(rowsSelected) {
+			if((modifiers & InputEvent.SHIFT_MASK) != 0 || (modifiers &
+																											InputEvent.META_MASK) != 0) {
 				// Zoom in (or out)
-				interactiveXmap.zoomToSelected(colSelection.getMinIndex(),
-						colSelection.getMaxIndex());
-				interactiveYmap.zoomToSelected(rowSelection.getMinIndex(),
-						rowSelection.getMaxIndex());
+				interactiveXmap.zoomToSelected(colSelection.getMinIndex(), colSelection.getMaxIndex());
+				interactiveYmap.zoomToSelected(rowSelection.getMinIndex(), rowSelection.getMaxIndex());
 
 				// Then scroll
 				interactiveXmap.scrollToFirstIndex(colSelection.getMinIndex());
 				interactiveYmap.scrollToFirstIndex(rowSelection.getMinIndex());
 
-			} else if ((modifiers & InputEvent.ALT_MASK) != 0) {
-				imView.smoothZoomTowardSelection(
-								colSelection.getMinIndex(),
-								(colSelection.getMaxIndex()
-										- colSelection.getMinIndex() + 1),
-								rowSelection.getMinIndex(),
-								(rowSelection.getMaxIndex()
-										- rowSelection.getMinIndex() + 1));
-			} else {
-				imView.smoothAnimatedZoomToTarget(
-								colSelection.getMinIndex(),
-								(colSelection.getMaxIndex()
-										- colSelection.getMinIndex() + 1),
-								rowSelection.getMinIndex(),
-								(rowSelection.getMaxIndex()
-										- rowSelection.getMinIndex() + 1));
+			}
+			else if((modifiers & InputEvent.ALT_MASK) != 0) {
+				imView.smoothZoomTowardSelection(colSelection.getMinIndex(), (colSelection.getMaxIndex() -
+																																			colSelection.getMinIndex() +
+																																			1), rowSelection.getMinIndex(), (rowSelection.getMaxIndex() -
+																																																				rowSelection.getMinIndex() +
+																																																				1));
+			}
+			else {
+				imView.smoothAnimatedZoomToTarget(colSelection.getMinIndex(), (colSelection.getMaxIndex() -
+																																				colSelection.getMinIndex() +
+																																				1), rowSelection.getMinIndex(), (rowSelection.getMaxIndex() -
+																																																					rowSelection.getMinIndex() +
+																																																					1));
 			}
 		}
 	}
-	
+
 	public void setDataTicker(final DataTicker ticker) {
-		
+
 		this.ticker = ticker;
 	}
-	
-	/**
-	 * A wrapper for retrieving a data value from the data model. Used by 
+
+	/** A wrapper for retrieving a data value from the data model. Used by
 	 * IMVMouseAdapter to update the DataTicker in DendroView when hovering
-	 * over the InteractiveMatrixView. 
+	 * over the InteractiveMatrixView.
+	 * 
 	 * @param rowIdx Row index of the data value in the model's data matrix.
 	 * @param colIdx Col index of the data value in the model's data matrix.
-	 * @return The data value at the specified indices, if it exists. 
-	 * DataModel.NAN otherwise.
-	 */
+	 * @return The data value at the specified indices, if it exists.
+	 *         DataModel.NAN otherwise. */
 	public void setDataValueAt(final int rowIdx, final int colIdx) {
 		ticker.setText("Data Value:");
 		ticker.setValue(model.getDataMatrix().getValue(colIdx, rowIdx));
 	}
-	
+
 	/* Set the data ticker to matrix average
 	 * Rounding off to 4 decimals
 	 */
 	public void setMeanDataValue() {
 		ticker.setText("Data Average:");
-		ticker.setValue( model.getDataMatrix().getMean());
+		ticker.setValue(model.getDataMatrix().getMean());
 	}
-	
-	/**
-	 * Scrolls to index i in the y-MapContainer
+
+	/** Scrolls to index i in the y-MapContainer
 	 *
-	 * @param i
-	 */
+	 * @param i */
 	public void scrollToGene(final int i) {
 
 		interactiveYmap.scrollToIndex(i);
 		interactiveYmap.notifyObservers();
 	}
 
-	/**
-	 * Scrolls to index i in the x-MapContainer.
+	/** Scrolls to index i in the x-MapContainer.
 	 *
-	 * @param i
-	 */
+	 * @param i */
 	public void scrollToArray(final int i) {
 
 		interactiveXmap.scrollToIndex(i);
 		interactiveXmap.notifyObservers();
 	}
-	
-	/**
-	 * Notifies both MatrixViews that the data has updated, so it can
-	 * recalculate pixel color values during the next update.
-	 */
+
+	/** Notifies both MatrixViews that the data has updated, so it can
+	 * recalculate pixel color values during the next update. */
 	public void updateMatrixPixels() {
-		
+
 		imView.setDataChanged();
 		gmView.setDataChanged();
 	}
-	
-	/**
-	 * Assigns references of MapContainer instances to be used for 
-	 * interactivity and information display in InteractiveMatrixView. 
+
+	/** Assigns references of MapContainer instances to be used for
+	 * interactivity and information display in InteractiveMatrixView.
+	 * 
 	 * @param interactiveXmap
-	 * @param interactiveYmap
-	 */
-	public void setInteractiveMapContainers(final MapContainer interactiveXmap, 
-			final MapContainer interactiveYmap) {
-		
+	 * @param interactiveYmap */
+	public void setInteractiveMapContainers(final MapContainer interactiveXmap,
+																					final MapContainer interactiveYmap) {
+
 		this.interactiveXmap = interactiveXmap;
 		this.interactiveYmap = interactiveYmap;
-		
+
 		interactiveXmap.addObserver(this);
 		interactiveYmap.addObserver(this);
-		
+
 		imView.setXMap(interactiveXmap);
 		imView.setYMap(interactiveYmap);
 	}
-	
-	/**
-	 * Assigns references of MapContainer instances to be used for 
-	 * information display in GlobalMatrixView. 
+
+	/** Assigns references of MapContainer instances to be used for
+	 * information display in GlobalMatrixView.
+	 * 
 	 * @param xmap
-	 * @param ymap
-	 */
-	public void setGlobalMapContainers(final MapContainer xmap, 
-			final MapContainer ymap) {
-		
+	 * @param ymap */
+	public void setGlobalMapContainers(	final MapContainer xmap,
+																			final MapContainer ymap) {
+
 		this.globalXmap = xmap;
 		this.globalYmap = ymap;
-		
+
 		globalXmap.addObserver(this);
 		globalYmap.addObserver(this);
-		
+
 		gmView.setXMap(xmap);
 		gmView.setYMap(ymap);
 	}
-	
-	/**
-	 * Set rowSelection
+
+	/** Set rowSelection
 	 *
 	 * @param rowSelection
-	 *            The TreeSelection which is set by selecting genes in the
-	 *            GlobalView
-	 */
+	 *          The TreeSelection which is set by selecting genes in the
+	 *          GlobalView */
 	public void setRowSelection(final TreeSelectionI rowSelection) {
 
-		if (this.rowSelection != null) {
+		if(this.rowSelection != null) {
 			this.rowSelection.deleteObserver(this);
 		}
 
 		this.rowSelection = rowSelection;
 		this.rowSelection.addObserver(this);
-		
+
 		imView.setRowSelection(rowSelection);
 		gmView.setRowSelection(rowSelection);
 	}
 
-	/**
-	 * Set colSelection
+	/** Set colSelection
 	 *
 	 * @param colSelection
-	 *            The TreeSelection which is set by selecting arrays in the
-	 *            GlobalView
-	 */
+	 *          The TreeSelection which is set by selecting arrays in the
+	 *          GlobalView */
 	public void setColSelection(final TreeSelectionI colSelection) {
 
-		if (this.colSelection != null) {
+		if(this.colSelection != null) {
 			this.colSelection.deleteObserver(this);
 		}
 
 		this.colSelection = colSelection;
 		this.colSelection.addObserver(this);
-		
+
 		imView.setColSelection(colSelection);
 		gmView.setColSelection(colSelection);
 	}
-	
-	/**
-	 * Assigns scrollbars to MapContainers.
+
+	/** Assigns scrollbars to MapContainers.
+	 * 
 	 * @param rowScroll Scrollbar for scrolling through matrix rows.
-	 * @param colScroll Scrollbar for scrolling through matrix columns.
-	 */
-	public void setScrollBars(final JScrollBar rowScroll, 
-			final JScrollBar colScroll) {
+	 * @param colScroll Scrollbar for scrolling through matrix columns. */
+	public void setScrollBars(final JScrollBar rowScroll,
+														final JScrollBar colScroll) {
 
 		interactiveXmap.setScrollbar(colScroll);
 		interactiveYmap.setScrollbar(rowScroll);
 	}
-	
-	/**
-	 * Notifies all MapContainers' observers.
-	 */
+
+	/** Notifies all MapContainers' observers. */
 	public void notifyAllMapObservers() {
 
 		globalXmap.notifyObservers();
@@ -1081,39 +999,39 @@ ConfigNodePersistent, Controller {
 		interactiveXmap.notifyObservers();
 		interactiveYmap.notifyObservers();
 	}
-	
-	/**
-	 * Access a reference of the color extractor which determines how
+
+	/** Access a reference of the color extractor which determines how
 	 * colors are displayed in relation to values.
-	 * @return The MatrixView's color extractor.
-	 */
+	 * 
+	 * @return The MatrixView's color extractor. */
 	public ColorExtractor getColorExtractor() {
-		
+
 		return colorExtractor;
 	}
-	
-	/**
-	 * Evaluates current zoom status and returns an array of booleans, which
+
+	/** Evaluates current zoom status and returns an array of booleans, which
 	 * can be used to test certain zoom conditions. This is for example relevant
-	 * for the DendroView buttons. They will be enabled or disabled based 
+	 * for the DendroView buttons. They will be enabled or disabled based
 	 * on the zoom status.
-	 * @return Ordered boolean array of zoom statuses: [isXMin, isYMin, 
-	 * atRight, atLeft, atTop, atBottom, isSelectionZoomed]
-	 */
+	 * 
+	 * @return Ordered boolean array of zoom statuses: [isXMin, isYMin,
+	 *         atRight, atLeft, atTop, atBottom, isSelectionZoomed] */
 	public boolean[] getZoomStatusForButtons() {
-		
+
 		boolean[] zoomStatus;
-		
+
 		/* Determine if either MapContainer is at minimum scale */
 		boolean isXMin = interactiveXmap.showsAllTiles();
 		boolean isYMin = interactiveYmap.showsAllTiles();
-		
+
 		boolean atRight = (interactiveXmap.getFirstVisible() + interactiveXmap
-				.getNumVisible()) == (interactiveXmap.getMaxIndex() + 1);
+																																					.getNumVisible()) == (interactiveXmap.getMaxIndex() +
+																																																1);
 		boolean atLeft = interactiveXmap.getFirstVisible() == 0;
 		boolean atTop = interactiveYmap.getFirstVisible() == 0;
 		boolean atBottom = (interactiveYmap.getFirstVisible() + interactiveYmap
-				.getNumVisible()) == (interactiveYmap.getMaxIndex() + 1);
+																																						.getNumVisible()) == (interactiveYmap.getMaxIndex() +
+																																																	1);
 
 		int xTilesVisible = interactiveXmap.getNumVisible();
 		int yTilesVisible = interactiveYmap.getNumVisible();
@@ -1123,19 +1041,17 @@ ConfigNodePersistent, Controller {
 
 		// Note: A selection is "fully zoomed" if there is no selection - this
 		// will disable the zoom selection button
-		boolean isSelectionZoomed = (!rowsSelected && !colsSelected)
-				|| (rowsSelected
-						&& rowSelection.getMinIndex() == interactiveYmap
-								.getFirstVisible()
-						&& (rowSelection.getFullSelectionRange()) == yTilesVisible
-						&& colsSelected
-						&& colSelection.getMinIndex() == interactiveXmap
-								.getFirstVisible() 
-						&& (colSelection.getFullSelectionRange()) == xTilesVisible);
-		
-		zoomStatus = new boolean[]{isXMin, isYMin, atRight, atLeft, atTop, 
-				atBottom, isSelectionZoomed};
-		
+		boolean isSelectionZoomed = (!rowsSelected && !colsSelected) ||
+																(rowsSelected &&	rowSelection
+																															.getMinIndex() == interactiveYmap.getFirstVisible() &&
+																	(rowSelection.getFullSelectionRange()) == yTilesVisible &&
+																	colsSelected && colSelection
+																															.getMinIndex() == interactiveXmap.getFirstVisible() &&
+																	(colSelection.getFullSelectionRange()) == xTilesVisible);
+
+		zoomStatus = new boolean[] {isXMin, isYMin, atRight, atLeft, atTop,
+																atBottom, isSelectionZoomed};
+
 		return zoomStatus;
 	}
 }
