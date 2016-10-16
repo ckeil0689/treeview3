@@ -23,8 +23,6 @@ import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import ColorChooser.ColorChooserController;
-import ColorChooser.ColorSchemeType;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSNumber;
 import com.dd.plist.PropertyListParser;

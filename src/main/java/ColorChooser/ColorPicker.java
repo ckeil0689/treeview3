@@ -219,11 +219,8 @@ public class ColorPicker {
 												empty));
 	}
 
-	/** Sets the color in colors[] at the specified index.
-	 *
-	 * @param newCol
-	 * @param index */
-	protected void setGradientColors() {
+	/** Sends the status of fractions and colors to <code>ColorExtractor</code> */
+	protected void updateColorExtractorData() {
 
 		colorExtractor.setNewParams(fractions, colorList);
 		colorExtractor.notifyObservers();
@@ -248,6 +245,12 @@ public class ColorPicker {
 	}
 
 	protected void updateBoundaryColors() {
+
+		if(colorList.size() < 2 || getColorNumber() < 2) {
+			LogBuffer.println("Could not update boundary colors. There is an issue" +
+												"with the list of colors.");
+			return;
+		}
 
 		minThumb.setColor(colorList.get(0));
 		maxThumb.setColor(colorList.get(getColorNumber() - 1));

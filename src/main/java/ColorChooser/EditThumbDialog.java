@@ -18,9 +18,7 @@ import Utilities.Helper;
 
 public class EditThumbDialog extends CustomDialog {
 
-	/**
-	 * Default serial version ID to keep Eclipse happy...
-	 */
+	/** Default serial version ID to keep Eclipse happy... */
 	private static final long serialVersionUID = 1L;
 
 	private final Thumb t;
@@ -32,7 +30,7 @@ public class EditThumbDialog extends CustomDialog {
 	private final double min;
 	private final double max;
 
-	/* GUI components */
+	// GUI components
 	private JLabel enterPrompt;
 	private JTextArea valueStatus;
 	private JTextField inputField;
@@ -50,23 +48,21 @@ public class EditThumbDialog extends CustomDialog {
 
 	private boolean colorChanged;
 
-	/**
-	 * Constructs a dialog which is allows the user to edit the details of a
+	/** Constructs a dialog which is allows the user to edit the details of a
 	 * thumb.
 	 * 
 	 * @param thumb
-	 *            The thumb to be edited.
+	 *          The thumb to be edited.
 	 * @param thumbIndex
-	 *            The index of the thumb in ColorPicker's thumbList.
+	 *          The index of the thumb in ColorPicker's thumbList.
 	 * @param thumbBox
-	 *            The thumbBox in which the thumbs are painted.
+	 *          The thumbBox in which the thumbs are painted.
 	 * @param colorList
-	 *            List of colors which may be updated by this dialog.
-	 *            
-	 */
-	public EditThumbDialog(Thumb thumb,int thumbIndex,ThumbBox thumbBox,
-		List<Color> colorList,final double mean,final double median,
-		final double center,final double min,final double max) {
+	 *          List of colors which may be updated by this dialog. */
+	public EditThumbDialog(	Thumb thumb, int thumbIndex, ThumbBox thumbBox,
+													List<Color> colorList, final double mean,
+													final double median, final double center,
+													final double min, final double max) {
 
 		super("Edit Color");
 
@@ -88,7 +84,7 @@ public class EditThumbDialog extends CustomDialog {
 	protected double showDialog(JPanel parent) {
 
 		setVisible(true);
-		return finalX;
+		return finalX; // returns when dialog closes!
 	}
 
 	private class SetValueListener implements ActionListener {
@@ -96,18 +92,16 @@ public class EditThumbDialog extends CustomDialog {
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			if (isValueInvalid()) {
-				return;
-			}
+			if(isValueInvalid()) { return; }
 
-			/* Set value that is returned when dialog closes */ 
-			finalX = inputX;
+			// Set value that is returned when dialog closes
+			EditThumbDialog.this.finalX = inputX;
 
 			/*
 			 * Only change if enter or ok button was used to quit and the
 			 * entered values were valid.
 			 */
-			if (colorChanged) {
+			if(colorChanged) {
 				t.setColor(newColor);
 				colorList.set(index, newColor);
 			}
@@ -117,41 +111,38 @@ public class EditThumbDialog extends CustomDialog {
 		}
 	}
 
-	/**
-	 * Parses the input and checks multiple conditions to decide if it 
+	/** Parses the input and checks multiple conditions to decide if it
 	 * should be accepted. Those conditions are largely defined by the intended
 	 * behavior of the handles.
 	 * 
-	 * @return Whether the user input is considered valid.
-	 */
+	 * @return Whether the user input is considered valid. */
 	private boolean isValueInvalid() {
 
 		boolean isInvalid = false;
 		int minThumbIdx = 0;
 		int maxThumbIdx = colorList.size() - 1;
 		setError(""); // ensure label reset
-		
+
 		try {
-			inputX = Double.parseDouble(inputField.getText());
-			double thumbVal = thumbBox.calcThumbVal(index);
-			boolean isInputEqualToThumbVal = Helper.nearlyEqual(inputX, thumbVal);
+			this.inputX = Double.parseDouble(inputField.getText());
 
 			// If edited thumb is boundary thumb
-			if (t instanceof BoundaryThumb) {
+			if(t instanceof BoundaryThumb) {
 				BoundaryThumb bT = (BoundaryThumb) t;
 				double otherBoundVal;
 				int otherBoundIdx;
 				// Min bound
-				if (bT.isMin()) {
+				if(bT.isMin()) {
 					otherBoundIdx = maxThumbIdx;
 					otherBoundVal = thumbBox.calcThumbVal(otherBoundIdx);
 					isInvalid = !(inputX < otherBoundVal);
 					if(isInvalid) {
 						setError("Cannot be equal to or greater than right-most handle.");
-					} 
-        
-				// Max bound
-				} else {
+					}
+
+					// Max bound
+				}
+				else {
 					otherBoundIdx = minThumbIdx;
 					otherBoundVal = thumbBox.calcThumbVal(otherBoundIdx);
 					isInvalid = !(inputX > otherBoundVal);
@@ -159,31 +150,20 @@ public class EditThumbDialog extends CustomDialog {
 						setError("Cannot be equal to or less than left-most handle.");
 					}
 				}
-//			// Replace other handle if other handle with same data value exists
-//			} else if(!isInputEqualToThumbVal && thumbBox.hasThumbForVal(inputX)) {
-//				/* Pop up a warning dialog */
-//				boolean shouldRemove = thumbBox.askForThumbRemoval(inputX);
-//				/* Proceed according to user choice */
-//				if(!shouldRemove) {
-//					//thumbBox.removeThumbWithVal(inputX);
-//					
-////				} else {
-//					isInvalid = true;
-//				}
 			}
-			
+
 			return isInvalid;
 
-		} catch (final NumberFormatException e) {
+		}
+		catch(final NumberFormatException e) {
 			setError("Enter a valid number!");
 			return true;
 		}
 	}
 
-	/**
-	 * Changes the text of the error JTextArea to the supplied message.
-	 * @param message - The text to display.
-	 */
+	/** Changes the text of the error JTextArea to the supplied message.
+	 * 
+	 * @param message - The text to display. */
 	private void setError(final String message) {
 
 		valueStatus.setText(message);
@@ -195,10 +175,9 @@ public class EditThumbDialog extends CustomDialog {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			final Color newCol = JColorChooser.showDialog(mainPanel.getParent(),
-					"Pick Color", t.getColor());
+			final Color newCol = JColorChooser.showDialog(mainPanel.getParent(), "Pick Color", t.getColor());
 
-			if (newCol != null) {
+			if(newCol != null) {
 				newColor = newCol;
 				colorIcon.setColor(newCol);
 				colorChanged = true;
@@ -207,30 +186,39 @@ public class EditThumbDialog extends CustomDialog {
 	}
 
 	private class SetToMeanListener implements ActionListener {
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			inputField.setText(Double.toString(mean));
 		}
 	}
+
 	private class SetToMedianListener implements ActionListener {
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			inputField.setText(Double.toString(median));
 		}
 	}
+
 	private class SetToCenterListener implements ActionListener {
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			inputField.setText(Double.toString(center));
 		}
 	}
+
 	private class SetToMinListener implements ActionListener {
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			inputField.setText(Double.toString(min));
 		}
 	}
+
 	private class SetToMaxListener implements ActionListener {
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			inputField.setText(Double.toString(max));
@@ -248,14 +236,12 @@ public class EditThumbDialog extends CustomDialog {
 	@Override
 	protected void setupLayout() {
 
-		final JLabel colorPrompt = GUIFactory.createLabel("Set color:", 
-			GUIFactory.FONTS);
-		enterPrompt = GUIFactory.createLabel("Set data value:", 
-			GUIFactory.FONTS);
-		
+		final JLabel colorPrompt = GUIFactory.createLabel("Set color:", GUIFactory.FONTS);
+		enterPrompt = GUIFactory.createLabel("Set data value:", GUIFactory.FONTS);
+
 		valueStatus = GUIFactory.createWrappableTextArea();
 		valueStatus.setForeground(GUIFactory.RED1);
- 
+
 		// default
 		startX = thumbBox.calcThumbVal(thumbIndex);
 		finalX = startX;
@@ -270,7 +256,7 @@ public class EditThumbDialog extends CustomDialog {
 		inputField.addActionListener(new SetValueListener());
 
 		colorIcon = new ColorIcon(t.getColor());
-		colorButton = GUIFactory.createColorIconBtn("",colorIcon);
+		colorButton = GUIFactory.createColorIconBtn("", colorIcon);
 		colorButton.addActionListener(new SetColorListener());
 
 		final JButton meanBtn = GUIFactory.getTextButton(String.valueOf(mean));
@@ -284,16 +270,11 @@ public class EditThumbDialog extends CustomDialog {
 		final JButton maxBtn = GUIFactory.getTextButton(String.valueOf(max));
 		maxBtn.addActionListener(new SetToMaxListener());
 
-		final JLabel meanLabel = GUIFactory.createLabel("Mean:",
-			GUIFactory.FONTS_B);
-		final JLabel medianLabel = GUIFactory.createLabel("Median:",
-			GUIFactory.FONTS_B);
-		final JLabel centerLabel = GUIFactory.createLabel("Center:",
-			GUIFactory.FONTS_B);
-		final JLabel minLabel = GUIFactory.createLabel("Min:",
-			GUIFactory.FONTS_B);
-		final JLabel maxLabel = GUIFactory.createLabel("Max:",
-			GUIFactory.FONTS_B);
+		final JLabel meanLabel = GUIFactory.createLabel("Mean:", GUIFactory.FONTS_B);
+		final JLabel medianLabel = GUIFactory.createLabel("Median:", GUIFactory.FONTS_B);
+		final JLabel centerLabel = GUIFactory.createLabel("Center:", GUIFactory.FONTS_B);
+		final JLabel minLabel = GUIFactory.createLabel("Min:", GUIFactory.FONTS_B);
+		final JLabel maxLabel = GUIFactory.createLabel("Max:", GUIFactory.FONTS_B);
 
 		final JButton okButton = GUIFactory.createBtn("OK");
 		okButton.addActionListener(new SetValueListener());
@@ -319,12 +300,12 @@ public class EditThumbDialog extends CustomDialog {
 		panel.add(medianBtn, "pushx, align left, gapright 8px");
 		panel.add(centerLabel, "pushx, align right, gapleft 8px");
 		panel.add(centerBtn, "pushx, align left, wrap");
-		panel.add(GUIFactory.createLabel("",GUIFactory.FONTS));
-		panel.add(GUIFactory.createLabel("",GUIFactory.FONTS));
+		panel.add(GUIFactory.createLabel("", GUIFactory.FONTS));
+		panel.add(GUIFactory.createLabel("", GUIFactory.FONTS));
 		panel.add(maxLabel, "pushx, align right, gapleft 8px");
 		panel.add(maxBtn, "pushx, align left, wrap");
 
-		panel.add(GUIFactory.createLabel(" ",GUIFactory.FONTS),"wrap");
+		panel.add(GUIFactory.createLabel(" ", GUIFactory.FONTS), "wrap");
 
 		panel.add(closeBtn, "pushx, span 2, align right");
 		panel.add(okButton, "pushx, span 2, align left");

@@ -238,7 +238,7 @@ public class ColorChooserController extends Observable {
 			return;
 		}
 
-		colorPicker.setGradientColors();
+		colorPicker.updateColorExtractorData();
 		setChanged();
 		notifyObservers();
 	}

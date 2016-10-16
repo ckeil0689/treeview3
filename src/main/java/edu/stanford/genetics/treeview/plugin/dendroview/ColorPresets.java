@@ -20,10 +20,7 @@ import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /** This class encapsulates a list of Color presets. This is the class to edit
- * the default presets in...
- *
- * @author Alok Saldanha <alok@genome.stanford.edu>
- * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $ */
+ * the default presets in... */
 
 public class ColorPresets implements ConfigNodePersistent {
 

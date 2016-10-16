@@ -19,17 +19,12 @@ import Utilities.StringRes;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 
-/**
- * Constructs the GUI for color selection and manipulation.
+/** Constructs the GUI for color selection and manipulation.
  * 
- * @author chris0689
- *
- */
+ * @author chris0689 */
 public class ColorChooserUI extends CustomDialog {
 
-	/**
-	 * Default serial version ID to keep Eclipse happy...
-	 */
+	/** Default serial version ID to keep Eclipse happy... */
 	private static final long serialVersionUID = 1L;
 
 	// GUI components
@@ -51,18 +46,17 @@ public class ColorChooserUI extends CustomDialog {
 	// ColorSet choices
 	private JComboBox<ColorSchemeType> presetChoice;
 
-	/**
-	 * Constructs a ColorChooser object.
+	/** Constructs a ColorChooser object.
 	 *
 	 * @param drawer
-	 *            The CoorExtractor which defines how colors are mapped to data.
+	 *          The CoorExtractor which defines how colors are mapped to data.
 	 * @param minVal
-	 *            Minimum boundary of the data.
+	 *          Minimum boundary of the data.
 	 * @param maxVal
-	 *            Maximum boundary of the data.
-	 */
+	 *          Maximum boundary of the data. */
 	public ColorChooserUI(final ColorExtractor drawer, final double minVal,
-			final double maxVal, final double mean, final double median) {
+												final double maxVal, final double mean,
+												final double median) {
 
 		super(StringRes.dlg_Colors);
 		this.colorPicker = new ColorPicker(drawer, minVal, maxVal, mean, median);
@@ -71,9 +65,7 @@ public class ColorChooserUI extends CustomDialog {
 		setupLayout();
 	}
 
-	/**
-	 * Sets up the GUI layout of the ColorChooser object.
-	 */
+	/** Sets up the GUI layout of the ColorChooser object. */
 	@Override
 	protected void setupLayout() {
 
@@ -85,33 +77,34 @@ public class ColorChooserUI extends CustomDialog {
 		this.removeBtn = GUIFactory.createBtn("Remove Selected Color");
 		this.saveBtn = GUIFactory.createBtn("Save");
 		getRootPane().setDefaultButton(saveBtn);
-		
+
 		this.closeBtn.setText("Cancel");
 
 		setSelectionDependentBtnStatus(false, false);
 
 		this.missingColorIcon = new ColorIcon();
-		this.missingBtn = GUIFactory.createColorIconBtn("Missing Data", missingColorIcon);
+		this.missingBtn = GUIFactory
+																.createColorIconBtn("Missing Data", missingColorIcon);
 
-		this.presetChoice = new JComboBox<ColorSchemeType>(ColorSchemeType.values());
+		this.presetChoice = new JComboBox<ColorSchemeType>(ColorSchemeType
+																																			.values());
 
 		// Preset choice panel
-		final JPanel presetChoicePanel = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT);
+		final JPanel presetChoicePanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		presetChoicePanel.add(presetChoice, "pushx");
 		presetChoicePanel.add(missingBtn, "pushx");
 
-		final JLabel colorHint = GUIFactory.createLabel("Choose a color "
-				+ "scheme: ", GUIFactory.FONTS);
-		final JLabel hint = GUIFactory.createLabel("Move, add or edit sliders "
-				+ "to adjust color scheme.", GUIFactory.FONTS);
+		final JLabel colorHint = GUIFactory.createLabel("Choose a color " +
+																										"scheme: ", GUIFactory.FONTS);
+		final JLabel hint = GUIFactory.createLabel("Move, add or edit sliders " +
+																								"to adjust color scheme.", GUIFactory.FONTS);
 
 		contentPanel.add(colorHint, "span, wrap");
 		contentPanel.add(presetChoicePanel, "span, pushx, wrap");
 		contentPanel.add(hint, "span, wrap");
-		contentPanel.add(gradientPanel, "h 150:150:, w 650:650:, pushx, "
-				+ "alignx 50%, span, wrap");
+		contentPanel.add(gradientPanel, "h 150:150:, w 650:650:, pushx, " +
+																		"alignx 50%, span, wrap");
 		contentPanel.add(addBtn, "pushx, split 3, alignx 50%");
 		contentPanel.add(removeBtn, "pushx");
 		contentPanel.add(editBtn, "pushx");
@@ -120,52 +113,46 @@ public class ColorChooserUI extends CustomDialog {
 
 		mainPanel.add(saveBtn, "al right, pushx");
 		mainPanel.add(closeBtn, "al right");
-		
+
 		getContentPane().add(mainPanel);
 
 		pack();
 		setLocationRelativeTo(JFrame.getFrames()[0]);
-		
+
 		mainPanel.revalidate();
 		mainPanel.repaint();
 	}
 
-	/**
-	 * Sets the icon of the missing color button to the new color.
+	/** Sets the icon of the missing color button to the new color.
 	 * 
 	 * @param newColor
-	 *            The new color to be displayed.
-	 */
+	 *          The new color to be displayed. */
 	protected void updateMissingColorIcon(Color newColor) {
 
 		if(missingColorIcon == null || missingBtn == null) {
 			LogBuffer.println("Could not update the color icon of the 'Missing Color' button.");
 			return;
 		}
-		
+
 		missingColorIcon.setColor(newColor);
 		missingBtn.repaint();
 	}
 
-	/**
-	 * Updates the status of buttons which are dependent on whether there is any
+	/** Updates the status of buttons which are dependent on whether there is any
 	 * thumb selected or not.
 	 * 
-	 * @param enabled
-	 */
+	 * @param enabled */
 	protected void setSelectionDependentBtnStatus(boolean editEnabled,
-			boolean removeEnabled) {
+																								boolean removeEnabled) {
 
 		editBtn.setEnabled(editEnabled);
 		removeBtn.setEnabled(removeEnabled);
 	}
 
-	/**
-	 * Gives access to the GradientBox object which is the JPanel containing the
+	/** Gives access to the GradientBox object which is the JPanel containing the
 	 * actual color gradient and thumbs.
 	 *
-	 * @return
-	 */
+	 * @return */
 	protected ColorPicker getColorPicker() {
 
 		return colorPicker;
@@ -184,7 +171,7 @@ public class ColorChooserUI extends CustomDialog {
 
 	protected boolean isCustomSelected() {
 
-		return (getPresetChoices().getSelectedItem() == ColorSchemeType.CUSTOM);
+		return(getPresetChoices().getSelectedItem() == ColorSchemeType.CUSTOM);
 	}
 
 	/* ------- GUI component listeners ------------ */
@@ -224,9 +211,9 @@ public class ColorChooserUI extends CustomDialog {
 
 		editBtn.addActionListener(l);
 	}
-	
+
 	protected void addSaveChangesListener(final ActionListener l) {
-		
+
 		saveBtn.addActionListener(l);
 	}
 
