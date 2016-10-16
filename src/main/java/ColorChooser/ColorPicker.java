@@ -235,7 +235,6 @@ public class ColorPicker {
 	 * @param color - The new missing <code>Color</code> */
 	protected void setMissing(final Color color) {
 
-		activeColorSet.setMissing(color);
 		colorExtractor.setMissingColor(color);
 		colorExtractor.notifyObservers();
 	}
