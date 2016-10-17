@@ -47,7 +47,85 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	private static final long serialVersionUID = 1L;
 
 	static RCSVersion version = new RCSVersion(
-			"$Id: DragGridPanel.java,v 1.12 2008-07-06 00:25:17 alokito Exp $");
+		"$Id: DragGridPanel.java,v 2.0 2016-10-17 05:18:00 rleach Exp $");
+
+	// ****************************
+	// Variables
+	// ****************************
+
+	boolean resize = false;
+	/** Set to true if user is allowed to adjust sizes. */
+	boolean adjustable = true;
+	/** Width of the draggable borders between Components. */
+	int bwidth = 6;
+	/** Height of the draggable borders between Components. */
+	int bheight = 6;
+	/** Minimum width of a component. */
+	int minwidth = 20;
+	/** Minimum height of a component. */
+	int minheight = 20;
+	/** Width of the focus rectangle round each control. */
+	int focuswidth = 0;
+	/** Height of the focus rectangle round each control. */
+	int focusheight = 0;
+
+	/**
+	 * The components, organised in a grid. If a component takes up more than
+	 * one cell, it is placed in all the array positions it occupies.
+	 */
+	Component components[][];
+	/**
+	 * The x positions of the dividing lines between cells. xpos[0] is always 0,
+	 * and xpos[no of columns] is the width of the Panel.
+	 */
+	int xpos[];
+	/**
+	 * The y positions of the dividing lines between cells. ypos[0] is always 0,
+	 * and ypos[no of rows] is the height of the Panel.
+	 */
+	int ypos[];
+	/** The relative sizes of the cell columns. Add up to 1. */
+	float xsizes[];
+	/** The relative sizes of the cell rows. Add up to 1. */
+	float ysizes[];
+	/** The absolute sizes of the all but the last cell columns. */
+	int xintsizes[];
+	boolean staticxsizes = false;
+	/** The absolute sizes of the all but the last cell rows. */
+	int yintsizes[];
+	boolean staticysizes = false;
+	/** column divider being dragged by mouse, or 0. */
+	int coldrag;
+	/** row divider being dragged by mouse, or 0. */
+	int rowdrag;
+	/** column divider which cursor is over. */
+	int curscol;
+	/** row divider which cursor is over. */
+	int cursrow;
+	/** original cursor type. */
+	Cursor originalCursor;
+	/** current cursor type. */
+	int currentCursor = -1;
+	boolean overHorizDragBar = false;
+	boolean overVertDragBar = false;
+	/*
+	 * ContainerFocusTracker to pass focus on to appropriate sub-component.
+	 * removed by alok 9/12/2001, as doesn't seem necessary.
+	 * 
+	 * ContainerFocusTracker tracker = new ContainerFocusTracker(this);
+	 */
+	/** Left-right cursor */
+	static final int leftRightCursor = 1;
+	/** Up-down cursor */
+	static final int upDownCursor = 2;
+	/** Cross-hair cursor */
+	static final int crossHairCursor = 3;
+	/** Hand cursor */
+	static final int handCursor = 4;
+
+	static final boolean trace = false;
+	DragBar dragBar = new DragBar();
+
 
 	// ****************************
 	// Constructors
@@ -1137,8 +1215,6 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		repaint();
 	}
 
-	boolean resize = false;
-
 	/**
 	 * If a border is selected, change it's position.
 	 * @param e  Mouse Event object
@@ -1577,83 +1653,6 @@ public class DragGridPanel extends JPanel implements MouseListener,
 			Debug.print(this, s, null);
 		}
 	}
-
-	// ****************************
-	// Variables
-	// ****************************
-
-	/** Set to true if user is allowed to adjust sizes. */
-	boolean adjustable = true;
-	/** Width of the draggable borders between Components. */
-	int bwidth = 6;
-	/** Height of the draggable borders between Components. */
-	int bheight = 6;
-	/** Minimum width of a component. */
-	int minwidth = 20;
-	/** Minimum height of a component. */
-	int minheight = 20;
-	/** Width of the focus rectangle round each control. */
-	int focuswidth = 0;
-	/** Height of the focus rectangle round each control. */
-	int focusheight = 0;
-
-	/**
-	 * The components, organised in a grid. If a component takes up more than
-	 * one cell, it is placed in all the array positions it occupies.
-	 */
-	Component components[][];
-	/**
-	 * The x positions of the dividing lines between cells. xpos[0] is always 0,
-	 * and xpos[no of columns] is the width of the Panel.
-	 */
-	int xpos[];
-	/**
-	 * The y positions of the dividing lines between cells. ypos[0] is always 0,
-	 * and ypos[no of rows] is the height of the Panel.
-	 */
-	int ypos[];
-	/** The relative sizes of the cell columns. Add up to 1. */
-	float xsizes[];
-	/** The relative sizes of the cell rows. Add up to 1. */
-	float ysizes[];
-	/** The absolute sizes of the all but the last cell columns. */
-	int xintsizes[];
-	boolean staticxsizes = false;
-	/** The absolute sizes of the all but the last cell rows. */
-	int yintsizes[];
-	boolean staticysizes = false;
-	/** column divider being dragged by mouse, or 0. */
-	int coldrag;
-	/** row divider being dragged by mouse, or 0. */
-	int rowdrag;
-	/** column divider which cursor is over. */
-	int curscol;
-	/** row divider which cursor is over. */
-	int cursrow;
-	/** original cursor type. */
-	Cursor originalCursor;
-	/** current cursor type. */
-	int currentCursor = -1;
-	boolean overHorizDragBar = false;
-	boolean overVertDragBar = false;
-	/*
-	 * ContainerFocusTracker to pass focus on to appropriate sub-component.
-	 * removed by alok 9/12/2001, as doesn't seem necessary.
-	 * 
-	 * ContainerFocusTracker tracker = new ContainerFocusTracker(this);
-	 */
-	/** Left-right cursor */
-	static final int leftRightCursor = 1;
-	/** Up-down cursor */
-	static final int upDownCursor = 2;
-	/** Cross-hair cursor */
-	static final int crossHairCursor = 3;
-	/** Hand cursor */
-	static final int handCursor = 4;
-
-	static final boolean trace = false;
-	DragBar dragBar = new DragBar();
-
 }
 
 class DragBar extends JComponent {
