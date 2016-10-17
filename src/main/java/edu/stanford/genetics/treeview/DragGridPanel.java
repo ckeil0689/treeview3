@@ -1210,7 +1210,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
 			updateCursor(0);
 		}
 
-		overVertDragBar = overHorizDragBar = false;
+		overVertDragBar  = false;
+		overHorizDragBar = false;
 
 		repaint();
 	}
