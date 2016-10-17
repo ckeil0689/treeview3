@@ -1132,7 +1132,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 		if (currentCursor != 0 && !dragging()) {
 
-			setCursor(0);
+			updateCursor(0);
 		}
 
 		overVertDragBar = overHorizDragBar = false;
@@ -1469,7 +1469,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 		if (newcursor != currentCursor) {
 
-			setCursor(newcursor);
+			updateCursor(newcursor);
 		}
 
 		debug("onDragBorder(" + curscol + "," + cursrow + ")");
@@ -1484,7 +1484,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	 * @param newcursor
 	 *            newcursor to use, -1 to change it back.
 	 */
-	private void setCursor(final int newcursor) {
+	private void updateCursor(final int newcursor) {
 
 		debug("setCursor(" + newcursor + ")");
 
