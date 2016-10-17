@@ -24,6 +24,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -434,6 +436,44 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 		removeFocusListenerRecursively(comp);
 		remove(comp);
+		repaint();
+	}
+
+	/**
+	 * Remove all components.
+	 */
+	@Override
+	public void removeAll() {
+
+		int x, y;
+		List<Component> allcomps = new ArrayList<Component>();
+
+		for (y = 0; y < ysizes.length; y++) {
+
+			for (x = 0; x < ysizes.length; x++) {
+
+				//The same component can occupy multiple cells in the grid
+				//We can only remove a component once, so we must find the
+				//unique list of components
+				boolean already_present = false;
+				for(int i = 0;i < allcomps.size();i++) {
+					if(components[x][y] == allcomps.get(i)) {
+						already_present = true;
+					}
+				}
+				if(!already_present) {
+					allcomps.add(components[x][y]);
+				}
+				components[x][y] = null;
+			}
+		}
+		for(int i = 0;i < allcomps.size();i++) {
+			Component comp = allcomps.get(i);
+			if(comp != null) {
+				removeFocusListenerRecursively(comp);
+				remove(comp);
+			}
+		}
 		repaint();
 	}
 

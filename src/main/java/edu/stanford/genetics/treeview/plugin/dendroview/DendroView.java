@@ -642,8 +642,8 @@ public class DendroView implements Observer, DendroPanel {
 		dragGrid.removeAll();
 
 		dragGrid.setName("MatrixPanel");
-		dragGrid.setBorderWidth(2);
-		dragGrid.setBorderHeight(2);
+		dragGrid.setBorderWidth(3);
+		dragGrid.setBorderHeight(3);
 		dragGrid.setMinimumWidth(10);
 		dragGrid.setMinimumHeight(10);
 		dragGrid.setFocusWidth(0);
