@@ -984,22 +984,20 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		final int h = size.height;
 
 		if (g == null) {
-
+			LogBuffer.println("Warning: Encountered null graphics object.");
 			return;
 		}
 
 		if (c == null) {
-
+			LogBuffer.println("Warning: Null component encountered in grid.");
 			return; // No component here!
 		}
 
 		if (x > 0 && components[x - 1][y] == c) {
-
 			return; // Already processed in last column
 		}
 
 		if (y > 0 && components[x][y - 1] == c) {
-
 			return; // Already processed in last row
 		}
 
