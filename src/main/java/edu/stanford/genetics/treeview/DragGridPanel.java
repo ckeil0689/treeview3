@@ -976,7 +976,6 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	 * @param x  X coordinate
 	 * @param y  Y coordinate
 	 */
-	@SuppressWarnings("unused")
 	private void drawFocus(final Graphics g, final int x, final int y) {
 
 		final Component c = components[x][y];
