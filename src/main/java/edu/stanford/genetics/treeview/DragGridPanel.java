@@ -90,6 +90,7 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 	/**
 	 * Adjustable - true if use is allowed to drag borders to change cell sizes.
+	 * @return boolean
 	 */
 	public boolean isAdjustable() {
 
@@ -98,79 +99,116 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 	/**
 	 * Adjustable - true if use is allowed to drag borders to change cell sizes.
+	 * @param on
 	 */
 	public void setAdjustable(final boolean on) {
 
 		adjustable = on;
 	}
 
-	/** BorderWidth - width of the draggable borders between Components. */
+	/**
+	 * BorderWidth - width of the draggable borders between Components.
+	 * @return int
+	 */
 	public int getBorderWidth() {
 
 		return bwidth;
 	}
 
-	/** BorderWidth - width of the draggable borders between Components. */
+	/**
+	 * BorderWidth - width of the draggable borders between Components.
+	 * @param width
+	 */
 	public void setBorderWidth(final int width) {
 
 		bwidth = width;
 	}
 
-	/** BorderHeight - height of the draggable borders between Components. */
+	/**
+	 * BorderHeight - height of the draggable borders between Components.
+	 * @return bheight  border height
+	 */
 	public int getBorderHeight() {
 
 		return bheight;
 	}
 
-	/** BorderHeight - height of the draggable borders between Components. */
+	/**
+	 * BorderHeight - height of the draggable borders between Components.
+	 * @param height
+	 */
 	public void setBorderHeight(final int height) {
 
 		bheight = height;
 	}
 
-	/** MinimumWidth - minimum width of a component. */
+	/**
+	 * MinimumWidth - minimum width of a component.
+	 * @return minwidth  minimum width
+	 */
 	public int getMinimumWidth() {
 
 		return minwidth;
 	}
 
-	/** MinimumWidth - minimum width of a component. */
+	/**
+	 * MinimumWidth - minimum width of a component.
+	 * @param width
+	 */
 	public void setMinimumWidth(final int width) {
 
 		minwidth = width;
 	}
 
-	/** MinimumHeight - minimum height of a component. */
+	/**
+	 * MinimumHeight - minimum height of a component.
+	 * @return minheight  minimum height
+	 */
 	public int getMinimumHeight() {
 
 		return minheight;
 	}
 
-	/** MinimumHeight - minimum height of a component. */
+	/**
+	 * MinimumHeight - minimum height of a component.
+	 * @param height
+	 */
 	public void setMinimumHeight(final int height) {
 
 		minheight = height;
 	}
 
-	/** FocusWidth - width of the focus rectangle round each control. */
+	/**
+	 * FocusWidth - width of the focus rectangle round each control.
+	 * @return focuswidth  Focus width
+	 */
 	public int getFocusWidth() {
 
 		return focuswidth;
 	}
 
-	/** FocusWidth - width of the focus rectangle round each control. */
+	/**
+	 * FocusWidth - width of the focus rectangle round each control.
+	 * @param width
+	 */
 	public void setFocusWidth(final int width) {
 
 		focuswidth = width;
 	}
 
-	/** FocusHeight - height of the focus rectangle round each control. */
+	/**
+	 * FocusHeight - height of the focus rectangle round each control.
+	 * @return focusheight  focus height
+	 */
 	public int getFocusHeight() {
 
 		return focusheight;
 	}
 
-	/** FocusHeight - height of the focus rectangle round each control. */
+	/**
+	 * FocusHeight - height of the focus rectangle round each control.
+	 * @param height
+	 */
 	public void setFocusHeight(final int height) {
 
 		focusheight = height;
@@ -354,6 +392,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	/**
 	 * Add a component to occupy a single cell.
 	 * 
+	 * @param comp
+	 *            The component to be added
 	 * @param x
 	 *            Top left cell.
 	 * @param y
@@ -372,6 +412,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	/**
 	 * Add a component to occupy a rectangle of cells.
 	 * 
+	 * @param comp
+	 *            The component to be added
 	 * @param x
 	 *            Top left cell.
 	 * @param y
@@ -420,6 +462,8 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	/**
 	 * Remove a component. Other components will use up the vacated cell(s) if
 	 * possible.
+	 * @param comp
+	 *            The component to be removed
 	 */
 	public void removeComponent(final Component comp) {
 
@@ -477,7 +521,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		repaint();
 	}
 
-	/** added by alok 10/9/2001 */
+	/**
+	 * Standard getPreferredSize method
+	 * @return Dimension
+	 * added by alok 10/9/2001 */
 	@Override
 	public Dimension getPreferredSize() {
 
@@ -536,7 +583,12 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		return new Dimension(maxw, maxh);
 	}
 
-	/** added by alok 9/12/2001 */
+	/**
+	 * Recursively adds focus listeners to a component
+	 * @param c
+	 *            The component to which to add listeners
+	 * added by alok 9/12/2001
+	 */
 	private void addFocusListenerRecursively(final Component c) {
 
 		// Add Focus Listener to the Component passed as an argument
@@ -562,7 +614,12 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 	}
 
-	/** added by alok 9/12/2001 */
+	/**
+	 * Recursively removes focus listeners from a component
+	 * @param c
+	 *            The component from which to remove listeners
+	 * added by alok 9/12/2001
+	 */
 	private void removeFocusListenerRecursively(final Component c) {
 
 		// Add Focus Listener to the Component passed as an argument
@@ -588,14 +645,22 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 	}
 
-	/** added by alok 9/12/2001 */
+	/**
+	 * Adds focus listeners automatically after a component is added
+	 * @param e  A container event
+	 * added by alok 9/12/2001
+	 */
 	@Override
 	public void componentAdded(final ContainerEvent e) {
 
 		addFocusListenerRecursively(e.getChild());
 	}
 
-	/** added by alok 9/12/2001 */
+	/**
+	 * Removes focus listeners automatically after a component is removed
+	 * @param e  A container event
+	 * added by alok 9/12/2001
+	 */
 	@Override
 	public void componentRemoved(final ContainerEvent e) {
 
@@ -678,6 +743,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 	}
 
+	/**
+	 * Checks to see if the component sizes are static, and if so, it populates
+	 * or updates the relative sizes based on the static sizes.
+	 */
 	private void checkPopulateSizes() {
 
 		final Dimension s = getSize();
@@ -754,7 +823,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	// Overridden public methods
 	// ****************************
 
-	/** Standard paint routine. */
+	/**
+	 * Standard paint routine.
+	 * @param g  The graphics object
+	 */
 	@Override
 	public void paintComponent(final Graphics g) {
 
@@ -817,7 +889,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		// System.out.println("exiting DragGridPanel paint");
 	}
 
-	/** draws focus rectangle, added by alok 9/12/2001 */
+	/**
+	 * draws focus rectangle, added by alok 9/12/2001
+	 * @param e  A Focus Event.
+	 */
 	@Override
 	public void focusGained(final FocusEvent e) {
 
@@ -848,6 +923,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 	}
 
+	/**
+	 * What to do when focus is lost
+	 * @param e  A focus event.
+	 */
 	@Override
 	public void focusLost(final FocusEvent e) {
 
@@ -890,6 +969,13 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 	}
 
+	/**
+	 * Draws focus rectangles.
+	 * 
+	 * @param g  Graphics object.
+	 * @param x  X coordinate
+	 * @param y  Y coordinate
+	 */
 	@SuppressWarnings("unused")
 	private void drawFocus(final Graphics g, final int x, final int y) {
 
@@ -930,7 +1016,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		(xpos[x] + focuswidth, ypos[y] + h + focuswidth, w, focusheight);
 	}
 
-	/** Standard toString returns "DragGridPanel[x][y]" and Panel info. */
+	/**
+	 * Standard toString
+	 * @return "DragGridPanel[x][y]" and Panel info
+	 */
 	@Override
 	public String toString() {
 
@@ -943,7 +1032,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 	// Event handling
 	// ****************************
 
-	/** Change the mouse cursor if over a draggable border. */
+	/**
+	 * Change the mouse cursor & darken the border if over a draggable border.
+	 * @param e  Mouse Event object
+	 */
 	@Override
 	public void mouseMoved(final MouseEvent e) {
 
@@ -962,7 +1054,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		//LogBuffer.println("Dragging? " + dragging());
 	}
 
-	/** Select a border to drag. */
+	/**
+	 * Select a border to drag.
+	 * @param e  Mouse Event object
+	 */
 	@Override
 	public void mousePressed(final MouseEvent e) {
 
@@ -980,7 +1075,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 	}
 
-	/** Stop dragging a border. */
+	/**
+	 * Stop dragging a border.
+	 * @param e  Mouse Event object
+	 */
 	@Override
 	public void mouseReleased(final MouseEvent e) {
 
@@ -1001,12 +1099,20 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 	}
 
+	/**
+	 * Standard mouse clicked method.
+	 * @param e  Mouse Event object
+	 */
 	@Override
 	public void mouseClicked(final MouseEvent e) {
 
 		debug("mouseClicked", e);
 	}
 
+	/**
+	 * Change the cursor & draw the border on mouse entered.
+	 * @param e  Mouse Event object
+	 */
 	@Override
 	public void mouseEntered(final MouseEvent e) {
 
@@ -1015,6 +1121,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		repaint();
 	}
 
+	/**
+	 * Change the cursor & blank out the border on mouse exited.
+	 * @param e  Mouse Event object
+	 */
 	@Override
 	public void mouseExited(final MouseEvent e) {
 
@@ -1032,7 +1142,10 @@ public class DragGridPanel extends JPanel implements MouseListener,
 
 	boolean resize = false;
 
-	/** If a border is selected, change it's position. */
+	/**
+	 * If a border is selected, change it's position.
+	 * @param e  Mouse Event object
+	 */
 	@Override
 	public void mouseDragged(final MouseEvent e) {
 
@@ -1123,11 +1236,19 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		repaint();
 	}
 
+	/**
+	 * Get the grid size
+	 * 
+	 * @return Dimension
+	 */
 	public Dimension getGridSize() {
 		return(getSize());
 	}
 
-	/** Called when this container gets resized. */
+	/**
+	 * Called when this container gets resized.
+	 * @param e  Component even object
+	 */
 	@Override
 	public void componentResized(final ComponentEvent e) {
 
@@ -1135,18 +1256,30 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		doLayout();
 	}
 
+	/**
+	 * Called when this container is moved.
+	 * @param e  Component even object
+	 */
 	@Override
 	public void componentMoved(final ComponentEvent e) {
 
 		debug("componentMoved", e);
 	}
 
+	/**
+	 * Called when this container is shown.
+	 * @param e  Component even object
+	 */
 	@Override
 	public void componentShown(final ComponentEvent e) {
 
 		debug("componentShown", e);
 	}
 
+	/**
+	 * Called when this container is hidden.
+	 * @param e  Component even object
+	 */
 	@Override
 	public void componentHidden(final ComponentEvent e) {
 
@@ -1412,11 +1545,22 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		currentCursor = newcursor;
 	}
 
+	/**
+	 * Determine if a border is being dragged
+	 * 
+	 * @return boolean
+	 */
 	private boolean dragging() {
 
 		return (adjustable && (coldrag > 0 || rowdrag > 0));
 	}
 
+	/**
+	 * Standard debug message method.
+	 * 
+	 * @param s  String
+	 * @param o  Object
+	 */
 	private void debug(final String s, final Object o) {
 
 		if (trace) {
@@ -1425,6 +1569,11 @@ public class DragGridPanel extends JPanel implements MouseListener,
 		}
 	}
 
+	/**
+	 * Standard debug message method.
+	 * 
+	 * @param s  String
+	 */
 	private void debug(final String s) {
 		if (trace) {
 
@@ -1513,16 +1662,22 @@ public class DragGridPanel extends JPanel implements MouseListener,
 class DragBar extends JComponent {
 
 	private static final long serialVersionUID = 1L;
+	private final Point mouse = new Point();
 
+	/**
+	 * Constructor
+	 */
 	public DragBar() {
-
 		setOpaque(false);
 	}
 
-	private final Point mouse = new Point();
-
+	/**
+	 * Record cursor position
+	 * 
+	 * @param x
+	 * @param y
+	 */
 	public void setMouse(final int x, final int y) {
-
 		mouse.x = x;
 		mouse.y = y;
 	}
