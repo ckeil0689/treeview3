@@ -1526,12 +1526,4 @@ class DragBar extends JComponent {
 		mouse.x = x;
 		mouse.y = y;
 	}
-
-//	@Override
-//	public void paintComponent(final Graphics g) {
-//
-//		g.setColor(Color.green);
-//		g.fillRect(mouse.x, 0, 2, getHeight());
-//		g.fillRect(0, mouse.y, getWidth(), 2);
-//	}
 }
