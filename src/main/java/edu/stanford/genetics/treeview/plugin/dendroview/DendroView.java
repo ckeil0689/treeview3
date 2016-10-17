@@ -136,6 +136,12 @@ public class DendroView implements Observer, DendroPanel {
 	private LabelFinderBox rowFinderBox;
 	private LabelFinderBox colFinderBox;
 
+	//Used to layout the matrix panel
+	static int BORDER_THICKNESS   = 3;
+	static int MIN_GRID_CELL_SIZE = 10;
+	static int FOCUS_THICKNESS    = 0;
+	static int LABEL_AREA_HEIGHT  = 180;
+
 	/**
 	 * Chained constructor for the DendroView object without a name.
 	 *
@@ -642,17 +648,19 @@ public class DendroView implements Observer, DendroPanel {
 		dragGrid.removeAll();
 
 		dragGrid.setName("MatrixPanel");
-		dragGrid.setBorderWidth(3);
-		dragGrid.setBorderHeight(3);
-		dragGrid.setMinimumWidth(10);
-		dragGrid.setMinimumHeight(10);
-		dragGrid.setFocusWidth(0);
-		dragGrid.setFocusHeight(0);
-		int mheights []  = new int[1];
-		mheights[0] = (int) 180; //must be less than pane size!!!
+		dragGrid.setBorderWidth(BORDER_THICKNESS);
+		dragGrid.setBorderHeight(BORDER_THICKNESS);
+		dragGrid.setMinimumWidth(MIN_GRID_CELL_SIZE);
+		dragGrid.setMinimumHeight(MIN_GRID_CELL_SIZE);
+		dragGrid.setFocusWidth(FOCUS_THICKNESS);   //This is a line in the
+		dragGrid.setFocusHeight(FOCUS_THICKNESS);  //middle of the border
+
+		int mheights []  = new int[1];   //1 less than the size of the grid
+		mheights[0] = LABEL_AREA_HEIGHT; //must be less than pane size!!!
 		dragGrid.setHeights(mheights);
-		int mwidths []  = new int[1];
-		mwidths[0] = (int) 180; //must be less than pane size!!!
+
+		int mwidths []  = new int[1];   //1 less than the size of the grid
+		mwidths[0] = LABEL_AREA_HEIGHT; //must be less than pane size!!!
 		dragGrid.setWidths(mwidths);
 
 		JPanel globalOverviewPanel;
