@@ -51,7 +51,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		this.dataInfo = dataInfo;
 	}
 
-	/** Set the dataInfo.getDelimiter() which is used to define separate cells in
+	/** Set the delimiter which is used to define separate cells in
 	 * the data file.
 	 * 
 	 * @param delimiter - The delimiter used for reading the file. */
