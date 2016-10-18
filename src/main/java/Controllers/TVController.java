@@ -247,19 +247,13 @@ public class TVController implements Observer {
 		// Timer to prevent repeatedly saving window dimensions upon resize
 		private final int saveResizeDelay = 1000;
 		private javax.swing.Timer saveResizeTimer;
-		ActionListener saveWindowAttrs = new ActionListener() {
+		ActionListener saveWindowAttrs=new ActionListener(){
 
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				if(evt.getSource() == saveResizeTimer) {
-					/* Stop timer */
-					saveResizeTimer.stop();
-					saveResizeTimer = null;
+		@Override public void actionPerformed(ActionEvent evt){if(evt.getSource()==saveResizeTimer){
+		/* Stop timer */
+		saveResizeTimer.stop();saveResizeTimer=null;
 
-					tvFrame.storeState();
-				}
-			}
-		};
+		tvFrame.storeState();}}};
 
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
@@ -305,6 +299,7 @@ public class TVController implements Observer {
 
 		// Loading TVModel
 		final TVModel tvModel = (TVModel) model;
+
 		setFileMenuSet(fileSet);
 
 		try {
@@ -539,10 +534,12 @@ public class TVController implements Observer {
 																	boolean shouldUseImport) {
 
 		Preferences oldNode;
+
 		// Transfer settings to clustered file
 		if(isFromCluster && oldRoot != null && oldExt != null) {
 			LogBuffer.println("Getting preferences for transfer to clustered file.");
 			oldNode = getOldPreferences(oldRoot, oldExt);
+
 			// Check if file was loaded before
 		}
 		else {
@@ -608,6 +605,7 @@ public class TVController implements Observer {
 																										final Preferences node) {
 
 		DataLoadInfo dataInfo = new DataLoadInfo(node);
+		String delimiter = node.get("delimiter", DataLoadInfo.DEFAULT_DELIM);
 
 		// Amount of label types may vary when loading, so they have to be re-detected
 		DataImportController importController = new DataImportController(dataInfo
@@ -929,9 +927,9 @@ public class TVController implements Observer {
 	 *
 	 * @param menu - The type of opened menu distinguished by its String name. */
 	@SuppressWarnings("unused") // LabelSettingsController doesn't need to be stored in a variable
+
 	public void openLabelMenu(final String menu) {
 
-		// View
 		final LabelSettings labelSettingsView = new LabelSettings(tvFrame);
 
 		if(menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
@@ -948,6 +946,7 @@ public class TVController implements Observer {
 	 *
 	 * @param menu */
 	@SuppressWarnings("unused") // ExportDialogController doesn't need to be stored in a variable
+
 	public void openExportMenu() {
 
 		if(tvFrame.getDendroView() == null || !tvFrame.isLoaded()) {
@@ -982,26 +981,18 @@ public class TVController implements Observer {
 		final double mean = model.getDataMatrix().getMean();
 		final double median = model.getDataMatrix().getMedian();
 
-		LogBuffer.println("Model MIN: " + min);
-		LogBuffer.println("Model MAX: " + max);
-
-		// View
 		ColorExtractor colorExtractor = dendroController.getColorExtractor();
 
-		final ColorChooserUI gradientPick = new ColorChooserUI(	colorExtractor, min,
-																														max, mean, median);
-
-		// Controller
+		final ColorChooserUI colorChooserUI = new ColorChooserUI(	colorExtractor,
+																															min, max, mean,
+																															median);
 		ColorChooserController controller = new ColorChooserController(
-																																		gradientPick);
-
-		// Adding GradientColorChooser configurations to DendroView node.
-		controller.setConfigNode(((TVModel) model).getDocumentConfig());
+																																		colorChooserUI);
 
 		controller.addObserver(dendroController.getInteractiveMatrixView());
 		controller.addObserver(dendroController.getGlobalMatrixView());
 
-		gradientPick.setVisible(true);
+		colorChooserUI.setVisible(true);
 	}
 
 	private void showWarning(final String message) {

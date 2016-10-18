@@ -1,11 +1,13 @@
-/* BEGIN_HEADER												   TreeView 3
- *
+/*
+ * BEGIN_HEADER TreeView 3
+ * 
  * Please refer to our LICENSE file if you wish to make changes to this software
- *
- * END_HEADER 
+ * 
+ * END_HEADER
  */
 
 package Controllers;
+
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 
@@ -16,11 +18,9 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-/**
- * A dialog window class that has an expandable Details pane
+/** A dialog window class that has an expandable Details pane
  * Original code from:
- * http://www.javaknowledge.info/custom-jdialog-with-expandable-details-pane/
- */
+ * http://www.javaknowledge.info/custom-jdialog-with-expandable-details-pane/ */
 public class CustomDetailsConfirmDialog extends CustomDialog {
 
 	private static final long serialVersionUID = 1L;
@@ -33,15 +33,13 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 	public static final int CANCEL_OPTION = 0;
 	public static final int OK_OPTION = 1;
 
-	/**
-	 * Constructor
+	/** Constructor
 	 * 
 	 * @param summary - The text of the summary
 	 * @param details - The text of the initially hidden details scrollpane
-	 * @param doString - the text on the 'OK' button
-	 */
+	 * @param doString - the text on the 'OK' button */
 	public CustomDetailsConfirmDialog(String title,String summary,
-		String details,String doString) {
+										String details,String doString) {
 
 		super(title);
 
@@ -65,15 +63,16 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 			labelSize.setSize(500,labelSize.height);
 			message.setPreferredSize(labelSize);
 		}
-		mainPanel.add(message,"wrap");
-	
+
+		mainPanel.add(message,"wrap, hmax " + labelSize.height);
+
 		//Create the details pane with inserted line wraps
 		final JTextArea textArea = new JTextArea();
 		textArea.setLineWrap(true);
 		textArea.setWrapStyleWord(true);
 		textArea.setText(details);
 		textArea.setEditable(false);
-	
+
 		//The message may be too big to fit in a dialog window, so we will throw
 		//it in a scrollpane.
 		final JScrollPane scrollPane = new JScrollPane(textArea);
@@ -82,13 +81,13 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 		detailSize.setSize(labelSize.width,0);
 		scrollPane.setPreferredSize(detailSize);
 		scrollPane.setVisible(false);
-	
+
 		//Create the details checkbox with a listener that adds/removes the
 		//detail message and updates the window size to accommodate it
 		JCheckBox cb = new JCheckBox(new AbstractAction() {
-	
+
 			private static final long serialVersionUID = 1L;
-	
+
 			//I'm not sure I understand why this needs to be in an anonymous
 			//code block, but it doesn't compile without it.
 			//Apparently it's an anonymous subclass to give the parent class an
@@ -99,10 +98,10 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 				this.putValue(Action.SELECTED_KEY,false);
 				this.putValue(Action.NAME,"Details");
 			}
-	
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if ((Boolean) this.getValue(Action.SELECTED_KEY)) {
+				if((Boolean) this.getValue(Action.SELECTED_KEY)) {
 					detailSize.setSize(labelSize.width,212);
 					scrollPane.setSize(detailSize);
 					Dimension curSize = getPreferredSize();
@@ -126,8 +125,8 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 		doBtn.addActionListener(new DoItListener());
 		closeBtn.setText("Cancel");
 		JPanel btnPanel = GUIFactory.createJPanel(false,GUIFactory.NO_INSETS);
-		btnPanel.add(closeBtn, "tag cancel, pushx, al right");
-		btnPanel.add(doBtn, "al right");
+		btnPanel.add(closeBtn,"tag cancel, pushx, al right");
+		btnPanel.add(doBtn,"al right");
 
 		mainPanel.add(btnPanel,"bottom, pushx, growx, span");
 
