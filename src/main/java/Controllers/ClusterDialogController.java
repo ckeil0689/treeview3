@@ -926,8 +926,9 @@ public class ClusterDialogController {
 	}
 
 	/**
-	 * Sets a new DendroView with the new data loaded into TVModel, displaying
-	 * an updated HeatMap. It should also close the ClusterViewFrame.
+	 * Sets a new <code>DendroView</code> with the new data loaded into 
+	 * <code>TVModel</code>, displaying an updated heat map. 
+	 * It should also close the <code>ClusterDialog</code>.
 	 */
 	private void loadClusteredData(final String newFilePath) {
 
@@ -936,15 +937,15 @@ public class ClusterDialogController {
 		if (newFilePath != null) {
 			file = new File(newFilePath);
 			
-			/* Later used to import preferences */
+			// Later used to import preferences
 			final String oldRoot = tvModel.getFileSet().getRoot();
 			final String oldExt = tvModel.getFileSet().getExt();
 			
-			final FileSet newFileSet = new FileSet(file.getName(),
+			final FileSet clusteredFileSet = new FileSet(file.getName(),
 					file.getParent() + File.separator);
 			
 			clusterDialog.dispose();
-			tvController.getDataInfoAndLoad(newFileSet, oldRoot, oldExt, true, false);
+			tvController.getDataInfoAndLoad(clusteredFileSet, oldRoot, oldExt, true, false);
 
 		} else {
 			final String alert = "When trying to load the clustered file, no "
