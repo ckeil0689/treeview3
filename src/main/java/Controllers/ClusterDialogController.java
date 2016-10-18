@@ -929,13 +929,15 @@ public class ClusterDialogController {
 	 * Sets a new <code>DendroView</code> with the new data loaded into 
 	 * <code>TVModel</code>, displaying an updated heat map. 
 	 * It should also close the <code>ClusterDialog</code>.
+	 * @param clusteredFilePath - The path to the clustered file which should
+	 * be loaded
 	 */
-	private void loadClusteredData(final String newFilePath) {
+	private void loadClusteredData(final String clusteredFilePath) {
 
 		File file = null;
 		
-		if (newFilePath != null) {
-			file = new File(newFilePath);
+		if (clusteredFilePath != null) {
+			file = new File(clusteredFilePath);
 			
 			// Later used to import preferences
 			final String oldRoot = tvModel.getFileSet().getRoot();
