@@ -117,16 +117,6 @@ public class DataLoadInfo {
 		}
 
 		this.dataCoords = newDataCoords;
-
-		if(oldNode == null) {
-			LogBuffer.println("Could not update new data start coordinates " +
-												"information in the Preferences because no node was defined in " +
-												"the DataLoadInfo object for this file.");
-			return;
-		}
-
-		oldNode.putInt("rowCoord", dataCoords[0]);
-		oldNode.putInt("colCoord", dataCoords[1]);
 	}
 
 	public String[] getRowLabelTypes() {
@@ -193,11 +183,11 @@ public class DataLoadInfo {
 
 		this.dataCoords[0] = node.getInt("rowCoord", 0);
 		this.dataCoords[1] = node.getInt("colCoord", 0);
-		
+
 		String dLabelTypes = Arrays.toString(DataLoadInfo.DEFAULT_LABEL_TYPES);
 		String rowLabelTypes = node.get("rowLabelTypes", dLabelTypes);
 		String colLabelTypes = node.get("colLabelTypes", dLabelTypes);
-		
+
 		this.rowLabelTypes = Helper.getStringValuesFromKeyString(rowLabelTypes);
 		this.colLabelTypes = Helper.getStringValuesFromKeyString(colLabelTypes);
 	}

@@ -247,13 +247,19 @@ public class TVController implements Observer {
 		// Timer to prevent repeatedly saving window dimensions upon resize
 		private final int saveResizeDelay = 1000;
 		private javax.swing.Timer saveResizeTimer;
-		ActionListener saveWindowAttrs=new ActionListener(){
+		ActionListener saveWindowAttrs = new ActionListener() {
 
-		@Override public void actionPerformed(ActionEvent evt){if(evt.getSource()==saveResizeTimer){
-		/* Stop timer */
-		saveResizeTimer.stop();saveResizeTimer=null;
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				if(evt.getSource() == saveResizeTimer) {
+					/* Stop timer */
+					saveResizeTimer.stop();
+					saveResizeTimer = null;
 
-		tvFrame.storeState();}}};
+					tvFrame.storeState();
+				}
+			}
+		};
 
 		@Override
 		public void componentResized(final ComponentEvent arg0) {
@@ -605,7 +611,6 @@ public class TVController implements Observer {
 																										final Preferences node) {
 
 		DataLoadInfo dataInfo = new DataLoadInfo(node);
-		String delimiter = node.get("delimiter", DataLoadInfo.DEFAULT_DELIM);
 
 		// Amount of label types may vary when loading, so they have to be re-detected
 		DataImportController importController = new DataImportController(dataInfo
@@ -619,6 +624,18 @@ public class TVController implements Observer {
 			LogBuffer.println("Data start coordinates have shifted because more " +
 												"label types were added.");
 			dataInfo.setDataStartCoords(newDataCoords);
+
+			/* prevent old node from updating coordinates unless fileSet represents
+			 * the exact same file as the node. In this case coordinates need to 
+			 * be updated here, as found by dataInfo.needsDataCoordsUpdate() but
+			 * otherwise the new coordinates are unrelated to the old node! */
+			String oldFileName = node.get("name", "") + node.get("extension", "");
+			String newFileName = fileSet.getRoot() + fileSet.getExt();
+
+			if(oldFileName.equals(newFileName)) {
+				node.putInt("rowCoord", newDataCoords[0]);
+				node.putInt("colCoord", newDataCoords[1]);
+			}
 		}
 
 		return dataInfo;

@@ -230,8 +230,6 @@ public class ColorChooserController extends Observable {
 	 *          values have changed. */
 	private void applyChangesToMatrix(final boolean valuesChanged) {
 
-		LogBuffer.println("Updating matrix with changes.");
-
 		if(!colorChooserUI.isCustomSelected() && valuesChanged) {
 			addCurrentSettingsTo(ColorSchemeType.CUSTOM);
 			colorChooserUI.getPresetChoices().setSelectedItem(ColorSchemeType.CUSTOM);
