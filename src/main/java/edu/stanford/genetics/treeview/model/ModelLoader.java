@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
@@ -315,58 +314,60 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	}
 
 	/** Parses the label types from the label data collected until
-	 * this point.
+	 * this point. It will set a default value if no labels are present and will
+	 * also create default label types if labels are present in the data, but
+	 * no label types could be found.
 	 *
-	 * @param stringLabels */
+	 * @param stringLabels - the parsed data lines containing the labels */
 	private void parseLabelTypes(final String[][] stringLabels) {
 
 		LogBuffer.println("Parsing label types.");
 
-		// lengths of required label type arrays (by detection or selection)
+		// supposed lengths of label type arrays (by selection or detection)
+		// this does NOT indicate whether the label types are present!
 		final int nRowLabelType = dataInfo.getDataStartCol();
 		final int nColLabelType = dataInfo.getDataStartRow();
 
-		String[] readRowLabelTypes = new String[nRowLabelType];
-		String[] readColLabelTypes = new String[nColLabelType];
+		String[] readRowLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
+		String[] readColLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
 
+		// row labels exist, replace single default label type
 		if(nRowLabelType > 0) {
-			// read row label types
-			System.arraycopy(stringLabels[0], 0, readRowLabelTypes, 0, nRowLabelType);
+			readRowLabelTypes = new String[nRowLabelType];
 
-		}
-		else {
-			// set a default empty label type
-			readRowLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
+			// may only add row label types if they are present
+			boolean areRowLabelTypesPresent = (dataInfo.getDataStartRow() > 0);
+			if(areRowLabelTypesPresent) {
+				String[] firstDataRow = stringLabels[0];
+				System.arraycopy(firstDataRow, 0, readRowLabelTypes, 0, nRowLabelType);
+			}
 		}
 
+		// column labels exist, replace single default label type
 		if(nColLabelType > 0) {
-			// read column label types
-			for(int i = 0; i < nColLabelType; i++) {
-				// labels for columns would shift the row data start index
-				if(dataInfo.getDataStartCol() > 0) {
+			readColLabelTypes = new String[nColLabelType];
+
+			// may only add column label types if they are present
+			boolean areColLabelTypesPresent = (dataInfo.getDataStartCol() > 0);
+			if(areColLabelTypesPresent) {
+				for(int i = 0; i < nColLabelType; i++) {
+					// labels for columns would shift the row data start index
 					readColLabelTypes[i] = stringLabels[i][0];
 				}
-				else {
-					readColLabelTypes[i] = "";
+
+				/*
+				 * The regex assurance is needed because the CDT-format is completely
+				 * inconsistent and we want to keep backwards compatibility.
+				 */
+				if(readColLabelTypes[0].equalsIgnoreCase("GID")) {
+					readColLabelTypes[0] = assureLabelTypeNames(readRowLabelTypes);
 				}
 			}
-
-			/*
-			 * The regex assurance is needed because the CDT-format is completely
-			 * inconsistent and we want to keep backwards compatibility.
-			 */
-			if(readColLabelTypes[0].equalsIgnoreCase("GID")) {
-				readColLabelTypes[0] = assureLabelTypeNames(readRowLabelTypes);
-			}
-		}
-		else {
-			// set a default empty label type
-			readColLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
 		}
 
 		// Replacing empty or whitespace-only label types
-		replaceEmptyLabelTypes(readRowLabelTypes, "ROW");
-		replaceEmptyLabelTypes(readColLabelTypes, "COLUMN");
+		readRowLabelTypes = replaceEmptyLabelTypes(readRowLabelTypes, "ROW");
+		readColLabelTypes = replaceEmptyLabelTypes(readColLabelTypes, "COLUMN");
 
 		// set the label types
 		targetModel.setRowLabelTypes(readRowLabelTypes);
@@ -380,20 +381,31 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.setGweightFound(hasGWeight);
 	}
 
-	private String[] replaceEmptyLabelTypes(String[] original,
+	/** Replaces empty or null values in the label type array with numbered
+	 * defaults.
+	 * 
+	 * @param originalLabelTypes - the array of original (detected label types)
+	 * @param axis - the axis type for the labels (row or column)
+	 * @return an adjusted String array without empty or null values. */
+	private String[] replaceEmptyLabelTypes(String[] originalLabelTypes,
 																					final String axis) {
 
+		String[] newLabelTypes = new String[originalLabelTypes.length];
 		Pattern p = Pattern.compile("(^\\s*$)", Pattern.UNICODE_CHARACTER_CLASS);
 
-		for(int i = 0; i < original.length; i++) {
-			Matcher m = p.matcher(original[i]);
-			if(m.find()) {
+		for(int i = 0; i < originalLabelTypes.length; i++) {
+			String oldLabelType = originalLabelTypes[i];
+			// java checks from left to right, so null is handled
+			String newLabelType = oldLabelType;
+			if(oldLabelType == null || p.matcher(oldLabelType).find()) {
 				int idx = i + 1;
-				original[i] = axis + " LABELS " + idx;
+				newLabelType = axis + " LABELS " + idx;
 			}
+
+			newLabelTypes[i] = newLabelType;
 		}
 
-		return original;
+		return newLabelTypes;
 	}
 
 	/** Switches out false axis labeling due to inconsistent CDT format.
