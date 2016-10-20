@@ -61,19 +61,20 @@ public final class PreviewLoader {
 			final BufferedReader br = new BufferedReader(new FileReader(filename));
 
 			String line;
-			int count = 0;
-			int lastCommonLabelColumn = -1;
+			int rowIdx = 0;
+			int maxRowLabelTypeIdx = -1;
 
-			/* read all lines */
-			while((line = br.readLine()) != null && count < LIMIT) {
+			// read all lines, at most up to LIMIT
+			while((line = br.readLine()) != null && rowIdx < LIMIT) {
 
 				final String[] lineAsStrings = line.split(delimiter, -1);
 
-				/* read all strings in a line */
-				for(int i = 0; i < lineAsStrings.length; i++) {
+				// iterate over strings in a line
+				for(int colIdx = 0; colIdx < lineAsStrings.length; colIdx++) {
 
-					String element = lineAsStrings[i];
+					String element = lineAsStrings[colIdx];
 
+					// correct trailing 'e' if it belongs to numeric element
 					if(element.endsWith("e") || element.endsWith("E")) {
 						String trimmedElem = element.substring(0, element.length() - 2);
 						// only do this if original is numeric with trailing 'e' 
@@ -93,40 +94,43 @@ public final class PreviewLoader {
 					if(isDoubleParseable(element) || isNaN(element)) {
 						// Numerics
 						// skip to next line
-						if(lastCommonLabelColumn < i && hasCommonLabel(lineAsStrings)) {
+						if(maxRowLabelTypeIdx < colIdx && hasCommonLabel(lineAsStrings)) {
 							break;
 						}
 
-						// skip to next element in line
-						if(i <= lastCommonLabelColumn) {
+						// skip to next element in line (data cannot be in this column)
+						if(colIdx <= maxRowLabelTypeIdx) {
 							continue;
 						}
 
-						dataStartCoords[0] = count;
-						dataStartCoords[1] = i;
-						count = LIMIT;
+						dataStartCoords[0] = rowIdx;
+						dataStartCoords[1] = colIdx;
+						rowIdx = LIMIT;
 						break;
 					}
 					else {
 						// Non-numeric
-						// if a known row label type is encountered, skip to next line
+						// if a known row label type is encountered, skip to next element
 						if(Arrays.asList(rowLabelTypes).contains(element)) {
 							LogBuffer.println("Found " + element + " from row label types.");
+							if(maxRowLabelTypeIdx < colIdx) {
+								maxRowLabelTypeIdx = colIdx;
+							}
 							continue;
 						}
 
-						// if a known column label type is encountered, skip to next element
+						// if a known column label type is encountered, skip to next line
 						if(Arrays.asList(colLabelTypes).contains(element)) {
 							LogBuffer.println("Found " + element + " from col label types.");
 							break;
 						}
 					}
 
-					if(isCommonLabel(element) && lastCommonLabelColumn < i) {
-						lastCommonLabelColumn = i;
+					if(isCommonLabel(element) && maxRowLabelTypeIdx < colIdx) {
+						maxRowLabelTypeIdx = colIdx;
 					}
 				}
-				count++;
+				rowIdx++;
 			}
 
 			br.close();

@@ -617,6 +617,7 @@ public class TVController implements Observer {
 																																							.getDelimiter());
 		importController.setFileSet(fileSet);
 
+		// FIXME detection does not work
 		int[] newDataCoords = importController.detectDataBoundaries(dataInfo);
 
 		// the number of label types may have been altered, e.g. by clustering

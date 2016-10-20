@@ -159,10 +159,11 @@ public class DataImportController {
 			colLabelTypes = dataInfo.getColLabelTypes();
 		}
 		
+		// FIXME
 		int[] dataStartCoords = PreviewLoader.findDataStartCoords(filename,
 				selectedDelimiter, rowLabelTypes, colLabelTypes);
 
-		/* This method can be called without the actual dialog being open! */
+		// This method can be called without the actual dialog being open!
 		if(previewDialog != null) {
 			int rowCount = dataStartCoords[0];
 			int columnCount = dataStartCoords[1];
