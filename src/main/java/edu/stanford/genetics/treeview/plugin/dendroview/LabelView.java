@@ -1863,7 +1863,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//that 2 different data files happen to have the same label in the same
 		//position and there exists a longer label elsewhere
 		if((longest_str_index > -1 && longest_str_index > map.getMaxIndex()) ||
-			longest_str == null || longest_str == "" ||
+			longest_str == null || "".equals(longest_str) ||
 			longest_str_index == -1 ||
 			!longest_str.equals(labelSummary.getSummary(labelInfo,
 				longest_str_index))) {
