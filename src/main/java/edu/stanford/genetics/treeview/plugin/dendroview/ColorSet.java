@@ -1,8 +1,9 @@
-/* BEGIN_HEADER                                                   TreeView 3
+/*
+ * BEGIN_HEADER TreeView 3
  *
  * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * END_HEADER 
+ * END_HEADER
  */
 
 package edu.stanford.genetics.treeview.plugin.dendroview;
@@ -18,10 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import ColorChooser.ColorSchemeType;
 import edu.stanford.genetics.treeview.LogBuffer;
 
-/**
- * This class represents a set of colors which can be used by a color extractor
+/** This class represents a set of colors which can be used by a color extractor
  * to translate data values into colors.
  *
  * NOTE: This class has been superceded by the ConfigColorSet in the
@@ -32,49 +33,47 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * ColorSet
  *
  * @author Alok Saldanha <alok@genome.stanford.edu>
- * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $
- */
+ * @version @version $Revision: 1.1 $ $Date: 2006-08-16 19:13:45 $ */
 
 public class ColorSet {
 
 	/* Default values for a ColorSet. */
-	private final static String default_name = "RedGreen";
-	private final static float[] default_fractions = { 0.0f, 0.5f, 1.0f };
-	private final static String[] default_colors = { "#FF0000", "#000000",
-			"#00FF00" };
+	private final static String default_colorSchemeType = ColorSchemeType.REDGREEN
+																																								.toString();
+	private final static float[] default_fractions = {0.0f, 0.5f, 1.0f};
+	private final static String[] default_colors = {"#FF0000", "#000000",
+																									"#00FF00"};
 	private final static String default_missingColor = "#FFFFFF";
 	private final static String default_emptyColor = "#FFFFFF";
 
 	private final static double default_min = -1.0;
 	private final static double default_max = 1.0;
 
-	private final String name;
+	private String colorSchemeType;
 	private List<Color> colorList = new ArrayList<Color>();
-	private List<Double> fractionList = new ArrayList<Double>();
+	private List<Float> fractionList = new ArrayList<Float>();
 	private double min;
 	private double max;
 	private Color missing;
 	private Color empty;
 
-	/**
-	 * Constructor for the ColorSet object
+	/** Constructor for the ColorSet object
 	 *
-	 * @param name
-	 *            initial name
+	 * @param colorSchemeType
+	 *          initial name
 	 * @param List
-	 *            <Color> colorList List of initial colors
+	 *          <Color> colorList List of initial colors
 	 * @param List
-	 *            <Double> fractionList List of initial fractions
+	 *          <Double> fractionList List of initial fractions
 	 * @param missing
-	 *            string representing initial missing color
+	 *          string representing initial missing color
 	 * @param empty
-	 *            string representing initial empty color
-	 */
-	public ColorSet(final String name, final List<Color> colorList,
-			final List<Double> fractionList, final double min,
-			final double max, final String missing, final String empty) {
+	 *          string representing initial empty color */
+	public ColorSet(final String colorSchemeType, final List<Color> colorList,
+									final List<Float> fractionList, final double min,
+									final double max, final String missing, final String empty) {
 
-		this.name = name;
+		this.colorSchemeType = colorSchemeType;
 		this.colorList = colorList;
 		this.fractionList = fractionList;
 		this.min = min;
@@ -83,37 +82,33 @@ public class ColorSet {
 		this.empty = decodeColor(empty);
 	}
 
-	/**
-	 * Constructor for ColorSet that loads values from ConfigNode
+	/** Constructor for ColorSet that loads values from ConfigNode
 	 *
 	 * @param Preferences
-	 *            colorSetNode Preferences node with color set information
-	 *            stored
-	 */
+	 *          colorSetNode Preferences node with color set information
+	 *          stored */
 	public ColorSet(final Preferences colorSetNode) {
 
-		this.name = colorSetNode.get("name", default_name);
-
+		this.colorSchemeType = colorSetNode.get("colorSchemeType", default_colorSchemeType);
 		int colorNum = colorSetNode.getInt("colorNum", default_colors.length);
 
 		try {
-			for (int i = 0; i < colorNum; i++) {
-
-				colorList.add(decodeColor(colorSetNode.get("Color" + i + 1,
-						default_colors[0])));// default_colors[i])));
-				fractionList.add(new Double(colorSetNode.getFloat("Fraction"
-						+ i + 1, default_fractions[1])));
+			for(int i = 0; i < colorNum; i++) {
+				colorList.add(decodeColor(colorSetNode.get("Color" + (i +
+																															1), default_colors[0])));
+				fractionList.add(colorSetNode.getFloat("Fraction" + (i +
+																															1), default_fractions[1]));
 			}
 
-		} catch (ArrayIndexOutOfBoundsException e) {
+		}
+		catch(ArrayIndexOutOfBoundsException e) {
 			LogBuffer.logException(e);
 
-			/* Add defaults if there's an issue */
+			// Add defaults if there's an issue
 			colorNum = default_colors.length;
-			for (int i = 0; i < colorNum; i++) {
-
-				colorList.add(decodeColor(default_colors[i]));// default_colors[i])));
-				fractionList.add(new Double(default_fractions[i]));
+			for(int i = 0; i < colorNum; i++) {
+				colorList.add(decodeColor(default_colors[i]));
+				fractionList.add(default_fractions[i]);
 			}
 		}
 
@@ -124,41 +119,40 @@ public class ColorSet {
 		this.min = colorSetNode.getDouble("min", default_min);
 		this.max = colorSetNode.getDouble("max", default_max);
 
-		this.missing = decodeColor(colorSetNode.get("missing",
-				default_missingColor));
+		this.missing = decodeColor(colorSetNode.get("missing", default_missingColor));
 		this.empty = decodeColor(colorSetNode.get("empty", default_emptyColor));
 	}
 
-	/**
-	 * Constructor for the ColorSet object
+	/** Constructor for the <code>ColorSet</code> object
 	 *
-	 * @param name
-	 *            inital name
+	 * @param colorSchemeType
+	 *          initial colorSchemeType
 	 * @param color1
-	 *            string representing inital color1
+	 *          string representing initial color1
 	 * @param color2
-	 *            string representing inital color2
+	 *          string representing initial color2
 	 * @param color3
-	 *            string representing inital color3
+	 *          string representing initial color3
 	 * @param missing
-	 *            string representing inital missing color
+	 *          string representing initial missing color
 	 * @param empty
-	 *            string representing inital empty color
-	 */
-	public ColorSet(final String name, final String[] colors,
-			final String missing, final String empty) {
+	 *          string representing initial empty color */
+	public ColorSet(final String colorSchemeType, final String[] colors,
+									final String missing, final String empty) {
+
+		LogBuffer.println("New ColorSet: " + colorSchemeType);
 
 		final List<Color> newColorList = new ArrayList<Color>();
-		for (String color : colors) {
-			newColorList.add(decodeColor(color)); /* min in ColorChooser */
+		for(String color : colors) {
+			newColorList.add(decodeColor(color)); // min in ColorChooser
 		}
 
-		final List<Double> newFractionList = new ArrayList<Double>();
-		for (int i = 0; i < default_fractions.length; i++) {
-			newFractionList.add((double) default_fractions[i]);
+		final List<Float> newFractionList = new ArrayList<Float>();
+		for(int i = 0; i < default_fractions.length; i++) {
+			newFractionList.add(default_fractions[i]);
 		}
 
-		this.name = name;
+		this.colorSchemeType = colorSchemeType;
 		this.colorList = newColorList;
 		this.fractionList = newFractionList;
 		this.min = default_min;
@@ -167,14 +161,12 @@ public class ColorSet {
 		this.empty = decodeColor(empty);
 	}
 
-	/**
-	 * Copy Constructor
+	/** Copy Constructor
 	 *
-	 * @param another
-	 */
+	 * @param another */
 	public ColorSet(final ColorSet another) {
 
-		this.name = another.name;
+		this.colorSchemeType = another.colorSchemeType;
 		this.colorList = another.colorList;
 		this.fractionList = another.fractionList;
 		this.min = another.min;
@@ -183,26 +175,24 @@ public class ColorSet {
 		this.empty = another.empty;
 	}
 
-	/**
-	 * Save ColorSet to ConfigNode
+	/** Save ColorSet to ConfigNode
 	 *
 	 * @param Preferences
-	 *            colorSetNode Preferences node to store ColorSet in
-	 */
-	public void save(final Preferences colorSetNode) {
+	 *          colorSetNode Preferences node to store ColorSet in */
+	public void saveTo(final Preferences colorSetNode) {
 
-		colorSetNode.put("name", this.name);
+		colorSetNode.put("colorSchemeType", this.colorSchemeType);
 
 		final int colorNum = colorList.size();
 		colorSetNode.putInt("colorNum", colorNum);
 
-		for (int i = 0; i < colorNum; i++) {
-			colorSetNode.put("Color" + i + 1, encodeColor(colorList.get(i)));
+		for(int i = 0; i < colorNum; i++) {
+			colorSetNode.put("Color" + (i + 1), encodeColor(colorList.get(i)));
 		}
 
-		for (int i = 0; i < colorNum; i++) {
-			colorSetNode.putFloat("Fraction" + i + 1, fractionList.get(i)
-					.floatValue());
+		for(int i = 0; i < colorNum; i++) {
+			colorSetNode.putFloat("Fraction" + (i + 1), fractionList.get(i)
+																															.floatValue());
 		}
 
 		colorSetNode.putDouble("min", min);
@@ -219,18 +209,19 @@ public class ColorSet {
 		final String[] colors = getColors();
 
 		String colorString = "";
-		if (colors.length > 0) {
-			for (final String color : colors) {
+		if(colors.length > 0) {
+			for(final String color : colors) {
 
 				colorString += color + "; ";
 			}
-		} else {
+		}
+		else {
 			colorString = "No colors in node.";
 		}
 
-		return "ColorSet " + getName() + "\n" + "Colors: " + colorString
-				+ " missing: " + getMissing().toString() + "\t" + "empty: "
-				+ getEmpty().toString() + "\t";
+		return "ColorSet " +	getColorSchemeName() + "\n" + "Colors: " +
+						colorString + " missing: " + getMissing().toString() + "\t" +
+						"empty: " + getEmpty().toString() + "\t";
 	}
 
 	public void setMissing(final Color missing) {
@@ -241,17 +232,19 @@ public class ColorSet {
 		this.empty = empty;
 	}
 
-	/**
-	 * Retrieves hex representations of colors
+	public void setColorSchemeType(final String name) {
+		this.colorSchemeType = name;
+	}
+
+	/** Retrieves hex representations of colors
 	 *
-	 * @return String[]
-	 */
+	 * @return String[] */
 	public String[] getColors() {
 
 		final int colorNum = colorList.size();
 		final String[] colors = new String[colorNum];
 
-		for (int i = 0; i < colorNum; i++) {
+		for(int i = 0; i < colorNum; i++) {
 			colors[i] = encodeColor(colorList.get(i));
 		}
 
@@ -263,7 +256,7 @@ public class ColorSet {
 		return colorList;
 	}
 
-	public List<Double> getFractionList() {
+	public List<Float> getFractionList() {
 
 		return fractionList;
 	}
@@ -278,17 +271,15 @@ public class ColorSet {
 		return max;
 	}
 
-	/**
-	 * Retrieves the fraction values stored in the current configNode.
+	/** Retrieves the fraction values stored in the current configNode.
 	 *
-	 * @return
-	 */
+	 * @return */
 	public float[] getFractions() {
 
 		final int colorNum = colorList.size();
 		final float[] fractions = new float[colorNum];
 
-		for (int i = 0; i < colorNum; i++) {
+		for(int i = 0; i < colorNum; i++) {
 			fractions[i] = fractionList.get(i).floatValue();
 		}
 
@@ -296,48 +287,38 @@ public class ColorSet {
 
 	}
 
-	/**
-	 * Color for missing values.
-	 */
+	/** Color for missing values. */
 	public Color getMissing() {
 
 		return missing;
 	}
 
-	/**
-	 * Color for empty values.
-	 */
+	/** Color for empty values. */
 	public Color getEmpty() {
 
 		return empty;
 	}
 
-	/**
-	 * The name of this color set
-	 */
-	public String getName() {
-		return name;
+	/** The name of this color set */
+	public String getColorSchemeName() {
+		return colorSchemeType;
 	}
 
-	/**
-	 * Convert a color from a hex string to a Java <code>Color</code> object.
+	/** Convert a color from a hex string to a Java <code>Color</code> object.
 	 *
 	 * @param colorString
-	 *            hex string, such as #FF11FF
-	 * @return The corresponding java color object.
-	 */
+	 *          hex string, such as #FF11FF
+	 * @return The corresponding java color object. */
 	public final static Color decodeColor(final String colorString) {
 
 		return Color.decode(colorString);// will this work?
 	}
 
-	/**
-	 * Convert a java <code>Color</code> object to a hex string.
+	/** Convert a java <code>Color</code> object to a hex string.
 	 *
 	 * @param color
-	 *            A java color object
-	 * @return The corresponding hex string
-	 */
+	 *          A java color object
+	 * @return The corresponding hex string */
 	public final static String encodeColor(final Color color) {
 
 		final int red = color.getRed();
@@ -357,70 +338,66 @@ public class ColorSet {
 
 	private final static String hexChar(final int i) {
 
-		switch (i) {
-		case 0:
-			return "0";
-		case 1:
-			return "1";
-		case 2:
-			return "2";
-		case 3:
-			return "3";
-		case 4:
-			return "4";
-		case 5:
-			return "5";
-		case 6:
-			return "6";
-		case 7:
-			return "7";
-		case 8:
-			return "8";
-		case 9:
-			return "9";
-		case 10:
-			return "A";
-		case 11:
-			return "B";
-		case 12:
-			return "C";
-		case 13:
-			return "D";
-		case 14:
-			return "E";
-		case 15:
-			return "F";
-		default:
-			return "F";
+		switch(i) {
+			case 0:
+				return "0";
+			case 1:
+				return "1";
+			case 2:
+				return "2";
+			case 3:
+				return "3";
+			case 4:
+				return "4";
+			case 5:
+				return "5";
+			case 6:
+				return "6";
+			case 7:
+				return "7";
+			case 8:
+				return "8";
+			case 9:
+				return "9";
+			case 10:
+				return "A";
+			case 11:
+				return "B";
+			case 12:
+				return "C";
+			case 13:
+				return "D";
+			case 14:
+				return "E";
+			case 15:
+				return "F";
+			default:
+				return "F";
 		}
 	}
 
 	// Save/ load methods
-	/**
-	 * extract values from Eisen-formatted file specified by the string argument
+	/** extract values from Eisen-formatted file specified by the string argument
 	 * The Eisen format is a 16 byte file. The first four bytes are interpreted
 	 * as RBGA values specifying red, green, blue and alpha values from 0-255
 	 * (00 - FF in base 16) for up-regulated genes, the next four are the values
 	 * for unchanged, then down regulated, then the color for missing values.
 	 *
 	 * @param file
-	 *            file to load from
+	 *          file to load from
 	 * @exception IOException
-	 *                throw if problems with file
-	 */
+	 *              throw if problems with file */
 	public void loadEisen(final String file) throws IOException {
 
 		loadEisen(new File(file));
 	}
 
-	/**
-	 * extract values from Eisen-formatted file
+	/** extract values from Eisen-formatted file
 	 *
 	 * @param file
-	 *            file to load from
+	 *          file to load from
 	 * @exception IOException
-	 *                throw if problems with file
-	 */
+	 *              throw if problems with file */
 	public void loadEisen(final File file) throws IOException {
 
 		final FileInputStream stream = new FileInputStream(file);
@@ -428,27 +405,23 @@ public class ColorSet {
 		stream.close();
 	}
 
-	/**
-	 * save values to Eisen-formatted file specified by the String
+	/** save values to Eisen-formatted file specified by the String
 	 *
 	 * @param file
-	 *            file to store to
+	 *          file to store to
 	 * @exception IOException
-	 *                throw if problems with file
-	 */
+	 *              throw if problems with file */
 	public void saveEisen(final String file) throws IOException {
 
 		saveEisen(new File(file));
 	}
 
-	/**
-	 * save values to Eisen-formatted file sp
+	/** save values to Eisen-formatted file sp
 	 *
 	 * @param file
-	 *            file to store to
+	 *          file to store to
 	 * @exception IOException
-	 *                throw if problems with file
-	 */
+	 *              throw if problems with file */
 	public void saveEisen(final File file) throws IOException {
 
 		final FileOutputStream stream = new FileOutputStream(file);
@@ -457,7 +430,7 @@ public class ColorSet {
 	}
 
 	private static Color unpackEisen(final InputStream stream)
-			throws IOException {
+																															throws IOException {
 
 		final int red = stream.read();
 		final int green = stream.read();
@@ -468,7 +441,7 @@ public class ColorSet {
 	}
 
 	private static void packEisen(final Color out, final OutputStream stream)
-			throws IOException {
+																																						throws IOException {
 
 		stream.write(out.getRed());
 		stream.write(out.getGreen());
