@@ -116,7 +116,12 @@ public abstract class MatrixView extends ModelViewProduced {
 			adjustPixelsToMaps();
 			revalidateScreen();
 			setSubImage();
-			
+
+			//Update the saved pixels available in the mapcontainers so that
+			//dependent components will adjust to the new real estate.
+			xmap.adjustToScreenChange();
+			ymap.adjustToScreenChange();
+
 			if(dataChanged) {
 				updatePixels();
 				dataChanged = false;

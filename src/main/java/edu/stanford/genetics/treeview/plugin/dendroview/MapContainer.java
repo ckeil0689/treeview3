@@ -1506,6 +1506,13 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
+	/**
+	 * Updates the saved pixels available so that dependent components will
+	 * adjust to the new real estate.  This has 3 practical effects:
+	 * selections will sync-up, the labels and trees sizes will adjust, and the
+	 * location highlight in the global overview ill update - all of which base
+	 * their drawing on the available pixels stored here in mapcontainer.
+	 */
 	public void adjustToScreenChange() {
 
 		adjustScaleToScreen();

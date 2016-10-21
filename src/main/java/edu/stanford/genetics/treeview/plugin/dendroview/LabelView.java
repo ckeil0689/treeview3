@@ -1643,6 +1643,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		if(labelAttr.isLongestStrIdxDefined() && (labelAttr.getLongestStrIdx() > map
 																																								.getMaxIndex() ||
 																							labelAttr.getLongestStr() == null ||
+																							"".equals(labelAttr.getLongestStr()) ||
+																							labelAttr.getLongestStrIdx() == -1 ||
 																							!labelAttr.isLongestStrEqualTo(labelSummary.getSummary(labelInfo, labelAttr.getLongestStrIdx())))) {
 			LogBuffer.println("Data changed. Prompting recalculation of max string length.");
 			labelAttr.setLongestStrIdx(-1);

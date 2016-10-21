@@ -48,6 +48,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.LabelFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
+import edu.stanford.genetics.treeview.DragGridPanel;
 
 /** TODO Refactor this JavaDoc. It's not applicable to the current program
  * anymore.
@@ -77,6 +78,7 @@ public class DendroView implements Observer, DendroPanel {
 
 	// Main containers
 	private final JPanel dendroPane;
+	private final DragGridPanel dragGrid;
 	private final JPanel searchPanel;
 	private final DataTicker ticker;
 
@@ -132,7 +134,15 @@ public class DendroView implements Observer, DendroPanel {
 	private LabelFinderBox rowFinderBox;
 	private LabelFinderBox colFinderBox;
 
-	/** Chained constructor for the DendroView object without a name.
+
+	//Used to layout the matrix panel
+	static int BORDER_THICKNESS   = 3;
+	static int MIN_GRID_CELL_SIZE = 10;
+	static int FOCUS_THICKNESS    = 0;
+	static int LABEL_AREA_HEIGHT  = 180;
+
+	/**
+	 * Chained constructor for the DendroView object without a name.
 	 *
 	 * @param vFrame
 	 *          parent ViewFrame of DendroView */
@@ -156,22 +166,24 @@ public class DendroView implements Observer, DendroPanel {
 		this.tvFrame = tvFrame;
 		this.name = "DendroView";
 
-		/* Main panel to which all components are added */
-		this.dendroPane = GUIFactory
-																.createJPanel(false, GUIFactory.TINY_GAPS_AND_INSETS);
+		// Main panel to which all components are added
+		this.dendroPane = GUIFactory.createJPanel(false, 
+				GUIFactory.TINY_GAPS_AND_INSETS);
 
-		/* Search panel containing the search bars */
+		this.dragGrid = new DragGridPanel(2,2);
+
+		// Search panel containing the search bars
 		this.searchPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
 
-		/* The two matrix views (big, interactive & small, overview) */
+		// The two matrix views (big, interactive & small, overview)
 		this.globalMatrixView = new GlobalMatrixView();
 		this.interactiveMatrixView = new InteractiveMatrixView();
 
-		/* Main matrix JScrollbars */
+		// Main matrix JScrollbars
 		this.matrixXscrollbar = interactiveMatrixView.getXMapScroll();
 		this.matrixYscrollbar = interactiveMatrixView.getYMapScroll();
 
-		/* Label views */
+		// Label views
 		this.rowLabelView = new RowLabelView();
 		this.colLabelView = new ColumnLabelView();
 		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
@@ -179,7 +191,7 @@ public class DendroView implements Observer, DendroPanel {
 		this.rowLabelScroll = rowLabelView.getSecondaryScrollBar();
 		this.colLabelScroll = colLabelView.getSecondaryScrollBar();
 
-		/* Dendrograms */
+		// Dendrograms
 		this.rowTreeView = new RowTreeView();
 		this.colTreeView = new ColumnTreeView();
 
@@ -261,18 +273,15 @@ public class DendroView implements Observer, DendroPanel {
 
 		dendroPane.removeAll();
 
-		JPanel toolbarPanel;
-		JPanel matrixPanel;
-
-		toolbarPanel = createToolbarPanel();
+		JPanel toolbarPanel = createToolbarPanel();
 
 		setupRowDataPane();
 		setupColDataPane();
 		setDataPaneDividers();
 
-		matrixPanel = createMatrixPanel();
+		setupMatrixPanel();
 
-		dendroPane.add(matrixPanel, "grow, push, wrap");
+		dendroPane.add(dragGrid, "grow, push, wrap");
 		dendroPane.add(toolbarPanel, "growx, pushx, h 3%, wrap");
 
 		dendroPane.revalidate();
@@ -588,11 +597,27 @@ public class DendroView implements Observer, DendroPanel {
 	/** Creates the full main matrix panel which includes all components
 	 * making up a full DendroView with the exception of the toolbar related
 	 * elements such as buttons or search.
-	 * 
-	 * @return A JPanel with all main views arranged in it. */
-	private JPanel createMatrixPanel() {
+	 * @return A DragGridPanel with all main views arranged in it.
+	 */
+	private void setupMatrixPanel() {
 
-		JPanel matrixPanel;
+		dragGrid.removeAll();
+
+		dragGrid.setName("MatrixPanel");
+		dragGrid.setBorderWidth(BORDER_THICKNESS);
+		dragGrid.setBorderHeight(BORDER_THICKNESS);
+		dragGrid.setMinimumWidth(MIN_GRID_CELL_SIZE);
+		dragGrid.setMinimumHeight(MIN_GRID_CELL_SIZE);
+		dragGrid.setFocusWidth(FOCUS_THICKNESS);   //This is a line in the
+		dragGrid.setFocusHeight(FOCUS_THICKNESS);  //middle of the border
+
+		int mheights []  = new int[1];   //1 less than the size of the grid
+		mheights[0] = LABEL_AREA_HEIGHT; //must be less than pane size!!!
+		dragGrid.setHeights(mheights);
+
+		int mwidths []  = new int[1];   //1 less than the size of the grid
+		mwidths[0] = LABEL_AREA_HEIGHT; //must be less than pane size!!!
+		dragGrid.setWidths(mwidths);
 
 		JPanel globalOverviewPanel;
 		JPanel interactiveMatrixPanel;
@@ -600,17 +625,18 @@ public class DendroView implements Observer, DendroPanel {
 		globalOverviewPanel = createGlobalOverviewPanel();
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
 
-		matrixPanel = GUIFactory
-														.createJPanel(false, GUIFactory.TINY_GAPS_AND_INSETS);
-		matrixPanel.add(globalOverviewPanel, "h 180!, w 180!, grow 0");
-		matrixPanel.add(colDataPane, "h 180!, pushx, " + "growx, growy 0, wrap");
-		matrixPanel.add(rowDataPane, "w 180!, pushy, growy, " + "growx 0");
-		matrixPanel.add(interactiveMatrixPanel, "grow");
-
-		return matrixPanel;
+		dragGrid.addComponent(globalOverviewPanel,0,0);
+		dragGrid.addComponent(colDataPane,1,0);
+		dragGrid.addComponent(rowDataPane,0,1);
+		dragGrid.addComponent(interactiveMatrixPanel,1,1);
 	}
 
-	/** Looks up the stored location values for the JSplitPane dividers.
+	public DragGridPanel getDragGrid() {
+		return(dragGrid);
+	}
+
+	/**
+	 * Looks up the stored location values for the JSplitPane dividers.
 	 * This is needed for "Show-Hide" trees. It determines how much of
 	 * labels vs. tree panel is shown. */
 	private void setDataPaneDividers() {
