@@ -20,8 +20,11 @@ public final class PreviewLoader {
 	 * YORF, ORF, EWEIGHT, GWEIGHT, WEIGHT, COMPLEX, NAME, GID, UID, AID, ID,
 	 * ROWID, COLID
 	 */
-	private final static String COMMON_LABELS = "(?i)(COMPLEX|NAME|^Y?ORF$|" +
+	public final static String COMMON_LABELS = "(?i)(COMPLEX|NAME|^Y?ORF$|" +
 																							"^(GENE|G|ARRAY|A|U|ROW|COL)?ID$|^.*WEIGHT$)";
+
+	public final static String COMMON_ROW_LABELS = "(?i)(COMPLEX|NAME|^Y?ORF$|" +
+																									"^(GENE|G|U|ROW)?ID$|^.*WEIGHT$)";
 
 	/*
 	 * For recognizing supposed numeric data in a file. Matches (non
@@ -94,7 +97,8 @@ public final class PreviewLoader {
 					if(isDoubleParseable(element) || isNaN(element)) {
 						// Numerics
 						// skip to next line
-						if(maxRowLabelTypeIdx < colIdx && hasCommonLabel(lineAsStrings)) {
+						if(maxRowLabelTypeIdx < colIdx &&
+								hasCommonLabel(lineAsStrings, PreviewLoader.COMMON_LABELS)) {
 							break;
 						}
 
@@ -126,7 +130,8 @@ public final class PreviewLoader {
 						}
 					}
 
-					if(isCommonLabel(element) && maxRowLabelTypeIdx < colIdx) {
+					if(isCommonLabel(element, PreviewLoader.COMMON_LABELS) &&
+							maxRowLabelTypeIdx < colIdx) {
 						maxRowLabelTypeIdx = colIdx;
 					}
 				}
@@ -147,23 +152,27 @@ public final class PreviewLoader {
 
 	/** Check the current line for any sort of common label.
 	 * 
-	 * @param line
+	 * @param line - the String array to check
+	 * @param pattern - the regex pattern to match
 	 * @return Whether line includes a common label or not. */
-	private static boolean hasCommonLabel(final String[] line) {
+	public static boolean hasCommonLabel(	final String[] line,
+																				final String pattern) {
 
 		for(String token : line) {
-			if(Pattern.matches(PreviewLoader.COMMON_LABELS, token)) { return true; }
+			if(Pattern.matches(pattern, token)) { return true; }
 		}
 		return false;
 	}
 
 	/** Check a string if it is part of the recognized common labels.
 	 * 
-	 * @param token
+	 * @param token - The token to check
+	 * @param pattern - the regex pattern to match
 	 * @return Whether token is a common label or not. */
-	private static boolean isCommonLabel(final String token) {
+	public static boolean isCommonLabel(final String token,
+																			final String pattern) {
 
-		if(Pattern.matches(PreviewLoader.COMMON_LABELS, token)) { return true; }
+		if(Pattern.matches(pattern, token)) { return true; }
 		return false;
 	}
 

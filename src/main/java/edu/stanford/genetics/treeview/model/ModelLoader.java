@@ -321,8 +321,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	 * @param stringLabels - the parsed data lines containing the labels */
 	private void parseLabelTypes(final String[][] stringLabels) {
 
-		LogBuffer.println("Parsing label types.");
-
 		// supposed lengths of label type arrays (by selection or detection)
 		// this does NOT indicate whether the label types are present!
 		final int nRowLabelType = dataInfo.getDataStartCol();
@@ -351,16 +349,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			boolean areColLabelTypesPresent = (dataInfo.getDataStartCol() > 0);
 			if(areColLabelTypesPresent) {
 				for(int i = 0; i < nColLabelType; i++) {
-					// labels for columns would shift the row data start index
+					// do not add known row label types
+					String colLabelType = stringLabels[i][0];
+					if(PreviewLoader.isCommonLabel(colLabelType, PreviewLoader.COMMON_ROW_LABELS)) {
+						continue;
+					}
 					readColLabelTypes[i] = stringLabels[i][0];
-				}
-
-				/*
-				 * The regex assurance is needed because the CDT-format is completely
-				 * inconsistent and we want to keep backwards compatibility.
-				 */
-				if(readColLabelTypes[0].equalsIgnoreCase("GID")) {
-					readColLabelTypes[0] = assureLabelTypeNames(readRowLabelTypes);
 				}
 			}
 		}
@@ -406,27 +400,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		}
 
 		return newLabelTypes;
-	}
-
-	/** Switches out false axis labeling due to inconsistent CDT format.
-	 *
-	 * @param rowLabelTypes
-	 *          The row label types contain the right label.
-	 * @return The correct label type */
-	private static String assureLabelTypeNames(final String[] rowLabelTypes) {
-
-		String finalLabelType = "OTHER";
-
-		for(int i = 0; i < rowLabelTypes.length; i++) {
-			if(!rowLabelTypes[i].equalsIgnoreCase("YORF") &&	!rowLabelTypes[i]
-																																				.equalsIgnoreCase("GID") &&
-					!rowLabelTypes[i].equalsIgnoreCase("GWEIGHT")) {
-				finalLabelType = rowLabelTypes[i];
-				break;
-			}
-		}
-
-		return finalLabelType;
 	}
 
 	/** Reads the label types and labels from the data and stores the data in
