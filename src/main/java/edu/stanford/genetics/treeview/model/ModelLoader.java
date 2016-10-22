@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
@@ -20,14 +19,12 @@ import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
 
-/**
- * The class responsible for loading data into the TVModel.
- */
+/** The class responsible for loading data into the TVModel. */
 public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 	protected TVController controller;
 
-	/* Reference to the main model which will hold the data */
+	// Reference to the main model which will hold the data
 	protected TVModel targetModel;
 	private final FileSet fileSet;
 
@@ -44,8 +41,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private boolean hasEWeight = false;
 	private boolean hasGWeight = false;
 
-	public ModelLoader(final DataModel model, final TVController controller,
-			final DataLoadInfo dataInfo) {
+	public ModelLoader(	final DataModel model, final TVController controller,
+											final DataLoadInfo dataInfo) {
 
 		this.controller = controller;
 		this.targetModel = (TVModel) model;
@@ -53,20 +50,20 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		this.dataInfo = dataInfo;
 	}
 
-	/**
-	 * Set the dataInfo.getDelimiter() which is used to define separate cells in the data file.
-	 * @param dataInfo.getDelimiter()
-	 */
+	/** Set the delimiter which is used to define separate cells in
+	 * the data file.
+	 * 
+	 * @param delimiter - The delimiter used for reading the file. */
 	public void setDelimiter(final String delimiter) {
 
 		dataInfo.setDelimiter(delimiter);
 	}
 
-	/**
-	 * Define the start coordinate of the first data cell in the data table to be loaded (first non-label cell).
+	/** Define the start coordinate of the first data cell in the data table to be
+	 * loaded (first non-label cell).
+	 * 
 	 * @param dataStartRow - The row index of the first data cell.
-	 * @param dataStartCol - The column index of the first data cell.
-	 */
+	 * @param dataStartCol - The column index of the first data cell. */
 	public void setDataCoords(int dataStartRow, int dataStartCol) {
 
 		dataInfo.setDataStartRow(dataStartRow);
@@ -76,7 +73,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	@Override
 	protected void process(final List<LoadStatus> chunks) {
 
-		/* Update the GUI */
+		// Update the GUI
 		final LoadStatus ls = chunks.get(chunks.size() - 1);
 		WelcomeView.setLoadBarMax(ls.getMaxProgress());
 		WelcomeView.updateLoadBar(ls.getProgress());
@@ -108,15 +105,15 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		ls.setStatus("Loading...");
 
-		/* Read all lines and parse the data */
-		while ((line = reader.readLine()) != null) {
+		// Read all lines and parse the data (creates a String matrix)
+		while((line = reader.readLine()) != null) {
 
 			String[] lineAsStrings = line.split(dataInfo.getDelimiter(), -1);
 
-			if (row_idx < dataInfo.getDataStartRow()) {
+			if(row_idx < dataInfo.getDataStartRow()) {
 				stringLabels[row_idx] = lineAsStrings;
-
-			} else {
+			}
+			else {
 				String[] labels = partitionRow(lineAsStrings, row_idx);
 				stringLabels[row_idx] = labels;
 			}
@@ -145,39 +142,46 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		doubleData = null;
 
-		/* Update GUI, set new DendroView */
+		// Update GUI, set new DendroView
 		controller.finishLoading(dataInfo);
 	}
 
-	/**
-	 * Check the labels for commonly used labels that are useful for TreeView.
-	 */
+	/** Check the labels for commonly used labels that are useful for TreeView. */
 	private void analyzeLabels(String[][] stringLabels) {
 
-		for (int i = 0; i < dataInfo.getDataStartRow(); i++) {
+		for(int i = 0; i < dataInfo.getDataStartRow(); i++) {
 
 			String[] labels = stringLabels[i];
-			for (int j = 0; j < dataInfo.getDataStartCol(); j++) {
-				if ("GID".equalsIgnoreCase(labels[j])) {
+			for(int j = 0; j < dataInfo.getDataStartCol(); j++) {
+				if("GID".equalsIgnoreCase(labels[j])) {
 					hasGID = true;
-				} else if ("AID".equalsIgnoreCase(labels[j])) {
+				}
+				else if("AID".equalsIgnoreCase(labels[j])) {
 					hasAID = true;
-				} else if ("GWEIGHT".equalsIgnoreCase(labels[j])) {
+				}
+				else if("GWEIGHT".equalsIgnoreCase(labels[j])) {
 					hasGWeight = true;
-				} else if ("EWEIGHT".equalsIgnoreCase(labels[j])) {
+				}
+				else if("EWEIGHT".equalsIgnoreCase(labels[j])) {
 					hasEWeight = true;
 				}
 			}
 		}
 	}
 
+	/** Splits a row into labels and data.
+	 * 
+	 * @param lineAsStrings - The line in the file after it has been split into a
+	 *          String array.
+	 * @param row_idx - The index of the current row.
+	 * @return An array of labels of the current row at index row_idx */
 	private String[] partitionRow(final String[] lineAsStrings,
-			final int row_idx) {
+																final int row_idx) {
 
 		// load line as String array
 		final String[] labels = new String[dataInfo.getDataStartCol()];
-		final double[] dataValues = new double[lineAsStrings.length
-				- dataInfo.getDataStartCol()];
+		final double[] dataValues = new double[lineAsStrings.length - dataInfo
+																																					.getDataStartCol()];
 
 		System.arraycopy(lineAsStrings, 0, labels, 0, dataInfo.getDataStartCol());
 
@@ -186,32 +190,26 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		 * readline()!) do not stay in memory. This can and will screw up RAM if
 		 * not done like this.
 		 */
-		for (int i = 0; i < labels.length; i++) {
+		for(int i = 0; i < labels.length; i++) {
 			labels[i] += "";
 		}
 
-		for (int i = 0; i < lineAsStrings.length - dataInfo.getDataStartCol(); i++) {
-
+		for(int i = 0; i < lineAsStrings.length - dataInfo.getDataStartCol(); i++) {
 			String element = lineAsStrings[i + dataInfo.getDataStartCol()];
 
 			/* no data value should ever be a word, so ending with e is
 			 * considered as exponent value notation */
-			if (element.endsWith("e") || element.endsWith("E")) {
+			if(element.endsWith("e") || element.endsWith("E")) {
 				element += "+00";
 			}
 
-			/* Trying to parse the String. If not possible add 0. */
+			// Trying to parse the String. If not possible add defined NAN.
 			try {
 				double val = Double.parseDouble(element);
-				
-//				/* NaN and Infinite treated as non-data values */
-//				if(Double.isNaN(val) || Double.isInfinite(val)) {
-//					val = DataModel.NAN;
-//				} 
-//				
 				dataValues[i] = val;
 
-			} catch (final NumberFormatException e) {
+			}
+			catch(final NumberFormatException e) {
 				dataValues[i] = DataModel.NAN;
 			}
 		}
@@ -223,28 +221,27 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 	private void assignDataToModel(final String[][] stringLabels) {
 
-		/* ----- Tree file and config stuff ---- */
-        LogBuffer.println("Assigning loaded data to model...");
-        
 		// Parse the CDT File
 		/* TODO wrap in try-catch */
 		parseCDT(stringLabels);
 
-		
+
 		// If present, parse ATR File
-		if (hasAID) {
+		if(hasAID) {
 			parseATR();
 
-		} else {
+		}
+		else {
 			LogBuffer.println("No ATR file found for this CDT file.");
 			targetModel.aidFound(false);
 		}
 
 		// If present, parse GTR File
-		if (hasGID) {
+		if(hasGID) {
 			parseGTR();
 
-		} else {
+		}
+		else {
 			LogBuffer.println("No GTR file found for this CDT file.");
 			targetModel.gidFound(false);
 		}
@@ -252,11 +249,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		setConfigData();
 	}
 
-	/**
-	 * Loads or sets up configuration data for the file.
-	 */
+	/** Loads or sets up configuration data for the file. */
 	private void setConfigData() {
-		
+
 		try {
 			final String fileName = targetModel.getFileSet().getRoot();
 			final String fileExt = targetModel.getFileSet().getExt();
@@ -269,18 +264,18 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			final String default_name = "No file.";
 			final String default_ext = "nan";
 
-			/* Look if there's already a node for the file */
+			// Look if there's already a node for the file
 			boolean fileFound = false;
-			if (childrenNodes.length > 0) {
-				for (final String childrenNode : childrenNodes) {
+			if(childrenNodes.length > 0) {
+				for(final String childrenNode : childrenNodes) {
 
-					final String childName = fileNode.node(childrenNode).get(
-							"name", default_name);
-					final String childExt = fileNode.node(childrenNode).get(
-							"extension", default_ext);
+					final String childName = fileNode	.node(childrenNode)
+																						.get("name", default_name);
+					final String childExt = fileNode.node(childrenNode)
+																					.get("extension", default_ext);
 
-					if (childName.equalsIgnoreCase(fileName)
-							&& childExt.equalsIgnoreCase(fileExt)) {
+					if(childName.equalsIgnoreCase(fileName) && childExt
+																															.equalsIgnoreCase(fileExt)) {
 						documentConfig = fileNode.node(childrenNode);
 						fileFound = true;
 						break;
@@ -289,129 +284,130 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			}
 
 			// If no node for the file has been found, add one.
-			if (!fileFound) {
-				documentConfig = fileNode.node("Model"
-						+ (childrenNodes.length + 1));
+			if(!fileFound) {
+				documentConfig = fileNode.node("Model" + (childrenNodes.length + 1));
 				documentConfig.put("name", fileName);
 				documentConfig.put("extension", fileExt);
-				storeDataLoadInfo(documentConfig);
 			}
 
-			LogBuffer.println("Setting model config data: " + documentConfig);
+			storeDataLoadInfo(documentConfig);
 			targetModel.setDocumentConfig(documentConfig);
-
-		} catch (final Exception e) {
+		}
+		catch(final Exception e) {
 			LogBuffer.logException(e);
 			targetModel.setDocumentConfig(null);
 		}
 	}
 
-	/**
-	 * Store load info such as coordinates of first data cell and used delimiter to the supplied node.
-	 * @param node - The node at which the values will be stored.
-	 */
+	/** Store load info such as coordinates of first data cell and used delimiter
+	 * to the supplied node.
+	 * 
+	 * @param node - The node at which the values will be stored. */
 	private void storeDataLoadInfo(Preferences node) {
 
 		node.putBoolean("firstLoad", false);
 		node.put("delimiter", dataInfo.getDelimiter());
 		node.putInt("rowCoord", dataInfo.getDataStartRow());
 		node.putInt("colCoord", dataInfo.getDataStartCol());
+		node.put("rowLabelTypes", dataInfo.getRowLabelTypesAsString());
+		node.put("colLabelTypes", dataInfo.getColLabelTypesAsString());
 	}
 
-	/**
-	 * Parses the label types from the label data collected until
-	 * this point.
+	/** Parses the label types from the label data collected until
+	 * this point. It will set a default value if no labels are present and will
+	 * also create default label types if labels are present in the data, but
+	 * no label types could be found.
 	 *
-	 * @param stringLabels
-	 */
+	 * @param stringLabels - the parsed data lines containing the labels */
 	private void parseLabelTypes(final String[][] stringLabels) {
 
-		LogBuffer.println("Parsing label types.");
-		
-		// lengths of label type arrays
+		// supposed lengths of label type arrays (by selection or detection)
+		// this does NOT indicate whether the label types are present!
 		final int nRowLabelType = dataInfo.getDataStartCol();
 		final int nColLabelType = dataInfo.getDataStartRow();
 
-		final String[] readRowLabelTypes = new String[nRowLabelType];
-		final String[] readColLabelTypes = new String[nColLabelType];
+		String[] readRowLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
+		String[] readColLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
 
-		// read gene label types
-		System.arraycopy(stringLabels[0], 0, readRowLabelTypes, 0, nRowLabelType);
+		// row labels exist, replace single default label type
+		if(nRowLabelType > 0) {
+			readRowLabelTypes = new String[nRowLabelType];
 
-		// read array label types
-		for (int i = 0; i < nColLabelType; i++) {
-			readColLabelTypes[i] = stringLabels[i][0];
+			// may only add row label types if they are present
+			boolean areRowLabelTypesPresent = (dataInfo.getDataStartRow() > 0);
+			if(areRowLabelTypesPresent) {
+				String[] firstDataRow = stringLabels[0];
+				System.arraycopy(firstDataRow, 0, readRowLabelTypes, 0, nRowLabelType);
+			}
 		}
 
-		/*
-		 * The regex assurance is needed because the CDT-format is completely
-		 * inconsistent and we wanna keep backwards compatibility.
-		 */
-		if (readColLabelTypes[0].equalsIgnoreCase("GID")) {
-			readColLabelTypes[0] = assureLabelTypeNames(readRowLabelTypes);
+		// column labels exist, replace single default label type
+		if(nColLabelType > 0) {
+			readColLabelTypes = new String[nColLabelType];
+
+			// may only add column label types if they are present
+			boolean areColLabelTypesPresent = (dataInfo.getDataStartCol() > 0);
+			if(areColLabelTypesPresent) {
+				for(int i = 0; i < nColLabelType; i++) {
+					// do not add known row label types
+					String colLabelType = stringLabels[i][0];
+					if(PreviewLoader.isCommonLabel(colLabelType, PreviewLoader.COMMON_ROW_LABELS)) {
+						continue;
+					}
+					readColLabelTypes[i] = stringLabels[i][0];
+				}
+			}
 		}
-		
-		// Replacing empty or whitespace-only labels
-		replaceEmptyLabels(readRowLabelTypes, "ROW");
-		replaceEmptyLabels(readColLabelTypes, "COLUMN");
-		
+
+		// Replacing empty or whitespace-only label types
+		readRowLabelTypes = replaceEmptyLabelTypes(readRowLabelTypes, "ROW");
+		readColLabelTypes = replaceEmptyLabelTypes(readColLabelTypes, "COLUMN");
+
 		// set the label types
 		targetModel.setRowLabelTypes(readRowLabelTypes);
+		dataInfo.setRowLabelTypes(readRowLabelTypes);
+
 		targetModel.setColumnLabelTypes(readColLabelTypes);
+		dataInfo.setColLabelTypes(readColLabelTypes);
 
 		// set weight status
 		targetModel.setEweightFound(hasEWeight);
 		targetModel.setGweightFound(hasGWeight);
 	}
-	
-	private String[] replaceEmptyLabels(String[] original, final String axis) {
-		
-		Pattern p = Pattern.compile("(^\\s*$)", 
-				Pattern.UNICODE_CHARACTER_CLASS);
-		
-		for(int i = 0; i < original.length; i++) {
-			Matcher m = p.matcher(original[i]);
-			if(m.find()) {
+
+	/** Replaces empty or null values in the label type array with numbered
+	 * defaults.
+	 * 
+	 * @param originalLabelTypes - the array of original (detected label types)
+	 * @param axis - the axis type for the labels (row or column)
+	 * @return an adjusted String array without empty or null values. */
+	private String[] replaceEmptyLabelTypes(String[] originalLabelTypes,
+																					final String axis) {
+
+		String[] newLabelTypes = new String[originalLabelTypes.length];
+		Pattern p = Pattern.compile("(^\\s*$)", Pattern.UNICODE_CHARACTER_CLASS);
+
+		for(int i = 0; i < originalLabelTypes.length; i++) {
+			String oldLabelType = originalLabelTypes[i];
+			// java checks from left to right, so null is handled
+			String newLabelType = oldLabelType;
+			if(oldLabelType == null || p.matcher(oldLabelType).find()) {
 				int idx = i + 1;
-				original[i] = axis + " LABELS " + idx;
+				newLabelType = axis + " LABELS " + idx;
 			}
-		}
-		
-		return original;
-	}
 
-	/**
-	 * Switches out false axis labeling due to inconsistent CDT format.
-	 *
-	 * @param rowLabelTypes - The row label types contain the right label.
-	 * @return The correct label type
-	 */
-	private static String assureLabelTypeNames(final String[] rowLabelTypes) {
-
-		String finalLabelType = "OTHER";
-
-		for (int i = 0; i < rowLabelTypes.length; i++) {
-			if (!rowLabelTypes[i].equalsIgnoreCase("YORF")
-					&& !rowLabelTypes[i].equalsIgnoreCase("GID")
-					&& !rowLabelTypes[i].equalsIgnoreCase("GWEIGHT")) {
-				finalLabelType = rowLabelTypes[i];
-				break;
-			}
+			newLabelTypes[i] = newLabelType;
 		}
 
-		return finalLabelType;
+		return newLabelTypes;
 	}
 
-	/**
-	 * Reads the label types and labels from the data and stores the data in
+	/** Reads the label types and labels from the data and stores the data in
 	 * the TVModel.
 	 *
-	 * @param stringLabels
-	 */
+	 * @param stringLabels */
 	private void parseCDT(final String[][] stringLabels) {
 
-		LogBuffer.println("Parsing for CDT-format..."); 
-		
 		parseLabelTypes(stringLabels);
 
 		// # of labels
@@ -419,28 +415,46 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final int nCols = doubleData[0].length;
 
 		// fill row label array
-		LogBuffer.println("Setting up row labels for the model.");
-		final String[][] rowLabels = new String[nRows][dataInfo.getDataStartCol()];
-		for (int i = 0; i < nRows; i++) {
-			rowLabels[i] = stringLabels[i + dataInfo.getDataStartRow()];
+		String[][] rowLabels;
+		if(dataInfo.getDataStartCol() > 0) {
+			rowLabels = new String[nRows][dataInfo.getDataStartCol()];
+			for(int i = 0; i < nRows; i++) {
+				rowLabels[i] = stringLabels[i + dataInfo.getDataStartRow()];
+			}
 		}
-		
+		else {
+			// default row labels
+			rowLabels = new String[nRows][1];
+			for(int i = 0; i < nRows; i++) {
+				rowLabels[i] = new String[] {"Row " + (i + 1)};
+			}
+		}
+
 		targetModel.setRowLabels(rowLabels);
 
 		// fill column label array
-		LogBuffer.println("Setting up column labels for the model.");
-		final String[][] colLabels = new String[nCols][dataInfo.getDataStartRow()];
-		for (int i = 0; i < dataInfo.getDataStartRow(); i++) {
-			for (int j = 0; j < nCols; j++) {
-				colLabels[j][i] = stringLabels[i][j + dataInfo.getDataStartCol()];
+		final String[][] colLabels;
+		if(dataInfo.getDataStartRow() > 0) {
+			colLabels = new String[nCols][dataInfo.getDataStartRow()];
+			for(int i = 0; i < dataInfo.getDataStartRow(); i++) {
+				for(int j = 0; j < nCols; j++) {
+					colLabels[j][i] = stringLabels[i][j + dataInfo.getDataStartCol()];
+				}
 			}
 		}
-		
+		else {
+			// default column labels
+			colLabels = new String[nCols][1];
+			for(int i = 0; i < nCols; i++) {
+				colLabels[i] = new String[] {"Column " + (i + 1)};
+			}
+		}
+
 		targetModel.setColumnLabels(colLabels);
 
 		targetModel.setExprData(doubleData);
 		targetModel.getDataMatrix().calculateBaseValues();
-		
+
 		LogBuffer.println("Done parsing for CDT-format.");
 	}
 
@@ -449,32 +463,33 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		// First, load the GTR File
 		final List<String[]> gtrData = loadTreeSet(fileSet.getGtr());
 
-		/* In case an gtr file exists but is empty */
-		if (gtrData.isEmpty()) {
+		// In case an gtr file exists but is empty
+		if(gtrData.isEmpty()) {
 			LogBuffer.println("GTR file empty.");
 			targetModel.gidFound(false);
 			return;
 		}
 
 		final String[] firstRow = gtrData.get(0);
-		if ( // decide if this is not an extended file..
+		if( // decide if this is not an extended file..
 		(firstRow.length == 4)// is the length classic?
 				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
 			// okay, need to assign label types...
-			targetModel.setGtrLabelTypes(new String[] { "NODEID", "LEFT", "RIGHT",
-					"CORRELATION" });
+			targetModel.setGtrLabelTypes(new String[] {	"NODEID", "LEFT", "RIGHT",
+																									"CORRELATION"});
 
 			final String[][] gtrLabels = new String[gtrData.size()][];
-			for (int i = 0; i < gtrLabels.length; i++) {
+			for(int i = 0; i < gtrLabels.length; i++) {
 				gtrLabels[i] = gtrData.get(i);
 			}
 			targetModel.setGtrLabels(gtrLabels);
 
-		} else {// first row of tempVector is actual label type names...
+		}
+		else {// first row of tempVector is actual label type names...
 			targetModel.setGtrLabelTypes(firstRow);
 
 			final String[][] gtrLabels = new String[gtrData.size() - 1][];
-			for (int i = 0; i < gtrLabels.length; i++) {
+			for(int i = 0; i < gtrLabels.length; i++) {
 				gtrLabels[i] = gtrData.get(i + 1);
 			}
 			targetModel.setGtrLabels(gtrLabels);
@@ -491,31 +506,32 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final List<String[]> atrData = loadTreeSet(fileSet.getAtr());
 
 		/* In case an atr file exists but is empty */
-		if (atrData.isEmpty()) {
+		if(atrData.isEmpty()) {
 			LogBuffer.println("ATR file empty.");
 			targetModel.aidFound(false);
 			return;
 		}
 
 		final String[] firstRow = atrData.get(0);
-		if ( // decide if this is not an extended file..
+		if( // decide if this is not an extended file..
 		(firstRow.length == 4)// is the length classic?
 				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
 
 			// okay, need to assign label types...
-			targetModel.setAtrLabelTypes(new String[] { "NODEID", "LEFT", "RIGHT",
-					"CORRELATION" });
+			targetModel.setAtrLabelTypes(new String[] {	"NODEID", "LEFT", "RIGHT",
+																									"CORRELATION"});
 
 			final String[][] atrLabels = new String[atrData.size()][];
-			for (int i = 0; i < atrLabels.length; i++) {
+			for(int i = 0; i < atrLabels.length; i++) {
 				atrLabels[i] = atrData.get(i);
 			}
 			targetModel.setAtrLabels(atrLabels);
-		} else {// first row of tempVector is actual label type names...
+		}
+		else {// first row of tempVector is actual label type names...
 			targetModel.setAtrLabelTypes(firstRow);
 
 			final String[][] atrLabels = new String[atrData.size() - 1][];
-			for (int i = 0; i < atrLabels.length; i++) {
+			for(int i = 0; i < atrLabels.length; i++) {
 				atrLabels[i] = atrData.get(i + 1);
 			}
 			targetModel.setAtrLabels(atrLabels);
@@ -532,8 +548,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		try {
 			// Read data from specified file location
-			final BufferedReader br = new BufferedReader(new FileReader(
-					loadingSet));
+			final BufferedReader br = new BufferedReader(new FileReader(loadingSet));
 
 			// Get data from file into String and double arrays
 			// Put the arrays in ArrayLists for later access.
@@ -541,7 +556,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			br.close();
 
-		} catch (final IOException e) {
+		}
+		catch(final IOException e) {
 			LogBuffer.logException(e);
 			return new ArrayList<String[]>();
 		}
@@ -555,24 +571,23 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		String line;
 
 		try {
-			while ((line = reader.readLine()) != null) {
+			while((line = reader.readLine()) != null) {
 
 				// load line as String array
 				final String[] lineAsStrings = line.split("\\t", -1);
 				treeData.add(lineAsStrings);
 			}
-		} catch (final IOException e) {
-			LogBuffer.println("IOException during the "
-					+ "extraction of GTR file: " + e.getMessage());
+		}
+		catch(final IOException e) {
+			LogBuffer.println("IOException during the " +	"extraction of GTR file: " +
+												e.getMessage());
 		}
 
 		return treeData;
 	}
 
-	/**
-	 * Encapsulates loading progress, so both label and progress bar can be
-	 * updated using publish() and only one SwingWorker.
-	 */
+	/** Encapsulates loading progress, so both label and progress bar can be
+	 * updated using publish() and only one SwingWorker. */
 	public static class LoadStatus {
 
 		private int progress;

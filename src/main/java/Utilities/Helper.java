@@ -159,4 +159,31 @@ public final class Helper {
 
 		return joint;
 	}
+	
+	/** Preferences nodes can only store String arrays as a single string.
+	 * This method is a helper used to convert such strings back to an array
+	 * by removing brackets, spaces, and splitting the String up at commas.
+	 * 
+	 * @param keyString - A String object, should be a single String
+	 *          representing comma-separated String array.
+	 * @return An array of Strings */
+	public static String[] getStringValuesFromKeyString(final String keyString) {
+
+		String[] storedVals = keyString	.replaceAll("\\[", "").replaceAll("\\]", "")
+																		.split(",");
+
+		/* No stored values case. Previous code will create a String array of
+		 * size 1 (empty string) if "[]" was stored in Preferences node, but
+		 * we need an empty String array */
+		if(storedVals.length == 1 && storedVals[0]
+																							.equals("")) { return new String[0]; }
+
+		/* Strings may have spaces within them, so extra trimming here. */
+		for(int i = 0; i < storedVals.length; i++) {
+			String s = storedVals[i];
+			storedVals[i] = s.trim();
+		}
+
+		return storedVals;
+	}
 }
