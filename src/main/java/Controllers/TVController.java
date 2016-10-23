@@ -39,10 +39,10 @@ import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialogController;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.RowListMaker;
 import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.RowListMaker;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
@@ -315,7 +315,6 @@ public class TVController implements Observer {
 
 			final ModelLoader loader = new ModelLoader(tvModel, this, dataInfo);
 			loader.execute();
-
 		}
 		catch(final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. " +
@@ -372,20 +371,11 @@ public class TVController implements Observer {
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], message, "Alert", JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + message);
 
-			/* Set model status, which will update the view. */
+			// Set model status, which will update the view.
 			((TVModel) model).setLoaded(false);
 
 			//Bring the user back to the load dialog to try again or cancel load
-			DataLoadInfo importedDataInfo = useImportDialog(loadingFile);
-
-			if(importedDataInfo != null) {
-				loadData(loadingFile, importedDataInfo);
-
-			}
-			else {
-				String msg = "Data loading was interrupted.";
-				LogBuffer.println(msg);
-			}
+			openFile(null, true);
 		}
 
 		addViewListeners();
@@ -571,7 +561,7 @@ public class TVController implements Observer {
 		}
 		else {
 			LogBuffer.println("Loading with info from existing node.");
-			dataInfo = getDataLoadInfo(newFileSet, oldNode);
+			dataInfo = getStoredDataLoadInfo(newFileSet, oldNode);
 		}
 
 		if(dataInfo == null) {
@@ -605,7 +595,7 @@ public class TVController implements Observer {
 		importController.initDialog();
 
 		/* Auto run before showing dialog */
-		importController.detectDataBoundaries();
+		importController.detectDataBoundaries(null);
 
 		DataLoadInfo dataInfo = loadPreview.showDialog();
 
@@ -614,22 +604,40 @@ public class TVController implements Observer {
 
 	/** Load stored info for a specific file.
 	 * 
-	 * @param fileSet The FileSet for the file to be loaded.
-	 * @return A DataLoadInfo object which contains information relevant for
-	 *         setting up the DataLoadDialog. */
-	public static DataLoadInfo getDataLoadInfo(	FileSet fileSet,
-																							Preferences node) {
+	 * @param fileSet The <code>FileSet</code> for the file to be loaded.
+	 * @return A <code>DataLoadInfo</code> object which contains information
+	 *         relevant for setting up the <code>DataLoadDialog</code>. */
+	public static DataLoadInfo getStoredDataLoadInfo(	final FileSet fileSet,
+																										final Preferences node) {
 
-		DataLoadInfo dataInfo;
-		String delimiter = node.get("delimiter", DataLoadInfo.DEFAULT_DELIM);
+		DataLoadInfo dataInfo = new DataLoadInfo(node);
 
 		// Amount of label types may vary when loading, so they have to be re-detected
-		DataImportController importController = new DataImportController(delimiter);
+		DataImportController importController = new DataImportController(dataInfo
+																																							.getDelimiter());
 		importController.setFileSet(fileSet);
 
-		int[] dataCoords = importController.detectDataBoundaries();
-		dataInfo = new DataLoadInfo(dataCoords, delimiter);
-		dataInfo.setOldNode(node);
+		// FIXME detection does not work
+		int[] newDataCoords = importController.detectDataBoundaries(dataInfo);
+
+		// the number of label types may have been altered, e.g. by clustering
+		if(dataInfo.needsDataCoordsUpdate(newDataCoords)) {
+			LogBuffer.println("Data start coordinates have shifted because more " +
+												"label types were added.");
+			dataInfo.setDataStartCoords(newDataCoords);
+
+			/* prevent old node from updating coordinates unless fileSet represents
+			 * the exact same file as the node. In this case coordinates need to 
+			 * be updated here, as found by dataInfo.needsDataCoordsUpdate() but
+			 * otherwise the new coordinates are unrelated to the old node! */
+			String oldFileName = node.get("name", "") + node.get("extension", "");
+			String newFileName = fileSet.getRoot() + fileSet.getExt();
+
+			if(oldFileName.equals(newFileName)) {
+				node.putInt("rowCoord", newDataCoords[0]);
+				node.putInt("colCoord", newDataCoords[1]);
+			}
+		}
 
 		return dataInfo;
 	}
@@ -936,6 +944,8 @@ public class TVController implements Observer {
 	 * option using a string as identification.
 	 *
 	 * @param menu - The type of opened menu distinguished by its String name. */
+	@SuppressWarnings("unused") // LabelSettingsController doesn't need to be stored in a variable
+
 	public void openLabelMenu(final String menu) {
 
 		final LabelSettings labelSettingsView = new LabelSettings(tvFrame);
@@ -953,6 +963,8 @@ public class TVController implements Observer {
 	 * option using a string as identification.
 	 *
 	 * @param menu */
+	@SuppressWarnings("unused") // ExportDialogController doesn't need to be stored in a variable
+
 	public void openExportMenu() {
 
 		if(tvFrame.getDendroView() == null || !tvFrame.isLoaded()) {

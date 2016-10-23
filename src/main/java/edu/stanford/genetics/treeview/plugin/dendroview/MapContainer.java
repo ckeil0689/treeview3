@@ -1,8 +1,9 @@
-/* BEGIN_HEADER                                                   TreeView 3
+/*
+ * BEGIN_HEADER TreeView 3
  *
  * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * END_HEADER 
+ * END_HEADER
  */
 
 package edu.stanford.genetics.treeview.plugin.dendroview;
@@ -21,14 +22,13 @@ import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
 
-/**
- * MapContainers tell the views which pixel offset to draw each array or gene
+/** MapContainers tell the views which pixel offset to draw each array or gene
  * index at the scrollbars "scroll" by communicating with the maps.
  *
- * This is distinct from which genes are selected (see the TreeSelection object)
- */
+ * This is distinct from which genes are selected (see the TreeSelection
+ * object) */
 public class MapContainer extends Observable implements Observer,
-		AdjustmentListener, ConfigNodePersistent {
+	AdjustmentListener, ConfigNodePersistent {
 
 	/*
 	 * TODO Should remove MIN_TILE_NUM as per the discussion on bitbucket issue
@@ -36,10 +36,10 @@ public class MapContainer extends Observable implements Observer,
 	 * instead of bouncing back as it is currently doing... related to
 	 * calculation in zoomToSelected()
 	 */
-	private static final double MIN_TILE_NUM        = 1.0;
-	private static final double ZOOM_INCREMENT      = 0.05;
+	private static final double MIN_TILE_NUM = 1.0;
+	private static final double ZOOM_INCREMENT = 0.05;
 	private static final double ZOOM_INCREMENT_FAST = 0.15;
-	
+
 	public static final int ZOOM_DEFAULT = 0;
 	public static final int ZOOM_FAST = 1;
 	public static final int ZOOM_SLOW = 2;
@@ -47,17 +47,17 @@ public class MapContainer extends Observable implements Observer,
 
 	private final int default_map = IntegerMap.FIXED;
 	private double default_scale = 1.0;
-	private double  minScale;
+	private double minScale;
 	private IntegerMap current = null;
-	private final String     mapName;
+	private final String mapName;
 
 	private FixedMap fixedMap = null;
-	private FillMap  fillMap  = null;
-	private NullMap  nullMap  = null;
+	private FillMap fillMap = null;
+	private NullMap nullMap = null;
 
-	private JScrollBar     scrollbar  = null;
-	private TreeDrawerNode selected   = null;
-	private Preferences    configNode = null;
+	private JScrollBar scrollbar = null;
+	private TreeDrawerNode selected = null;
+	private Preferences configNode = null;
 
 	private double tileNumVisible;
 
@@ -69,32 +69,32 @@ public class MapContainer extends Observable implements Observer,
 	//track the first and last visible labels (controlled by LabelView) so that
 	//it can be used in other classes (e.g. for matching the trees to the
 	//labels)
-	private int firstVisibleLabel       = -1;
-	private int lastVisibleLabel        = -1;
+	private int firstVisibleLabel = -1;
+	private int lastVisibleLabel = -1;
 	private int firstVisibleLabelOffset = 0;
-	private int lastVisibleLabelOffset  = 0;
+	private int lastVisibleLabelOffset = 0;
 
 	//Track the explicitly manipulated visible labels. These can change as a
 	//result of a scroll in the label pane
-	private boolean overLabels            = false;
-	private boolean overLabelsScrollbar   = false;
+	private boolean overLabels = false;
+	private boolean overLabelsScrollbar = false;
 	private boolean overInteractiveMatrix = false;
-	private boolean overTree              = false;
-	private boolean overDivider           = false;
-	private boolean draggingDivider       = false;
-	private boolean labelsBeingScrolled   = false;
-	private boolean lastTreeModeGlobal    = true;
-	private boolean keepTreeGlobal        = true;
-	private int     hoverPixel            = -1;
-	private int     hoverIndex            = -1;
-	private int     hoverTreeMinIndex     = -1;
-	private int     hoverTreeMaxIndex     = -1;
-	private boolean hoverChanged          = false;
-	private boolean selecting             = false;
-	private boolean toggling              = false;
-	private boolean deselecting           = false;
-	private int     selectingStart        = -1;
-	private boolean whizMode              = false;
+	private boolean overTree = false;
+	private boolean overDivider = false;
+	private boolean draggingDivider = false;
+	private boolean labelsBeingScrolled = false;
+	private boolean lastTreeModeGlobal = true;
+	private boolean keepTreeGlobal = true;
+	private int hoverPixel = -1;
+	private int hoverIndex = -1;
+	private int hoverTreeMinIndex = -1;
+	private int hoverTreeMaxIndex = -1;
+	private boolean hoverChanged = false;
+	private boolean selecting = false;
+	private boolean toggling = false;
+	private boolean deselecting = false;
+	private int selectingStart = -1;
+	private boolean whizMode = false;
 
 	//These allow modifier keys in the label/tree areas to reveal the row/col
 	//highlight bar
@@ -129,16 +129,16 @@ public class MapContainer extends Observable implements Observer,
 	@Override
 	public void setConfigNode(final Preferences parentNode) {
 
-		if (parentNode == null) {
-			LogBuffer.println("Could not find or create MapContainer "
-					+ "node because parentNode was null.");
+		if(parentNode == null) {
+			LogBuffer.println("Could not find or create MapContainer " +
+												"node because parentNode was null.");
 			return;
 		}
-		
+
 		this.configNode = parentNode.node(mapName);
 		setupMaps();
 	}
-	
+
 	@Override
 	public Preferences getConfigNode() {
 
@@ -153,40 +153,38 @@ public class MapContainer extends Observable implements Observer,
 					+ " was null.");
 			return;
 		}
-		
 		importStateFrom(configNode);
 	}
 
 	@Override
 	public void storeState() {
-		
-		if (configNode == null) {
-			LogBuffer.println("Unable to store MapContainer state. ConfigNode"
-					+ " was null.");
+
+		if(configNode == null) {
+			LogBuffer.println("Unable to store MapContainer state. ConfigNode" +
+												" was null.");
 			return;
 		}
-		
+
 		configNode.putInt("current", current.type());
 		configNode.putDouble("scale", current.getScale());
 	}
-	
+
 	@Override
 	public void importStateFrom(final Preferences oldNode) {
-		
+
 		if(oldNode == null) {
-			LogBuffer.println("Could not import from undefined node in " + this.getClass().getName() + ".");
+			LogBuffer.println("Could not import from undefined node in " 
+				+ this.getClass().getName() + ".");
 			return;
 		}
 		
 		setMap(oldNode.getInt("current", default_map));
 		setScale(oldNode.getDouble("scale", default_scale));
 	}
-	
-	/**
-	 * Reset the MapContainer state to a default.
-	 */
+
+	/** Reset the MapContainer state to a default. */
 	public void resetDefaultState() {
-		
+
 		this.tileNumVisible = getTotalTileNum();
 		this.numVisible = getTotalTileNum();
 		this.firstVisible = getMinIndex();
@@ -194,34 +192,33 @@ public class MapContainer extends Observable implements Observer,
 		this.lastVisibleLabel = getMaxIndex();
 		this.firstVisibleLabelOffset = -1;
 		this.lastVisibleLabelOffset = -1;
-		
-		this.overLabels            = false;
-		this.overLabelsScrollbar   = false;
+
+		this.overLabels = false;
+		this.overLabelsScrollbar = false;
 		this.overInteractiveMatrix = false;
-		this.overTree              = false;
-		this.overDivider           = false;
-		this.draggingDivider       = false;
-		this.labelsBeingScrolled   = false;
-		this.lastTreeModeGlobal    = true;
-		this.keepTreeGlobal        = true;
-		this.hoverPixel            = -1;
-		this.hoverIndex            = -1;
-		this.hoverTreeMinIndex     = -1;
-		this.hoverTreeMaxIndex     = -1;
-		this.hoverChanged          = false;
-		this.selecting             = false;
-		this.toggling              = false;
-		this.deselecting           = false;
-		this.selectingStart        = -1;
-		this.whizMode              = false;
-		
+		this.overTree = false;
+		this.overDivider = false;
+		this.draggingDivider = false;
+		this.labelsBeingScrolled = false;
+		this.lastTreeModeGlobal = true;
+		this.keepTreeGlobal = true;
+		this.hoverPixel = -1;
+		this.hoverIndex = -1;
+		this.hoverTreeMinIndex = -1;
+		this.hoverTreeMaxIndex = -1;
+		this.hoverChanged = false;
+		this.selecting = false;
+		this.toggling = false;
+		this.deselecting = false;
+		this.selectingStart = -1;
+		this.whizMode = false;
 	}
 	
 	/**
 	 * Attaches Preferences node to all map objects and sets their specific type.
 	 */
 	private void setupMaps() {
-		
+
 		// first bind subordinate maps...
 		fixedMap.setConfigNode(configNode);
 		fixedMap.setType(IntegerMap.FIXED);
@@ -232,50 +229,44 @@ public class MapContainer extends Observable implements Observer,
 		nullMap.setConfigNode(configNode);
 		nullMap.setType(IntegerMap.NULL);
 	}
-	
+
 	@Override
 	public String toString() {
-		
+
 		String mapInfo;
-		mapInfo = "FirstVisible: " + firstVisible + "; numVisible: " 
-				+ numVisible + "; Scale: " + getScale() + "; tileNumVisible: " 
-				+ getTileNumVisible();
-		
+		mapInfo = "FirstVisible: " +	firstVisible + "; numVisible: " + numVisible +
+							"; Scale: " + getScale() + "; tileNumVisible: " +
+							getTileNumVisible();
+
 		return mapInfo;
 	}
 
-	/**
-	 * Sets the MapContainer's scale back to the default value.
+	/** Sets the MapContainer's scale back to the default value.
 	 *
-	 * @param d
-	 */
+	 * @param d */
 	public void setDefaultScale(final double d) {
 
 		this.default_scale = d;
 		fixedMap.setDefaultScale(d);
 	}
 
-	/**
-	 * Resets the MapContainer so that it completely fills out the available
-	 * screen space.
-	 */
+	/** Resets the MapContainer so that it completely fills out the available
+	 * screen space. */
 	public void setMinScale() {
 
 		this.tileNumVisible = getTotalTileNum();
 		this.minScale = getCalculatedMinScale();
 		setFirstVisible(0);
 		setNumVisible(getTotalTileNum());
-		
+
 		setScale(minScale);
 		notifyObservers();
 	}
 
-	/**
-	 * Sets the scale of this MapContainer to the last saved value. The 
+	/** Sets the scale of this MapContainer to the last saved value. The
 	 * value needs to be the tile number that is visible on screen. The actual
 	 * scale value does not apply if the screen size changed since that would
-	 * mean that too few or too many tiles might be visible.
-	 */
+	 * mean that too few or too many tiles might be visible. */
 	public void setLastScale() {
 
 		if(configNode != null) {
@@ -286,67 +277,57 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
-	/**
-	 * Calculates how many pixels this side of a tile is long so that all tiles
+	/** Calculates how many pixels this side of a tile is long so that all tiles
 	 * can be fir onto the screen (minimum scale). It is based on the
-	 * available screen space. 
-	 * @return The length of a tile's side such that all tiles fit 
-	 * on the screen.
-	 */
+	 * available screen space.
+	 * 
+	 * @return The length of a tile's side such that all tiles fit
+	 *         on the screen. */
 	public double getCalculatedMinScale() {
 
-		final double pixels  = getAvailablePixels();
+		final double pixels = getAvailablePixels();
 		final double divider = getMaxIndex() - getMinIndex() + 1;
-		
-		return (pixels/ divider);
+
+		return(pixels / divider);
 	}
-	
-	/**
-	 * Tests whether all data tiles for this MapContainer are visible.
-	 * @return True if all tiles are visible, false otherwise.
-	 */
+
+	/** Tests whether all data tiles for this MapContainer are visible.
+	 * 
+	 * @return True if all tiles are visible, false otherwise. */
 	public boolean showsAllTiles() {
-		
+
 		return getTotalTileNum() == getNumVisible();
 	}
 
-	/**
-	 * This method allows for a more intuitive call from other classes so
+	/** This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
-	 * and set first.
-	 */
+	 * and set first. */
 	public void zoomOutBegin() {
-		
+
 		incrementalZoom(false, true, true);
 	}
 
-	/**
-	 * This method allows for a more intuitive call from other classes so
+	/** This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
-	 * and set first.
-	 */
+	 * and set first. */
 	public void zoomInBegin() {
-		
+
 		incrementalZoom(true, true, true);
 	}
 
-	/**
-	 * This method allows for a more intuitive call from other classes so
+	/** This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
-	 * and set first.
-	 */
+	 * and set first. */
 	public void zoomOutEnd() {
-		
+
 		incrementalZoom(false, false, true);
 	}
 
-	/**
-	 * This method allows for a more intuitive call from other classes so
+	/** This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
-	 * and set first.
-	 */
+	 * and set first. */
 	public void zoomInEnd() {
-		
+
 		incrementalZoom(true, false, true);
 	}
 
@@ -361,28 +342,28 @@ public class MapContainer extends Observable implements Observer,
 		this.tileNumVisible = Math.round(getAvailablePixels() / getScale());
 
 		switch(speed) {
-		
-		case ZOOM_SLOW: 
-			zoomVal = 2;
-			break;
-		case ZOOM_FAST:
-			zoomVal = (int) Math.round(ZOOM_INCREMENT_FAST * tileNumVisible);
-			break;
-		case ZOOM_SLAM:
-			zoomVal = getTotalTileNum() - (int) Math.round(tileNumVisible);
-			break;
-		default:
-			zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
-		
+
+			case ZOOM_SLOW:
+				zoomVal = 2;
+				break;
+			case ZOOM_FAST:
+				zoomVal = (int) Math.round(ZOOM_INCREMENT_FAST * tileNumVisible);
+				break;
+			case ZOOM_SLAM:
+				zoomVal = getTotalTileNum() - (int) Math.round(tileNumVisible);
+				break;
+			default:
+				zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
+
 		}
 
 		// Ensure that at least one tile will be zoomed out.
-		if (zoomVal < 2) {
+		if(zoomVal < 2) {
 			zoomVal = 2;
 		}
 
 		tileNumVisible = tileNumVisible + zoomVal;
-		if (tileNumVisible > (getTotalTileNum())) {
+		if(tileNumVisible > (getTotalTileNum())) {
 			tileNumVisible = getTotalTileNum();
 		}
 
@@ -394,7 +375,7 @@ public class MapContainer extends Observable implements Observer,
 		//Ensure that the difference between the previous number visible and the
 		//new number visible is even
 		if((numVisible - prevNumVisible) % 2 == 1 &&
-		   numVisible < (getTotalTileNum())) {
+				numVisible < (getTotalTileNum())) {
 			setNumVisible(numVisible + 1);
 			tileNumVisible += 1;
 		}
@@ -402,13 +383,13 @@ public class MapContainer extends Observable implements Observer,
 		newScale = getAvailablePixels() / tileNumVisible;
 
 		final double myMinScale = getCalculatedMinScale();
-		if (newScale < myMinScale) {
+		if(newScale < myMinScale) {
 			newScale = myMinScale;
 		}
 		setScale(newScale);
 
-		int newFirstVisible = initialFirstVisible -
-			(numVisible - prevNumVisible) / 2;
+		int newFirstVisible = initialFirstVisible - (numVisible - prevNumVisible) /
+																								2;
 		if((newFirstVisible + numVisible) > (getTotalTileNum())) {
 			newFirstVisible = (getTotalTileNum()) - numVisible;
 		}
@@ -422,8 +403,7 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
-	/**
-	 * Method to zoom in the MapContainer and set the scale for drawing. 
+	/** Method to zoom in the MapContainer and set the scale for drawing.
 	 * It's important to take the range of elements displayed on
 	 * screen (range of scrollbar -> visibleAmount()) into account, as well as
 	 * the amount of available pixels on screen. Otherwise there will be drawing
@@ -431,10 +411,9 @@ public class MapContainer extends Observable implements Observer,
 	 *
 	 * @param boolean zoomsIn Tells the method if it should zoom in or out.
 	 * @param boolean zoomsIn Tells the method if it should fix the beginning
-	 *        (e.g. left/top) or end (e.g. right/bottom).
-	 */
-	private void incrementalZoom(boolean zoomsIn, boolean beginFixed,
-			boolean hardFixed) {
+	 *          (e.g. left/top) or end (e.g. right/bottom). */
+	private void incrementalZoom(	boolean zoomsIn, boolean beginFixed,
+																boolean hardFixed) {
 
 		int zoomVal;
 		double newScale = getScale();
@@ -453,39 +432,35 @@ public class MapContainer extends Observable implements Observer,
 		zoomVal = (int) Math.round(tileNumVisible * ZOOM_INCREMENT);
 
 		// Ensure that at least one tile will be zoomed out.
-		if (zoomVal < 1) {
+		if(zoomVal < 1) {
 			zoomVal = 1;
 		}
 
 		if(zoomsIn) {
 			tileNumVisible -= zoomVal;
-			if (tileNumVisible < 1) {
+			if(tileNumVisible < 1) {
 				tileNumVisible = 1;
 			}
-		} else {
+		}
+		else {
 			//Don't add columns on the side that is fixed
 			if(hardFixed) {
 				if(beginFixed) {
-					if(zoomVal > ((getTotalTileNum()) -
-						(firstVisible + numVisible))) {
+					if(zoomVal > ((getTotalTileNum()) - (firstVisible + numVisible))) {
 
-						zoomVal = (getTotalTileNum()) -
-							(firstVisible + numVisible);
-						if(zoomVal <= 0) {
-							return;
-						}
+						zoomVal = (getTotalTileNum()) - (firstVisible + numVisible);
+						if(zoomVal <= 0) { return; }
 					}
-				} else {
+				}
+				else {
 					if(zoomVal > firstVisible) {
 						zoomVal = firstVisible;
-						if(zoomVal <= 0) {
-							return;
-						}
+						if(zoomVal <= 0) { return; }
 					}
 				}
 			}
 			tileNumVisible += zoomVal;
-			if (tileNumVisible > (getTotalTileNum())) {
+			if(tileNumVisible > (getTotalTileNum())) {
 				tileNumVisible = getTotalTileNum();
 			}
 		}
@@ -500,12 +475,13 @@ public class MapContainer extends Observable implements Observer,
 		final double limitScale;
 		if(zoomsIn) {
 			limitScale = getAvailablePixels();
-			if (newScale > limitScale) {
+			if(newScale > limitScale) {
 				newScale = limitScale;
 			}
-		} else {
+		}
+		else {
 			limitScale = getCalculatedMinScale();
-			if (newScale < limitScale) {
+			if(newScale < limitScale) {
 				newScale = limitScale;
 			}
 		}
@@ -530,31 +506,31 @@ public class MapContainer extends Observable implements Observer,
 		if(tileNumVisible > (getTotalTileNum())) {
 			tileNumVisible = getTotalTileNum();
 		}
-		
+
 		switch(speed) {
-		
-		case ZOOM_SLOW: 
-			zoomVal = 2;
-			break;
-		case ZOOM_FAST:
-			zoomVal = (int) Math.round(ZOOM_INCREMENT_FAST * tileNumVisible);
-			break;
-		case ZOOM_SLAM:
-			zoomVal = (int) Math.round(tileNumVisible) - 1;
-			break;
-		default:
-			zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
-	
+
+			case ZOOM_SLOW:
+				zoomVal = 2;
+				break;
+			case ZOOM_FAST:
+				zoomVal = (int) Math.round(ZOOM_INCREMENT_FAST * tileNumVisible);
+				break;
+			case ZOOM_SLAM:
+				zoomVal = (int) Math.round(tileNumVisible) - 1;
+				break;
+			default:
+				zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
+
 		}
 
 		//Ensure that at least 2 tiles will be zoomed in (1 on each side of the
 		//current zoom dimension).
-		if (zoomVal < 2) {
+		if(zoomVal < 2) {
 			zoomVal = 2;
 		}
 
 		tileNumVisible = tileNumVisible - zoomVal;
-		if (tileNumVisible < 1) {
+		if(tileNumVisible < 1) {
 			tileNumVisible = 1;
 		}
 
@@ -574,7 +550,7 @@ public class MapContainer extends Observable implements Observer,
 		newScale = getAvailablePixels() / tileNumVisible;
 
 		final double myMaxScale = getAvailablePixels();
-		if (newScale > myMaxScale) {
+		if(newScale > myMaxScale) {
 			newScale = myMaxScale;
 		}
 		setScale(newScale);
@@ -598,14 +574,13 @@ public class MapContainer extends Observable implements Observer,
 	//getZoomTowardPixelOfSelection and zoomTowardPixel
 	//smoothZoomTowardSelection resides in GlobalView instead of here because it
 	//keeps track of the aspect ratio, needing info on both dimensions
-	public int zoomToward(int firstIndex,int numIndexes) {
+	public int zoomToward(int firstIndex, int numIndexes) {
 		int updateAspectRatio = 0;
 		//Catch errors - If num indexes is less than 1 or greater than the
 		//number of pixels available
-		if(numIndexes < 1 || numIndexes > getAvailablePixels() ||
-		   firstIndex < 0 || (firstIndex + numIndexes - 1) > getMaxIndex()) {
-			return(updateAspectRatio);
-		}
+		if(numIndexes < 1 ||	numIndexes > getAvailablePixels() || firstIndex < 0 ||
+				(firstIndex +	numIndexes -
+					1) > getMaxIndex()) { return(updateAspectRatio); }
 
 		int initialFirstVisible = firstVisible;
 		double newScale = getScale();
@@ -617,12 +592,12 @@ public class MapContainer extends Observable implements Observer,
 		zoomVal = (int) Math.round(ZOOM_INCREMENT * tileNumVisible);
 		// Ensure that at least 2 tiles will be zoomed in (1 on each side of the
 		//current zoom dimension).
-		if (zoomVal < 2) {
+		if(zoomVal < 2) {
 			zoomVal = 2;
 		}
 
 		tileNumVisible = tileNumVisible - zoomVal;
-		if (tileNumVisible < 1) {
+		if(tileNumVisible < 1) {
 			tileNumVisible = 1;
 		}
 
@@ -638,7 +613,7 @@ public class MapContainer extends Observable implements Observer,
 			tileNumVisible -= 1;
 		}
 
-		if (tileNumVisible < numIndexes) {
+		if(tileNumVisible < numIndexes) {
 			tileNumVisible = numIndexes;
 			setNumVisible(numIndexes);
 		}
@@ -647,7 +622,7 @@ public class MapContainer extends Observable implements Observer,
 		newScale = getAvailablePixels() / tileNumVisible;
 
 		final double myMaxScale = getAvailablePixels();
-		if (newScale > myMaxScale) {
+		if(newScale > myMaxScale) {
 			newScale = myMaxScale;
 		}
 		setScale(newScale);
@@ -655,8 +630,9 @@ public class MapContainer extends Observable implements Observer,
 		int newFirstVisible = 0;
 		if(numIndexes == numVisible) {
 			newFirstVisible = firstIndex;
-			
-		} else {
+
+		}
+		else {
 			int diff = numVisible - numIndexes;
 
 			//If the difference is odd and greater than 2, the selection isn't
@@ -677,15 +653,16 @@ public class MapContainer extends Observable implements Observer,
 				newFirstVisible = firstIndex;
 			}
 			//Else if the last visible index is inside the target area
-			else if((initialFirstVisible + prevNumVisible - 1) <
-			        (firstIndex + numIndexes - 1)) {
+			else if((initialFirstVisible + prevNumVisible - 1) < (firstIndex +
+																														numIndexes - 1)) {
 				newFirstVisible = (firstIndex + numIndexes) - numVisible;
 			}
 			//If the left/top side is closer than or equal to half the
 			//difference in area sizes
 			else if((firstIndex - initialFirstVisible) <= (diff / 2) &&
-					((initialFirstVisible + prevNumVisible - 1) -
-					 (firstIndex + numIndexes - 1)) > (diff / 2)) {
+							((initialFirstVisible + prevNumVisible - 1) - (firstIndex +
+																															numIndexes - 1)) > (diff /
+																																									2)) {
 				newFirstVisible = initialFirstVisible;
 				//LogBuffer.println("zoomToward: Left/top is remaining fixed.");
 
@@ -693,14 +670,17 @@ public class MapContainer extends Observable implements Observer,
 			}
 			//If the right/bottom side is closer than or equal to half the
 			//difference in area sizes
-			else if(((initialFirstVisible + prevNumVisible - 1) -
-			         (firstIndex + numIndexes - 1)) <= (diff / 2) &&
-					(firstIndex - initialFirstVisible) > (diff / 2)) {
+			else if(((initialFirstVisible + prevNumVisible - 1) - (firstIndex +
+																															numIndexes -
+																															1)) <= (diff /
+																																			2) &&
+							(firstIndex - initialFirstVisible) > (diff / 2)) {
 				newFirstVisible = (initialFirstVisible + prevNumVisible - 1) -
-					numVisible + 1;
+													numVisible + 1;
 
 				updateAspectRatio = 1;
-			} else {
+			}
+			else {
 				newFirstVisible = firstIndex - diff / 2;
 			}
 		}
@@ -711,25 +691,22 @@ public class MapContainer extends Observable implements Observer,
 		return(updateAspectRatio);
 	}
 
-	/**
-	 * TODO: Make customZoomVal required (no ability to supply -1) and strip out
+	/** TODO: Make customZoomVal required (no ability to supply -1) and strip out
 	 * the code that picks the zoom value - this has been replaced with
-	 * getBestZoomIn/OutVal. Merge with zoomAwayPixel.
-	 */
+	 * getBestZoomIn/OutVal. Merge with zoomAwayPixel. */
 	//This function smoothly zooms while trying to keep the dot the cursor is
 	//currently over under the cursor.  Some of the code is generalized in case
 	//it's ever called with a value out of range
 	//Set customZoomVal to a negative number (e.g. -1) to dynamically determine
 	//the zoomVal based on a 5% zoom increment
-	public int zoomTowardPixel(int pixelPos,int customZoomVal) {
-		
+	public int zoomTowardPixel(int pixelPos, int customZoomVal) {
+
 		int updateAspectRatio = 0;
 		int firstIndex = getIndex(pixelPos);
 		//Catch errors - If num indexes is less than 1 or greater than the
 		//number of pixels available
-		if(firstIndex < 0 || firstIndex > getMaxIndex()) {
-			return(updateAspectRatio);
-		}
+		if(firstIndex < 0 ||
+				firstIndex > getMaxIndex()) { return(updateAspectRatio); }
 
 		int dotOver = getIndex(pixelPos);
 		int initialFirstVisible = firstVisible;
@@ -751,8 +728,8 @@ public class MapContainer extends Observable implements Observer,
 		//aspect ratios (see GlobalView)),
 		//select the best zoom value to make the zooming as smooth as possible
 		else if(customZoomVal < 0 && tileNumVisible > 15) {
-			zoomVal = getBestZoomInVal(pixelPos,targetZoomFrac);
-			if (zoomVal < 1) {
+			zoomVal = getBestZoomInVal(pixelPos, targetZoomFrac);
+			if(zoomVal < 1) {
 				zoomVal = 1;
 			}
 		}
@@ -760,14 +737,14 @@ public class MapContainer extends Observable implements Observer,
 		else {
 			zoomVal = (int) Math.round(tileNumVisible * targetZoomFrac);
 
-			if (zoomVal < 1) {
+			if(zoomVal < 1) {
 				zoomVal = 1;
 			}
 		}
 
 		//Make sure we're left with at least 1 dot on the screen
 		tileNumVisible = tileNumVisible - zoomVal;
-		if (tileNumVisible < 1) {
+		if(tileNumVisible < 1) {
 			tileNumVisible = 1;
 		}
 
@@ -780,7 +757,7 @@ public class MapContainer extends Observable implements Observer,
 		newScale = pxAvail / tileNumVisible;
 
 		final double myMaxScale = getAvailablePixels();
-		if (newScale > myMaxScale) {
+		if(newScale > myMaxScale) {
 			newScale = myMaxScale;
 		}
 		setScale(newScale);
@@ -789,7 +766,8 @@ public class MapContainer extends Observable implements Observer,
 		int newFirstVisible = 0;
 		if(1 == numVisible) {
 			newFirstVisible = firstIndex;
-		} else {
+		}
+		else {
 			//If the first visible index is inside the target area
 			if(initialFirstVisible > firstIndex) {
 				newFirstVisible = firstIndex;
@@ -798,16 +776,15 @@ public class MapContainer extends Observable implements Observer,
 			//the size of the area we're zooming toward is 1 data cell)
 			else if((initialFirstVisible + prevNumVisible - 1) < firstIndex) {
 				newFirstVisible = (firstIndex + 1) - numVisible;
-			} else {
-				newFirstVisible =
-					(int) ((double) dotOver + 1 - pixelPos / newScale);
+			}
+			else {
+				newFirstVisible = (int) ((double) dotOver + 1 - pixelPos / newScale);
 
 				//If the result of pixelPos / newScale is a whole number,
 				//newFirstVisible must be decremented (discovered via trial &
 				//error)
-				if(newFirstVisible > 0 &&
-				   pixelPos / newScale ==
-				   (int) (pixelPos / newScale)) {
+				if(newFirstVisible > 0 && pixelPos / newScale == (int) (pixelPos /
+																																newScale)) {
 					newFirstVisible--;
 				}
 
@@ -849,27 +826,25 @@ public class MapContainer extends Observable implements Observer,
 	//Use this function to pick a pixel to zoom toward when zooming toward a
 	//selection
 	//Assumes that the full selection is visible on the screen
-	public int getZoomTowardPixelOfSelection(int pixelIndexOfSelec,
-		int numPixelsOfSelec) {
+	public int getZoomTowardPixelOfSelection(	int pixelIndexOfSelec,
+																						int numPixelsOfSelec) {
 
 		int numPixelsOffsetOfSelec = pixelIndexOfSelec;
 		int numTotalPixels = getAvailablePixels();
 
 		//If any of the selected area is above/before the visible area
-		if(pixelIndexOfSelec < 0 &&
-			(pixelIndexOfSelec + numPixelsOfSelec) < numTotalPixels) {
+		if(pixelIndexOfSelec < 0 && (pixelIndexOfSelec +
+																	numPixelsOfSelec) < numTotalPixels) {
 			//If zooming out, return the furthest pixel, otherwise return the
 			//closest pixel
-			if(numPixelsOfSelec > numTotalPixels) {
-				return(numTotalPixels - 1);
-			}
+			if(numPixelsOfSelec > numTotalPixels) { return(numTotalPixels - 1); }
 			//LogBuffer.println("Returning Target pixel: [0].");
 			return(0);
 		}
 		//If any of the selected area is below/after the visible area, return
 		//the first pixel so that
 		else if((pixelIndexOfSelec + numPixelsOfSelec) > numTotalPixels &&
-			pixelIndexOfSelec > 0) {
+						pixelIndexOfSelec > 0) {
 			//If zooming out, return the furthest pixel, otherwise return the
 			//closest pixel
 			if(numPixelsOfSelec > numTotalPixels) {
@@ -896,16 +871,16 @@ public class MapContainer extends Observable implements Observer,
 		//numPixelsOffsetOfSelec in the first selection and solve for
 		//targetPixel and you get the equation below
 		int targetPixel = (int) Math.round((double) numTotalPixels *
-		                                   (double) numPixelsOffsetOfSelec /
-		                                   ((double) numPixelsOfSelec -
-		                                    (double) numTotalPixels));
+																				(double) numPixelsOffsetOfSelec /
+																				((double) numPixelsOfSelec -
+																					(double) numTotalPixels));
 		//LogBuffer.println("Target Pixel calculation: targetPixel = " +
 		//	"numTotalPixels * numPixelsOffsetOfSelec / (numPixelsOfSelec - " +
 		//	"numTotalPixels)");
 		//LogBuffer.println("Target Pixel calculation: " + targetPixel + " = " +
 		//	numTotalPixels + " * " + numPixelsOffsetOfSelec + " / (" +
 		//	numPixelsOfSelec + " - " + numTotalPixels + ")");
-		
+
 		//The equation above actually has 2 solutions.  If the solution is
 		//negative, we just need to negate it, otherwise, the solution turns out
 		//to need a slight adjustment because it is on the outside of the
@@ -915,9 +890,10 @@ public class MapContainer extends Observable implements Observer,
 		if(targetPixel < 0) {
 			//LogBuffer.println("Negating Target pixel: [" + targetPixel +"].");
 			targetPixel = Math.abs(targetPixel);
-		} else {
-			targetPixel = numPixelsOffsetOfSelec +
-				Math.abs(numPixelsOffsetOfSelec-targetPixel);
+		}
+		else {
+			targetPixel = numPixelsOffsetOfSelec + Math.abs(numPixelsOffsetOfSelec -
+																											targetPixel);
 		}
 
 		//Decrement because pixels are indexed from 0 and the equation above
@@ -932,25 +908,23 @@ public class MapContainer extends Observable implements Observer,
 		return(targetPixel);
 	}
 
-	/**
-	 * TODO: Make customZoomVal required (no ability to supply -1) and strip out
+	/** TODO: Make customZoomVal required (no ability to supply -1) and strip out
 	 * the code that picks the zoom value - this has been replaced with
-	 * getBestZoomIn/OutVal. Merge with zoomTowardPixel.
-	 */
+	 * getBestZoomIn/OutVal. Merge with zoomTowardPixel. */
 	//This function does the reverse of zoomTowardPixel
 	//Some of the code is generalized in case it's ever called with a value out
 	//of range
-	public int zoomAwayPixel(int pixelPos,int customZoomVal) {
+	public int zoomAwayPixel(int pixelPos, int customZoomVal) {
 		int updateAspectRatio = 0;
 		int firstIndex = getIndex(pixelPos);
 		//Catch errors - If num indexes is less than 1 or greater than the
 		//number of pixels available
 		if(firstIndex < 0 || firstIndex > getMaxIndex()) {
-			LogBuffer.println("ERROR: Either firstIndex [" + firstIndex +
-			                  "] derived from pixelIndex [" + pixelPos +
-			                  " out of " + getAvailablePixels() +
-			                  " available] is less than 0 or greater than " +
-			                  "maxIndex [" + getMaxIndex() + "]");
+			LogBuffer.println("ERROR: Either firstIndex [" +	firstIndex +
+												"] derived from pixelIndex [" + pixelPos + " out of " +
+												getAvailablePixels() +
+												" available] is less than 0 or greater than " +
+												"maxIndex [" + getMaxIndex() + "]");
 			return(updateAspectRatio);
 		}
 
@@ -974,8 +948,8 @@ public class MapContainer extends Observable implements Observer,
 		//aspect ratios (see GlobalView)), select the best zoom value to make
 		//the zooming as smooth as possible
 		else if(customZoomVal < 0 && tileNumVisible >= 15) {
-			zoomVal = getBestZoomOutVal(pixelPos,targetZoomFrac);
-			if (zoomVal < 1) {
+			zoomVal = getBestZoomOutVal(pixelPos, targetZoomFrac);
+			if(zoomVal < 1) {
 				zoomVal = 1;
 			}
 		}
@@ -983,13 +957,13 @@ public class MapContainer extends Observable implements Observer,
 		else {
 			zoomVal = (int) Math.round(tileNumVisible * targetZoomFrac);
 
-			if (zoomVal < 2) {
+			if(zoomVal < 2) {
 				zoomVal = 2;
 			}
 		}
 
 		tileNumVisible = tileNumVisible + zoomVal;
-		if (tileNumVisible > (getTotalTileNum())) {
+		if(tileNumVisible > (getTotalTileNum())) {
 			tileNumVisible = getTotalTileNum();
 			updateAspectRatio = 1;
 		}
@@ -1002,7 +976,7 @@ public class MapContainer extends Observable implements Observer,
 		newScale = pxAvail / tileNumVisible;
 
 		final double myMinScale = getCalculatedMinScale();
-		if (newScale < myMinScale) {
+		if(newScale < myMinScale) {
 			newScale = myMinScale;
 			updateAspectRatio = 1;
 		}
@@ -1012,7 +986,8 @@ public class MapContainer extends Observable implements Observer,
 		int newFirstVisible = 0;
 		if(1 == numVisible) {
 			newFirstVisible = firstIndex;
-		} else {
+		}
+		else {
 			//If the first visible index is inside the target area
 			if(initialFirstVisible > firstIndex) {
 				newFirstVisible = firstIndex;
@@ -1020,16 +995,15 @@ public class MapContainer extends Observable implements Observer,
 			//Else if the last visible index is inside the target area
 			else if((initialFirstVisible + prevNumVisible - 1) < firstIndex) {
 				newFirstVisible = (firstIndex + 1) - numVisible;
-			} else {
-				newFirstVisible =
-					(int) ((double) dotOver + 1 - pixelPos / newScale);
+			}
+			else {
+				newFirstVisible = (int) ((double) dotOver + 1 - pixelPos / newScale);
 
 				//If the result of pixelPos / newScale is a whole number,
 				//newFirstVisible must be decremented (discovered via trial &
 				//error)
-				if(newFirstVisible > 0 &&
-				   pixelPos / newScale ==
-				   (int) (pixelPos / newScale)) {
+				if(newFirstVisible > 0 && pixelPos / newScale == (int) (pixelPos /
+																																newScale)) {
 					newFirstVisible--;
 				}
 
@@ -1053,27 +1027,29 @@ public class MapContainer extends Observable implements Observer,
 			}
 		}
 
-		if(newFirstVisible != getFirstVisible())
-			scrollToFirstIndex(newFirstVisible);
+		if(newFirstVisible != getFirstVisible()) scrollToFirstIndex(newFirstVisible);
 
 		int correction = dotOver - getIndex(pixelPos);
 		//Catch and correct bad calculations - this is useless now that the
 		//whole-number result test was added above
-		if(correction != 0 && !(newFirstVisible == 0 && correction < 0) &&
-		   !((newFirstVisible + numVisible - 1) > getMaxIndex()) &&
-		   correction > 0) {
+		if(correction != 0 &&	!(newFirstVisible == 0 && correction < 0) &&
+				!((newFirstVisible + numVisible - 1) > getMaxIndex()) &&
+				correction > 0) {
 			newFirstVisible += correction;
 
 			//Make sure we're not past what is possible to scroll to
 			if((newFirstVisible + numVisible - 1) > getMaxIndex()) {
 				newFirstVisible = getMaxIndex() - numVisible + 1;
-			} else {
+			}
+			else {
 				LogBuffer.println("WARNING: The data cell hovered over has " +
-					"shifted. It was over [" + dotOver + "].  Now it is over: [" +
-					getIndex(pixelPos) + "].  Previous dotOver calculation: " +
-					"[firstVisible + (int) ((double) pixelPos / newScale))] = [" +
-					firstVisible + " + (int) ((double) " + pixelPos + " / " +
-					newScale + "))].  Correcting this retroactively...");
+													"shifted. It was over [" + dotOver +
+													"].  Now it is over: [" + getIndex(pixelPos) +
+													"].  Previous dotOver calculation: " +
+													"[firstVisible + (int) ((double) pixelPos / newScale))] = [" +
+													firstVisible + " + (int) ((double) " + pixelPos +
+													" / " + newScale +
+													"))].  Correcting this retroactively...");
 			}
 
 			scrollToFirstIndex(newFirstVisible/*,true*/);
@@ -1093,28 +1069,25 @@ public class MapContainer extends Observable implements Observer,
 	//result in as smooth a zoom as possible.
 	//It uses relative data index hovered over to calculate the target position
 	//of the zoom (as opposed to the relative pixel position of the cursor)
-	public int getBestZoomInVal(int pixel,double targetZoomFrac) {
-		
+	public int getBestZoomInVal(int pixel, double targetZoomFrac) {
+
 		int cells = getNumVisible();
 		//If the targetZoomFrac is 1.0, return the remainder of this dimension
-		if((targetZoomFrac % 1) == 0 &&
-			((int) Math.round(targetZoomFrac)) == 1) {
-			return(getTotalTileNum() - cells);
-		}
+		if((targetZoomFrac % 1) == 0 && ((int) Math
+																								.round(targetZoomFrac)) == 1) { return(getTotalTileNum() -
+																																												cells); }
 		int zoomVal = (int) Math.round(cells * targetZoomFrac);
 		//int numPixels = getAvailablePixels();
 
 		//If we're at the minimum zoom level, do not zoom in any more
 		if((cells == 1 && targetZoomFrac <= 1) || (targetZoomFrac % 1 == 0) &&
-			((int) Math.round(targetZoomFrac)) == 0) {
-			return(0);
-		}
-		if (zoomVal < 2) {
+																							((int) Math.round(targetZoomFrac)) == 0) { return(0); }
+		if(zoomVal < 2) {
 			zoomVal = 2;
 		}
 		//If the amount of zoom is larger than the number of cells currently
 		//visible
-		if (zoomVal > cells) {
+		if(zoomVal > cells) {
 			zoomVal = cells - 1;
 		}
 		int smallThresh = 15;
@@ -1144,9 +1117,9 @@ public class MapContainer extends Observable implements Observer,
 		//than to prefer the target values
 		double minDiff = 1.0;
 		int[] zoomRange = new int[zoomMax - zoomMin + 2]; // 2 was just to be on
-															// the safe side.
+		// the safe side.
 		int i = 0;
-		for(int l = 0;l <= (zoomMax - zoomMin);l++) {
+		for(int l = 0; l <= (zoomMax - zoomMin); l++) {
 			if(l >= 0 && (zoomVal + l) <= zoomMax) {
 				zoomRange[i] = zoomVal + l;
 				i++;
@@ -1160,7 +1133,7 @@ public class MapContainer extends Observable implements Observer,
 			if(i > (zoomMax - zoomMin)) break;
 		}
 
-		
+
 		double minDiffThresh = 0.005;
 		//0=best possible ratio. "Good enough value" for when the ratio of the
 		//relative cell position of the cell under the cursor is really close to
@@ -1171,15 +1144,14 @@ public class MapContainer extends Observable implements Observer,
 		//mouse is over
 		//double targetFrac = ((double) getIndex(pixel) + 1.0) /
 		//		((double) getTotalTileNum());
-		double targetFrac = (getIndex(pixel) + 1.0 -
-				firstVisible) / (numVisible);
+		double targetFrac = (getIndex(pixel) + 1.0 - firstVisible) / (numVisible);
 		double diff = 0.0;
 		//LogBuffer.println("getBestZoomInVal: minZoom: [" + zoomMin +
 		//		"] maxZoom: [" + zoomMax + "].");
 		//Loop through the zoomVals and find which one will result in a ratio
 		//with the relative index that is closest to the pixelPos to pxAvail
 		//ratio
-		for(i = 0;i <= (zoomMax - zoomMin);i++) {
+		for(i = 0; i <= (zoomMax - zoomMin); i++) {
 			int z = zoomRange[i];
 			int relCell = (int) (targetFrac * z);
 			//LogBuffer.println("getBestZoomInVal: [relCell = (int) (pixel / " +
@@ -1204,7 +1176,7 @@ public class MapContainer extends Observable implements Observer,
 		//LogBuffer.println("getBestZoomInVal: Selected zoomVal [" +
 		//		bestZoomVal + "] instead of defaults [" + zoomVal +
 		//		"] Diff: [" + diff + "].");
-		
+
 		//Do not force a zoom amount here because a minimum zoom should be
 		//enforced after this has been called
 		if(bestZoomVal < 0) bestZoomVal = 0;
@@ -1218,14 +1190,13 @@ public class MapContainer extends Observable implements Observer,
 	//This function performs the reverse of getBestZoomInVal, except it uses the
 	//relative pixel position of the cursor to calculate the zoom position that
 	//is targeted for smoothing
-	public int getBestZoomOutVal(int pixel,double targetZoomFrac) {
-		
+	public int getBestZoomOutVal(int pixel, double targetZoomFrac) {
+
 		int cells = getNumVisible();
 		//If the targetZoomFrac is 1.0, return the remainder of this dimension
-		if((targetZoomFrac % 1) == 0 &&
-		   ((int) Math.round(targetZoomFrac)) == 1) {
-			return(getTotalTileNum() - cells);
-		}
+		if((targetZoomFrac % 1) == 0 && ((int) Math
+																								.round(targetZoomFrac)) == 1) { return(getTotalTileNum() -
+																																												cells); }
 		int zoomVal = (int) Math.round(cells * targetZoomFrac);
 		int numPixels = getAvailablePixels();
 		//LogBuffer.println("getBestZoomOutVal: Called with pixel [" + pixel +
@@ -1235,9 +1206,7 @@ public class MapContainer extends Observable implements Observer,
 		//If the closest zoom amount is 0, return 0 because it's the smoothest
 		//possible scroll value (and the math below will result in NaN)
 		//The calling function is expected to handle cases resulting in no zoom
-		if(zoomVal < 1) {
-			return(0);
-		}
+		if(zoomVal < 1) { return(0); }
 		//If the resulting zoom level is bigger than or equal to full zoom-out
 		if((zoomVal + cells) >= (getTotalTileNum())) {
 			zoomVal = getTotalTileNum() - cells;
@@ -1279,7 +1248,7 @@ public class MapContainer extends Observable implements Observer,
 		//		zoomMax + " - " + zoomMin + " + 2].");
 		int[] zoomRange = new int[zoomMax - zoomMin + 2];	//2 was just to be
 		int i = 0;											//on the safe side.
-		for(int l = 0;l <= (zoomMax - zoomMin);l++) {
+		for(int l = 0; l <= (zoomMax - zoomMin); l++) {
 			if(l >= 0 && (zoomVal + l) <= zoomMax) {
 				zoomRange[i] = zoomVal + l;
 				i++;
@@ -1294,11 +1263,11 @@ public class MapContainer extends Observable implements Observer,
 		}
 
 		double minDiffThresh = 0.005;	//0=best possible ratio. "Good enough
-										//value" for when the ratio of the
-										//relative cell position of the cell
-										//under the cursor is really close to
-										//the ratio of the relative pixel
-										//position of the cursor
+		//value" for when the ratio of the
+		//relative cell position of the cell
+		//under the cursor is really close to
+		//the ratio of the relative pixel
+		//position of the cursor
 
 		//LogBuffer.println("getBestZoomOutVal: minZoom: [" + zoomMin +
 		//		"] maxZoom: [" + zoomMax + "].");
@@ -1306,16 +1275,15 @@ public class MapContainer extends Observable implements Observer,
 		//Loop through the zoomVals and find which one will result in a ratio
 		//with the relative index that is closest to the pixelPos to pxAvail
 		//ratio
-		for(i = 0;i <= (zoomMax - zoomMin);i++) {
+		for(i = 0; i <= (zoomMax - zoomMin); i++) {
 			int z = zoomRange[i];
-			int relCell = (int) ((double) (pixel + 1) /
-					(double) numPixels * z);
+			int relCell = (int) ((double) (pixel + 1) / (double) numPixels * z);
 			//LogBuffer.println("getBestZoomOutVal: [relCell = (int) (pixel " +
 			//		"/ numPixels * z)] = [" + relCell + " = (int) (" + pixel +
 			//		" / " + numPixels + " * " + z + ")].");
 			if(z == 0) continue;
-			diff = Math.abs(((double) relCell / (double) z) -
-					((double) (pixel + 1) / (double) numPixels));
+			diff = Math.abs(((double) relCell / (double) z) - ((double) (pixel + 1) /
+																													(double) numPixels));
 			//LogBuffer.println("getBestZoomOutVal: [diff = relCell / z - " +
 			//		"pixel / numPixels] = [" +
 			//		diff + " = " + relCell + " / " + z + " - " + pixel + " / " +
@@ -1341,20 +1309,16 @@ public class MapContainer extends Observable implements Observer,
 		return(bestZoomVal);
 	}
 
-	/**
-	 * This function calculates the fraction by which the zoom increment should
+	/** This function calculates the fraction by which the zoom increment should
 	 * be if you want to draw increments in an animation (e.g. an animated
-	 * zoom).  Drawing large matrices takes a lot of time, thus animations
+	 * zoom). Drawing large matrices takes a lot of time, thus animations
 	 * should zoom more when there are large amounts of squares to zoom
-	 * through
-	 */
+	 * through */
 	public double getOptimalZoomIncrement(int targetNumIndexes,
-										  boolean zoomingOut) {
+																				boolean zoomingOut) {
 		//double maxZoomFrac = 0.5;
 		double maxZoomFrac = 0.6;
-		if(ZOOM_INCREMENT > maxZoomFrac) {
-			return(maxZoomFrac);
-		}
+		if(ZOOM_INCREMENT > maxZoomFrac) { return(maxZoomFrac); }
 		int maxZF = (int) Math.round(maxZoomFrac / ZOOM_INCREMENT);
 		double targetZoomFrac = maxZoomFrac;
 		//The following loop cycles through zoom increments 0.05,0.1,0.15,...
@@ -1377,16 +1341,16 @@ public class MapContainer extends Observable implements Observer,
 		//if(targetNumIndexes > largerXSize) {
 		//	largerXSize = targetNumIndexes;
 		//}
-		for(int zf = 1;zf<=maxZF;zf++) {
-		//for(int zf = maxZF;zf > 0;zf--) {
+		for(int zf = 1; zf <= maxZF; zf++) {
+			//for(int zf = maxZF;zf > 0;zf--) {
 			double zmfc = zf * ZOOM_INCREMENT;
-			if(a * Math.pow(b,zmfc) >= largerXSize &&
+			if(a * Math.pow(b, zmfc) >= largerXSize &&
 					//Only select this zoom fraction if the next zoom fraction
 					//will be larger - this is to reduce the number of steps in
 					//large zoom changes
-					a*Math.pow(b,zmfc) < (largerXSize +
-							(zf + 1) * ZOOM_INCREMENT * largerXSize)) {
-			//if(a*Math.pow(b,zmfc) <= largerXSize) {
+					a * Math.pow(b, zmfc) < (largerXSize + (zf + 1) *	ZOOM_INCREMENT *
+																									largerXSize)) {
+				//if(a*Math.pow(b,zmfc) <= largerXSize) {
 				targetZoomFrac = zmfc;
 				if(zoomingOut) targetZoomFrac += ZOOM_INCREMENT;
 				break;
@@ -1400,11 +1364,10 @@ public class MapContainer extends Observable implements Observer,
 		//remaining for the next step, just go all the way
 		//This is an approximation because I should actually be using the next
 		//step, not this one
-		if((zoomingOut &&
-				targetZoomFrac * largerXSize >
-				Math.abs(largerXSize + 1 * 
-							(int) Math.round(targetZoomFrac * largerXSize) -
-				targetNumIndexes))) {
+		if((zoomingOut && targetZoomFrac * largerXSize > Math.abs(largerXSize +	1 *
+																																						(int) Math.round(targetZoomFrac *
+																																															largerXSize) -
+																															targetNumIndexes))) {
 			//The above seems only necessary for zoom out (for speed)
 			// ||
 			//(!zoomingOut && targetZoomFrac * largerXSize <
@@ -1418,20 +1381,18 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	public void fullZoomOut() {
-		zoomToSelected(0,getMaxIndex());
+		zoomToSelected(0, getMaxIndex());
 	}
 
-	/**
-	 * Zooms to the selected index range for this MapContainer. 
+	/** Zooms to the selected index range for this MapContainer.
 	 * Uses the array- and geneSelection and currently available pixels on
 	 * screen retrieved from the MapContainer objects to calculate a new scale
 	 * and zoom in on it by working in conjunction with centerSelection().
 	 * 
 	 * @param selectedMin
-	 *            Minimum index of selected area.
+	 *          Minimum index of selected area.
 	 * @param selectedMax
-	 *            Maximum index of selected area.
-	 */
+	 *          Maximum index of selected area. */
 	public void zoomToSelected(final int selectedMin, final int selectedMax) {
 
 		/*
@@ -1459,15 +1420,14 @@ public class MapContainer extends Observable implements Observer,
 
 			// If the center of the selection is less than half the distance to
 			// the near edge
-			if ((selectedMin + numSelected / 2) < (minTileNum / 2)) {
+			if((selectedMin + numSelected / 2) < (minTileNum / 2)) {
 				numSelected = (selectedMin + numSelected / 2) * 2;
 			}
 			// Else if the center of the selection is less than half the
 			// distance to the far edge
-			else if((selectedMin + numSelected / 2) > (getMaxIndex() 
-					- (minTileNum / 2))) {
-				numSelected = (getMaxIndex() - (selectedMin 
-						+ numSelected / 2 - 1)) * 2;
+			else if((selectedMin + numSelected / 2) > (getMaxIndex() - (minTileNum /
+																																	2))) {
+				numSelected = (getMaxIndex() - (selectedMin + numSelected / 2 - 1)) * 2;
 			}
 			// Otherwise, set the standard minimum zoom
 			else {
@@ -1497,15 +1457,15 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
-	public void centerScrollOnSelection(final int startIndex, 
-			final int endIndex) {
-		
+	public void centerScrollOnSelection(final int startIndex,
+																			final int endIndex) {
+
 		int scrollVal = (int) Math.round((endIndex + startIndex) / 2.0);
-		
+
 		scrollToIndex(scrollVal);
 
 		int firstX = 0;
-		while (firstX < getMaxIndex() && !isVisible(firstX)) {
+		while(firstX < getMaxIndex() && !isVisible(firstX)) {
 			firstX++;
 		}
 
@@ -1518,13 +1478,11 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
-	/**
-	 * Checks how many tiles are visible and uses the current available pixels
+	/** Checks how many tiles are visible and uses the current available pixels
 	 * to adjust the tile scale to the screen size and then re-scrolls to the
-	 * position currently in focus.
-	 */
+	 * position currently in focus. */
 	public void adjustScaleToScreen() {
-		
+
 		if(numVisible == 0) {
 			setNumVisible(getTotalTileNum());
 		}
@@ -1537,9 +1495,10 @@ public class MapContainer extends Observable implements Observer,
 
 	public void adjustScrollToScreen() {
 
-		if (getNumVisible() > 0) {
+		if(getNumVisible() > 0) {
 			scrollToFirstIndex(getFirstVisible()/*,true*/);
-		} else {
+		}
+		else {
 			setFirstVisible(0);
 			scrollToFirstIndex(0);
 		}
@@ -1555,22 +1514,18 @@ public class MapContainer extends Observable implements Observer,
 	 * their drawing on the available pixels stored here in mapcontainer.
 	 */
 	public void adjustToScreenChange() {
-		
+
 		adjustScaleToScreen();
 		adjustScrollToScreen();
 	}
 
 	public void recalculateScale() {
 
-		if (nodeHasAttribute("FixedMap", "scale")) {
-			if (getScale() < getAvailablePixels()) {
-				return;
-			}
+		if(nodeHasAttribute("FixedMap", "scale")) {
+			if(getScale() < getAvailablePixels()) { return; }
 		}
-		
-		if(numVisible < 1) {
-			return;
-		}
+
+		if(numVisible < 1) { return; }
 
 		// The divisor here was previously calculated by:
 		// getMaxIndex() - getMinIndex() + 1, which inadvertently resulted
@@ -1581,22 +1536,23 @@ public class MapContainer extends Observable implements Observer,
 		//LogBuffer.println("recalculateScale: numVisible: [" + tileNumVisible
 		//		+ "] was used to calculate requiredScale.");
 		final double requiredScale = getAvailablePixels() / numVisible;
-		if (requiredScale > default_scale) {
+		if(requiredScale > default_scale) {
 			setScale(requiredScale);
 
-		} else {
+		}
+		else {
 			setScale(default_scale);
 		}
 	}
 
 	public void setScrollbar(final JScrollBar scrollbar) {
 
-		if (this.scrollbar != null) {
+		if(this.scrollbar != null) {
 			this.scrollbar.removeAdjustmentListener(this);
 		}
 
 		this.scrollbar = scrollbar;
-		if (this.scrollbar != null) {
+		if(this.scrollbar != null) {
 			this.scrollbar.addAdjustmentListener(this);
 			setupScrollbar();
 		}
@@ -1604,29 +1560,27 @@ public class MapContainer extends Observable implements Observer,
 
 	public IntegerMap setMap(final int type) {
 
-		if (current.equalsType(type)) {
-			return current;
-		}
+		if(current.equalsType(type)) { return current; }
 
 		IntegerMap newMap = null;
 		switch(type) {
-		
-		case IntegerMap.NULL:
-			newMap = nullMap;
-			break;
-			
-		case IntegerMap.FIXED:
-			newMap = fixedMap;
-			break;
-			
-		case IntegerMap.FILL:
-			newMap = fillMap;
-			break;
-			
-		default:
-			LogBuffer.println("Map type (" + type + ") not found. "
-					+ "Setting fixed map.");
-			newMap = fixedMap;
+
+			case IntegerMap.NULL:
+				newMap = nullMap;
+				break;
+
+			case IntegerMap.FIXED:
+				newMap = fixedMap;
+				break;
+
+			case IntegerMap.FILL:
+				newMap = fillMap;
+				break;
+
+			default:
+				LogBuffer.println("Map type (" +	type + ") not found. " +
+													"Setting fixed map.");
+				newMap = fixedMap;
 		}
 
 		switchMap(newMap);
@@ -1667,66 +1621,63 @@ public class MapContainer extends Observable implements Observer,
 
 	public void scrollToFirstIndex(int i) {
 
-		if(scrollbar == null) {
-			return;
-		}
-		
+		if(scrollbar == null) { return; }
+
 		int scrollToVal = i;
 		if(i < getMinIndex() || i > getMaxIndex()) {
 			if(i < 0) {
 				scrollToVal = 0;
-			} else {
+			}
+			else {
 				LogBuffer.println("ERROR: Index out of range: " + i);
 				return;
 			}
 		}
-		
+
 		final int j = scrollbar.getValue();
 		scrollbar.setValue(scrollToVal);
 
 		// Keep track of the first visible index
 		setFirstVisible(scrollToVal);
 
-		if (j != scrollbar.getValue()) {
+		if(j != scrollbar.getValue()) {
 			setChanged();
 		}
 
 		notifyObservers();
 	}
 
-	/**
-	 * Set a new value for the MapContainer's associated scrollbar. The supplied
-	 * parameter will be added to the current scrollbar value. If it 
+	/** Set a new value for the MapContainer's associated scrollbar. The supplied
+	 * parameter will be added to the current scrollbar value. If it
 	 * is positive, the value will increase. If negative the scrollbar value
-	 * will decrease. No matter what value is supplied, the scrollbar can 
-	 * never be set to scroll such that the range of visible tiles 
-	 * in MapContainer ends up below its minimum index or above 
-	 * its maximum index. 
-	 * @param i The value by which the current scrollbar value is changed.
-	 */
+	 * will decrease. No matter what value is supplied, the scrollbar can
+	 * never be set to scroll such that the range of visible tiles
+	 * in MapContainer ends up below its minimum index or above
+	 * its maximum index.
+	 * 
+	 * @param i The value by which the current scrollbar value is changed. */
 	public void scrollBy(final int i) {
 
-		if(showsAllTiles()) {
-			return;
-		}
-		
+		if(showsAllTiles()) { return; }
+
 		final int j = scrollbar.getValue();
 		int newVal = j + i; // is firstVisible not last... -> error
 
 		// out of range
-		if(newVal < scrollbar.getMinimum() ) {
+		if(newVal < scrollbar.getMinimum()) {
 			newVal = scrollbar.getMinimum();
-			
-		} else if(newVal + getNumVisible() > scrollbar.getMaximum()) {
+
+		}
+		else if(newVal + getNumVisible() > scrollbar.getMaximum()) {
 			newVal = scrollbar.getMaximum() - getNumVisible();
 		}
-		
+
 		scrollbar.setValue(newVal);
 
 		// Keep track of the first visible index
 		setFirstVisibleStrictly(newVal);
 
-		if (j != scrollbar.getValue()) {
+		if(j != scrollbar.getValue()) {
 			setChanged();
 		}
 
@@ -1751,7 +1702,7 @@ public class MapContainer extends Observable implements Observer,
 
 	private void setupScrollbar() {
 
-		if (scrollbar != null) {
+		if(scrollbar != null) {
 			// This value can change when the window is resized larger, so use
 			// stored value instead
 			// int value = scrollbar.getValue();
@@ -1761,17 +1712,17 @@ public class MapContainer extends Observable implements Observer,
 			// stored value instead
 			// final int extent = current.getViewableIndexes();
 			int extent = getNumVisible();
-			if (extent < 1) {
+			if(extent < 1) {
 				extent = current.getViewableIndexes();
 			}
 
 			final int max = current.getMaxIndex() - current.getMinIndex() + 1;
-			if (value + extent > max) {
+			if(value + extent > max) {
 				value = max - extent;
 				setFirstVisible(value);
 			}
 
-			if (value < 0) {
+			if(value < 0) {
 				value = 0;
 				setFirstVisible(0);
 			}
@@ -1781,14 +1732,13 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
-	/**
-	 * expect to get updates from selection only
-	 */
+	/** expect to get updates from selection only */
 	@Override
 	public void update(final Observable observable, final Object object) {
 
-		LogBuffer.println(new StringBuffer("MapContainer Got an "
-				+ "update from unknown ").append(observable).toString());
+		LogBuffer.println(new StringBuffer("MapContainer Got an " +
+																				"update from unknown ")	.append(observable)
+																																.toString());
 		notifyObservers(object);
 	}
 
@@ -1822,118 +1772,107 @@ public class MapContainer extends Observable implements Observer,
 	public int getPixel(final double d) {
 
 		int offset = 0;
-		if (scrollbar != null) {
+		if(scrollbar != null) {
 			offset = scrollbar.getValue();
 		}
 
 		return current.getPixel(d - offset);
 	}
 
-	/**
-	 * Get the first pixels belonging to the tile which represents the given
+	/** Get the first pixels belonging to the tile which represents the given
 	 * index.
+	 * 
 	 * @param i The index for which to retrieve the pixel.
-	 * @return A pixel index.
-	 */
+	 * @return A pixel index. */
 	public int getPixel(final int i) {
 
 		int offset = 0;
-		if (scrollbar != null) {
+		if(scrollbar != null) {
 			offset = scrollbar.getValue();
 		}
 
 		return current.getPixel(i - offset);
 	}
 
-	/**
-	 * Uses the MapContainers assigned IntegerMap object to figure out what
+	/** Uses the MapContainers assigned IntegerMap object to figure out what
 	 * index a certain pixel belongs to.
+	 * 
 	 * @param pixel The pixel to be checked.
-	 * @return The index of the tile to which the given pixel belongs.
-	 */
+	 * @return The index of the tile to which the given pixel belongs. */
 	public int getIndex(final int pixel) {
 
 		int index = -1;
-		if (current != null) {
+		if(current != null) {
 			index = current.getIndex(pixel);
 		}
 
-		if (scrollbar != null) {
+		if(scrollbar != null) {
 			index += scrollbar.getValue();
 		}
 
 		return index;
 	}
 
-	/**
-	 * This checks if an index is currently in the range of visible pixels.
+	/** This checks if an index is currently in the range of visible pixels.
+	 * 
 	 * @param i The index to be checked.
-	 * @return Whether an index is within range of visible screen pixels.
-	 */
+	 * @return Whether an index is within range of visible screen pixels. */
 	public boolean isVisible(final int i) {
 
 		final int min = getIndex(0);
 		final int max = getIndex(getAvailablePixels());
-		
-		if (i < min || i > max) {
-			return false;
-		}
+
+		if(i < min || i > max) { return false; }
 
 		return true;
 	}
 
-	/**
-	 * @return The number of required pixels to fill out the index range of the
-	 * MapContainer's IntegerMap at the currently set tile scale.
-	 */
+	/** @return The number of required pixels to fill out the index range of the
+	 *         MapContainer's IntegerMap at the currently set tile scale. */
 	public int getRequiredPixels() {
 
 		return current.getRequiredPixels();
 	}
 
-	/**
-	 * @return How many pixels of the MapContainer's IntegerMap are actually 
-	 * used/ filled out by tiles.
-	 */
+	/** @return How many pixels of the MapContainer's IntegerMap are actually
+	 *         used/ filled out by tiles. */
 	public int getUsedPixels() {
 
 		return current.getUsedPixels();
 	}
 
-	/**
-	 * Tells MapContainer's IntegerMap how many pixels are available on the
-	 * screen. 
-	 * @param i The number of pixels available for 
-	 * the MapContainer's IntegerMap (axis).
-	 */
+	/** Tells MapContainer's IntegerMap how many pixels are available on the
+	 * screen.
+	 * 
+	 * @param i The number of pixels available for
+	 *          the MapContainer's IntegerMap (axis). */
 	public void setAvailablePixels(final int i) {
 
 		final int j = current.getUsedPixels();
 		current.setAvailablePixels(i);
 		setupScrollbar();
 
-		if (j != current.getUsedPixels()) {
+		if(j != current.getUsedPixels()) {
 			setChanged();
 		}
 	}
 
-	/**
-	 * Set a new index range for the MapContainer's IntegerMap.
+	/** Set a new index range for the MapContainer's IntegerMap.
+	 * 
 	 * @param i The new minimum index.
-	 * @param j The new maximum index.
-	 */
+	 * @param j The new maximum index. */
 	public void setIndexRange(final int i, final int j) {
-		
+
 		int minIdx = i;
 		int maxIdx = j;
-		
-		if (i > j) {
+
+		if(i > j) {
 			final int k = i;
 			minIdx = j;
 			maxIdx = k;
 		}
 
-		if (current.getMinIndex() != minIdx || current.getMaxIndex() != maxIdx) {
+		if(current.getMinIndex() != minIdx || current.getMaxIndex() != maxIdx) {
 			current.setIndexRange(minIdx, maxIdx);
 			setupScrollbar();
 			setFirstVisible(minIdx);
@@ -1944,21 +1883,19 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
-	/**
-	 * Setting the axis size per tile in pixels for this MapContainer.
-	 * @param d The new axis size per tile in pixels.
-	 */
+	/** Setting the axis size per tile in pixels for this MapContainer.
+	 * 
+	 * @param d The new axis size per tile in pixels. */
 	public void setScale(final double d) {
 
-		if (!Helper.nearlyEqual(fixedMap.getScale(), d)) {
+		if(!Helper.nearlyEqual(fixedMap.getScale(), d)) {
 			fixedMap.setScale(d);
 			setupScrollbar();
 			setChanged();
 		}
 	}
 
-	/**
-	 * The purpose of these two functions (setNumVisible and setFirst visible),
+	/** The purpose of these two functions (setNumVisible and setFirst visible),
 	 * other than to simply set values is to support the tracking of explicit
 	 * image manipulation by the user. The main reasons these were implemented
 	 * was because the image was being changed by implicit actions, such as
@@ -1967,34 +1904,38 @@ public class MapContainer extends Observable implements Observer,
 	 * currently being displayed by way of converting a pixel index into a data
 	 * index. These variables are manipulated only by actions that the user
 	 * explicitly takes to intentionally alter the image, meaning the range of
-	 * spots they are looking at.
-	 */
+	 * spots they are looking at. */
 	public void setNumVisible(final int i) {
 
 		if(i > getTotalTileNum() && getTotalTileNum() > 0) {
 			numVisible = getTotalTileNum();
-		} else if(i < 1) {
+		}
+		else if(i < 1) {
 			numVisible = 1;
-		} else if(i > 0) {
+		}
+		else if(i > 0) {
 			numVisible = i;
-		} else {
+		}
+		else {
 			numVisible = 1;
 		}
 	}
 
 	public void setFirstVisible(final int i) {
-		if (i >= 0 && i < getTotalTileNum()) {
+		if(i >= 0 && i < getTotalTileNum()) {
 			firstVisible = i;
 		}
 	}
 
 	public void setFirstVisibleStrictly(final int i) {
-		if (i < 0) {
+		if(i < 0) {
 			firstVisible = 0;
-		} else if(i > (getTotalTileNum() - getNumVisible()) &&
-			getTotalTileNum() > 0 && getNumVisible() > 0) {
+		}
+		else if(i > (getTotalTileNum() - getNumVisible()) &&
+						getTotalTileNum() > 0 && getNumVisible() > 0) {
 			firstVisible = getTotalTileNum() - getNumVisible();
-		} else {
+		}
+		else {
 			firstVisible = i;
 		}
 	}
@@ -2003,35 +1944,40 @@ public class MapContainer extends Observable implements Observer,
 
 		return (getPixel(i) + getPixel(i + 1)) / 2;
 	}
-	
-	/**
-	 * Gives information about the total number of currently assigned to its
+
+	/** Gives information about the total number of currently assigned to its
 	 * MapContainer object.
-	 * @return
-	 */
+	 * 
+	 * @return */
 	public int getTotalTileNum() {
-		
+
 		return getMaxIndex() + 1;
 	}
 
-	/**
-	 * Get maximum amount of data points on entire MapContainer
+	/** Get maximum amount of data points on entire MapContainer
 	 *
-	 * @return
-	 */
+	 * @return */
 	public int getMaxIndex() {
 
 		return current.getMaxIndex();
 	}
 
-	/**
-	 * Get minimum amount of data points on entire MapContainer
+	/** Get minimum amount of data points on entire MapContainer
 	 *
-	 * @return
-	 */
+	 * @return */
 	public int getMinIndex() {
 
 		return current.getMinIndex();
+	}
+
+	/** Checks if a given index is within the defined bounds of this MapContainer.
+	 * 
+	 * @param idx - The index to check.
+	 * @return Whether the index is within the bounds defined by getMinIndex() and
+	 *         getMaxIndex(). */
+	public boolean isWithinBounds(final int idx) {
+
+		return(idx >= getMinIndex() && idx <= getMaxIndex());
 	}
 
 	public TreeDrawerNode getSelectedNode() {
@@ -2041,7 +1987,7 @@ public class MapContainer extends Observable implements Observer,
 
 	public void setSelectedNode(final TreeDrawerNode treeDrawerNode) {
 
-		if (selected != treeDrawerNode) {
+		if(selected != treeDrawerNode) {
 			/*
 			 * System.out.println("setindexrange called, start = " + selected);
 			 * Throwable t = new Throwable(); t.printStackTrace();
@@ -2061,18 +2007,15 @@ public class MapContainer extends Observable implements Observer,
 		return current.getAvailablePixels();
 	}
 
-	/**
-	 * Returns amount of tiles currently visible on this map.
+	/** Returns amount of tiles currently visible on this map.
 	 *
-	 * @return
-	 */
+	 * @return */
 	public int getTileNumVisible() {
 
 		return (int) tileNumVisible;
 	}
 
-	/**
-	 * The purpose of these two functions (getNumVisible and getFirstVisible),
+	/** The purpose of these two functions (getNumVisible and getFirstVisible),
 	 * other than to simply obtain values is to support the tracking of explicit
 	 * image manipulation by the user. The main reasons these were implemented
 	 * was because the image was being changed by implicit actions, such as
@@ -2081,8 +2024,7 @@ public class MapContainer extends Observable implements Observer,
 	 * currently being displayed by way of converting a pixel index into a data
 	 * index. These variables are manipulated only by actions that the user
 	 * explicitly takes to intentionally alter the image, meaning the range of
-	 * spots they are looking at.
-	 */
+	 * spots they are looking at. */
 	public int getNumVisible() {
 		/** TODO: For some undetermined reason, the above sometimes yields an
 		 * out of bounds number. I suspect that it has something to do with
@@ -2092,13 +2034,14 @@ public class MapContainer extends Observable implements Observer,
 		if(numVisible > getTotalTileNum()) {
 			if(getMaxIndex() > 0) {
 				LogBuffer.println("Warning: Encountered invalid/too-large " +
-					"numVisible value: [" + numVisible + "].  Resetting.");
+													"numVisible value: [" + numVisible +
+													"].  Resetting.");
 				numVisible = getMaxIndex() + 1;
 			}
 		}
 		if(numVisible < 1) {
 			LogBuffer.println("Warning: Encountered invalid/too-small " +
-				"numVisible value: [" + numVisible + "].  Resetting.");
+												"numVisible value: [" + numVisible + "].  Resetting.");
 			numVisible = 1;
 		}
 		return(numVisible);
@@ -2110,15 +2053,16 @@ public class MapContainer extends Observable implements Observer,
 		 * multiple cells under a single pixel, but I'm not sure. For now, this
 		 * work-around will prevent exceptions. Figure this out & fix it
 		 * eventually. */
-		if(firstVisible + numVisible - 1 > getMaxIndex() &&
-			getMaxIndex() > -1) {
+		if(firstVisible + numVisible - 1 > getMaxIndex() && getMaxIndex() > -1) {
 			LogBuffer.println("Warning: Encountered invalid/too-large " +
-				"firstVisible value: [" + firstVisible + "].  Resetting.");
+												"firstVisible value: [" + firstVisible +
+												"].  Resetting.");
 			firstVisible = getMaxIndex() - numVisible;
 		}
 		if(firstVisible < 0) {
 			LogBuffer.println("Warning: Encountered invalid/negative " +
-				"firstVisible value: [" + firstVisible + "].  Resetting.");
+												"firstVisible value: [" + firstVisible +
+												"].  Resetting.");
 			firstVisible = 0;
 		}
 		return(firstVisible);
@@ -2133,7 +2077,8 @@ public class MapContainer extends Observable implements Observer,
 		 * eventually. */
 		if(lastVisible > getMaxIndex()) {
 			LogBuffer.println("Warning: Encountered invalid/too-large " +
-				"lastVisible value: [" + lastVisible + "].  Resetting.");
+												"lastVisible value: [" + lastVisible +
+												"].  Resetting.");
 			lastVisible = getMaxIndex();
 		}
 		return(lastVisible);
@@ -2141,10 +2086,9 @@ public class MapContainer extends Observable implements Observer,
 
 	private void switchMap(final IntegerMap integerMap) {
 
-		if (current != integerMap) {
+		if(current != integerMap) {
 			integerMap.setAvailablePixels(current.getAvailablePixels());
-			integerMap.setIndexRange(current.getMinIndex(),
-					current.getMaxIndex());
+			integerMap.setIndexRange(current.getMinIndex(), current.getMaxIndex());
 			current = integerMap;
 			setupScrollbar();
 			// Added this, but took it out because it was to fix something that
@@ -2159,13 +2103,11 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
-	/**
-	 * Checks if a certain node has a certain attribute (key).
+	/** Checks if a certain node has a certain attribute (key).
 	 *
 	 * @param nodeName
 	 * @param key
-	 * @return
-	 */
+	 * @return */
 	public boolean nodeHasAttribute(final String nodeName, final String key) {
 
 		if(configNode == null) {
@@ -2177,68 +2119,59 @@ public class MapContainer extends Observable implements Observer,
 		boolean hasAttribute = false;
 		try {
 			final String[] keys = configNode.node(nodeName).keys();
-			for (final String key2 : keys) {
+			for(final String key2 : keys) {
 
-				if (key2.equalsIgnoreCase(key)) {
+				if(key2.equalsIgnoreCase(key)) {
 					hasAttribute = true;
 				}
 			}
 
-		} catch (final BackingStoreException e) {
-			LogBuffer.println("Error in MapContainer/nodeHasAttribute: "
-					+ e.getMessage());
+		}
+		catch(final BackingStoreException e) {
+			LogBuffer.println("Error in MapContainer/nodeHasAttribute: " + e
+																																			.getMessage());
 			e.printStackTrace();
 		}
 
 		return hasAttribute;
 	}
 
-	/**
-	 * @param overLabels the overLabels to set
-	 */
+	/** @param overLabels the overLabels to set */
 	public void setOverLabels(boolean overLabels) {
-		
+
 		this.overLabels = overLabels;
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
 	}
 
-	/**
-	 * @param overLabels the overLabels to set
-	 */
+	/** @param overLabels the overLabels to set */
 	public void setOverLabelsScrollbar(boolean overLabels) {
-		
+
 		this.overLabelsScrollbar = overLabels;
 		setChanged(); // TODO why does the mapcontainer need to update here?
 		setHoverChanged();
 		notifyObservers();
 	}
 
-	/**
-	 * @param overLabels the overLabels to set
-	 */
+	/** @param overLabels the overLabels to set */
 	public void setLabelsBeingScrolled(boolean overLabels) {
-		
+
 		this.labelsBeingScrolled = overLabels;
 		setChanged();
 		setHoverChanged();
 		notifyObservers(); //calls recalculateOverlay for IMV & GMV... should'nt
 	}
 
-	/**
-	 * @return boolean
-	 */
+	/** @return boolean */
 	public boolean areLabelsBeingScrolled() {
-		
+
 		return(labelsBeingScrolled);
 	}
 
-	/**
-	 * @param overTree the overTree to set
-	 */
+	/** @param overTree the overTree to set */
 	public void setOverTree(boolean overTree) {
-		
+
 		this.overTree = overTree;
 		unsetHoverTreeMinIndex();
 		unsetHoverTreeMaxIndex();
@@ -2247,38 +2180,30 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
-	/**
-	 * @param overDivider the overDivider to set
-	 */
+	/** @param overDivider the overDivider to set */
 	public void setOverDivider(boolean overDivider) {
-		
+
 		this.overDivider = overDivider;
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
 	}
 
-	/**
-	 * @author rleach
-	 * @return the draggingDivider
-	 */
+	/** @author rleach
+	 * @return the draggingDivider */
 	public boolean isDraggingDivider() {
 		return(draggingDivider);
 	}
 
-	/**
-	 * @author rleach
-	 * @param draggingDivider the draggingDivider to set
-	 */
+	/** @author rleach
+	 * @param draggingDivider the draggingDivider to set */
 	public void setDraggingDivider(boolean draggingDivider) {
 		this.draggingDivider = draggingDivider;
 	}
 
-	/**
-	 * @param overInteractiveMatrix the overInteractiveMatrix to set
-	 */
+	/** @param overInteractiveMatrix the overInteractiveMatrix to set */
 	public void setOverInteractiveMatrix(boolean overInteractiveMatrix) {
-		
+
 		this.overInteractiveMatrix = overInteractiveMatrix;
 		setChanged(); // see above
 		setHoverChanged();
@@ -2286,7 +2211,7 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	public boolean isOverIMV() {
-		
+
 		return(overInteractiveMatrix);
 	}
 
@@ -2298,27 +2223,25 @@ public class MapContainer extends Observable implements Observer,
 	//reference for all the classes in the view and is their only way to
 	//communicate with one another.
 	public boolean overALabelLinkedView() {
-		debug("overALabelPortLinkedView: overLabels [" +
-			(overLabels ? "true" : "false") + "] overInteractiveMatrix [" +
-			(overInteractiveMatrix ? "true" : "false") +
-			"] overLabelsScrollbar [" +
-			(overLabelsScrollbar ? "true" : "false") +
-			"] labelsBeingScrolled [" +
-			(labelsBeingScrolled ? "true" : "false") +
-			"] selecting [" + (selecting ? "true" : "false") +
-			"] overTree [" + (overTree ? "true" : "false") + "] overDivider [" +
-			(overDivider ? "true" : "false") + "] draggingDivider [" +
-			(draggingDivider ? "true" : "false") + "]",1);
-		return(overLabels || overInteractiveMatrix || overLabelsScrollbar ||
-			labelsBeingScrolled || selecting || overTree || overDivider ||
-			draggingDivider);
+		debug("overALabelPortLinkedView: overLabels [" +	(overLabels																							? "true"
+																																	: "false") +
+					"] overInteractiveMatrix [" + (overInteractiveMatrix	? "true"
+																																: "false") +
+					"] overLabelsScrollbar [" + (overLabelsScrollbar ? "true" : "false") +
+					"] labelsBeingScrolled [" + (labelsBeingScrolled ? "true" : "false") +
+					"] selecting [" + (selecting ? "true" : "false") + "] overTree [" +
+					(overTree ? "true" : "false") + "] overDivider [" + (overDivider
+																																						? "true" : "false") +
+					"] draggingDivider [" + (draggingDivider ? "true" : "false") +
+					"]", 1);
+		return(overLabels ||	overInteractiveMatrix || overLabelsScrollbar ||
+						labelsBeingScrolled || selecting || overTree || overDivider ||
+						draggingDivider);
 	}
 
-	/**
-	 * @return the overRowLabels
-	 */
+	/** @return the overRowLabels */
 	public boolean isOverLabels() {
-		
+
 		return overLabels;
 	}
 
@@ -2327,29 +2250,26 @@ public class MapContainer extends Observable implements Observer,
 	 * notifyObservers */
 	//TODO only declare member variable before constructor.
 	private boolean labelAnimeRunning = false;
+
 	public void setLabelAnimeRunning(boolean state) {
-		
+
 		labelAnimeRunning = state;
 	}
-	
+
 	public boolean isLabelAnimeRunning() {
-		
+
 		return(labelAnimeRunning);
 	}
 
-	/**
-	 * @return the hoverIndex
-	 */
+	/** @return the hoverIndex */
 	public int getHoverIndex() {
-		
+
 		return hoverIndex;
 	}
 
-	/**
-	 * @param hoverIndex the hoverIndex to set
-	 */
+	/** @param hoverIndex the hoverIndex to set */
 	public void setHoverIndex(int hoverIndex) {
-		
+
 		this.hoverIndex = hoverIndex;
 		//setHoverChanged prevents the IMV (and other views) from repainting
 		//when no visual change has occurred (i.e. it's just a change in hover
@@ -2368,86 +2288,75 @@ public class MapContainer extends Observable implements Observer,
 		}
 	}
 
-	/**
-	 * This sets the hoverIndex to a value indicating that the cursor is not
+	/** This sets the hoverIndex to a value indicating that the cursor is not
 	 * hovered over a position corresponding to a visible data index
+	 * 
 	 * @author rleach
 	 * @param none
-	 * @return nothing
-	 */
+	 * @return nothing */
 	public void unsetHoverIndex() {
-		
+
 		this.hoverIndex = -1;
 	}
 
 	public int getHoverPixel() {
-		
+
 		return(hoverPixel);
 	}
 
 	public void setHoverPixel(int pixelIndex) {
-		
+
 		hoverPixel = pixelIndex;
 	}
 
 	public void unsetHoverPixel() {
-		
+
 		hoverPixel = -1;
 	}
 
-	/**
-	 * This is used to decide to not actually repaint because all that changed
+	/** This is used to decide to not actually repaint because all that changed
 	 * is the hover position of the mouse - however, that DOES trigger a change
 	 * in the LabelView classes
 	 * TODO maybe setChanged & notify shouldn't be triggered on simple hovering
-	 * @return hoverChanged
-	 */
+	 * 
+	 * @return hoverChanged */
 	public boolean hoverChanged() {
-		
+
 		return(hoverChanged);
 	}
 
-	/**
-	 * This is used to distinguish between hover updates and actual visual
-	 * change updates - The LabelView classes views do change on hover changed
-	 */
+	/** This is used to distinguish between hover updates and actual visual
+	 * change updates - The LabelView classes views do change on hover changed */
 	public void setHoverChanged() {
-		
+
 		hoverChanged = true;
 	}
 
-	/**
-	 * This is used to distinguish between hover updates and actual visual
-	 * change updates - The LabelView classes views do change on hover changed
-	 */
+	/** This is used to distinguish between hover updates and actual visual
+	 * change updates - The LabelView classes views do change on hover changed */
 	public void unsetHoverChanged() {
-		
+
 		hoverChanged = false;
 	}
 
-	/**
-	 * @author rleach
-	 * @return the hoverTreeMinIndex
-	 */
+	/** @author rleach
+	 * @return the hoverTreeMinIndex */
 	public int getHoverTreeMinIndex() {
 		return(hoverTreeMinIndex);
 	}
 
-	/**
-	 * @author rleach
-	 * @param hoverTreeMinIndex the hoverTreeMinIndex to set
-	 */
+	/** @author rleach
+	 * @param hoverTreeMinIndex the hoverTreeMinIndex to set */
 	public void setHoverTreeMinIndex(int hoverTreeMinIndex) {
 		this.hoverTreeMinIndex = hoverTreeMinIndex;
-		debug("Setting new tree min index hover to [" + hoverTreeMinIndex + "].",18);
+		debug("Setting new tree min index hover to [" +	hoverTreeMinIndex +
+					"].", 18);
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
 	}
 
-	/**
-	 * @author rleach
-	 */
+	/** @author rleach */
 	public void unsetHoverTreeMinIndex() {
 		this.hoverTreeMinIndex = -1;
 		setChanged();
@@ -2455,29 +2364,24 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
-	/**
-	 * @author rleach
-	 * @return the hoverTreeMaxIndex
-	 */
+	/** @author rleach
+	 * @return the hoverTreeMaxIndex */
 	public int getHoverTreeMaxIndex() {
 		return(hoverTreeMaxIndex);
 	}
 
-	/**
-	 * @author rleach
-	 * @param hoverTreeMaxIndex the hoverTreeMaxIndex to set
-	 */
+	/** @author rleach
+	 * @param hoverTreeMaxIndex the hoverTreeMaxIndex to set */
 	public void setHoverTreeMaxIndex(int hoverTreeMaxIndex) {
 		this.hoverTreeMaxIndex = hoverTreeMaxIndex;
-		debug("Setting new tree max index hover to [" + hoverTreeMaxIndex + "].",18);
+		debug("Setting new tree max index hover to [" +	hoverTreeMaxIndex +
+					"].", 18);
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
 	}
 
-	/**
-	 * @author rleach
-	 */
+	/** @author rleach */
 	public void unsetHoverTreeMaxIndex() {
 		this.hoverTreeMaxIndex = -1;
 		setChanged();
@@ -2485,211 +2389,178 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
-	/**
-	 * @return the selectingStart
-	 */
+	/** @return the selectingStart */
 	public int getSelectingStart() {
-		
+
 		return selectingStart;
 	}
 
-	/**
-	 * @param selectingStart the selectingStart to set
-	 */
+	/** @param selectingStart the selectingStart to set */
 	public void setSelectingStart(int selectingStart) {
-		
+
 		this.selectingStart = selectingStart;
 	}
 
-	/**
-	 * @return the selecting
-	 */
+	/** @return the selecting */
 	public boolean isSelecting() {
-		
+
 		return selecting;
 	}
 
-	/**
-	 * @param selecting the selecting to set
-	 */
+	/** @param selecting the selecting to set */
 	public void setSelecting(boolean selecting) {
-		
+
 		this.selecting = selecting;
 	}
 
 	public boolean isToggling() {
-		
+
 		return toggling;
 	}
 
 	public void setToggling(boolean toggling) {
-		
+
 		this.toggling = toggling;
 	}
 
 	public boolean isDeSelecting() {
-		
+
 		return deselecting;
 	}
 
 	public void setDeSelecting(boolean deselecting) {
-		
+
 		this.deselecting = deselecting;
 	}
 
-	/**
-	 * TODO Why is there a method to access a static member variable?
+	/** TODO Why is there a method to access a static member variable?
 	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
 	 * zooming that is aware of aspect ratio
+	 * 
 	 * @author rleach
-	 * @return double ZOOM_INCREMENT
-	 */
+	 * @return double ZOOM_INCREMENT */
 	public static double getZoomIncrement() {
-		
+
 		return(ZOOM_INCREMENT);
 	}
 
-	/**
-	 * TODO Why is there a method to access a static member variable?
+	/** TODO Why is there a method to access a static member variable?
 	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
 	 * zooming that is aware of aspect ratio
+	 * 
 	 * @author rleach
-	 * @return double ZOOM_INCREMENT_FAST
-	 */
+	 * @return double ZOOM_INCREMENT_FAST */
 	public static double getZoomIncrementFast() {
-		
+
 		return(ZOOM_INCREMENT_FAST);
 	}
 
-	/**
-	 * Set the first visible label data index.  For use by LabelView.
+	/** Set the first visible label data index. For use by LabelView.
 	 * -1 = unset
+	 * 
 	 * @author rleach
-	 * @param p
-	 */
+	 * @param p */
 	public void setFirstVisibleLabel(int p) {
-		if(p < getMinIndex() || p > getMaxIndex())
-			firstVisibleLabel = -1;
-		else
-			firstVisibleLabel = p;
+		if(p < getMinIndex() || p > getMaxIndex()) firstVisibleLabel = -1;
+		else firstVisibleLabel = p;
 	}
 
-	/**
-	 * Retrieves the first visible label data index
+	/** Retrieves the first visible label data index
+	 * 
 	 * @author rleach
-	 * @return firstVisiblelabel data index
-	 */
+	 * @return firstVisiblelabel data index */
 	public int getFirstVisibleLabel() {
 		return(firstVisibleLabel);
 	}
 
-	/**
-	 * Set the last visible label data index.  For use by LabelView.
+	/** Set the last visible label data index. For use by LabelView.
 	 * -1 = unset
+	 * 
 	 * @author rleach
-	 * @param p
-	 */
+	 * @param p */
 	public void setLastVisibleLabel(int p) {
-		if(p < getMinIndex() || p > getMaxIndex())
-			lastVisibleLabel = -1;
-		else
-			lastVisibleLabel = p;
+		if(p < getMinIndex() || p > getMaxIndex()) lastVisibleLabel = -1;
+		else lastVisibleLabel = p;
 	}
 
-	/**
-	 * Retrieves the last visible label data index
+	/** Retrieves the last visible label data index
+	 * 
 	 * @author rleach
-	 * @return lastVisiblelabel data index
-	 */
+	 * @return lastVisiblelabel data index */
 	public int getLastVisibleLabel() {
 		return(lastVisibleLabel);
 	}
 
-	/**
-	 * Retrieves the last visible label data index
+	/** Retrieves the last visible label data index
+	 * 
 	 * @author rleach
-	 * @return lastVisiblelabel data index
-	 */
+	 * @return lastVisiblelabel data index */
 	public int getNumVisibleLabels() {
-		if(lastVisibleLabel < 0) {
-			return(-1);
-		}
+		if(lastVisibleLabel < 0) { return(-1); }
 		return(lastVisibleLabel - firstVisibleLabel + 1);
 	}
 
-	/**
-	 * This provides the number of pixels the first label is offset from the
-	 * nearest edge.  This is required by the trees in order to align the leaves
+	/** This provides the number of pixels the first label is offset from the
+	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
+	 * 
 	 * @author rleach
-	 * @return the firstVisibleLabelOffset
-	 */
+	 * @return the firstVisibleLabelOffset */
 	public int getFirstVisibleLabelOffset() {
 		return(firstVisibleLabelOffset);
 	}
 
-	/**
-	 * This sets the number of pixels the first label is offset from the
-	 * nearest edge.  This is required by the trees in order to align the leaves
+	/** This sets the number of pixels the first label is offset from the
+	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
+	 * 
 	 * @author rleach
-	 * @param firstVisibleLabelOffset the firstVisibleLabelOffset to set
-	 */
+	 * @param firstVisibleLabelOffset the firstVisibleLabelOffset to set */
 	public void setFirstVisibleLabelOffset(int firstVisibleLabelOffset) {
 		this.firstVisibleLabelOffset = firstVisibleLabelOffset;
 	}
 
-	/**
-	 * This provides the number of pixels the last label is offset from the
-	 * nearest edge.  This is required by the trees in order to align the leaves
+	/** This provides the number of pixels the last label is offset from the
+	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
+	 * 
 	 * @author rleach
-	 * @return the lastVisibleLabelOffset
-	 */
+	 * @return the lastVisibleLabelOffset */
 	public int getLastVisibleLabelOffset() {
 		return(lastVisibleLabelOffset);
 	}
 
-	/**
-	 * This sets the number of pixels the last label is offset from the
-	 * nearest edge.  This is required by the trees in order to align the leaves
+	/** This sets the number of pixels the last label is offset from the
+	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
+	 * 
 	 * @author rleach
-	 * @param lastVisibleLabelOffset the lastVisibleLabelOffset to set
-	 */
+	 * @param lastVisibleLabelOffset the lastVisibleLabelOffset to set */
 	public void setLastVisibleLabelOffset(int lastVisibleLabelOffset) {
 		this.lastVisibleLabelOffset = lastVisibleLabelOffset;
 	}
 
 
-	/**
-	 * @author rleach
-	 * @return the lastTreeModeGlobal
-	 */
+	/** @author rleach
+	 * @return the lastTreeModeGlobal */
 	public boolean wasLastTreeModeGlobal() {
 		return(lastTreeModeGlobal);
 	}
 
-	/**
-	 * @author rleach
-	 * @param lastTreeModeGlobal the lastTreeModeGlobal to set
-	 */
+	/** @author rleach
+	 * @param lastTreeModeGlobal the lastTreeModeGlobal to set */
 	public void setLastTreeModeGlobal(boolean lastTreeModeGlobal) {
 		this.lastTreeModeGlobal = lastTreeModeGlobal;
 	}
 
-	/**
-	 * @author rleach
-	 * @return the keepTreeGlobal
-	 */
+	/** @author rleach
+	 * @return the keepTreeGlobal */
 	public boolean shouldKeepTreeGlobal() {
 		return(keepTreeGlobal);
 	}
 
-	/**
-	 * @author rleach
-	 * @param keepTreeGlobal the keepTreeGlobal to set
-	 */
+	/** @author rleach
+	 * @param keepTreeGlobal the keepTreeGlobal to set */
 	public void setKeepTreeGlobal(boolean keepTreeGlobal) {
 		this.keepTreeGlobal = keepTreeGlobal;
 	}
@@ -2698,44 +2569,38 @@ public class MapContainer extends Observable implements Observer,
 		return(selecting || labelsBeingScrolled || draggingDivider);
 	}
 
-	/**
-	 * @author rleach
-	 * @return the whizMode
-	 */
+	/** @author rleach
+	 * @return the whizMode */
 	public boolean isWhizMode() {
 		return(whizMode);
 	}
 
-	/**
-	 * @author rleach
-	 * @param whizMode the whizMode to set
-	 */
+	/** @author rleach
+	 * @param whizMode the whizMode to set */
 	public void setWhizMode(boolean whizMode) {
 		this.whizMode = whizMode;
 	}
 
 	public void debug(String msg, int level) {
-		
+
 		if(level == debug) {
 			LogBuffer.println(msg);
 		}
 	}
 
-	/**
-	 * This is used to determine whether an entire row/column will be
+	/** This is used to determine whether an entire row/column will be
 	 * highlighted in the matrix overlay during drawing
-	 * @return the highlightHoverChange
-	 */
+	 * 
+	 * @return the highlightHoverChange */
 	public boolean isHoverHighlightActive() {
 		return(hoverHighlight);
 	}
 
-	/**
-	 * Set this to true when you want to trigger an entire row/col to be
-	 * highlighted on the matrix.  This is called from MatrixViewController
+	/** Set this to true when you want to trigger an entire row/col to be
+	 * highlighted on the matrix. This is called from MatrixViewController
 	 * whenever the user presses/releases a modifier key.
-	 * @param rowHoverChange the rowHoverChange to set
-	 */
+	 * 
+	 * @param rowHoverChange the rowHoverChange to set */
 	public void setHoverHighlight(boolean highlightHoverChange) {
 		this.hoverHighlight = highlightHoverChange;
 	}

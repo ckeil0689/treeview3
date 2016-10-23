@@ -12,6 +12,7 @@ import javax.swing.event.ChangeListener;
 
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.PreviewLoader;
 
 public class DataImportController {
@@ -133,7 +134,7 @@ public class DataImportController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			detectDataBoundaries();
+			detectDataBoundaries(null);
 		}
 	}
 	
@@ -141,14 +142,28 @@ public class DataImportController {
 	 * Initiates data boundary detection with currently set fileSet object
 	 * and the selectedDelimiter. Then it updates the JSpinner values which
 	 * describe the data boundaries in the dialog.
+	 * @param dataInfo - The <code>DataLoadInfo</code> object which contains
+	 * data load setting information. If it is supplied, previously found
+	 * row or column label types can be used to find the data start coordinates.
+	 * @return an integer array with two elements which describe the coordinates
+	 * of the data starting point in file
 	 */
-	public int[] detectDataBoundaries() {
+	public int[] detectDataBoundaries(final DataLoadInfo dataInfo) {
 		
 		String filename = fileSet.getCdt();
+		String[] rowLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
+		String[] colLabelTypes = DataLoadInfo.DEFAULT_LABEL_TYPES;
+		
+		if(dataInfo != null) {
+			rowLabelTypes = dataInfo.getRowLabelTypes();
+			colLabelTypes = dataInfo.getColLabelTypes();
+		}
+		
+		// FIXME
 		int[] dataStartCoords = PreviewLoader.findDataStartCoords(filename,
-				selectedDelimiter);
+				selectedDelimiter, rowLabelTypes, colLabelTypes);
 
-		/* This method can be called without the actual dialog being open! */
+		// This method can be called without the actual dialog being open!
 		if(previewDialog != null) {
 			int rowCount = dataStartCoords[0];
 			int columnCount = dataStartCoords[1];
