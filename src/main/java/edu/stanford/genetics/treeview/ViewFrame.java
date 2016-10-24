@@ -286,11 +286,8 @@ public abstract class ViewFrame extends Observable implements Observer,
 	}
 
 	/**
-	 * Listens to the resizing of DendroView2 and makes changes to MapContainers
-	 * as a result.
-	 *
-	 * @author CKeil
-	 *
+	 * Listens to the repositioning of the window and stores the state once
+	 * movement has stopped (as determined by a timer)
 	 */
 	private class AppWindowPosListener extends ComponentAdapter {
 
