@@ -767,13 +767,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 * here on out
 		 */
 
-		/*
-		 * Gets the Current active Window (eg: export or treeview frame). It
-		 * will return null if we are active in other application.
-		 */
-		Window activeWindow = javax.swing.FocusManager.getCurrentManager()
-																									.getActiveWindow();
-		if(SwingUtilities	.getWindowAncestor(this).isActive())
+		
+		if(SwingUtilities.getWindowAncestor(this).isActive())
+		  // There used to be a custom case for hover index updates during
+			// scrollbar drag, but it has been replaced by this more universal
+			// method. Note, this method returns 0 or the max index if the
+			// cursor is
+			// hovered off that nearest edge.
 			forceUpdatePrimaryHoverIndex();
 		Window[] wins = Window.getWindows();
 		boolean dialogOntop = false;
@@ -785,6 +785,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				}
 			}
 		}
+		/*
+		 * Gets the Current active Window (eg: export or treeview frame). It
+		 * will return null if we are active in other application.
+		 */
+		Window activeWindow = javax.swing.FocusManager.getCurrentManager()
+																									.getActiveWindow();
 		if(activeWindow == null && !dialogOntop) {
 			// There used to be a custom case for hover index updates during
 			// scrollbar drag, but it has been replaced by this more universal
