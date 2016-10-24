@@ -28,6 +28,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BoundedRangeModel;
+import javax.swing.JDialog;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
@@ -772,8 +773,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 */
 		Window activeWindow = javax.swing.FocusManager.getCurrentManager()
 																									.getActiveWindow();
-		if(activeWindow == null || SwingUtilities	.getWindowAncestor(this)
-																							.isActive()) {
+		if(SwingUtilities	.getWindowAncestor(this).isActive())
+			forceUpdatePrimaryHoverIndex();
+		Window[] wins = Window.getWindows();
+		boolean dialogOntop = false;
+		for(Window windowInstance : wins){
+			if(windowInstance instanceof JDialog){
+				if(windowInstance.isVisible()){
+					dialogOntop = true;
+				  break;
+				}
+			}
+		}
+		if(activeWindow == null && !dialogOntop) {
 			// There used to be a custom case for hover index updates during
 			// scrollbar drag, but it has been replaced by this more universal
 			// method. Note, this method returns 0 or the max index if the
