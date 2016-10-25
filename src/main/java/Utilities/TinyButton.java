@@ -4,23 +4,22 @@ import java.awt.Dimension;
 import java.awt.Insets;
 
 import javax.swing.JButton;
+import javax.swing.UIManager;
 
-public class SquareButton extends JButton {
+public class TinyButton extends JButton {
 
 	/**
 	 * Default so no warnings are shown.
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private int size;
+	private final int size = ((Integer)UIManager.get("ScrollBar.width")).intValue();
 
-	public SquareButton(String s, int size) {
+	public TinyButton(String s) {
 
 		super(s);
 		
-		this.size = size;
 		setFont(GUIFactory.FONTXS);
-		setMargin(new Insets(0, 0, 0, 0));
 	}
 
 	@Override
@@ -31,6 +30,12 @@ public class SquareButton extends JButton {
 
 	@Override
 	public Dimension getMinimumSize() {
+
+		return new Dimension(size, size);
+	}
+	
+	@Override
+	public Dimension getMaximumSize() {
 
 		return new Dimension(size, size);
 	}

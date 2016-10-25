@@ -8,6 +8,7 @@
 
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -538,16 +539,23 @@ public class DendroView implements Observer, DendroPanel {
 	private JPanel createColNavPanel() {
 
 		JPanel colNavPanel;
+    JPanel btnLeftPanel;
+    JPanel btnRightPanel;
+		
+		colNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_VERT_INSETS, Color.MAGENTA);
+		btnLeftPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_VERT_INSETS);
+		btnRightPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_VERT_INSETS);
+		
+		btnLeftPanel.add(scaleAddLeftX, "push, growy");
+		btnLeftPanel.add(scaleRemoveLeftX, "push, growy");
 
-		colNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
-		colNavPanel.add(scaleAddLeftX);
-		colNavPanel.add(scaleRemoveLeftX);
-
-		colNavPanel.add(matrixXscrollbar, "w 100%, growx, pushx");
-
-		colNavPanel.add(scaleRemoveRightX);
-		colNavPanel.add(scaleAddRightX);
-
+		btnRightPanel.add(scaleRemoveRightX, "push, growy");
+		btnRightPanel.add(scaleAddRightX, "push, growy");
+		
+		colNavPanel.add(btnLeftPanel, "pushx, grow, al left, hmax 80%, wmin 20px, wmax 35px");
+		colNavPanel.add(matrixXscrollbar, "wmin 80%, pushx, growx");
+		colNavPanel.add(btnRightPanel, "pushx, grow, al right, wmin 20px, wmax 35px, hmax 80%");
+		
 		return colNavPanel;
 	}
 
@@ -559,15 +567,15 @@ public class DendroView implements Observer, DendroPanel {
 
 		JPanel rowNavPanel;
 
-		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+		rowNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_HORIZ_INSETS, Color.MAGENTA);
 
-		rowNavPanel.add(scaleAddTopY, "wrap");
-		rowNavPanel.add(scaleRemoveTopY, "wrap");
+		rowNavPanel.add(scaleAddTopY, "growx, wmax 80%, wrap");
+		rowNavPanel.add(scaleRemoveTopY, "growx, wmax 80%, wrap");
 
-		rowNavPanel.add(matrixYscrollbar, "growy, push, wrap");
+		rowNavPanel.add(matrixYscrollbar, "growy, pushy, hmin 50%, wrap");
 
-		rowNavPanel.add(scaleRemoveBottomY, "wrap");
-		rowNavPanel.add(scaleAddBottomY, "");
+		rowNavPanel.add(scaleRemoveBottomY, "growx, wmax 80%, wrap");
+		rowNavPanel.add(scaleAddBottomY, "growx, wmax 80%");
 
 		return rowNavPanel;
 	}
@@ -660,51 +668,46 @@ public class DendroView implements Observer, DendroPanel {
 	/** Sets up the JButtons which control scaling and zooming. */
 	private void setupScaleButtons() {
 
+		// reset scale
 		scaleDefaultAll = GUIFactory.createIconBtn(StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-		int btnSize = 15;
-
-		/* Scale x-axis */
-		scaleAddRightX = GUIFactory.createSquareBtn("+", btnSize);
+		// scale x-axis
+		scaleAddRightX = GUIFactory.createTinyBtn("+");
 		scaleAddRightX.setToolTipText(StringRes.tt_xZoomIn_right);
 
-		scaleRemoveRightX = GUIFactory.createSquareBtn("-", btnSize);
+		scaleRemoveRightX = GUIFactory.createTinyBtn("-");
 		scaleRemoveRightX.setToolTipText(StringRes.tt_xZoomOut_right);
 
-		scaleAddLeftX = GUIFactory.createSquareBtn("+", btnSize);
+		scaleAddLeftX = GUIFactory.createTinyBtn("+");
 		scaleAddLeftX.setToolTipText(StringRes.tt_xZoomIn_left);
 
-		scaleRemoveLeftX = GUIFactory.createSquareBtn("-", btnSize);
+		scaleRemoveLeftX = GUIFactory.createTinyBtn("-");
 		scaleRemoveLeftX.setToolTipText(StringRes.tt_xZoomOut_left);
 
-		/* Scale y-axis */
-		scaleAddBottomY = GUIFactory.createSquareBtn("+", btnSize);
+		// scale y-axis
+		scaleAddBottomY = GUIFactory.createTinyBtn("+");
 		scaleAddBottomY.setToolTipText(StringRes.tt_yZoomIn_bottom);
 
-		scaleRemoveBottomY = GUIFactory.createSquareBtn("-", btnSize);
+		scaleRemoveBottomY = GUIFactory.createTinyBtn("-");
 		scaleRemoveBottomY.setToolTipText(StringRes.tt_yZoomOut_bottom);
 
-		scaleAddTopY = GUIFactory.createSquareBtn("+", btnSize);
+		scaleAddTopY = GUIFactory.createTinyBtn("+");
 		scaleAddTopY.setToolTipText(StringRes.tt_yZoomIn_top);
 
-		scaleRemoveTopY = GUIFactory.createSquareBtn("-", btnSize);
+		scaleRemoveTopY = GUIFactory.createTinyBtn("-");
 		scaleRemoveTopY.setToolTipText(StringRes.tt_yZoomOut_top);
 
-		/* Scale both axes */
+		// scale both axes (large buttons)
 		scaleIncXY = GUIFactory.createIconBtn(StringRes.icon_fullZoomIn);
 		scaleIncXY.setToolTipText(StringRes.tt_xyZoomIn);
 
 		scaleDecXY = GUIFactory.createIconBtn(StringRes.icon_fullZoomOut);
 		scaleDecXY.setToolTipText(StringRes.tt_xyZoomOut);
 
-		/* Reset zoom */
+		// zoom
 		zoomBtn = GUIFactory.createIconBtn(StringRes.icon_zoomAll);
 		zoomBtn.setToolTipText(StringRes.tt_home);
-
-		/* TODO: This needs to be better integrated into the interface */
-//		exportBtn = GUIFactory.createSquareBtn("X",39);
-//		exportBtn.setToolTipText("Export image to file");
 	}
 
 	/** Used to update the JMenuItem field "Show trees/ Hide trees" depending

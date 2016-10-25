@@ -729,7 +729,7 @@ public class ExportDialog extends CustomDialog {
 			exportFileName = GUIFactory.createWrappableTextArea();
 			exportFileName.setFont(GUIFactory.FONTXS);
 			exportFileName.setFocusable(true);
-			cancelButton = GUIFactory.createSquareBtn("cancel", 15);
+			cancelButton = GUIFactory.createBtn("cancel");
 			jpb = new JProgressBar();
 	        mainPanel.add(label,"push, grow, w 375, wrap");
 	        mainPanel.add(jpb, "push, grow, split 2, gapright 15,  w 300!,  h 25!");
