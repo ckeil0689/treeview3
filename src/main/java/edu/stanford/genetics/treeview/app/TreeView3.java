@@ -15,15 +15,24 @@ import edu.stanford.genetics.treeview.TreeViewApp;
 public class TreeView3 {
 
 	/**
+	 * Tests if the current system is running on a version of OSX
+	 * @return true if the operating system on which the JVM runs is OSX
+	 */
+	public static boolean isMac() {
+		
+		final String os = System.getProperty("os.name").toLowerCase();
+		final boolean isMac = os.startsWith("mac os x");
+		
+		return isMac;
+	}
+	
+	/**
 	 * Sets up important system properties for Apple OS X systems. This includes
 	 * mostly properties related to the OS X menu bar.
 	 */
 	private static void macSetup() {
 
-		final String os = System.getProperty("os.name").toLowerCase();
-		final boolean isMac = os.startsWith("mac os x");
-
-		if (!isMac) return;
+		if (!isMac()) return;
 
 		LogBuffer.println("Running on a Mac.");
 

@@ -46,6 +46,7 @@ import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeViewFrame;
+import edu.stanford.genetics.treeview.app.TreeView3;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.LabelFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
@@ -570,17 +571,42 @@ public class DendroView implements Observer, DendroPanel {
 	private JPanel createRowNavPanel() {
 
 		JPanel rowNavPanel;
+    
+    // OS differentiation because OSX treats JButtons different
+		if(TreeView3.isMac()) {
+	
+			rowNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_HORIZ_INSETS, Color.MAGENTA);
+	
+			rowNavPanel.add(scaleAddTopY, "growx, wmax 80%, wrap");
+			rowNavPanel.add(scaleRemoveTopY, "growx, wmax 80%, wrap");
+	
+			rowNavPanel.add(matrixYscrollbar, "growy, pushy, hmin 50%, wrap");
+	
+			rowNavPanel.add(scaleRemoveBottomY, "growx, wmax 80%, wrap");
+			rowNavPanel.add(scaleAddBottomY, "growx, wmax 80%");
+	
+		} else {
+			JPanel btnTopPanel;
+	    JPanel btnBottomPanel;
+			rowNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_HORIZ_INSETS, Color.MAGENTA);
+			btnTopPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+			btnBottomPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+			
+			btnTopPanel.setLayout(new MigLayout("ins 0", "[10px]0", "[10px]0"));
+			btnBottomPanel.setLayout(new MigLayout("ins 0", "[10px]0", "[10px]0"));
+			
+			btnTopPanel.add(scaleAddTopY, "push, grow");
+			btnTopPanel.add(scaleRemoveTopY, "push, grow");
 
-		rowNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_HORIZ_INSETS, Color.MAGENTA);
-
-		rowNavPanel.add(scaleAddTopY, "growx, wmax 80%, wrap");
-		rowNavPanel.add(scaleRemoveTopY, "growx, wmax 80%, wrap");
-
-		rowNavPanel.add(matrixYscrollbar, "growy, pushy, hmin 50%, wrap");
-
-		rowNavPanel.add(scaleRemoveBottomY, "growx, wmax 80%, wrap");
-		rowNavPanel.add(scaleAddBottomY, "growx, wmax 80%");
-
+			btnBottomPanel.add(scaleRemoveBottomY, "push, grow");
+			btnBottomPanel.add(scaleAddBottomY, "push, grow");
+			
+			rowNavPanel.add(btnTopPanel, "grow, al top, wmax 80%, h 10::35");
+			rowNavPanel.add(matrixYscrollbar, "hmin 80%, push, grow");
+			rowNavPanel.add(btnBottomPanel, "grow, align bottom, h 10::35, wmax 80%");
+			return rowNavPanel;
+		}
+		
 		return rowNavPanel;
 	}
 
