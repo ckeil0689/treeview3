@@ -49,6 +49,7 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.LabelFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
+import net.miginfocom.swing.MigLayout;
 import edu.stanford.genetics.treeview.DragGridPanel;
 
 /** TODO Refactor this JavaDoc. It's not applicable to the current program
@@ -542,9 +543,12 @@ public class DendroView implements Observer, DendroPanel {
     JPanel btnLeftPanel;
     JPanel btnRightPanel;
 		
-		colNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_VERT_INSETS, Color.MAGENTA);
+		colNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_GAPS_OR_INSETS, Color.MAGENTA);
 		btnLeftPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
 		btnRightPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+		
+		btnLeftPanel.setLayout(new MigLayout("ins 0", "[10px]0"));
+		btnRightPanel.setLayout(new MigLayout("ins 0", "[10px]0"));
 		
 		btnLeftPanel.add(scaleAddLeftX, "push, grow");
 		btnLeftPanel.add(scaleRemoveLeftX, "push, grow");
@@ -553,7 +557,7 @@ public class DendroView implements Observer, DendroPanel {
 		btnRightPanel.add(scaleAddRightX, "push, grow");
 		
 		colNavPanel.add(btnLeftPanel, "grow, al left, hmax 80%, w 10::35");
-		colNavPanel.add(matrixXscrollbar, "wmin 80%, pushx, growx");
+		colNavPanel.add(matrixXscrollbar, "wmin 80%, push, grow");
 		colNavPanel.add(btnRightPanel, "grow, al right, w 10::35, hmax 80%");
 		
 		return colNavPanel;
