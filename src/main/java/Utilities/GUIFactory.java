@@ -38,7 +38,7 @@ import net.miginfocom.swing.MigLayout;
 public class GUIFactory {
 
 	// Application fonts
-	public static final Font FONTXS = new Font("Sans Serif", Font.PLAIN, 8);
+	public static final Font FONTXS = new Font("Sans Serif", Font.PLAIN, 10);
 	public static final Font FONTS = new Font("Sans Serif", Font.PLAIN, 12);
 	public static final Font FONTS_B = new Font("Sans Serif", Font.BOLD, 12);
 	public static final Font FONTM = new Font("Sans Serif", Font.PLAIN, 14);

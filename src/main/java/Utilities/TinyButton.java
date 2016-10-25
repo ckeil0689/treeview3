@@ -19,6 +19,7 @@ public class TinyButton extends JButton {
 
 		super(s);
 		
+		setMargin(new Insets(1,0,1,0));
 		setFont(GUIFactory.FONTXS);
 	}
 

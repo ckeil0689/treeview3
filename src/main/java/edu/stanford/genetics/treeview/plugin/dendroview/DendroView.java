@@ -543,18 +543,18 @@ public class DendroView implements Observer, DendroPanel {
     JPanel btnRightPanel;
 		
 		colNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_VERT_INSETS, Color.MAGENTA);
-		btnLeftPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_VERT_INSETS);
-		btnRightPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_VERT_INSETS);
+		btnLeftPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+		btnRightPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
 		
-		btnLeftPanel.add(scaleAddLeftX, "push, growy");
-		btnLeftPanel.add(scaleRemoveLeftX, "push, growy");
+		btnLeftPanel.add(scaleAddLeftX, "push, grow");
+		btnLeftPanel.add(scaleRemoveLeftX, "push, grow");
 
-		btnRightPanel.add(scaleRemoveRightX, "push, growy");
-		btnRightPanel.add(scaleAddRightX, "push, growy");
+		btnRightPanel.add(scaleRemoveRightX, "push, grow");
+		btnRightPanel.add(scaleAddRightX, "push, grow");
 		
-		colNavPanel.add(btnLeftPanel, "pushx, grow, al left, hmax 80%, wmin 20px, wmax 35px");
+		colNavPanel.add(btnLeftPanel, "grow, al left, hmax 80%, w 10::35");
 		colNavPanel.add(matrixXscrollbar, "wmin 80%, pushx, growx");
-		colNavPanel.add(btnRightPanel, "pushx, grow, al right, wmin 20px, wmax 35px, hmax 80%");
+		colNavPanel.add(btnRightPanel, "grow, al right, w 10::35, hmax 80%");
 		
 		return colNavPanel;
 	}
@@ -743,9 +743,6 @@ public class DendroView implements Observer, DendroPanel {
 		scaleIncXY.addActionListener(l);
 		scaleDecXY.addActionListener(l);
 		scaleDefaultAll.addActionListener(l);
-
-		/* TODO: This needs to be better integrated into the interface */
-//		exportBtn.addActionListener(l);
 	}
 
 	/** Adds an ActionListener to the Zoom button in DendroView.
@@ -866,113 +863,6 @@ public class DendroView implements Observer, DendroPanel {
 		getColLabelView().getLabelAttributes().setRightJustified(isColRight);
 	}
 
-	// @Override
-	// public void populateExportMenu(final TreeviewMenuBarI menu) {
-	//
-	// menu.addMenuItem("Export to Postscript...");
-	// , new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent actionEvent) {
-	//
-	// MapContainer initXmap, initYmap;
-	//
-	// // if ((getArraySelection().getNSelectedIndexes() != 0) ||
-	// // (getGeneSelection().getNSelectedIndexes() != 0)) {
-	// // initXmap = getZoomXmap();
-	// // initYmap = getZoomYmap();
-	// //
-	// // } else {
-	// initXmap = getGlobalXmap();
-	// initYmap = getGlobalYmap();
-	// // }
-	//
-	// final PostscriptExportPanel psePanel = setupPostscriptExport(
-	// initXmap, initYmap);
-	//
-	// final JDialog popup = new CancelableSettingsDialog(viewFrame,
-	// "Export to Postscript", psePanel);
-	// popup.pack();
-	// popup.setVisible(true);
-	// }
-	// });
-	// menu.setAccelerator(KeyEvent.VK_X);
-	// menu.setMnemonic(KeyEvent.VK_X);
-	//
-	// menu.addMenuItem("Export to Image...");
-	// , new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent actionEvent) {
-	//
-	// MapContainer initXmap, initYmap;
-	// // if ((getArraySelection().getNSelectedIndexes() != 0) ||
-	// // (getGeneSelection().getNSelectedIndexes() != 0)) {
-	// // initXmap = getZoomXmap();
-	// // initYmap = getZoomYmap();
-	// //
-	// // } else {
-	// initXmap = getGlobalXmap();
-	// initYmap = getGlobalYmap();
-	// // }
-	//
-	// final BitmapExportPanel bitmapPanel = setupBitmapExport(
-	// initXmap, initYmap);
-	//
-	// final JDialog popup = new CancelableSettingsDialog(viewFrame,
-	// "Export to Image", bitmapPanel);
-	// popup.pack();
-	// popup.setVisible(true);
-	// }
-	// });
-	// menu.setMnemonic(KeyEvent.VK_I);
-	//
-	// menu.addMenuItem("Export ColorBar to Postscript...");
-	// , new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent actionEvent) {
-	//
-	// final PostscriptColorBarExportPanel gcbPanel =
-	// new PostscriptColorBarExportPanel(
-	// ((DoubleArrayDrawer) arrayDrawer)
-	// .getColorExtractor());
-	//
-	// gcbPanel.setSourceSet(getDataModel().getFileSet());
-	//
-	// final JDialog popup = new CancelableSettingsDialog(
-	// viewFrame, "Export ColorBar to Postscript",
-	// gcbPanel);
-	// popup.pack();
-	// popup.setVisible(true);
-	// }
-	// });
-	// menu.setMnemonic(KeyEvent.VK_B);
-	//
-	// menu.addMenuItem("Export ColorBar to Image...");
-	// , new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(final ActionEvent actionEvent) {
-	//
-	// final BitmapColorBarExportPanel gcbPanel =
-	// new BitmapColorBarExportPanel(
-	// ((DoubleArrayDrawer) arrayDrawer).getColorExtractor());
-	//
-	// gcbPanel.setSourceSet(getDataModel().getFileSet());
-	//
-	// final JDialog popup = new CancelableSettingsDialog(viewFrame,
-	// "Export ColorBar to Image", gcbPanel);
-	// popup.pack();
-	// popup.setVisible(true);
-	// }
-	// });
-	// menu.setMnemonic(KeyEvent.VK_M);
-	//
-	// menu.addSeparator();
-	// addSimpleExportOptions(menu);
-	// }
-
 	// Populate Menus
 	/** adds DendroView stuff to Analysis menu
 	 *
@@ -1087,25 +977,6 @@ public class DendroView implements Observer, DendroPanel {
 	// menu.setMnemonic(KeyEvent.VK_S);
 	// }
 
-	// /**
-	// * adds DendroView stuff to Document menu
-	// *
-	// * @param menu
-	// * menu to add to
-	// */
-	// @Override
-	// public void populateSettingsMenu(final TreeviewMenuBarI menu) {
-	//
-	// annotationsMenuItem = (JMenuItem) menu.addMenuItem(
-	// "Row and Column Labels", 0);
-	// menu.setMnemonic(KeyEvent.VK_R);
-	// tvFrame.addToMenuList(annotationsMenuItem);
-	//
-	// colorMenuItem = (JMenuItem) menu.addMenuItem("Color Settings", 1);
-	// menu.setMnemonic(KeyEvent.VK_C);
-	// tvFrame.addToMenuList(colorMenuItem);
-	// }
-
 	@Override
 	public void addDendroMenus(final JMenu menu) {
 
@@ -1116,31 +987,6 @@ public class DendroView implements Observer, DendroPanel {
 		colorMenuItem = new JMenuItem(StringRes.menu_Color);
 		menu.add(colorMenuItem);
 		tvFrame.addToStackMenuList(colorMenuItem);
-
-		menu.addSeparator();
-
-		/* TODO add back when feature works well */
-		// matrixMenu = new JMenu("Matrix Size");
-		// menu.add(matrixMenu);
-		//
-		// final JMenuItem fillScreenMenuItem = new JMenuItem("Fill screen");
-		// matrixMenu.add(fillScreenMenuItem);
-		// fillScreenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
-		// Event.ALT_MASK));
-		// tvFrame.addToStackMenuList(fillScreenMenuItem);
-		//
-		// final JMenuItem equalAxesMenuItem = new JMenuItem("Equal axes");
-		// matrixMenu.add(equalAxesMenuItem);
-		// equalAxesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2,
-		// Event.ALT_MASK));
-		// tvFrame.addToStackMenuList(equalAxesMenuItem);
-		//
-		// final JMenuItem proportMatrixMenuItem = new JMenuItem(
-		// "Proportional axes");
-		// matrixMenu.add(proportMatrixMenuItem);
-		// proportMatrixMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-		// KeyEvent.VK_3, Event.ALT_MASK));
-		// tvFrame.addToStackMenuList(proportMatrixMenuItem);
 
 		menu.addSeparator();
 
@@ -1171,7 +1017,6 @@ public class DendroView implements Observer, DendroPanel {
 		// StringRes.menu_KMeans);
 		// menu.add(kMeansMenuItem);
 		// tvFrame.addToStackMenuList(kMeansMenuItem);
-
 	}
 
 	// @Override
