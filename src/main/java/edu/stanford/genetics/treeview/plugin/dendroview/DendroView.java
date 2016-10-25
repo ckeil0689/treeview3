@@ -139,13 +139,12 @@ public class DendroView implements Observer, DendroPanel {
 
 
 	//Used to layout the matrix panel
-	static int BORDER_THICKNESS   = 3;
+	static int BORDER_THICKNESS = 3;
 	static int MIN_GRID_CELL_SIZE = 10;
-	static int FOCUS_THICKNESS    = 0;
-	static int LABEL_AREA_HEIGHT  = 180;
+	static int FOCUS_THICKNESS = 0;
+	static int LABEL_AREA_HEIGHT = 180;
 
-	/**
-	 * Chained constructor for the DendroView object without a name.
+	/** Chained constructor for the DendroView object without a name.
 	 *
 	 * @param vFrame
 	 *          parent ViewFrame of DendroView */
@@ -170,10 +169,10 @@ public class DendroView implements Observer, DendroPanel {
 		this.name = "DendroView";
 
 		// Main panel to which all components are added
-		this.dendroPane = GUIFactory.createJPanel(false, 
-				GUIFactory.TINY_GAPS_AND_INSETS);
+		this.dendroPane = GUIFactory
+																.createJPanel(false, GUIFactory.TINY_GAPS_AND_INSETS);
 
-		this.dragGrid = new DragGridPanel(2,2);
+		this.dragGrid = new DragGridPanel(2, 2);
 
 		// Search panel containing the search bars
 		this.searchPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
@@ -541,26 +540,44 @@ public class DendroView implements Observer, DendroPanel {
 	private JPanel createColNavPanel() {
 
 		JPanel colNavPanel;
-    JPanel btnLeftPanel;
-    JPanel btnRightPanel;
-		
-		colNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_GAPS_OR_INSETS, Color.MAGENTA);
-		btnLeftPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
-		btnRightPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
-		
-		btnLeftPanel.setLayout(new MigLayout("ins 0", "[10px]0"));
-		btnRightPanel.setLayout(new MigLayout("ins 0", "[10px]0"));
-		
-		btnLeftPanel.add(scaleAddLeftX, "push, grow");
-		btnLeftPanel.add(scaleRemoveLeftX, "push, grow");
 
-		btnRightPanel.add(scaleRemoveRightX, "push, grow");
-		btnRightPanel.add(scaleAddRightX, "push, grow");
-		
-		colNavPanel.add(btnLeftPanel, "grow, al left, hmax 80%, w 10::35");
-		colNavPanel.add(matrixXscrollbar, "wmin 80%, push, grow");
-		colNavPanel.add(btnRightPanel, "grow, al right, w 10::35, hmax 80%");
-		
+		if(TreeView3.isMac()) {
+			colNavPanel = GUIFactory
+															.createJPanel(true, GUIFactory.NO_VERT_INSETS, Color.MAGENTA);
+
+			colNavPanel.add(scaleAddLeftX, "growy, hmax 80%");
+			colNavPanel.add(scaleRemoveLeftX, "growy, hmax 80%");
+
+			colNavPanel.add(matrixXscrollbar, "growx, pushx, wmin 50%");
+
+			colNavPanel.add(scaleRemoveRightX, "growy, hmax 80%");
+			colNavPanel.add(scaleAddRightX, "growy, hmax 80%");
+		}
+		else {
+
+			JPanel btnLeftPanel;
+			JPanel btnRightPanel;
+
+			colNavPanel = GUIFactory
+															.createJPanel(true, GUIFactory.NO_GAPS_OR_INSETS, Color.MAGENTA);
+			btnLeftPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+			btnRightPanel = GUIFactory
+																.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+
+			btnLeftPanel.setLayout(new MigLayout("ins 0", "[10px]0"));
+			btnRightPanel.setLayout(new MigLayout("ins 0", "[10px]0"));
+
+			btnLeftPanel.add(scaleAddLeftX, "push, grow");
+			btnLeftPanel.add(scaleRemoveLeftX, "push, grow");
+
+			btnRightPanel.add(scaleRemoveRightX, "push, grow");
+			btnRightPanel.add(scaleAddRightX, "push, grow");
+
+			colNavPanel.add(btnLeftPanel, "grow, al left, hmax 80%, w 10::35");
+			colNavPanel.add(matrixXscrollbar, "wmin 80%, push, grow");
+			colNavPanel.add(btnRightPanel, "grow, al right, w 10::35, hmax 80%");
+		}
+
 		return colNavPanel;
 	}
 
@@ -571,42 +588,46 @@ public class DendroView implements Observer, DendroPanel {
 	private JPanel createRowNavPanel() {
 
 		JPanel rowNavPanel;
-    
-    // OS differentiation because OSX treats JButtons different
+
+		// OS differentiation because OSX treats JButtons different
 		if(TreeView3.isMac()) {
-	
-			rowNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_HORIZ_INSETS, Color.MAGENTA);
-	
+
+			rowNavPanel = GUIFactory
+															.createJPanel(true, GUIFactory.NO_HORIZ_INSETS, Color.MAGENTA);
+
 			rowNavPanel.add(scaleAddTopY, "growx, wmax 80%, wrap");
 			rowNavPanel.add(scaleRemoveTopY, "growx, wmax 80%, wrap");
-	
+
 			rowNavPanel.add(matrixYscrollbar, "growy, pushy, hmin 50%, wrap");
-	
+
 			rowNavPanel.add(scaleRemoveBottomY, "growx, wmax 80%, wrap");
 			rowNavPanel.add(scaleAddBottomY, "growx, wmax 80%");
-	
-		} else {
+
+		}
+		else {
 			JPanel btnTopPanel;
-	    JPanel btnBottomPanel;
-			rowNavPanel = GUIFactory.createJPanel(true, GUIFactory.NO_HORIZ_INSETS, Color.MAGENTA);
-			btnTopPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+			JPanel btnBottomPanel;
+			rowNavPanel = GUIFactory
+															.createJPanel(true, GUIFactory.NO_HORIZ_INSETS, Color.MAGENTA);
+			btnTopPanel = GUIFactory
+															.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
 			btnBottomPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
-			
+
 			btnTopPanel.setLayout(new MigLayout("ins 0", "[10px]0", "[10px]0"));
 			btnBottomPanel.setLayout(new MigLayout("ins 0", "[10px]0", "[10px]0"));
-			
+
 			btnTopPanel.add(scaleAddTopY, "push, grow, wrap");
 			btnTopPanel.add(scaleRemoveTopY, "push, grow");
 
 			btnBottomPanel.add(scaleRemoveBottomY, "push, grow, wrap");
 			btnBottomPanel.add(scaleAddBottomY, "push, grow");
-			
+
 			rowNavPanel.add(btnTopPanel, "grow, top, wmax 80%, h 10::35, wrap");
 			rowNavPanel.add(matrixYscrollbar, "hmin 80%, push, grow, wrap");
 			rowNavPanel.add(btnBottomPanel, "grow, bottom, h 10::35, wmax 80%");
 			return rowNavPanel;
 		}
-		
+
 		return rowNavPanel;
 	}
 
@@ -635,8 +656,8 @@ public class DendroView implements Observer, DendroPanel {
 	/** Creates the full main matrix panel which includes all components
 	 * making up a full DendroView with the exception of the toolbar related
 	 * elements such as buttons or search.
-	 * @return A DragGridPanel with all main views arranged in it.
-	 */
+	 * 
+	 * @return A DragGridPanel with all main views arranged in it. */
 	private void setupMatrixPanel() {
 
 		dragGrid.removeAll();
@@ -649,11 +670,11 @@ public class DendroView implements Observer, DendroPanel {
 		dragGrid.setFocusWidth(FOCUS_THICKNESS);   //This is a line in the
 		dragGrid.setFocusHeight(FOCUS_THICKNESS);  //middle of the border
 
-		int mheights []  = new int[1];   //1 less than the size of the grid
+		int mheights[] = new int[1];   //1 less than the size of the grid
 		mheights[0] = LABEL_AREA_HEIGHT; //must be less than pane size!!!
 		dragGrid.setHeights(mheights);
 
-		int mwidths []  = new int[1];   //1 less than the size of the grid
+		int mwidths[] = new int[1];   //1 less than the size of the grid
 		mwidths[0] = LABEL_AREA_HEIGHT; //must be less than pane size!!!
 		dragGrid.setWidths(mwidths);
 
@@ -663,18 +684,17 @@ public class DendroView implements Observer, DendroPanel {
 		globalOverviewPanel = createGlobalOverviewPanel();
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
 
-		dragGrid.addComponent(globalOverviewPanel,0,0);
-		dragGrid.addComponent(colDataPane,1,0);
-		dragGrid.addComponent(rowDataPane,0,1);
-		dragGrid.addComponent(interactiveMatrixPanel,1,1);
+		dragGrid.addComponent(globalOverviewPanel, 0, 0);
+		dragGrid.addComponent(colDataPane, 1, 0);
+		dragGrid.addComponent(rowDataPane, 0, 1);
+		dragGrid.addComponent(interactiveMatrixPanel, 1, 1);
 	}
 
 	public DragGridPanel getDragGrid() {
 		return(dragGrid);
 	}
 
-	/**
-	 * Looks up the stored location values for the JSplitPane dividers.
+	/** Looks up the stored location values for the JSplitPane dividers.
 	 * This is needed for "Show-Hide" trees. It determines how much of
 	 * labels vs. tree panel is shown. */
 	private void setDataPaneDividers() {
