@@ -595,15 +595,15 @@ public class DendroView implements Observer, DendroPanel {
 			btnTopPanel.setLayout(new MigLayout("ins 0", "[10px]0", "[10px]0"));
 			btnBottomPanel.setLayout(new MigLayout("ins 0", "[10px]0", "[10px]0"));
 			
-			btnTopPanel.add(scaleAddTopY, "push, grow");
+			btnTopPanel.add(scaleAddTopY, "push, grow, wrap");
 			btnTopPanel.add(scaleRemoveTopY, "push, grow");
 
-			btnBottomPanel.add(scaleRemoveBottomY, "push, grow");
+			btnBottomPanel.add(scaleRemoveBottomY, "push, grow, wrap");
 			btnBottomPanel.add(scaleAddBottomY, "push, grow");
 			
-			rowNavPanel.add(btnTopPanel, "grow, al top, wmax 80%, h 10::35");
-			rowNavPanel.add(matrixYscrollbar, "hmin 80%, push, grow");
-			rowNavPanel.add(btnBottomPanel, "grow, align bottom, h 10::35, wmax 80%");
+			rowNavPanel.add(btnTopPanel, "grow, top, wmax 80%, h 10::35, wrap");
+			rowNavPanel.add(matrixYscrollbar, "hmin 80%, push, grow, wrap");
+			rowNavPanel.add(btnBottomPanel, "grow, bottom, h 10::35, wmax 80%");
 			return rowNavPanel;
 		}
 		
