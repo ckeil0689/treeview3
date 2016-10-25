@@ -19,25 +19,25 @@ public class TinyButton extends JButton {
 
 		super(s);
 		
-		setMargin(new Insets(1,0,1,0));
+//		setMargin(new Insets(1,0,1,0));
 		setFont(GUIFactory.FONTXS);
 	}
 
-	@Override
-	public Dimension getPreferredSize() {
-
-		return new Dimension(size, size);
-	}
-
-	@Override
-	public Dimension getMinimumSize() {
-
-		return new Dimension(size, size);
-	}
-	
-	@Override
-	public Dimension getMaximumSize() {
-
-		return new Dimension(size, size);
-	}
+//	@Override
+//	public Dimension getPreferredSize() {
+//
+//		return new Dimension(size, size);
+//	}
+//
+//	@Override
+//	public Dimension getMinimumSize() {
+//
+//		return new Dimension(size, size);
+//	}
+//	
+//	@Override
+//	public Dimension getMaximumSize() {
+//
+//		return new Dimension(size, size);
+//	}
 }

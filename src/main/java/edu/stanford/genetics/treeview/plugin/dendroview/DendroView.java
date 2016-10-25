@@ -567,15 +567,15 @@ public class DendroView implements Observer, DendroPanel {
 			btnLeftPanel.setLayout(new MigLayout("ins 0", "[10px]0"));
 			btnRightPanel.setLayout(new MigLayout("ins 0", "[10px]0"));
 
-			btnLeftPanel.add(scaleAddLeftX, "push, grow");
+			btnLeftPanel.add(scaleAddLeftX, "push, grow, w 5::10");
 			btnLeftPanel.add(scaleRemoveLeftX, "push, grow");
 
 			btnRightPanel.add(scaleRemoveRightX, "push, grow");
 			btnRightPanel.add(scaleAddRightX, "push, grow");
 
-			colNavPanel.add(btnLeftPanel, "grow, al left, hmax 80%, w 10::35");
+			colNavPanel.add(btnLeftPanel, "grow, al left, hmax 80%, w 10::20");
 			colNavPanel.add(matrixXscrollbar, "wmin 80%, push, grow");
-			colNavPanel.add(btnRightPanel, "grow, al right, w 10::35, hmax 80%");
+			colNavPanel.add(btnRightPanel, "grow, al right, w 10::20, hmax 80%");
 		}
 
 		return colNavPanel;
@@ -622,9 +622,9 @@ public class DendroView implements Observer, DendroPanel {
 			btnBottomPanel.add(scaleRemoveBottomY, "push, grow, wrap");
 			btnBottomPanel.add(scaleAddBottomY, "push, grow");
 
-			rowNavPanel.add(btnTopPanel, "grow, top, wmax 80%, h 10::35, wrap");
+			rowNavPanel.add(btnTopPanel, "grow, top, wmax 80%, h 10::20, wrap");
 			rowNavPanel.add(matrixYscrollbar, "hmin 80%, push, grow, wrap");
-			rowNavPanel.add(btnBottomPanel, "grow, bottom, h 10::35, wmax 80%");
+			rowNavPanel.add(btnBottomPanel, "grow, bottom, h 10::20, wmax 80%");
 			return rowNavPanel;
 		}
 
