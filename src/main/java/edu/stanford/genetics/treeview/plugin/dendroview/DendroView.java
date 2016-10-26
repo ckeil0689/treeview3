@@ -559,23 +559,23 @@ public class DendroView implements Observer, DendroPanel {
 			JPanel btnRightPanel;
 
 			colNavPanel = GUIFactory
-															.createJPanel(true, GUIFactory.NO_GAPS_OR_INSETS, Color.MAGENTA);
-			btnLeftPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+															.createJPanel(true, GUIFactory.DEFAULT, Color.MAGENTA);
+			btnLeftPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 			btnRightPanel = GUIFactory
-																.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+																.createJPanel(false, GUIFactory.DEFAULT);
+			
+			colNavPanel.setLayout(new MigLayout("ins 0 5 5 5"));
+			btnLeftPanel.setLayout(new MigLayout("ins 0 5 5 5"));
 
-			btnLeftPanel.setLayout(new MigLayout("ins 0", "[10px]0"));
-			btnRightPanel.setLayout(new MigLayout("ins 0", "[10px]0"));
-
-			btnLeftPanel.add(scaleAddLeftX, "push, grow, w 5::10");
-			btnLeftPanel.add(scaleRemoveLeftX, "push, grow");
+			btnLeftPanel.add(scaleAddLeftX, "push");
+			btnLeftPanel.add(scaleRemoveLeftX, "push");
 
 			btnRightPanel.add(scaleRemoveRightX, "push, grow");
 			btnRightPanel.add(scaleAddRightX, "push, grow");
 
-			colNavPanel.add(btnLeftPanel, "grow, al left, hmax 80%, w 10::20");
-			colNavPanel.add(matrixXscrollbar, "wmin 80%, push, grow");
-			colNavPanel.add(btnRightPanel, "grow, al right, w 10::20, hmax 80%");
+			colNavPanel.add(btnLeftPanel, "grow, al left");
+			colNavPanel.add(matrixXscrollbar, "wmin 80%, push, growx");
+			colNavPanel.add(btnRightPanel, "grow, al right");
 		}
 
 		return colNavPanel;
