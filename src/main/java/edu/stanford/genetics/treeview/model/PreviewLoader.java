@@ -32,7 +32,7 @@ public final class PreviewLoader {
 	 */
 	private final static String MISSING = "(?i)(^N(/)?A.?$|EMPTY|NONE|^MISS.*$)";
 
-	public final static int LIMIT = 20;  //The number of rows & cols to include
+	public final static int LIMIT = 30;  //The number of rows & cols to include
 
 	private PreviewLoader() {
 
@@ -44,6 +44,9 @@ public final class PreviewLoader {
 	 * are distinguished by the <code>delimiter</code>. If label types were
 	 * already defined, for example in a previous load, they can assist in
 	 * correctly identifying the data starting coordinates.
+	 * 
+	 * This at most checks a preview square area as defined by
+	 * <code>PreviewLoader.LIMIT</code>
 	 * 
 	 * @param filename - The file to read line by line
 	 * @param delimiter - Separator of elements in the file
@@ -58,7 +61,12 @@ public final class PreviewLoader {
 																					final String[] rowLabelTypes,
 																					final String[] colLabelTypes) {
 
-		int[] dataStartCoords = new int[2];
+		/* max value for columns because empty data cells might cause smaller
+		 * column indexes to hold data in later rows. this is essentially
+		 * finding the minimal column data index in the file.
+		 * Row indexes can only increase as the file is read line by line.
+		 */
+		int[] dataStartCoords = new int[] {-1, Integer.MAX_VALUE};
 
 		try {
 			final BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -73,9 +81,13 @@ public final class PreviewLoader {
 				final String[] lineAsStrings = line.split(delimiter, -1);
 
 				// iterate over strings in a line
-				for(int colIdx = 0; colIdx < lineAsStrings.length; colIdx++) {
+				for(int colIdx = 0; colIdx < LIMIT; colIdx++) {
 
 					String element = lineAsStrings[colIdx];
+
+					if("".equals(element)) {
+						continue;
+					}
 
 					// correct trailing 'e' if it belongs to numeric element
 					if(element.endsWith("e") || element.endsWith("E")) {
@@ -107,10 +119,18 @@ public final class PreviewLoader {
 							continue;
 						}
 
-						dataStartCoords[0] = rowIdx;
-						dataStartCoords[1] = colIdx;
-						rowIdx = LIMIT;
-						break;
+						// rows can only increase, only update once
+						if(dataStartCoords[0] == -1) {
+							dataStartCoords[0] = rowIdx;
+						}
+
+						/* update only if existing coordinates are minimized
+						 * for example important if first data cells are empty but later
+						 * data is found in an earlier column
+						 */
+						if(colIdx < dataStartCoords[1]) {
+							dataStartCoords[1] = colIdx;
+						}
 					}
 					else {
 						// Non-numeric
