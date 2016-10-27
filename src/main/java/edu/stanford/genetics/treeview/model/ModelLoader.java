@@ -199,7 +199,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			/* no data value should ever be a word, so ending with e is
 			 * considered as exponent value notation */
-			PreviewLoader.correctForTrailingE(element);
+			if(element.endsWith("e") || element.endsWith("E")) {
+				element += "+00";
+			}
 
 			// Trying to parse the String. If not possible add defined NAN.
 			try {
