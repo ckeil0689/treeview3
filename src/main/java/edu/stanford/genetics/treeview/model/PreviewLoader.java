@@ -13,7 +13,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * the user. The information can then be used to specify parameters and option
  * for the real loading process.
  * 
- * @author chris0689 */
+ */
 public final class PreviewLoader {
 
 	/*
@@ -33,7 +33,8 @@ public final class PreviewLoader {
 	 */
 	private final static String MISSING = "(?i)(^N(/)?A.?$|EMPTY|NONE|^MISS.*$)";
 
-	public final static int LIMIT = 30;  //The number of rows & cols to include
+  // the number of rows & cols to include
+	public final static int PREVIEW_LIMIT = 20;
 
 	private PreviewLoader() {
 
@@ -79,8 +80,7 @@ public final class PreviewLoader {
 			// no need to search rows beyond the already identified smallest col idx
 			int dynamicColIdxLimit = Integer.MAX_VALUE;
 
-			// read all lines, at most up to LIMIT
-			while((line = br.readLine()) != null) {// && rowIdx < LIMIT) {
+			while((line = br.readLine()) != null) {
 
 				final String[] lineAsStrings = line.split(delimiter, -1);
 
@@ -278,16 +278,16 @@ public final class PreviewLoader {
 	private static String[][] extractPreviewData(	final BufferedReader reader,
 																								final String delimiter) {
 
-		final String[][] previewData = new String[LIMIT][];
+		final String[][] previewData = new String[PREVIEW_LIMIT][];
 		String line;
 		int count = 0;
 
 		try {
-			while((line = reader.readLine()) != null && count < LIMIT) {
+			while((line = reader.readLine()) != null && count < PREVIEW_LIMIT) {
 
 				// load line as String array
 				final String[] lineAsStrings = line.split(delimiter, -1);
-				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 0, LIMIT);
+				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 0, PREVIEW_LIMIT);
 			}
 		}
 		catch(final IOException e) {
