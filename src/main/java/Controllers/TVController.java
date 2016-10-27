@@ -399,7 +399,7 @@ public class TVController implements Observer {
 
 			}
 			else {
-				LogBuffer.println("File node not found. Could not" + " copy data.");
+				LogBuffer.println("File node not found. Could not copy data.");
 				return null;
 			}
 

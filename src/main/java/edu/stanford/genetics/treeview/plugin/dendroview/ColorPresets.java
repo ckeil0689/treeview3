@@ -127,9 +127,43 @@ public class ColorPresets implements ConfigNodePersistent {
 			return;
 		}
 
+		importLastActiveScheme(oldNode);
+		importColorSetNodes(oldNode);
+	}
+
+	/** Imports the last active <code>ColorSchemeType</code> from an old
+	 * <code>Preferences</code> node.
+	 * 
+	 * @param oldNode - An old <code>Preferences</code> node from which to import
+	 *          settings */
+	private void importLastActiveScheme(final Preferences oldNode) {
+
 		String oldLastActiveScheme = oldNode.get("lastActiveColorScheme", ColorSchemeType.REDGREEN.toString());
 		configNode.put("lastActiveColorScheme", oldLastActiveScheme);
 		this.lastActiveColorScheme = oldLastActiveScheme;
+	}
+
+	/** Import all existing <code>ColorSet</code> nodes from an old
+	 * <code>Preferences</code> node.
+	 * 
+	 * @param oldNode - An old <code>Preferences</code> node from which to import
+	 *          settings */
+	private void importColorSetNodes(final Preferences oldNode) {
+
+		String[] colorSetNodes;
+		try {
+			colorSetNodes = oldNode.childrenNames();
+		}
+		catch(final BackingStoreException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Issue when retrieving children nodes for Preferences.");
+			return;
+		}
+
+		for(String node : colorSetNodes) {
+			ColorSet csCopy = new ColorSet(oldNode.node(node));
+			addColorSet(csCopy);
+		}
 	}
 
 	/** @return default preset, for use when opening a new file which has no
@@ -146,10 +180,18 @@ public class ColorPresets implements ConfigNodePersistent {
 	 *         Default Red-Green if none was stored. */
 	public ColorSchemeType getLastActiveColorScheme() {
 
-		ColorSchemeType lastActive = ColorSchemeType.getMemberFromKey(lastActiveColorScheme);
+		if(configNode == null) {
+			LogBuffer.println("Cannot access last active color scheme. " +
+												"No Preferences node was set in ColorPresets. " +
+												"Returning default Red-Green.");
+			return ColorSchemeType.REDGREEN;
+		}
 
-		if(lastActive == null) { return ColorSchemeType.REDGREEN; }
+		String lastActiveScheme = configNode
+																				.get("lastActiveColorScheme", ColorSchemeType.REDGREEN.toString());
+		ColorSchemeType lastActive = ColorSchemeType.getMemberFromKey(lastActiveScheme);
 
+		LogBuffer.println("Last active set: " + lastActiveScheme);
 		return lastActive;
 	}
 
