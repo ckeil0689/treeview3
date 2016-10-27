@@ -172,7 +172,7 @@ public final class PreviewLoader {
 	 * 
 	 * @param elem - The data element to be checked.
 	 * @return A corrected version of the element. */
-	private static String correctForTrailingE(String elem) {
+	public static String correctForTrailingE(String elem) {
 
 		String correctElem = elem;
 		String regex = "^(\\d)+(,|\\.)*(\\d)*(e|E)$";
