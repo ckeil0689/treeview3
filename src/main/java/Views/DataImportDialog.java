@@ -94,9 +94,9 @@ public class DataImportDialog extends CustomDialog {
 
 		// must be ints for spinner listener
 		SpinnerNumberModel indexModel = new SpinnerNumberModel(1,1,
-			PreviewLoader.LIMIT,1);
+			PreviewLoader.PREVIEW_LIMIT,1);
 		SpinnerNumberModel indexModel2 = new SpinnerNumberModel(1,1,
-			PreviewLoader.LIMIT,1);
+			PreviewLoader.PREVIEW_LIMIT,1);
 
 		final String rowSpinnerText = "Row:";
 		JLabel rowSpinnerLabel = GUIFactory.createLabel(rowSpinnerText);
@@ -115,8 +115,8 @@ public class DataImportDialog extends CustomDialog {
 		indexPanel.add(columnDataStart, "pushx 5");
 		indexPanel.add(findDataBtn, "pushx");
 
-		final String previewText = "Preview (" + PreviewLoader.LIMIT + "x" +
-			PreviewLoader.LIMIT + "):";
+		final String previewText = "Preview (" + PreviewLoader.PREVIEW_LIMIT + "x" +
+			PreviewLoader.PREVIEW_LIMIT + "):";
 		final JLabel preTableLine = GUIFactory.createBoldLabel(previewText);
 
 		final JScrollPane scrollPane = new JScrollPane(dataTable);
