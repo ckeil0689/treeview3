@@ -32,6 +32,7 @@ public class ColorChooserController extends Observable {
 	private final ColorPicker colorPicker;
 
 	private SaveChangesListener saveChangesListener;
+	private boolean wereChangesPerformed;
 
 	// Holds all preset color data
 	private final ColorPresets colorPresets;
@@ -45,6 +46,11 @@ public class ColorChooserController extends Observable {
 
 		addAllListeners();
 		restoreStateFromColorPresets();
+		
+		// needs to happen after PresetChoiceListener was added because it fires
+		// once during setup and calls applyChangesToMatrix() which would set this
+		// variable to true before the user can do anything
+		this.wereChangesPerformed = false;
 	}
 
 	/** Adds all defined listeners to the ColorGradientChooser object. */
@@ -236,6 +242,9 @@ public class ColorChooserController extends Observable {
 			return;
 		}
 
+		// valuesChanged because call from PresetChoiceListener 
+		wereChangesPerformed = true;
+		
 		colorPicker.updateColorExtractorData();
 		setChanged();
 		notifyObservers();
@@ -452,12 +461,17 @@ public class ColorChooserController extends Observable {
 		@Override
 		public void windowClosed(WindowEvent e) {
 
+			if(!wereChangesPerformed) {
+				LogBuffer.println("Colors not changed. Not updating matrix.");
+				return;
+			}
+			
 			if(saveChangesListener.wereChangesSaved()) {
 				saveChangesListener.reset();
 				return;
 			}
 
-			// Revert process
+			// revert process if any changes were performed
 			colorPresets.removeColorSet(ColorSchemeType.CUSTOM);
 			if(saveChangesListener.wasCustomPresentOnLoad()) {
 				// re-add initial custom ColorSet
