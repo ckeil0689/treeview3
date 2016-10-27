@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -81,22 +82,17 @@ public final class PreviewLoader {
 				final String[] lineAsStrings = line.split(delimiter, -1);
 
 				// iterate over strings in a line
-				for(int colIdx = 0; colIdx < LIMIT; colIdx++) {
+				for(int colIdx = 0; colIdx < LIMIT &&
+														colIdx < lineAsStrings.length; colIdx++) {
 
-					String element = lineAsStrings[colIdx];
+					String elem = lineAsStrings[colIdx];
 
-					if("".equals(element)) {
+					// skip empty cells
+					if("".equals(elem)) {
 						continue;
 					}
 
-					// correct trailing 'e' if it belongs to numeric element
-					if(element.endsWith("e") || element.endsWith("E")) {
-						String trimmedElem = element.substring(0, element.length() - 2);
-						// only do this if original is numeric with trailing 'e' 
-						if(isDoubleParseable(trimmedElem)) {
-							element += "+00";
-						}
-					}
+					elem = correctForTrailingE(elem);
 
 					/*
 					 * Data found if: 
@@ -106,7 +102,7 @@ public final class PreviewLoader {
 					 * common known label type (e.g. EWEIGHT) in the line, which may be 
 					 * a label but contain numeric data.
 					 */
-					if(isDoubleParseable(element) || isNaN(element)) {
+					if(isDoubleParseable(elem) || isNaN(elem)) {
 						// Numerics
 						// skip to next line
 						if(maxRowLabelTypeIdx < colIdx &&
@@ -135,8 +131,7 @@ public final class PreviewLoader {
 					else {
 						// Non-numeric
 						// if a known row label type is encountered, skip to next element
-						if(Arrays.asList(rowLabelTypes).contains(element)) {
-							LogBuffer.println("Found " + element + " from row label types.");
+						if(Arrays.asList(rowLabelTypes).contains(elem)) {
 							if(maxRowLabelTypeIdx < colIdx) {
 								maxRowLabelTypeIdx = colIdx;
 							}
@@ -144,13 +139,12 @@ public final class PreviewLoader {
 						}
 
 						// if a known column label type is encountered, skip to next line
-						if(Arrays.asList(colLabelTypes).contains(element)) {
-							LogBuffer.println("Found " + element + " from col label types.");
+						if(Arrays.asList(colLabelTypes).contains(elem)) {
 							break;
 						}
 					}
 
-					if(isCommonLabel(element, PreviewLoader.COMMON_LABELS) &&
+					if(isCommonLabel(elem, PreviewLoader.COMMON_LABELS) &&
 							maxRowLabelTypeIdx < colIdx) {
 						maxRowLabelTypeIdx = colIdx;
 					}
@@ -159,7 +153,6 @@ public final class PreviewLoader {
 			}
 
 			br.close();
-
 		}
 		catch(final IOException e) {
 			LogBuffer.logException(e);
@@ -170,10 +163,31 @@ public final class PreviewLoader {
 		return dataStartCoords;
 	}
 
+	/** Corrects trailing 'e' if it belongs to a numerical element so it can be
+	 * parsed as a <code>double</code>.
+	 * 
+	 * @param elem - The data element to be checked.
+	 * @return A corrected version of the element. */
+	private static String correctForTrailingE(String elem) {
+
+		String correctElem = elem;
+		String regex = "^(\\d)+(,|\\.)*(\\d)*(e|E)$";
+
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(elem);
+
+		if(m.find()) {
+			// this makes it parse-able as double
+			correctElem += "+00";
+		}
+
+		return correctElem;
+	}
+
 	/** Check the current line for any sort of common label.
 	 * 
 	 * @param line - the String array to check
-	 * @param pattern - the regex pattern to match
+	 * @param pattern - the RegEx pattern to match
 	 * @return Whether line includes a common label or not. */
 	public static boolean hasCommonLabel(	final String[] line,
 																				final String pattern) {
@@ -207,7 +221,7 @@ public final class PreviewLoader {
 		return false;
 	}
 
-	/** Check if the current string is numeric and can be parsed into a double.
+	/** Check if the current string is numerical and can be parsed into a double.
 	 * 
 	 * @param token
 	 * @return Whether token is parseable to double. */
