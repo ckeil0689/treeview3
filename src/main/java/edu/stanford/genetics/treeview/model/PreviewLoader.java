@@ -75,14 +75,17 @@ public final class PreviewLoader {
 			String line;
 			int rowIdx = 0;
 			int maxRowLabelTypeIdx = -1;
+			
+			// no need to search rows beyond the already identified smallest col idx
+			int dynamicColIdxLimit = Integer.MAX_VALUE;
 
 			// read all lines, at most up to LIMIT
-			while((line = br.readLine()) != null && rowIdx < LIMIT) {
+			while((line = br.readLine()) != null) {// && rowIdx < LIMIT) {
 
 				final String[] lineAsStrings = line.split(delimiter, -1);
 
 				// iterate over strings in a line
-				for(int colIdx = 0; colIdx < LIMIT &&
+				for(int colIdx = 0; colIdx < dynamicColIdxLimit &&
 														colIdx < lineAsStrings.length; colIdx++) {
 
 					String elem = lineAsStrings[colIdx];
@@ -125,6 +128,7 @@ public final class PreviewLoader {
 						 * data is found in an earlier column
 						 */
 						if(colIdx < dataStartCoords[1]) {
+							dynamicColIdxLimit = colIdx;
 							dataStartCoords[1] = colIdx;
 						}
 					}
