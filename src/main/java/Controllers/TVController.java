@@ -594,9 +594,6 @@ public class TVController implements Observer {
 		loadPreview.setNewTable(previewData);
 		importController.initDialog();
 
-		/* Auto run before showing dialog */
-		importController.detectDataBoundaries(null);
-
 		DataLoadInfo dataInfo = loadPreview.showDialog();
 
 		return dataInfo;

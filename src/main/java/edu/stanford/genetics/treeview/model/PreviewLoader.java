@@ -78,8 +78,12 @@ public final class PreviewLoader {
 					String element = lineAsStrings[colIdx];
 
 					// correct trailing 'e' if it belongs to numeric element
+					// REVIEW NOTE: this is replaced in another open PR but temporarily 
+					// updated to avoid exceptions
 					if(element.endsWith("e") || element.endsWith("E")) {
-						String trimmedElem = element.substring(0, element.length() - 2);
+						int bound = (element.length() > 2)	? (element.length() - 2)
+																								: element.length();
+						String trimmedElem = element.substring(0, bound);
 						// only do this if original is numeric with trailing 'e' 
 						if(isDoubleParseable(trimmedElem)) {
 							element += "+00";
