@@ -769,34 +769,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		
 		if(SwingUtilities.getWindowAncestor(this).isActive())
-		  // There used to be a custom case for hover index updates during
-			// scrollbar drag, but it has been replaced by this more universal
-			// method. Note, this method returns 0 or the max index if the
-			// cursor is
-			// hovered off that nearest edge.
 			forceUpdatePrimaryHoverIndex();
-		Window[] wins = Window.getWindows();
-		boolean dialogOntop = false;
-		for(Window windowInstance : wins){
-			if(windowInstance instanceof JDialog){
-				if(windowInstance.isVisible()){
-					dialogOntop = true;
-				  break;
-				}
-			}
-		}
 		/*
 		 * Gets the Current active Window (eg: export or treeview frame). It
 		 * will return null if we are active in other application.
 		 */
-		Window activeWindow = javax.swing.FocusManager.getCurrentManager()
-																									.getActiveWindow();
-		if(activeWindow == null && !dialogOntop) {
-			// There used to be a custom case for hover index updates during
-			// scrollbar drag, but it has been replaced by this more universal
-			// method. Note, this method returns 0 or the max index if the
-			// cursor is
-			// hovered off that nearest edge.
+		Window activeWindow = javax.swing.FocusManager.getCurrentManager().getActiveWindow();
+		if(activeWindow == null && !isDialogonTop()) {
 			forceUpdatePrimaryHoverIndex();
 		}
 		debug(getPaneType() +	" forced hover index: [" + getPrimaryHoverIndex() +
@@ -906,6 +885,20 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			map.setLastVisibleLabel(-1);
 			map.setWhizMode(false);
 		}
+	}
+
+	private static boolean isDialogonTop() {
+		Window[] wins = Window.getWindows();
+		boolean dialogOntop = false;
+		for(Window windowInstance : wins){
+			if(windowInstance instanceof JDialog){
+				if(windowInstance.isVisible() && ((JDialog)windowInstance).isModal()){
+					dialogOntop = true;
+				  break;
+				}
+			}
+		}
+		return dialogOntop;
 	}
 
 	private int getSavedSecondaryPaneSize() {
@@ -2092,6 +2085,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 	}
 
+	// There used to be a custom case for hover index updates during
+	// scrollbar drag, but it has been replaced by this more universal
+	// method. Note, this method returns 0 or the max index if the
+	// cursor is
+	// hovered off that nearest edge.
 	public void forceUpdatePrimaryHoverIndex() {
 		Point p = MouseInfo.getPointerInfo().getLocation();
 		SwingUtilities.convertPointFromScreen(p, getComponent());
