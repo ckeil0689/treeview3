@@ -30,6 +30,12 @@ import javax.swing.WindowConstants;
 
 import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import javax.swing.Timer;
 
 /* BEGIN_HEADER                                                   TreeView 3
 *
@@ -105,6 +111,8 @@ public abstract class ViewFrame extends Observable implements Observer,
 		appFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
 		setupWindowListener();
+
+		setupWindowPosListener();
 	}
 
 	/**
@@ -275,6 +283,53 @@ public abstract class ViewFrame extends Observable implements Observer,
 	public boolean windowActive() {
 
 		return windowActive;
+	}
+
+	/**
+	 * Listens to the repositioning of the window and stores the state once
+	 * movement has stopped (as determined by a timer)
+	 */
+	private class AppWindowPosListener extends ComponentAdapter {
+
+		//Timer to prevent repeatedly saving window dimensions upon resize
+		private final int saveResizeDelay = 1000;
+		private javax.swing.Timer saveResizeTimer;
+		ActionListener saveWindowAttrs = new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				if (evt.getSource() == saveResizeTimer) {
+					/* Stop timer */
+					saveResizeTimer.stop();
+					saveResizeTimer = null;
+					LogBuffer.println("Saving window dimensions & position.");
+				
+					storeState();
+				}
+			}
+		};
+
+		public void componentMoved(ComponentEvent e) {
+			//Save the new dimensions/position if it's done changing
+			if (this.saveResizeTimer == null) {
+				/* Start waiting for saveResizeDelay millis to elapse and then
+				 * call actionPerformed of the ActionListener
+				 * "saveWindowAttrs". */
+				this.saveResizeTimer = new Timer(this.saveResizeDelay,
+												 saveWindowAttrs);
+				this.saveResizeTimer.start();
+			} else {
+				/* Event came too soon, swallow it by resetting the timer.. */
+				this.saveResizeTimer.restart();
+			}
+		}
+	}
+
+	public void addAppWindowPosListener() {
+		
+		appFrame.addComponentListener( new AppWindowPosListener());
+	}
+
+	private void setupWindowPosListener() {
+		addAppWindowPosListener();
 	}
 
 	/**
