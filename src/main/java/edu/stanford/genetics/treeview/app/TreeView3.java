@@ -28,8 +28,11 @@ public class TreeView3 {
 		LogBuffer.println("Running on a Mac.");
 
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
-		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-				"TreeView3");
+		//This does not appear to do anything (on mac)
+		//System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+		//	"TreeView3");
+		//The latest Mac OS X doesn't have growboxes, so this is here primarily
+		//for older versions of OS X
 		System.setProperty("apple.awt.showGrowBox", "true");
 	}
 
