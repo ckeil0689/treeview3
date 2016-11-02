@@ -87,8 +87,16 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 * @param title
 	 *            Title for the ViewFrame.
 	 */
-	public ViewFrame(final String title, final Preferences mainConfigNode) {
+	public ViewFrame(String title, final Preferences mainConfigNode) {
 
+		// TODO replace with static method when PR is merged
+		final String os = System.getProperty("os.name").toLowerCase();
+		final boolean isMac = os.startsWith("mac os x");
+	  if(isMac) {
+	  	// no app name in frame title
+	  	title = "";
+	  }
+	  
 		this.appFrame = new JFrame(title);
 		this.configNode = mainConfigNode;
 		
