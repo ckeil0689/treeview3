@@ -875,7 +875,18 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	private void setLoadedTitle() {
 
-		appFrame.setTitle(StringRes.appName + ": " + title);
+		String newTitle;
+		// TODO replace with static method when PR is merged
+		final String os = System.getProperty("os.name").toLowerCase();
+		final boolean isMac = os.startsWith("mac os x");
+	  if(isMac) {
+	  	// no app name in frame title
+	  	newTitle = title;
+	  } else {
+	  	newTitle = StringRes.appName + ": " + title;
+	  }
+	  
+		appFrame.setTitle(newTitle);
 	}
 
 	// @Override
