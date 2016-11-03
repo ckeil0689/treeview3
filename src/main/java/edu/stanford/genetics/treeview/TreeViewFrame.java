@@ -529,9 +529,10 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		fileMenu.add(quitMenuItem);
 		stackMenuList.add(quitMenuItem);
 		
-		fileMenu.addSeparator();
+//		fileMenu.addSeparator();
 		
 		if(running != null) {
+			fileMenu.addSeparator();
 			// Open new file with import dialog menu
 			final JMenuItem importMenuItem = new JMenuItem(StringRes.menu_Import, KeyEvent.VK_I);
 			importMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
