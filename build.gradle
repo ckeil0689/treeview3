@@ -111,7 +111,6 @@ macAppBundle {
                 set viewOptions to the icon view options of container window
                 set arrangement of viewOptions to not arranged
                 set icon size of viewOptions to 128
-                set background picture of viewOptions to file ".background:\${DMG_BACKGROUND_IMG}"
                 --There's currently no way to hide the path bar, tab bar, or
                 --preview, if the user has them set to visible by default
 
@@ -133,8 +132,8 @@ macAppBundle {
                 end repeat
 
                 --Now move our files to the desired position
-                set position of item "\${APP_NAME}.app" of container window to { 140, 294 }
-                set position of item "Applications" of container window to { 506, 294 }
+                set position of item "\${APP_NAME}.app" of container window to { 180, 262 }
+                set position of item "Applications" of container window to { 466, 262 }
 
                 close
                 open
