@@ -62,7 +62,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/* Selection of row/ column indices */
 	protected final Color textFGColor = Color.black;
-	protected Color textBGColor;	
+	protected Color textBGColor;
 	protected final Color selectionBorderColor = Color.yellow;
 	protected final Color selectionTextBGColor = new Color(249, 238, 160);// yel
 	protected final Color selectionTextFGColor = Color.black;
@@ -767,15 +767,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 * here on out
 		 */
 
-		
-		if(SwingUtilities.getWindowAncestor(this).isActive()){
+
+		if(SwingUtilities.getWindowAncestor(this).isActive()) {
 			forceUpdatePrimaryHoverIndex();
 		}
 		/*
 		 * Gets the Current active Window (eg: export or treeview frame). It
 		 * will return null if we are active in other application.
 		 */
-		Window activeWindow = javax.swing.FocusManager.getCurrentManager().getActiveWindow();
+		Window activeWindow = javax.swing.FocusManager.getCurrentManager()
+																									.getActiveWindow();
 		if(activeWindow == null && !isDialogonTop()) {
 			forceUpdatePrimaryHoverIndex();
 		}
@@ -895,11 +896,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	private static boolean isDialogonTop() {
 		Window[] wins = Window.getWindows();
 		boolean dialogOntop = false;
-		for(Window windowInstance : wins){
-			if(windowInstance instanceof JDialog){
-				if(windowInstance.isVisible() && ((JDialog)windowInstance).isModal()){
+		for(Window windowInstance : wins) {
+			if(windowInstance instanceof JDialog) {
+				if(windowInstance.isVisible() && ((JDialog) windowInstance).isModal()) {
 					dialogOntop = true;
-				  break;
+					break;
 				}
 			}
 		}
