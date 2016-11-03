@@ -198,7 +198,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			String element = lineAsStrings[i + dataInfo.getDataStartCol()];
 
 			/* no data value should ever be a word, so ending with e is
-			 * considered as exponent value notation */
+			 * considered as exponent value notation. If it indeed is not a data
+			 * value, then the NumberFormatException will be triggered */
 			if(element.endsWith("e") || element.endsWith("E")) {
 				element += "+00";
 			}

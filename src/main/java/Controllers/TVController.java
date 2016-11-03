@@ -333,7 +333,7 @@ public class TVController implements Observer {
 	public void finishLoading(final DataLoadInfo dataInfo) {
 
 		if(model.getDataMatrix().getNumRow() > 0) {
-			tvFrame.setTitleString(model.getSource());
+			tvFrame.setTitleString(model.getFileName());
 
 			/* Will notify view of successful loading. */
 			((TVModel) model).setLoaded(true);
@@ -593,9 +593,6 @@ public class TVController implements Observer {
 
 		loadPreview.setNewTable(previewData);
 		importController.initDialog();
-
-		/* Auto run before showing dialog */
-		importController.detectDataBoundaries(null);
 
 		DataLoadInfo dataInfo = loadPreview.showDialog();
 
