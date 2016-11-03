@@ -11,9 +11,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 /** Static class (java way...) to be used for loading read-only preview data for
  * the user. The information can then be used to specify parameters and option
- * for the real loading process.
- * 
- */
+ * for the real loading process. */
 public final class PreviewLoader {
 
 	/*
@@ -33,7 +31,7 @@ public final class PreviewLoader {
 	 */
 	private final static String MISSING = "(?i)(^N(/)?A.?$|EMPTY|NONE|^MISS.*$)";
 
-  // the number of rows & cols to include
+	// the number of rows & cols to include
 	public final static int PREVIEW_LIMIT = 20;
 
 	private PreviewLoader() {
@@ -78,7 +76,7 @@ public final class PreviewLoader {
 			String line;
 			int rowIdx = 0;
 			int maxRowLabelTypeIdx = -1;
-			
+
 			while((line = br.readLine()) != null) {
 
 				final String[] lineAsStrings = line.split(delimiter, -1);

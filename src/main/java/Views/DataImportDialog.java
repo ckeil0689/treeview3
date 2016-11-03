@@ -49,9 +49,9 @@ public class DataImportDialog extends CustomDialog {
 	public DataImportDialog(String filename) {
 
 		super("Data Import - [" + filename + "]");
-		
+
 		this.delimiters = new ArrayList<JCheckBox>();
-		
+
 		// "Cancel" makes more sense here than "Close" - functionality remains
 		closeBtn.setText("Cancel");
 	}
@@ -63,9 +63,7 @@ public class DataImportDialog extends CustomDialog {
 		setInputDefaults();
 	}
 
-	/**
-	 * Sets up the GUI for the data import dialog.
-	 */
+	/** Sets up the GUI for the data import dialog. */
 	@Override
 	protected void setupLayout() {
 
@@ -89,14 +87,15 @@ public class DataImportDialog extends CustomDialog {
 		delimPanel.add(checkboxPanel);
 
 		final String findDataStartText = "First data cell:";
-		JLabel findDataStartLabel = 
-				GUIFactory.createBoldLabel(findDataStartText);
+		JLabel findDataStartLabel = GUIFactory.createBoldLabel(findDataStartText);
 
 		// must be ints for spinner listener
-		SpinnerNumberModel indexModel = new SpinnerNumberModel(1,1,
-			PreviewLoader.PREVIEW_LIMIT,1);
-		SpinnerNumberModel indexModel2 = new SpinnerNumberModel(1,1,
-			PreviewLoader.PREVIEW_LIMIT,1);
+		SpinnerNumberModel indexModel = new SpinnerNumberModel(	1, 1,
+																														PreviewLoader.PREVIEW_LIMIT,
+																														1);
+		SpinnerNumberModel indexModel2 = new SpinnerNumberModel(1, 1,
+																														PreviewLoader.PREVIEW_LIMIT,
+																														1);
 
 		final String rowSpinnerText = "Row:";
 		JLabel rowSpinnerLabel = GUIFactory.createLabel(rowSpinnerText);
@@ -115,8 +114,8 @@ public class DataImportDialog extends CustomDialog {
 		indexPanel.add(columnDataStart, "pushx 5");
 		indexPanel.add(findDataBtn, "pushx");
 
-		final String previewText = "Preview (" + PreviewLoader.PREVIEW_LIMIT + "x" +
-			PreviewLoader.PREVIEW_LIMIT + "):";
+		final String previewText = "Preview (" +	PreviewLoader.PREVIEW_LIMIT + "x" +
+																PreviewLoader.PREVIEW_LIMIT + "):";
 		final JLabel preTableLine = GUIFactory.createBoldLabel(previewText);
 
 		final JScrollPane scrollPane = new JScrollPane(dataTable);
@@ -151,10 +150,8 @@ public class DataImportDialog extends CustomDialog {
 		return result;
 	}
 
-	/**
-	 * Sets up the JCheckBoxes which are used to set delimiters for file
-	 * loading.
-	 */
+	/** Sets up the JCheckBoxes which are used to set delimiters for file
+	 * loading. */
 	private void setupCheckBoxes() {
 
 		tabDelimCheckBox = new JCheckBox("Tab");
@@ -178,9 +175,7 @@ public class DataImportDialog extends CustomDialog {
 		spaceDelimCheckBox.setSelected(false);
 	}
 
-	/**
-	 * Set up the JTable which will contain the preview data.
-	 */
+	/** Set up the JTable which will contain the preview data. */
 	public void setNewTable(String[][] previewData) {
 
 		String[] columnNames = getColumnNames(previewData[0].length);
@@ -193,18 +188,16 @@ public class DataImportDialog extends CustomDialog {
 		dataTable.repaint();
 	}
 
-	/**
-	 * Generates an array of Strings which serve as headers for the JTable
+	/** Generates an array of Strings which serve as headers for the JTable
 	 * constructor.
 	 * 
 	 * @param Number
-	 *            of columns.
-	 * @return An array of numbers as Strings.
-	 */
+	 *          of columns.
+	 * @return An array of numbers as Strings. */
 	private static String[] getColumnNames(final int colNum) {
 
 		String[] columnNames = new String[colNum];
-		for (int i = 0; i < colNum; i++) {
+		for(int i = 0; i < colNum; i++) {
 			columnNames[i] = Integer.toString(i + 1);
 		}
 
@@ -246,18 +239,17 @@ public class DataImportDialog extends CustomDialog {
 		getRootPane().setDefaultButton(proceedBtn);
 	}
 
-	/**
-	 * Takes the number of rows & columns that are label rows/columns and sets
+	/** Takes the number of rows & columns that are label rows/columns and sets
 	 * the column & row number (numbered from 1) which represents the first data
-	 * cell (i.e. non-label row/col).  Note that the spinners reflect the "First
+	 * cell (i.e. non-label row/col). Note that the spinners reflect the "First
 	 * Data Cell".
-	 * @param rowCount - number of rows (from the top) containing labels.  Also
-	 *                   can be interpreted as the index of the first row of
-	 *                   data
+	 * 
+	 * @param rowCount - number of rows (from the top) containing labels. Also
+	 *          can be interpreted as the index of the first row of
+	 *          data
 	 * @param columnCount - number of columns (from the left) containing labels
-	 *                      Also can be interpreted as the index of the first
-	 *                      column of data
-	 **/
+	 *          Also can be interpreted as the index of the first
+	 *          column of data **/
 	public void setSpinnerValues(final int rowCount, final int columnCount) {
 
 		rowDataStart.setValue(Integer.valueOf(rowCount) + 1);
@@ -269,24 +261,20 @@ public class DataImportDialog extends CustomDialog {
 		int rowNum = getRowSpinnerDataIndex();
 		int colNum = getColSpinnerDataIndex();
 
-		this.result = new DataLoadInfo(new int[] { rowNum, colNum }, delimiter);
+		this.result = new DataLoadInfo(new int[] {rowNum, colNum}, delimiter);
 	}
 
-	/**
-	 * Calculates and returns the data index of the first row containing data
+	/** Calculates and returns the data index of the first row containing data
 	 * 
-	 * @return int
-	 */
+	 * @return int */
 	public int getRowSpinnerDataIndex() {
 
 		return((Integer) rowDataStart.getValue() - 1);
 	}
 
-	/**
-	 * Calculates and returns the data index of the first column containing data
+	/** Calculates and returns the data index of the first column containing data
 	 * 
-	 * @return int
-	 */
+	 * @return int */
 	public int getColSpinnerDataIndex() {
 
 		return((Integer) columnDataStart.getValue() - 1);
