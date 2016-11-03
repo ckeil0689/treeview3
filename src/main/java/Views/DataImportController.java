@@ -42,6 +42,9 @@ public class DataImportController {
 
 		previewDialog.setupDialogComponents();
 		addAllListeners();
+		
+		// auto-run once 
+		detectDataBoundaries(null);
 	}
 
 	private void addAllListeners() {
@@ -187,6 +190,7 @@ public class DataImportController {
 			updateSelectedDelimiter();
 			String[][] newData = loadPreviewData();
 			previewDialog.updateTableData(newData);
+			detectDataBoundaries(null);
 		}
 	}
 

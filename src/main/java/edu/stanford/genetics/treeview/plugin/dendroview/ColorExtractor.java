@@ -150,7 +150,7 @@ public class ColorExtractor extends Observable implements ConfigNodePersistent,
 
 		setNewParams(colorSet.getFractions(), cList);
 
-		if((ColorSchemeType.CUSTOM.toString()).equalsIgnoreCase(colorSet.getColorSchemeName())) {
+		if((ColorSchemeType.CUSTOM.toString()).equals(colorSet.getColorSchemeName())) {
 			setMin(colorSet.getMin());
 			setMax(colorSet.getMax());
 		}

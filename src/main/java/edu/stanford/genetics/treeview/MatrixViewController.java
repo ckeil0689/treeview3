@@ -171,16 +171,16 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		String colorPresetsNode = colorPresets.getClass().getSimpleName();
 
 		if(!oldNode.nodeExists(colorPresetsNode)) {
-			LogBuffer.println("ColorPresets node not found when trying to import previous color settings. " +
+			LogBuffer.println(colorPresetsNode +	" node not found when trying " +
+												"to import previous color settings. " +
 												"Aborting import attempt.");
 			return;
 		}
 
-		colorExtractor.importStateFrom(oldNode.node(colorPresetsNode));
-
 		// Store copied node in new ColorPresets node
 		colorPresets.setConfigNode(configNode);
 		colorPresets.importStateFrom(oldNode.node(colorPresetsNode));
+		colorExtractor.importStateFrom(oldNode.node(colorPresetsNode));
 	}
 
 	@Override // Observer code

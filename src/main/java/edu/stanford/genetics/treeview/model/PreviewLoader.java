@@ -4,15 +4,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /** Static class (java way...) to be used for loading read-only preview data for
  * the user. The information can then be used to specify parameters and option
- * for the real loading process.
- * 
- * @author chris0689 */
+ * for the real loading process. */
 public final class PreviewLoader {
 
 	/*
@@ -32,7 +31,8 @@ public final class PreviewLoader {
 	 */
 	private final static String MISSING = "(?i)(^N(/)?A.?$|EMPTY|NONE|^MISS.*$)";
 
-	public final static int LIMIT = 20;  //The number of rows & cols to include
+	// the number of rows & cols to include
+	public final static int PREVIEW_LIMIT = 20;
 
 	private PreviewLoader() {
 
@@ -44,6 +44,9 @@ public final class PreviewLoader {
 	 * are distinguished by the <code>delimiter</code>. If label types were
 	 * already defined, for example in a previous load, they can assist in
 	 * correctly identifying the data starting coordinates.
+	 * 
+	 * This at most checks a preview square area as defined by
+	 * <code>PreviewLoader.PREVIEW_LIMIT</code>
 	 * 
 	 * @param filename - The file to read line by line
 	 * @param delimiter - Separator of elements in the file
@@ -58,7 +61,14 @@ public final class PreviewLoader {
 																					final String[] rowLabelTypes,
 																					final String[] colLabelTypes) {
 
-		int[] dataStartCoords = new int[2];
+		/* max value for columns because empty data cells might cause smaller
+		 * column indexes to hold data in later rows. this is essentially
+		 * finding the minimal column data index in the file.
+		 * Row indexes can only increase as the file is read line by line.
+		 * 
+		 * No need to search rows beyond the already identified smallest col idx.
+		 */
+		int[] dataStartCoords = new int[] {-1, Integer.MAX_VALUE};
 
 		try {
 			final BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -67,24 +77,22 @@ public final class PreviewLoader {
 			int rowIdx = 0;
 			int maxRowLabelTypeIdx = -1;
 
-			// read all lines, at most up to LIMIT
-			while((line = br.readLine()) != null && rowIdx < LIMIT) {
+			while((line = br.readLine()) != null) {
 
 				final String[] lineAsStrings = line.split(delimiter, -1);
 
 				// iterate over strings in a line
-				for(int colIdx = 0; colIdx < lineAsStrings.length; colIdx++) {
+				for(int colIdx = 0; colIdx < dataStartCoords[1] &&
+														colIdx < lineAsStrings.length; colIdx++) {
 
-					String element = lineAsStrings[colIdx];
-
-					// correct trailing 'e' if it belongs to numeric element
-					if(element.endsWith("e") || element.endsWith("E")) {
-						String trimmedElem = element.substring(0, element.length() - 2);
-						// only do this if original is numeric with trailing 'e' 
-						if(isDoubleParseable(trimmedElem)) {
-							element += "+00";
-						}
+					String elem = lineAsStrings[colIdx];
+					
+					// skip empty cells
+					if("".equals(elem)) {
+						continue;
 					}
+
+					elem = correctForTrailingE(elem);
 
 					/*
 					 * Data found if: 
@@ -94,7 +102,7 @@ public final class PreviewLoader {
 					 * common known label type (e.g. EWEIGHT) in the line, which may be 
 					 * a label but contain numeric data.
 					 */
-					if(isDoubleParseable(element) || isNaN(element)) {
+					if(isDoubleParseable(elem) || isNaN(elem)) {
 						// Numerics
 						// skip to next line
 						if(maxRowLabelTypeIdx < colIdx &&
@@ -107,16 +115,23 @@ public final class PreviewLoader {
 							continue;
 						}
 
-						dataStartCoords[0] = rowIdx;
-						dataStartCoords[1] = colIdx;
-						rowIdx = LIMIT;
-						break;
+						// rows can only increase, only update once
+						if(dataStartCoords[0] == -1) {
+							dataStartCoords[0] = rowIdx;
+						}
+
+						/* update only if existing coordinates are minimized
+						 * for example important if first data cells are empty but later
+						 * data is found in an earlier column
+						 */
+						if(colIdx < dataStartCoords[1]) {
+							dataStartCoords[1] = colIdx;
+						}
 					}
 					else {
 						// Non-numeric
 						// if a known row label type is encountered, skip to next element
-						if(Arrays.asList(rowLabelTypes).contains(element)) {
-							LogBuffer.println("Found " + element + " from row label types.");
+						if(Arrays.asList(rowLabelTypes).contains(elem)) {
 							if(maxRowLabelTypeIdx < colIdx) {
 								maxRowLabelTypeIdx = colIdx;
 							}
@@ -124,13 +139,12 @@ public final class PreviewLoader {
 						}
 
 						// if a known column label type is encountered, skip to next line
-						if(Arrays.asList(colLabelTypes).contains(element)) {
-							LogBuffer.println("Found " + element + " from col label types.");
+						if(Arrays.asList(colLabelTypes).contains(elem)) {
 							break;
 						}
 					}
 
-					if(isCommonLabel(element, PreviewLoader.COMMON_LABELS) &&
+					if(isCommonLabel(elem, PreviewLoader.COMMON_LABELS) &&
 							maxRowLabelTypeIdx < colIdx) {
 						maxRowLabelTypeIdx = colIdx;
 					}
@@ -139,7 +153,6 @@ public final class PreviewLoader {
 			}
 
 			br.close();
-
 		}
 		catch(final IOException e) {
 			LogBuffer.logException(e);
@@ -150,10 +163,31 @@ public final class PreviewLoader {
 		return dataStartCoords;
 	}
 
+	/** Corrects trailing 'e' if it belongs to a numerical element so it can be
+	 * parsed as a <code>double</code>.
+	 * 
+	 * @param elem - The data element to be checked.
+	 * @return A corrected version of the element. */
+	public static String correctForTrailingE(String elem) {
+
+		String correctElem = elem;
+		String regex = "^(\\d)+(,|\\.)*(\\d)*(e|E)$";
+
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(elem);
+
+		if(m.find()) {
+			// this makes it parse-able as double
+			correctElem += "+00";
+		}
+
+		return correctElem;
+	}
+
 	/** Check the current line for any sort of common label.
 	 * 
 	 * @param line - the String array to check
-	 * @param pattern - the regex pattern to match
+	 * @param pattern - the RegEx pattern to match
 	 * @return Whether line includes a common label or not. */
 	public static boolean hasCommonLabel(	final String[] line,
 																				final String pattern) {
@@ -187,7 +221,7 @@ public final class PreviewLoader {
 		return false;
 	}
 
-	/** Check if the current string is numeric and can be parsed into a double.
+	/** Check if the current string is numerical and can be parsed into a double.
 	 * 
 	 * @param token
 	 * @return Whether token is parseable to double. */
@@ -240,16 +274,16 @@ public final class PreviewLoader {
 	private static String[][] extractPreviewData(	final BufferedReader reader,
 																								final String delimiter) {
 
-		final String[][] previewData = new String[LIMIT][];
+		final String[][] previewData = new String[PREVIEW_LIMIT][];
 		String line;
 		int count = 0;
 
 		try {
-			while((line = reader.readLine()) != null && count < LIMIT) {
+			while((line = reader.readLine()) != null && count < PREVIEW_LIMIT) {
 
 				// load line as String array
 				final String[] lineAsStrings = line.split(delimiter, -1);
-				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 0, LIMIT);
+				previewData[count++] = Arrays.copyOfRange(lineAsStrings, 0, PREVIEW_LIMIT);
 			}
 		}
 		catch(final IOException e) {

@@ -399,7 +399,7 @@ public class TVController implements Observer {
 
 			}
 			else {
-				LogBuffer.println("File node not found. Could not" + " copy data.");
+				LogBuffer.println("File node not found. Could not copy data.");
 				return null;
 			}
 
@@ -593,9 +593,6 @@ public class TVController implements Observer {
 
 		loadPreview.setNewTable(previewData);
 		importController.initDialog();
-
-		/* Auto run before showing dialog */
-		importController.detectDataBoundaries(null);
 
 		DataLoadInfo dataInfo = loadPreview.showDialog();
 
