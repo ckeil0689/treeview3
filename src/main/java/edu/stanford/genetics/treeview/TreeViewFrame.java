@@ -575,7 +575,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		if (running != null) {
 			final JMenu viewMenu = new JMenu(StringRes.mbar_View);
 			viewMenu.setMnemonic(KeyEvent.VK_V);
-			running.addDendroMenus(viewMenu);
+			running.addViewMenus(viewMenu);
 			menuBar.add(viewMenu);
 
 			// final JMenu searchMenu = new JMenu("Search");

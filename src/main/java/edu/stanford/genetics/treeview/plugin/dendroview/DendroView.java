@@ -1104,7 +1104,7 @@ public class DendroView implements Observer, DendroPanel {
 	// }
 
 	@Override
-	public void addDendroMenus(final JMenu menu) {
+	public void addViewMenus(final JMenu menu) {
 
 		annotationsMenuItem = new JMenuItem(StringRes.menu_RowAndCol);
 		menu.add(annotationsMenuItem);
@@ -1113,31 +1113,6 @@ public class DendroView implements Observer, DendroPanel {
 		colorMenuItem = new JMenuItem(StringRes.menu_Color);
 		menu.add(colorMenuItem);
 		tvFrame.addToStackMenuList(colorMenuItem);
-
-		menu.addSeparator();
-
-		/* TODO add back when feature works well */
-		// matrixMenu = new JMenu("Matrix Size");
-		// menu.add(matrixMenu);
-		//
-		// final JMenuItem fillScreenMenuItem = new JMenuItem("Fill screen");
-		// matrixMenu.add(fillScreenMenuItem);
-		// fillScreenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
-		// Event.ALT_MASK));
-		// tvFrame.addToStackMenuList(fillScreenMenuItem);
-		//
-		// final JMenuItem equalAxesMenuItem = new JMenuItem("Equal axes");
-		// matrixMenu.add(equalAxesMenuItem);
-		// equalAxesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2,
-		// Event.ALT_MASK));
-		// tvFrame.addToStackMenuList(equalAxesMenuItem);
-		//
-		// final JMenuItem proportMatrixMenuItem = new JMenuItem(
-		// "Proportional axes");
-		// matrixMenu.add(proportMatrixMenuItem);
-		// proportMatrixMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-		// KeyEvent.VK_3, Event.ALT_MASK));
-		// tvFrame.addToStackMenuList(proportMatrixMenuItem);
 
 		menu.addSeparator();
 

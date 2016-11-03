@@ -20,7 +20,7 @@ import javax.swing.JMenu;
  */
 public interface DendroPanel {
 
-	public void addDendroMenus(JMenu menu);
+	public void addViewMenus(JMenu menu);
 
 	public void addClusterMenus(JMenu menu);
 
