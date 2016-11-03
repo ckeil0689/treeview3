@@ -120,10 +120,17 @@ public class ColorPresets implements ConfigNodePersistent {
 	@Override
 	public void importStateFrom(final Preferences oldNode) {
 
+		String className = getClass().getSimpleName();
 		if(oldNode == null) {
-			LogBuffer.println("Could not import state to " +	getClass()
-																																	.getSimpleName() +
+			LogBuffer.println("Could not import state to " +	className +
 												" because the old Preferences node was null.");
+			return;
+		}
+
+		if(!oldNode.name().equals(className)) {
+			LogBuffer.println("Could not import state from " +	oldNode +
+												" because it is not recognized as " + className +
+												"  node.");
 			return;
 		}
 
