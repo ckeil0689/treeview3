@@ -194,6 +194,12 @@ public class ColorChooserController extends Observable {
 
 			saveColorSettings();
 			wereChangesSaved = true;
+			
+			/* assumption that values changed. this will trigger the pop up dialogs
+			 * appearing to apply changes - purely for UX (user confidence)
+			 */
+			applyChangesToMatrix(true);
+			
 			colorChooserUI.dispose();
 		}
 
