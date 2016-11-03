@@ -86,7 +86,7 @@ public final class PreviewLoader {
 														colIdx < lineAsStrings.length; colIdx++) {
 
 					String elem = lineAsStrings[colIdx];
-
+					
 					// skip empty cells
 					if("".equals(elem)) {
 						continue;
