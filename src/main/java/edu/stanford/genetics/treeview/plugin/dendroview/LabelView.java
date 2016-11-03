@@ -62,7 +62,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/* Selection of row/ column indices */
 	protected final Color textFGColor = Color.black;
-	protected Color textBGColor;
+	protected Color textBGColor;	
 	protected final Color selectionBorderColor = Color.yellow;
 	protected final Color selectionTextBGColor = new Color(249, 238, 160);// yel
 	protected final Color selectionTextFGColor = Color.black;
@@ -768,8 +768,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 */
 
 		
-		if(SwingUtilities.getWindowAncestor(this).isActive())
+		if(SwingUtilities.getWindowAncestor(this).isActive()){
 			forceUpdatePrimaryHoverIndex();
+		}
 		/*
 		 * Gets the Current active Window (eg: export or treeview frame). It
 		 * will return null if we are active in other application.
@@ -887,6 +888,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 	}
 
+	/*
+	 * return true if a Modal Dialog is on top/visible for this instance for this
+	 * instance of treeview
+	 */
 	private static boolean isDialogonTop() {
 		Window[] wins = Window.getWindows();
 		boolean dialogOntop = false;
