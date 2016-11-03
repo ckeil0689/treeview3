@@ -81,11 +81,92 @@ def getVersionName() {
     return stdout.toString().trim()
 }
 
+/*
+ * This is a placeholder for a method which will get a more meaningful tag
+ */
+def getTagVersion() {
+    return "3.0alpha04"
+}
+
 macAppBundle {
     mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
     icon = "src/main/resources/TreeView3.icns"
     appName = "TreeView3"
     bundleJRE = true
+    volumeName = "${->project.name}-" + getTagVersion() + "-${->project.version}"
+    dmgName = "${->project.name}-" + getTagVersion() + "-${->project.version}"
     javaProperties.put("apple.laf.useScreenMenuBar", "true")
-    backgroundImage = "src/main/resources/logo.png"
+    backgroundImage = "src/main/resources/TreeView3-dmgbackground.png"
+    backgroundImageWidth = 512
+    backgroundImageHeight = 512
+    backgroundScript = """
+        tell application "Finder"
+            tell disk "\${VOL_NAME}"
+                open
+                set current view of container window to icon view
+                set toolbar visible of container window to false
+                set statusbar visible of container window to false
+                set the bounds of container window to { 0, 0, 649, 524 }
+                set the position of the container window to {100, 100}
+                set viewOptions to the icon view options of container window
+                set arrangement of viewOptions to not arranged
+                set icon size of viewOptions to 128
+                set background picture of viewOptions to file ".background:\${DMG_BACKGROUND_IMG}"
+                --There's currently no way to hide the path bar, tab bar, or
+                --preview, if the user has them set to visible by default
+
+                -- Move all files far enough to be not visible if user has
+                -- "show hidden files" option set
+                -- Note: this only make sense if "hidden" files are also visible
+                -- on the build system, otherwise command below will only return
+                -- list of non-hidden items
+                set filesToHide to the name of every item of container window
+                set newx to 100
+                set newy to 588
+                repeat with theFile in filesToHide
+                    set position of item theFile of container window to {newx, newy}
+                    set newx to newx + 150
+                    if (newx + 64) is greater than or equal to 1000 then
+                        set newx to 100
+                        set newy to newy + 150
+                    end if
+                end repeat
+
+                --Now move our files to the desired position
+                set position of item "\${APP_NAME}.app" of container window to { 140, 294 }
+                set position of item "Applications" of container window to { 506, 294 }
+
+                close
+                open
+                update without registering applications
+
+                --Used this site to resolve issues trying to get the window size & position to stick:
+                --https://github.com/andreyvit/create-dmg/blob/master/support/template.applescript
+
+                --Force saving of the size and position
+                delay 2
+                tell container window
+                    set the bounds to {0, 0, 649, 524}
+                    set the position to {100, 100}
+                end tell
+
+                update without registering applications
+
+            end tell
+
+            delay 1
+            tell disk "\${VOL_NAME}"
+                tell container window
+                    set the bounds to {0, 0, 649, 524}
+                    set the position to {100, 100}
+                end tell
+
+                update without registering applications
+            end tell
+
+            --give the finder some time to write the .DS_Store file
+            delay 5
+
+        end tell
+"""
 }
