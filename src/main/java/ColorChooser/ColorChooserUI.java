@@ -111,8 +111,8 @@ public class ColorChooserUI extends CustomDialog {
 
 		mainPanel.add(contentPanel, "push, grow, span, wrap");
 
-		mainPanel.add(saveBtn, "al right, pushx");
-		mainPanel.add(closeBtn, "al right");
+		mainPanel.add(closeBtn, "span, split 2, tag cancel, sizegroup bttn");
+		mainPanel.add(saveBtn, "tag ok, sizegroup bttn");
 
 		getContentPane().add(mainPanel);
 
