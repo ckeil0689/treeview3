@@ -889,9 +889,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 	}
 
-	/*
+	/**
 	 * return true if a Modal Dialog is on top/visible for this instance for this
 	 * instance of treeview
+	 * 
+	 * @return boolean whether a Modal dialog is top
 	 */
 	private static boolean isDialogonTop() {
 		Window[] wins = Window.getWindows();
