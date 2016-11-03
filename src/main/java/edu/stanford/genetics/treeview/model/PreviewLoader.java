@@ -48,7 +48,7 @@ public final class PreviewLoader {
 	 * correctly identifying the data starting coordinates.
 	 * 
 	 * This at most checks a preview square area as defined by
-	 * <code>PreviewLoader.LIMIT</code>
+	 * <code>PreviewLoader.PREVIEW_LIMIT</code>
 	 * 
 	 * @param filename - The file to read line by line
 	 * @param delimiter - Separator of elements in the file
@@ -67,6 +67,8 @@ public final class PreviewLoader {
 		 * column indexes to hold data in later rows. this is essentially
 		 * finding the minimal column data index in the file.
 		 * Row indexes can only increase as the file is read line by line.
+		 * 
+		 * No need to search rows beyond the already identified smallest col idx.
 		 */
 		int[] dataStartCoords = new int[] {-1, Integer.MAX_VALUE};
 
@@ -77,15 +79,12 @@ public final class PreviewLoader {
 			int rowIdx = 0;
 			int maxRowLabelTypeIdx = -1;
 			
-			// no need to search rows beyond the already identified smallest col idx
-			int dynamicColIdxLimit = Integer.MAX_VALUE;
-
 			while((line = br.readLine()) != null) {
 
 				final String[] lineAsStrings = line.split(delimiter, -1);
 
 				// iterate over strings in a line
-				for(int colIdx = 0; colIdx < dynamicColIdxLimit &&
+				for(int colIdx = 0; colIdx < dataStartCoords[1] &&
 														colIdx < lineAsStrings.length; colIdx++) {
 
 					String elem = lineAsStrings[colIdx];
@@ -128,7 +127,6 @@ public final class PreviewLoader {
 						 * data is found in an earlier column
 						 */
 						if(colIdx < dataStartCoords[1]) {
-							dynamicColIdxLimit = colIdx;
 							dataStartCoords[1] = colIdx;
 						}
 					}
