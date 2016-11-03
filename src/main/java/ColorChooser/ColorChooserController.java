@@ -32,6 +32,8 @@ public class ColorChooserController extends Observable {
 	private final ColorPicker colorPicker;
 
 	private SaveChangesListener saveChangesListener;
+	
+	// tracks if any changes were performed which lead to a matrix update
 	private boolean wereChangesPerformed;
 
 	// Holds all preset color data
@@ -242,7 +244,6 @@ public class ColorChooserController extends Observable {
 			return;
 		}
 
-		// valuesChanged because call from PresetChoiceListener 
 		wereChangesPerformed = true;
 		
 		colorPicker.updateColorExtractorData();
