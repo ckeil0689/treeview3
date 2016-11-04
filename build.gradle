@@ -78,13 +78,6 @@ def getVersionName() {
     return stdout.toString().trim()
 }
 
-/*
- * This is a placeholder for a method which will get a more meaningful tag
- */
-def getTagVersion() {
-    return "3.0alpha04"
-}
-
 macAppBundle {
     mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
     icon = "src/main/resources/TreeView3.icns"
