@@ -96,9 +96,6 @@ macAppBundle {
     volumeName = "${->project.name}-" + getTagVersion() + "-${->project.version}"
     dmgName = "${->project.name}-" + getTagVersion() + "-${->project.version}"
     javaProperties.put("apple.laf.useScreenMenuBar", "true")
-    backgroundImage = "src/main/resources/TreeView3-dmgbackground.png"
-    backgroundImageWidth = 512
-    backgroundImageHeight = 512
     backgroundScript = """
         tell application "Finder"
             tell disk "\${VOL_NAME}"
