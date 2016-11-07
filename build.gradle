@@ -77,3 +77,10 @@ def getVersionName() {
     }
     return stdout.toString().trim()
 }
+
+macAppBundle {
+    mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
+    icon = "src/main/resources/TreeView3.icns"
+    appName = "TreeView3"
+    bundleJRE = true
+}
