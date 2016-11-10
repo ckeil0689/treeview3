@@ -1,3 +1,7 @@
+plugins {
+  id "edu.sc.seis.macAppBundle" version "2.1.6"
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
