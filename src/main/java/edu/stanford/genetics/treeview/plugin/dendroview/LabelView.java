@@ -39,7 +39,6 @@ import javax.swing.event.ChangeListener;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LabelSummary;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -70,7 +69,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/* DataModel is an observer */
 	protected DataModel dataModel;
-	protected DataTicker ticker;
 
 	/* Required label data */
 	protected LabelInfo labelInfo;
@@ -2954,47 +2952,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 
 		map.setKeepTreeGlobal(true);
-
 		map.unsetHoverPixel();
 		unsetPrimaryHoverIndex();
-		if(isZoomed()){
-			/* This is not a recommended way of setting Zoomed Mean values
-			 * Parent should never no its child
-			 */
-			if(this instanceof RowLabelView)
-				setZoomMeanDataTickerValue(map.getFirstVisible(), 
-				                           map.getLastVisible(),
-				                           map2.getFirstVisible(),
-				                           map2.getLastVisible());
-			else if(this instanceof ColumnLabelView)
-				setZoomMeanDataTickerValue(map2.getFirstVisible(), 
-				                           map2.getLastVisible(),
-				                           map.getFirstVisible(),
-				                           map.getLastVisible());
-			else
-				LogBuffer.println("ERROR: Could not set Zoom Average value.");
-		}else
-		  setMeanDataTickerValue();
+
+		super.mouseExited(e);
 		repaint();
 	}
-
-	/**
-	 * Set the data ticker to Zoomed matrix average
-	 */
-	private void setZoomMeanDataTickerValue(int startingRow, int endingRow, int startingCol, int endingCol) {
-		ticker.setText("Zoom Average:");
-		ticker.setValue( dataModel.getDataMatrix().getZoomedMean(startingRow, endingRow, startingCol, endingCol));
-	}
 	
-	/**
-	 * Set the data ticker to matrix average
-	 * Rounding off to 4 decimals
-	 */
-	private void setMeanDataTickerValue() {
-		ticker.setText("Data Average:");
-		ticker.setValue( dataModel.getDataMatrix().getMean());
-	}
-
 	/**
 	 * TODO: This needs to go into a generic selection class and then the
 	 * TreeSelectionI param can be removed
@@ -3245,30 +3209,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		revalidate();
 		repaint();
 	}
-	
-    public void setDataTicker(final DataTicker ticker) {
-		
-		this.ticker = ticker;
-	}
     
     public void setDataModel(final DataModel dataModel) {
 		
 		this.dataModel = dataModel;
 	}
-    
-    /**
-  	 * Returns true if the visible area is a part of the matrix, 
-  	 * false if whole matrix is visible
-  	 * @author smd.faizan
-  	 * @return boolean
-  	 */
-  	private boolean isZoomed() {
-  	
-  		return(
-  			!(map.getMaxIndex()+1 ==
-  			map.getNumVisible() &&
-  			map2.getMaxIndex()+1 ==
-  			map2.getNumVisible()));
-  	}
     
 }

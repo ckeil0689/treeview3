@@ -13,9 +13,10 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
 import Utilities.GUIFactory;
+import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import net.miginfocom.swing.MigLayout;
 
-public class DataTicker {
+public class DataTicker{
 
 	private final JPanel tickerPanel;
 	private final JTextArea valTextArea;
@@ -24,7 +25,11 @@ public class DataTicker {
 	 * e.g. Data Value, Row Ave, Column Ave...
 	 */
 	private final JLabel textLabel;
-
+	/* dataModel contains the actual data  */
+	private DataModel dataModel;
+	/* Maps to know the position of the matrix*/
+	private MapContainer xmap;
+	private MapContainer ymap;
 	/**
 	 * Creates a new DataTicker instance.
 	 */
@@ -85,6 +90,57 @@ public class DataTicker {
 	 */
 	public void setText(String text){
 		textLabel.setText(text);
+	}
+	
+	public void setValueOnMouseExit(){
+		if(isZoomed()){
+			setZoomMeanDataTickerValue();
+		}else{
+		  setMeanDataValue();
+		}
+	}
+	
+	public void setModel(DataModel dataModel){
+		this.dataModel = dataModel;
+	}
+	
+	public void setMaps(MapContainer xMap, MapContainer yMap){
+		this.xmap = xMap;
+		this.ymap = yMap;
+	}
+	
+	/** 
+	 * Set the data ticker to matrix average
+	 */
+	public void setMeanDataValue() {
+		setText("Data Average:");
+		setValue( dataModel.getDataMatrix().getMean());
+	}
+	
+	/**
+	 * Set the data ticker to Zoomed matrix average
+	 */
+	public void setZoomMeanDataTickerValue() {
+		int startingRow = ymap.getFirstVisible();
+		int endingRow = ymap.getLastVisible();
+		int startingCol = xmap.getFirstVisible();
+		int endingCol = xmap.getLastVisible();
+		setText("Zoom Average:");
+		setValue( dataModel.getDataMatrix().getZoomedMean(startingRow, endingRow, startingCol, endingCol));
+	}
+	/**
+	 * Returns true if the visible area is a part of the matrix, 
+	 * false if whole matrix is visible
+	 * @author smd.faizan
+	 * @return boolean
+	 */
+	private boolean isZoomed() {
+	
+		return(
+			!(ymap.getMaxIndex()+1 ==
+			ymap.getNumVisible() &&
+			xmap.getMaxIndex()+1 ==
+			xmap.getNumVisible()));
 	}
 	
 }

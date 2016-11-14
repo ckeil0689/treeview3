@@ -47,6 +47,8 @@ public abstract class ModelView extends JPanel implements Observer,
 	/* Stores whether to draw a port around squares corresponding to what's
 	 * shown in the label pane(s) */
 	protected boolean labelPortMode = false;
+	
+	protected DataTicker ticker;
 
 	public int debug; //This is a verbosity level
 
@@ -202,6 +204,7 @@ public abstract class ModelView extends JPanel implements Observer,
 		}
 		
 		hasMouse = false;
+		ticker.setValueOnMouseExit();
 	}
 
 	/* a bunch of stubs so we can claim to be a MouseListener */
@@ -232,5 +235,9 @@ public abstract class ModelView extends JPanel implements Observer,
 		if(level == debug) {
 			LogBuffer.println(msg);
 		}
+	}
+	
+	public void setDataTicker(DataTicker ticker) {
+		this.ticker = ticker;
 	}
 }

@@ -945,21 +945,6 @@ ConfigNodePersistent, Controller {
 		ticker.setValue(model.getDataMatrix().getValue(colIdx, rowIdx));
 	}
 	
-	/* Set the data ticker to matrix average
-	 * Rounding off to 4 decimals
-	 */
-	public void setMeanDataValue() {
-		ticker.setText("Data Average:");
-		ticker.setValue( model.getDataMatrix().getMean());
-	}
-	
-	/* Set the data ticker to Zommed matrix average
-	 */
-	public void setZoomedMeanDataValue(int startingRow, int endingRow, int startingCol, int endingCol) {
-		ticker.setText("Zoom Average:");
-		ticker.setValue( model.getDataMatrix().getZoomedMean(startingRow, endingRow, startingCol, endingCol));
-	}
-	
 	/**
 	 * Scrolls to index i in the y-MapContainer
 	 *

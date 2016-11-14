@@ -847,7 +847,7 @@ public class DendroView implements Observer, DendroPanel {
 	 *            The ModelView to be added
 	 */
 	private void registerView(final ModelView modelView) {
-
+    modelView.setDataTicker(ticker);
 		modelView.setViewFrame(tvFrame);
 	}
 

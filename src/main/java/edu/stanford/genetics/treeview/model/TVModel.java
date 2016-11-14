@@ -711,7 +711,6 @@ public class TVModel extends Observable implements DataModel {
 																			int startingCol, int endingCol,
 																			double sum, int skipped) {
 			double roundedMean;
-			LogBuffer.println("Calculating Zoom mean.");
 			
 			double mean;
 			int numDataPoints = ((endingRow-startingRow+1) * (endingCol-startingCol+1)) - skipped;

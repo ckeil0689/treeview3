@@ -25,7 +25,6 @@ import javax.swing.Timer;
 
 import Controllers.RegionType;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
@@ -70,7 +69,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * 
 	 */
 	protected DataModel dataModel;
-	protected DataTicker ticker;
 
 	public TRView(final boolean isGeneTree) {
 
@@ -991,41 +989,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		map.setOverTree(false);
 		unsetHoveredNode();
-		if(isZoomed()){
-			/* This is not a recommended way of setting Zoomed Mean values
-			 * Parent should never no its child
-			 */
-			if(this instanceof RowTreeView)
-				setZoomMeanDataTickerValue(map.getFirstVisible(), 
-				                           map.getLastVisible(),
-				                           map2.getFirstVisible(),
-				                           map2.getLastVisible());
-			else if(this instanceof ColumnTreeView)
-				setZoomMeanDataTickerValue(map2.getFirstVisible(), 
-				                           map2.getLastVisible(),
-				                           map.getFirstVisible(),
-				                           map.getLastVisible());
-			else
-				LogBuffer.println("ERROR: Could not set Zoom Average value.");
-		}else
-		  setMeanDataTickerValue();
-	}
-
-	/**
-	 * Set the data ticker to Zoomed matrix average
-	 */
-	private void setZoomMeanDataTickerValue(int startingRow, int endingRow, int startingCol, int endingCol) {
-		ticker.setText("Zoom Average:");
-		ticker.setValue( dataModel.getDataMatrix().getZoomedMean(startingRow, endingRow, startingCol, endingCol));
-	}
-	
-	/**
-	 * Set the data ticker to matrix average
-	 * Rounding off to 4 decimals
-	 */
-	private void setMeanDataTickerValue() {
-		ticker.setText("Data Average:");
-		ticker.setValue( dataModel.getDataMatrix().getMean());
+    super.mouseExited(e);
 	}
 
 	@Override
@@ -1161,29 +1125,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		
 		return scaled;
 	}
-	
-	public void setDataTicker(final DataTicker ticker) {
-		
-		this.ticker = ticker;
-	}
-    
+	  
     public void setDataModel(final DataModel dataModel) {
 		
 		this.dataModel = dataModel;
 	}
-    
-  	/**
-  	 * Returns true if the visible area is a part of the matrix, 
-  	 * false if whole matrix is visible
-  	 * @author smd.faizan
-  	 * @return boolean
-  	 */
-  	private boolean isZoomed() {
-  	
-  		return(
-  			!(map.getMaxIndex()+1 ==
-  			map.getNumVisible() &&
-  			map2.getMaxIndex()+1 ==
-  			map2.getNumVisible()));
-  	}
+  
 }

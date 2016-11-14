@@ -208,14 +208,12 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * @param dendroView
 	 * @param tvModel
 	 */
-	private static void setModelAndTicker(final DendroView dendroView,
+	private void setModelAndTicker(final DendroView dendroView,
 								final DataModel tvModel) {
-		dendroView.getRowLabelView().setDataTicker(dendroView.getDataTicker());
-		dendroView.getColLabelView().setDataTicker(dendroView.getDataTicker());
+		dendroView.getDataTicker().setModel(tvModel);
+		dendroView.getDataTicker().setMaps(this.interactiveXmap, this.interactiveYmap);
 		dendroView.getRowLabelView().setDataModel(tvModel);
 		dendroView.getColLabelView().setDataModel(tvModel);
-		dendroView.getRowTreeView().setDataTicker(dendroView.getDataTicker());
-		dendroView.getColumnTreeView().setDataTicker(dendroView.getDataTicker());
 		dendroView.getRowTreeView().setDataModel(tvModel);
 		dendroView.getColumnTreeView().setDataModel(tvModel);
 	}
