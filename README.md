@@ -11,8 +11,6 @@ DOWNLOAD
 
 ** [Alpha 3 (current release)](https://bitbucket.org/TreeView3Dev/treeview3/downloads/tv3_alpha03_release.jar) ** - released on July 5, 2016
 
-** [Bleeding edge](https://bitbucket.org/TreeView3Dev/treeview3/src/37cf1e6b59426a56183f80d8dc136819eb99854f/build/libs/treeview3-all-267ff8e.jar?at=master) ** - updated with the master branch, includes latest fixes
-
 More recent "bleeding edge" releases, as well as older stable versions, are available at the [Treeview Wiki page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home).
 
 
@@ -66,6 +64,16 @@ DOCUMENTATION
 =============
 
 [Coming soon]
+
+
+HOW TO CITE
+===========
+
+The manuscript describing Treeview 3.0 is currently in preparation. In the meantime, if you have used the latest pre-release version of the software (alpha 3) and wish to cite the source, please use the following reference:
+
+> Keil C, Leach RW, Faizaan SM, Bezawada S, Parsons L, Baryshnikova A. (2016). Treeview 3.0 (alpha 3) - Visualization and analysis of large data matrices [Data set]. Zenodo. http://doi.org/10.5281/zenodo.160573
+
+To cite older alpha versions of Treeview 3.0, contact us at <treeview@princeton.edu>.
 
 
 DEVELOPERS

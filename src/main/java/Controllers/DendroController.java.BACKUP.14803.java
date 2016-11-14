@@ -201,11 +201,20 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	/** sets data model and ticker in Label View and TreeView classes
 	 * 
 	 * @param dendroView
-	 * @param tvModel */
+<<<<<<< HEAD
+	 * @param tvModel
+	 */
 	private void setModelAndTicker(final DendroView dendroView,
 								final DataModel tvModel) {
 		dendroView.getDataTicker().setModel(tvModel);
 		dendroView.getDataTicker().setMaps(this.interactiveXmap, this.interactiveYmap);
+=======
+	 * @param tvModel */
+	private static void setModelAndTicker(final DendroView dendroView,
+																				final DataModel tvModel) {
+		dendroView.getRowLabelView().setDataTicker(dendroView.getDataTicker());
+		dendroView.getColLabelView().setDataTicker(dendroView.getDataTicker());
+>>>>>>> master
 		dendroView.getRowLabelView().setDataModel(tvModel);
 		dendroView.getColLabelView().setDataModel(tvModel);
 		dendroView.getRowTreeView().setDataModel(tvModel);
@@ -944,10 +953,10 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	/** Assigns the MapContainers to classes which need to know about them. */
 	private void setupMapContainers() {
 
-		dendroView.getColumnTreeView().setMap(interactiveXmap);
-		dendroView.getColLabelView().setMap(interactiveXmap);
-		dendroView.getRowTreeView().setMap(interactiveYmap);
-		dendroView.getRowLabelView().setMap(interactiveYmap);
+		dendroView.getColumnTreeView().setMap(interactiveXmap, interactiveYmap);
+		dendroView.getColLabelView().setMap(interactiveXmap, interactiveYmap);
+		dendroView.getRowTreeView().setMap(interactiveYmap, interactiveXmap);
+		dendroView.getRowLabelView().setMap(interactiveYmap, interactiveXmap);
 
 		mvController.setInteractiveMapContainers(interactiveXmap, interactiveYmap);
 		mvController.setGlobalMapContainers(globalXmap, globalYmap);

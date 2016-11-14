@@ -2,6 +2,7 @@ package ColorChooser;
 
 import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowListener;
@@ -15,19 +16,15 @@ import javax.swing.JPanel;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 
-/**
- * Constructs the GUI for color selection and manipulation.
+/** Constructs the GUI for color selection and manipulation.
  * 
- * @author chris0689
- *
- */
+ * @author chris0689 */
 public class ColorChooserUI extends CustomDialog {
 
-	/**
-	 * Default serial version ID to keep Eclipse happy...
-	 */
+	/** Default serial version ID to keep Eclipse happy... */
 	private static final long serialVersionUID = 1L;
 
 	// GUI components
@@ -42,40 +39,33 @@ public class ColorChooserUI extends CustomDialog {
 	private JButton editBtn;
 	private JButton removeBtn;
 	private JButton missingBtn;
-	private JButton applyBtn;
+	private JButton saveBtn;
 
 	private ColorIcon missingColorIcon;
 
 	// ColorSet choices
 	private JComboBox<ColorSchemeType> presetChoice;
 
-	// Stores whether custom ColorSet is selected or not
-	private boolean isCustomSelected;
-
-	/**
-	 * Constructs a ColorChooser object.
+	/** Constructs a ColorChooser object.
 	 *
 	 * @param drawer
-	 *            The CoorExtractor which defines how colors are mapped to data.
+	 *          The CoorExtractor which defines how colors are mapped to data.
 	 * @param minVal
-	 *            Minimum boundary of the data.
+	 *          Minimum boundary of the data.
 	 * @param maxVal
-	 *            Maximum boundary of the data.
-	 */
+	 *          Maximum boundary of the data. */
 	public ColorChooserUI(final ColorExtractor drawer, final double minVal,
-			final double maxVal, final double mean, final double median) {
+												final double maxVal, final double mean,
+												final double median) {
 
 		super(StringRes.dlg_Colors);
-		this.colorPicker = new ColorPicker(drawer, minVal, maxVal, 
-				mean, median);
+		this.colorPicker = new ColorPicker(drawer, minVal, maxVal, mean, median);
 		this.gradientPanel = colorPicker.getContainerPanel();
 
 		setupLayout();
 	}
 
-	/**
-	 * Sets up the GUI layout of the ColorChooser object.
-	 */
+	/** Sets up the GUI layout of the ColorChooser object. */
 	@Override
 	protected void setupLayout() {
 
@@ -85,83 +75,84 @@ public class ColorChooserUI extends CustomDialog {
 		this.addBtn = GUIFactory.createBtn("Add New Color");
 		this.editBtn = GUIFactory.createBtn("Edit Selected Color");
 		this.removeBtn = GUIFactory.createBtn("Remove Selected Color");
-		this.applyBtn = GUIFactory.createBtn("Apply");
-		getRootPane().setDefaultButton(applyBtn);
+		this.saveBtn = GUIFactory.createBtn("Save");
+		getRootPane().setDefaultButton(saveBtn);
+
+		this.closeBtn.setText("Cancel");
 
 		setSelectionDependentBtnStatus(false, false);
 
 		this.missingColorIcon = new ColorIcon();
-		this.missingBtn = GUIFactory.createColorIconBtn("Missing Data",
-				missingColorIcon);
+		this.missingBtn = GUIFactory
+																.createColorIconBtn("Missing Data", missingColorIcon);
 
-		this.presetChoice = new JComboBox<ColorSchemeType>(
-				ColorSchemeType.values());
+		this.presetChoice = new JComboBox<ColorSchemeType>(ColorSchemeType
+																																			.values());
 
 		// Preset choice panel
-		final JPanel presetChoicePanel = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT);
+		final JPanel presetChoicePanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 
 		presetChoicePanel.add(presetChoice, "pushx");
 		presetChoicePanel.add(missingBtn, "pushx");
 
-		final JLabel colorHint = GUIFactory.createLabel("Choose a color "
-				+ "scheme: ", GUIFactory.FONTS);
-		final JLabel hint = GUIFactory.createLabel("Move, add or edit sliders "
-				+ "to adjust color scheme.", GUIFactory.FONTS);
+		final JLabel colorHint = GUIFactory.createLabel("Choose a color " +
+																										"scheme: ", GUIFactory.FONTS);
+		final JLabel hint = GUIFactory.createLabel("Move, add or edit sliders " +
+																								"to adjust color scheme.", GUIFactory.FONTS);
 
 		contentPanel.add(colorHint, "span, wrap");
 		contentPanel.add(presetChoicePanel, "span, pushx, wrap");
 		contentPanel.add(hint, "span, wrap");
-		contentPanel.add(gradientPanel, "h 150:150:, w 650:650:, pushx, "
-				+ "alignx 50%, span, wrap");
+		contentPanel.add(gradientPanel, "h 150:150:, w 650:650:, pushx, " +
+																		"alignx 50%, span, wrap");
 		contentPanel.add(addBtn, "pushx, split 3, alignx 50%");
 		contentPanel.add(removeBtn, "pushx");
 		contentPanel.add(editBtn, "pushx");
 
 		mainPanel.add(contentPanel, "push, grow, span, wrap");
 
-		mainPanel.add(applyBtn, "al right, pushx");
-		mainPanel.add(closeBtn, "al right");
-		
+		mainPanel.add(closeBtn, "span, split 2, tag cancel, sizegroup bttn");
+		mainPanel.add(saveBtn, "tag ok, sizegroup bttn");
+
 		getContentPane().add(mainPanel);
 
 		pack();
 		setLocationRelativeTo(JFrame.getFrames()[0]);
-		
+
 		mainPanel.revalidate();
 		mainPanel.repaint();
 	}
 
-	/**
-	 * Sets the icon of the missing color button to the new color.
+	/** Sets the icon of the missing color button to the new color.
 	 * 
 	 * @param newColor
-	 *            The new color to be displayed.
-	 */
+	 *          The new color to be displayed. */
 	protected void updateMissingColorIcon(Color newColor) {
 
+		if(missingColorIcon == null || missingBtn == null) {
+			LogBuffer.println("Could not update the color icon of the 'Missing Color' button.");
+			return;
+		}
+
 		missingColorIcon.setColor(newColor);
+		missingBtn.repaint();
 	}
 
-	/**
-	 * Updates the status of buttons which are dependent on whether there is any
+	/** Updates the status of buttons which are dependent on whether there is any
 	 * thumb selected or not.
 	 * 
-	 * @param enabled
-	 */
+	 * @param enabled */
 	protected void setSelectionDependentBtnStatus(boolean editEnabled,
-			boolean removeEnabled) {
+																								boolean removeEnabled) {
 
 		editBtn.setEnabled(editEnabled);
 		removeBtn.setEnabled(removeEnabled);
 	}
 
-	/**
-	 * Gives access to the GradientBox object which is the JPanel containing the
+	/** Gives access to the GradientBox object which is the JPanel containing the
 	 * actual color gradient and thumbs.
 	 *
-	 * @return
-	 */
+	 * @return */
 	protected ColorPicker getColorPicker() {
 
 		return colorPicker;
@@ -178,14 +169,9 @@ public class ColorChooserUI extends CustomDialog {
 		return presetChoice;
 	}
 
-	protected void setCustomSelected(boolean isCustom) {
-
-		this.isCustomSelected = isCustom;
-	}
-
 	protected boolean isCustomSelected() {
 
-		return isCustomSelected;
+		return(getPresetChoices().getSelectedItem() == ColorSchemeType.CUSTOM);
 	}
 
 	/* ------- GUI component listeners ------------ */
@@ -211,9 +197,9 @@ public class ColorChooserUI extends CustomDialog {
 		removeBtn.addActionListener(l);
 	}
 
-	protected void addPresetChoiceListener(final ActionListener l) {
+	protected void addPresetChoiceListener(final ItemListener l) {
 
-		presetChoice.addActionListener(l);
+		presetChoice.addItemListener(l);
 	}
 
 	protected void addMissingListener(final ActionListener l) {
@@ -225,10 +211,10 @@ public class ColorChooserUI extends CustomDialog {
 
 		editBtn.addActionListener(l);
 	}
-	
-	protected void addApplyChangeListener(final ActionListener l) {
-		
-		applyBtn.addActionListener(l);
+
+	protected void addSaveChangesListener(final ActionListener l) {
+
+		saveBtn.addActionListener(l);
 	}
 
 	protected void addDialogCloseListener(final WindowListener l) {

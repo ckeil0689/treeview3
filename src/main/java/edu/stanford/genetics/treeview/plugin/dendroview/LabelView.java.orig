@@ -76,6 +76,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/* Maps label position to GlobalView */
 	protected MapContainer map;
+	/*The other orthogonal map, used only once while calculating Zoomed Averages
+	 */
+	protected MapContainer map2;
 
 	/* Use labels to generate URLs for look-up */
 	protected UrlExtractor urlExtractor;
@@ -353,12 +356,17 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	/** Used to space the array names.
 	 *
 	 * @param im
+<<<<<<< HEAD
 	 *            A new mapcontainer.
 	 * @param m2 The other orthogonal map, used only once while calculating
 	 *            Zoomed Averages
 	 */
 	public void setMap(final MapContainer im, final MapContainer m2) {
 		map2 = m2;
+=======
+	 *          A new mapcontainer. */
+	public void setMap(final MapContainer im) {
+>>>>>>> master
 		if(map != null) {
 			map.deleteObserver(this);
 		}
@@ -2706,6 +2714,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		map.unsetHoverPixel();
 		unsetPrimaryHoverIndex();
 
+<<<<<<< HEAD
 		super.mouseExited(e);
 		repaint();
 	}
@@ -2719,6 +2728,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			selection.setIndexSelection(index, false);
 		else
 			selection.setIndexSelection(index, true);
+=======
+	/** Set the data ticker to matrix average Rounding off to 4 decimals */
+	private void setMeanDataTickerValue() {
+		ticker.setText("Data Average:");
+		ticker.setValue(dataModel.getDataMatrix().getMean());
+	}
+
+	/** TODO: This needs to go into a generic selection class and then the
+	 * TreeSelectionI param can be removed */
+	public void toggleSelect(TreeSelectionI selection, int index) {
+		if(selection.isIndexSelected(index)) selection.setIndexSelection(index, false);
+		else selection.setIndexSelection(index, true);
+>>>>>>> master
 	}
 
 	/** TODO: This needs to go into a generic selection class and then the
@@ -2961,9 +2983,20 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		revalidate();
 		repaint();
 	}
+<<<<<<< HEAD
+    
+    public void setDataModel(final DataModel dataModel) {
+		
+=======
+
+	public void setDataTicker(final DataTicker ticker) {
+
+		this.ticker = ticker;
+	}
 
 	public void setDataModel(final DataModel dataModel) {
 
+>>>>>>> master
 		this.dataModel = dataModel;
 	}
 

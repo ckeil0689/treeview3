@@ -1,8 +1,9 @@
-/* BEGIN_HEADER                                                   TreeView 3
+/*
+ * BEGIN_HEADER TreeView 3
  *
  * Please refer to our LICENSE file if you wish to make changes to this software
  *
- * END_HEADER 
+ * END_HEADER
  */
 
 package edu.stanford.genetics.treeview.plugin.dendroview;
@@ -12,7 +13,6 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentListener;
 import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
@@ -48,9 +48,9 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.LabelFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
+import edu.stanford.genetics.treeview.DragGridPanel;
 
-/**
- * TODO Refactor this JavaDoc. It's not applicable to the current program
+/** TODO Refactor this JavaDoc. It's not applicable to the current program
  * anymore.
  *
  * This class encapsulates a dendrogram view, which is the classic Eisen
@@ -68,8 +68,7 @@ import edu.stanford.genetics.treeview.core.RowFinderBox;
  * changed ad libitum.
  *
  * @author Alok Saldanha <alok@genome.stanford.edu>
- * @version $Revision: 1.7 $ $Date: 2009-03-23 02:46:51 $
- */
+ * @version $Revision: 1.7 $ $Date: 2009-03-23 02:46:51 $ */
 public class DendroView implements Observer, DendroPanel {
 
 	// Container JFrame
@@ -79,6 +78,7 @@ public class DendroView implements Observer, DendroPanel {
 
 	// Main containers
 	private final JPanel dendroPane;
+	private final DragGridPanel dragGrid;
 	private final JPanel searchPanel;
 	private final DataTicker ticker;
 
@@ -134,12 +134,18 @@ public class DendroView implements Observer, DendroPanel {
 	private LabelFinderBox rowFinderBox;
 	private LabelFinderBox colFinderBox;
 
+
+	//Used to layout the matrix panel
+	static int BORDER_THICKNESS   = 3;
+	static int MIN_GRID_CELL_SIZE = 10;
+	static int FOCUS_THICKNESS    = 0;
+	static int LABEL_AREA_HEIGHT  = 180;
+
 	/**
 	 * Chained constructor for the DendroView object without a name.
 	 *
 	 * @param vFrame
-	 *            parent ViewFrame of DendroView
-	 */
+	 *          parent ViewFrame of DendroView */
 	public DendroView(final TreeViewFrame tvFrame) {
 
 		this(tvFrame, "Dendrogram");
@@ -151,34 +157,33 @@ public class DendroView implements Observer, DendroPanel {
 		this(tvFrame, "Dendrogram");
 	}
 
-	/**
-	 * Constructor for the DendroView object
+	/** Constructor for the DendroView object
 	 *
 	 * @param tvFrame parent ViewFrame of DendroView
-	 * @param name name of this view.
-	 */
+	 * @param name name of this view. */
 	public DendroView(final TreeViewFrame tvFrame, final String name) {
 
 		this.tvFrame = tvFrame;
 		this.name = "DendroView";
 
-		/* Main panel to which all components are added */
+		// Main panel to which all components are added
 		this.dendroPane = GUIFactory.createJPanel(false, 
 				GUIFactory.TINY_GAPS_AND_INSETS);
-		
-		/* Search panel containing the search bars */
-		this.searchPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS_OR_INSETS);
 
-		/* The two matrix views (big, interactive & small, overview) */
+		this.dragGrid = new DragGridPanel(2,2);
+
+		// Search panel containing the search bars
+		this.searchPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+
+		// The two matrix views (big, interactive & small, overview)
 		this.globalMatrixView = new GlobalMatrixView();
 		this.interactiveMatrixView = new InteractiveMatrixView();
 
-		/* Main matrix JScrollbars */
+		// Main matrix JScrollbars
 		this.matrixXscrollbar = interactiveMatrixView.getXMapScroll();
 		this.matrixYscrollbar = interactiveMatrixView.getYMapScroll();
 
-		/* Label views */
+		// Label views
 		this.rowLabelView = new RowLabelView();
 		this.colLabelView = new ColumnLabelView();
 		// arraynameview.setUrlExtractor(viewFrame.getArrayUrlExtractor());
@@ -186,20 +191,18 @@ public class DendroView implements Observer, DendroPanel {
 		this.rowLabelScroll = rowLabelView.getSecondaryScrollBar();
 		this.colLabelScroll = colLabelView.getSecondaryScrollBar();
 
-		/* Dendrograms */
+		// Dendrograms
 		this.rowTreeView = new RowTreeView();
 		this.colTreeView = new ColumnTreeView();
-		
+
 		this.ticker = new DataTicker();
 
 		setupScaleButtons();
 	}
 
-	/**
-	 * Returns the dendroPane so it can be displayed in TVFrame.
+	/** Returns the dendroPane so it can be displayed in TVFrame.
 	 *
-	 * @return JPanel dendroPane
-	 */
+	 * @return JPanel dendroPane */
 	public JPanel makeDendro() {
 
 		colLabelView.setUrlExtractor(tvFrame.getUrlExtractor());
@@ -209,12 +212,10 @@ public class DendroView implements Observer, DendroPanel {
 
 		return dendroPane;
 	}
-	
-	/**
-	 * Registers all ModelViews with the ViewFrame.
-	 */
+
+	/** Registers all ModelViews with the ViewFrame. */
 	private void registerViews() {
-		
+
 		registerView(globalMatrixView);
 		registerView(interactiveMatrixView);
 		registerView(colTreeView);
@@ -223,152 +224,134 @@ public class DendroView implements Observer, DendroPanel {
 		registerView(rowTreeView);
 	}
 
-	/**
-	 * Setup the search panel which contains tow editable JComboBoxes containing
+	/** Setup the search panel which contains tow editable JComboBoxes containing
 	 * all labels for each axis.
 	 *
-	 * @return JPanel
-	 */
+	 * @return JPanel */
 	private void setupSearchPanel() {
 
-		if (rowFinderBox == null || colFinderBox == null) {
-			LogBuffer.println("Could not set up search. A search bar has"
-					+ " not been set up.");
+		if(rowFinderBox == null || colFinderBox == null) {
+			LogBuffer.println("Could not set up search. A search bar has" +
+												" not been set up.");
 			return;
 		}
 
 		searchPanel.removeAll();
 
-		final String tooltip = "You can use wildcards to search (*, ?). "
-				+ "E.g.: *complex* --> Rpd3s complex, ATP Synthase "
-				+ "(complex V), etc...";
+		final String tooltip = "You can use wildcards to search (*, ?). " +
+														"E.g.: *complex* --> Rpd3s complex, ATP Synthase " +
+														"(complex V), etc...";
 		searchPanel.setToolTipText(tooltip);
 
-		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 80::, growx, "
-				+ "pushx, al right");
-		searchPanel.add(colFinderBox.getSearchTermBox(), "w 80::, growx, "
-				+ "pushx, al right");
+		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 80::, growx, " +
+																											"pushx, al right");
+		searchPanel.add(colFinderBox.getSearchTermBox(), "w 80::, growx, " +
+																											"pushx, al right");
 
 		searchPanel.revalidate();
 		searchPanel.repaint();
 	}
 
-	/**
-	 * Initializes the objects associated with label search. These are the
+	/** Initializes the objects associated with label search. These are the
 	 * JComboBoxes containing all the label names as well as the buttons on that
 	 * panel.
 	 *
 	 * @param geneHI
 	 * @param arrayHI
 	 * @param xmap
-	 * @param ymap
-	 */
+	 * @param ymap */
 	public void setupSearch(final LabelInfo geneHI, final LabelInfo arrayHI,
-			final MapContainer xmap, final MapContainer ymap) {
+													final MapContainer xmap, final MapContainer ymap) {
 
 		setSearchTermBoxes();
 		updateSearchTermBoxes(geneHI, arrayHI, xmap, ymap);
 		setupSearchPanel();
 	}
 
-	/**
-	 * Organizes the main layout for DendroView.
-	 */
+	/** Organizes the main layout for DendroView. */
 	public void setupLayout() {
 
 		dendroPane.removeAll();
 
-		JPanel toolbarPanel;
-		JPanel matrixPanel;
-				
-		toolbarPanel = createToolbarPanel();
-		
+		JPanel toolbarPanel = createToolbarPanel();
+
 		setupRowDataPane();
 		setupColDataPane();
 		setDataPaneDividers();
 
-		matrixPanel = createMatrixPanel();
-		
-		dendroPane.add(matrixPanel, "grow, push, wrap");
+		setupMatrixPanel();
+
+		dendroPane.add(dragGrid, "grow, push, wrap");
 		dendroPane.add(toolbarPanel, "growx, pushx, h 3%, wrap");
-		
+
 		dendroPane.revalidate();
 		dendroPane.repaint();
 	}
-	
-	/**
-	 * Reset default state for all model views.
-	 */
+
+	/** Reset default state for all model views. */
 	public void resetModelViewDefaults() {
-		
+
 		rowLabelView.resetDefaults();
 		colLabelView.resetDefaults();
-		
+
 		rowTreeView.resetDefaults();
 		colTreeView.resetDefaults();
-		
+
 		interactiveMatrixView.resetDefaults();
 		globalMatrixView.resetDefaults();
 	}
-	
-	/**
-	 * Restore the state of RowLabelView and ColumnLabelView to the stored
-	 * values in their respective Preferences nodes.
-	 */
+
+	/** Restore the state of RowLabelView and ColumnLabelView to the stored
+	 * values in their respective Preferences nodes. */
 	public void restoreLabelViewStates() {
-		
+
 		rowLabelView.requestStoredState();
 		colLabelView.requestStoredState();
 	}
-	
-	/**
-	 * Creates a panel which contains the color-value indicator. This is
+
+	/** Creates a panel which contains the color-value indicator. This is
 	 * used to display the data value of the currently hovered matrix pixel.
-	 * @return JPanel containing the olor-value indicator.
-	 */
+	 * 
+	 * @return JPanel containing the olor-value indicator. */
 	private JPanel createColorValIndicatorPanel() {
-		
+
 		// TODO currently just a data ticker displaying a tile's data value
 		return ticker.getTickerPanel();
 	}
-	
-	/**
-	 * Creates a JPanel to hold the main navigation buttons for the matrix.
-	 * @return A JPanel with all navigation buttons.
-	 */
+
+	/** Creates a JPanel to hold the main navigation buttons for the matrix.
+	 * 
+	 * @return A JPanel with all navigation buttons. */
 	private JPanel createNavBtnPanel() {
-		
-		JPanel navBtnPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_INSETS);
+
+		JPanel navBtnPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		navBtnPanel.add(scaleIncXY);
 		navBtnPanel.add(scaleDecXY);
 		navBtnPanel.add(zoomBtn);
 		navBtnPanel.add(scaleDefaultAll);
 		/* TODO: This needs to be better integrated into the interface */
 //		navBtnPanel.add(exportBtn);
-		
+
 		return navBtnPanel;
 	}
-	
-	/**
-	 * Creates a button which contains search interface elements, such as 
-	 * search bars. 
-	 * @return A JPanel containing search bars.
-	 */
+
+	/** Creates a button which contains search interface elements, such as
+	 * search bars.
+	 * 
+	 * @return A JPanel containing search bars. */
 	private JPanel createSearchBarPanel() {
-		
-		JPanel searchBarPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_INSETS_FILL);
+
+		JPanel searchBarPanel = GUIFactory
+																			.createJPanel(false, GUIFactory.NO_INSETS_FILL);
 		searchBarPanel.add(searchPanel);
-		
+
 		return searchBarPanel;
 	}
-	
-	/**
-	 * A parent JPanel to organize main navigation + info UI elements in a 
+
+	/** A parent JPanel to organize main navigation + info UI elements in a
 	 * toolbar like layout.
-	 * @return A JPanel containing all major UI navigation + info elements.
-	 */
+	 * 
+	 * @return A JPanel containing all major UI navigation + info elements. */
 	private JPanel createToolbarPanel() {
 
 		JPanel navBtnPanel;
@@ -381,8 +364,7 @@ public class DendroView implements Observer, DendroPanel {
 		searchBarPanel = createSearchBarPanel();
 
 		// Toolbar
-		toolbarPanel = GUIFactory.createJPanel(false, 
-			GUIFactory.NO_GAPS_OR_INSETS);
+		toolbarPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
 		toolbarPanel.add(colorValIndicatorPanel, "al left, w 33%, wmax 33%");
 		toolbarPanel.add(navBtnPanel, "al center, pushx");
 		toolbarPanel.add(searchBarPanel, "al right, w 33%");
@@ -390,48 +372,43 @@ public class DendroView implements Observer, DendroPanel {
 		return toolbarPanel;
 	}
 
-	/**
-	 * Creates a panel to hold the row dendrogram. This will be added to
+	/** Creates a panel to hold the row dendrogram. This will be added to
 	 * the left side of the corresponding JSplitPane. The dendrogram is only
 	 * drawn if a model was clustered and a gtr-file exists.
-	 * @return A JPanel with the row dendrogram.
-	 */
+	 * 
+	 * @return A JPanel with the row dendrogram. */
 	private JPanel createRowTreePanel() {
-	
-		JPanel rowTreePanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS_OR_INSETS);
-		
+
+		JPanel rowTreePanel = GUIFactory
+																		.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+
 		rowTreePanel.add(rowTreeView, "w 100%, pushy, growy, wrap");
 
 		// hidemode is a MigLayout trick! Very important to keep trees aligned.
-		rowTreePanel.add(rowTreeView.getHorizontalScrollBar(), "w 100%, "
-				+ "hidemode 0"); 
+		rowTreePanel.add(rowTreeView.getHorizontalScrollBar(), "w 100%, " +
+																														"hidemode 0");
 		rowTreeView.getHorizontalScrollBar().setVisible(false);
-		
+
 		return rowTreePanel;
 	}
-	
-	/**
-	 * Creates a JPanel to hold the display of row labels.
-	 * @return A JPanel holding the row LabelView.
-	 */
-	private JPanel createRowLabelPanel() {
-		
-		JPanel rowLabelPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS_OR_INSETS);
 
-		rowLabelPanel.add(rowLabelView.getComponent(), "w 100%, pushy, growy, "
-				+ "wrap");
+	/** Creates a JPanel to hold the display of row labels.
+	 * 
+	 * @return A JPanel holding the row LabelView. */
+	private JPanel createRowLabelPanel() {
+
+		JPanel rowLabelPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+
+		rowLabelPanel.add(rowLabelView.getComponent(), "w 100%, pushy, growy, " +
+																										"wrap");
 		// Row-Label scrollbar in sync with colNavPanel via MigLayout!
 		// Guaranteeing same size and alignment can only be done via manual add.
 		rowLabelPanel.add(rowLabelView.getSecondaryScrollBar(), "w 100%");
-		
+
 		return rowLabelPanel;
 	}
-	
-	/**
-	 * Sets up the JSplitPane used to show row dendrogram and labels.
-	 */
+
+	/** Sets up the JSplitPane used to show row dendrogram and labels. */
 	private void setupRowDataPane() {
 
 		JPanel rowLabelPanel;
@@ -439,76 +416,72 @@ public class DendroView implements Observer, DendroPanel {
 
 		rowLabelPanel = createRowLabelPanel();
 		//Allow the user to drag the divider to completely hide the labels
-		rowLabelPanel.setMinimumSize(new Dimension(0,0));
+		rowLabelPanel.setMinimumSize(new Dimension(0, 0));
 
 		rowTreePanel = createRowTreePanel();
 		//Allow the user to drag the divider to completely hide the trees
-		rowTreePanel.setMinimumSize(new Dimension(0,0));
+		rowTreePanel.setMinimumSize(new Dimension(0, 0));
 
-		rowDataPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rowTreePanel,
-				rowLabelPanel);
+		rowDataPane = new JSplitPane(	JSplitPane.HORIZONTAL_SPLIT, rowTreePanel,
+																	rowLabelPanel);
 		rowDataPane.setResizeWeight(0.0);
 		rowDataPane.setOpaque(false);
 
 		rowDataPane.setUI(new DragBarUI(StringRes.icon_dragbar_vert,
-				StringRes.icon_dragbar_vert_light));
+																		StringRes.icon_dragbar_vert_light));
 		rowDataPane.setBorder(null);
 		rowDataPane.setDividerSize(10);
 
-		final double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc",
-				0.5d);
-		if (rowTreeView.isEnabled()) {
+		final double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc", 0.5d);
+		if(rowTreeView.isEnabled()) {
 			rowDataPane.setDividerLocation(oldRowDiv);
 			setRowTRViewEnabled(true);
-			
-		} else {
+
+		}
+		else {
 			rowDataPane.setDividerLocation(0.0);
 			setRowTRViewEnabled(false);
 		}
 	}
-	
-	/**
-	 * Creates a panel to hold the column dendrogram. This will be added to
+
+	/** Creates a panel to hold the column dendrogram. This will be added to
 	 * the top side of the corresponding JSplitPane. The dendrogram is only
 	 * drawn if a model was clustered and a atr-file exists.
-	 * @return A JPanel with the column dendrogram.
-	 */
+	 * 
+	 * @return A JPanel with the column dendrogram. */
 	private JPanel createColTreePanel() {
-		
-		JPanel colTreePanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS_OR_INSETS);
-		
+
+		JPanel colTreePanel = GUIFactory
+																		.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
+
 		colTreePanel.add(colTreeView, "push, growx, h 100%");
-		
+
 		// hidemode is a MigLayout trick! Very important to keep trees aligned.
-		colTreePanel.add(colTreeView.getVerticalScrollBar(), "h 100%, "
-				+ "hidemode 0");
+		colTreePanel.add(colTreeView.getVerticalScrollBar(), "h 100%, " +
+																													"hidemode 0");
 		colTreeView.getVerticalScrollBar().setVisible(false);
-		
+
 		return colTreePanel;
 	}
-	
-	/**
-	 * Creates a JPanel to hold the display of column labels.
-	 * @return A JPanel holding the column LabelView.
-	 */
+
+	/** Creates a JPanel to hold the display of column labels.
+	 * 
+	 * @return A JPanel holding the column LabelView. */
 	private JPanel createColLabelPanel() {
-		
+
 		JPanel colLabelPanel;
-		
-		colLabelPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS_OR_INSETS);
+
+		colLabelPanel = GUIFactory
+															.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
 		colLabelPanel.add(colLabelView.getComponent(), "h 100%, pushx, growx");
 		// Col-Label scrollbar in sync with rowNavPanel via MigLayout!
 		// Guaranteeing same size and alignment can only be done via manual add.
 		colLabelPanel.add(colLabelView.getSecondaryScrollBar(), "h 100%");
-		
+
 		return colLabelPanel;
 	}
-	
-	/**
-	 * Sets up the JSplitPane used to show column dendrogram and labels.
-	 */
+
+	/** Sets up the JSplitPane used to show column dendrogram and labels. */
 	private void setupColDataPane() {
 
 		JPanel colTreePanel;
@@ -516,179 +489,182 @@ public class DendroView implements Observer, DendroPanel {
 
 		colTreePanel = createColTreePanel();
 		//Allow the user to drag the divider to completely hide the trees
-		colTreePanel.setMinimumSize(new Dimension(0,0));
+		colTreePanel.setMinimumSize(new Dimension(0, 0));
 
 		colLabelPanel = createColLabelPanel();
 		//Allow the user to drag the divider to completely hide the labels
-		colLabelPanel.setMinimumSize(new Dimension(0,0));
+		colLabelPanel.setMinimumSize(new Dimension(0, 0));
 
-		colDataPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, colTreePanel,
-				colLabelPanel);
+		colDataPane = new JSplitPane(	JSplitPane.VERTICAL_SPLIT, colTreePanel,
+																	colLabelPanel);
 		colDataPane.setResizeWeight(0.0);
 		colDataPane.setOpaque(false);
 
 		colDataPane.setUI(new DragBarUI(StringRes.icon_dragbar_horiz,
-				StringRes.icon_dragbar_horiz_light));
+																		StringRes.icon_dragbar_horiz_light));
 		colDataPane.setBorder(null);
 		colDataPane.setDividerSize(10);
 
-		final double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc",
-				0.5d);
-		if (colTreeView.isEnabled()) {
+		final double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc", 0.5d);
+		if(colTreeView.isEnabled()) {
 			colDataPane.setDividerLocation(oldColDiv);
 			setColTRViewEnabled(true);
-			
-		} else {
+
+		}
+		else {
 			colDataPane.setDividerLocation(0.0);
 			setColTRViewEnabled(false);
 		}
 	}
-	
-	/**
-	 * Creates container for the GlobalOverViewMatrix.
-	 * @return JPanel holding the GlobalOverviewMatrix instance.
-	 */
+
+	/** Creates container for the GlobalOverViewMatrix.
+	 * 
+	 * @return JPanel holding the GlobalOverviewMatrix instance. */
 	private JPanel createGlobalOverviewPanel() {
-		
+
 		JPanel globalOverviewPanel;
-		
-		globalOverviewPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS_OR_TOPLEFT_INSETS);
+
+		globalOverviewPanel = GUIFactory
+																		.createJPanel(false, GUIFactory.NO_GAPS_OR_TOPLEFT_INSETS);
 		globalOverviewPanel.add(globalMatrixView, "grow, push");
-		
+
 		return globalOverviewPanel;
 	}
-	
-	/**
-	 * Creates the InteractiveMatrixView column navigation panel. This includes
+
+	/** Creates the InteractiveMatrixView column navigation panel. This includes
 	 * the column scrollbar and 4 scaling buttons (2 on each side).
-	 * @return JPanel holding column navigation components.
-	 */
+	 * 
+	 * @return JPanel holding column navigation components. */
 	private JPanel createColNavPanel() {
-		
+
 		JPanel colNavPanel;
-		
-		colNavPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS_OR_INSETS);
+
+		colNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
 		colNavPanel.add(scaleAddLeftX);
 		colNavPanel.add(scaleRemoveLeftX);
 
 		colNavPanel.add(matrixXscrollbar, "w 100%, growx, pushx");
-		
+
 		colNavPanel.add(scaleRemoveRightX);
 		colNavPanel.add(scaleAddRightX);
-		
+
 		return colNavPanel;
 	}
-	
-	/**
-	 * Creates the InteractiveMatrixView row navigation panel. This includes
+
+	/** Creates the InteractiveMatrixView row navigation panel. This includes
 	 * the row scrollbar and 4 scaling buttons (2 on each side).
-	 * @return JPanel holding row navigation components.
-	 */
+	 * 
+	 * @return JPanel holding row navigation components. */
 	private JPanel createRowNavPanel() {
-		
+
 		JPanel rowNavPanel;
-		
+
 		rowNavPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
-		
+
 		rowNavPanel.add(scaleAddTopY, "wrap");
 		rowNavPanel.add(scaleRemoveTopY, "wrap");
-		
+
 		rowNavPanel.add(matrixYscrollbar, "growy, push, wrap");
-		
+
 		rowNavPanel.add(scaleRemoveBottomY, "wrap");
 		rowNavPanel.add(scaleAddBottomY, "");
-		
+
 		return rowNavPanel;
 	}
-	
-	/**
-	 * Panel that holds the main components for the interactive matrix.
+
+	/** Panel that holds the main components for the interactive matrix.
 	 * This includes InteractiveMatrixView itself as well as row and column
 	 * navigation panels.
-	 * @return A JPanel with the interactive matrix view setup.
-	 */
+	 * 
+	 * @return A JPanel with the interactive matrix view setup. */
 	private JPanel createInteractiveMatrixPanel() {
-		
+
 		JPanel interactiveMatrixPanel;
 		JPanel colNavPanel;
 		JPanel rowNavPanel;
-		
+
 		colNavPanel = createColNavPanel();
 		rowNavPanel = createRowNavPanel();
-		
-		interactiveMatrixPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.NO_GAPS_OR_INSETS);
+
+		interactiveMatrixPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
 		interactiveMatrixPanel.add(interactiveMatrixView, "push, grow");
 		interactiveMatrixPanel.add(rowNavPanel, "h 100%, wrap");
 		interactiveMatrixPanel.add(colNavPanel, "w 100%");
-		
+
 		return interactiveMatrixPanel;
 	}
-	
-	/**
-	 * Creates the full main matrix panel which includes all components
+
+	/** Creates the full main matrix panel which includes all components
 	 * making up a full DendroView with the exception of the toolbar related
 	 * elements such as buttons or search.
-	 * @return A JPanel with all main views arranged in it.
+	 * @return A DragGridPanel with all main views arranged in it.
 	 */
-	private JPanel createMatrixPanel() {
-		
-		JPanel matrixPanel;
-		
+	private void setupMatrixPanel() {
+
+		dragGrid.removeAll();
+
+		dragGrid.setName("MatrixPanel");
+		dragGrid.setBorderWidth(BORDER_THICKNESS);
+		dragGrid.setBorderHeight(BORDER_THICKNESS);
+		dragGrid.setMinimumWidth(MIN_GRID_CELL_SIZE);
+		dragGrid.setMinimumHeight(MIN_GRID_CELL_SIZE);
+		dragGrid.setFocusWidth(FOCUS_THICKNESS);   //This is a line in the
+		dragGrid.setFocusHeight(FOCUS_THICKNESS);  //middle of the border
+
+		int mheights []  = new int[1];   //1 less than the size of the grid
+		mheights[0] = LABEL_AREA_HEIGHT; //must be less than pane size!!!
+		dragGrid.setHeights(mheights);
+
+		int mwidths []  = new int[1];   //1 less than the size of the grid
+		mwidths[0] = LABEL_AREA_HEIGHT; //must be less than pane size!!!
+		dragGrid.setWidths(mwidths);
+
 		JPanel globalOverviewPanel;
 		JPanel interactiveMatrixPanel;
-		
+
 		globalOverviewPanel = createGlobalOverviewPanel();
 		interactiveMatrixPanel = createInteractiveMatrixPanel();
-		
-		matrixPanel = GUIFactory.createJPanel(false, 
-				GUIFactory.TINY_GAPS_AND_INSETS);
-		matrixPanel.add(globalOverviewPanel, "h 180!, w 180!, grow 0");
-		matrixPanel.add(colDataPane, "h 180!, pushx, "
-				+ "growx, growy 0, wrap");
-		matrixPanel.add(rowDataPane, "w 180!, pushy, growy, "
-				+ "growx 0");
-		matrixPanel.add(interactiveMatrixPanel, "grow");
-		
-		return matrixPanel;
+
+		dragGrid.addComponent(globalOverviewPanel,0,0);
+		dragGrid.addComponent(colDataPane,1,0);
+		dragGrid.addComponent(rowDataPane,0,1);
+		dragGrid.addComponent(interactiveMatrixPanel,1,1);
 	}
-	
+
+	public DragGridPanel getDragGrid() {
+		return(dragGrid);
+	}
+
 	/**
 	 * Looks up the stored location values for the JSplitPane dividers.
 	 * This is needed for "Show-Hide" trees. It determines how much of
-	 * labels vs. tree panel is shown.
-	 */
+	 * labels vs. tree panel is shown. */
 	private void setDataPaneDividers() {
-		
-		final double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc",
-				0.5d);
-		final double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc",
-				0.5d);
-		
+
+		final double oldRowDiv = tvFrame.getConfigNode().getDouble("gtr_loc", 0.5d);
+		final double oldColDiv = tvFrame.getConfigNode().getDouble("atr_loc", 0.5d);
+
 		/* If trees in general are disabled */
-		if (!treesEnabled() && showTreesMenuItem != null) {
+		if(!treesEnabled() && showTreesMenuItem != null) {
 			showTreesMenuItem.setEnabled(false);
-			
-		} else {
+
+		}
+		else {
 			/* If trees are visible from the start */
-			if (oldRowDiv > 0.0 || oldColDiv > 0.0) {
+			if(oldRowDiv > 0.0 || oldColDiv > 0.0) {
 				showTreesMenuItem.setText(StringRes.menu_hideTrees);
 			}
 		}
 	}
 
-	/**
-	 * Sets up the JButtons which control scaling and zooming.
-	 */
+	/** Sets up the JButtons which control scaling and zooming. */
 	private void setupScaleButtons() {
 
 		scaleDefaultAll = GUIFactory.createIconBtn(StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
 		int btnSize = 15;
-		
+
 		/* Scale x-axis */
 		scaleAddRightX = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddRightX.setToolTipText(StringRes.tt_xZoomIn_right);
@@ -705,13 +681,13 @@ public class DendroView implements Observer, DendroPanel {
 		/* Scale y-axis */
 		scaleAddBottomY = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddBottomY.setToolTipText(StringRes.tt_yZoomIn_bottom);
-		
+
 		scaleRemoveBottomY = GUIFactory.createSquareBtn("-", btnSize);
 		scaleRemoveBottomY.setToolTipText(StringRes.tt_yZoomOut_bottom);
-		
+
 		scaleAddTopY = GUIFactory.createSquareBtn("+", btnSize);
 		scaleAddTopY.setToolTipText(StringRes.tt_yZoomIn_top);
-		
+
 		scaleRemoveTopY = GUIFactory.createSquareBtn("-", btnSize);
 		scaleRemoveTopY.setToolTipText(StringRes.tt_yZoomOut_top);
 
@@ -731,27 +707,24 @@ public class DendroView implements Observer, DendroPanel {
 //		exportBtn.setToolTipText("Export image to file");
 	}
 
-	/**
-	 * Used to update the JMenuItem field "Show trees/ Hide trees" depending
-	 * on the current status of the divider.
-	 */
+	/** Used to update the JMenuItem field "Show trees/ Hide trees" depending
+	 * on the current status of the divider. */
 	public void updateTreeMenuBtn() {
 
 		/* Should always be "Show trees" if any tree panel is invisible */
-		if (rowDataPane.getDividerLocation() == 0
-				|| colDataPane.getDividerLocation() == 0) {
+		if(rowDataPane.getDividerLocation() == 0 || colDataPane
+																														.getDividerLocation() == 0) {
 			showTreesMenuItem.setText(StringRes.menu_showTrees);
-			
-		} else {
+
+		}
+		else {
 			showTreesMenuItem.setText(StringRes.menu_hideTrees);
 		}
 	}
 
-	/**
-	 * Adds an ActionListener to the scale buttons in DendroView.
+	/** Adds an ActionListener to the scale buttons in DendroView.
 	 *
-	 * @param l
-	 */
+	 * @param l */
 	public void addScaleListeners(final ActionListener l) {
 
 		scaleAddRightX.addActionListener(l);
@@ -772,32 +745,26 @@ public class DendroView implements Observer, DendroPanel {
 //		exportBtn.addActionListener(l);
 	}
 
-	/**
-	 * Adds an ActionListener to the Zoom button in DendroView.
+	/** Adds an ActionListener to the Zoom button in DendroView.
 	 *
-	 * @param l
-	 */
+	 * @param l */
 	public void addZoomListener(final ActionListener l) {
 
 		zoomBtn.addActionListener(l);
 	}
 
-	/**
-	 * Adds a component listener to the main panel of DendroView.
+	/** Adds a component listener to the main panel of DendroView.
 	 *
-	 * @param l
-	 */
+	 * @param l */
 	public void addContListener(final ContainerListener l) {
 
 		dendroPane.addContainerListener(l);
 	}
 
-	/**
-	 * Add listener for divider movement and position for the Tree/ Label
+	/** Add listener for divider movement and position for the Tree/ Label
 	 * JSplitPanes.
 	 *
-	 * @param l
-	 */
+	 * @param l */
 	public void addDividerListener(final PropertyChangeListener l) {
 
 		rowDataPane.addPropertyChangeListener(l);
@@ -810,12 +777,10 @@ public class DendroView implements Observer, DendroPanel {
 		colDataPane.addComponentListener(c);
 	}
 
-	/**
-	 * A small listener for the main dendroPane and the searchPanel which
+	/** A small listener for the main dendroPane and the searchPanel which
 	 * causes deselection of all elements upon clicking within these panels.
 	 * 
-	 * @param l
-	 */
+	 * @param l */
 	public void addDeselectClickListener(MouseListener l) {
 
 		dendroPane.addMouseListener(l);
@@ -823,11 +788,8 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	// Methods
-	/**
-	 *
-	 * @param o
-	 * @param arg
-	 */
+	/** @param o
+	 * @param arg */
 	@Override
 	public void update(final Observable o, final Object arg) {
 
@@ -839,73 +801,66 @@ public class DendroView implements Observer, DendroPanel {
 		// }
 	}
 
-	/**
-	 * Connects a ModelView to the viewFrame and sets it up with the DataTicker
+	/** Connects a ModelView to the viewFrame and sets it up with the DataTicker
 	 * so it can post information.
 	 *
 	 * @param modelView
-	 *            The ModelView to be added
-	 */
+	 *          The ModelView to be added */
 	private void registerView(final ModelView modelView) {
     modelView.setDataTicker(ticker);
 		modelView.setViewFrame(tvFrame);
 	}
 
-	/**
-	 * Changes the visibility of dendrograms and resets the layout.
+	/** Changes the visibility of dendrograms and resets the layout.
 	 *
-	 * @param visible
-	 */
+	 * @param visible */
 	public void setTreeVisibility(final double atr_loc, final double gtr_loc) {
 
-		if (colDataPane != null) {
+		if(colDataPane != null) {
 			colDataPane.setDividerLocation(atr_loc);
 		}
-		if (rowDataPane != null) {
+		if(rowDataPane != null) {
 			rowDataPane.setDividerLocation(gtr_loc);
 		}
 
-		if (Helper.nearlyEqual(atr_loc, 0.0)
-				|| Helper.nearlyEqual(gtr_loc, 0.0)) {
+		if(Helper.nearlyEqual(atr_loc, 0.0) || Helper.nearlyEqual(gtr_loc, 0.0)) {
 			showTreesMenuItem.setText(StringRes.menu_showTrees);
 
-		} else {
+		}
+		else {
 			showTreesMenuItem.setText(StringRes.menu_hideTrees);
 		}
 
 		dendroPane.repaint();
 	}
 
-	/**
-	 * Returns information about the current alignment of TextView and
+	/** Returns information about the current alignment of TextView and
 	 * ArrayNameView
 	 *
-	 * @return [isRowRight, isColRight]
-	 */
+	 * @return [isRowRight, isColRight] */
 	public boolean[] getLabelAligns() {
 
-		final boolean[] alignments = { getRowLabelView().getJustifyOption(),
-				getColLabelView().getJustifyOption() };
+		final boolean[] alignments = {getRowLabelView()	.getLabelAttributes()
+																										.isRightJustified(),
+																	getColLabelView()	.getLabelAttributes()
+																										.isRightJustified()};
 
 		return alignments;
 	}
 
-	/**
-	 * Sets the label alignment for TextView and ArrayNameView.
+	/** Sets the label alignment for TextView and ArrayNameView.
 	 *
 	 * @param isRowRight
-	 *            TextView label justification.
+	 *          TextView label justification.
 	 * @param isColRight
-	 *            ArrayNameView label justification.
-	 */
+	 *          ArrayNameView label justification. */
 	public void setLabelAlignment(final boolean isRowRight,
-			final boolean isColRight) {
+																final boolean isColRight) {
 
-		if (getRowLabelView() == null || getColLabelView() == null)
-			return;
+		if(getRowLabelView() == null || getColLabelView() == null) { return; }
 
-		getRowLabelView().setJustifyOption(isRowRight);
-		getColLabelView().setJustifyOption(isColRight);
+		getRowLabelView().getLabelAttributes().setRightJustified(isRowRight);
+		getColLabelView().getLabelAttributes().setRightJustified(isColRight);
 	}
 
 	// @Override
@@ -1016,12 +971,10 @@ public class DendroView implements Observer, DendroPanel {
 	// }
 
 	// Populate Menus
-	/**
-	 * adds DendroView stuff to Analysis menu
+	/** adds DendroView stuff to Analysis menu
 	 *
 	 * @param menu
-	 *            menu to add to
-	 */
+	 *          menu to add to */
 	// @Override
 	// public void populateAnalysisMenu(final TreeviewMenuBarI menu) {
 	//
@@ -1151,7 +1104,7 @@ public class DendroView implements Observer, DendroPanel {
 	// }
 
 	@Override
-	public void addDendroMenus(final JMenu menu) {
+	public void addViewMenus(final JMenu menu) {
 
 		annotationsMenuItem = new JMenuItem(StringRes.menu_RowAndCol);
 		menu.add(annotationsMenuItem);
@@ -1163,35 +1116,10 @@ public class DendroView implements Observer, DendroPanel {
 
 		menu.addSeparator();
 
-		/* TODO add back when feature works well */
-		// matrixMenu = new JMenu("Matrix Size");
-		// menu.add(matrixMenu);
-		//
-		// final JMenuItem fillScreenMenuItem = new JMenuItem("Fill screen");
-		// matrixMenu.add(fillScreenMenuItem);
-		// fillScreenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
-		// Event.ALT_MASK));
-		// tvFrame.addToStackMenuList(fillScreenMenuItem);
-		//
-		// final JMenuItem equalAxesMenuItem = new JMenuItem("Equal axes");
-		// matrixMenu.add(equalAxesMenuItem);
-		// equalAxesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2,
-		// Event.ALT_MASK));
-		// tvFrame.addToStackMenuList(equalAxesMenuItem);
-		//
-		// final JMenuItem proportMatrixMenuItem = new JMenuItem(
-		// "Proportional axes");
-		// matrixMenu.add(proportMatrixMenuItem);
-		// proportMatrixMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-		// KeyEvent.VK_3, Event.ALT_MASK));
-		// tvFrame.addToStackMenuList(proportMatrixMenuItem);
-
-		menu.addSeparator();
-
 		showTreesMenuItem = new JMenuItem("Show trees...");
 		menu.add(showTreesMenuItem);
-		showTreesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T,
-				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		showTreesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit()
+																																									.getMenuShortcutKeyMask()));
 		tvFrame.addToStackMenuList(showTreesMenuItem);
 
 		// TODO readd once copy-from-selection is available
@@ -1205,8 +1133,8 @@ public class DendroView implements Observer, DendroPanel {
 
 		// Cluster Menu
 		final JMenuItem hierMenuItem = new JMenuItem(StringRes.menu_Hier);
-		hierMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
-				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		hierMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit	.getDefaultToolkit()
+																																							.getMenuShortcutKeyMask()));
 		menu.add(hierMenuItem);
 		tvFrame.addToStackMenuList(hierMenuItem);
 
@@ -1339,9 +1267,7 @@ public class DendroView implements Observer, DendroPanel {
 	// }
 	// }
 
-	/**
-	 * Setter for viewFrame
-	 */
+	/** Setter for viewFrame */
 	public void setViewFrame(final TreeViewFrame viewFrame) {
 
 		this.tvFrame = viewFrame;
@@ -1365,120 +1291,118 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	public boolean isAFinderBoxFocussed() {
-		return(rowFinderBox.getSearchTermBox().getEditor()
-			.getEditorComponent().isFocusOwner() ||
-			colFinderBox.getSearchTermBox().getEditor()
-			.getEditorComponent().isFocusOwner());
+		return(rowFinderBox	.getSearchTermBox().getEditor().getEditorComponent()
+												.isFocusOwner() || colFinderBox	.getSearchTermBox()
+																												.getEditor()
+																												.getEditorComponent()
+																												.isFocusOwner());
 	}
 
 	public void updateSearchTermBoxes(final LabelInfo rowHI,
-			final LabelInfo columnHI, final MapContainer xmap,
-			final MapContainer ymap) {
+																		final LabelInfo columnHI,
+																		final MapContainer xmap,
+																		final MapContainer ymap) {
 
 		rowFinderBox.setLabelInfo(rowHI);
 		rowFinderBox.setLabelSummary(getRowLabelView().getLabelSummary());
 		rowFinderBox.setMapContainers(ymap, xmap);
-		rowFinderBox.setSelection(tvFrame.getRowSelection(),
-				tvFrame.getColSelection());
+		rowFinderBox.setSelection(tvFrame.getRowSelection(), tvFrame.getColSelection());
 		rowFinderBox.setNewSearchTermBox();
 
 		colFinderBox.setLabelInfo(columnHI);
 		colFinderBox.setLabelSummary(getColLabelView().getLabelSummary());
 		colFinderBox.setMapContainers(xmap, ymap);
-		colFinderBox.setSelection(tvFrame.getColSelection(),
-				tvFrame.getRowSelection());
+		colFinderBox.setSelection(tvFrame.getColSelection(), tvFrame.getRowSelection());
 		colFinderBox.setNewSearchTermBox();
 
 		setupSearchPanel();
 	}
-	
-	/**
-	 * Disables the ColumnTreeView and its JSplitPane to make divider
+
+	/** Disables the ColumnTreeView and its JSplitPane to make divider
 	 * movement / resizing impossible.
-	 * @param enabled Enable / disable the column TreeView.
-	 */
+	 * 
+	 * @param enabled Enable / disable the column TreeView. */
 	public void setColTRViewEnabled(final boolean enabled) {
-		
+
 		if(colTreeView == null || colDataPane == null) {
-			LogBuffer.println("colTreeView could not be enabled/ disabled "
-					+ "because it was null");
+			LogBuffer.println("colTreeView could not be enabled/ disabled " +
+												"because it was null");
 			return;
 		}
-		
+
 		colTreeView.setEnabled(enabled);
 		colDataPane.setEnabled(enabled);
 	}
-	
-	/**
-	 * Disables the RowTreeView and its JSplitPane to make divider
+
+	/** Disables the RowTreeView and its JSplitPane to make divider
 	 * movement / resizing impossible.
-	 * @param enabled Enable / disable the row TreeView.
-	 */
+	 * 
+	 * @param enabled Enable / disable the row TreeView. */
 	public void setRowTRViewEnabled(final boolean enabled) {
-		
+
 		if(rowTreeView == null || rowDataPane == null) {
-			LogBuffer.println("rowTreeView could not be enabled/ disabled "
-					+ "because it was null");
+			LogBuffer.println("rowTreeView could not be enabled/ disabled " +
+												"because it was null");
 			return;
 		}
-		
+
 		rowTreeView.setEnabled(enabled);
 		rowDataPane.setEnabled(enabled);
 	}
-	
-	/**
-	 * Gets a snapshot of the matrix from InteractiveMatrixView depending on
+
+	/** Gets a snapshot of the matrix from InteractiveMatrixView depending on
 	 * the selected region type. Selections can be drawn as well.
-	 * @param withSelections - whether selections should be drawn onto 
-	 * the matrix
+	 * 
+	 * @param withSelections - whether selections should be drawn onto
+	 *          the matrix
 	 * @param region - The RegionType defines which region of the matrix
-	 * will be shown.
-	 * @return A new ExportPreviewMatrix panel containing the matrix.
-	 */
-	public ExportPreviewMatrix getMatrixSnapshot(final boolean withSelections, 
-			RegionType region) {
-		
+	 *          will be shown.
+	 * @return A new ExportPreviewMatrix panel containing the matrix. */
+	public ExportPreviewMatrix getMatrixSnapshot(	final boolean withSelections,
+																								RegionType region) {
+
 		Image image;
-		
+
 		switch(region) {
-		case ALL:
-			image = getInteractiveMatrixView().getFullImage(withSelections);
-			break;
-		case VISIBLE:
-			image = getInteractiveMatrixView().getVisibleImage(withSelections);
-			break;
-		case SELECTION:
-			image = getInteractiveMatrixView().getSelectionImage();
-			break;
-		default:
-			image = getInteractiveMatrixView().getFullImage(withSelections);
+			case ALL:
+				image = getInteractiveMatrixView().getFullImage(withSelections);
+				break;
+			case VISIBLE:
+				image = getInteractiveMatrixView().getVisibleImage(withSelections);
+				break;
+			case SELECTION:
+				image = getInteractiveMatrixView().getSelectionImage();
+				break;
+			default:
+				image = getInteractiveMatrixView().getFullImage(withSelections);
 		}
-		
+
 		return new ExportPreviewMatrix(image);
 	}
-	
-	public ExportPreviewTrees getRowTreeSnapshot(final boolean withSelections, 
-			RegionType region) {
-		
+
+	public ExportPreviewTrees getRowTreeSnapshot(	final boolean withSelections,
+																								RegionType region) {
+
 		return getTreeSnapshot(rowTreeView, region, withSelections, true);
 	}
-	
-	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections, 
-			RegionType region) {
-		
+
+	public ExportPreviewTrees getColTreeSnapshot(	final boolean withSelections,
+																								RegionType region) {
+
 		return getTreeSnapshot(colTreeView, region, withSelections, false);
 	}
-	
-	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
-			RegionType region, final boolean withSelections, 
-			final boolean isRows) {
-		
+
+	private ExportPreviewTrees getTreeSnapshot(	TRView treeAxisView,
+																							RegionType region,
+																							final boolean withSelections,
+																							final boolean isRows) {
+
 		if(treeAxisView == null) {
-			LogBuffer.println("Cannot generate tree snapshot. "
-					+ "TRView object is null.");
+			LogBuffer.println("Cannot generate tree snapshot. " +
+												"TRView object is null.");
 			return new ExportPreviewTrees(null, isRows); // empty panel
 		}
-		
+
 		/* using defaults here. The actual image will be rescaled later
 		 * in the ExportDialog. */
 		int width;
@@ -1486,21 +1410,21 @@ public class DendroView implements Observer, DendroPanel {
 		if(isRows) {
 			width = ExportPreviewTrees.D_SHORT;
 			height = ExportPreviewTrees.D_LONG;
-			
-		} else {
+
+		}
+		else {
 			width = ExportPreviewTrees.D_LONG;
 			height = ExportPreviewTrees.D_SHORT;
 		}
-		
+
 		/* Set up column tree image */
 		BufferedImage treeSnapshot = null;
 		ExportPreviewTrees expTrees = null;
 		if(treeAxisView.isEnabled()) {
-			treeSnapshot = treeAxisView.getSnapshot(width, height, region,
-					withSelections);
+			treeSnapshot = treeAxisView.getSnapshot(width, height, region, withSelections);
 			expTrees = new ExportPreviewTrees(treeSnapshot, isRows);
 		}
-		
+
 		return expTrees;
 	}
 
@@ -1642,45 +1566,40 @@ public class DendroView implements Observer, DendroPanel {
 		return colDataPane;
 	}
 
-	/**
-	 * Get the InputMap for the DendroPane. This is important for key binding.
-	 * @return An InputMap object belonging to DendroView's dendroPane.
-	 */
+	/** Get the InputMap for the DendroPane. This is important for key binding.
+	 * 
+	 * @return An InputMap object belonging to DendroView's dendroPane. */
 	public InputMap getInputMap() {
 
 		return dendroPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
-	/**
-	 * Get the ActionMap for the DendroPane. This is important for key binding.
-	 * @return An ActionMap object belonging to DendroView's dendroPane.
-	 */
+	/** Get the ActionMap for the DendroPane. This is important for key binding.
+	 * 
+	 * @return An ActionMap object belonging to DendroView's dendroPane. */
 	public ActionMap getActionMap() {
 
 		return dendroPane.getActionMap();
 	}
-	
-	/**
-	 * Get a reference to the data ticker object. 
-	 * @return The DataTicker object for the active DendroView.
-	 */
+
+	/** Get a reference to the data ticker object.
+	 * 
+	 * @return The DataTicker object for the active DendroView. */
 	public DataTicker getDataTicker() {
-		
+
 		return ticker;
 	}
 
-	/**
-	 * Returns the current location of the divider in the supplied TRView's
+	/** Returns the current location of the divider in the supplied TRView's
 	 * JSplitPane
 	 *
 	 * @param dendrogram
-	 * @return Location of divider (max = 1.0)
-	 */
+	 * @return Location of divider (max = 1.0) */
 	public double getDivLoc(final TRView dendrogram) {
 
 		/* Get value for correct dendrogram JSplitPane */
-		final JSplitPane treePane = (dendrogram == colTreeView) ? colDataPane
-				: rowDataPane;
+		final JSplitPane treePane = (dendrogram == colTreeView)	? colDataPane
+																														: rowDataPane;
 
 		final double abs_div_loc = treePane.getDividerLocation();
 		final double max_div_loc = treePane.getMaximumDividerLocation();
@@ -1691,15 +1610,13 @@ public class DendroView implements Observer, DendroPanel {
 		return (rel_div_loc > 1.0) ? 1.0 : rel_div_loc;
 	}
 
-	/**
-	 * Returns a boolean which indicates whether any Dendrogram is enabled.
+	/** Returns a boolean which indicates whether any Dendrogram is enabled.
 	 *
-	 * @return boolean
-	 */
+	 * @return boolean */
 	public boolean treesEnabled() {
 
-		final boolean treesEnabled = rowTreeView.isEnabled()
-				|| colTreeView.isEnabled();
+		final boolean treesEnabled = rowTreeView.isEnabled() || colTreeView
+																																				.isEnabled();
 		return treesEnabled;
 	}
 }

@@ -870,9 +870,22 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		ticker.setText("Data Value:");
 		ticker.setValue(model.getDataMatrix().getValue(colIdx, rowIdx));
 	}
+<<<<<<< HEAD
 	
 	/**
 	 * Scrolls to index i in the y-MapContainer
+=======
+
+	/* Set the data ticker to matrix average
+	 * Rounding off to 4 decimals
+	 */
+	public void setMeanDataValue() {
+		ticker.setText("Data Average:");
+		ticker.setValue(model.getDataMatrix().getMean());
+	}
+
+	/** Scrolls to index i in the y-MapContainer
+>>>>>>> master
 	 *
 	 * @param i */
 	public void scrollToGene(final int i) {
