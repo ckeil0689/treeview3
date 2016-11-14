@@ -41,9 +41,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	protected TreeSelectionI treeSelection;
 	protected LinearTransformation xScaleEq, yScaleEq;
 	protected MapContainer map;
-	/*The other orthogonal map, used only once while calculating Zoomed Averages
-	 */
-	protected MapContainer map2;
 	
 
 	protected final JScrollPane scrollPane;
@@ -132,8 +129,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * @param m2 The other orthogonal map, used only once while calculating
 	 *            Zoomed Averages
 	 */
-	public void setMap(final MapContainer m, final MapContainer m2) {
-    map2 = m2;
+	public void setMap(final MapContainer m) {
 		if (map != null) {
 			map.deleteObserver(this);
 		}

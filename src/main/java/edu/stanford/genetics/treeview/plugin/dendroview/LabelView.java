@@ -357,8 +357,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @param m2 The other orthogonal map, used only once while calculating
 	 *            Zoomed Averages
 	 */
-	public void setMap(final MapContainer im, final MapContainer m2) {
-		map2 = m2;
+	public void setMap(final MapContainer im) {
 		if(map != null) {
 			map.deleteObserver(this);
 		}
