@@ -39,7 +39,7 @@ public class MenubarController {
 	}
 
 	/**
-	 * TODO Enumerate menu items (own enum class and rmove strings)
+	 * TODO Enumerate menu items (own enum class and remove strings)
 	 * Executes a certain function based on which menuItem was clicked by the
 	 * user. This is determined by using the name string of the MenuItem, stored
 	 * in StringRes.
