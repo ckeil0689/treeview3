@@ -692,12 +692,8 @@ public class ExportHandler {
 
         @Override
         protected Void doInBackground() throws Exception {
-        	if(format == FormatType.PDF || format == FormatType.SVG ||
-    			format == FormatType.PS) {
-
-    			exportDocument(format,defPageSize,fileName,region,showSelections);
-    		} else {
     			try {
+      			exportDocument(format,defPageSize,fileName,region,showSelections);
     				exportImage(format,fileName,region,showSelections);
     			} catch(OutOfMemoryError oome) {
     				showWarning("ERROR: Out of memory.  Note, you may be able to " +
@@ -705,7 +701,6 @@ public class ExportHandler {
     			} catch(Exception e) {
     				showWarning(e.getLocalizedMessage());
     			}
-    		}
             return null;
         }
 
@@ -754,6 +749,27 @@ public class ExportHandler {
 		}
 		
 		/**
+		 * This calls the export functions of the trees
+		 * 
+		 * @author rleach
+		 * @param g2d
+		 * @param region
+		 */
+		private void createContentForTrees(final Graphics2D g2d,final RegionType region,
+		                   		final boolean showSelections) {
+	    	createContentForColumnTV(g2d, region, showSelections);
+	    	
+	    	if(this.isCancelled()){
+	    		setExportSuccessful(false);
+				return;
+	    	}
+	    	createContentForRowTV(g2d, region, showSelections);
+	    	
+	        ls.setStatus("Preparing to open the file in the default system app");
+	    	publish(ls);
+		}
+		
+		/**
 		 * This calls the export functions of the various components of the total
 		 * image, arranged in an aligned fashion together
 		 * 
@@ -762,46 +778,93 @@ public class ExportHandler {
 		 * @param region
 		 */
 		private void createContent(final Graphics2D g2d,final RegionType region,
-		                   		final boolean showSelections) {	
-
-	    	ls.setStatus("Exporting interactive matrix view ...");
-	    	ls.setProgress(0);
-	    	publish(ls);
-	    	dendroView.getInteractiveMatrixView().export(this, g2d,
-	    	    (dendroView.getRowTreeView().treeExists() ?
-	    	        treesHeight + treeMatrixGapSize : 0),
-	    	    (dendroView.getColumnTreeView().treeExists() ?
-	    	    	treesHeight + treeMatrixGapSize : 0),
-	    	    tileWidth,tileHeight,region,showSelections);
+		                   		final boolean showSelections) {
+	    	createContentForIMV(g2d, region, showSelections);
 	    	// Checks if the worker has been cancelled
 	    	if(this.isCancelled()){
 	    		setExportSuccessful(false);
 				return;
 	    	}
-	    	ls.setStatus("Exporting column tree view ...");
-	    	publish(ls);
-	    	if(dendroView.getColumnTreeView().treeExists()) {
-	    	    dendroView.getColumnTreeView().export(g2d,
-	    	    	(dendroView.getRowTreeView().treeExists() ?
-	    	    		treesHeight + treeMatrixGapSize : 0),treesHeight,tileWidth,
-	    	            region,showSelections);
-	    	}
+	    	createContentForColumnTV(g2d, region, showSelections);
 	    	
 	    	if(this.isCancelled()){
 	    		setExportSuccessful(false);
 				return;
 	    	}
-	    	ls.setStatus("Exporting row tree view ...");
-	    	publish(ls);
-	    	if(dendroView.getRowTreeView().treeExists()) {
-	    		dendroView.getRowTreeView().export(g2d,treesHeight,
-	    	        (dendroView.getColumnTreeView().treeExists() ?
-	    	            treesHeight + treeMatrixGapSize : 0),tileHeight,region,
-	    	            showSelections);
-	    	}
+	    	createContentForRowTV(g2d, region, showSelections);
 	    	
 	        ls.setStatus("Preparing to open the file in the default system app");
 	    	publish(ls);
+		}
+
+		/**
+		 * @param g2d
+		 * @param region
+		 * @param showSelections
+		 */
+		private void createContentForRowTV(	final Graphics2D g2d,
+																				final RegionType region,
+																				final boolean showSelections) {
+    	ls.setStatus("Exporting row tree view ...");
+    	publish(ls);
+			if(dendroView.getRowTreeView().treeExists()) {
+				dendroView.getRowTreeView().export(g2d,treesHeight,
+			        (dendroView.getColumnTreeView().treeExists() ?
+			            treesHeight + treeMatrixGapSize : 0),tileHeight,region,
+			            showSelections);
+			}
+		}
+
+		/**
+		 * @param g2d
+		 * @param region
+		 * @param showSelections
+		 */
+		private void createContentForColumnTV(final Graphics2D g2d,
+																					final RegionType region,
+																					final boolean showSelections) {
+    	ls.setStatus("Exporting column tree view ...");
+    	publish(ls);
+			if(dendroView.getColumnTreeView().treeExists()) {
+			    dendroView.getColumnTreeView().export(g2d,
+			    	(dendroView.getRowTreeView().treeExists() ?
+			    		treesHeight + treeMatrixGapSize : 0),treesHeight,tileWidth,
+			            region,showSelections);
+			}
+		}
+
+		/**
+		 * @param g2d
+		 * @param region
+		 * @param showSelections
+		 */
+		private void createContentForIMV(	final Graphics2D g2d,
+																			final RegionType region,
+																			final boolean showSelections) {
+  	  ls.setProgress(0);
+			ls.setStatus("Exporting interactive matrix view ...");
+    	publish(ls);
+			dendroView.getInteractiveMatrixView().export(this, g2d,
+			    (dendroView.getRowTreeView().treeExists() ?
+			        treesHeight + treeMatrixGapSize : 0),
+			    (dendroView.getColumnTreeView().treeExists() ?
+			    	treesHeight + treeMatrixGapSize : 0),
+			    tileWidth,tileHeight,region,showSelections);
+		}
+		
+		/**
+		 * @param g2d
+		 * @param region
+		 * @param showSelections
+		 */
+		private void createImageContentForIMVAlone(	final Graphics2D g2d,
+																			final RegionType region,
+																			final boolean showSelections) {
+  	  ls.setProgress(0);
+			ls.setStatus("Exporting interactive matrix view ...");
+    	publish(ls);
+			dendroView.getInteractiveMatrixView().export(this, g2d,0,0,
+			    tileWidth,tileHeight,region,showSelections);
 		}
 		
 		/**
@@ -948,7 +1011,23 @@ public class ExportHandler {
 				g.setProperties(p); 
 
 				g.startExport();
-				createContent(g,region,showSelections);
+				//createContent(g,region,showSelections);
+				// create a image graphics object
+				// TODO: check what color profile to use?
+				// TODO: set accurate image dimensions
+				// TODO: do we really need a buffered image, isnt the Graphics2D enough?
+				BufferedImage im = new BufferedImage(getXDim(region),
+				                           					getYDim(region),BufferedImage.TYPE_INT_ARGB);
+				Graphics2D imGraphics = (Graphics2D) im.getGraphics();
+				// create contents of the image
+				createImageContentForIMVAlone(imGraphics,region,showSelections);
+				// draw the image to the vector graphics g
+				g.drawImage(im, (dendroView.getRowTreeView().treeExists() ?treesHeight + treeMatrixGapSize : 0),
+				  			    (dendroView.getColumnTreeView().treeExists() ?
+				  			    	treesHeight + treeMatrixGapSize : 0), null);
+				// now create tree 
+				createContentForTrees(g,region,showSelections);
+				
 				g.endExport();
 			}
 			catch(FileNotFoundException exc) {
