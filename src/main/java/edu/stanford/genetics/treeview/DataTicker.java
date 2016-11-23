@@ -7,6 +7,9 @@
 
 package edu.stanford.genetics.treeview;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -16,7 +19,7 @@ import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import net.miginfocom.swing.MigLayout;
 
-public class DataTicker{
+public class DataTicker implements Observer{
 
 	private final JPanel tickerPanel;
 	private final JTextArea valTextArea;
@@ -92,7 +95,7 @@ public class DataTicker{
 		textLabel.setText(text);
 	}
 	
-	public void setValueOnMouseExit(){
+	public void setAppropriateValue(){
 		if(isZoomed()){
 			setZoomMeanDataTickerValue();
 		}else{
@@ -105,8 +108,26 @@ public class DataTicker{
 	}
 	
 	public void setMaps(MapContainer xMap, MapContainer yMap){
-		this.xmap = xMap;
-		this.ymap = yMap;
+		
+		if(xMap != null){
+			if(xmap != null) {
+				xmap.deleteObserver(this);
+			}
+			this.xmap = xMap;
+			xmap.addObserver(this);
+		}else{
+			LogBuffer.println("Warning: Please dont mess with the maps!");
+		}
+		
+		if(xMap != null){
+			if(ymap != null) {
+				ymap.deleteObserver(this);
+			}
+			this.ymap = yMap;
+			ymap.addObserver(this);
+		}else{
+			LogBuffer.println("Warning: Please dont mess with the maps!");
+		}
 	}
 	
 	/** 
@@ -141,6 +162,16 @@ public class DataTicker{
 			ymap.getNumVisible() &&
 			xmap.getMaxIndex()+1 ==
 			xmap.getNumVisible()));
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if(o == xmap || o == ymap ) {
+			setAppropriateValue();
+		}
+		else {
+			LogBuffer.println("Warning: Data Ticker got funny update!");
+		}
 	}
 	
 }

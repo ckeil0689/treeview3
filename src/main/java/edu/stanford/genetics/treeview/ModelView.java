@@ -204,7 +204,7 @@ public abstract class ModelView extends JPanel implements Observer,
 		}
 		
 		hasMouse = false;
-		ticker.setValueOnMouseExit();
+		ticker.setAppropriateValue();
 	}
 
 	/* a bunch of stubs so we can claim to be a MouseListener */
