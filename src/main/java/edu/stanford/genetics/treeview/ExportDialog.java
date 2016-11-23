@@ -1,8 +1,6 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.AWTEvent;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.Dimension;
