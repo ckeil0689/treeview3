@@ -693,8 +693,7 @@ public class ExportHandler {
         @Override
         protected Void doInBackground() throws Exception {
     			try {
-    				if(format == FormatType.PDF || format == FormatType.SVG || 
-    						format == FormatType.PS) {
+    				if(format.isDocumentFormat()) {
     					exportDocument(format,defPageSize,fileName,region,showSelections);
     				} else {
     					exportImage(format,fileName,region,showSelections);
