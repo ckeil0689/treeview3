@@ -8,7 +8,6 @@
 
 package edu.stanford.genetics.treeview.plugin.dendroview;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -40,18 +39,16 @@ import Utilities.Helper;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.DendroPanel;
+import edu.stanford.genetics.treeview.DragGridPanel;
 import edu.stanford.genetics.treeview.ExportPreviewMatrix;
 import edu.stanford.genetics.treeview.ExportPreviewTrees;
 import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.app.TreeView3;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.LabelFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
-import net.miginfocom.swing.MigLayout;
-import edu.stanford.genetics.treeview.DragGridPanel;
 
 /** TODO Refactor this JavaDoc. It's not applicable to the current program
  * anymore.
@@ -116,16 +113,6 @@ public class DendroView implements Observer, DendroPanel {
 	/* JButtons for scaling the matrix */
 	/* TODO should be controlled in a GlobalViewController...when it exists */
 	private JButton zoomBtn;
-
-	private JButton scaleAddRightX;
-	private JButton scaleAddBottomY;
-	private JButton scaleAddLeftX;
-	private JButton scaleAddTopY;
-
-	private JButton scaleRemoveRightX;
-	private JButton scaleRemoveBottomY;
-	private JButton scaleRemoveLeftX;
-	private JButton scaleRemoveTopY;
 
 	private JButton scaleIncXY;
 	private JButton scaleDecXY;
@@ -533,104 +520,6 @@ public class DendroView implements Observer, DendroPanel {
 		return globalOverviewPanel;
 	}
 
-	/** Creates the InteractiveMatrixView column navigation panel. This includes
-	 * the column scrollbar and 4 scaling buttons (2 on each side).
-	 * 
-	 * @return JPanel holding column navigation components. */
-	private JPanel createColNavPanel() {
-
-		JPanel colNavPanel;
-
-		if(TreeView3.isMac()) {
-			colNavPanel = GUIFactory
-															.createJPanel(true, GUIFactory.NO_VERT_INSETS, Color.MAGENTA);
-
-			colNavPanel.add(scaleAddLeftX, "growy, hmax 80%");
-			colNavPanel.add(scaleRemoveLeftX, "growy, hmax 80%");
-
-			colNavPanel.add(matrixXscrollbar, "growx, pushx, wmin 50%");
-
-			colNavPanel.add(scaleRemoveRightX, "growy, hmax 80%");
-			colNavPanel.add(scaleAddRightX, "growy, hmax 80%");
-		}
-		else {
-
-			JPanel btnLeftPanel;
-			JPanel btnRightPanel;
-
-			colNavPanel = GUIFactory
-															.createJPanel(true, GUIFactory.DEFAULT, Color.MAGENTA);
-			btnLeftPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
-			btnRightPanel = GUIFactory
-																.createJPanel(false, GUIFactory.DEFAULT);
-			
-			colNavPanel.setLayout(new MigLayout("ins 0 5 5 5"));
-			btnLeftPanel.setLayout(new MigLayout("ins 0 5 5 5"));
-
-			btnLeftPanel.add(scaleAddLeftX, "push");
-			btnLeftPanel.add(scaleRemoveLeftX, "push");
-
-			btnRightPanel.add(scaleRemoveRightX, "push, grow");
-			btnRightPanel.add(scaleAddRightX, "push, grow");
-
-			colNavPanel.add(btnLeftPanel, "grow, al left");
-			colNavPanel.add(matrixXscrollbar, "wmin 80%, push, growx");
-			colNavPanel.add(btnRightPanel, "grow, al right");
-		}
-
-		return colNavPanel;
-	}
-
-	/** Creates the InteractiveMatrixView row navigation panel. This includes
-	 * the row scrollbar and 4 scaling buttons (2 on each side).
-	 * 
-	 * @return JPanel holding row navigation components. */
-	private JPanel createRowNavPanel() {
-
-		JPanel rowNavPanel;
-
-		// OS differentiation because OSX treats JButtons different
-		if(TreeView3.isMac()) {
-
-			rowNavPanel = GUIFactory
-															.createJPanel(true, GUIFactory.NO_HORIZ_INSETS, Color.MAGENTA);
-
-			rowNavPanel.add(scaleAddTopY, "growx, wmax 80%, wrap");
-			rowNavPanel.add(scaleRemoveTopY, "growx, wmax 80%, wrap");
-
-			rowNavPanel.add(matrixYscrollbar, "growy, pushy, hmin 50%, wrap");
-
-			rowNavPanel.add(scaleRemoveBottomY, "growx, wmax 80%, wrap");
-			rowNavPanel.add(scaleAddBottomY, "growx, wmax 80%");
-
-		}
-		else {
-			JPanel btnTopPanel;
-			JPanel btnBottomPanel;
-			rowNavPanel = GUIFactory
-															.createJPanel(true, GUIFactory.NO_HORIZ_INSETS, Color.MAGENTA);
-			btnTopPanel = GUIFactory
-															.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
-			btnBottomPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
-
-			btnTopPanel.setLayout(new MigLayout("ins 0", "[10px]0", "[10px]0"));
-			btnBottomPanel.setLayout(new MigLayout("ins 0", "[10px]0", "[10px]0"));
-
-			btnTopPanel.add(scaleAddTopY, "push, grow, wrap");
-			btnTopPanel.add(scaleRemoveTopY, "push, grow");
-
-			btnBottomPanel.add(scaleRemoveBottomY, "push, grow, wrap");
-			btnBottomPanel.add(scaleAddBottomY, "push, grow");
-
-			rowNavPanel.add(btnTopPanel, "grow, top, wmax 80%, h 10::20, wrap");
-			rowNavPanel.add(matrixYscrollbar, "hmin 80%, push, grow, wrap");
-			rowNavPanel.add(btnBottomPanel, "grow, bottom, h 10::20, wmax 80%");
-			return rowNavPanel;
-		}
-
-		return rowNavPanel;
-	}
-
 	/** Panel that holds the main components for the interactive matrix.
 	 * This includes InteractiveMatrixView itself as well as row and column
 	 * navigation panels.
@@ -639,16 +528,11 @@ public class DendroView implements Observer, DendroPanel {
 	private JPanel createInteractiveMatrixPanel() {
 
 		JPanel interactiveMatrixPanel;
-		JPanel colNavPanel;
-		JPanel rowNavPanel;
-
-		colNavPanel = createColNavPanel();
-		rowNavPanel = createRowNavPanel();
 
 		interactiveMatrixPanel = GUIFactory.createJPanel(false, GUIFactory.NO_GAPS_OR_INSETS);
 		interactiveMatrixPanel.add(interactiveMatrixView, "push, grow");
-		interactiveMatrixPanel.add(rowNavPanel, "h 100%, wrap");
-		interactiveMatrixPanel.add(colNavPanel, "w 100%");
+		interactiveMatrixPanel.add(matrixYscrollbar, "growy, pushy, wrap");
+		interactiveMatrixPanel.add(matrixXscrollbar, "growx, pushx");
 
 		return interactiveMatrixPanel;
 	}
@@ -722,32 +606,6 @@ public class DendroView implements Observer, DendroPanel {
 		scaleDefaultAll = GUIFactory.createIconBtn(StringRes.icon_home);
 		scaleDefaultAll.setToolTipText("Reset the zoomed view");
 
-		// scale x-axis
-		scaleAddRightX = GUIFactory.createTinyBtn("+");
-		scaleAddRightX.setToolTipText(StringRes.tt_xZoomIn_right);
-
-		scaleRemoveRightX = GUIFactory.createTinyBtn("-");
-		scaleRemoveRightX.setToolTipText(StringRes.tt_xZoomOut_right);
-
-		scaleAddLeftX = GUIFactory.createTinyBtn("+");
-		scaleAddLeftX.setToolTipText(StringRes.tt_xZoomIn_left);
-
-		scaleRemoveLeftX = GUIFactory.createTinyBtn("-");
-		scaleRemoveLeftX.setToolTipText(StringRes.tt_xZoomOut_left);
-
-		// scale y-axis
-		scaleAddBottomY = GUIFactory.createTinyBtn("+");
-		scaleAddBottomY.setToolTipText(StringRes.tt_yZoomIn_bottom);
-
-		scaleRemoveBottomY = GUIFactory.createTinyBtn("-");
-		scaleRemoveBottomY.setToolTipText(StringRes.tt_yZoomOut_bottom);
-
-		scaleAddTopY = GUIFactory.createTinyBtn("+");
-		scaleAddTopY.setToolTipText(StringRes.tt_yZoomIn_top);
-
-		scaleRemoveTopY = GUIFactory.createTinyBtn("-");
-		scaleRemoveTopY.setToolTipText(StringRes.tt_yZoomOut_top);
-
 		// scale both axes (large buttons)
 		scaleIncXY = GUIFactory.createIconBtn(StringRes.icon_fullZoomIn);
 		scaleIncXY.setToolTipText(StringRes.tt_xyZoomIn);
@@ -779,16 +637,6 @@ public class DendroView implements Observer, DendroPanel {
 	 *
 	 * @param l */
 	public void addScaleListeners(final ActionListener l) {
-
-		scaleAddRightX.addActionListener(l);
-		scaleRemoveRightX.addActionListener(l);
-		scaleAddBottomY.addActionListener(l);
-		scaleRemoveBottomY.addActionListener(l);
-
-		scaleAddLeftX.addActionListener(l);
-		scaleRemoveLeftX.addActionListener(l);
-		scaleAddTopY.addActionListener(l);
-		scaleRemoveTopY.addActionListener(l);
 
 		scaleIncXY.addActionListener(l);
 		scaleDecXY.addActionListener(l);
@@ -1363,49 +1211,9 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	// Getters
-	public JButton getXLeftPlusButton() {
-
-		return scaleAddLeftX;
-	}
-
-	public JButton getXRightPlusButton() {
-
-		return scaleAddRightX;
-	}
-
 	public JButton getXYPlusButton() {
 
 		return scaleIncXY;
-	}
-
-	public JButton getXMinusLeftButton() {
-
-		return scaleRemoveLeftX;
-	}
-
-	public JButton getXMinusRightButton() {
-
-		return scaleRemoveRightX;
-	}
-
-	public JButton getYPlusTopButton() {
-
-		return scaleAddTopY;
-	}
-
-	public JButton getYPlusBottomButton() {
-
-		return scaleAddBottomY;
-	}
-
-	public JButton getYMinusTopButton() {
-
-		return scaleRemoveTopY;
-	}
-
-	public JButton getYMinusBottomButton() {
-
-		return scaleRemoveBottomY;
 	}
 
 	public JButton getXYMinusButton() {
