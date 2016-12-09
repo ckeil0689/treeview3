@@ -65,7 +65,6 @@ public final class PreviewLoader {
 																					final String[] rowLabelTypes,
 																					final String[] colLabelTypes) {
 
-		LogBuffer.println("Finding data start coordinates...");
 		/* max value for columns because empty data cells might cause smaller
 		 * column indexes to hold data in later rows. this is essentially
 		 * finding the minimal column data index in the file.
@@ -184,7 +183,6 @@ public final class PreviewLoader {
 			}
 		}
 		
-		LogBuffer.println("Found coordinates: " + Arrays.toString(dataStartCoords));
 		return dataStartCoords;
 	}
 
