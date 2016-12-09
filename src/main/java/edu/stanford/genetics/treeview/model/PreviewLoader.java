@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -169,9 +170,15 @@ public final class PreviewLoader {
 		} 
 		finally {
 			if(!(foundRow && foundCol)) {
-				String msg = "Could not detect data automatically. " +
+				final String msg = "Could not detect data automatically. " +
 					"Setting default [0, 0]";
-				JOptionPane.showMessageDialog(JFrame.getFrames()[0], msg, "Warning", JOptionPane.WARNING_MESSAGE);
+				// be careful of Swing threading issues when popping up a dialog in a listener
+				SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+          	int topFrameIdx = JFrame.getFrames().length - 1;
+          	JOptionPane.showMessageDialog(JFrame.getFrames()[topFrameIdx], msg, "Warning", JOptionPane.WARNING_MESSAGE);
+          }
+        });
 				LogBuffer.println(msg);
 				dataStartCoords = new int[] {0, 0};
 			}

@@ -16,7 +16,6 @@ import javax.swing.event.ChangeListener;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.PreviewDataTable;
 import edu.stanford.genetics.treeview.model.PreviewLoader;
@@ -253,7 +252,6 @@ public class DataImportDialog extends CustomDialog {
 	 *          column of data **/
 	public void setSpinnerValues(final int rowCount, final int columnCount) {
 
-		LogBuffer.println("Rows: " + rowCount + "; Cols: " + columnCount);
 		rowDataStart.setValue(Integer.valueOf(rowCount) + 1);
 		columnDataStart.setValue(Integer.valueOf(columnCount) + 1);
 	}
