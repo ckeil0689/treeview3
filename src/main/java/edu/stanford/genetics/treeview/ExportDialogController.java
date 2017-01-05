@@ -150,7 +150,7 @@ public class ExportDialogController {
 		try {
 			File inFile = new File(model.getSource());
 			File outFile = new File(getInitialExportFileString(selFormat));
-			fileDialog.setDirectory(inFile.getCanonicalPath());
+			fileDialog.setDirectory(inFile.getParentFile().getCanonicalPath());
 			fileDialog.setFile(outFile.getName());
 			
 		} catch(Exception e) {
