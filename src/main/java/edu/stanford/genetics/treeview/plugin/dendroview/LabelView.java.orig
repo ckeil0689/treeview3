@@ -28,7 +28,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BoundedRangeModel;
-import javax.swing.JDialog;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
@@ -77,6 +76,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/* Maps label position to GlobalView */
 	protected MapContainer map;
+	/*The other orthogonal map, used only once while calculating Zoomed Averages
+	 */
+	protected MapContainer map2;
 
 	/* Use labels to generate URLs for look-up */
 	protected UrlExtractor urlExtractor;
@@ -354,11 +356,17 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	/** Used to space the array names.
 	 *
 	 * @param im
+<<<<<<< HEAD
 	 *            A new mapcontainer.
 	 * @param m2 The other orthogonal map, used only once while calculating
 	 *            Zoomed Averages
 	 */
+	public void setMap(final MapContainer im, final MapContainer m2) {
+		map2 = m2;
+=======
+	 *          A new mapcontainer. */
 	public void setMap(final MapContainer im) {
+>>>>>>> master
 		if(map != null) {
 			map.deleteObserver(this);
 		}
@@ -768,17 +776,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 * here on out
 		 */
 
-
-		if(SwingUtilities.getWindowAncestor(this).isActive()) {
-			forceUpdatePrimaryHoverIndex();
-		}
 		/*
 		 * Gets the Current active Window (eg: export or treeview frame). It
 		 * will return null if we are active in other application.
 		 */
 		Window activeWindow = javax.swing.FocusManager.getCurrentManager()
 																									.getActiveWindow();
-		if(activeWindow == null && !isDialogonTop()) {
+		if(activeWindow == null || SwingUtilities	.getWindowAncestor(this)
+																							.isActive()) {
+			// There used to be a custom case for hover index updates during
+			// scrollbar drag, but it has been replaced by this more universal
+			// method. Note, this method returns 0 or the max index if the
+			// cursor is
+			// hovered off that nearest edge.
 			forceUpdatePrimaryHoverIndex();
 		}
 		debug(getPaneType() +	" forced hover index: [" + getPrimaryHoverIndex() +
@@ -888,26 +898,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			map.setLastVisibleLabel(-1);
 			map.setWhizMode(false);
 		}
-	}
-
-	/**
-	 * return true if a Modal Dialog is on top/visible for this instance for this
-	 * instance of treeview
-	 * 
-	 * @return boolean whether a Modal dialog is top
-	 */
-	private static boolean isDialogonTop() {
-		Window[] wins = Window.getWindows();
-		boolean dialogOntop = false;
-		for(Window windowInstance : wins) {
-			if(windowInstance instanceof JDialog) {
-				if(windowInstance.isVisible() && ((JDialog) windowInstance).isModal()) {
-					dialogOntop = true;
-					break;
-				}
-			}
-		}
-		return dialogOntop;
 	}
 
 	private int getSavedSecondaryPaneSize() {
@@ -2094,11 +2084,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 	}
 
-	// There used to be a custom case for hover index updates during
-	// scrollbar drag, but it has been replaced by this more universal
-	// method. Note, this method returns 0 or the max index if the
-	// cursor is
-	// hovered off that nearest edge.
 	public void forceUpdatePrimaryHoverIndex() {
 		Point p = MouseInfo.getPointerInfo().getLocation();
 		SwingUtilities.convertPointFromScreen(p, getComponent());
@@ -2729,6 +2714,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		map.unsetHoverPixel();
 		unsetPrimaryHoverIndex();
 
+<<<<<<< HEAD
 		super.mouseExited(e);
 		repaint();
 	}
@@ -2742,6 +2728,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			selection.setIndexSelection(index, false);
 		else
 			selection.setIndexSelection(index, true);
+=======
+	/** Set the data ticker to matrix average Rounding off to 4 decimals */
+	private void setMeanDataTickerValue() {
+		ticker.setText("Data Average:");
+		ticker.setValue(dataModel.getDataMatrix().getMean());
+	}
+
+	/** TODO: This needs to go into a generic selection class and then the
+	 * TreeSelectionI param can be removed */
+	public void toggleSelect(TreeSelectionI selection, int index) {
+		if(selection.isIndexSelected(index)) selection.setIndexSelection(index, false);
+		else selection.setIndexSelection(index, true);
+>>>>>>> master
 	}
 
 	/** TODO: This needs to go into a generic selection class and then the
@@ -2984,9 +2983,20 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		revalidate();
 		repaint();
 	}
+<<<<<<< HEAD
+    
+    public void setDataModel(final DataModel dataModel) {
+		
+=======
+
+	public void setDataTicker(final DataTicker ticker) {
+
+		this.ticker = ticker;
+	}
 
 	public void setDataModel(final DataModel dataModel) {
 
+>>>>>>> master
 		this.dataModel = dataModel;
 	}
 

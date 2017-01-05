@@ -648,6 +648,85 @@ public class TVModel extends Observable implements DataModel {
 		}
 		
 		/**
+		 * return the mean of data points in a zoomed matrix
+		 * @param startingRow included in the mean calculation
+		 * @param endingRow included in the mean calculation
+		 * @param startingCol included in the mean calculation
+		 * @param endingRow included in the mean calculation
+		 */
+		public double getZoomedMean(int startingRow, int endingRow, int startingCol, int endingCol){
+			final int nRows = nRows();
+			final int nCols = nCols();
+			if (exprData == null) {
+		    LogBuffer.println("Could not calculate Zommed mean. "
+		    		+ "Data matrix was null.");
+		    return 0;
+		  }
+			if (startingRow<0 || endingRow>=nRows || startingCol<0 || endingCol>=nCols) {
+		    LogBuffer.println("Could not calculate Zommed mean. "
+		    		+ "Indexes are out of range.");
+		    return 0;
+		  }
+			
+			double roundedMean = Double.NaN;
+			double sum = 0;
+			int skipped = 0;
+
+			for (int i = startingRow; i <= endingRow; i++) {
+				for (int j = startingCol; j <= endingCol; j++) {
+					
+					final double dataPoint = exprData[i][j];
+					
+					if(!Double.isNaN(dataPoint) 
+							&& !Double.isInfinite(dataPoint)) {
+						sum += dataPoint;
+						
+						if (dataPoint > maxVal) {
+							maxVal = dataPoint;
+						}
+						
+						if (dataPoint < minVal) {
+							minVal = dataPoint;
+						}
+					} else {
+						skipped++;
+					}
+				}
+			}
+		  
+      roundedMean = calculateZoomMean(startingRow, endingRow, startingCol, endingCol, sum, skipped);
+			return roundedMean;
+		}
+
+		/** calculates the mean of a subset of the data matrix
+		 * @param startingRow
+		 * @param endingRow
+		 * @param startingCol
+		 * @param endingCol
+		 * @param sum
+		 * @param skipped
+		 * @return
+		 */
+		private double calculateZoomMean(	int startingRow, int endingRow,
+																			int startingCol, int endingCol,
+																			double sum, int skipped) {
+			double roundedMean;
+			
+			double mean;
+			int numDataPoints = ((endingRow-startingRow+1) * (endingCol-startingCol+1)) - skipped;
+			
+			if(numDataPoints < 1) {
+				LogBuffer.println("Not enough data points for calculation of mean: " + numDataPoints);
+				return Double.NaN;
+			}
+			
+			mean = sum / numDataPoints;
+			
+			roundedMean = Helper.roundDouble(mean, 4);
+			return roundedMean;
+		}
+		
+		/**
 		 * Finds the median value of a 2D double array.
 		 * @param data
 		 * @return Median value.

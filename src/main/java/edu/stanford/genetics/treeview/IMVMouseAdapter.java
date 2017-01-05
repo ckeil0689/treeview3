@@ -362,7 +362,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 		}
 
 		imView.setHasMouse(false);
-		mvController.setMeanDataValue();
+		imView.mouseExited(e);
 
 		xmap.setHoverIndex(-1);
 		ymap.setHoverIndex(-1);
@@ -1494,7 +1494,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 		
 		return new Rectangle(x, y, w, h);
 	}
-
+	
 	private void debug(String msg,int level) {
 		if(level == debug) {
 			LogBuffer.println(msg);
