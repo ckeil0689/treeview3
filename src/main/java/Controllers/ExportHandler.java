@@ -721,7 +721,8 @@ public class ExportHandler {
 		@Override
 		public void update(Observable o,Object arg) {
 			if((arg != null) && Integer.class.isInstance(arg)) {
-				if(o == dendroView.getInteractiveMatrixView().getArrayDrawer()) {
+				if(o ==
+					dendroView.getInteractiveMatrixView().getArrayDrawer()) {
 					int i = (int) arg;
 					ls.setProgress(i);
 					publish(ls);
