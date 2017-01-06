@@ -464,7 +464,8 @@ public class ExportHandler {
 			return((int) Math.round((double) maxMatrixDim /
 				(1.0 - treeRatio)));
 		} else if(dendroView.getRowTreeView().treeExists()) {
-			if((int) Math.round(matrixWidth / (1.0 - treeRatio)) > matrixHeight) {
+			if((int) Math.round(matrixWidth / (1.0 - treeRatio)) >
+				matrixHeight) {
 
 				return((int) Math.round((double) matrixWidth /
 					(1.0 - treeRatio)));
@@ -472,7 +473,8 @@ public class ExportHandler {
 				return(matrixHeight);
 			}
 		} else if(dendroView.getColumnTreeView().treeExists()) {
-			if((int) Math.round(matrixHeight / (1.0 - treeRatio)) > matrixWidth) {
+			if((int) Math.round(matrixHeight / (1.0 - treeRatio)) >
+				matrixWidth) {
 
 				return((int) Math.round((double) matrixHeight /
 					(1.0 - treeRatio)));
@@ -525,7 +527,10 @@ public class ExportHandler {
 			return(interactiveXmap.getTotalTileNum() > 0);
 		} else if(region == RegionType.VISIBLE) {
 			return(interactiveXmap.getNumVisible() > 0);
-		} else if(region == RegionType.SELECTION) { return(!((colSelection == null) || (colSelection.getNSelectedIndexes() == 0))); }
+		} else if(region == RegionType.SELECTION) {
+			return(!((colSelection == null) ||
+				(colSelection.getNSelectedIndexes() == 0)));
+		}
 
 		return(false);
 	}
@@ -588,7 +593,8 @@ public class ExportHandler {
 			//If this region is valid for export and it is too big
 			if(isExportValid(RegionType.values()[i]) &&
 				((((double) (minimum ? getMinXDim(RegionType.values()[i]) :
-					getXDim(RegionType.values()[i])) / (double) MAX_IMAGE_SIZE) *
+					getXDim(RegionType.values()[i])) /
+					(double) MAX_IMAGE_SIZE) *
 				(double) (minimum ? getMinYDim(RegionType.values()[i]) :
 					getYDim(RegionType.values()[i]))) > 1.0)) {
 
@@ -622,7 +628,8 @@ public class ExportHandler {
 			AspectType aspect = AspectType.values()[i];
 			setCalculatedDimensions(selectedRegion,aspect);
 			//If this aspect results in an image that is too big
-			if((((double) getXDim(selectedRegion) / (double) MAX_IMAGE_SIZE) * (double) getYDim(selectedRegion)) > 1.0) {
+			if((((double) getXDim(selectedRegion) / (double) MAX_IMAGE_SIZE) *
+				(double) getYDim(selectedRegion)) > 1.0) {
 
 				asps.add(aspect);
 			}
@@ -658,7 +665,8 @@ public class ExportHandler {
 	 */
 	public boolean isOversized(RegionType reg) {
 		//If this region is too big
-		if((((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) * (double) getYDim(reg)) > 1.0) {
+		if((((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) *
+			(double) getYDim(reg)) > 1.0) {
 
 		return(true); }
 		return(false);
@@ -711,9 +719,8 @@ public class ExportHandler {
 					exportImage(format,fileName,region,showSelections);
 				}
 				catch(OutOfMemoryError oome) {
-					showWarning("ERROR: Out of memory.  Note, you may be able to "
-						+
-						"export a smaller portion of the matrix.");
+					showWarning("ERROR: Out of memory.  Note, you may be " +
+						"able to export a smaller portion of the matrix.");
 				}
 				catch(Exception e) {
 					showWarning(e.getLocalizedMessage());
@@ -817,7 +824,8 @@ public class ExportHandler {
 					showSelections);
 			}
 
-			ls.setStatus("Preparing to open the file in the default system app");
+			ls.setStatus("Preparing to open the file in the default system " +
+				"app");
 			publish(ls);
 		}
 
@@ -835,8 +843,9 @@ public class ExportHandler {
 
 			try {
 				int colorProfile;
-				//JPG is the only format that doesn't support an alpha channel, so
-				//we must create a buffered image object without the ARGB type
+				//JPG is the only format that doesn't support an alpha channel,
+				//so we must create a buffered image object without the ARGB
+				//type
 				if(format == FormatType.JPG) {
 					colorProfile = BufferedImage.TYPE_INT_RGB;
 					LogBuffer.println("Exporting withOUT an alpha channel");
@@ -851,9 +860,9 @@ public class ExportHandler {
 					getYDim(region),colorProfile);
 				Graphics2D g2d = (Graphics2D) im.getGraphics();
 
-				//Formats JPG and PPM default to a black background, so we need to
-				//draw a white canvas.  Note, setting the background color did not
-				//work
+				//Formats JPG and PPM default to a black background, so we need
+				//to draw a white canvas.  Note, setting the background color
+				//did not work
 				if((format == FormatType.JPG) || (format == FormatType.PPM)) {
 					g2d.setBackground(Color.WHITE);
 					g2d.setColor(Color.WHITE);
@@ -866,10 +875,12 @@ public class ExportHandler {
 				if(format == FormatType.PNG) {
 					ImageIO.write(im,"png",exportFile);
 				} else if(format == FormatType.JPG) {
-					//Code from http://stackoverflow.com/questions/17108234/setting-jpg-compression-level-with-imageio-in-java
+					//Code from http://stackoverflow.com/questions/17108234/
+					//setting-jpg-compression-level-with-imageio-in-java
 					JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(
 						null);
-					jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					jpegParams.setCompressionMode(
+						ImageWriteParam.MODE_EXPLICIT);
 					jpegParams.setCompressionQuality(1f);
 					final ImageWriter writer =
 						ImageIO.getImageWritersByFormatName("jpg").next();
@@ -891,18 +902,13 @@ public class ExportHandler {
 				BigDecimal bd = new BigDecimal(tooBig);
 				bd = bd.round(new MathContext(4));
 				double rounded = bd.doubleValue();
-				throw new Exception(
-					"Error: Unable to export image.\n\nExported " +
-						"region [" +
-						region.toString() +
-						": " +
-						getNumXExportIndexes(region) +
-						"cols x " +
-						getNumYExportIndexes(region) +
-						"rows] is about [" +
-						rounded +
-						"] times too big to export.\n\nPlease zoom to a smaller area " +
-						"and try exporting only that visible portion.",iae);
+				throw new Exception("Error: Unable to export image.\n\n" +
+					"Exported region [" + region.toString() + ": " +
+					getNumXExportIndexes(region) + "cols x " +
+					getNumYExportIndexes(region) + "rows] is about [" +
+					rounded +
+					"] times too big to export.\n\nPlease zoom to a smaller " +
+					"area and try exporting only that visible portion.",iae);
 			}
 			catch(Exception exc) {
 				double tooBig = ((double) getXDim(region) /
