@@ -50,8 +50,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
 /**
  * This class provides export functionality of the matrix and trees to a file.
- * 
- * @author rleach
  */
 public class ExportHandler {
 
@@ -94,7 +92,6 @@ public class ExportHandler {
 	 * exporting a selected area, in which case the last 2 parameters are
 	 * unnecessary and you may use the other constructor.
 	 * 
-	 * @author rleach
 	 * @param dendroView
 	 * @param interactiveXmap
 	 * @param interactiveYmap
@@ -115,7 +112,6 @@ public class ExportHandler {
 	/**
 	 * Constructor. All parameters are required.
 	 * 
-	 * @author rleach
 	 * @param dendroView
 	 * @param interactiveXmap
 	 * @param interactiveYmap
@@ -133,7 +129,6 @@ public class ExportHandler {
 	/**
 	 * Allows one to set the page size that is given to freehep.
 	 * 
-	 * @author rleach
 	 * @param dps - default page size
 	 */
 	public void setDefaultPageSize(String dps) {
@@ -145,7 +140,6 @@ public class ExportHandler {
 	}
 
 	/**
-	 * @author rleach
 	 * @return the defPageOrientation
 	 */
 	public static String getDefaultPageOrientation() {
@@ -153,7 +147,6 @@ public class ExportHandler {
 	}
 
 	/**
-	 * @author rleach
 	 * @param defPageOrientation the defPageOrientation to set
 	 */
 	public void setDefaultPageOrientation(String defPageOrientation) {
@@ -164,7 +157,6 @@ public class ExportHandler {
 	 * Uses stored tileWidth, treesHeight, & treeMatrixGapSize to determine the
 	 * width of the output image.
 	 * 
-	 * @author rleach
 	 * @param region
 	 * @return int
 	 */
@@ -193,7 +185,6 @@ public class ExportHandler {
 	 * Uses stored tileHeight, treesHeight, & treeMatrixGapSize to determine the
 	 * height of the output image.
 	 * 
-	 * @author rleach
 	 * @param region
 	 * @return int
 	 */
@@ -221,7 +212,6 @@ public class ExportHandler {
 	/**
 	 * Determines the number of x axis data indexes that will be exported
 	 * 
-	 * @author rleach
 	 * @param region
 	 * @return int
 	 */
@@ -247,7 +237,6 @@ public class ExportHandler {
 	/**
 	 * Determines the number of y axis data indexes that will be exported
 	 * 
-	 * @author rleach
 	 * @param region
 	 * @return int
 	 */
@@ -273,7 +262,6 @@ public class ExportHandler {
 	/**
 	 * Sets the aspectRatio of a tile
 	 * 
-	 * @author rleach
 	 * @param aR - aspect ratio
 	 */
 	public void setTileAspectRatio(final double aR) {
@@ -283,8 +271,7 @@ public class ExportHandler {
 	/**
 	 * Sets the aspectRatio of a tile
 	 * 
-	 * @author rleach
-	 * @param aR - aspect ratio
+	 * @param eAsp - aspect ratio
 	 */
 	public void setTileAspectRatio(final AspectType eAsp) {
 		if(eAsp == AspectType.ASSEEN) {
@@ -301,7 +288,6 @@ public class ExportHandler {
 	/**
 	 * Calculates the aspect ratio in the user's window and sets the result
 	 * 
-	 * @author rleach
 	 * @param region
 	 */
 	public void setTileAspectRatioToScreen(final RegionType region) {
@@ -314,7 +300,6 @@ public class ExportHandler {
 	}
 
 	/**
-	 * @author rleach
 	 * @return the treeRatio
 	 */
 	public double getTreeRatio() {
@@ -327,7 +312,6 @@ public class ExportHandler {
 	 * Sets the treeRatio, which is the fraction of the longest final edge of
 	 * the image (when the tree(s) are included)
 	 * 
-	 * @author rleach
 	 * @param treeRatio the treeRatio to set
 	 */
 	public void setTreeRatio(double treeRatio) {
@@ -338,7 +322,6 @@ public class ExportHandler {
 	 * Returns the fraction of the longest edge of the image that is reserved
 	 * for the gap between the tree and the matrix
 	 * 
-	 * @author rleach
 	 * @return the treeMatrixGapRatio
 	 */
 	public double getTreeMatrixGapRatio() {
@@ -349,7 +332,6 @@ public class ExportHandler {
 	 * Sets the fraction of the longest edge of the image that is reserved
 	 * for the gap between the tree and the matrix
 	 * 
-	 * @author rleach
 	 * @param treeMatrixGapRatio the treeMatrixGapRatio to set
 	 */
 	public void setTreeMatrixGapRatio(double treeMatrixGapRatio) {
@@ -380,7 +362,6 @@ public class ExportHandler {
 	 * minTreesHeight, then the tile dimensions are scaled up to meet the
 	 * minimum tree height requirement or vice versa.
 	 * 
-	 * @author rleach
 	 * @param region
 	 */
 	public void setCalculatedDimensions(final RegionType region,
@@ -450,7 +431,6 @@ public class ExportHandler {
 	 * on the longer edge when the longer edge does not have a tree - the
 	 * shorter edge does.
 	 *
-	 * @author rleach
 	 * @param region
 	 * @return int
 	 */
@@ -489,7 +469,6 @@ public class ExportHandler {
 	/**
 	 * Wrapper export function for all file types.
 	 * 
-	 * @author rleach
 	 * @param format - String. Recognized values: pdf, svg, ps (and implied
 	 *            recognized values: png, jpg, and ppm)
 	 * @param fileName - String
@@ -518,7 +497,6 @@ public class ExportHandler {
 	 * not check whether a region is too big for export. Refer to these methods
 	 * for that: getOversizedRegions, getOversizedAspects, and isOversized.
 	 *
-	 * @author rleach
 	 * @param region
 	 * @return boolean
 	 */
@@ -779,7 +757,6 @@ public class ExportHandler {
 		 * total
 		 * image, arranged in an aligned fashion together
 		 *
-		 * @author rleach
 		 * @param g2d
 		 * @param region
 		 */
@@ -832,7 +809,6 @@ public class ExportHandler {
 		/**
 		 * Export an image file (not on a "page")
 		 * 
-		 * @author rleach
 		 * @param format
 		 * @param fileName
 		 * @param region
@@ -937,7 +913,6 @@ public class ExportHandler {
 		/**
 		 * Export an image file as a part of a document in a vector format
 		 *
-		 * @author rleach
 		 * @param format
 		 * @param pageSize
 		 * @param fileName
