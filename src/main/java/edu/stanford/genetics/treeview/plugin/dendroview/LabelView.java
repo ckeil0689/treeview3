@@ -3323,7 +3323,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		int xSize = getMaxStringLength(metrics);
 
 		//This really just defines the size of the drawing area
-		g.clearRect(0,0,xSize,ySize);
+		//g.clearRect(0,0,xSize,ySize);
 
 		for(int j = start;j <= end;j++) {
 
@@ -3347,7 +3347,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 					g.setColor(selectionTextBGColor);
 
-					g.fillRect(0,yPos,xSize,size);
+					g.fillRect(xIndent,yPos,xSize,size);
 				} else if(!drawSelection.isIndexSelected(j) &&
 					drawSelectedOnly) {
 

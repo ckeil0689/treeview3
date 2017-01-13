@@ -63,6 +63,8 @@ public class ExportDialogController {
 		exportDialog.addRegionListener(new RegionListener());
 		exportDialog.addItemStateListener(new RadioItemStateListener());
 		exportDialog.addCheckBoxItemStateListener(new CheckItemStateListener());
+		exportDialog.addRowLabelListener(new RowLabelListener());
+		exportDialog.addColLabelListener(new ColLabelListener());
 	}
 
 	/**
@@ -115,6 +117,8 @@ public class ExportDialogController {
 				eh.setDefaultPageSize(exportOptions.getPaperType());
 				eh.setDefaultPageOrientation(exportOptions.getOrientation());
 				eh.setTileAspectRatio(exportOptions.getAspectType());
+				eh.setColLabelsIncluded(exportOptions.getColLabelOption());
+				eh.setRowLabelsIncluded(exportOptions.getRowLabelOption());
 				boolean exportSucess = eh.export(exportOptions.getFormatType(),
 					exportFilename,
 					exportOptions.getRegionType(),
@@ -231,6 +235,32 @@ public class ExportDialogController {
 			RegionType selRegion = exportOptions.getRegionType();
 
 			exportDialog.updateAspectRadioBtns(selFormat.isDocumentFormat(),
+				selRegion);
+		}
+	}
+
+	private class RowLabelListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			FormatType selFormat = exportOptions.getFormatType();
+			RegionType selRegion = exportOptions.getRegionType();
+
+			exportDialog.updateRowLabelBtns(selFormat.isDocumentFormat(),
+				selRegion);
+		}
+	}
+
+	private class ColLabelListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			FormatType selFormat = exportOptions.getFormatType();
+			RegionType selRegion = exportOptions.getRegionType();
+
+			exportDialog.updateColLabelBtns(selFormat.isDocumentFormat(),
 				selRegion);
 		}
 	}

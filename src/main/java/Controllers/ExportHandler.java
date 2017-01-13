@@ -529,6 +529,8 @@ public class ExportHandler {
 		final LabelExportOption rowLabelOption,
 		final LabelExportOption colLabelOption) throws Exception {
 
+		LogBuffer.println("EH:export: showSelections is set to: [" + (showSelections ? "true" : "false") + "] rowLabelOption is set to: [" + rowLabelOption.toString() + "]");
+
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
 				"].");
@@ -846,7 +848,9 @@ public class ExportHandler {
 
 				dendroView.getColumnTreeView().export(g2d,
 					(dendroView.getRowTreeView().treeExists() ?
-						treesHeight + gapSize : 0),treesHeight,
+						treesHeight + gapSize : 0) +
+					(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0),
+					treesHeight,
 					tileWidth,
 					region,showSelections);
 			}
@@ -883,7 +887,9 @@ public class ExportHandler {
 
 				dendroView.getRowTreeView().export(g2d,treesHeight,
 					(dendroView.getColumnTreeView().treeExists() ?
-						treesHeight + gapSize : 0),tileHeight,region,
+						treesHeight + gapSize : 0) +
+					(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0),
+					tileHeight,region,
 					showSelections);
 			}
 

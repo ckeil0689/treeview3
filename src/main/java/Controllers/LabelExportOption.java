@@ -3,6 +3,8 @@
  */
 package Controllers;
 
+import edu.stanford.genetics.treeview.AspectType;
+
 /**
  * The export file formats supported.
  * @author rleach
@@ -23,5 +25,14 @@ public enum LabelExportOption {
 
 	public static LabelExportOption getDefault() {
 		return(LabelExportOption.NO);
+	}
+
+	public static LabelExportOption getLabelExportOption(String optName) {
+		for(LabelExportOption leo : LabelExportOption.values()) {
+			if(leo.toString().equals(optName)) {
+				return(leo);
+			}
+		}
+		return(null);
 	}
 }

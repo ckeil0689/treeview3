@@ -494,6 +494,22 @@ public class ExportDialog extends CustomDialog {
 		}
 	}
 	
+	public void addRowLabelListener(final ActionListener l) {
+		Enumeration<AbstractButton> rlb = regionRadioBtns.getElements();
+		while(rlb.hasMoreElements()) {
+			AbstractButton btn = rlb.nextElement();
+			btn.addActionListener(l);
+		}
+	}
+	
+	public void addColLabelListener(final ActionListener l) {
+		Enumeration<AbstractButton> clb = regionRadioBtns.getElements();
+		while(clb.hasMoreElements()) {
+			AbstractButton btn = clb.nextElement();
+			btn.addActionListener(l);
+		}
+	}
+	
 	/**
 	 * An item listener that allows us to fire events upon selection changes
 	 * in the components that it has been added to.
@@ -514,6 +530,18 @@ public class ExportDialog extends CustomDialog {
 		Enumeration<AbstractButton> asp = aspectRadioBtns.getElements();
 		while(asp.hasMoreElements()) {
 			AbstractButton btn = asp.nextElement();
+			btn.addItemListener(l);
+		}
+		
+		Enumeration<AbstractButton> rlb = rowLabelBtns.getElements();
+		while(rlb.hasMoreElements()) {
+			AbstractButton btn = rlb.nextElement();
+			btn.addItemListener(l);
+		}
+		
+		Enumeration<AbstractButton> clb = colLabelBtns.getElements();
+		while(clb.hasMoreElements()) {
+			AbstractButton btn = clb.nextElement();
 			btn.addItemListener(l);
 		}
 	}
@@ -890,7 +918,113 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 	}
-	
+
+	/* TODO: Make sure this takes inclusion of trees into account */
+	public void updateRowLabelBtns(final boolean isDocFormat,
+		final RegionType selectedRegion) {
+
+		Enumeration<AbstractButton> rlBtns = rowLabelBtns.getElements();
+		boolean changeSelected = false;
+
+		//Any labels included uses the same image space, so we only need to test 1 option that includes labels
+		eh.setRowLabelsIncluded(LabelExportOption.YES);
+		eh.setCalculatedDimensions(selectedRegion);
+		rowLabelsTooBig = eh.areRowLabelsTooBig(selectedRegion);
+
+		//Check if row label buttons need to be disabled/enabled based on
+		//selected region
+		while(rlBtns.hasMoreElements()) {
+			AbstractButton option = rlBtns.nextElement();
+			LabelExportOption leo =
+					LabelExportOption.getLabelExportOption(option.getText());
+			boolean enabled = true;
+			if(!isDocFormat && rowLabelsTooBig && leo != LabelExportOption.NO) {
+				enabled = false;
+			}
+			if(!enabled && option.isSelected()) {
+				option.setSelected(false);
+				changeSelected = true;
+			}
+			option.setEnabled(enabled);
+			if(enabled) {
+				option.setToolTipText(null);
+			} else {
+				option.setToolTipText("Too big for image export");
+			}
+		}
+
+		//If the selected option was disabled, select a new default
+		if(changeSelected) {
+			LabelExportOption defLeo;
+			defLeo = LabelExportOption.getDefault();
+
+			if(defLeo != null) {
+				rlBtns = rowLabelBtns.getElements();
+				while(rlBtns.hasMoreElements()) {
+					AbstractButton option = rlBtns.nextElement();
+					LabelExportOption leo =
+							LabelExportOption.getLabelExportOption(option.getText());
+					if(leo == defLeo) {
+						option.setSelected(true);
+					}
+				}
+			}
+		}
+	}
+
+	/* TODO: Make sure this takes inclusion of trees into account */
+	public void updateColLabelBtns(final boolean isDocFormat,
+		final RegionType selectedRegion) {
+
+		Enumeration<AbstractButton> clBtns = colLabelBtns.getElements();
+		boolean changeSelected = false;
+
+		//Any labels included uses the same image space, so we only need to test 1 option that includes labels
+		eh.setColLabelsIncluded(LabelExportOption.YES);
+		eh.setCalculatedDimensions(selectedRegion);
+		colLabelsTooBig = eh.areColLabelsTooBig(selectedRegion);
+
+		//Check if col label buttons need to be disabled/enabled based on
+		//selected region
+		while(clBtns.hasMoreElements()) {
+			AbstractButton option = clBtns.nextElement();
+			LabelExportOption leo =
+					LabelExportOption.getLabelExportOption(option.getText());
+			boolean enabled = true;
+			if(!isDocFormat && colLabelsTooBig && leo != LabelExportOption.NO) {
+				enabled = false;
+			}
+			if(!enabled && option.isSelected()) {
+				option.setSelected(false);
+				changeSelected = true;
+			}
+			option.setEnabled(enabled);
+			if(enabled) {
+				option.setToolTipText(null);
+			} else {
+				option.setToolTipText("Too big for image export");
+			}
+		}
+
+		//If the selected option was disabled, select a new default
+		if(changeSelected) {
+			LabelExportOption defLeo;
+			defLeo = LabelExportOption.getDefault();
+
+			if(defLeo != null) {
+				clBtns = colLabelBtns.getElements();
+				while(clBtns.hasMoreElements()) {
+					AbstractButton option = clBtns.nextElement();
+					LabelExportOption leo =
+							LabelExportOption.getLabelExportOption(option.getText());
+					if(leo == defLeo) {
+						option.setSelected(true);
+					}
+				}
+			}
+		}
+	}
+
 	/* A Dialog box with progress bar used to show the export progress
 	 * 
 	 */
