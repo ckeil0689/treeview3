@@ -65,6 +65,17 @@ public class ColumnLabelView extends LabelView {
 		g2d.translate(-offscreenSize.height, 0);
 	}
 
+	/**
+	 * This un-rotates the graphics object.  This is mainly so that labels can
+	 * be drawn along a vertical axis and then the rest of the object can be
+	 * drawn using the original coordinate system (purpose: for creating an
+	 * exported image)
+	 */
+	public void unOrientLabelPane(Graphics2D g2d) {
+		g2d.rotate(-Math.PI * 3 / 2);
+		g2d.translate(offscreenSize.height, 0);
+	}
+
 	@Override
 	public void orientHintPane(Graphics2D g2d) {}
 

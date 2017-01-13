@@ -34,6 +34,7 @@ import Controllers.RegionType;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Controllers.ExportHandler.ExportWorker;
+import Controllers.LabelExportOption;
 
 public class ExportDialog extends CustomDialog {
 
@@ -56,10 +57,14 @@ public class ExportDialog extends CustomDialog {
 	private JComboBox<PaperType> paperBox;
 	private JComboBox<String> orientBox;
 	private ButtonGroup regionRadioBtns;
+	private ButtonGroup rowLabelBtns;
+	private ButtonGroup colLabelBtns;
 	private ButtonGroup aspectRadioBtns;
 	private JCheckBox selectionsBox;
 	private JButton exportBtn;
 	private List<RegionType> bigRegs; //List of regions that are too big for image export (doc export is OK)
+	private boolean rowLabelsTooBig; //True if including labels makes the image too big (doc export is OK)
+	private boolean colLabelsTooBig; //True if including labels makes the image too big (doc export is OK)
 	private boolean selectionsExist;
 	private ExportHandler eh;
 
@@ -70,8 +75,24 @@ public class ExportDialog extends CustomDialog {
 		final boolean useMinimums = true;
 		this.bigRegs = eh.getOversizedRegions(useMinimums);
 		this.selectionsExist = selectionsExist;
+
+		//This interface interactively sets its own defaults based on user
+		//selections and what turns out to be too big, so let's set a minimum
+		//calculated size to start based on the defaults selected in this class
+		/* TODO: Organize this code better so that there aren't so many nested
+		         calls to various getDefault* methods */
+		eh.setCalculatedDimensions(getDefaultRegion(getDefaultFormatType()), 
+			getDefaultAspectType(getDefaultFormatType(),
+			eh.getOversizedAspects(getDefaultRegion(getDefaultFormatType()))));
+
+		this.rowLabelsTooBig = getDefaultFormatType().isDocumentFormat() ?
+			false : eh.areRowLabelsTooBig(
+				getDefaultRegion(getDefaultFormatType()));
+		this.colLabelsTooBig = getDefaultFormatType().isDocumentFormat() ?
+			false : eh.areColLabelsTooBig(
+				getDefaultRegion(getDefaultFormatType()));
 		
-		this.gapsize = 5; // default
+		this.gapsize = eh.getGapSize(); //Minimum gap size
 		
 		this.bgWidth = PAPER_LONGSIDELEN;
 		this.bgHeight = PAPER_LONGSIDELEN;
@@ -102,13 +123,15 @@ public class ExportDialog extends CustomDialog {
 		JLabel matrix = GUIFactory.createLabel("Matrix:",GUIFactory.FONTS);
 		JLabel aspect = GUIFactory.createLabel("Tile Aspect:",GUIFactory.FONTS);
 		JLabel orient = GUIFactory.createLabel("Orientation:",GUIFactory.FONTS);
+		JLabel rlabel = GUIFactory.createLabel("Row Labels:",GUIFactory.FONTS);
+		JLabel clabel = GUIFactory.createLabel("Col Labels:",GUIFactory.FONTS);
 
 		FormatType selectedFormat = FormatType.getDefault();
 		if(eh.isImageExportPossible()) {
 			this.formatBox = new JComboBox<FormatType>(FormatType
 					.getHiResFormats());
+
 			formatBox.setSelectedItem(FormatType.getDefault());
-			
 		} else {
 			selectedFormat = FormatType.getDefaultDocumentFormat();
 			formatBox = new JComboBox<FormatType>(FormatType.getDocumentFormats());
@@ -116,14 +139,17 @@ public class ExportDialog extends CustomDialog {
 			formatBox.setToolTipText("All regions too big for PNG/JPG/PPM " +
 				"export");
 		}
-		
+
 		this.paperBox = new JComboBox<PaperType>(PaperType.values());
 		paperBox.setSelectedItem(PaperType.getDefault());
 		paperBox.setEnabled(selectedFormat.isDocumentFormat());
 		
 		this.regionRadioBtns = new ButtonGroup();
 		this.aspectRadioBtns = new ButtonGroup();
-		
+
+		this.rowLabelBtns = new ButtonGroup();
+		this.colLabelBtns = new ButtonGroup();
+
 		this.selectionsBox = new JCheckBox("Show Selections");
 		selectionsBox.setEnabled(selectionsExist);
 		if(!selectionsExist) {
@@ -148,10 +174,16 @@ public class ExportDialog extends CustomDialog {
 		optionsPanel.add(matrix, "label, aligny 0");
 		RegionType selectedRegion = addRegionRadioButtons(optionsPanel,
 			selectedFormat);
-		
+
 		optionsPanel.add(aspect, "label, aligny 0");
 		addAspectRadioButtons(optionsPanel,selectedRegion,selectedFormat);
-		
+
+		optionsPanel.add(rlabel, "label, aligny 0");
+		addRowLabelButtons(optionsPanel,selectedFormat);
+
+		optionsPanel.add(clabel, "label, aligny 0");
+		addColLabelButtons(optionsPanel,selectedFormat);
+
 		optionsPanel.add(selectionsBox,"span");
 
 		contentPanel.add(previewPanel, "grow, w 500!, h 500!");
@@ -173,12 +205,21 @@ public class ExportDialog extends CustomDialog {
 		mainPanel.repaint();
 	}
 
+	public FormatType getDefaultFormatType() {
+		FormatType defaultFormat = FormatType.getDefault();
+		if(!eh.isImageExportPossible()) {
+			defaultFormat = FormatType.getDefaultDocumentFormat();
+		}
+		return(defaultFormat);
+	}
+
 	/**
 	 * Adds radio buttons to regionRadioBtns and to the supplied rangePanel and
 	 * also disables invalid regions with a tooltip explaining why based on
 	 * bigRegs and selectionsExist.  The default region is pre-selected.
 	 * 
 	 * @param rangePanel
+	 * @param selectedFormat
 	 * @return
 	 */
 	public RegionType addRegionRadioButtons(final JPanel optionPanel,
@@ -229,6 +270,153 @@ public class ExportDialog extends CustomDialog {
 	}
 
 	/**
+	 * Adds radio buttons to regionRadioBtns and to the supplied rangePanel and
+	 * also disables invalid regions with a tooltip explaining why based on
+	 * bigRegs and selectionsExist.  The default region is pre-selected.
+	 * 
+	 * @param selectedFormat
+	 * @return
+	 */
+	public RegionType getDefaultRegion(final FormatType selectedFormat) {
+
+		RegionType selectedRegion = null;
+		RegionType defReg = (selectedFormat.isDocumentFormat() ?
+			RegionType.getDefault(selectionsExist) :
+			RegionType.getDefault(bigRegs,selectionsExist));
+
+		RegionType[] vals = RegionType.values(); 
+		for (int i = 0; i < vals.length; i++) {
+
+			RegionType reg = vals[i];
+
+			if(reg == defReg && (selectedFormat.isDocumentFormat() ||
+				!bigRegs.contains(reg))) {
+
+				selectedRegion = reg;
+			}
+		}
+		return(selectedRegion);
+	}
+
+	/**
+	 * Adds row label radio buttons to rowLabelBtns and to the supplied
+	 * labelPanel and also disables invalid label inclusions with a tooltip
+	 * explaining why based on rowLabelsTooBig.  The default label
+	 * option is pre-selected.
+	 * 
+	 * @param optionPanel
+	 * @param selectedFormat
+	 * @return
+	 */
+	public LabelExportOption addRowLabelButtons(final JPanel optionPanel,
+		final FormatType selectedFormat) {
+
+		//This is a "safe" default which cannot result in an image that is "too
+		//big"
+		LabelExportOption selectedLabelOption = LabelExportOption.NO;
+		//And this is an assumed valid default set by the LabelExportOption
+		//class
+		LabelExportOption defLO = LabelExportOption.getDefault();
+
+		// Switched to normal for loop to handle last button via index
+		LabelExportOption[] vals = LabelExportOption.values(); 
+		for (int i = 0; i < vals.length; i++) {
+			LabelExportOption lo = vals[i];
+			JRadioButton option = new JRadioButton(lo.toString());
+
+			if(lo != LabelExportOption.NO && rowLabelsTooBig) {
+				option.setEnabled(false);
+				option.setToolTipText("This will make the image too big for " +
+					"export");
+			}
+			//Default label export option pre-selected
+			if(lo == defLO && (selectedFormat.isDocumentFormat() ||
+				!rowLabelsTooBig)) {
+
+				option.setSelected(true);
+				selectedLabelOption = lo;
+			}
+			//If this is the selection region and it's valid
+			if(lo == LabelExportOption.SELECTION &&
+				(selectedFormat.isDocumentFormat() || !rowLabelsTooBig)) {
+
+				option.setEnabled(selectionsExist);
+				if(!selectionsExist) {
+					option.setToolTipText("No data selected");
+				}
+			}
+			rowLabelBtns.add(option);
+			
+			// Wrap after last button	
+			if(i == vals.length - 1) {
+				optionPanel.add(option, "wrap");
+			} else {
+				optionPanel.add(option);
+			}
+		}
+		return(selectedLabelOption);
+	}
+
+	/**
+	 * Adds column label radio buttons to colLabelBtns and to the supplied
+	 * labelPanel and also disables invalid label inclusions with a tooltip
+	 * explaining why based on colLabelsTooBig.  The default label
+	 * option is pre-selected.
+	 * 
+	 * @param optionPanel
+	 * @param selectedFormat
+	 * @return
+	 */
+	public LabelExportOption addColLabelButtons(final JPanel optionPanel,
+		final FormatType selectedFormat) {
+
+		//This is a "safe" default which cannot result in an image that is "too
+		//big"
+		LabelExportOption selectedLabelOption = LabelExportOption.NO;
+		//And this is an assumed valid default set by the LabelExportOption
+		//class
+		LabelExportOption defLO = LabelExportOption.getDefault();
+
+		// Switched to normal for loop to handle last button via index
+		LabelExportOption[] vals = LabelExportOption.values(); 
+		for (int i = 0; i < vals.length; i++) {
+			LabelExportOption lo = vals[i];
+			JRadioButton option = new JRadioButton(lo.toString());
+
+			if(lo != LabelExportOption.NO && colLabelsTooBig) {
+				option.setEnabled(false);
+				option.setToolTipText("This will make the image too big for " +
+					"export");
+			}
+			//Default label export option pre-selected
+			if(lo == defLO && (selectedFormat.isDocumentFormat() ||
+				!colLabelsTooBig)) {
+
+				option.setSelected(true);
+				selectedLabelOption = lo;
+			}
+			//If this is the selection region and it's valid
+			if(lo == LabelExportOption.SELECTION &&
+				(selectedFormat.isDocumentFormat() || !colLabelsTooBig)) {
+
+				option.setEnabled(selectionsExist);
+				if(!selectionsExist) {
+					option.setToolTipText("No data selected");
+				}
+			}
+			colLabelBtns.add(option);
+			
+			// Wrap after last button	
+			if(i == vals.length - 1) {
+				optionPanel.add(option, "wrap");
+			} else {
+				optionPanel.add(option);
+			}
+		}
+		return(selectedLabelOption);
+	}
+
+	/**
 	 * Adds radio buttons to aspectRadioBtns and to the supplied aspectPanel and
 	 * also disables invalid aspects with a tooltip explaining why based on
 	 * bigRegs.  The default aspect is pre-selected.
@@ -239,16 +427,15 @@ public class ExportDialog extends CustomDialog {
 	public void addAspectRadioButtons(final JPanel optionsPanel,
 		final RegionType selectedRegion,final FormatType selectedFormat) {
 
+		//Default region pre-selected
+		List<AspectType> tooBigs = eh.getOversizedAspects(selectedRegion);
+		AspectType defAsp = getDefaultAspectType(selectedFormat,tooBigs);
+
 		// Switched to normal for loop to handle last button via index
 		AspectType[] vals = AspectType.values();
 		for(int i = 0; i < vals.length; i++) {
 			AspectType asp = vals[i];
 			JRadioButton option = new JRadioButton(asp.toString());
-			List<AspectType> tooBigs =
-				eh.getOversizedAspects(selectedRegion);
-			//Default region pre-selected
-			AspectType defAsp = (selectedFormat.isDocumentFormat() ?
-				AspectType.getDefault() : AspectType.getDefault(tooBigs));
 			if(asp == defAsp) {
 				option.setSelected(true);
 			}
@@ -266,6 +453,14 @@ public class ExportDialog extends CustomDialog {
 				optionsPanel.add(option);
 			}
 		}
+	}
+
+	public AspectType getDefaultAspectType(FormatType ft,
+		List<AspectType> tooBigs) {
+
+		AspectType defAsp = (ft.isDocumentFormat() ?
+			AspectType.getDefault() : AspectType.getDefault(tooBigs));
+		return(defAsp);
 	}
 
 	/**
@@ -548,7 +743,7 @@ public class ExportDialog extends CustomDialog {
 		
 		/* Get scaled sizes for trees and gaps */
 		int treeSize = (int)(scaleWidth * scaleHeight * eh.getTreesHeight());
-		this.gapsize = (int)(scaleWidth * scaleHeight * eh.getTreeMatrixGapSize());
+		this.gapsize = (int)(scaleWidth * scaleHeight * eh.getGapSize());
 		
 		// adjust maximum matrix side length for tree thickness and gaps
 		if(rowPrevTrees != null) {
@@ -831,8 +1026,8 @@ public class ExportDialog extends CustomDialog {
 		
 		exportOptions.setFormatType((FormatType) formatBox.getSelectedItem());
 		exportOptions.setPaperType((PaperType) paperBox.getSelectedItem());
-		exportOptions.setOrientation((String)orientBox.getSelectedItem());
-		
+		exportOptions.setOrientation((String) orientBox.getSelectedItem());
+
 		/* Aspect ratio */
 		AspectType aspectType = AspectType.getDefault();
 		String buttonText = "default";
@@ -852,7 +1047,7 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 		exportOptions.setAspectType(aspectType);
-		
+
 		/* Region to be exported */
 		RegionType regionType = RegionType.getDefault();
 		buttonText = "default";
@@ -864,7 +1059,7 @@ public class ExportDialog extends CustomDialog {
 				break;
 			}
 		}
-		
+
 		for(RegionType rT : RegionType.values()) {
 			if(rT.toString().equalsIgnoreCase(buttonText)) {
 				regionType = rT;
@@ -872,7 +1067,45 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 		exportOptions.setRegionType(regionType);
-		
+
+		/* Labels to be exported */
+		LabelExportOption includeRowLabels = LabelExportOption.getDefault();
+		buttonText = "default";
+		for(Enumeration<AbstractButton> buttons = rowLabelBtns.getElements();
+			buttons.hasMoreElements();) {
+			AbstractButton button = buttons.nextElement();
+			if(button.isSelected()) {
+				buttonText = button.getText();
+				break;
+			}
+		}
+		for(LabelExportOption leo : LabelExportOption.values()) {
+			if(leo.toString().equalsIgnoreCase(buttonText)) {
+				includeRowLabels = leo;
+				break;
+			}
+		}
+		exportOptions.setRowLabelOption(includeRowLabels);
+
+		LabelExportOption includeColLabels = LabelExportOption.getDefault();
+		buttonText = "default";
+		for(Enumeration<AbstractButton> buttons = colLabelBtns.getElements();
+			buttons.hasMoreElements();) {
+			AbstractButton button = buttons.nextElement();
+			if(button.isSelected()) {
+				buttonText = button.getText();
+				break;
+			}
+		}
+		for(LabelExportOption leo : LabelExportOption.values()) {
+			if(leo.toString().equalsIgnoreCase(buttonText)) {
+				includeColLabels = leo;
+				break;
+			}
+		}
+		exportOptions.setColLabelOption(includeColLabels);
+
+
 		/* Show selections */
 		exportOptions.setShowSelections(selectionsBox.isSelected());
 	}

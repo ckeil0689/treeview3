@@ -4,6 +4,7 @@ import org.freehep.graphicsio.PageConstants;
 
 import Controllers.ExportHandler;
 import Controllers.FormatType;
+import Controllers.LabelExportOption;
 import Controllers.RegionType;
 
 /**
@@ -19,6 +20,8 @@ public class ExportOptions {
 	private AspectType aspectType;
 	private String orientation;
 	private boolean showSelections;
+	private LabelExportOption rowLabelOption;
+	private LabelExportOption colLabelOption;
 	
 	public ExportOptions() {
 		
@@ -84,5 +87,37 @@ public class ExportOptions {
 
 	public void setShowSelections(boolean showSelections) {
 		this.showSelections = showSelections;
+	}
+
+	/**
+	 * 
+	 * @return the rowLabelOption
+	 */
+	public LabelExportOption getRowLabelOption() {
+		return(rowLabelOption);
+	}
+
+	/**
+	 * 
+	 * @param rowLabelOption the rowLabelOption to set
+	 */
+	public void setRowLabelOption(LabelExportOption rowLabelOption) {
+		this.rowLabelOption = rowLabelOption;
+	}
+
+	/**
+	 * 
+	 * @return the colLabelOption
+	 */
+	public LabelExportOption getColLabelOption() {
+		return(colLabelOption);
+	}
+
+	/**
+	 * 
+	 * @param colLabelOption the colLabelOption to set
+	 */
+	public void setColLabelOption(LabelExportOption colLabelOption) {
+		this.colLabelOption = colLabelOption;
 	}
 }

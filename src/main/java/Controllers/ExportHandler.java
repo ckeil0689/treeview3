@@ -5,6 +5,7 @@ package Controllers;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -46,6 +47,7 @@ import edu.stanford.genetics.treeview.PpmWriter;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
+import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
 /**
@@ -69,7 +71,7 @@ public class ExportHandler {
 
 	protected double aspectRatio = 1.0; //x / y
 	protected double treeRatio = 0.2; //fraction of the long content dimension
-	protected double treeMatrixGapRatio = 0.005; //Gap bet tree & matrix
+	protected double gapRatio = 0.005; //Gap bet tree & matrix
 
 	/* Note: The height in "points" a tree is determines whether should provide
 	 * enough space to separate a node's shoulder line from its parent's and
@@ -81,11 +83,21 @@ public class ExportHandler {
 	/* Note: The line width of the tree is 1, so the more points thicker the
 	 * tile is, the relatively more narrow the tree lines are */
 	protected int minTileDim = 3; //Min number of "points" for a tile's edge
+	protected int curMinTileDim = minTileDim; //Changed by label height
 	protected int tileHeight = 3; //Number of "points" for a tile's height
 	protected int tileWidth = 3; //Number of "points" for a tile's width
 
-	protected int treeMatrixGapMin = 5; //Min number of "points" bet tree/matrix
-	protected int treeMatrixGapSize = 20; //Number of "points" bet tree/matrix
+	protected int minGapSize = 5; //Min number of "points" bet tree/matrix
+	protected int gapSize = 20; //Number of "points" bet tree/matrix
+
+	//Label Options
+	protected LabelExportOption rowLabelsIncluded = LabelExportOption.NO;
+	protected LabelExportOption colLabelsIncluded = LabelExportOption.NO;
+	protected int minFontPoints = 12;
+	protected final static int SQUEEZE = LabelView.getSqueeze(); //static
+	protected int labelAreaHeight = minFontPoints + SQUEEZE; //Hght for 1 label
+	protected int maxRowLabelLength = 0;
+	protected int maxColLabelLength = 0;
 
 	/**
 	 * Constructor. All the parameters are necessary unless you are not
@@ -163,7 +175,8 @@ public class ExportHandler {
 	public int getXDim(final RegionType region) {
 		int xDim = (getNumXExportIndexes(region) * tileWidth) +
 			(dendroView.getRowTreeView().treeExists() ? treesHeight +
-				treeMatrixGapSize : 0);
+				gapSize : 0) +
+			(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0);
 		return(xDim);
 	}
 
@@ -175,9 +188,10 @@ public class ExportHandler {
 	 * @return
 	 */
 	public int getMinXDim(final RegionType region) {
-		int minXDim = (getNumXExportIndexes(region) * minTileDim) +
+		int minXDim = (getNumXExportIndexes(region) * curMinTileDim) +
 			(dendroView.getRowTreeView().treeExists() ? treesHeight +
-				treeMatrixGapSize : 0);
+				gapSize : 0) +
+			(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0);
 		return(minXDim);
 	}
 
@@ -191,7 +205,8 @@ public class ExportHandler {
 	public int getYDim(final RegionType region) {
 		int yDim = (getNumYExportIndexes(region) * tileHeight) +
 			(dendroView.getColumnTreeView().treeExists() ? treesHeight +
-				treeMatrixGapSize : 0);
+				gapSize : 0) +
+			(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0);
 		return(yDim);
 	}
 
@@ -203,9 +218,10 @@ public class ExportHandler {
 	 * @return
 	 */
 	public int getMinYDim(final RegionType region) {
-		int minYDim = (getNumYExportIndexes(region) * minTileDim) +
+		int minYDim = (getNumYExportIndexes(region) * curMinTileDim) +
 			(dendroView.getColumnTreeView().treeExists() ? treesHeight +
-				treeMatrixGapSize : 0);
+				gapSize : 0) +
+			(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0);
 		return(minYDim);
 	}
 
@@ -325,7 +341,7 @@ public class ExportHandler {
 	 * @return the treeMatrixGapRatio
 	 */
 	public double getTreeMatrixGapRatio() {
-		return(treeMatrixGapRatio);
+		return(gapRatio);
 	}
 
 	/**
@@ -335,7 +351,7 @@ public class ExportHandler {
 	 * @param treeMatrixGapRatio the treeMatrixGapRatio to set
 	 */
 	public void setTreeMatrixGapRatio(double treeMatrixGapRatio) {
-		this.treeMatrixGapRatio = treeMatrixGapRatio;
+		this.gapRatio = treeMatrixGapRatio;
 	}
 
 	public void setCalculatedDimensions(final RegionType region,
@@ -371,38 +387,50 @@ public class ExportHandler {
 		//Using: treeMatrixGapRatio,aspectRatio,treeRatio
 		//And adjusting using: treeMatrixGapMin,minTileDim,minTreeHeight
 
+		//Update various dimensions to account for labels (if they're included)
+		updateForLabelSize();
+
 		//First, we'll calculate the tile dimensions
 		if(aspectRatio > 1.0) {
-			tileHeight = minTileDim;
-			tileWidth = (int) Math.round(aspectRatio * (double) minTileDim);
+			tileHeight = curMinTileDim;
+			tileWidth = (int) Math.round(aspectRatio * (double) curMinTileDim);
 		} else {
-			tileWidth = minTileDim;
-			tileHeight = (int) Math.round((double) minTileDim / aspectRatio);
+			tileWidth = curMinTileDim;
+			tileHeight = (int) Math.round((double) curMinTileDim / aspectRatio);
 		}
 
 		//Now we can calculate the trees height based on the shorter matrix
 		//dimension
 		int maxImageDim = calculateMaxFinalImageDim(region);
-		treeMatrixGapSize =
-			(int) Math.round(treeMatrixGapRatio * (double) maxImageDim);
-		if(treeMatrixGapSize < treeMatrixGapMin) {
-			treeMatrixGapSize = treeMatrixGapMin;
+		gapSize =
+			(int) Math.round(gapRatio * (double) maxImageDim);
+		if(gapSize < minGapSize) {
+			gapSize = minGapSize;
 		}
-		treesHeight = (int) Math.round(treeRatio * (double) maxImageDim) -
-			treeMatrixGapSize;
+		treesHeight = (int) Math.round(treeRatio * (double) maxImageDim);
+
+		//If the trees are smaller than the minimum, scale up the whole image
+		//(resolution) until they are large enough
 		if(treesHeight < minTreeHeight) {
 			double scaleUpFactor =
 				(double) minTreeHeight / (double) treesHeight;
 			tileWidth = (int) Math.ceil(scaleUpFactor * (double) tileWidth);
 			tileHeight = (int) Math.round(tileWidth / aspectRatio);
 			maxImageDim = calculateMaxFinalImageDim(region);
-			treeMatrixGapSize =
-				(int) Math.round(treeMatrixGapRatio * (double) maxImageDim);
-			if(treeMatrixGapSize < treeMatrixGapMin) {
-				treeMatrixGapSize = treeMatrixGapMin;
+
+			//Note, we do not need to recalculate the label area dimensions or
+			//the font size because we're defaulting to the min (or fixed, if
+			//set) font and the dimensions of the area are based on the longest
+			//string and the tile dimensions
+
+			gapSize =
+				(int) Math.round(gapRatio * (double) maxImageDim);
+			if(gapSize < minGapSize) {
+				gapSize = minGapSize;
 			}
-			treesHeight = (int) Math.round(treeRatio * (double) maxImageDim) -
-				treeMatrixGapSize;
+			treesHeight = (int) Math.round(treeRatio * (double) maxImageDim);
+
+			//Just in case there's a math or precision error above...
 			if(treesHeight < minTreeHeight) {
 				LogBuffer.println("ERROR: Something is wrong with the " +
 					"calculation of the export dimensions using " +
@@ -435,34 +463,55 @@ public class ExportHandler {
 	 * @return int
 	 */
 	public int calculateMaxFinalImageDim(final RegionType region) {
-		int matrixWidth = getNumXExportIndexes(region) * tileWidth;
-		int matrixHeight = getNumYExportIndexes(region) * tileHeight;
-		int maxMatrixDim =
-			(matrixWidth > matrixHeight ? matrixWidth : matrixHeight);
+		int matrixLabelWidth = getNumXExportIndexes(region) * tileWidth;
+		if(areRowLabelsIncluded()) {
+			matrixLabelWidth += maxRowLabelLength;
+		}
+		int matrixLabelHeight = getNumYExportIndexes(region) * tileHeight;
+		if(areColLabelsIncluded()) {
+			matrixLabelHeight += maxColLabelLength;
+		}
+		//This is the size component that is determined statically (not by
+		//proportion, like trees height or gap sizes)
+		int maxPartialDimSize =
+			(matrixLabelWidth > matrixLabelHeight ?
+				matrixLabelWidth : matrixLabelHeight);
+		boolean maxDimIncludesLabels = (matrixLabelWidth > matrixLabelHeight ?
+			areRowLabelsIncluded() : areColLabelsIncluded());
+
 		if(dendroView.getRowTreeView().treeExists() &&
 			dendroView.getColumnTreeView().treeExists()) {
-			return((int) Math.round((double) maxMatrixDim /
-				(1.0 - treeRatio)));
-		} else if(dendroView.getRowTreeView().treeExists()) {
-			if((int) Math.round(matrixWidth / (1.0 - treeRatio)) >
-				matrixHeight) {
 
-				return((int) Math.round((double) matrixWidth /
-					(1.0 - treeRatio)));
+			return((int) Math.round((double) maxPartialDimSize /
+				(1.0 - treeRatio -
+					gapRatio * (maxDimIncludesLabels ? 2.0 : 1.0))));
+		} else if(dendroView.getRowTreeView().treeExists()) {
+			int finalWidth = (int) Math.round(matrixLabelWidth / (1.0 -
+				treeRatio - gapRatio * (areRowLabelsIncluded() ? 2.0 : 1.0)));
+			int finalHeight = (int) Math.round(matrixLabelHeight /
+				(1.0 - (areColLabelsIncluded() ? gapRatio : 0.0)));
+			//If the final width is larger than the final height in the case of
+			//only the row tree being present
+			if(finalWidth > finalHeight) {
+				return(finalWidth);
 			} else {
-				return(matrixHeight);
+				return(finalHeight);
 			}
 		} else if(dendroView.getColumnTreeView().treeExists()) {
-			if((int) Math.round(matrixHeight / (1.0 - treeRatio)) >
-				matrixWidth) {
-
-				return((int) Math.round((double) matrixHeight /
-					(1.0 - treeRatio)));
+			int finalWidth = (int) Math.round(matrixLabelWidth / (1.0 -
+				(areRowLabelsIncluded() ? gapRatio : 0.0)));
+			int finalHeight = (int) Math.round(matrixLabelHeight / (1.0 -
+				treeRatio - gapRatio * (areColLabelsIncluded() ? 2.0 : 1.0)));
+			//If the final width is larger than the final height in the case of
+			//only the row tree being present
+			if(finalHeight > finalWidth) {
+				return(finalHeight);
 			} else {
-				return(matrixWidth);
+				return(finalWidth);
 			}
 		} else {
-			return(maxMatrixDim);
+			return((int) Math.round((double) maxPartialDimSize /
+				(1.0 - (maxDimIncludesLabels ? gapRatio : 0.0))));
 		}
 	}
 
@@ -476,7 +525,9 @@ public class ExportHandler {
 	 *            selection
 	 */
 	public boolean export(final FormatType format,final String fileName,
-		final RegionType region,final boolean showSelections) throws Exception {
+		final RegionType region,final boolean showSelections,
+		final LabelExportOption rowLabelOption,
+		final LabelExportOption colLabelOption) throws Exception {
 
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
@@ -485,7 +536,7 @@ public class ExportHandler {
 		}
 
 		final ExportWorker worker = new ExportWorker(format,fileName,region,
-			showSelections);
+			showSelections,rowLabelOption,colLabelOption);
 		// start the process of exporting
 		worker.execute();
 		worker.ebd.setVisible(true);
@@ -599,7 +650,7 @@ public class ExportHandler {
 		int saveTreesHeight = treesHeight;
 		int saveTileHeight = tileHeight;
 		int saveTileWidth = tileWidth;
-		int saveGapSize = treeMatrixGapSize;
+		int saveGapSize = gapSize;
 
 		List<AspectType> asps = new ArrayList<AspectType>();
 		for(int i = 0;i < AspectType.values().length;i++) {
@@ -619,7 +670,7 @@ public class ExportHandler {
 		treesHeight = saveTreesHeight;
 		tileHeight = saveTileHeight;
 		tileWidth = saveTileWidth;
-		treeMatrixGapSize = saveGapSize;
+		gapSize = saveGapSize;
 
 		return(asps);
 	}
@@ -629,9 +680,9 @@ public class ExportHandler {
 		return treesHeight;
 	}
 
-	public int getTreeMatrixGapSize() {
+	public int getGapSize() {
 
-		return treeMatrixGapSize;
+		return gapSize;
 	}
 
 	/**
@@ -658,12 +709,16 @@ public class ExportHandler {
 		String fileName;
 		final RegionType region;
 		final boolean showSelections;
+		final LabelExportOption rowLabelOption;
+		final LabelExportOption colLabelOption;
 		ModelLoader.LoadStatus ls;
 		private boolean exportSuccessful = true;
 
 		public ExportWorker(FormatType format,String fileName,
 			final RegionType region,
-			final boolean showSelections) {
+			final boolean showSelections,
+			final LabelExportOption rowLabelOption,
+			final LabelExportOption colLabelOption) {
 			ebd = new ExportBarDialog("Exporting ...",this);
 			ebd.setupDialogComponents();
 			ebd.setExportFileName("File Name - " + fileName);
@@ -671,6 +726,8 @@ public class ExportHandler {
 			this.fileName = fileName;
 			this.region = region;
 			this.showSelections = showSelections;
+			this.rowLabelOption = rowLabelOption;
+			this.colLabelOption = colLabelOption;
 			dendroView.getInteractiveMatrixView().getArrayDrawer().addObserver(
 				this);
 			ls = new ModelLoader.LoadStatus();
@@ -687,14 +744,14 @@ public class ExportHandler {
 
 		@Override
 		protected Void doInBackground() throws Exception {
-			if((format == FormatType.PDF) || (format == FormatType.SVG) ||
-				(format == FormatType.PS)) {
+			if(format.isDocumentFormat()) {
 
 				exportDocument(format,defPageSize,fileName,region,
-					showSelections);
+					showSelections,rowLabelOption,colLabelOption);
 			} else {
 				try {
-					exportImage(format,fileName,region,showSelections);
+					exportImage(format,fileName,region,showSelections,
+						rowLabelOption,colLabelOption);
 				}
 				catch(OutOfMemoryError oome) {
 					showWarning("ERROR: Out of memory.  Note, you may be " +
@@ -762,44 +819,94 @@ public class ExportHandler {
 		 * @param region
 		 */
 		private void createContent(final Graphics2D g2d,
-			final RegionType region,
-			final boolean showSelections) {
+			final RegionType region,final boolean showSelections,
+			final LabelExportOption rowLabelOption,
+			final LabelExportOption colLabelOption) {
 
-			ls.setStatus("Exporting interactive matrix view ...");
+			ls.setStatus("Exporting matrix ...");
 			ls.setProgress(0);
 			publish(ls);
 			dendroView.getInteractiveMatrixView().export(this,g2d,
 				(dendroView.getRowTreeView().treeExists() ?
-					treesHeight + treeMatrixGapSize : 0),
+					treesHeight + gapSize : 0) +
+				(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0),
 				(dendroView.getColumnTreeView().treeExists() ?
-					treesHeight + treeMatrixGapSize : 0),
+					treesHeight + gapSize : 0) +
+				(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0),
 				tileWidth,tileHeight,region,showSelections);
 			// Checks if the worker has been cancelled
 			if(isCancelled()) {
 				setExportSuccessful(false);
 				return;
 			}
-			ls.setStatus("Exporting column tree view ...");
-			publish(ls);
+
 			if(dendroView.getColumnTreeView().treeExists()) {
+				ls.setStatus("Exporting column tree ...");
+				publish(ls);
+
 				dendroView.getColumnTreeView().export(g2d,
 					(dendroView.getRowTreeView().treeExists() ?
-						treesHeight + treeMatrixGapSize : 0),treesHeight,
+						treesHeight + gapSize : 0),treesHeight,
 					tileWidth,
 					region,showSelections);
 			}
 
-			if(isCancelled()) {
-				setExportSuccessful(false);
-				return;
-			}
-			ls.setStatus("Exporting row tree view ...");
-			publish(ls);
+//			if(colLabelOption != LabelExportOption.NO) {
+//				ls.setStatus("Exporting column labels ...");
+//				publish(ls);
+//
+//				//Determine how long the labels are
+//				FontMetrics fm =
+//					dendroView.getColLabelView().getFontMetrics(g2d.getFont());
+//				int labelLength =
+//					dendroView.getColLabelView().getMaxStringLength(fm);
+//
+//				dendroView.getColLabelView().export(g2d,
+//					(dendroView.getRowTreeView().treeExists() ?
+//						treesHeight + gapSize : 0) +
+//					(rowLabelOption != LabelExportOption.NO ?
+//						labelLength + gapSize : 0),
+//					(dendroView.getColumnTreeView().treeExists() ?
+//						treesHeight + gapSize : 0),
+//					tileWidth,region,showSelections,
+//					colLabelOption == LabelExportOption.SELECTION,
+//					labelAreaHeight - SQUEEZE);
+//			}
+//			if(isCancelled()) {
+//				setExportSuccessful(false);
+//				return;
+//			}
+
 			if(dendroView.getRowTreeView().treeExists()) {
+				ls.setStatus("Exporting row tree ...");
+				publish(ls);
+
 				dendroView.getRowTreeView().export(g2d,treesHeight,
 					(dendroView.getColumnTreeView().treeExists() ?
-						treesHeight + treeMatrixGapSize : 0),tileHeight,region,
+						treesHeight + gapSize : 0),tileHeight,region,
 					showSelections);
+			}
+
+			if(rowLabelOption != LabelExportOption.NO) {
+				ls.setStatus("Exporting row labels ...");
+				publish(ls);
+
+				//Determine how long the labels are
+				FontMetrics fm =
+					dendroView.getRowLabelView().getFontMetrics(g2d.getFont());
+				int labelLength =
+					dendroView.getRowLabelView().getMaxStringLength(fm);
+
+				dendroView.getRowLabelView().export(g2d,
+					(dendroView.getColumnTreeView().treeExists() ?
+						treesHeight + gapSize : 0) +
+						(colLabelOption != LabelExportOption.NO ?
+							labelLength + gapSize : 0),
+					(dendroView.getRowTreeView().treeExists() ?
+						treesHeight + gapSize : 0),
+					tileWidth,region,showSelections,
+					rowLabelOption == LabelExportOption.SELECTION,
+					labelAreaHeight - SQUEEZE);
 			}
 
 			ls.setStatus("Preparing to open the file in the default system " +
@@ -815,7 +922,9 @@ public class ExportHandler {
 		 * @param region
 		 */
 		private void exportImage(final FormatType format,final String fileName,
-			final RegionType region,final boolean showSelections)
+			final RegionType region,final boolean showSelections,
+			final LabelExportOption rowLabelOption,
+			final LabelExportOption colLabelOption)
 			throws Exception {
 
 			try {
@@ -846,7 +955,8 @@ public class ExportHandler {
 					g2d.fillRect(0,0,getXDim(region),getYDim(region));
 				}
 
-				createContent(g2d,region,showSelections);
+				createContent(g2d,region,showSelections,rowLabelOption,
+					colLabelOption);
 
 				File exportFile = new File(fileName);
 				if(format == FormatType.PNG) {
@@ -922,7 +1032,9 @@ public class ExportHandler {
 		private void
 			exportDocument(final FormatType format,final PaperType pageSize,
 				String fileName,final RegionType region,
-				final boolean showSelections) {
+				final boolean showSelections,
+				final LabelExportOption rowLabelOption,
+				final LabelExportOption colLabelOption) {
 
 			try {
 				setCalculatedDimensions(region);
@@ -960,7 +1072,8 @@ public class ExportHandler {
 				g.setProperties(p);
 
 				g.startExport();
-				createContent(g,region,showSelections);
+				createContent(g,region,showSelections,rowLabelOption,
+					colLabelOption);
 				g.endExport();
 			}
 			catch(FileNotFoundException exc) {
@@ -993,4 +1106,193 @@ public class ExportHandler {
 		}
 	}
 
+	/**
+	 * Determines whether adding a row labels panel to the exported image will
+	 * make the image size exceed the dimensions allowable for image export
+	 * (limited by BufferedImage's MAX_INTEGER requirement).
+	 * @param reg
+	 * @return
+	 */
+	public boolean areRowLabelsTooBig(RegionType reg) {
+
+		//If this region is valid for export and it is not too big
+		if(isExportValid(reg) &&
+			((((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) *
+			(double) getYDim(reg)) <= 1.0)) {
+
+			return(false);
+		}
+		return(true);
+	}
+
+	/**
+	 * Determines whether adding a column labels panel to the exported image
+	 * will make the image size exceed the dimensions allowable for image export
+	 * (limited by BufferedImage's MAX_INTEGER requirement).
+	 * @param reg
+	 * @return
+	 */
+	public boolean areColLabelsTooBig(RegionType reg) {
+
+		//If this region is valid for export and it is not too big
+		if(isExportValid(reg) &&
+			((((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) *
+			(double) getYDim(reg)) <= 1.0)) {
+
+			return(false);
+		}
+		return(true);
+	}
+
+	/**
+	 * 
+	 * @return the rowLabelsIncluded
+	 */
+	public LabelExportOption getRowLabelsIncluded() {
+		return(rowLabelsIncluded);
+	}
+
+	/**
+	 * 
+	 * @return boolean wehter any labels are included or not
+	 */
+	public boolean areRowLabelsIncluded() {
+		return(rowLabelsIncluded != LabelExportOption.NO);
+	}
+
+	/**
+	 * 
+	 * @param rowLabelsIncluded the rowLabelsIncluded to set
+	 */
+	public void setRowLabelsIncluded(LabelExportOption rowLabelsIncluded) {
+		this.rowLabelsIncluded = rowLabelsIncluded;
+	}
+
+	/**
+	 * 
+	 * @param rowLabelsIncluded the rowLabelsIncluded to set
+	 */
+	public void setRowLabelsIncluded(final boolean rowLabelsIncluded) {
+		if(rowLabelsIncluded) {
+			this.rowLabelsIncluded = LabelExportOption.YES;
+		} else {
+			this.rowLabelsIncluded = LabelExportOption.NO;
+		}
+	}
+
+	/**
+	 * 
+	 * @return the colLabelsIncluded
+	 */
+	public LabelExportOption getColLabelsIncluded() {
+		return(colLabelsIncluded);
+	}
+
+	/**
+	 * 
+	 * @return boolean wehter any labels are included or not
+	 */
+	public boolean areColLabelsIncluded() {
+		return(colLabelsIncluded != LabelExportOption.NO);
+	}
+
+	/**
+	 * 
+	 * @param colLabelsIncluded the colLabelsIncluded to set
+	 */
+	public void setColLabelsIncluded(LabelExportOption colLabelsIncluded) {
+		this.colLabelsIncluded = colLabelsIncluded;
+	}
+
+	/**
+	 * 
+	 * @param colLabelsIncluded the colLabelsIncluded to set
+	 */
+	public void setColLabelsIncluded(final boolean colLabelsIncluded) {
+		if(colLabelsIncluded) {
+			this.colLabelsIncluded = LabelExportOption.YES;
+		} else {
+			this.colLabelsIncluded = LabelExportOption.NO;
+		}
+	}
+
+	/**
+	 * 
+	 * @return the fontPoints
+	 */
+	public int getMinFontPoints() {
+		return(minFontPoints);
+	}
+
+	/**
+	 * 
+	 * @param fontPoints the fontPoints to set
+	 */
+	public void setMinFontPoints(int fontPoints) {
+		this.minFontPoints = fontPoints;
+	}
+
+	/**
+	 * 
+	 * @return the labelAreaHeight
+	 */
+	public int getLabelAreaHeight() {
+		return(labelAreaHeight);
+	}
+
+	/**
+	 * 
+	 * @param labelAreaHeight the labelAreaHeight to set
+	 */
+	public void setLabelAreaHeight(int labelAreaHeight) {
+		this.labelAreaHeight = labelAreaHeight;
+	}
+
+	/**
+	 * Grabs the minimum (or fixed) font height (plus SQUEEZE) and updates
+	 * labelAreaHeight and cutMinTileDim (if labels are included).
+	 * Adds 1 to cutMinTileDim if the height is less than 10 and even, so that
+	 * the tree branch and label will look centered on the tile
+	 * @param labelAreaHeight the labelAreaHeight to set
+	 */
+	public void updateForLabelSize() {
+		//Label height is the same for both row and column labels, so we're arbitrarily
+		//grabbing the row view's label height
+		try {
+			setLabelAreaHeight(
+				dendroView.getRowLabelView().getMinLabelAreaHeight());
+		} finally {
+			setLabelAreaHeight(minFontPoints + SQUEEZE);
+		}
+		if(areColLabelsIncluded() || areRowLabelsIncluded()) {
+			curMinTileDim = labelAreaHeight;
+		} else {
+			curMinTileDim = minTileDim;
+		}
+		if(curMinTileDim < 10 && curMinTileDim % 2 == 0) {
+			curMinTileDim++;
+		}
+
+		//Update the height of the col label area
+		if(getColLabelsIncluded() == LabelExportOption.YES) {
+			maxColLabelLength =
+				dendroView.getColLabelView().getMaxExportStringLength(false);
+		} else if(getColLabelsIncluded() == LabelExportOption.SELECTION) {
+			maxColLabelLength =
+				dendroView.getColLabelView().getMaxExportStringLength(true);
+		} else {
+			maxColLabelLength = 0;
+		}
+
+		//Update the height of the row label area
+		if(getRowLabelsIncluded() == LabelExportOption.YES) {
+			maxRowLabelLength =
+				dendroView.getRowLabelView().getMaxExportStringLength(false);
+		} else if(getRowLabelsIncluded() == LabelExportOption.SELECTION) {
+			maxRowLabelLength =
+				dendroView.getRowLabelView().getMaxExportStringLength(true);
+		} else {
+			maxRowLabelLength = 0;
+		}
+	}
 }

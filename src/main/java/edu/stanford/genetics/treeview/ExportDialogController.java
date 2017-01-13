@@ -118,7 +118,9 @@ public class ExportDialogController {
 				boolean exportSucess = eh.export(exportOptions.getFormatType(),
 					exportFilename,
 					exportOptions.getRegionType(),
-					exportOptions.isShowSelections());
+					exportOptions.isShowSelections(),
+					exportOptions.getRowLabelOption(),
+					exportOptions.getColLabelOption());
 
 				if(exportSucess) {
 					String msg = "Exported file: [" + exportFilename + "].";
