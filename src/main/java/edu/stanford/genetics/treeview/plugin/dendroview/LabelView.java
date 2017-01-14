@@ -3307,7 +3307,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
-		//TODO: There is a bug in here somewhere where something isn't getting initialized properly. It might be in a method that calls this method.  When row labels are printed, they are not getting their initial y starting coordinate correct IF THE USER HAS NOT HOVERED OVER A LABEL LINKED VIEW
+		//TODO: There is a bug where something iIndent isn't getting initialized properly in a method that calls this method.  When row labels are printed, they are not getting their initial y starting coordinate correct IF THE USER HAS NOT HOVERED OVER A LABEL LINKED VIEW
 		Font exportFont = new Font(labelAttr.getFace(),
 				labelAttr.getStyle(),fontSize);
 		final FontMetrics metrics = getFontMetrics(exportFont);
@@ -3335,6 +3335,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		int yPos = yIndent;
 		int yOffset = (int) Math.floor((double) size / 2.0);
 		int xPos = xIndent;
+
+		LogBuffer.println("Drawing [" + (isAColumnPane() ? "Column" : "Row") + "] labels" +
+			"Longest Str Len: [" + xSize + "] font size: [" + fontSize + "] tile size: [" + size + "] ascent: [" + ascent + "] yIndent: [" + yIndent + "] xIndent: [" + xIndent + "] yOffset: [" + yOffset + "]");
 
 		//This really just defines the size of the drawing area
 		//g.clearRect(0,0,xSize,ySize);

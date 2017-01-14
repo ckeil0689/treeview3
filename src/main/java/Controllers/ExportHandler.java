@@ -5,6 +5,7 @@ package Controllers;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -47,6 +48,7 @@ import edu.stanford.genetics.treeview.PpmWriter;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
+import edu.stanford.genetics.treeview.plugin.dendroview.LabelAttributes;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
@@ -872,8 +874,11 @@ public class ExportHandler {
 				publish(ls);
 
 				//Determine how long the labels are
+				//We need to set the size of the exported font explicitly to find out how long the column label area is just in case the user has not triggered this update yet by hovering over a label linked view.  If we didn't use this, the yIndent sent to the export method would be off.
+				LabelAttributes la = dendroView.getColLabelView().getLabelAttributes();
+				Font exportFont = new Font(la.getFace(),la.getStyle(),labelAreaHeight - SQUEEZE);
 				FontMetrics fm =
-					dendroView.getColLabelView().getFontMetrics(g2d.getFont());
+					dendroView.getColLabelView().getFontMetrics(exportFont);
 				int labelLength =
 					dendroView.getColLabelView().getMaxStringLength(fm);
 
