@@ -3313,7 +3313,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		final FontMetrics metrics = getFontMetrics(exportFont);
 		int xSize = getMaxStringLength(metrics);
 		final int ascent = metrics.getAscent();
-
+ 
 		/* Rotate plane for array axis (not for zoomHint) */
 		/* TODO: Make this an abstract method in LabelView and put this code in columnlabelview, passing it coordinates it needs for placement */
 		//orientLabelPane(g2d);

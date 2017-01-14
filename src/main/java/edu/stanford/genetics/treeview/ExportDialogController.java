@@ -251,7 +251,7 @@ public class ExportDialogController {
 				selRegion);
 		}
 	}
-
+ 
 	private class ColLabelListener implements ActionListener {
 
 		@Override

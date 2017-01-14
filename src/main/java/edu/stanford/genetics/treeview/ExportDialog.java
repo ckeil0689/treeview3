@@ -985,7 +985,7 @@ public class ExportDialog extends CustomDialog {
 		eh.setColLabelsIncluded(LabelExportOption.YES);
 		eh.setCalculatedDimensions(selectedRegion);
 		colLabelsTooBig = eh.areColLabelsTooBig(selectedRegion);
-
+ 
 		//Check if col label buttons need to be disabled/enabled based on
 		//selected region
 		while(clBtns.hasMoreElements()) {

@@ -338,7 +338,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 
 		this.d_justified = isRightJustified;
 	}
-
+ 
 	@Override
 	public Font getFont() {
 		return new Font(face, style, size);

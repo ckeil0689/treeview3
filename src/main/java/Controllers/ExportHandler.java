@@ -865,7 +865,7 @@ public class ExportHandler {
 					(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0),
 					tileHeight,region,
 					showSelections);
-			}
+			} 
 
 			if(rowLabelOption != LabelExportOption.NO) {
 				ls.setStatus("Exporting row labels ...");

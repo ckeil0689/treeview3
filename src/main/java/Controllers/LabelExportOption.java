@@ -17,7 +17,7 @@ public enum LabelExportOption {
 	private LabelExportOption(String toString) {
 		this.toString = toString;
 	}
-	
+	 
 	@Override
 	public String toString() {
 		return toString;
