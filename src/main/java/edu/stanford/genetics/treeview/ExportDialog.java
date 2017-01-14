@@ -938,7 +938,9 @@ public class ExportDialog extends CustomDialog {
 			LabelExportOption leo =
 					LabelExportOption.getLabelExportOption(option.getText());
 			boolean enabled = true;
-			if(!isDocFormat && rowLabelsTooBig && leo != LabelExportOption.NO) {
+			if((!selectionsExist && leo == LabelExportOption.SELECTION) ||
+				(!isDocFormat && rowLabelsTooBig && leo != LabelExportOption.NO)) {
+
 				enabled = false;
 			}
 			if(!enabled && option.isSelected()) {
@@ -991,7 +993,8 @@ public class ExportDialog extends CustomDialog {
 			LabelExportOption leo =
 					LabelExportOption.getLabelExportOption(option.getText());
 			boolean enabled = true;
-			if(!isDocFormat && colLabelsTooBig && leo != LabelExportOption.NO) {
+			if((!selectionsExist && leo == LabelExportOption.SELECTION) ||
+				(!isDocFormat && colLabelsTooBig && leo != LabelExportOption.NO)) {
 				enabled = false;
 			}
 			if(!enabled && option.isSelected()) {

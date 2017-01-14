@@ -1867,6 +1867,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		Font tmpFont = new Font(labelAttr.getFace(),labelAttr.getStyle(),
 			fontSize);
 		FontMetrics fm = getFontMetrics(tmpFont);
+		//Calling this because it updates longest_str (which may not have been calculated if labels were never drawn on the screen)
+		getMaxStringLength(fm);
 		int maxStrLen = fm.stringWidth(labelAttr.getLongestStr());
 
 		if(selected) {
@@ -3301,15 +3303,29 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		final Graphics2D g2d = (Graphics2D) g;
 
+		//Turn on anti-aliasing so the text looks better
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+
+		//TODO: There is a bug in here somewhere where something isn't getting initialized properly. It might be in a method that calls this method.  When row labels are printed, they are not getting their initial y starting coordinate correct IF THE USER HAS NOT HOVERED OVER A LABEL LINKED VIEW
+		Font exportFont = new Font(labelAttr.getFace(),
+				labelAttr.getStyle(),fontSize);
+		final FontMetrics metrics = getFontMetrics(exportFont);
+		int xSize = getMaxStringLength(metrics);
+		final int ascent = metrics.getAscent();
+
 		/* Rotate plane for array axis (not for zoomHint) */
-		orientLabelPane(g2d);
+		/* TODO: Make this an abstract method in LabelView and put this code in columnlabelview, passing it coordinates it needs for placement */
+		//orientLabelPane(g2d);
+		if(isAColumnPane()) {
+			g2d.rotate(Math.PI * 3 / 2);
+			//The following takes advantage of the fact that the trees are always the same height, which it uses to get the row label width
+			g2d.translate(-xIndent-yIndent-xSize,xIndent-yIndent);
+			//g2d.translate(-offscreenSize.height,0);
+		}
 
 		final int start = map.getMinIndex();
 		final int end = map.getMaxIndex();
-		Font exportFont = new Font(labelAttr.getFace(),
-			labelAttr.getStyle(),fontSize);
-		final FontMetrics metrics = getFontMetrics(exportFont);
-		final int ascent = metrics.getAscent();
 
 		//Labels are always drawn horizontally.  orientLabelPane does its magic
 		//to rotate the whole thing, so we don't have to worry about it.  Thus
@@ -3318,9 +3334,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//yPos and xPos are assumed to start at 0.
 		int yPos = yIndent;
 		int yOffset = (int) Math.floor((double) size / 2.0);
-		int ySize = map.getTotalTileNum() * size;
 		int xPos = xIndent;
-		int xSize = getMaxStringLength(metrics);
 
 		//This really just defines the size of the drawing area
 		//g.clearRect(0,0,xSize,ySize);
@@ -3369,6 +3383,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					xPos += (xSize - metrics.stringWidth(out));
 				}
 
+				if(isAColumnPane()) {
+					LogBuffer.println("Drawing column label [" + out + "] at x[" + xPos + "] y[" + (yPos + yOffset + (ascent / 2)) + "]");
+				}
 				g2d.drawString(out,xPos,yPos + yOffset + (ascent / 2));
 
 //				drawOverrunArrows(metrics.stringWidth(out),g,

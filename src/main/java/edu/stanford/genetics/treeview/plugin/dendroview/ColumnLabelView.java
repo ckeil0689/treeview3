@@ -61,8 +61,9 @@ public class ColumnLabelView extends LabelView {
 
 	@Override
 	public void orientLabelPane(Graphics2D g2d) {
+		LogBuffer.println("Rotating the column label coord system");
 		g2d.rotate(Math.PI * 3 / 2);
-		g2d.translate(-offscreenSize.height, 0);
+		g2d.translate(-offscreenSize.height,0);
 	}
 
 	/**
@@ -72,8 +73,8 @@ public class ColumnLabelView extends LabelView {
 	 * exported image)
 	 */
 	public void unOrientLabelPane(Graphics2D g2d) {
+		g2d.translate(offscreenSize.height,0);
 		g2d.rotate(-Math.PI * 3 / 2);
-		g2d.translate(offscreenSize.height, 0);
 	}
 
 	@Override

@@ -855,32 +855,6 @@ public class ExportHandler {
 					region,showSelections);
 			}
 
-//			if(colLabelOption != LabelExportOption.NO) {
-//				ls.setStatus("Exporting column labels ...");
-//				publish(ls);
-//
-//				//Determine how long the labels are
-//				FontMetrics fm =
-//					dendroView.getColLabelView().getFontMetrics(g2d.getFont());
-//				int labelLength =
-//					dendroView.getColLabelView().getMaxStringLength(fm);
-//
-//				dendroView.getColLabelView().export(g2d,
-//					(dendroView.getRowTreeView().treeExists() ?
-//						treesHeight + gapSize : 0) +
-//					(rowLabelOption != LabelExportOption.NO ?
-//						labelLength + gapSize : 0),
-//					(dendroView.getColumnTreeView().treeExists() ?
-//						treesHeight + gapSize : 0),
-//					tileWidth,region,showSelections,
-//					colLabelOption == LabelExportOption.SELECTION,
-//					labelAreaHeight - SQUEEZE);
-//			}
-//			if(isCancelled()) {
-//				setExportSuccessful(false);
-//				return;
-//			}
-
 			if(dendroView.getRowTreeView().treeExists()) {
 				ls.setStatus("Exporting row tree ...");
 				publish(ls);
@@ -899,20 +873,47 @@ public class ExportHandler {
 
 				//Determine how long the labels are
 				FontMetrics fm =
+					dendroView.getColLabelView().getFontMetrics(g2d.getFont());
+				int labelLength =
+					dendroView.getColLabelView().getMaxStringLength(fm);
+
+				dendroView.getRowLabelView().export(g2d,
+					(dendroView.getRowTreeView().treeExists() ?
+						treesHeight + gapSize : 0),
+					(dendroView.getColumnTreeView().treeExists() ?
+						treesHeight + gapSize : 0) +
+					(colLabelOption != LabelExportOption.NO ?
+						labelLength + gapSize : 0),
+					tileWidth,region,showSelections,
+					rowLabelOption == LabelExportOption.SELECTION,
+					labelAreaHeight - SQUEEZE);
+			}
+
+			//Doing the column labels last because it rotates the coordinate system and I'm not certain how to unrotate it
+			if(colLabelOption != LabelExportOption.NO) {
+				ls.setStatus("Exporting column labels ...");
+				publish(ls);
+
+				//Determine how long the labels are
+				FontMetrics fm =
 					dendroView.getRowLabelView().getFontMetrics(g2d.getFont());
 				int labelLength =
 					dendroView.getRowLabelView().getMaxStringLength(fm);
 
-				dendroView.getRowLabelView().export(g2d,
-					(dendroView.getColumnTreeView().treeExists() ?
-						treesHeight + gapSize : 0) +
-						(colLabelOption != LabelExportOption.NO ?
-							labelLength + gapSize : 0),
+				dendroView.getColLabelView().export(g2d,
 					(dendroView.getRowTreeView().treeExists() ?
+						treesHeight + gapSize : 0) +
+					(rowLabelOption != LabelExportOption.NO ?
+						labelLength + gapSize : 0),
+					(dendroView.getColumnTreeView().treeExists() ?
 						treesHeight + gapSize : 0),
 					tileWidth,region,showSelections,
-					rowLabelOption == LabelExportOption.SELECTION,
+					colLabelOption == LabelExportOption.SELECTION,
 					labelAreaHeight - SQUEEZE);
+			}
+			if(isCancelled()) {
+				setExportSuccessful(false);
+				return;
 			}
 
 			ls.setStatus("Preparing to open the file in the default system " +
