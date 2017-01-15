@@ -3,11 +3,8 @@
  */
 package Controllers;
 
-import edu.stanford.genetics.treeview.AspectType;
-
 /**
  * The export file formats supported.
- * @author rleach
  */
 public enum LabelExportOption {
 	YES("Yes"),NO("No"),SELECTION("Selection");
