@@ -541,6 +541,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	abstract public void orientLabelPane(Graphics2D g2d);
 
+	abstract public void orientLabelsForExport(Graphics2D g2d,
+		final int xIndent,final int yIndent,final int longestXLabelLen);
+
 	abstract public void orientHintPane(Graphics2D g2d);
 
 	/**
@@ -3305,9 +3308,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		//Turn on anti-aliasing so the text looks better
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+			RenderingHints.VALUE_ANTIALIAS_ON);
 
-		//TODO: There is a bug where something iIndent isn't getting initialized properly in a method that calls this method.  When row labels are printed, they are not getting their initial y starting coordinate correct IF THE USER HAS NOT HOVERED OVER A LABEL LINKED VIEW
 		Font exportFont = new Font(labelAttr.getFace(),
 				labelAttr.getStyle(),fontSize);
 		final FontMetrics metrics = getFontMetrics(exportFont);
@@ -3315,14 +3317,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		final int ascent = metrics.getAscent();
  
 		/* Rotate plane for array axis (not for zoomHint) */
-		/* TODO: Make this an abstract method in LabelView and put this code in columnlabelview, passing it coordinates it needs for placement */
-		//orientLabelPane(g2d);
-		if(isAColumnPane()) {
-			g2d.rotate(Math.PI * 3 / 2);
-			//The following takes advantage of the fact that the trees are always the same height, which it uses to get the row label width
-			g2d.translate(-xIndent-yIndent-xSize,xIndent-yIndent);
-			//g2d.translate(-offscreenSize.height,0);
-		}
+		orientLabelsForExport(g2d,xIndent,yIndent,xSize);
 
 		final int start = map.getMinIndex();
 		final int end = map.getMaxIndex();

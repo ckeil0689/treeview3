@@ -125,6 +125,9 @@ public class RowLabelView extends LabelView {
 	@Override
 	public void orientLabelPane(Graphics2D g2d) {}
 
+	public void orientLabelsForExport(Graphics2D g2d,final int xIndent,
+		final int yIndent,final int longestLabelLen) {}
+
 	@Override
 	public void orientHintPane(Graphics2D g2d) {
 		g2d.rotate(Math.PI * 3 / 2);
