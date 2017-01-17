@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 
 import Controllers.ExportHandler;
 import Controllers.FormatType;
+import Controllers.LabelExportOption;
 import Controllers.RegionType;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
@@ -246,9 +247,11 @@ public class ExportDialogController {
 
 			FormatType selFormat = exportOptions.getFormatType();
 			RegionType selRegion = exportOptions.getRegionType();
+			AspectType selAspect = exportOptions.getAspectType();
+			LabelExportOption selCols = exportOptions.getColLabelOption();
 
 			exportDialog.updateRowLabelBtns(selFormat.isDocumentFormat(),
-				selRegion);
+				selRegion,selAspect,selCols);
 		}
 	}
  
@@ -259,9 +262,11 @@ public class ExportDialogController {
 
 			FormatType selFormat = exportOptions.getFormatType();
 			RegionType selRegion = exportOptions.getRegionType();
+			AspectType selAspect = exportOptions.getAspectType();
+			LabelExportOption selRows = exportOptions.getColLabelOption();
 
 			exportDialog.updateColLabelBtns(selFormat.isDocumentFormat(),
-				selRegion);
+				selRegion,selAspect,selRows);
 		}
 	}
 

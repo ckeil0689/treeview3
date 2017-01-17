@@ -31,6 +31,7 @@ import org.freehep.graphicsio.PageConstants;
 import Controllers.ExportHandler;
 import Controllers.FormatType;
 import Controllers.RegionType;
+import Controllers.TreeExportOption;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Controllers.ExportHandler.ExportWorker;
@@ -69,7 +70,7 @@ public class ExportDialog extends CustomDialog {
 	private ExportHandler eh;
 
 	public ExportDialog(final boolean selectionsExist, final ExportHandler eh) {
-		
+
 		super("Export");
 		this.eh = eh;
 		final boolean useMinimums = true;
@@ -91,13 +92,16 @@ public class ExportDialog extends CustomDialog {
 		this.colLabelsTooBig = getDefaultFormatType().isDocumentFormat() ?
 			false : eh.areColLabelsTooBig(
 				getDefaultRegion(getDefaultFormatType()));
-		
+
 		this.gapsize = eh.getGapSize(); //Minimum gap size
-		
+
 		this.bgWidth = PAPER_LONGSIDELEN;
 		this.bgHeight = PAPER_LONGSIDELEN;
-		
+
 		setupLayout();
+
+		//This will cause a cascade of updates
+		updateRegionRadioBtns(getDefaultFormatType().isDocumentFormat());
 	}
 
 	@Override
@@ -751,7 +755,7 @@ public class ExportDialog extends CustomDialog {
 		
 		/* (!)
 		 * Using int casts throughout this method instead of Math methods,
-		 * because plain truncating is fine. 
+		 * because plain truncating is fine.
 		 */
 		int availBgWidth = (int) bgSize.getWidth();
 		int availBgHeight = (int) bgSize.getHeight();
@@ -823,6 +827,13 @@ public class ExportDialog extends CustomDialog {
 		boolean changeSelected = false;
 		RegionType selectedRegion = null;
 
+		//Set minimum options in order to determine whether region options should be disabled
+		eh.setRowLabelsIncluded(LabelExportOption.NO);
+		eh.setColLabelsIncluded(LabelExportOption.NO);
+		eh.setRowTreeIncluded(TreeExportOption.AUTO);
+		eh.setColTreeIncluded(TreeExportOption.AUTO);
+		eh.setTileAspectRatio(AspectType.ONETOONE);
+
 		//Check if region radio buttons need to be disabled/enabled based on
 		//selected region
 		while(rBtns.hasMoreElements()) {
@@ -876,7 +887,7 @@ public class ExportDialog extends CustomDialog {
 
 		//The aspect radio buttons should be updated based on the selected
 		//region
-		updateAspectRadioBtns(isDocFormat, selectedRegion);
+		updateAspectRadioBtns(isDocFormat,selectedRegion);
 	}
 
 	/**
@@ -889,9 +900,14 @@ public class ExportDialog extends CustomDialog {
 	public void updateAspectRadioBtns(final boolean isDocFormat,
 		final RegionType selectedRegion) {
 
+		eh.setRowLabelsIncluded(LabelExportOption.NO);
+		eh.setColLabelsIncluded(LabelExportOption.NO);
+		eh.setRowTreeIncluded(TreeExportOption.AUTO);
+		eh.setColTreeIncluded(TreeExportOption.AUTO);
 		Enumeration<AbstractButton> aBtns = aspectRadioBtns.getElements();
 		boolean changeSelected = false;
 		List<AspectType> bigAsps = new ArrayList<AspectType>();
+		AspectType selectedAspect = AspectType.getDefault();
 
 		//Check if aspect radio buttons need to be disabled/enabled based on
 		//selected region
@@ -900,11 +916,15 @@ public class ExportDialog extends CustomDialog {
 			AspectType asp = AspectType.getAspect(option.getText());
 			eh.setTileAspectRatio(asp);
 			eh.setCalculatedDimensions(selectedRegion);
+			LogBuffer.println("Dimensions for aspect " + asp.toString() + ": X" + eh.getXDim(selectedRegion) + " by Y" + eh.getYDim(selectedRegion));
 			final boolean tooBig = eh.isOversized(selectedRegion);
 			if(tooBig) {
 				bigAsps.add(asp);
 			}
 			final boolean enabled = isDocFormat || !tooBig;
+			if(option.isSelected()) {
+				selectedAspect = asp;
+			}
 			if(!enabled && option.isSelected()) {
 				option.setSelected(false);
 				changeSelected = true;
@@ -913,7 +933,7 @@ public class ExportDialog extends CustomDialog {
 			if(enabled) {
 				option.setToolTipText(null);
 			} else {
-				option.setToolTipText("Too big for PNG/JPG/PPM export");
+				option.setToolTipText("Too big for image export");
 			}
 		}
 
@@ -933,22 +953,57 @@ public class ExportDialog extends CustomDialog {
 					AspectType asp = AspectType.getAspect(option.getText());
 					if(asp == defAsp) {
 						option.setSelected(true);
+						selectedAspect = asp;
 					}
 				}
 			}
 		}
+
+		//Get the current selected column label option
+		Enumeration<AbstractButton> cBtns = colLabelBtns.getElements();
+		LabelExportOption selectedCLEO = LabelExportOption.getDefault();
+		while(cBtns.hasMoreElements()) {
+			AbstractButton option = cBtns.nextElement();
+			if(option.isSelected()) {
+				selectedCLEO =
+					LabelExportOption.getLabelExportOption(option.getText());
+				break;
+			}
+		}
+
+		//The label buttons should be updated based on the selected
+		//format, region, and aspect (and column/row labels)
+		updateRowLabelBtns(isDocFormat,selectedRegion,selectedAspect,selectedCLEO);
+
+		//Get the current selected column label option
+		Enumeration<AbstractButton> rBtns = rowLabelBtns.getElements();
+		LabelExportOption selectedRLEO = LabelExportOption.getDefault();
+		while(rBtns.hasMoreElements()) {
+			AbstractButton option = rBtns.nextElement();
+			if(option.isSelected()) {
+				selectedRLEO =
+					LabelExportOption.getLabelExportOption(option.getText());
+				break;
+			}
+		}
+
+		updateColLabelBtns(isDocFormat,selectedRegion,selectedAspect,selectedRLEO);
 	}
 
 	/* TODO: Make sure this takes inclusion of trees into account */
 	public void updateRowLabelBtns(final boolean isDocFormat,
-		final RegionType selectedRegion) {
+		final RegionType selectedRegion,final AspectType selectedAsp,
+		final LabelExportOption selectedColLEO) {
 
 		Enumeration<AbstractButton> rlBtns = rowLabelBtns.getElements();
 		boolean changeSelected = false;
 
+		eh.setTileAspectRatio(selectedAsp);
+		eh.setColLabelsIncluded(selectedColLEO);
 		//Any labels included uses the same image space, so we only need to test 1 option that includes labels
 		eh.setRowLabelsIncluded(LabelExportOption.YES);
 		eh.setCalculatedDimensions(selectedRegion);
+		LogBuffer.println("Dimensions when including row labels: X" + eh.getXDim(selectedRegion) + " by Y" + eh.getYDim(selectedRegion) + " and each label's font space is: " + eh.getLabelAreaHeight());
 		rowLabelsTooBig = eh.areRowLabelsTooBig(selectedRegion);
 
 		//Check if row label buttons need to be disabled/enabled based on
@@ -970,6 +1025,8 @@ public class ExportDialog extends CustomDialog {
 			option.setEnabled(enabled);
 			if(enabled) {
 				option.setToolTipText(null);
+			} else if(!selectionsExist && leo == LabelExportOption.SELECTION) {
+				option.setToolTipText("No selection has been made");
 			} else {
 				option.setToolTipText("Too big for image export");
 			}
@@ -996,11 +1053,14 @@ public class ExportDialog extends CustomDialog {
 
 	/* TODO: Make sure this takes inclusion of trees into account */
 	public void updateColLabelBtns(final boolean isDocFormat,
-		final RegionType selectedRegion) {
+		final RegionType selectedRegion,final AspectType selectedAsp,
+		final LabelExportOption selectedRowLEO) {
 
 		Enumeration<AbstractButton> clBtns = colLabelBtns.getElements();
 		boolean changeSelected = false;
 
+		eh.setTileAspectRatio(selectedAsp);
+		eh.setColLabelsIncluded(selectedRowLEO);
 		//Any labels included uses the same image space, so we only need to test 1 option that includes labels
 		eh.setColLabelsIncluded(LabelExportOption.YES);
 		eh.setCalculatedDimensions(selectedRegion);
@@ -1024,6 +1084,8 @@ public class ExportDialog extends CustomDialog {
 			option.setEnabled(enabled);
 			if(enabled) {
 				option.setToolTipText(null);
+			} else if(!selectionsExist && leo == LabelExportOption.SELECTION) {
+				option.setToolTipText("No selection has been made");
 			} else {
 				option.setToolTipText("Too big for image export");
 			}
@@ -1081,9 +1143,9 @@ public class ExportDialog extends CustomDialog {
 			exportFileName.setFocusable(true);
 			cancelButton = GUIFactory.createSquareBtn("cancel", 15);
 			jpb = new JProgressBar();
-	        mainPanel.add(label,"push, grow, w 375, wrap");
-	        mainPanel.add(jpb, "push, grow, split 2, gapright 15,  w 300!,  h 25!");
-	        mainPanel.add(cancelButton, "push, grow, w 75!, h 25!, wrap");
+			mainPanel.add(label,"push, grow, w 375, wrap");
+			mainPanel.add(jpb, "push, grow, split 2, gapright 15,  w 300!,  h 25!");
+			mainPanel.add(cancelButton, "push, grow, w 75!, h 25!, wrap");
 			mainPanel.add(exportFileName,"push, grow, w 390!, wrap");
 			getContentPane().add(mainPanel);
 			this.setResizable(false);

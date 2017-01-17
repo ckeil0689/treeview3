@@ -86,8 +86,8 @@ public class ExportHandler {
 	 * tile is, the relatively more narrow the tree lines are */
 	protected int minTileDim = 3; //Min number of "points" for a tile's edge
 	protected int curMinTileDim = minTileDim; //Changed by label height
-	protected int tileHeight = 3; //Number of "points" for a tile's height
-	protected int tileWidth = 3; //Number of "points" for a tile's width
+	protected int tileHeight = curMinTileDim; //Number of "points" for a tile's height
+	protected int tileWidth = curMinTileDim; //Number of "points" for a tile's width
 
 	protected int minGapSize = 5; //Min number of "points" bet tree/matrix
 	protected int gapSize = 20; //Number of "points" bet tree/matrix
@@ -97,7 +97,7 @@ public class ExportHandler {
 	protected LabelExportOption colLabelsIncluded = LabelExportOption.NO;
 	protected TreeExportOption rowTreeIncluded = TreeExportOption.AUTO;
 	protected TreeExportOption colTreeIncluded = TreeExportOption.AUTO;
-	protected int minFontPoints = 12;
+	protected int minFontPoints = 1;
 	protected final static int SQUEEZE = LabelView.getSqueeze(); //static
 	protected int labelAreaHeight = minFontPoints + SQUEEZE; //Hght for 1 label
 	protected int maxRowLabelLength = 0;
@@ -1296,7 +1296,9 @@ public class ExportHandler {
 		try {
 			setLabelAreaHeight(
 				dendroView.getRowLabelView().getMinLabelAreaHeight());
-		} finally {
+			LogBuffer.println("updateForLabelSize: getMinLabelAreaHeight: " + labelAreaHeight);
+			LogBuffer.println("updateForLabelSize: rowLabelsIncluded: " + areRowLabelsIncluded());
+		} catch(Exception e) {
 			setLabelAreaHeight(minFontPoints + SQUEEZE);
 		}
 		if(areColLabelsIncluded() || areRowLabelsIncluded()) {
@@ -1329,5 +1331,6 @@ public class ExportHandler {
 		} else {
 			maxRowLabelLength = 0;
 		}
+		LogBuffer.println("updateForLabelSize: current minimum tile dim: " + curMinTileDim);
 	}
 }

@@ -6,10 +6,10 @@ import Controllers.ExportHandler;
 import Controllers.FormatType;
 import Controllers.LabelExportOption;
 import Controllers.RegionType;
+import Controllers.TreeExportOption;
 
 /**
  * This class holds and manages selected export options.
- * @author CKeil
  *
  */
 public class ExportOptions {
@@ -22,6 +22,8 @@ public class ExportOptions {
 	private boolean showSelections;
 	private LabelExportOption rowLabelOption;
 	private LabelExportOption colLabelOption;
+	private TreeExportOption rowTreeOption;
+	private TreeExportOption colTreeOption;
 	
 	public ExportOptions() {
 		
@@ -31,6 +33,11 @@ public class ExportOptions {
 		this.aspectType = AspectType.getDefault();
 		this.orientation = ExportHandler.getDefaultPageOrientation();
 		this.showSelections = false;
+		this.rowLabelOption = LabelExportOption.getDefault();
+		this.colLabelOption = LabelExportOption.getDefault();
+		//This currently never changes
+		this.rowTreeOption = TreeExportOption.getDefault();
+		this.colTreeOption = TreeExportOption.getDefault();
 	}
 	
 	public FormatType getFormatType() {
@@ -119,5 +126,21 @@ public class ExportOptions {
 	 */
 	public void setColLabelOption(LabelExportOption colLabelOption) {
 		this.colLabelOption = colLabelOption;
+	}
+
+	public TreeExportOption getRowTreeOption() {
+		return rowTreeOption;
+	}
+
+	public void setRowTreeOption(TreeExportOption rowTreeOption) {
+		this.rowTreeOption = rowTreeOption;
+	}
+
+	public TreeExportOption getColTreeOption() {
+		return colTreeOption;
+	}
+
+	public void setColTreeOption(TreeExportOption colTreeOption) {
+		this.colTreeOption = colTreeOption;
 	}
 }
