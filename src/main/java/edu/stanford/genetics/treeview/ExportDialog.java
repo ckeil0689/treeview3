@@ -120,11 +120,22 @@ public class ExportDialog extends CustomDialog {
 		
 		JLabel format = GUIFactory.createLabel("Format:",GUIFactory.FONTS);
 		JLabel paper = GUIFactory.createLabel("Paper Size:",GUIFactory.FONTS);
-		JLabel matrix = GUIFactory.createLabel("Matrix:",GUIFactory.FONTS);
-		JLabel aspect = GUIFactory.createLabel("Tile Aspect:",GUIFactory.FONTS);
 		JLabel orient = GUIFactory.createLabel("Orientation:",GUIFactory.FONTS);
-		JLabel rlabel = GUIFactory.createLabel("Row Labels:",GUIFactory.FONTS);
-		JLabel clabel = GUIFactory.createLabel("Col Labels:",GUIFactory.FONTS);
+
+		JLabel matrix = GUIFactory.createLabel("<HTML><U>Matrix</U></HTML>",GUIFactory.FONTS);
+		JLabel region = GUIFactory.createLabel("Region:",GUIFactory.FONTS);
+		JLabel aspect = GUIFactory.createLabel("Tile Aspect:",GUIFactory.FONTS);
+
+		JLabel labels = GUIFactory.createLabel("<HTML><U>Labels</U></HTML>",GUIFactory.FONTS);
+		JLabel rlabel = GUIFactory.createLabel("Row:",GUIFactory.FONTS);
+		JLabel clabel = GUIFactory.createLabel("Column:",GUIFactory.FONTS);
+
+		JLabel selecs = GUIFactory.createLabel("<HTML><U>Selections</U></HTML>",GUIFactory.FONTS);
+		JLabel showsl = GUIFactory.createLabel("Show:",GUIFactory.FONTS);
+
+		JLabel spacer1 = GUIFactory.createLabel(" ",GUIFactory.FONTS);
+		JLabel spacer2 = GUIFactory.createLabel(" ",GUIFactory.FONTS);
+		JLabel spacer3 = GUIFactory.createLabel(" ",GUIFactory.FONTS);
 
 		FormatType selectedFormat = FormatType.getDefault();
 		if(eh.isImageExportPossible()) {
@@ -150,7 +161,7 @@ public class ExportDialog extends CustomDialog {
 		this.rowLabelBtns = new ButtonGroup();
 		this.colLabelBtns = new ButtonGroup();
 
-		this.selectionsBox = new JCheckBox("Show Selections");
+		this.selectionsBox = new JCheckBox("");
 		selectionsBox.setEnabled(selectionsExist);
 		if(!selectionsExist) {
 			selectionsBox.setToolTipText("No data selected");
@@ -171,19 +182,28 @@ public class ExportDialog extends CustomDialog {
 		optionsPanel.add(orient, "label");
 		optionsPanel.add(orientBox, "growx, span, wrap");
 
-		optionsPanel.add(matrix, "label, aligny 0");
+		optionsPanel.add(spacer1,"wrap");
+
+		optionsPanel.add(matrix,"align right, wrap");
+		optionsPanel.add(region, "label, aligny 0");
 		RegionType selectedRegion = addRegionRadioButtons(optionsPanel,
 			selectedFormat);
 
 		optionsPanel.add(aspect, "label, aligny 0");
 		addAspectRadioButtons(optionsPanel,selectedRegion,selectedFormat);
 
+		optionsPanel.add(spacer2,"wrap");
+
+		optionsPanel.add(labels,"align right, wrap");
 		optionsPanel.add(rlabel, "label, aligny 0");
 		addRowLabelButtons(optionsPanel,selectedFormat);
-
 		optionsPanel.add(clabel, "label, aligny 0");
 		addColLabelButtons(optionsPanel,selectedFormat);
 
+		optionsPanel.add(spacer3,"wrap");
+
+		optionsPanel.add(selecs,"align right, wrap");
+		optionsPanel.add(showsl, "label, aligny 0");
 		optionsPanel.add(selectionsBox,"span");
 
 		contentPanel.add(previewPanel, "grow, w 500!, h 500!");
