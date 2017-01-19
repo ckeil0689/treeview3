@@ -388,7 +388,7 @@ public class ExportHandler {
 		//And adjusting using: treeMatrixGapMin,minTileDim,minTreeHeight
 
 		//Update various dimensions to account for labels (if they're included)
-		updateForLabelSize();
+		updateForLabelSize(region);
 
 		//First, we'll calculate the tile dimensions
 		if(aspectRatio > 1.0) {
@@ -676,12 +676,10 @@ public class ExportHandler {
 	}
 
 	public int getTreesHeight() {
-
 		return treesHeight;
 	}
 
 	public int getGapSize() {
-
 		return gapSize;
 	}
 
@@ -867,13 +865,10 @@ public class ExportHandler {
 				publish(ls);
 
 				//Determine how long the labels are
-				//We need to set the size of the exported font explicitly to find out how long the column label area is just in case the user has not triggered this update yet by hovering over a label linked view.  If we didn't use this, the yIndent sent to the export method would be off.
-				LabelAttributes la = dendroView.getColLabelView().getLabelAttributes();
-				Font exportFont = new Font(la.getFace(),la.getStyle(),labelAreaHeight - SQUEEZE);
-				FontMetrics fm =
-					dendroView.getColLabelView().getFontMetrics(exportFont);
 				int labelLength =
-					dendroView.getColLabelView().getMaxStringLength(fm);
+					dendroView.getColLabelView().getMaxExportStringLength(region,
+						colLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE);
+				LogBuffer.println("Longest col label length: " + labelLength + " Trees height: " + treesHeight + " Gap size: " + gapSize);
 
 				dendroView.getRowLabelView().export(g2d,
 					(isRowTreeIncluded() ?
@@ -882,7 +877,7 @@ public class ExportHandler {
 						treesHeight + gapSize : 0) +
 					(colLabelOption != LabelExportOption.NO ?
 						labelLength + gapSize : 0),
-					tileWidth,region,showSelections,
+					tileHeight,region,showSelections,
 					rowLabelOption == LabelExportOption.SELECTION,
 					labelAreaHeight - SQUEEZE);
 			}
@@ -893,10 +888,10 @@ public class ExportHandler {
 				publish(ls);
 
 				//Determine how long the labels are
-				FontMetrics fm =
-					dendroView.getRowLabelView().getFontMetrics(g2d.getFont());
 				int labelLength =
-					dendroView.getRowLabelView().getMaxStringLength(fm);
+					dendroView.getRowLabelView().getMaxExportStringLength(region,
+						rowLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE);
+				LogBuffer.println("Longest row label length: " + labelLength + " Trees height: " + treesHeight + " Gap size: " + gapSize);
 
 				dendroView.getColLabelView().export(g2d,
 					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
@@ -1288,16 +1283,14 @@ public class ExportHandler {
 	 * labelAreaHeight and cutMinTileDim (if labels are included).
 	 * Adds 1 to cutMinTileDim if the height is less than 10 and even, so that
 	 * the tree branch and label will look centered on the tile
-	 * @param labelAreaHeight the labelAreaHeight to set
+	 * @param region the region whose labels are being exported
 	 */
-	public void updateForLabelSize() {
+	public void updateForLabelSize(RegionType rt) {
 		//Label height is the same for both row and column labels, so we're arbitrarily
 		//grabbing the row view's label height
 		try {
 			setLabelAreaHeight(
 				dendroView.getRowLabelView().getMinLabelAreaHeight());
-			LogBuffer.println("updateForLabelSize: getMinLabelAreaHeight: " + labelAreaHeight);
-			LogBuffer.println("updateForLabelSize: rowLabelsIncluded: " + areRowLabelsIncluded());
 		} catch(Exception e) {
 			setLabelAreaHeight(minFontPoints + SQUEEZE);
 		}
@@ -1313,10 +1306,10 @@ public class ExportHandler {
 		//Update the height of the col label area
 		if(getColLabelsIncluded() == LabelExportOption.YES) {
 			maxColLabelLength =
-				dendroView.getColLabelView().getMaxExportStringLength(false);
+				dendroView.getColLabelView().getMaxExportStringLength(rt,false,labelAreaHeight - SQUEEZE);
 		} else if(getColLabelsIncluded() == LabelExportOption.SELECTION) {
 			maxColLabelLength =
-				dendroView.getColLabelView().getMaxExportStringLength(true);
+				dendroView.getColLabelView().getMaxExportStringLength(rt,true,labelAreaHeight - SQUEEZE);
 		} else {
 			maxColLabelLength = 0;
 		}
@@ -1324,10 +1317,10 @@ public class ExportHandler {
 		//Update the height of the row label area
 		if(getRowLabelsIncluded() == LabelExportOption.YES) {
 			maxRowLabelLength =
-				dendroView.getRowLabelView().getMaxExportStringLength(false);
+				dendroView.getRowLabelView().getMaxExportStringLength(rt,false,labelAreaHeight - SQUEEZE);
 		} else if(getRowLabelsIncluded() == LabelExportOption.SELECTION) {
 			maxRowLabelLength =
-				dendroView.getRowLabelView().getMaxExportStringLength(true);
+				dendroView.getRowLabelView().getMaxExportStringLength(rt,true,labelAreaHeight - SQUEEZE);
 		} else {
 			maxRowLabelLength = 0;
 		}

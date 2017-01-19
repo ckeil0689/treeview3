@@ -120,6 +120,7 @@ public class ExportDialogController {
 				eh.setTileAspectRatio(exportOptions.getAspectType());
 				eh.setColLabelsIncluded(exportOptions.getColLabelOption());
 				eh.setRowLabelsIncluded(exportOptions.getRowLabelOption());
+				eh.setCalculatedDimensions(exportOptions.getRegionType());
 				boolean exportSucess = eh.export(exportOptions.getFormatType(),
 					exportFilename,
 					exportOptions.getRegionType(),

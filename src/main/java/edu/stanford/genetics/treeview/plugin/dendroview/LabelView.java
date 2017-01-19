@@ -1865,22 +1865,54 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		return(maxStrLen);
 	}
 
-	public int getMaxExportStringLength(final boolean selected) {
-		int fontSize = getMinLabelAreaHeight() - SQUEEZE;
+	/**
+	 * Find the length of the longest exported label
+	 * @param rt
+	 * @param selected
+	 * @return
+	 */
+	public int getMaxExportStringLength(RegionType rt,final boolean selected,final int fontSize) {
+		int start = 0;
+		int end = 0;
+		//Error check the parameters sent in
+		if(rt == RegionType.ALL) {
+			start = map.getMinIndex();
+			end = map.getMaxIndex();
+		} else if(rt == RegionType.VISIBLE) {
+			start = map.getFirstVisible();
+			end = map.getLastVisible();
+		} else if(rt == RegionType.SELECTION) {
+			start = drawSelection.getMinIndex();
+			end = drawSelection.getMaxIndex();
+		} else {
+			LogBuffer.println("ERROR: Invalid region type.");
+			return(0);
+		}
+		if(selected && drawSelection.getNSelectedIndexes() == 0) {
+			return(0);
+		}
+
+		//Establish the export font size
 		Font tmpFont = new Font(labelAttr.getFace(),labelAttr.getStyle(),
 			fontSize);
 		FontMetrics fm = getFontMetrics(tmpFont);
-		//Calling this because it updates longest_str (which may not have been calculated if labels were never drawn on the screen)
-		getMaxStringLength(fm);
-		int maxStrLen = fm.stringWidth(labelAttr.getLongestStr());
 
-		if(selected) {
-			maxStrLen = 0;
-			int[] selectedIndexes = drawSelection.getSelectedIndexes();
-			for(int j = 0;j < drawSelection.getNSelectedIndexes();j++) {
+		int maxStrLen = 0;
+
+		//If we want to global max string length
+		if(!selected && start == map.getMinIndex() && end == map.getMaxIndex()) {
+			//Calling this because it updates longest_str (which may not have been calculated if labels were never drawn on the screen)
+			getMaxStringLength(fm);
+			maxStrLen = fm.stringWidth(labelAttr.getLongestStr());
+		}
+		//This isn't fully implemented yet...
+		else {
+			for(int j = start;j <= end;j++) {
+				if(selected && !drawSelection.isIndexSelected(j)) {
+					continue;
+				}
 				try {
-					String out =
-						labelSummary.getSummary(labelInfo,selectedIndexes[j]);
+					String out = labelSummary.getSummary(labelInfo,j);
 
 					if(out == null) {
 						out = "No Label";
@@ -3279,30 +3311,44 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		final int size,final RegionType region,final boolean showSelections,
 		final boolean drawSelectedOnly,final int fontSize) {
 
-		if(region == RegionType.ALL) {
-			exportAll(g,xIndent,yIndent,size,showSelections,drawSelectedOnly,
-				fontSize);
-		} else if(region == RegionType.VISIBLE) {
-			exportVisible(g,xIndent,yIndent,size,showSelections);
-		} else if(region == RegionType.SELECTION) {
-			exportSelection(g,xIndent,yIndent,size,showSelections);
-		} else {
-			LogBuffer.println("ERROR: Invalid export region: [" + region +
-				"].");
-		}
+		exportRange(g,xIndent,yIndent,size,showSelections,drawSelectedOnly,
+			fontSize,region);
 	}
 
 	/**
-	 * Exports all the labels
+	 * Exports the portion of the labels corresponding to the visible portion of
+	 * the matrix
 	 *
 	 * @param g - graphics object
 	 * @param xIndent - size of the indent where to start drawing the labels
 	 * @param yIndent - size of the indent where to start drawing the labels
 	 * @param size - size of a matrix tile or rather, font height area
+	 * @param showSelections - whether of not to highlight selections
+	 * @param drawSelectedOnly - whether or not to only draw labels that are selected
+	 * @param fontSize - the size of the font to use for export
+	 * @param start - the first index to be included in the label export
+	 * @param end - the last index to include in the label export
 	 */
-	public void exportAll(final Graphics g,final int xIndent,
+	public void exportRange(final Graphics g,final int xIndent,
 		final int yIndent,final int size,final boolean showSelections,
-		final boolean drawSelectedOnly,final int fontSize) {
+		final boolean drawSelectedOnly,final int fontSize,
+		final RegionType region) {
+
+		int start = 0;
+		int end = 0;
+		if(region == RegionType.ALL) {
+			start = map.getMinIndex();
+			end = map.getMaxIndex();
+		} else if(region == RegionType.VISIBLE) {
+			start = map.getFirstVisible();
+			end = map.getLastVisible();
+		} else if(region == RegionType.SELECTION) {
+			start = drawSelection.getMinIndex();
+			end = drawSelection.getMaxIndex();
+		} else {
+			LogBuffer.println("Invalid region type.");
+			return;
+		}
 
 		final Graphics2D g2d = (Graphics2D) g;
 
@@ -3313,14 +3359,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		Font exportFont = new Font(labelAttr.getFace(),
 				labelAttr.getStyle(),fontSize);
 		final FontMetrics metrics = getFontMetrics(exportFont);
-		int xSize = getMaxStringLength(metrics);
+		int xSize = getMaxExportStringLength(region,drawSelectedOnly,fontSize);
 		final int ascent = metrics.getAscent();
  
 		/* Rotate plane for array axis (not for zoomHint) */
 		orientLabelsForExport(g2d,xIndent,yIndent,xSize);
-
-		final int start = map.getMinIndex();
-		final int end = map.getMaxIndex();
 
 		//Labels are always drawn horizontally.  orientLabelPane does its magic
 		//to rotate the whole thing, so we don't have to worry about it.  Thus
@@ -3381,9 +3424,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					xPos += (xSize - metrics.stringWidth(out));
 				}
 
-				if(isAColumnPane()) {
-					LogBuffer.println("Drawing column label [" + out + "] at x[" + xPos + "] y[" + (yPos + yOffset + (ascent / 2)) + "]");
-				}
+//				if(isAColumnPane()) {
+//					LogBuffer.println("Drawing column label [" + out + "] at x[" + xPos + "] y[" + (yPos + yOffset + (ascent / 2)) + "]");
+//				}
 				g2d.drawString(out,xPos,yPos + yOffset + (ascent / 2));
 
 //				drawOverrunArrows(metrics.stringWidth(out),g,
@@ -3398,33 +3441,5 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			yPos += size;
 		}
-	}
-
-	/**
-	 * Exports the portion of the labels corresponding to the visible portion of
-	 * the matrix
-	 *
-	 * @param g - graphics object
-	 * @param xIndent - size of the indent where to start drawing the labels
-	 * @param yIndent - size of the indent where to start drawing the labels
-	 * @param size - size of a matrix tile or rather, font height area
-	 */
-	public void exportVisible(final Graphics g,final int xIndent,
-		final int yIndent,final int size,final boolean showSelections) {
-
-	}
-
-	/**
-	 * Exports the portion of the labels corresponding to the minimum & maximum
-	 * selected portions of the matrix
-	 *
-	 * @param g - graphics object
-	 * @param xIndent - size of the indent where to start drawing the labels
-	 * @param yIndent - size of the indent where to start drawing the labels
-	 * @param size - size of a matrix tile or rather, font height area
-	 */
-	public void exportSelection(final Graphics g,final int xIndent,
-		final int yIndent,final int size,final boolean showSelections) {
-
 	}
 }
