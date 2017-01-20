@@ -3424,9 +3424,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					xPos += (xSize - metrics.stringWidth(out));
 				}
 
-//				if(isAColumnPane()) {
-//					LogBuffer.println("Drawing column label [" + out + "] at x[" + xPos + "] y[" + (yPos + yOffset + (ascent / 2)) + "]");
-//				}
 				g2d.drawString(out,xPos,yPos + yOffset + (ascent / 2));
 
 //				drawOverrunArrows(metrics.stringWidth(out),g,

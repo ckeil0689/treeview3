@@ -1292,16 +1292,12 @@ public class DendroView implements Observer, DendroPanel {
 
 	public boolean isAFinderBoxFocussed() {
 		return(rowFinderBox	.getSearchTermBox().getEditor().getEditorComponent()
-												.isFocusOwner() || colFinderBox	.getSearchTermBox()
-																												.getEditor()
-																												.getEditorComponent()
-																												.isFocusOwner());
+			.isFocusOwner() || colFinderBox	.getSearchTermBox().getEditor()
+			.getEditorComponent().isFocusOwner());
 	}
 
 	public void updateSearchTermBoxes(final LabelInfo rowHI,
-																		final LabelInfo columnHI,
-																		final MapContainer xmap,
-																		final MapContainer ymap) {
+		final LabelInfo columnHI,final MapContainer xmap,final MapContainer ymap) {
 
 		rowFinderBox.setLabelInfo(rowHI);
 		rowFinderBox.setLabelSummary(getRowLabelView().getLabelSummary());
@@ -1380,26 +1376,23 @@ public class DendroView implements Observer, DendroPanel {
 		return new ExportPreviewMatrix(image);
 	}
 
-	public ExportPreviewTrees getRowTreeSnapshot(	final boolean withSelections,
-																								RegionType region) {
+	public ExportPreviewTrees getRowTreeSnapshot(final boolean withSelections,
+		RegionType region) {
 
 		return getTreeSnapshot(rowTreeView, region, withSelections, true);
 	}
 
-	public ExportPreviewTrees getColTreeSnapshot(	final boolean withSelections,
-																								RegionType region) {
+	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections,
+		RegionType region) {
 
 		return getTreeSnapshot(colTreeView, region, withSelections, false);
 	}
 
-	private ExportPreviewTrees getTreeSnapshot(	TRView treeAxisView,
-																							RegionType region,
-																							final boolean withSelections,
-																							final boolean isRows) {
+	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
+		RegionType region,final boolean withSelections,final boolean isRows) {
 
 		if(treeAxisView == null) {
-			LogBuffer.println("Cannot generate tree snapshot. " +
-												"TRView object is null.");
+			LogBuffer.println("Cannot generate tree snapshot. TRView object is null.");
 			return new ExportPreviewTrees(null, isRows); // empty panel
 		}
 

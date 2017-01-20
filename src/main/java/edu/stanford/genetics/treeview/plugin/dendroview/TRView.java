@@ -1058,7 +1058,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	public boolean treeExists() {
 		return(treePainter != null && treePainter.getRootNode() != null);
 	}
-	
+
 	/**
 	 * Get a scaled snapshot of the trees. The snapshot will be taken in
 	 * the specified region.
@@ -1137,8 +1137,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		
 		return scaled;
 	}
-	  
-    public void setDataModel(final DataModel dataModel) {
+
+	public void setDataModel(final DataModel dataModel) {
 		
 		this.dataModel = dataModel;
 	}
