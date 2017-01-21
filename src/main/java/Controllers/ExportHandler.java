@@ -34,6 +34,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import org.freehep.graphics2d.VectorGraphics;
+import org.freehep.graphicsio.AbstractVectorGraphicsIO;
+import org.freehep.graphicsio.FontConstants;
 import org.freehep.graphicsio.PageConstants;
 import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.freehep.graphicsio.ps.PSGraphics2D;
@@ -1067,6 +1069,15 @@ public class ExportHandler {
 				Properties p = new Properties();
 				p.setProperty(PDFGraphics2D.PAGE_SIZE,pageSize.toString());
 				p.setProperty(PDFGraphics2D.ORIENTATION,defPageOrientation);
+
+				//These 3 commands are entirely what makes the labels selectable/editable
+				//in PDF and other vector formats
+				p.setProperty(PDFGraphics2D.EMBED_FONTS,"true");
+				p.setProperty(PDFGraphics2D.EMBED_FONTS_AS,
+					FontConstants.EMBED_FONTS_TYPE3);
+				p.setProperty(AbstractVectorGraphicsIO.TEXT_AS_SHAPES,
+					"false");
+
 				g.setProperties(p);
 
 				g.startExport();
