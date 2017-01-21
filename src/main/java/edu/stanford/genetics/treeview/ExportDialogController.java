@@ -76,17 +76,60 @@ public class ExportDialogController {
 	 */
 	private void setNewPreviewComponents(final ExportOptions options) {
 
+		//Obtain the dimensions of the exported image components
+		ExportHandler eh = new ExportHandler(dendroView,
+			interactiveXmap,interactiveYmap,colSelection,rowSelection);
+		eh.setDefaultPageSize(exportOptions.getPaperType());
+		eh.setDefaultPageOrientation(exportOptions.getOrientation());
+		eh.setTileAspectRatio(exportOptions.getAspectType());
+		//Temporarily setting this to false in order to test this new schema for doing the preview based on actual dimensions of the exported image
+		eh.setColLabelsIncluded(exportOptions.getColLabelOption());
+		eh.setRowLabelsIncluded(exportOptions.getRowLabelOption());
+		eh.setCalculatedDimensions(exportOptions.getRegionType());
+		int height = eh.getYDim(exportOptions.getRegionType());
+		int width = eh.getXDim(exportOptions.getRegionType());
+		int treesHeight = eh.getTreesHeight();
+		int gapSize = eh.getGapSize();
+		int rowLabelsLen = eh.getRowLabelPanelWidth(exportOptions.getRegionType(),exportOptions.getRowLabelOption());
+		int colLabelsLen = eh.getColLabelPanelHeight(exportOptions.getRegionType(),exportOptions.getColLabelOption());
+		int matrixHeight = height - (eh.isColTreeIncluded() ? treesHeight + gapSize : 0) -
+			(eh.areColLabelsIncluded() ? colLabelsLen + gapSize : 0);
+		int matrixWidth = width - (eh.isRowTreeIncluded() ? treesHeight + gapSize : 0) -
+			(eh.areRowLabelsIncluded() ? rowLabelsLen + gapSize : 0);
+
 		ExportPreviewTrees expRowTrees =
 			tvFrame.getDendroView().getRowTreeSnapshot(
-				options.isShowSelections(),options.getRegionType());
+				options.isShowSelections(),options.getRegionType(),
+				treesHeight,matrixHeight);
 		ExportPreviewTrees expColTrees =
 			tvFrame.getDendroView().getColTreeSnapshot(
-				options.isShowSelections(),options.getRegionType());
+				options.isShowSelections(),options.getRegionType(),
+				matrixWidth,treesHeight);
+		ExportPreviewLabels expRowLabels = null;
+		if(options.getRowLabelOption() != LabelExportOption.NO) {
+			expRowLabels =
+				tvFrame.getDendroView().getRowLabelsSnapshot(
+					options.isShowSelections(),options.getRegionType(),
+					rowLabelsLen,matrixHeight,
+					options.getRowLabelOption() == LabelExportOption.SELECTION,
+					eh.getTileHeight(),
+					eh.getLabelAreaHeight() - ExportHandler.SQUEEZE);
+		}
+		ExportPreviewLabels expColLabels = null;
+		if(options.getColLabelOption() != LabelExportOption.NO) {
+			expColLabels =
+				tvFrame.getDendroView().getColLabelsSnapshot(
+					options.isShowSelections(),options.getRegionType(),
+					matrixWidth,colLabelsLen,
+					options.getColLabelOption() == LabelExportOption.SELECTION,
+					eh.getTileWidth(),
+					eh.getLabelAreaHeight() - ExportHandler.SQUEEZE);
+		}
 		ExportPreviewMatrix expMatrix =
 			tvFrame.getDendroView().getMatrixSnapshot(
 				options.isShowSelections(),options.getRegionType());
 
-		exportDialog.setPreviewComponents(expRowTrees,expColTrees,expMatrix);
+		exportDialog.setPreviewComponents(expRowTrees,expColTrees,expRowLabels,expColLabels,expMatrix);
 	}
 
 	/**
@@ -112,8 +155,7 @@ public class ExportDialogController {
 			//Now export the file
 			try {
 				ExportHandler eh = new ExportHandler(dendroView,
-					interactiveXmap,
-					interactiveYmap,colSelection,rowSelection);
+					interactiveXmap,interactiveYmap,colSelection,rowSelection);
 				//TODO use and pass ExportOptions object instead
 				eh.setDefaultPageSize(exportOptions.getPaperType());
 				eh.setDefaultPageOrientation(exportOptions.getOrientation());

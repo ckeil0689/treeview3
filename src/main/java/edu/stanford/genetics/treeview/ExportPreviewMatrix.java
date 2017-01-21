@@ -66,29 +66,29 @@ public class ExportPreviewMatrix extends JPanel {
 			g2d.drawImage(img, 0, 0, null);
 		}
 	}
-	
+
 	/* Methods to manipulate image dimensions */
 	public void setMatrixWidth(final int newWidth) {
-		
+
 		this.matrixWidth = newWidth;
 	}
-	
+
 	public void setMatrixHeight(final int newHeight) {
-		
+
 		this.matrixHeight = newHeight;
 	}
-	
+
 	public void setDefaultSideLength() {
-		
+
 		this.matrixWidth = D_SIDE;
 		this.matrixHeight = D_SIDE;
 	}
-	
+
 	public int getMatrixWidth() {
-		
+
 		return(matrixWidth);
 	}
-	
+
 	public int getMatrixHeight() {
 		
 		return(matrixHeight);

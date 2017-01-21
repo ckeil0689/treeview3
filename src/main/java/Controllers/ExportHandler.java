@@ -98,7 +98,7 @@ public class ExportHandler {
 	protected TreeExportOption rowTreeIncluded = TreeExportOption.AUTO;
 	protected TreeExportOption colTreeIncluded = TreeExportOption.AUTO;
 	protected int minFontPoints = 1;
-	protected final static int SQUEEZE = LabelView.getSqueeze(); //static
+	public final static int SQUEEZE = LabelView.getSqueeze(); //static
 	protected int labelAreaHeight = minFontPoints + SQUEEZE; //Hght for 1 label
 	protected int maxRowLabelLength = 0;
 	protected int maxColLabelLength = 0;
@@ -1325,5 +1325,37 @@ public class ExportHandler {
 			maxRowLabelLength = 0;
 		}
 		LogBuffer.println("updateForLabelSize: current minimum tile dim: " + curMinTileDim);
+	}
+
+	public int getRowLabelPanelWidth(final RegionType region,LabelExportOption rowLabelOption) {
+		if(rowLabelOption == LabelExportOption.NO) {
+			return(0);
+		}
+		return(dendroView.getRowLabelView().getMaxExportStringLength(region,
+			rowLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE));
+	}
+
+	public int getColLabelPanelHeight(final RegionType region,LabelExportOption colLabelOption) {
+		if(colLabelOption == LabelExportOption.NO) {
+			return(0);
+		}
+		return(dendroView.getColLabelView().getMaxExportStringLength(region,
+			colLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE));
+	}
+
+	public int getTileHeight() {
+		return tileHeight;
+	}
+
+	public void setTileHeight(int tileHeight) {
+		this.tileHeight = tileHeight;
+	}
+
+	public int getTileWidth() {
+		return tileWidth;
+	}
+
+	public void setTileWidth(int tileWidth) {
+		this.tileWidth = tileWidth;
 	}
 }

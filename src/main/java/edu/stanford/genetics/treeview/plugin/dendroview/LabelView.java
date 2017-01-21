@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -23,6 +24,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -44,6 +46,7 @@ import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LabelSummary;
+import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -3438,5 +3441,190 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			yPos += size;
 		}
+	}
+
+	public void createPreview(final Graphics g,final int xIndent,
+		final int yIndent,final int size,final boolean showSelections,
+		final boolean drawSelectedOnly,final int fontSize,
+		final RegionType region) {
+
+		int start = 0;
+		int end = 0;
+		if(region == RegionType.ALL) {
+			start = map.getMinIndex();
+			end = map.getMaxIndex();
+		} else if(region == RegionType.VISIBLE) {
+			start = map.getFirstVisible();
+			end = map.getLastVisible();
+		} else if(region == RegionType.SELECTION) {
+			start = drawSelection.getMinIndex();
+			end = drawSelection.getMaxIndex();
+		} else {
+			LogBuffer.println("Invalid region type.");
+			return;
+		}
+
+		final Graphics2D g2d = (Graphics2D) g;
+
+		//Turn on anti-aliasing so the text looks better
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+
+		Font exportFont = new Font(labelAttr.getFace(),
+				labelAttr.getStyle(),fontSize);
+		final FontMetrics metrics = getFontMetrics(exportFont);
+		int xSize = getMaxExportStringLength(region,drawSelectedOnly,fontSize);
+		final int ascent = metrics.getAscent();
+ 
+		/* Rotate plane for array axis (not for zoomHint) */
+		orientLabelPane(g2d);
+
+		//Labels are always drawn horizontally.  orientLabelPane does its magic
+		//to rotate the whole thing, so we don't have to worry about it.  Thus
+		//yPos is the "pixel" (i.e. "point") position referring to lines of
+		//labels.  yOffset is to center the label on a tile.
+		//yPos and xPos are assumed to start at 0.
+		int yPos = yIndent;
+		int yOffset = (int) Math.floor((double) size / 2.0);
+		int xPos = xIndent;
+
+		//This really just defines the size of the drawing area
+		//g.clearRect(0,0,xSize,ySize);
+
+		for(int j = start;j <= end;j++) {
+
+			try {
+				String out = labelSummary.getSummary(labelInfo,j);
+
+				if(out == null) {
+					out = "No Label";
+				}
+
+				/*
+				 * This will draw the label background if selected
+				 */
+				if(drawSelection.isIndexSelected(j) && showSelections) {
+
+					g.setColor(selectionTextBGColor);
+
+					g.fillRect(xIndent,yPos,xSize,size);
+				} else if(!drawSelection.isIndexSelected(j) &&
+					drawSelectedOnly) {
+
+					//Skip this label if it is not selected and we're only
+					//drawing selected labels
+					yPos += size;
+					continue;
+				}
+
+				/* Set label color */
+				g2d.setColor(Color.black);
+				g2d.setFont(exportFont);
+				
+
+				/* Finally draw label (alignment-dependent) */
+				xPos = xIndent;
+				if(labelAttr.isRightJustified()) {
+					xPos += (xSize - metrics.stringWidth(out));
+				}
+
+				g2d.drawString(out,xPos,yPos + yOffset + (ascent / 2));
+
+//					drawOverrunArrows(metrics.stringWidth(out),g,
+//						map.getMiddlePixel(j) -
+//						(ascent / 2),labelAttr.getPoints(),g2d.getColor(),
+//						bgColor,labelStrStart);
+			}
+			catch(final java.lang.ArrayIndexOutOfBoundsException e) {
+				LogBuffer.logException(e);
+				break;
+			}
+
+			yPos += size;
+		}
+	}
+
+	/**
+	 * Get a scaled snapshot of the trees. The snapshot will be taken in
+	 * the specified region.
+	 * @param width - The width of the scaled image to be returned.
+	 * @param height - The height of the scaled image to be returned.
+	 * @param region - The region from which to take a snapshot.
+	 * @param withSelections - Whether to include selections in the snapshot.
+	 * @return A scaled BufferedImage representing the trees.
+	 */
+	public BufferedImage getSnapshot(final int width,final int height, 
+		final RegionType region,final boolean withSelections,
+		final boolean drawSelectionOnly,final int tileSize,final int fontSize) {
+
+		BufferedImage img = new BufferedImage(width,height,
+			BufferedImage.TYPE_INT_ARGB);
+//		Rectangle dest = new Rectangle(width, height);
+		
+		BufferedImage scaled = new BufferedImage(width, height,
+			BufferedImage.TYPE_INT_ARGB);
+
+//		setExportPreviewScale(dest);
+
+		/* 
+		 * Temporarily update MapContainer for this TreeView to get user
+		 * selected region. Reset after drawing the image.
+		 */
+//		int firstVisible = map.getFirstVisible();
+//		int numVisible = map.getNumVisible();
+
+		/* These depend on the selected region */
+//		int tempFirstVisible;
+//		int tempNumVisible;
+//		int tempLastVisible;
+
+//		switch(region) {
+//		case ALL:
+//			tempFirstVisible = map.getMinIndex();
+//			tempNumVisible = map.getTotalTileNum();
+//			break;
+//		case SELECTION:
+//			tempFirstVisible = drawSelection.getMinIndex();
+//			tempNumVisible = drawSelection.getNSelectedIndexes();
+//			break;
+//		/* Fall through, visible same as default */
+//		case VISIBLE:
+//		default:
+//			tempFirstVisible = firstVisible;
+//			tempNumVisible = numVisible;
+//			break;
+//		}
+
+//		tempLastVisible = tempFirstVisible + tempNumVisible;
+
+//		LinearTransformation primaryScaleEq = getPrimaryScaleEq();
+//		/* temporarily update for snapshot drawing */
+//		setPrimaryScaleEq(new LinearTransformation(
+//				tempFirstVisible,
+//				getSnapShotDestRectStart(dest),
+//				tempLastVisible,
+//				getSnapShotDestRectEnd(dest)));
+
+		/* Now draw trees to first image, original size */
+//		if(withSelections) {
+//			treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
+//				isLeft, -1, treeSelection, null);
+//		} else {
+//			treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
+//				isLeft, -1, null, null);
+//		}
+
+		LogBuffer.println("Creating " + (isAColumnPane() ? "column" : "row") + " label preview WxH " + width + "x" + height);
+		createPreview(img.getGraphics(),0,0,tileSize,withSelections,
+			drawSelectionOnly,fontSize,region);
+
+		/* Draw a scaled version of the old image to a new image */
+		Graphics g = scaled.getGraphics();
+		g.drawImage(img, 0, 0, width, height, null);
+
+//		/* Reset scale tree so normal TreeViews continue as usual */
+//		setPrimaryScaleEq(primaryScaleEq);
+
+		return scaled;
 	}
 }

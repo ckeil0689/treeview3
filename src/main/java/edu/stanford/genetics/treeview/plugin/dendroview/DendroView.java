@@ -49,6 +49,7 @@ import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.LabelFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
 import edu.stanford.genetics.treeview.DragGridPanel;
+import edu.stanford.genetics.treeview.ExportPreviewLabels;
 
 /** TODO Refactor this JavaDoc. It's not applicable to the current program
  * anymore.
@@ -1354,8 +1355,8 @@ public class DendroView implements Observer, DendroPanel {
 	 * @param region - The RegionType defines which region of the matrix
 	 *          will be shown.
 	 * @return A new ExportPreviewMatrix panel containing the matrix. */
-	public ExportPreviewMatrix getMatrixSnapshot(	final boolean withSelections,
-																								RegionType region) {
+	public ExportPreviewMatrix getMatrixSnapshot(final boolean withSelections,
+		RegionType region) {
 
 		Image image;
 
@@ -1382,10 +1383,38 @@ public class DendroView implements Observer, DendroPanel {
 		return getTreeSnapshot(rowTreeView, region, withSelections, true);
 	}
 
+	public ExportPreviewTrees getRowTreeSnapshot(final boolean withSelections,
+		final RegionType region,final int width,final int height) {
+
+		return getTreeSnapshot(rowTreeView,region,withSelections,true,width,height);
+	}
+
 	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections,
 		RegionType region) {
 
 		return getTreeSnapshot(colTreeView, region, withSelections, false);
+	}
+
+	public ExportPreviewLabels getRowLabelsSnapshot(final boolean withSelections,
+		final RegionType region,final int width,final int height,
+		final boolean drawSelectionOnly,final int tileHeight,final int fontSize) {
+
+		return getLabelsSnapshot(rowLabelView,region,withSelections,true,width,height,
+			drawSelectionOnly,tileHeight,fontSize);
+	}
+
+	public ExportPreviewLabels getColLabelsSnapshot(final boolean withSelections,
+		RegionType region,final int width,final int height,
+		final boolean drawSelectionOnly,final int tileWidth,final int fontSize) {
+
+		return getLabelsSnapshot(colLabelView,region,withSelections,false,width,height,
+			drawSelectionOnly,tileWidth,fontSize);
+	}
+
+	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections,
+		final RegionType region,final int width,final int height) {
+
+		return getTreeSnapshot(colTreeView,region,withSelections,false,width,height);
 	}
 
 	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
@@ -1419,6 +1448,101 @@ public class DendroView implements Observer, DendroPanel {
 		}
 
 		return expTrees;
+	}
+
+//	private ExportPreviewLabels getLabelsSnapshot(LabelView labelAxisView,
+//		RegionType region,final boolean withSelections,final boolean isRows) {
+//
+//		if(labelAxisView == null) {
+//			LogBuffer.println("Cannot generate labels snapshot. LabelView object is null.");
+//			return new ExportPreviewLabels(null, isRows); // empty panel
+//		}
+//
+//		/* using defaults here. The actual image will be rescaled later
+//		 * in the ExportDialog. */
+//		int width;
+//		int height;
+//		if(isRows) {
+//			width = ExportPreviewLabels.D_SHORT;
+//			height = ExportPreviewLabels.D_LONG;
+//
+//		}
+//		else {
+//			width = ExportPreviewLabels.D_LONG;
+//			height = ExportPreviewLabels.D_SHORT;
+//		}
+//
+//		/* Set up column tree image */
+//		BufferedImage labelsSnapshot = null;
+//		ExportPreviewLabels expLabels = null;
+//		if(labelAxisView.isEnabled()) {
+//			labelsSnapshot = labelAxisView.getSnapshot(width, height, region, withSelections);
+//			expLabels = new ExportPreviewLabels(labelsSnapshot, isRows);
+//		}
+//
+//		return expLabels;
+//	}
+
+	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
+		RegionType region,final boolean withSelections,final boolean isRows,
+		final int width,final int height) {
+
+		if(treeAxisView == null) {
+			LogBuffer.println("Cannot generate tree snapshot. TRView object is null.");
+			return new ExportPreviewTrees(null, isRows); // empty panel
+		}
+
+		int shortLen = 0;
+		int longLen = 0;
+		if(isRows) {
+			shortLen = width;
+			longLen = height;
+		} else {
+			shortLen = height;
+			longLen = width;
+		}
+
+		/* Set up column tree image */
+		BufferedImage treeSnapshot = null;
+		ExportPreviewTrees expTrees = null;
+		if(treeAxisView.isEnabled()) {
+			treeSnapshot = treeAxisView.getSnapshot(width, height, region, withSelections);
+			expTrees = new ExportPreviewTrees(treeSnapshot,isRows,shortLen,longLen);
+		}
+
+		return expTrees;
+	}
+
+	private ExportPreviewLabels getLabelsSnapshot(LabelView labelsAxisView,
+		RegionType region,final boolean withSelections,final boolean isRows,
+		final int width,final int height,final boolean drawSelectionOnly,
+		final int tileHeight,final int fontSize) {
+
+		if(labelsAxisView == null) {
+			LogBuffer.println("Cannot generate labels snapshot. Label object is null.");
+			return new ExportPreviewLabels(null,isRows); // empty panel
+		}
+
+		int shortLen = 0;
+		int longLen = 0;
+		if(isRows) {
+			shortLen = width;
+			longLen = height;
+		} else {
+			shortLen = height;
+			longLen = width;
+		}
+
+		/* Set up column tree image */
+		BufferedImage labelsSnapshot = null;
+		ExportPreviewLabels expLabels = null;
+//		if(labelsAxisView.isEnabled()) {
+			labelsSnapshot = labelsAxisView.getSnapshot(width, height, region, withSelections,
+				drawSelectionOnly,tileHeight,fontSize);
+			expLabels = new ExportPreviewLabels(labelsSnapshot,isRows,shortLen,longLen);
+//		}
+
+		return expLabels;
 	}
 
 	@Override
