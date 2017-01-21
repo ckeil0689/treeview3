@@ -3380,9 +3380,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		LogBuffer.println("Drawing [" + (isAColumnPane() ? "Column" : "Row") + "] labels" +
 			"Longest Str Len: [" + xSize + "] font size: [" + fontSize + "] tile size: [" + size + "] ascent: [" + ascent + "] yIndent: [" + yIndent + "] xIndent: [" + xIndent + "] yOffset: [" + yOffset + "]");
 
-		//This really just defines the size of the drawing area
-		//g.clearRect(0,0,xSize,ySize);
-
 		for(int j = start;j <= end;j++) {
 
 			debug("Getting data index [" + j + "]",1);
@@ -3422,17 +3419,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 				/* Finally draw label (alignment-dependent) */
 				xPos = xIndent;
-//					getLabelStartOffset(metrics.stringWidth(out));
 				if(labelAttr.isRightJustified()) {
-					xPos += (xSize - metrics.stringWidth(out));
+					//Changed this method because it fixes the width calculation for
+					//labels in document format exports (only an issue when right-justified)
+					//xPos += (xSize - metrics.stringWidth(out));
+					xPos += (xSize - (int)Math.round(metrics.getStringBounds(out,g2d).getWidth()));
 				}
 
 				g2d.drawString(out,xPos,yPos + yOffset + (ascent / 2));
-
-//				drawOverrunArrows(metrics.stringWidth(out),g,
-//					map.getMiddlePixel(j) -
-//					(ascent / 2),labelAttr.getPoints(),g2d.getColor(),
-//					bgColor,labelStrStart);
 			}
 			catch(final java.lang.ArrayIndexOutOfBoundsException e) {
 				LogBuffer.logException(e);
