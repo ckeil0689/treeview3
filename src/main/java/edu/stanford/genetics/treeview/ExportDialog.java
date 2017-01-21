@@ -845,12 +845,8 @@ public class ExportDialog extends CustomDialog {
 		this.gapsize = (int)(scaleWidth * scaleHeight * eh.getGapSize());
 		int rowLabelSize = (int)(eh.getRowLabelPanelWidth(exportOptions.getRegionType(),
 			exportOptions.getRowLabelOption()) * scaleWidth * scaleHeight);
-		LogBuffer.println("Scaling row label panel width [" + eh.getRowLabelPanelWidth(exportOptions.getRegionType(),
-			exportOptions.getRowLabelOption()) + "] by 2 factors [" + scaleWidth + " * " + scaleHeight + "] to get [" + rowLabelSize + "].");
 		int colLabelSize = (int)(eh.getColLabelPanelHeight(exportOptions.getRegionType(),
 			exportOptions.getColLabelOption()) * scaleWidth * scaleHeight);
-		LogBuffer.println("Scaling column label panel height [" + eh.getColLabelPanelHeight(exportOptions.getRegionType(),
-			exportOptions.getColLabelOption()) + "] by 2 factors [" + scaleWidth + " * " + scaleHeight + "] to get [" + colLabelSize + "].");
 
 		// adjust maximum matrix side length for tree thickness and gaps
 		if(rowPrevTrees != null) {
@@ -898,8 +894,6 @@ public class ExportDialog extends CustomDialog {
 //		if(colPrevLabels != null) {
 //			colPrevLabels.setLongSide(previewImgWidth);
 //		}
-
-LogBuffer.println("Matrix WxH: [" + previewImgWidth + "x" + previewImgHeight + "]");
 
 		matrix.setMatrixWidth(previewImgWidth);
 		matrix.setMatrixHeight(previewImgHeight);
@@ -1007,7 +1001,6 @@ LogBuffer.println("Matrix WxH: [" + previewImgWidth + "x" + previewImgHeight + "
 			AspectType asp = AspectType.getAspect(option.getText());
 			eh.setTileAspectRatio(asp);
 			eh.setCalculatedDimensions(selectedRegion);
-			LogBuffer.println("Dimensions for aspect " + asp.toString() + ": X" + eh.getXDim(selectedRegion) + " by Y" + eh.getYDim(selectedRegion));
 			final boolean tooBig = eh.isOversized(selectedRegion);
 			if(tooBig) {
 				bigAsps.add(asp);
@@ -1094,7 +1087,6 @@ LogBuffer.println("Matrix WxH: [" + previewImgWidth + "x" + previewImgHeight + "
 		//Any labels included uses the same image space, so we only need to test 1 option that includes labels
 		eh.setRowLabelsIncluded(LabelExportOption.YES);
 		eh.setCalculatedDimensions(selectedRegion);
-		LogBuffer.println("Dimensions when including row labels: X" + eh.getXDim(selectedRegion) + " by Y" + eh.getYDim(selectedRegion) + " and each label's font space is: " + eh.getLabelAreaHeight());
 		rowLabelsTooBig = eh.areRowLabelsTooBig(selectedRegion);
 
 		//Check if row label buttons need to be disabled/enabled based on

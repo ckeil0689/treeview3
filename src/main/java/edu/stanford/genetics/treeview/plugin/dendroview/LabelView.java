@@ -3377,9 +3377,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		int yOffset = (int) Math.floor((double) size / 2.0);
 		int xPos = xIndent;
 
-		LogBuffer.println("Drawing [" + (isAColumnPane() ? "Column" : "Row") + "] labels" +
-			"Longest Str Len: [" + xSize + "] font size: [" + fontSize + "] tile size: [" + size + "] ascent: [" + ascent + "] yIndent: [" + yIndent + "] xIndent: [" + xIndent + "] yOffset: [" + yOffset + "]");
-
 		for(int j = start;j <= end;j++) {
 
 			debug("Getting data index [" + j + "]",1);
@@ -3608,7 +3605,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 //				isLeft, -1, null, null);
 //		}
 
-		LogBuffer.println("Creating " + (isAColumnPane() ? "column" : "row") + " label preview WxH " + width + "x" + height);
 		createPreview(img.getGraphics(),0,0,tileSize,withSelections,
 			drawSelectionOnly,fontSize,region);
 

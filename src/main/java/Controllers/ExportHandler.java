@@ -529,8 +529,6 @@ public class ExportHandler {
 		final LabelExportOption rowLabelOption,
 		final LabelExportOption colLabelOption) throws Exception {
 
-		LogBuffer.println("EH:export: showSelections is set to: [" + (showSelections ? "true" : "false") + "] rowLabelOption is set to: [" + rowLabelOption.toString() + "]");
-
 		if(!isExportValid(region)) {
 			LogBuffer.println("ERROR: Invalid export region: [" + region +
 				"].");
@@ -870,7 +868,6 @@ public class ExportHandler {
 				int labelLength =
 					dendroView.getColLabelView().getMaxExportStringLength(region,
 						colLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE);
-				LogBuffer.println("Longest col label length: " + labelLength + " Trees height: " + treesHeight + " Gap size: " + gapSize);
 
 				dendroView.getRowLabelView().export(g2d,
 					(isRowTreeIncluded() ?
@@ -893,7 +890,6 @@ public class ExportHandler {
 				int labelLength =
 					dendroView.getRowLabelView().getMaxExportStringLength(region,
 						rowLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE);
-				LogBuffer.println("Longest row label length: " + labelLength + " Trees height: " + treesHeight + " Gap size: " + gapSize);
 
 				dendroView.getColLabelView().export(g2d,
 					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
@@ -1335,7 +1331,6 @@ public class ExportHandler {
 		} else {
 			maxRowLabelLength = 0;
 		}
-		LogBuffer.println("updateForLabelSize: current minimum tile dim: " + curMinTileDim);
 	}
 
 	public int getRowLabelPanelWidth(final RegionType region,LabelExportOption rowLabelOption) {
