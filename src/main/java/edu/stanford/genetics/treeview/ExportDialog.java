@@ -681,7 +681,8 @@ public class ExportDialog extends CustomDialog {
 		}
 
 		if(rowPrevLabels != null) {
-			rowPrevLabels.setLongSide(matrix.getMatrixWidth());
+			LogBuffer.println("Setting preview matrix height for the row labels to " + matrix.getMatrixHeight());
+			rowPrevLabels.setLongSide(matrix.getMatrixHeight());
 			previews.add(rowPrevLabels, "growx, pushx, "
 				+ "h " + rowPrevLabels.getLongSide() + "!,"
 				+ " w " + rowPrevLabels.getShortSide() + "!, "
@@ -813,6 +814,7 @@ public class ExportDialog extends CustomDialog {
 		/* issue #6/ #6.1 implementation */
 		eh.setRowLabelsIncluded(exportOptions.getRowLabelOption());
 		eh.setColLabelsIncluded(exportOptions.getColLabelOption());
+		eh.setTileAspectRatio(exportOptions.getAspectType());
 		eh.setCalculatedDimensions(exportOptions.getRegionType(), 
 			exportOptions.getAspectType());
 
