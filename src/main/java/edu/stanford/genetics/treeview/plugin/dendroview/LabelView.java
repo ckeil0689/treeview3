@@ -544,6 +544,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	abstract public void orientLabelPane(Graphics2D g2d);
 
+	abstract public void orientLabelsForPreview(Graphics2D g2d,final int maxLabelLen);
 	abstract public void orientLabelsForExport(Graphics2D g2d,
 		final int xIndent,final int yIndent,final int longestXLabelLen);
 
@@ -3471,7 +3472,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		final int ascent = metrics.getAscent();
  
 		/* Rotate plane for array axis (not for zoomHint) */
-		orientLabelPane(g2d);
+		orientLabelsForPreview(g2d,xSize);
 
 		//Labels are always drawn horizontally.  orientLabelPane does its magic
 		//to rotate the whole thing, so we don't have to worry about it.  Thus
@@ -3500,7 +3501,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				if(drawSelection.isIndexSelected(j) && showSelections) {
 
 					g.setColor(selectionTextBGColor);
-
+LogBuffer.println("Drawing selection highlight box at X,Y: [" + xIndent + "," + yPos+ "]");
 					g.fillRect(xIndent,yPos,xSize,size);
 				} else if(!drawSelection.isIndexSelected(j) &&
 					drawSelectedOnly) {
