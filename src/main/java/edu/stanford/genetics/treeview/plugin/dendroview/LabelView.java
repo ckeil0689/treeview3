@@ -3498,7 +3498,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				if(drawSelection.isIndexSelected(j) && showSelections) {
 
 					g.setColor(selectionTextBGColor);
-LogBuffer.println("Drawing selection highlight box at X,Y: [" + xIndent + "," + yPos+ "]");
+
 					g.fillRect(xIndent,yPos,xSize,size);
 				} else if(!drawSelection.isIndexSelected(j) &&
 					drawSelectedOnly) {

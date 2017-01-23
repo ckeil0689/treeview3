@@ -114,9 +114,6 @@ public class ExportDialogController {
 					options.getRowLabelOption() == LabelExportOption.SELECTION,
 					eh.getTileHeight(),
 					eh.getLabelAreaHeight() - ExportHandler.SQUEEZE);
-			LogBuffer.println("PREVIEW- Tile Aspect: [" + exportOptions.getAspectType().toString() + "] " +
-				"RowLabelsLen: [" + rowLabelsLen + "] matrixHeight: [" + matrixHeight + "] matrixWidth: [" + matrixWidth + "] " +
-				"TileHeight: [" + eh.getTileHeight() + "] Squeeze: [" + ExportHandler.SQUEEZE + "]");
 		}
 		ExportPreviewLabels expColLabels = null;
 		if(options.getColLabelOption() != LabelExportOption.NO) {
@@ -150,8 +147,8 @@ public class ExportDialogController {
 			//If the returned string is null or empty, they either canceled or
 			//there was an error
 			if((exportFilename == null) || exportFilename.isEmpty()) {
-				LogBuffer.println("Could not export. A file name could "
-					+ "not be created.");
+				LogBuffer.println("Could not export. A file name could " +
+					"not be created.");
 				return;
 			}
 

@@ -138,8 +138,6 @@ public class ExportPreviewLabels extends JPanel {
 
 		if(paintImage != null) {
 			g2d.drawImage(paintImage, 0, 0, xSide, ySide, this);
-
-			LogBuffer.println("Drawing preview image for labels at size WxH: [" + xSide + "x" + ySide + "].");
 		} else {
 			BufferedImage img = new BufferedImage(xSide, ySide, 
 				BufferedImage.TYPE_BYTE_GRAY);

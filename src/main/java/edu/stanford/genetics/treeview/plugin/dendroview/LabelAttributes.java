@@ -62,9 +62,9 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	public void requestStoredState() {
 
 		if(configNode == null) {
-			LogBuffer.println("Could not synchronize state for " +	this																			.getClass()
-																																	.getSimpleName() +
-												" because configNode was null.");
+			LogBuffer.println("Could not synchronize state for " +
+				this.getClass().getSimpleName() +
+				" because configNode was null.");
 			return;
 		}
 
@@ -81,9 +81,9 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	public void storeState() {
 
 		if(configNode == null) {
-			LogBuffer.println("Could not store state for " +	this																.getClass()
-																														.getSimpleName() +
-												" because configNode was null.");
+			LogBuffer.println("Could not store state for " +
+				this.getClass().getSimpleName() +
+				" because configNode was null.");
 			return;
 		}
 
@@ -100,9 +100,9 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	public void importStateFrom(Preferences oldNode) {
 
 		if(oldNode == null) {
-			LogBuffer.println("Could not import node for " +	this																.getClass()
-																														.getSimpleName() +
-												". Node not defined.");
+			LogBuffer.println("Could not import node for " +
+				this.getClass().getSimpleName() +
+				". Node not defined.");
 			return;
 		}
 
@@ -120,7 +120,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 
 		if(parentNode == null) {
 			LogBuffer.println("parentNode for " +	this.getClass().getSimpleName() +
-												" was null.");
+				" was null.");
 			return;
 		}
 

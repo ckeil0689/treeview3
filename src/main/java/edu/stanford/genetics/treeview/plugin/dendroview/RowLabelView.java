@@ -47,7 +47,7 @@ public class RowLabelView extends LabelView {
 
 		if(parentNode == null) {
 			LogBuffer.println("Error: Could not find or create ArrayameView" +
-												"node because parentNode was null.");
+				"node because parentNode was null.");
 			return;
 		}
 

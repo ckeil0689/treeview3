@@ -233,21 +233,21 @@ public class DendroView implements Observer, DendroPanel {
 
 		if(rowFinderBox == null || colFinderBox == null) {
 			LogBuffer.println("Could not set up search. A search bar has" +
-												" not been set up.");
+				" not been set up.");
 			return;
 		}
 
 		searchPanel.removeAll();
 
 		final String tooltip = "You can use wildcards to search (*, ?). " +
-														"E.g.: *complex* --> Rpd3s complex, ATP Synthase " +
-														"(complex V), etc...";
+			"E.g.: *complex* --> Rpd3s complex, ATP Synthase " +
+			"(complex V), etc...";
 		searchPanel.setToolTipText(tooltip);
 
 		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 80::, growx, " +
-																											"pushx, al right");
+			"pushx, al right");
 		searchPanel.add(colFinderBox.getSearchTermBox(), "w 80::, growx, " +
-																											"pushx, al right");
+			"pushx, al right");
 
 		searchPanel.revalidate();
 		searchPanel.repaint();
@@ -1323,7 +1323,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		if(colTreeView == null || colDataPane == null) {
 			LogBuffer.println("colTreeView could not be enabled/ disabled " +
-												"because it was null");
+				"because it was null");
 			return;
 		}
 
@@ -1339,7 +1339,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		if(rowTreeView == null || rowDataPane == null) {
 			LogBuffer.println("rowTreeView could not be enabled/ disabled " +
-												"because it was null");
+				"because it was null");
 			return;
 		}
 
