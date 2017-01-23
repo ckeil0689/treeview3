@@ -114,6 +114,9 @@ public class ExportDialogController {
 					options.getRowLabelOption() == LabelExportOption.SELECTION,
 					eh.getTileHeight(),
 					eh.getLabelAreaHeight() - ExportHandler.SQUEEZE);
+			LogBuffer.println("PREVIEW- Tile Aspect: [" + exportOptions.getAspectType().toString() + "] " +
+				"RowLabelsLen: [" + rowLabelsLen + "] matrixHeight: [" + matrixHeight + "] matrixWidth: [" + matrixWidth + "] " +
+				"TileHeight: [" + eh.getTileHeight() + "] Squeeze: [" + ExportHandler.SQUEEZE + "]");
 		}
 		ExportPreviewLabels expColLabels = null;
 		if(options.getColLabelOption() != LabelExportOption.NO) {

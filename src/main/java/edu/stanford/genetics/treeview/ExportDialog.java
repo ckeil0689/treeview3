@@ -653,6 +653,7 @@ public class ExportDialog extends CustomDialog {
 
 		JPanel filler3 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevLabels != null) {
+			LogBuffer.println("Length of column labels in preview: " + colPrevLabels.getShortSide());
 			previews.add(filler3, "w " + rowPrevTrees.getShortSide() + "!, "
 				+ "h " + colPrevLabels.getShortSide() + "!,"
 				+ "gap " + gapsize + "! " + gapsize);
@@ -681,7 +682,7 @@ public class ExportDialog extends CustomDialog {
 		}
 
 		if(rowPrevLabels != null) {
-			rowPrevLabels.setLongSide(matrix.getMatrixWidth());
+			rowPrevLabels.setLongSide(matrix.getMatrixHeight());
 			previews.add(rowPrevLabels, "growx, pushx, "
 				+ "h " + rowPrevLabels.getLongSide() + "!,"
 				+ " w " + rowPrevLabels.getShortSide() + "!, "
@@ -813,6 +814,7 @@ public class ExportDialog extends CustomDialog {
 		/* issue #6/ #6.1 implementation */
 		eh.setRowLabelsIncluded(exportOptions.getRowLabelOption());
 		eh.setColLabelsIncluded(exportOptions.getColLabelOption());
+		eh.setTileAspectRatio(exportOptions.getAspectType());
 		eh.setCalculatedDimensions(exportOptions.getRegionType(), 
 			exportOptions.getAspectType());
 

@@ -1536,11 +1536,10 @@ public class DendroView implements Observer, DendroPanel {
 		/* Set up column tree image */
 		BufferedImage labelsSnapshot = null;
 		ExportPreviewLabels expLabels = null;
-//		if(labelsAxisView.isEnabled()) {
-			labelsSnapshot = labelsAxisView.getSnapshot(width, height, region, withSelections,
-				drawSelectionOnly,tileHeight,fontSize);
-			expLabels = new ExportPreviewLabels(labelsSnapshot,isRows,shortLen,longLen);
-//		}
+
+		labelsSnapshot = labelsAxisView.getSnapshot(width, height, region, withSelections,
+			drawSelectionOnly,tileHeight,fontSize);
+		expLabels = new ExportPreviewLabels(labelsSnapshot,isRows,shortLen,longLen);
 
 		return expLabels;
 	}
