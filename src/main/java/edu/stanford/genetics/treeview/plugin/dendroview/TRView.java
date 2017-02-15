@@ -25,7 +25,6 @@ import javax.swing.Timer;
 
 import Controllers.RegionType;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewBuffered;
@@ -42,6 +41,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	protected TreeSelectionI treeSelection;
 	protected LinearTransformation xScaleEq, yScaleEq;
 	protected MapContainer map;
+	
 
 	protected final JScrollPane scrollPane;
 
@@ -66,7 +66,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * 
 	 */
 	protected DataModel dataModel;
-	protected DataTicker ticker;
 
 	public TRView(final boolean isGeneTree) {
 
@@ -127,9 +126,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * @param m
 	 *            The new map to be used for determining the spacing between
 	 *            indexes.
+	 * @param m2 The other orthogonal map, used only once while calculating
+	 *            Zoomed Averages
 	 */
 	public void setMap(final MapContainer m) {
-
 		if (map != null) {
 			map.deleteObserver(this);
 		}
@@ -985,16 +985,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		map.setOverTree(false);
 		unsetHoveredNode();
-		setMeanDataTickerValue();
-	}
-
-	/**
-	 * Set the data ticker to matrix average
-	 * Rounding off to 4 decimals
-	 */
-	private void setMeanDataTickerValue() {
-		ticker.setText("Data Average:");
-		ticker.setValue( dataModel.getDataMatrix().getMean());
+    super.mouseExited(e);
 	}
 
 	@Override
@@ -1130,14 +1121,10 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		
 		return scaled;
 	}
-	
-	public void setDataTicker(final DataTicker ticker) {
-		
-		this.ticker = ticker;
-	}
-    
+	  
     public void setDataModel(final DataModel dataModel) {
 		
 		this.dataModel = dataModel;
 	}
+  
 }

@@ -58,6 +58,13 @@ public interface DataMatrix {
 	double getMean();
 	
 	/**
+	 * Return the mean value of a subset of the data set.
+	 *
+	 * @return A double representing the mean value of a subset of the data set.
+	 */
+	double getZoomedMean(int startingRow, int endingRow, int startingCol, int endingCol);
+	
+	/**
 	 * Return the median value of the data set.
 	 *
 	 * @return A double representing the mean value of the data set.
