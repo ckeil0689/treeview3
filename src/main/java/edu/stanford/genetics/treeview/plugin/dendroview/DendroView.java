@@ -1450,39 +1450,6 @@ public class DendroView implements Observer, DendroPanel {
 		return expTrees;
 	}
 
-//	private ExportPreviewLabels getLabelsSnapshot(LabelView labelAxisView,
-//		RegionType region,final boolean withSelections,final boolean isRows) {
-//
-//		if(labelAxisView == null) {
-//			LogBuffer.println("Cannot generate labels snapshot. LabelView object is null.");
-//			return new ExportPreviewLabels(null, isRows); // empty panel
-//		}
-//
-//		/* using defaults here. The actual image will be rescaled later
-//		 * in the ExportDialog. */
-//		int width;
-//		int height;
-//		if(isRows) {
-//			width = ExportPreviewLabels.D_SHORT;
-//			height = ExportPreviewLabels.D_LONG;
-//
-//		}
-//		else {
-//			width = ExportPreviewLabels.D_LONG;
-//			height = ExportPreviewLabels.D_SHORT;
-//		}
-//
-//		/* Set up column tree image */
-//		BufferedImage labelsSnapshot = null;
-//		ExportPreviewLabels expLabels = null;
-//		if(labelAxisView.isEnabled()) {
-//			labelsSnapshot = labelAxisView.getSnapshot(width, height, region, withSelections);
-//			expLabels = new ExportPreviewLabels(labelsSnapshot, isRows);
-//		}
-//
-//		return expLabels;
-//	}
-
 	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
 		RegionType region,final boolean withSelections,final boolean isRows,
 		final int width,final int height) {

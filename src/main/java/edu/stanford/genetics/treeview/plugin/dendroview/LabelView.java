@@ -3521,11 +3521,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				}
 
 				g2d.drawString(out,xPos,yPos + yOffset + (ascent / 2));
-
-//					drawOverrunArrows(metrics.stringWidth(out),g,
-//						map.getMiddlePixel(j) -
-//						(ascent / 2),labelAttr.getPoints(),g2d.getColor(),
-//						bgColor,labelStrStart);
 			}
 			catch(final java.lang.ArrayIndexOutOfBoundsException e) {
 				LogBuffer.logException(e);
@@ -3551,60 +3546,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		BufferedImage img = new BufferedImage(width,height,
 			BufferedImage.TYPE_INT_ARGB);
-//		Rectangle dest = new Rectangle(width, height);
 		
 		BufferedImage scaled = new BufferedImage(width, height,
 			BufferedImage.TYPE_INT_ARGB);
-
-//		setExportPreviewScale(dest);
-
-		/* 
-		 * Temporarily update MapContainer for this TreeView to get user
-		 * selected region. Reset after drawing the image.
-		 */
-//		int firstVisible = map.getFirstVisible();
-//		int numVisible = map.getNumVisible();
-
-		/* These depend on the selected region */
-//		int tempFirstVisible;
-//		int tempNumVisible;
-//		int tempLastVisible;
-
-//		switch(region) {
-//		case ALL:
-//			tempFirstVisible = map.getMinIndex();
-//			tempNumVisible = map.getTotalTileNum();
-//			break;
-//		case SELECTION:
-//			tempFirstVisible = drawSelection.getMinIndex();
-//			tempNumVisible = drawSelection.getNSelectedIndexes();
-//			break;
-//		/* Fall through, visible same as default */
-//		case VISIBLE:
-//		default:
-//			tempFirstVisible = firstVisible;
-//			tempNumVisible = numVisible;
-//			break;
-//		}
-
-//		tempLastVisible = tempFirstVisible + tempNumVisible;
-
-//		LinearTransformation primaryScaleEq = getPrimaryScaleEq();
-//		/* temporarily update for snapshot drawing */
-//		setPrimaryScaleEq(new LinearTransformation(
-//				tempFirstVisible,
-//				getSnapShotDestRectStart(dest),
-//				tempLastVisible,
-//				getSnapShotDestRectEnd(dest)));
-
-		/* Now draw trees to first image, original size */
-//		if(withSelections) {
-//			treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
-//				isLeft, -1, treeSelection, null);
-//		} else {
-//			treePainter.paint(img.getGraphics(), xScaleEq, yScaleEq, dest, 
-//				isLeft, -1, null, null);
-//		}
 
 		createPreview(img.getGraphics(),0,0,tileSize,withSelections,
 			drawSelectionOnly,fontSize,region);
@@ -3612,9 +3556,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		/* Draw a scaled version of the old image to a new image */
 		Graphics g = scaled.getGraphics();
 		g.drawImage(img, 0, 0, width, height, null);
-
-//		/* Reset scale tree so normal TreeViews continue as usual */
-//		setPrimaryScaleEq(primaryScaleEq);
 
 		return scaled;
 	}

@@ -880,22 +880,6 @@ public class ExportDialog extends CustomDialog {
 			previewImgHeight -= gapsize;
 		}
 
-//		if(rowPrevTrees != null) {
-//			rowPrevTrees.setLongSide(previewImgHeight);
-//		}
-//
-//		if(rowPrevLabels != null) {
-//			rowPrevLabels.setLongSide(previewImgHeight);
-//		}
-//
-//		if(colPrevTrees != null) {
-//			colPrevTrees.setLongSide(previewImgWidth);
-//		}
-//
-//		if(colPrevLabels != null) {
-//			colPrevLabels.setLongSide(previewImgWidth);
-//		}
-
 		matrix.setMatrixWidth(previewImgWidth);
 		matrix.setMatrixHeight(previewImgHeight);
 	}
