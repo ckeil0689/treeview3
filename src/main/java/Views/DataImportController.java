@@ -178,9 +178,6 @@ public class DataImportController {
 
 	/**
 	 * Listens to changes in selection and initiates a new data loading process.
-	 * 
-	 * @author chris0689
-	 *
 	 */
 	private class DelimiterListener implements ItemListener {
 

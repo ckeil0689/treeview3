@@ -7,6 +7,10 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /** Static class (java way...) to be used for loading read-only preview data for
@@ -69,7 +73,9 @@ public final class PreviewLoader {
 		 * No need to search rows beyond the already identified smallest col idx.
 		 */
 		int[] dataStartCoords = new int[] {-1, Integer.MAX_VALUE};
-
+		boolean foundRow = false;
+		boolean foundCol = false;
+		
 		try {
 			final BufferedReader br = new BufferedReader(new FileReader(filename));
 
@@ -117,6 +123,7 @@ public final class PreviewLoader {
 
 						// rows can only increase, only update once
 						if(dataStartCoords[0] == -1) {
+							foundRow = true;
 							dataStartCoords[0] = rowIdx;
 						}
 
@@ -125,6 +132,7 @@ public final class PreviewLoader {
 						 * data is found in an earlier column
 						 */
 						if(colIdx < dataStartCoords[1]) {
+							foundCol = true;
 							dataStartCoords[1] = colIdx;
 						}
 					}
@@ -158,8 +166,23 @@ public final class PreviewLoader {
 			LogBuffer.logException(e);
 			LogBuffer.println("Could not find data start coordinates.");
 			return new int[] {0, 0};
+		} 
+		finally {
+			if(!(foundRow && foundCol)) {
+				final String msg = "Could not detect data automatically. " +
+					"Setting default [0, 0]";
+				// be careful of Swing threading issues when popping up a dialog in a listener
+				SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+          	int topFrameIdx = JFrame.getFrames().length - 1;
+          	JOptionPane.showMessageDialog(JFrame.getFrames()[topFrameIdx], msg, "Warning", JOptionPane.WARNING_MESSAGE);
+          }
+        });
+				LogBuffer.println(msg);
+				dataStartCoords = new int[] {0, 0};
+			}
 		}
-
+		
 		return dataStartCoords;
 	}
 
