@@ -853,21 +853,41 @@ public class ExportHandler {
 		private void createContent(final Graphics2D g2d,
 			final RegionType region,final boolean showSelections,
 			final LabelExportOption rowLabelOption,
-			final LabelExportOption colLabelOption) {
+			final LabelExportOption colLabelOption,final boolean isDocFormat) {
 
 			ls.setProgress(0);
 			ls.setStatus("Exporting matrix ...");
 			publish(ls);
-			dendroView.getInteractiveMatrixView().export(this,g2d,
-				(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-					(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0),
-				(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-					(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0),
-				tileWidth,tileHeight,region,showSelections);
-			// Checks if the worker has been cancelled
-			if(isCancelled()) {
-				setExportSuccessful(false);
-				return;
+			//If this is a document format, embed a PNG of the matrix in the
+			//document so that the size of the exported file is not enormous
+			if(isDocFormat) {
+				BufferedImage im =
+					new BufferedImage(getNumXExportIndexes(region) * tileWidth,
+						getNumYExportIndexes(region) * tileHeight,
+						BufferedImage.TYPE_INT_ARGB);
+				Graphics2D imGraphics = (Graphics2D) im.getGraphics();
+				// create contents of the image
+				createContentForIMVAlone(imGraphics,region,showSelections);
+				// draw the image to the vector graphics g
+				g2d.drawImage(im,
+					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
+						(areRowLabelsIncluded() ?
+							maxRowLabelLength + gapSize : 0),
+					(isColTreeIncluded() ? treesHeight + gapSize : 0) +
+						(areColLabelsIncluded() ?
+							maxColLabelLength + gapSize : 0), null);
+			} else {
+				dendroView.getInteractiveMatrixView().export(this,g2d,
+					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
+						(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0),
+					(isColTreeIncluded() ? treesHeight + gapSize : 0) +
+						(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0),
+					tileWidth,tileHeight,region,showSelections);
+				// Checks if the worker has been cancelled
+				if(isCancelled()) {
+					setExportSuccessful(false);
+					return;
+				}
 			}
 
 			createContentForTrees(g2d, region, showSelections);
@@ -978,7 +998,7 @@ public class ExportHandler {
 				}
 
 				createContent(g2d,region,showSelections,rowLabelOption,
-					colLabelOption);
+					colLabelOption,false);
 
 				File exportFile = new File(fileName);
 				if(format == FormatType.PNG) {
@@ -1103,62 +1123,8 @@ public class ExportHandler {
 
 				g.startExport();
 
-				// create a image graphics object
-				// using ARGB color profile, that we use for PNG
-				BufferedImage im = new BufferedImage(getNumXExportIndexes(region) * tileWidth,
-						getNumYExportIndexes(region) * tileHeight,BufferedImage.TYPE_INT_ARGB);
-				Graphics2D imGraphics = (Graphics2D) im.getGraphics();
-				// create contents of the image
-				createContentForIMVAlone(imGraphics,region,showSelections);
-				// draw the image to the vector graphics g
-				g.drawImage(im,
-					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-						(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0),
-					(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-						(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0), null);
-				// now create tree 
-				createContentForTrees(g,region,showSelections);
-				
-				if(rowLabelOption != LabelExportOption.NO) {
-					ls.setStatus("Exporting row labels ...");
-					publish(ls);
-
-					//Determine how long the labels are
-					int labelLength =
-						dendroView.getColLabelView().getMaxExportStringLength(region,
-							colLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE);
-
-					dendroView.getRowLabelView().export(g,
-						(isRowTreeIncluded() ?
-							treesHeight + gapSize : 0),
-						(isColTreeIncluded() ?
-							treesHeight + gapSize : 0) +
-						(colLabelOption != LabelExportOption.NO ?
-							labelLength + gapSize : 0),
-						tileHeight,region,showSelections,
-						rowLabelOption == LabelExportOption.SELECTION,
-						labelAreaHeight - SQUEEZE);
-				}
-
-				//Doing the column labels last because it rotates the coordinate system and I'm not certain how to unrotate it
-				if(colLabelOption != LabelExportOption.NO) {
-					ls.setStatus("Exporting column labels ...");
-					publish(ls);
-
-					//Determine how long the labels are
-					int labelLength =
-						dendroView.getRowLabelView().getMaxExportStringLength(region,
-							rowLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE);
-
-					dendroView.getColLabelView().export(g,
-						(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-							(rowLabelOption != LabelExportOption.NO ?
-									labelLength + gapSize : 0),
-						(isColTreeIncluded() ? treesHeight + gapSize : 0),
-						tileWidth,region,showSelections,
-						colLabelOption == LabelExportOption.SELECTION,
-						labelAreaHeight - SQUEEZE);
-				}
+				createContent(g,region,showSelections,rowLabelOption,
+					colLabelOption,true);
 
 				g.endExport();
 			}
