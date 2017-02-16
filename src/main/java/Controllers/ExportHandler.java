@@ -819,6 +819,7 @@ public class ExportHandler {
 			final boolean showSelections) {
 
 			if(isColTreeIncluded()) {
+				ls.setProgress(0);
 				ls.setStatus("Exporting column tree ...");
 				publish(ls);
 
@@ -832,6 +833,7 @@ public class ExportHandler {
 			}
 
 			if(isRowTreeIncluded()) {
+				ls.setProgress(0);
 				ls.setStatus("Exporting row tree ...");
 				publish(ls);
 
@@ -893,6 +895,7 @@ public class ExportHandler {
 			createContentForTrees(g2d, region, showSelections);
 
 			if(rowLabelOption != LabelExportOption.NO) {
+				ls.setProgress(0);
 				ls.setStatus("Exporting row labels ...");
 				publish(ls);
 
@@ -915,6 +918,7 @@ public class ExportHandler {
 
 			//Doing the column labels last because it rotates the coordinate system and I'm not certain how to unrotate it
 			if(colLabelOption != LabelExportOption.NO) {
+				ls.setProgress(0);
 				ls.setStatus("Exporting column labels ...");
 				publish(ls);
 
