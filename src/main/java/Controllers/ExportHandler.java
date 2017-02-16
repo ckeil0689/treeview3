@@ -809,32 +809,14 @@ public class ExportHandler {
 		}
 
 		/**
-		 * This calls the export functions of the various components of the
-		 * total
-		 * image, arranged in an aligned fashion together
+		 * This calls the export functions of the trees
 		 *
 		 * @param g2d
 		 * @param region
+		 * @param showSelections
 		 */
-		private void createContent(final Graphics2D g2d,
-			final RegionType region,final boolean showSelections,
-			final LabelExportOption rowLabelOption,
-			final LabelExportOption colLabelOption) {
-
-			ls.setStatus("Exporting matrix ...");
-			ls.setProgress(0);
-			publish(ls);
-			dendroView.getInteractiveMatrixView().export(this,g2d,
-				(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-					(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0),
-				(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-					(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0),
-				tileWidth,tileHeight,region,showSelections);
-			// Checks if the worker has been cancelled
-			if(isCancelled()) {
-				setExportSuccessful(false);
-				return;
-			}
+		private void createContentForTrees(final Graphics2D g2d,final RegionType region,
+			final boolean showSelections) {
 
 			if(isColTreeIncluded()) {
 				ls.setStatus("Exporting column tree ...");
@@ -859,6 +841,36 @@ public class ExportHandler {
 					tileHeight,region,
 					showSelections);
 			} 
+		}
+		
+		/**
+		 * This calls the export functions of the various components of the total
+		 * image, arranged in an aligned fashion together
+		 * 
+		 * @param g2d
+		 * @param region
+		 */
+		private void createContent(final Graphics2D g2d,
+			final RegionType region,final boolean showSelections,
+			final LabelExportOption rowLabelOption,
+			final LabelExportOption colLabelOption) {
+
+			ls.setProgress(0);
+			ls.setStatus("Exporting matrix ...");
+			publish(ls);
+			dendroView.getInteractiveMatrixView().export(this,g2d,
+				(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
+					(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0),
+				(isColTreeIncluded() ? treesHeight + gapSize : 0) +
+					(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0),
+				tileWidth,tileHeight,region,showSelections);
+			// Checks if the worker has been cancelled
+			if(isCancelled()) {
+				setExportSuccessful(false);
+				return;
+			}
+
+			createContentForTrees(g2d, region, showSelections);
 
 			if(rowLabelOption != LabelExportOption.NO) {
 				ls.setStatus("Exporting row labels ...");
@@ -908,6 +920,20 @@ public class ExportHandler {
 			ls.setStatus("Preparing to open the file in the default system " +
 				"app");
 			publish(ls);
+		}
+		
+		/**
+		 * @param g2d
+		 * @param region
+		 * @param showSelections
+		 */
+		private void createContentForIMVAlone(final Graphics2D g2d,
+			final RegionType region, final boolean showSelections) {
+			//ls.setProgress(0);
+			ls.setStatus("Exporting matrix ...");
+			publish(ls);
+			dendroView.getInteractiveMatrixView().export(this,g2d,0,0,
+				tileWidth,tileHeight,region,showSelections);
 		}
 
 		/**
@@ -1025,12 +1051,11 @@ public class ExportHandler {
 		 * @param fileName
 		 * @param region
 		 */
-		private void
-			exportDocument(final FormatType format,final PaperType pageSize,
-				String fileName,final RegionType region,
-				final boolean showSelections,
-				final LabelExportOption rowLabelOption,
-				final LabelExportOption colLabelOption) {
+		private void exportDocument(final FormatType format,
+			final PaperType pageSize, String fileName,final RegionType region,
+			final boolean showSelections,
+			final LabelExportOption rowLabelOption,
+			final LabelExportOption colLabelOption) {
 
 			try {
 				setCalculatedDimensions(region);
@@ -1077,8 +1102,64 @@ public class ExportHandler {
 				g.setProperties(p);
 
 				g.startExport();
-				createContent(g,region,showSelections,rowLabelOption,
-					colLabelOption);
+
+				// create a image graphics object
+				// using ARGB color profile, that we use for PNG
+				BufferedImage im = new BufferedImage(getNumXExportIndexes(region) * tileWidth,
+						getNumYExportIndexes(region) * tileHeight,BufferedImage.TYPE_INT_ARGB);
+				Graphics2D imGraphics = (Graphics2D) im.getGraphics();
+				// create contents of the image
+				createContentForIMVAlone(imGraphics,region,showSelections);
+				// draw the image to the vector graphics g
+				g.drawImage(im,
+					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
+						(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0),
+					(isColTreeIncluded() ? treesHeight + gapSize : 0) +
+						(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0), null);
+				// now create tree 
+				createContentForTrees(g,region,showSelections);
+				
+				if(rowLabelOption != LabelExportOption.NO) {
+					ls.setStatus("Exporting row labels ...");
+					publish(ls);
+
+					//Determine how long the labels are
+					int labelLength =
+						dendroView.getColLabelView().getMaxExportStringLength(region,
+							colLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE);
+
+					dendroView.getRowLabelView().export(g,
+						(isRowTreeIncluded() ?
+							treesHeight + gapSize : 0),
+						(isColTreeIncluded() ?
+							treesHeight + gapSize : 0) +
+						(colLabelOption != LabelExportOption.NO ?
+							labelLength + gapSize : 0),
+						tileHeight,region,showSelections,
+						rowLabelOption == LabelExportOption.SELECTION,
+						labelAreaHeight - SQUEEZE);
+				}
+
+				//Doing the column labels last because it rotates the coordinate system and I'm not certain how to unrotate it
+				if(colLabelOption != LabelExportOption.NO) {
+					ls.setStatus("Exporting column labels ...");
+					publish(ls);
+
+					//Determine how long the labels are
+					int labelLength =
+						dendroView.getRowLabelView().getMaxExportStringLength(region,
+							rowLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE);
+
+					dendroView.getColLabelView().export(g,
+						(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
+							(rowLabelOption != LabelExportOption.NO ?
+									labelLength + gapSize : 0),
+						(isColTreeIncluded() ? treesHeight + gapSize : 0),
+						tileWidth,region,showSelections,
+						colLabelOption == LabelExportOption.SELECTION,
+						labelAreaHeight - SQUEEZE);
+				}
+
 				g.endExport();
 			}
 			catch(FileNotFoundException exc) {
