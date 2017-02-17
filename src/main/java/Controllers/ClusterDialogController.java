@@ -160,7 +160,6 @@ public class ClusterDialogController {
 	 */
 	private class ClusterTask extends SwingWorker<Boolean, String> {
 		
-		private DataModel reorderedModel;
 		/* The finished reordered axes */
 		private ClusteredAxisData rowClusterData;
 		private ClusteredAxisData colClusterData;
@@ -279,7 +278,6 @@ public class ClusterDialogController {
 			 */
 			if(!isReorderingValid(clusterCheck)) {
 				LogBuffer.println("Something occurred during reordering.");
-				reorderedModel = null;
 				return;
 			}
 			

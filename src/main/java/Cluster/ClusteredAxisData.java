@@ -5,7 +5,6 @@ package Cluster;
  * It can be passed and used throughout different phases of clustering and
  * makes it easier and cleaner to track important cluster information for 
  * an axis.
- * @author chris0689
  *
  */
 public class ClusteredAxisData {
@@ -13,10 +12,10 @@ public class ClusteredAxisData {
 	private final int AXIS_ID;
 	private final String AXIS_BASEID;
 	
-	private String[] reorderedIDs;
-	private String[] axisLabelTypes;
-	private String[][] axisLabels;
-	private String[][] orderedAxisLabels;
+	private String[] reorderedIDs = new String[0];
+	private String[] axisLabelTypes = new String[0];
+	private String[][] axisLabels = new String[0][];
+	private String[][] orderedAxisLabels = new String[0][];
 	
 	private boolean isAxisClustered;
 	private boolean shouldReorderAxis;
@@ -25,9 +24,6 @@ public class ClusteredAxisData {
 		
 		this.AXIS_ID = axisID;
 		this.AXIS_BASEID = (axisID == 0) ? "ROW" : "COL";
-		this.shouldReorderAxis = false;
-		this.isAxisClustered = false;
-		this.reorderedIDs = new String[] {};
 	}
 	
 	/* Setters */
