@@ -10,6 +10,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,6 +54,8 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 public class ClusterDialogController {
 
 	/* Axes identifiers */
+	public final static String ROW_ID_LABELTYPE = "GID";
+	public final static String COL_ID_LABELTYPE = "AID";
 	public final static String CDT_END = ".cdt";
 	public final static String GTR_END = ".gtr";
 	public final static String ATR_END = ".atr";
@@ -297,9 +301,16 @@ public class ClusterDialogController {
 		 *          labels. */
 		public void prepare(final IntLabelInfo rowLabelI,
 												final IntLabelInfo colLabelI) {
-
-			this.rowClusterData.setLabelTypes(rowLabelI.getLabelTypes());
-			this.colClusterData.setLabelTypes(colLabelI.getLabelTypes());
+			
+			String[] rLabelTypes = extendLabelTypes(rowLabelI.getLabelTypes(), 
+			                                        rowClusterData.shouldReorderAxis(), 
+			                                        ROW_ID_LABELTYPE);
+			String[] cLabelTypes = extendLabelTypes(colLabelI.getLabelTypes(), 
+			                                        colClusterData.shouldReorderAxis(), 
+			                                        COL_ID_LABELTYPE);
+			
+			this.rowClusterData.setLabelTypes(rLabelTypes);
+			this.colClusterData.setLabelTypes(cLabelTypes);
 
 			/* 
 			 * retrieving names and weights of row elements
@@ -316,6 +327,21 @@ public class ClusterDialogController {
 			this.colClusterData.setOrderedAxisLabels(new String[colLabelNum][]);
 		}
 		
+		public String[] extendLabelTypes(String[] labelTypes, 
+		                                 final boolean shouldReorder, 
+		                                 final String id) {
+			
+			String[] nLabelTypes = labelTypes;
+			if(shouldReorder) {
+				List<String> newLabelTypes = new ArrayList<String>(Arrays.asList(labelTypes));
+				newLabelTypes.add(id);
+				nLabelTypes = new String[newLabelTypes.size()];
+				newLabelTypes.toArray(nLabelTypes);
+			} 
+			
+			return nLabelTypes;
+		}
+		
 		/**
 		 * Updates the TVModel ... and more? TODO
 		 */
@@ -326,6 +352,12 @@ public class ClusterDialogController {
 			int[] reorderedRowIndices = getReorderedIndices(rowClusterData);
 			int[] reorderedColIndices = getReorderedIndices(colClusterData);
 			origMatrix.reorderMatrixData(reorderedRowIndices, reorderedColIndices);
+			
+			tvModel.getRowLabelInfo().setLabelTypeArray(rowClusterData.getAxisLabelTypes());
+			tvModel.getColLabelInfo().setLabelTypeArray(colClusterData.getAxisLabelTypes());
+			
+			tvModel.getRowLabelInfo().setLabelArray(rowClusterData.getOrderedLabels());
+			tvModel.getColLabelInfo().setLabelArray(colClusterData.getOrderedLabels());
 		}
 		
 		/** Creates a list of the post-clustering axis index order.
