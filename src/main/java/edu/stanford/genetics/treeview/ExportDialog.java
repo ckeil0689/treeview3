@@ -104,6 +104,8 @@ public class ExportDialog extends CustomDialog {
 
 		//This will cause a cascade of updates
 		updateRegionRadioBtns(getDefaultFormatType().isDocumentFormat());
+
+		LogBuffer.println("ExportDialog ready.");
 	}
 
 	@Override

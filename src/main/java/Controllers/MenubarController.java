@@ -76,7 +76,13 @@ public class MenubarController {
 			tvFrame.closeWindow();
 			break;
 		case StringRes.menu_Export:
-			controller.openExportMenu();
+			try {
+				controller.openExportMenu();
+			} catch(Exception oome) {
+				LogBuffer.println("Out of memory during " +
+					"controller.openExportMenu().");
+				oome.printStackTrace();
+			}
 			break;
 		case StringRes.menu_RowAndCol:
 			controller.openLabelMenu(name);

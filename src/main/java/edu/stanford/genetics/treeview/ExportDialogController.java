@@ -51,7 +51,15 @@ public class ExportDialogController {
 		setNewPreviewComponents(exportOptions);
 		exportDialog.arrangePreviewPanel();
 		updatePreview();
-		exportDialog.setVisible(true);
+		try {
+			exportDialog.setVisible(true);
+		} catch(Exception oome) {
+			LogBuffer.println("Out of memory during exportDialog.setVisible(true).");
+			oome.printStackTrace();
+			showWarning(oome.getLocalizedMessage());
+		}
+
+		LogBuffer.println("ExportDialogController ready");
 	}
 
 	/**

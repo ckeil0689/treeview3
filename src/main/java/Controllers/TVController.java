@@ -982,9 +982,16 @@ public class TVController implements Observer {
 
 		ExportDialog exportDialog = new ExportDialog(selectionsExist, eh);
 
-		new ExportDialogController(	exportDialog, tvFrame, dendroController
-																																			.getInteractiveXMap(),
-																dendroController.getInteractiveYMap(), model);
+		try {
+			new ExportDialogController(exportDialog, tvFrame,
+				dendroController.getInteractiveXMap(),
+				dendroController.getInteractiveYMap(), model);
+		} catch(Exception oome) {
+			LogBuffer.println("Out of memory when trying to create the " +
+				"ExportDialogController.");
+			oome.printStackTrace();
+			showWarning(oome.getLocalizedMessage());
+		}
 	}
 
 	/** Opens up the color chooser dialog. */
