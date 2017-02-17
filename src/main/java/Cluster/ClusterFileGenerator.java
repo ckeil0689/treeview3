@@ -61,32 +61,6 @@ public class ClusterFileGenerator {
 		this.clusterFileWriter = new ClusterFileWriter(file);
 	}
 
-	/** Sets up instance variables needed for writing.
-	 *
-	 * @param rowLabelI - <code>IntLabelInfo</code> object for the row labels.
-	 * @param colLabelI - <code>IntLabelInfo</code> object for the column
-	 *          labels. */
-	public void prepare(final IntLabelInfo rowLabelI,
-											final IntLabelInfo colLabelI) {
-
-		this.rowClusterData.setLabelTypes(rowLabelI.getLabelTypes());
-		this.colClusterData.setLabelTypes(colLabelI.getLabelTypes());
-
-		/* 
-		 * retrieving names and weights of row elements
-		 * format: [[YAL063C, 1.0], ..., [...]]
-		 */
-		this.rowClusterData.setLabels(rowLabelI.getLabelArray());
-		this.colClusterData.setLabels(colLabelI.getLabelArray());
-
-		int rowLabelNum = rowClusterData.getNumLabels();
-		int colLabelNum = colClusterData.getNumLabels();
-
-		// Lists to be filled with reordered strings
-		this.rowClusterData.setOrderedAxisLabels(new String[rowLabelNum][]);
-		this.colClusterData.setOrderedAxisLabels(new String[colLabelNum][]);
-	}
-
 	/** Manages the generation of a clustered data table (CDT) file. */
 	public void generateCDT() {
 

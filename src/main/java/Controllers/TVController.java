@@ -54,7 +54,6 @@ import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.TVModel;
-import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 
 /** This class controls user interaction with TVFrame and its views. */
@@ -521,26 +520,27 @@ public class TVController implements Observer {
 	 * preferences node without saving to file. This is exclusively used 
 	 * post-clustering for now.
 	 */
-	public void updateReorderedData(final boolean isFromCluster) {
-				
-		if(((TVDataMatrix) model.getDataMatrix()).getModified()) {
-			FileSet roFileset = model.getFileSet();
-			String oldRoot = roFileset.getRoot();
-			String oldExt = roFileset.getExt();
-			Preferences oldNode = getOldPreferences(oldRoot, oldExt);
-			DataLoadInfo dataInfo = getStoredDataLoadInfo(roFileset, oldNode);
-			
-	
-			if(dataInfo == null) {
-				String message = "Updating data after clustering was interrupted.";
-				LogBuffer.println(message);
-				return;
-			}
-	
-			dataInfo.setIsClusteredFile(isFromCluster);
-			
-			finishLoading(dataInfo);
+	public void updateReorderedData(final TVModel newModel, 
+	                                final boolean isFromCluster) {
+		
+		LogBuffer.println("UPDATING TVMODEL");
+		FileSet oldFileset = model.getFileSet();
+		String oldRoot = oldFileset.getRoot();
+		String oldExt = oldFileset.getExt();
+		Preferences oldNode = getOldPreferences(oldRoot, oldExt);
+		DataLoadInfo dataInfo = getStoredDataLoadInfo(oldFileset, oldNode);
+		
+
+		if(dataInfo == null) {
+			String message = "Updating data after clustering was interrupted.";
+			LogBuffer.println(message);
+			return;
 		}
+
+		dataInfo.setIsClusteredFile(isFromCluster);
+		model = newModel;
+		finishLoading(dataInfo);
+		
 	}
 
 	/** Used to transfer information to ModelLoader about the data

@@ -33,6 +33,7 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
+import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
@@ -46,8 +47,6 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  * TODO Make use of OOP methods to create more lean controllers. Use interfaces
  * and inheritance and avoid passing of the TVFrameController object here, just
  * to use its loading methods. Also inherits instance variables like tvModel..
- *
- * @author CKeil
  *
  */
 public class ClusterDialogController {
@@ -256,8 +255,6 @@ public class ClusterDialogController {
 				return Boolean.FALSE;
 			}
 			
-			updateTVModel();
-			
 			// Determine file extensions for CDT file (varies between hierarchical and k-means)
 //			String fileEnd = ClusterFileStorage.determineClusterFileExt(
 //					isHierarchical(), clusterView.getSpinnerValues(), 
@@ -276,33 +273,49 @@ public class ClusterDialogController {
 		@Override
 		public void done() {
 
-			boolean shouldSave = true;
-
 			/* 
 			 * Checked again here in case doInBackground() terminates before
 			 * first check (not via cancel).
 			 */
 			if(!isReorderingValid(clusterCheck)) {
 				LogBuffer.println("Something occurred during reordering.");
-//				shouldSave = false;
 				reorderedModel = null;
 				return;
 			}
 			
-			tvController.updateReorderedData(true);
-			
-			//tvController.updateAllData(oldRoot, oldExt, rowClusterData, colClusterData);
-//			if (!isCancelled() && shouldSave) {
-//				saveClusterFile(oldFileName, rowClusterData, colClusterData);
-//				LogBuffer.println("ClusterTask is done: success.");
-//
-//			} else {
-//				rowClusterData.setReorderedIDs(new String[] {});
-//				colClusterData.setReorderedIDs(new String[] {});
-//				clusterView.setClustering(false);
-//				LogBuffer.println("ClusterTask is done: cancelled.");
-//				deleteAllFiles();
-//			}
+			final IntLabelInfo rowLabelI = tvModel.getRowLabelInfo();
+			final IntLabelInfo colLabelI = tvModel.getColLabelInfo();
+
+			prepare(rowLabelI, colLabelI);
+			updateTVModel();
+			tvController.updateReorderedData((TVModel) tvModel, true);
+			clusterDialog.dispose();
+		}
+		
+		/** Sets up instance variables needed for writing.
+		 *
+		 * @param rowLabelI - <code>IntLabelInfo</code> object for the row labels.
+		 * @param colLabelI - <code>IntLabelInfo</code> object for the column
+		 *          labels. */
+		public void prepare(final IntLabelInfo rowLabelI,
+												final IntLabelInfo colLabelI) {
+
+			this.rowClusterData.setLabelTypes(rowLabelI.getLabelTypes());
+			this.colClusterData.setLabelTypes(colLabelI.getLabelTypes());
+
+			/* 
+			 * retrieving names and weights of row elements
+			 * format: [[YAL063C, 1.0], ..., [...]]
+			 */
+			this.rowClusterData.setLabels(rowLabelI.getLabelArray());
+			this.colClusterData.setLabels(colLabelI.getLabelArray());
+
+			int rowLabelNum = rowClusterData.getNumLabels();
+			int colLabelNum = colClusterData.getNumLabels();
+
+			// Lists to be filled with reordered strings
+			this.rowClusterData.setOrderedAxisLabels(new String[rowLabelNum][]);
+			this.colClusterData.setOrderedAxisLabels(new String[colLabelNum][]);
 		}
 		
 		/**
@@ -310,11 +323,11 @@ public class ClusterDialogController {
 		 */
 		private void updateTVModel() {
 
+			LogBuffer.println("UPDATE TVMODEL CSDIALOG");
 			final TVDataMatrix origMatrix = (TVDataMatrix) tvModel.getDataMatrix();
 			int[] reorderedRowIndices = getReorderedIndices(rowClusterData);
 			int[] reorderedColIndices = getReorderedIndices(colClusterData);
 			origMatrix.reorderMatrixData(reorderedRowIndices, reorderedColIndices);
-			origMatrix.setModified(true);
 		}
 		
 		/** Creates a list of the post-clustering axis index order.
@@ -778,11 +791,6 @@ public class ClusterDialogController {
 					rowClusterData, colClusterData, isHierarchical());
 
 			cdtGen.setupWriter(cdtFile);
-
-			final IntLabelInfo rowLabelI = tvModel.getRowLabelInfo();
-			final IntLabelInfo colLabelI = tvModel.getColLabelInfo();
-
-			cdtGen.prepare(rowLabelI, colLabelI);
 			cdtGen.generateCDT();
 
 			filePath = cdtGen.finish();

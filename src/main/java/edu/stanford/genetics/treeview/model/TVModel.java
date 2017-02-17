@@ -782,7 +782,6 @@ public class TVModel extends Observable implements DataModel {
 			
 			if(rows != getNumRow() || cols != getNumCol()) {
 				LogBuffer.println("Size of reordered axes does not match the original matrix.");
-				
 				return;
 			}
 
@@ -801,7 +800,9 @@ public class TVModel extends Observable implements DataModel {
 				}
 			}
 
+			LogBuffer.println("REORDERED");
 			setExprData(reorderedMatrixData);
+			setChanged();
 		}
 		
 		/**
