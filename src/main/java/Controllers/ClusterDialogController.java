@@ -621,7 +621,6 @@ public class ClusterDialogController {
 	 *
 	 * @param reorderedRows
 	 *            Reordered row axis.
-	 * @author CKeil
 	 */
 	private class SaveTask extends SwingWorker<Boolean, Void> {
 
@@ -960,9 +959,6 @@ public class ClusterDialogController {
 	/**
 	 * Listens to a change in selection for the clusterChoice JComboBox in
 	 * clusterView. Calls a new layout setup as a response.
-	 *
-	 * @author CKeil
-	 *
 	 */
 	private class ClusterTypeListener implements ActionListener {
 
@@ -985,8 +981,6 @@ public class ClusterDialogController {
 	 * Listens to a change in selection for the JComboBox linkChooser in
 	 * the ClusterDialog. Calls a new layout setup as a response.
 	 *
-	 * @author CKeil
-	 *
 	 */
 	private class LinkChoiceListener implements ActionListener {
 
@@ -1003,8 +997,6 @@ public class ClusterDialogController {
 	/**
 	 * Listens to a change in selection in the JComboBox for row distance
 	 * measure selection.
-	 *
-	 * @author CKeil
 	 */
 	private class RowDistListener implements ItemListener {
 
@@ -1027,8 +1019,6 @@ public class ClusterDialogController {
 	/**
 	 * Listens to a change in selection in the JComboBox for col distance
 	 * measure selection.
-	 *
-	 * @author CKeil
 	 */
 	private class ColDistListener implements ItemListener {
 
@@ -1052,8 +1042,6 @@ public class ClusterDialogController {
 
 	/**
 	 * Listens to a change in selection in the JSpinners for k-means.
-	 *
-	 * @author CKeil
 	 */
 	private class SpinnerListener implements ChangeListener {
 
@@ -1075,9 +1063,6 @@ public class ClusterDialogController {
 	 * Defines what happens if the user clicks the 'Cancel' button in
 	 * DendroView. Calls the cancel() method in the view. TODO add cancel
 	 * functionality to distance worker and cluster worker.
-	 *
-	 * @author CKeil
-	 *
 	 */
 	private class CancelListener implements ActionListener {
 
