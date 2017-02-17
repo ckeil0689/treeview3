@@ -619,8 +619,9 @@ public class ClusterDialogController {
 	 * visualized right after clustering, given that the process was not
 	 * cancelled.
 	 *
-	 * @param reorderedRows
-	 *            Reordered row axis.
+	 * @param rowClusterData - row clustering data relevant for CDT save file
+	 * @param colClusterData - column clustering data relevant for CDT save file
+	 * @param fileName - name of the CDT file to be written
 	 */
 	private class SaveTask extends SwingWorker<Boolean, Void> {
 
