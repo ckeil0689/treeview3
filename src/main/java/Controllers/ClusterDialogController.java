@@ -347,12 +347,21 @@ public class ClusterDialogController {
 		 */
 		private void updateTVModel() {
 
-			LogBuffer.println("UPDATE TVMODEL CSDIALOG");
+			// data matrix
 			final TVDataMatrix origMatrix = (TVDataMatrix) tvModel.getDataMatrix();
 			int[] reorderedRowIndices = getReorderedIndices(rowClusterData);
 			int[] reorderedColIndices = getReorderedIndices(colClusterData);
 			origMatrix.reorderMatrixData(reorderedRowIndices, reorderedColIndices);
 			
+			
+		  if(rowClusterData.getAxisLabelTypes().length != rowClusterData.getOrderedLabels()[0].length) {
+			  LogBuffer.println("Siye of label types and labels does NOT match");
+		  }
+		  
+		  // labels
+		  final String[] orderedGIDs = rowClusterData.getReorderedIDs();
+			final String[] orderedAIDs = colClusterData.getReorderedIDs();
+
 			tvModel.getRowLabelInfo().setLabelTypeArray(rowClusterData.getAxisLabelTypes());
 			tvModel.getColLabelInfo().setLabelTypeArray(colClusterData.getAxisLabelTypes());
 			
