@@ -35,22 +35,10 @@ public class ClusterFileGenerator {
 	 * interpreted by TreeView.
 	 *
 	 * @param origMatrix The original data matrix.
-	 * @param orderedRows Row labels after clustering.
-	 * @param orderedCols Column labels after clustering.
-	 * @param isRowClustered Indicates whether the row axis is considered to
-	 *          be clustered.
-	 * @param shouldReorderRows Indicates, whether row labels should be reordered.
-	 *          This is different from <code>isRowClustered</code> because a row
-	 *          can be considered clustered and should not undergo reordering,
-	 *          e.g. tree file transfer when an axis was already clustered
-	 *          earlier.
-	 * @param isColClustered Indicates whether the row axis is considered to
-	 *          be clustered.
-	 * @param shouldReorderCols Indicates, whether row labels should be reordered.
-	 *          This is different from <code>isColClustered</code> because a row
-	 *          can be considered clustered and should not undergo reordering,
-	 *          e.g. tree file transfer when an axis was already clustered
-	 *          earlier.
+	 * @param rowClusterData - contains information necessary to reorder
+	 * the rows of the original matrix. 
+	 * @param colClusterData - contains information necessary to reorder
+	 * the columns of the original matrix. 
 	 * @param isHier Indicates type of clustering. If true, clustering is
 	 *          hierarchical. If false, clustering is k-means. */
 	public ClusterFileGenerator(final double[][] origMatrix,
