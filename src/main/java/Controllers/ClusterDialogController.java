@@ -158,8 +158,6 @@ public class ClusterDialogController {
 	 * updating the progress bar and progress label. When the thread is done it
 	 * calls a function to save the results to a CDT file.
 	 *
-	 * @author CKeil
-	 *
 	 */
 	private class ClusterTask extends SwingWorker<Boolean, String> {
 		
