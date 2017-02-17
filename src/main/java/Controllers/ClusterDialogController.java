@@ -161,6 +161,7 @@ public class ClusterDialogController {
 	 */
 	private class ClusterTask extends SwingWorker<Boolean, String> {
 		
+		private DataModel reorderedModel;
 		/* The finished reordered axes */
 		private ClusteredAxisData rowClusterData;
 		private ClusteredAxisData colClusterData;
@@ -255,17 +256,19 @@ public class ClusterDialogController {
 				return Boolean.FALSE;
 			}
 			
-			// Determine file extensions for CDT file (varies between hierarchical and k-means)
-			String fileEnd = ClusterFileStorage.determineClusterFileExt(
-					isHierarchical(), clusterView.getSpinnerValues(), 
-					rowClusterData, colClusterData);
+			updateTVModel();
 			
-			cdtFile = ClusterFileStorage.retrieveFile(clusterFilePath, fileEnd);
-
-			if(cdtFile == null) {
-				this.cancel(true);
-				return Boolean.FALSE;
-			}
+			// Determine file extensions for CDT file (varies between hierarchical and k-means)
+//			String fileEnd = ClusterFileStorage.determineClusterFileExt(
+//					isHierarchical(), clusterView.getSpinnerValues(), 
+//					rowClusterData, colClusterData);
+//			
+//			cdtFile = ClusterFileStorage.retrieveFile(clusterFilePath, fileEnd);
+//
+//			if(cdtFile == null) {
+//				this.cancel(true);
+//				return Boolean.FALSE;
+//			}
 			// finished setting reordered axis labels
 			return Boolean.TRUE;
 		}
@@ -281,19 +284,141 @@ public class ClusterDialogController {
 			 */
 			if(!isReorderingValid(clusterCheck)) {
 				LogBuffer.println("Something occurred during reordering.");
-				shouldSave = false;
+//				shouldSave = false;
+				reorderedModel = null;
+				return;
 			}
 			
-			if (!isCancelled() && shouldSave) {
-				saveClusterFile(oldFileName, rowClusterData, colClusterData);
-				LogBuffer.println("ClusterTask is done: success.");
+			tvController.updateReorderedData(true);
+			
+			//tvController.updateAllData(oldRoot, oldExt, rowClusterData, colClusterData);
+//			if (!isCancelled() && shouldSave) {
+//				saveClusterFile(oldFileName, rowClusterData, colClusterData);
+//				LogBuffer.println("ClusterTask is done: success.");
+//
+//			} else {
+//				rowClusterData.setReorderedIDs(new String[] {});
+//				colClusterData.setReorderedIDs(new String[] {});
+//				clusterView.setClustering(false);
+//				LogBuffer.println("ClusterTask is done: cancelled.");
+//				deleteAllFiles();
+//			}
+		}
+		
+		/**
+		 * Updates the TVModel ... and more? TODO
+		 */
+		private void updateTVModel() {
 
-			} else {
-				rowClusterData.setReorderedIDs(new String[] {});
-				colClusterData.setReorderedIDs(new String[] {});
-				clusterView.setClustering(false);
-				LogBuffer.println("ClusterTask is done: cancelled.");
-				deleteAllFiles();
+			final TVDataMatrix origMatrix = (TVDataMatrix) tvModel.getDataMatrix();
+			int[] reorderedRowIndices = getReorderedIndices(rowClusterData);
+			int[] reorderedColIndices = getReorderedIndices(colClusterData);
+			origMatrix.reorderMatrixData(reorderedRowIndices, reorderedColIndices);
+			origMatrix.setModified(true);
+		}
+		
+		/** Creates a list of the post-clustering axis index order.
+		 * 
+		 * @param cd The <code>ClusteredAxisData</code> object for the axis for which
+		 *          indices are to be retrieved.
+		 * @return An integer array of new axis indices, useful for reordering. */
+		private int[] getReorderedIndices(ClusteredAxisData cd) {
+
+			int[] reorderedIndices = new int[cd.getNumLabels()];
+			int orderedIDNum = cd.getReorderedIDs().length;
+
+			if(cd.shouldReorderAxis() && cd.isAxisClustered() && orderedIDNum != 0) {
+				reorderedIndices = orderElements(cd);
+
+				/* old order simply remains */
+			}
+			else {
+				for(int i = 0; i < reorderedIndices.length; i++) {
+					reorderedIndices[i] = i;
+				}
+				cd.setOrderedAxisLabels(cd.getAxisLabels());
+			}
+
+			return reorderedIndices;
+		}
+		
+		/** Orders the labels for the CDT data based on the ordered ID String arrays.
+		 * 
+		 * @param cd The ClusteredAxisData objects containing all relevant info
+		 *          for label reordering.
+		 * @return List of new element order indices that can be used to rearrange
+		 *         the matrix data consistent with the new element ordering. */
+		private int[] orderElements(ClusteredAxisData cd) {
+
+			String[][] orderedNames = new String[cd.getNumLabels()][];
+			int[] reorderedIndices = new int[cd.getNumLabels()];
+
+			// Make list of gene names to quickly access indexes
+			final String[] geneNames = new String[cd.getNumLabels()];
+
+			if(!isHierarchical()) {
+				for(int i = 0; i < geneNames.length; i++) {
+					geneNames[i] = cd.getAxisLabels()[i][0];
+				}
+			}
+
+			int index = -1;
+			// Make an array of indexes from the ordered column list.
+			for(int i = 0; i < reorderedIndices.length; i++) {
+				final String id = cd.getReorderedIDs()[i];
+
+				if(isHierarchical()) {
+					// extract numerical part of element ID
+					final String adjusted = id.replaceAll("[\\D]", "");
+					// gets index from ordered list, e.g. COL45X --> 45;
+					index = Integer.parseInt(adjusted);
+
+				}
+				else {
+					index = findIndex(geneNames, id);
+				}
+
+				reorderedIndices[i] = index;
+				// reordering column names
+				orderedNames[i] = cd.getAxisLabels()[index];
+			}
+
+			setReorderedNames(orderedNames, cd.getAxisBaseID());
+
+			return reorderedIndices;
+		}
+		
+		/** Finds the index of an element in a String array.
+		 *
+		 * @param array
+		 * @param element
+		 * @return */
+		private int findIndex(final String[] array, final String element) {
+
+			int index = -1;
+			for(int i = 0; i < array.length; i++) {
+
+				if(array[i].equalsIgnoreCase(element)) {
+					index = i;
+				}
+			}
+
+			return index;
+		}
+
+		/** Setting the ordered names depending on the axis to be ordered.
+		 * 
+		 * @param orderedNames
+		 * @param axisLabelType */
+		private void setReorderedNames(	String[][] orderedNames,
+																		String axisLabelType) {
+
+			if(axisLabelType.equals(rowClusterData.getAxisBaseID())) {
+				this.rowClusterData.setOrderedAxisLabels(orderedNames);
+
+			}
+			else if(axisLabelType.equals(colClusterData.getAxisBaseID())) {
+				this.colClusterData.setOrderedAxisLabels(orderedNames);
 			}
 		}
 		
@@ -924,6 +1049,7 @@ public class ClusterDialogController {
 	}
 
 	/**
+	 * @deprecated
 	 * Sets a new <code>DendroView</code> with the new data loaded into 
 	 * <code>TVModel</code>, displaying an updated heat map. 
 	 * It should also close the <code>ClusterDialog</code>.

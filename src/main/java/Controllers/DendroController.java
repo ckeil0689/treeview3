@@ -49,7 +49,6 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.AtrTVModel;
-import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
@@ -725,7 +724,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		// ISSUE: Needs DataModel, not TVModel. Should dataModel be used
 		// in this class rather than TVModel?
 		if((colIndex != null) || (rowIndex != null)) {
-			tvModel = new ReorderedDataModel(tvModel, rowIndex, colIndex);
+			// commented to further check when KMeans gets reinstated
+//			tvModel = new ReorderedDataModel(tvModel, rowIndex, colIndex);
 			LogBuffer.println("DataModel issue in DendroController.");
 		}
 	}

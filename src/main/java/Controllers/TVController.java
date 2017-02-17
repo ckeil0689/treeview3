@@ -53,16 +53,16 @@ import edu.stanford.genetics.treeview.ViewType;
 import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
-import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
+import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 
 /** This class controls user interaction with TVFrame and its views. */
 public class TVController implements Observer {
 
-	private final DataModel model;
 	private final TreeViewFrame tvFrame;
 	private final DendroController dendroController;
+	private DataModel model;
 	private MenubarController menuController;
 	private File file;
 	private FileSet fileMenuSet;
@@ -180,9 +180,7 @@ public class TVController implements Observer {
 	}
 
 	/** Calls a sequence of methods related to loading a file, when its button is
-	 * clicked.
-	 *
-	 * @author CKeil */
+	 * clicked.*/
 	private class LoadButtonListener implements ActionListener {
 
 		@Override
@@ -192,9 +190,7 @@ public class TVController implements Observer {
 		}
 	}
 
-	/** Initiates loading of last used file.
-	 *
-	 * @author CKeil */
+	/** Initiates loading of last used file.*/
 	private class LoadLastButtonListener implements ActionListener {
 
 		@Override
@@ -219,8 +215,7 @@ public class TVController implements Observer {
 
 	/* >>>>>>>>> Component listeners <<<<<<<<<<<< */
 	/** Adds the listeners to all JMenuItems in the main menubar.
-	 *
-	 * @author CKeil */
+	 */
 	private class StackMenuListener implements ActionListener {
 
 		@Override
@@ -520,6 +515,33 @@ public class TVController implements Observer {
 			return;
 		}
 	}
+	
+	/**
+	 * Updates all TVModel data, labels and generates a temporary 
+	 * preferences node without saving to file. This is exclusively used 
+	 * post-clustering for now.
+	 */
+	public void updateReorderedData(final boolean isFromCluster) {
+				
+		if(((TVDataMatrix) model.getDataMatrix()).getModified()) {
+			FileSet roFileset = model.getFileSet();
+			String oldRoot = roFileset.getRoot();
+			String oldExt = roFileset.getExt();
+			Preferences oldNode = getOldPreferences(oldRoot, oldExt);
+			DataLoadInfo dataInfo = getStoredDataLoadInfo(roFileset, oldNode);
+			
+	
+			if(dataInfo == null) {
+				String message = "Updating data after clustering was interrupted.";
+				LogBuffer.println(message);
+				return;
+			}
+	
+			dataInfo.setIsClusteredFile(isFromCluster);
+			
+			finishLoading(dataInfo);
+		}
+	}
 
 	/** Used to transfer information to ModelLoader about the data
 	 * for proper loading and import of settings from old Preferences.
@@ -732,29 +754,6 @@ public class TVController implements Observer {
 
 			setupExtractors();
 		}
-	}
-
-	public void showSubDataModel(	final int[] geneIndexes,
-																final int[] arrayIndexes, final String source,
-																final String name) {
-
-		final ReorderedDataModel dataModel = new ReorderedDataModel(model,
-																																geneIndexes,
-																																arrayIndexes);
-		if(source != null) {
-			dataModel.setSource(source);
-		}
-
-		if(name != null) {
-			dataModel.setName(name);
-		}
-
-		// final ViewFrame window = getApp().openNew();
-		// window.setDataModel(dataModel);
-		// window.setLoaded(true);
-		// window.getAppFrame().setVisible(true);
-		// tvFrame.setDataModel(dataModel);
-		// setViewChoice(false);
 	}
 
 	/** Opens an instance of GeneListMaker used to save a list of genes. */

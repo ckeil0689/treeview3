@@ -769,6 +769,41 @@ public class TVModel extends Observable implements DataModel {
 			return Helper.roundDouble(result, 4);
 		}
 		
+		/** Uses lists of reordered axis indices to reorder the expression 
+		 * data matrix. This algorithm is not in place!
+		 * 
+		 * @param reorderedRowIndices List of reordered row indices.
+		 * @param reorderedColIndices List of reordered column indices */
+		public void reorderMatrixData(final int[] reorderedRowIndices,
+																	final int[] reorderedColIndices) {
+
+			int rows = reorderedRowIndices.length;
+			int cols = reorderedColIndices.length;
+			
+			if(rows != getNumRow() || cols != getNumCol()) {
+				LogBuffer.println("Size of reordered axes does not match the original matrix.");
+				
+				return;
+			}
+
+			double[][] reorderedMatrixData = new double[rows][cols];
+
+			// order the numerical data.
+			int row = -1;
+			int col = -1;
+
+			for(int i = 0; i < rows; i++) {
+				row = reorderedRowIndices[i];
+
+				for(int j = 0; j < cols; j++) {
+					col = reorderedColIndices[j];
+					reorderedMatrixData[i][j] = exprData[row][col];
+				}
+			}
+
+			setExprData(reorderedMatrixData);
+		}
+		
 		/**
 		 * This method truncates a sorted array at the first occurrence of
 		 * NaN or Infinity as defined in the Double class.
