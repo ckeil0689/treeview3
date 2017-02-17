@@ -299,18 +299,6 @@ public class GUIFactory {
 	}
 
 	/**
-	 * Creates a tiny square button with a title. The method centralizes
-	 * the layout setting for these buttons so that all buttons will look similar.
-	 *
-	 * @param title - The text to be displayed on the button.
-	 * @return A very small <code>TinyButton</code> 
-	 */
-	public static TinyButton createTinyBtn(final String title) {
-
-		return new TinyButton(title);
-	}
-
-	/**
 	 * Creates a button with a title and icon if desired. The method centralizes
 	 * the layout setting for buttons so that all buttons will look similar.
 	 *
