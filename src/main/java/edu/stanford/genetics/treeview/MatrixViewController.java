@@ -1015,15 +1015,6 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		boolean isXMin = interactiveXmap.showsAllTiles();
 		boolean isYMin = interactiveYmap.showsAllTiles();
 
-		boolean atRight = (interactiveXmap.getFirstVisible() + interactiveXmap
-																																					.getNumVisible()) == (interactiveXmap.getMaxIndex() +
-																																																1);
-		boolean atLeft = interactiveXmap.getFirstVisible() == 0;
-		boolean atTop = interactiveYmap.getFirstVisible() == 0;
-		boolean atBottom = (interactiveYmap.getFirstVisible() + interactiveYmap
-																																						.getNumVisible()) == (interactiveYmap.getMaxIndex() +
-																																																	1);
-
 		int xTilesVisible = interactiveXmap.getNumVisible();
 		int yTilesVisible = interactiveYmap.getNumVisible();
 
@@ -1040,8 +1031,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 																															.getMinIndex() == interactiveXmap.getFirstVisible() &&
 																	(colSelection.getFullSelectionRange()) == xTilesVisible);
 
-		zoomStatus = new boolean[] {isXMin, isYMin, atRight, atLeft, atTop,
-																atBottom, isSelectionZoomed};
+		zoomStatus = new boolean[] {isXMin, isYMin, isSelectionZoomed};
 
 		return zoomStatus;
 	}

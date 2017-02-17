@@ -69,6 +69,10 @@ public class GUIFactory {
 	public static final int NO_GAPS_OR_INSETS_FILL = 11;
 	public static final int TINY_GAPS_AND_INSETS = 12;
 	public static final int DEBUG = 13;
+	public static final int NO_HORIZ_GAPS = 14;
+	public static final int NO_VERT_GAPS = 15;
+	public static final int TINY_VERT_INSETS = 16;
+	public static final int TINY_HORIZ_INSETS = 17;
 
 	/**
 	 * Creates and returns a simple JPanel with MigLayout to be used as
@@ -139,15 +143,31 @@ public class GUIFactory {
 			break;
 
 		case NO_HORIZ_INSETS:
-			comp.setLayout(new MigLayout("ins 5 0 5 0"));
+			comp.setLayout(new MigLayout("ins 2 0 2 0"));
+			break;
+			
+		case TINY_HORIZ_INSETS:
+			comp.setLayout(new MigLayout("ins 2 1 2 1"));
 			break;
 
 		case NO_VERT_INSETS:
-			comp.setLayout(new MigLayout("ins 0 5 0 5"));
+			comp.setLayout(new MigLayout("ins 0 2 0 2"));
+			break;
+			
+		case TINY_VERT_INSETS:
+			comp.setLayout(new MigLayout("ins 1 2 1 2"));
 			break;
 			
 		case NO_GAPS:
 			comp.setLayout(new MigLayout("gap 0!"));
+			break;
+			
+		case NO_HORIZ_GAPS:
+			comp.setLayout(new MigLayout("gapx 0!"));
+			break;
+			
+		case NO_VERT_GAPS:
+			comp.setLayout(new MigLayout("gapy 0!"));
 			break;
 			
 		case NO_GAPS_OR_INSETS:
@@ -276,19 +296,6 @@ public class GUIFactory {
 		btn.setFocusPainted(true);
 
 		return btn;
-	}
-
-	/**
-	 * Creates a button with a title and icon if desired. The method centralizes
-	 * the layout setting for buttons so that all buttons will look similar.
-	 *
-	 * @param title
-	 * @param iconFileName
-	 * @return
-	 */
-	public static SquareButton createSquareBtn(final String title, int size) {
-
-		return new SquareButton(title, size);
 	}
 
 	/**
