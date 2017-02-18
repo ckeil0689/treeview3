@@ -178,6 +178,7 @@ public class ClusterDialogController {
 		
 		public ClusterTask() {
 			
+			// TODO let background tasks return these
 			this.rowClusterData = new ClusteredAxisData(ROW_IDX);
 			this.colClusterData = new ClusteredAxisData(COL_IDX);
 			

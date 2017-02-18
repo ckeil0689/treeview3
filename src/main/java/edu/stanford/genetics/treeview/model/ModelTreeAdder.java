@@ -6,18 +6,13 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 public class ModelTreeAdder {
 	private final TVModel targetModel;
-	private final List<String[]> atrData;
-	private final List<String[]> gtrData;
 	
-	public ModelTreeAdder(final TVModel targetModel, List<String[]> atrData, 
-	                      List<String[]> gtrData) {
+	public ModelTreeAdder(final TVModel targetModel) {
 		
 		this.targetModel = targetModel;
-		this.atrData = atrData;
-		this.gtrData = gtrData;
 	}
 	
-	public void parseATR(final boolean hasAID) {
+	public void parseATR(final List<String[]> atrData, final boolean hasAID) {
 		
 		/* In case an atr file exists but is empty */
 		if(atrData == null || atrData.isEmpty()) {
@@ -56,7 +51,7 @@ public class ModelTreeAdder {
 		targetModel.aidFound(hasAID);
 	}
 	
-	public void parseGTR(final boolean hasGID) {
+	public void parseGTR(final List<String[]> gtrData, final boolean hasGID) {
 
 		// In case an gtr file exists but is empty
 		if(gtrData == null || gtrData.isEmpty()) {

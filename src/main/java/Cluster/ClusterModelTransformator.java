@@ -1,6 +1,7 @@
 package Cluster;
 
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
+import edu.stanford.genetics.treeview.model.ModelTreeAdder;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
@@ -105,6 +106,14 @@ public class ClusterModelTransformator {
 		model.getRowLabelInfo().addLabels(orderedGIDs);
 		model.getColLabelInfo().addLabels(orderedAIDs);
 		
+		addTrees();
+	}
+	
+	private void addTrees() {
+		
+		ModelTreeAdder mta = new ModelTreeAdder(model);
+	  mta.parseATR(colCAD.getTreeNodeData(), (model.aidFound() && colCAD.shouldReorderAxis()));
+	  mta.parseGTR(rowCAD.getTreeNodeData(), (model.gidFound() && rowCAD.shouldReorderAxis()));
 	}
 	
 	/** Creates a list of the post-clustering axis index order.
