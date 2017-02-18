@@ -15,7 +15,6 @@ public class ClusteredAxisData {
 	private String[] reorderedIDs = new String[0];
 	private String[] axisLabelTypes = new String[0];
 	private String[][] axisLabels = new String[0][];
-	private String[][] orderedAxisLabels = new String[0][];
 	
 	private boolean isAxisClustered;
 	private boolean shouldReorderAxis;
@@ -41,11 +40,6 @@ public class ClusteredAxisData {
 		
 		this.axisLabels = newAxisLabels;
 	}
-	
-//	public void setOrderedAxisLabels(final String[][] newOrderedAxisLabels) {
-//		
-//		this.orderedAxisLabels = newOrderedAxisLabels;
-//	}
 	
 	public void setAxisClustered(final boolean isAxisClustered) {
 		
@@ -87,11 +81,6 @@ public class ClusteredAxisData {
 		
 		return axisLabels.length;
 	}
-	
-//	public String[][] getOrderedLabels() {
-//		
-//		return orderedAxisLabels;
-//	}
 	
 	public boolean isAxisClustered() {
 		

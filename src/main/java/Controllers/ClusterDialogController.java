@@ -24,6 +24,7 @@ import javax.swing.event.ChangeListener;
 
 import Cluster.ClusterFileGenerator;
 import Cluster.ClusterFileStorage;
+import Cluster.ClusterModelTransformator;
 import Cluster.ClusterProcessor;
 import Cluster.ClusteredAxisData;
 import Cluster.DistMatrixCalculator;
@@ -285,179 +286,13 @@ public class ClusterDialogController {
 				LogBuffer.println("Something occurred during reordering.");
 				return;
 			}
-			
-			final IntLabelInfo rowLabelI = tvModel.getRowLabelInfo();
-			final IntLabelInfo colLabelI = tvModel.getColLabelInfo();
 
-			prepare(rowLabelI, colLabelI);
-			updateTVModel();
-			tvController.updateModel((TVModel) tvModel, true);
+			ClusterModelTransformator cmt = 
+				new ClusterModelTransformator(rowClusterData, colClusterData, 
+				                              (TVModel) tvModel);
+			tvController.updateModel(cmt.applyClusterChanges(isHierarchical()), true);
 			clusterDialog.dispose();
 		}
-		
-		/** Sets up instance variables needed for writing.
-		 *
-		 * @param rowLabelI - <code>IntLabelInfo</code> object for the row labels.
-		 * @param colLabelI - <code>IntLabelInfo</code> object for the column
-		 *          labels. */
-		public void prepare(final IntLabelInfo rowLabelI,
-												final IntLabelInfo colLabelI) {
-			
-			this.rowClusterData.setLabelTypes(rowLabelI.getLabelTypes());
-			this.colClusterData.setLabelTypes(colLabelI.getLabelTypes());
-
-			/* 
-			 * retrieving names and weights of row elements
-			 * format: [[YAL063C, 1.0], ..., [...]]
-			 */
-			this.rowClusterData.setLabels(rowLabelI.getLabelArray());
-			this.colClusterData.setLabels(colLabelI.getLabelArray());
-		}
-		
-		/**
-		 * Updates the TVModel ... and more? TODO
-		 */
-		private void updateTVModel() {
-
-			// data matrix
-			final TVDataMatrix origMatrix = (TVDataMatrix) tvModel.getDataMatrix();
-			int[] reorderedRowIndices = getReorderedIndices(rowClusterData);
-			int[] reorderedColIndices = getReorderedIndices(colClusterData);
-			origMatrix.reorderMatrixData(reorderedRowIndices, reorderedColIndices);
-		  
-		  // update label types
-			String[] rLabelTypes = rowClusterData.getAxisLabelTypes();
-			if(!tvModel.gidFound() && rowClusterData.shouldReorderAxis()) {
-				int idx = tvModel.getRowLabelInfo().getNumLabelTypes();
-				tvModel.getRowLabelInfo().addLabelType(ROW_ID_LABELTYPE, idx);
-			  ((TVModel)tvModel).gidFound(true);
-			}
-			
-			String[] cLabelTypes = colClusterData.getAxisLabelTypes();
-			if(!tvModel.aidFound() && colClusterData.shouldReorderAxis()) {
-				int idx = tvModel.getColLabelInfo().getNumLabelTypes();
-				tvModel.getColLabelInfo().addLabelType(COL_ID_LABELTYPE, idx);
-			  ((TVModel)tvModel).aidFound(true);
-			}
-			
-			// labels
-		  final String[] orderedGIDs = rowClusterData.getReorderedIDs();
-			final String[] orderedAIDs = colClusterData.getReorderedIDs();
-			
-			tvModel.getRowLabelInfo().reorderLabels(reorderedRowIndices);
-			tvModel.getColLabelInfo().reorderLabels(reorderedColIndices);
-			
-			tvModel.getRowLabelInfo().setLabelTypeArray(rLabelTypes);
-			tvModel.getColLabelInfo().setLabelTypeArray(cLabelTypes);
-			tvModel.getRowLabelInfo().addLabels(orderedGIDs);
-			tvModel.getColLabelInfo().addLabels(orderedAIDs);
-			
-		}
-		
-		/** Creates a list of the post-clustering axis index order.
-		 * 
-		 * @param cd The <code>ClusteredAxisData</code> object for the axis for which
-		 *          indices are to be retrieved.
-		 * @return An integer array of new axis indices, useful for reordering. */
-		private int[] getReorderedIndices(ClusteredAxisData cd) {
-
-			int[] reorderedIndices = new int[cd.getNumLabels()];
-			int orderedIDNum = cd.getReorderedIDs().length;
-
-			if(cd.shouldReorderAxis() && cd.isAxisClustered() && orderedIDNum != 0) {
-				reorderedIndices = orderElements(cd);
-
-				/* old order simply remains */
-			}
-			else {
-				for(int i = 0; i < reorderedIndices.length; i++) {
-					reorderedIndices[i] = i;
-				}
-//				cd.setOrderedAxisLabels(cd.getAxisLabels());
-			}
-
-			return reorderedIndices;
-		}
-		
-		/** Orders the labels for the CDT data based on the ordered ID String arrays.
-		 * 
-		 * @param cd The ClusteredAxisData objects containing all relevant info
-		 *          for label reordering.
-		 * @return List of new element order indices that can be used to rearrange
-		 *         the matrix data consistent with the new element ordering. */
-		private int[] orderElements(ClusteredAxisData cd) {
-
-//			String[][] orderedNames = new String[cd.getNumLabels()][];
-			int[] reorderedIndices = new int[cd.getNumLabels()];
-
-			// Make list of gene names to quickly access indexes
-			final String[] geneNames = new String[cd.getNumLabels()];
-
-			if(!isHierarchical()) {
-				for(int i = 0; i < geneNames.length; i++) {
-					geneNames[i] = cd.getAxisLabels()[i][0];
-				}
-			}
-
-			int index = -1;
-			// Make an array of indexes from the ordered column list.
-			for(int i = 0; i < reorderedIndices.length; i++) {
-				final String id = cd.getReorderedIDs()[i];
-
-				if(isHierarchical()) {
-					// extract numerical part of element ID
-					final String adjusted = id.replaceAll("[\\D]", "");
-					// gets index from ordered list, e.g. COL45X --> 45;
-					index = Integer.parseInt(adjusted);
-
-				}
-				else {
-					index = findIndex(geneNames, id);
-				}
-
-				reorderedIndices[i] = index;
-				// reordering column names
-//				orderedNames[i] = cd.getAxisLabels()[index]; // TODO necessary?
-			}
-
-//			setReorderedNames(orderedNames, cd.getAxisBaseID());
-
-			return reorderedIndices;
-		}
-		
-		/** Finds the last index of an element match in a String array.
-		 *
-		 * @param array
-		 * @param element
-		 * @return */
-		private int findIndex(final String[] array, final String element) {
-
-			int index = -1;
-			for(int i = 0; i < array.length; i++) {
-
-				if(array[i].equalsIgnoreCase(element)) {
-					index = i;
-				}
-			}
-
-			return index;
-		}
-
-//		/** Setting the ordered names depending on the axis to be ordered.
-//		 * 
-//		 * @param orderedNames
-//		 * @param axisLabelType */
-//		private void setReorderedNames(	String[][] orderedNames,
-//																		String axisLabelType) {
-//
-//			if(axisLabelType.equals(rowClusterData.getAxisBaseID())) {
-//				this.rowClusterData.setOrderedAxisLabels(orderedNames);
-//
-//			}
-//			else if(axisLabelType.equals(colClusterData.getAxisBaseID())) {
-//				this.colClusterData.setOrderedAxisLabels(orderedNames);
-//			}
-//		}
 		
 		/**
 		 * Checks if the arrays of reordered labels are the same size as
