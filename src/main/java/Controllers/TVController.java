@@ -520,7 +520,7 @@ public class TVController implements Observer {
 	 * preferences node without saving to file. This is exclusively used 
 	 * post-clustering for now.
 	 */
-	public void updateReorderedData(final TVModel newModel, 
+	public void updateModel(final TVModel newModel, 
 	                                final boolean isFromCluster) {
 		
 		LogBuffer.println("UPDATING TVMODEL");

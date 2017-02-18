@@ -390,7 +390,7 @@ public class ClusterProcessor {
 			/* Write the tree file */
 			clusterer.finish();
 
-			return clusterer.getReorderedList();
+			return clusterer.getReorderedIDs();
 		}
 		
 		/**

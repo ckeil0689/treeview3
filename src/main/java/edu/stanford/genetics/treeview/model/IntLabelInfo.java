@@ -145,23 +145,37 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 			return false;
 
 		final int newNumLabelTypes = getNumLabelTypes() + 1;
-		for (int row = 0; row < getNumLabels(); row++) {
-			final String[] from = getLabelArray()[row];
-			final String[] to = new String[newNumLabelTypes];
-
-			System.arraycopy(from, 0, to, 0, idx);
-			System.arraycopy(from, idx, to, idx + 1, newNumLabelTypes);
-
-			getLabelArray()[row] = to;
-		}
-
 		final String[] newLabelType = new String[newNumLabelTypes];
 		System.arraycopy(labelTypeArray, 0, newLabelType, 0, idx);
-
 		newLabelType[idx] = labelType;
-		System.arraycopy(labelTypeArray, idx, newLabelType, idx + 1, newNumLabelTypes);
 
 		labelTypeArray = newLabelType;
+		setModified(true);
+		
+		return true;
+	}
+	
+	@Override
+	public boolean addLabels(final String[] newLabels) {
+		
+		if(newLabels.length != labelArray.length) {
+			LogBuffer.println("Could not extend labels because the array of labels" +
+				" to be added does not match the size of the existing label arrays.");
+			return false;
+		}
+		
+		String[][] oldLabelArray = labelArray;
+		String[][] newLabelArray = new String[labelArray.length][];
+		
+		for(int i = 0; i < oldLabelArray.length; i++) {
+			String[] oldEntry = oldLabelArray[i];
+			String[] newEntry = new String[oldEntry.length + 1];
+			System.arraycopy(oldEntry, 0, newEntry, 0, oldEntry.length);
+			newEntry[newEntry.length - 1] = newLabels[i];
+			newLabelArray[i] = newEntry;
+		}
+		
+		labelArray = newLabelArray;
 		setModified(true);
 		
 		return true;

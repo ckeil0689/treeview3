@@ -42,10 +42,10 @@ public class ClusteredAxisData {
 		this.axisLabels = newAxisLabels;
 	}
 	
-	public void setOrderedAxisLabels(final String[][] newOrderedAxisLabels) {
-		
-		this.orderedAxisLabels = newOrderedAxisLabels;
-	}
+//	public void setOrderedAxisLabels(final String[][] newOrderedAxisLabels) {
+//		
+//		this.orderedAxisLabels = newOrderedAxisLabels;
+//	}
 	
 	public void setAxisClustered(final boolean isAxisClustered) {
 		
@@ -88,10 +88,10 @@ public class ClusteredAxisData {
 		return axisLabels.length;
 	}
 	
-	public String[][] getOrderedLabels() {
-		
-		return orderedAxisLabels;
-	}
+//	public String[][] getOrderedLabels() {
+//		
+//		return orderedAxisLabels;
+//	}
 	
 	public boolean isAxisClustered() {
 		

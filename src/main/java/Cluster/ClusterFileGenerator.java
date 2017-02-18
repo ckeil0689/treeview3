@@ -85,7 +85,7 @@ public class ClusterFileGenerator {
 		return filePath;
 	}
 
-	/** Finds the index of an element in a String array.
+	/** Finds the last index of an element match in a String array.
 	 *
 	 * @param array
 	 * @param element
@@ -142,7 +142,7 @@ public class ClusterFileGenerator {
 		idxTracker += rowLabelTypes.length;
 
 		// Adding column names to first row
-		for(final String[] labels : colClusterData.getOrderedLabels()) {
+		for(final String[] labels : colClusterData.getAxisLabels()) {
 			cdtRow[idxTracker] = labels[0];
 			idxTracker++;
 		}
@@ -177,7 +177,7 @@ public class ClusterFileGenerator {
 				idxTracker++;
 			}
 
-			for(final String[] names : colClusterData.getOrderedLabels()) {
+			for(final String[] names : colClusterData.getAxisLabels()) {
 				cdtRow[idxTracker] = names[i];
 				idxTracker++;
 			}
@@ -190,7 +190,7 @@ public class ClusterFileGenerator {
 			// 1) adding row IDs ("ROW130X")...
 			idxTracker = 0;
 			final String[] row = new String[rowLength];
-			String[] labels = rowClusterData.getOrderedLabels()[i];
+			String[] labels = rowClusterData.getAxisLabels()[i];
 
 			if(rowClusterData.isAxisClustered() && !foundGIDs) {
 				row[idxTracker] = orderedGIDs[i];
@@ -262,7 +262,7 @@ public class ClusterFileGenerator {
 		}
 
 		/* Adding column names to first row */
-		for(final String[] element : colClusterData.getOrderedLabels()) {
+		for(final String[] element : colClusterData.getAxisLabels()) {
 			cdtRow1[addIndex] = element[0];
 			addIndex++;
 		}
@@ -282,7 +282,7 @@ public class ClusterFileGenerator {
 		}
 
 		/* Fill with weights */
-		for(final String[] element : colClusterData.getOrderedLabels()) {
+		for(final String[] element : colClusterData.getAxisLabels()) {
 			cdtRow2[addIndex] = element[1];
 			addIndex++;
 		}
@@ -299,7 +299,7 @@ public class ClusterFileGenerator {
 			final String[] row = new String[rowLength];
 
 			for(int j = 0; j < rowLabels.length; j++) {
-				row[addIndex] = rowClusterData.getOrderedLabels()[i][j];
+				row[addIndex] = rowClusterData.getAxisLabels()[i][j];
 				addIndex++;
 			}
 

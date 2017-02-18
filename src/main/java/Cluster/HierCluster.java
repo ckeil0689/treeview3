@@ -49,7 +49,7 @@ public class HierCluster {
 	 * Reordered list of distance matrix rows. This directly represents the
 	 * reordered axis that was selected to be clustered.
 	 */
-	private String[] reorderedRows;
+	private String[] reorderedRowIDs;
 
 	/**
 	 * TEST
@@ -493,7 +493,7 @@ public class HierCluster {
 			bw = new BufferedWriter((new OutputStreamWriter(
 					new FileOutputStream(file.getAbsoluteFile()), "UTF-8")));
 
-			for (String element : reorderedRows) {
+			for (String element : reorderedRowIDs) {
 				bw.write(element + "\n");
 				bw.write("\n");
 			}
@@ -670,12 +670,12 @@ public class HierCluster {
 
 		int limit = finalCluster.size();
 
-		reorderedRows = new String[limit];
+		reorderedRowIDs = new String[limit];
 
 		for (int i = 0; i < limit; i++) {
 
 			element = axisLabelType + finalCluster.get((limit - 1) - i) + "X";
-			reorderedRows[i] = element;
+			reorderedRowIDs[i] = element;
 		}
 	}
 
@@ -684,8 +684,8 @@ public class HierCluster {
 	 *
 	 * @return The reordered list of matrix elements after clustering.
 	 */
-	public String[] getReorderedList() {
+	public String[] getReorderedIDs() {
 
-		return reorderedRows;
+		return reorderedRowIDs;
 	}
 }
