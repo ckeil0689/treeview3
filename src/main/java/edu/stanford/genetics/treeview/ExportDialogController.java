@@ -90,7 +90,6 @@ public class ExportDialogController {
 		eh.setDefaultPageSize(exportOptions.getPaperType());
 		eh.setDefaultPageOrientation(exportOptions.getOrientation());
 		eh.setTileAspectRatio(exportOptions.getAspectType());
-		//Temporarily setting this to false in order to test this new schema for doing the preview based on actual dimensions of the exported image
 		eh.setColLabelsIncluded(exportOptions.getColLabelOption());
 		eh.setRowLabelsIncluded(exportOptions.getRowLabelOption());
 		eh.setCalculatedDimensions(exportOptions.getRegionType());
@@ -98,11 +97,17 @@ public class ExportDialogController {
 		int width = eh.getXDim(exportOptions.getRegionType());
 		int treesHeight = eh.getTreesHeight();
 		int gapSize = eh.getGapSize();
-		int rowLabelsLen = eh.getRowLabelPanelWidth(exportOptions.getRegionType(),exportOptions.getRowLabelOption());
-		int colLabelsLen = eh.getColLabelPanelHeight(exportOptions.getRegionType(),exportOptions.getColLabelOption());
-		int matrixHeight = height - (eh.isColTreeIncluded() ? treesHeight + gapSize : 0) -
+		int rowLabelsLen =
+			eh.getRowLabelPanelWidth(exportOptions.getRegionType(),
+				exportOptions.getRowLabelOption());
+		int colLabelsLen =
+			eh.getColLabelPanelHeight(exportOptions.getRegionType(),
+				exportOptions.getColLabelOption());
+		int matrixHeight = height -
+			(eh.isColTreeIncluded() ? treesHeight + gapSize : 0) -
 			(eh.areColLabelsIncluded() ? colLabelsLen + gapSize : 0);
-		int matrixWidth = width - (eh.isRowTreeIncluded() ? treesHeight + gapSize : 0) -
+		int matrixWidth = width -
+			(eh.isRowTreeIncluded() ? treesHeight + gapSize : 0) -
 			(eh.areRowLabelsIncluded() ? rowLabelsLen + gapSize : 0);
 
 		ExportPreviewTrees expRowTrees =
@@ -137,7 +142,8 @@ public class ExportDialogController {
 			tvFrame.getDendroView().getMatrixSnapshot(
 				options.isShowSelections(),options.getRegionType());
 
-		exportDialog.setPreviewComponents(expRowTrees,expColTrees,expRowLabels,expColLabels,expMatrix);
+		exportDialog.setPreviewComponents(expRowTrees,expColTrees,expRowLabels,
+			expColLabels,expMatrix);
 	}
 
 	/**
@@ -268,10 +274,7 @@ public class ExportDialogController {
 				tvFrame.getRowSelection());
 
 			List<RegionType> tooBigs = new ArrayList<RegionType>();
-			if(!selFormat.isDocumentFormat()) {
-				final boolean useMinimums = true;
-				tooBigs = eh.getOversizedRegions(useMinimums);
-			}
+			tooBigs = eh.getOversizedRegions(true,selFormat.isDocumentFormat());
 
 			exportDialog.setBigRegs(tooBigs);
 			exportDialog.updateRegionRadioBtns(selFormat.isDocumentFormat());
@@ -299,10 +302,12 @@ public class ExportDialogController {
 			FormatType selFormat = exportOptions.getFormatType();
 			RegionType selRegion = exportOptions.getRegionType();
 			AspectType selAspect = exportOptions.getAspectType();
-			LabelExportOption selCols = exportOptions.getColLabelOption();
+			LabelExportOption selRows = exportOptions.getRowLabelOption();
 
-			exportDialog.updateRowLabelBtns(selFormat.isDocumentFormat(),
-				selRegion,selAspect,selCols);
+			//We might need to enable/disable column label buttons upon change
+			//of the row label button selection
+			exportDialog.updateColLabelBtns(selFormat.isDocumentFormat(),
+				selRegion,selAspect,selRows);
 		}
 	}
  
@@ -314,10 +319,12 @@ public class ExportDialogController {
 			FormatType selFormat = exportOptions.getFormatType();
 			RegionType selRegion = exportOptions.getRegionType();
 			AspectType selAspect = exportOptions.getAspectType();
-			LabelExportOption selRows = exportOptions.getColLabelOption();
+			LabelExportOption selCols = exportOptions.getColLabelOption();
 
-			exportDialog.updateColLabelBtns(selFormat.isDocumentFormat(),
-				selRegion,selAspect,selRows);
+			//We might need to enable/disable row label buttons upon change
+			//of the column label button selection
+			exportDialog.updateRowLabelBtns(selFormat.isDocumentFormat(),
+				selRegion,selAspect,selCols);
 		}
 	}
 

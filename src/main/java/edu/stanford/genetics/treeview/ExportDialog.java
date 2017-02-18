@@ -76,24 +76,20 @@ public class ExportDialog extends CustomDialog {
 		super("Export");
 		this.eh = eh;
 		final boolean useMinimums = true;
-		this.bigRegs = eh.getOversizedRegions(useMinimums);
+		FormatType ft = getDefaultFormatType();
+		this.bigRegs = eh.getOversizedRegions(useMinimums,
+			ft.isDocumentFormat());
 		this.selectionsExist = selectionsExist;
 
 		//This interface interactively sets its own defaults based on user
 		//selections and what turns out to be too big, so let's set a minimum
 		//calculated size to start based on the defaults selected in this class
-		/* TODO: Organize this code better so that there aren't so many nested
-		         calls to various getDefault* methods */
-		eh.setCalculatedDimensions(getDefaultRegion(getDefaultFormatType()), 
-			getDefaultAspectType(getDefaultFormatType(),
-			eh.getOversizedAspects(getDefaultRegion(getDefaultFormatType()))));
+		RegionType rt = getDefaultRegion(ft);
+		eh.setCalculatedDimensions(rt, getDefaultAspectType(ft,
+			eh.getOversizedAspects(rt,ft.isDocumentFormat())));
 
-		this.rowLabelsTooBig = getDefaultFormatType().isDocumentFormat() ?
-			false : eh.areRowLabelsTooBig(
-				getDefaultRegion(getDefaultFormatType()));
-		this.colLabelsTooBig = getDefaultFormatType().isDocumentFormat() ?
-			false : eh.areColLabelsTooBig(
-				getDefaultRegion(getDefaultFormatType()));
+		this.rowLabelsTooBig = eh.areRowLabelsTooBig(rt,ft.isDocumentFormat());
+		this.colLabelsTooBig = eh.areColLabelsTooBig(rt,ft.isDocumentFormat());
 
 		this.gapsize = eh.getGapSize(); //Minimum gap size
 
@@ -103,7 +99,7 @@ public class ExportDialog extends CustomDialog {
 		setupLayout();
 
 		//This will cause a cascade of updates
-		updateRegionRadioBtns(getDefaultFormatType().isDocumentFormat());
+		updateRegionRadioBtns(ft.isDocumentFormat());
 
 		LogBuffer.println("ExportDialog ready.");
 	}
@@ -456,7 +452,8 @@ public class ExportDialog extends CustomDialog {
 		final RegionType selectedRegion,final FormatType selectedFormat) {
 
 		//Default region pre-selected
-		List<AspectType> tooBigs = eh.getOversizedAspects(selectedRegion);
+		List<AspectType> tooBigs = eh.getOversizedAspects(selectedRegion,
+			selectedFormat.isDocumentFormat());
 		AspectType defAsp = getDefaultAspectType(selectedFormat,tooBigs);
 
 		// Switched to normal for loop to handle last button via index
@@ -467,16 +464,15 @@ public class ExportDialog extends CustomDialog {
 			if(asp == defAsp) {
 				option.setSelected(true);
 			}
-			if(!selectedFormat.isDocumentFormat() && tooBigs.contains(asp)) {
+			if(tooBigs.contains(asp)) {
 				option.setEnabled(false);
 				option.setToolTipText("Too big for PNG/JPG/PPM export");
 			}
 			aspectRadioBtns.add(option);
-			
+
 			// Wrap after last button, also span because of long name	
 			if(i == vals.length - 1) {
 				optionsPanel.add(option, "span, wrap");
-				
 			} else {
 				optionsPanel.add(option);
 			}
@@ -1030,15 +1026,33 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 
-		//Get the current selected column label option
+		//Get the current selected column label option or set default to be used
+		//in deciding whether the row label options should be enabled
 		Enumeration<AbstractButton> cBtns = colLabelBtns.getElements();
 		LabelExportOption selectedCLEO = LabelExportOption.getDefault();
+		boolean oneIsSelected = false;
 		while(cBtns.hasMoreElements()) {
 			AbstractButton option = cBtns.nextElement();
 			if(option.isSelected()) {
 				selectedCLEO =
 					LabelExportOption.getLabelExportOption(option.getText());
+				oneIsSelected = true;
 				break;
+			}
+		}
+		/* TODO: This should actually be done in updateRowLabelBtns or
+		 * updateColLabelBtns.  If there's code there toi do it already, it
+		 * should be fixed, because it's not working */
+		if(!oneIsSelected) {
+			cBtns = colLabelBtns.getElements();
+			while(cBtns.hasMoreElements()) {
+				AbstractButton option = cBtns.nextElement();
+				LabelExportOption leo =
+					LabelExportOption.getLabelExportOption(option.getText());
+				if(leo == selectedCLEO) {
+					option.setSelected(true);
+					break;
+				}
 			}
 		}
 
@@ -1046,15 +1060,33 @@ public class ExportDialog extends CustomDialog {
 		//format, region, and aspect (and column/row labels)
 		updateRowLabelBtns(isDocFormat,selectedRegion,selectedAspect,selectedCLEO);
 
-		//Get the current selected column label option
+		//Get the current selected row label option or set default to be used
+		//in deciding whether the column label options should be enabled
 		Enumeration<AbstractButton> rBtns = rowLabelBtns.getElements();
 		LabelExportOption selectedRLEO = LabelExportOption.getDefault();
+		oneIsSelected = false;
 		while(rBtns.hasMoreElements()) {
 			AbstractButton option = rBtns.nextElement();
 			if(option.isSelected()) {
 				selectedRLEO =
 					LabelExportOption.getLabelExportOption(option.getText());
+				oneIsSelected = true;
 				break;
+			}
+		}
+		/* TODO: This should actually be done in updateRowLabelBtns or
+		 * updateColLabelBtns.  If there's code there toi do it already, it
+		 * should be fixed, because it's not working */
+		if(!oneIsSelected) {
+			rBtns = rowLabelBtns.getElements();
+			while(cBtns.hasMoreElements()) {
+				AbstractButton option = rBtns.nextElement();
+				LabelExportOption leo =
+					LabelExportOption.getLabelExportOption(option.getText());
+				if(leo == selectedRLEO) {
+					option.setSelected(true);
+					break;
+				}
 			}
 		}
 
@@ -1062,6 +1094,15 @@ public class ExportDialog extends CustomDialog {
 	}
 
 	/* TODO: Make sure this takes inclusion of trees into account */
+	/**
+	 * Update row label buttons based on other selections
+	 * 
+	 * @param isDocFormat - Whether we're exporting in doc format or not 
+	 * @param selectedRegion - the selected region
+	 * @param selectedAsp - the selected aspect ratio
+	 * @param selectedColLEO - We need to know whether col labels are being
+	 *                         exported already
+	 */
 	public void updateRowLabelBtns(final boolean isDocFormat,
 		final RegionType selectedRegion,final AspectType selectedAsp,
 		final LabelExportOption selectedColLEO) {
@@ -1074,7 +1115,7 @@ public class ExportDialog extends CustomDialog {
 		//Any labels included uses the same image space, so we only need to test 1 option that includes labels
 		eh.setRowLabelsIncluded(LabelExportOption.YES);
 		eh.setCalculatedDimensions(selectedRegion);
-		rowLabelsTooBig = eh.areRowLabelsTooBig(selectedRegion);
+		rowLabelsTooBig = eh.areRowLabelsTooBig(selectedRegion,isDocFormat);
 
 		//Check if row label buttons need to be disabled/enabled based on
 		//selected region
@@ -1084,7 +1125,7 @@ public class ExportDialog extends CustomDialog {
 					LabelExportOption.getLabelExportOption(option.getText());
 			boolean enabled = true;
 			if((!selectionsExist && leo == LabelExportOption.SELECTION) ||
-				(!isDocFormat && rowLabelsTooBig && leo != LabelExportOption.NO)) {
+				(rowLabelsTooBig && leo != LabelExportOption.NO)) {
 
 				enabled = false;
 			}
@@ -1122,6 +1163,15 @@ public class ExportDialog extends CustomDialog {
 	}
 
 	/* TODO: Make sure this takes inclusion of trees into account */
+	/**
+	 * Update col label buttons based on other selections
+	 * 
+	 * @param isDocFormat - Whether we're exporting in doc format or not 
+	 * @param selectedRegion - the selected region
+	 * @param selectedAsp - the selected aspect ratio
+	 * @param selectedRowLEO - We need to know whether row labels are being
+	 *                         exported already
+	 */
 	public void updateColLabelBtns(final boolean isDocFormat,
 		final RegionType selectedRegion,final AspectType selectedAsp,
 		final LabelExportOption selectedRowLEO) {
@@ -1130,28 +1180,33 @@ public class ExportDialog extends CustomDialog {
 		boolean changeSelected = false;
 
 		eh.setTileAspectRatio(selectedAsp);
-		eh.setColLabelsIncluded(selectedRowLEO);
+		eh.setRowLabelsIncluded(selectedRowLEO);
 		//Any labels included uses the same image space, so we only need to test 1 option that includes labels
 		eh.setColLabelsIncluded(LabelExportOption.YES);
 		eh.setCalculatedDimensions(selectedRegion);
-		colLabelsTooBig = eh.areColLabelsTooBig(selectedRegion);
+		colLabelsTooBig = eh.areColLabelsTooBig(selectedRegion,isDocFormat);
  
 		//Check if col label buttons need to be disabled/enabled based on
 		//selected region
 		while(clBtns.hasMoreElements()) {
 			AbstractButton option = clBtns.nextElement();
 			LabelExportOption leo =
-					LabelExportOption.getLabelExportOption(option.getText());
+				LabelExportOption.getLabelExportOption(option.getText());
 			boolean enabled = true;
+			//If the column label option is invalid or would result in an image
+			//that is too big, disable it
 			if((!selectionsExist && leo == LabelExportOption.SELECTION) ||
-				(!isDocFormat && colLabelsTooBig && leo != LabelExportOption.NO)) {
+				(colLabelsTooBig && leo != LabelExportOption.NO)) {
 				enabled = false;
 			}
+			//If the column label option was disabled, yet is selected, mark the
+			//selection to be changed
 			if(!enabled && option.isSelected()) {
 				option.setSelected(false);
 				changeSelected = true;
 			}
 			option.setEnabled(enabled);
+			//Update the tool tip
 			if(enabled) {
 				option.setToolTipText(null);
 			} else if(!selectionsExist && leo == LabelExportOption.SELECTION) {

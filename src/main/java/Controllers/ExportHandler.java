@@ -5,8 +5,6 @@ package Controllers;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -574,7 +572,7 @@ public class ExportHandler {
 	 * @return
 	 */
 	public List<RegionType> getOversizedMinimumRegions() {
-		return(getOversizedRegions(true));
+		return(getOversizedRegions(true,false));
 	}
 
 	/**
@@ -583,16 +581,27 @@ public class ExportHandler {
 	 *
 	 * @return
 	 */
-	public List<RegionType> getMinimumAvailableRegions() {
+	public List<RegionType> getMinimumAvailableRegions(
+		final boolean matrixOnly) {
+
 		List<RegionType> regs = new ArrayList<RegionType>();
 		for(int i = 0;i < RegionType.values().length;i++) {
-			//If this region is valid for export and it is not too big
-			if(isExportValid(RegionType.values()[i]) &&
-				((((double) getMinXDim(RegionType.values()[i]) /
-				(double) MAX_IMAGE_SIZE) *
-				(double) getMinYDim(RegionType.values()[i])) <= 1.0)) {
+			RegionType rt = RegionType.values()[i];
+			int xdim,ydim;
+			if(matrixOnly) {
+				xdim = getNumXExportIndexes(rt) * curMinTileDim;
+				ydim = getNumYExportIndexes(rt) * curMinTileDim;
+			} else {
+				xdim = getMinXDim(rt);
+				ydim = getMinYDim(rt);
+			}
 
-				regs.add(RegionType.values()[i]);
+			//If this region is valid for export and it is not too big
+			if(isExportValid(rt) &&
+				((double) xdim / (double) MAX_IMAGE_SIZE * (double) ydim <=
+				1.0)) {
+
+				regs.add(rt);
 			}
 		}
 		return(regs);
@@ -604,7 +613,7 @@ public class ExportHandler {
 	 * @return
 	 */
 	public boolean isImageExportPossible() {
-		return(getMinimumAvailableRegions().size() > 0);
+		return(getMinimumAvailableRegions(false).size() > 0);
 	}
 
 	/**
@@ -616,16 +625,26 @@ public class ExportHandler {
 	 *            if the current size is too big
 	 * @return
 	 */
-	public List<RegionType> getOversizedRegions(final boolean minimum) {
+	public List<RegionType> getOversizedRegions(final boolean minimum,
+		final boolean matrixOnly) {
+
 		List<RegionType> regs = new ArrayList<RegionType>();
 		for(int i = 0;i < RegionType.values().length;i++) {
+			RegionType rt = RegionType.values()[i];
+			int xdim,ydim;
+			if(matrixOnly) {
+				xdim = getNumXExportIndexes(rt) *
+					(minimum ? curMinTileDim : tileWidth);
+				ydim = getNumYExportIndexes(rt) *
+					(minimum ? curMinTileDim : tileHeight);
+			} else {
+				xdim = minimum ? getMinXDim(rt) : getXDim(rt);
+				ydim = minimum ? getMinYDim(rt) : getYDim(rt);
+			}
 			//If this region is valid for export and it is too big
 			if(isExportValid(RegionType.values()[i]) &&
-				((((double) (minimum ? getMinXDim(RegionType.values()[i]) :
-					getXDim(RegionType.values()[i])) /
-					(double) MAX_IMAGE_SIZE) *
-				(double) (minimum ? getMinYDim(RegionType.values()[i]) :
-					getYDim(RegionType.values()[i]))) > 1.0)) {
+				((((double) xdim / (double) MAX_IMAGE_SIZE) * (double) ydim) >
+				1.0)) {
 
 				regs.add(RegionType.values()[i]);
 			}
@@ -643,7 +662,7 @@ public class ExportHandler {
 	 * @return
 	 */
 	public List<AspectType> getOversizedAspects(
-		final RegionType selectedRegion) {
+		final RegionType selectedRegion, final boolean matrixOnly) {
 
 		//Save the current dimension values
 		double saveAspect = aspectRatio;
@@ -652,13 +671,28 @@ public class ExportHandler {
 		int saveTileWidth = tileWidth;
 		int saveGapSize = gapSize;
 
+		int xdim,ydim;
+		if(matrixOnly) {
+			xdim = getNumXExportIndexes(selectedRegion) * tileWidth;
+			ydim = getNumYExportIndexes(selectedRegion) * tileHeight;
+		} else {
+			xdim = getXDim(selectedRegion);
+			ydim = getYDim(selectedRegion);
+		}
+
 		List<AspectType> asps = new ArrayList<AspectType>();
 		for(int i = 0;i < AspectType.values().length;i++) {
 			AspectType aspect = AspectType.values()[i];
 			setCalculatedDimensions(selectedRegion,aspect);
 			//If this aspect results in an image that is too big
-			if((((double) getXDim(selectedRegion) / (double) MAX_IMAGE_SIZE) *
-				(double) getYDim(selectedRegion)) > 1.0) {
+			//The logic below is weird to avoid generating a number larger than
+			//Integer.MAX_VALUE.  It's more easily understood as:
+			//if(w*h > Integer.MAX_VALUE)
+			//NOTE: if we are doing matrixOnly, we do not include the gaps,
+			//labels, or trees.  This is intended to service the case where we
+			//embed a PNG of the matrix inside a PDF
+			if(((double) xdim / (double) MAX_IMAGE_SIZE * (double) ydim) >
+				1.0) {
 
 				asps.add(aspect);
 			}
@@ -1167,17 +1201,42 @@ public class ExportHandler {
 	 * make the image size exceed the dimensions allowable for image export
 	 * (limited by BufferedImage's MAX_INTEGER requirement).
 	 * @param reg
+	 * @param matrixOnly - Only calculate dimensions of the matrix necessary to
+	 *                     accommodate the labels
 	 * @return
 	 */
-	public boolean areRowLabelsTooBig(RegionType reg) {
+	public boolean areRowLabelsTooBig(final RegionType reg,
+		final boolean matrixOnly) {
+
+		/* TODO: This needs to be redone differently. This strategy of saving
+		 * the label option, changing, calculating, then restoring &
+		 * recalculating is problematic. What if the calling code had not set
+		 * calculated dimensions yet? What should be done is setting options &
+		 * calculating in the caller and then asking if it's too big. */
+		LabelExportOption save_rleo = rowLabelsIncluded;
+		setRowLabelsIncluded(true);
+		setCalculatedDimensions(reg);
+
+		int xdim,ydim;
+		if(matrixOnly) {
+			xdim = getNumXExportIndexes(reg) * tileWidth;
+			ydim = getNumYExportIndexes(reg) * tileHeight;
+		} else {
+			xdim = getXDim(reg);
+			ydim = getYDim(reg);
+		}
 
 		//If this region is valid for export and it is not too big
 		if(isExportValid(reg) &&
-			((((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) *
-			(double) getYDim(reg)) <= 1.0)) {
+			((double) xdim / (double) MAX_IMAGE_SIZE * (double) ydim) < 1.0) {
 
+			setRowLabelsIncluded(save_rleo);
+			setCalculatedDimensions(reg);
 			return(false);
 		}
+
+		setRowLabelsIncluded(save_rleo);
+		setCalculatedDimensions(reg);
 		return(true);
 	}
 
@@ -1186,17 +1245,42 @@ public class ExportHandler {
 	 * will make the image size exceed the dimensions allowable for image export
 	 * (limited by BufferedImage's MAX_INTEGER requirement).
 	 * @param reg
+	 * @param matrixOnly - Only calculate dimensions of the matrix necessary to
+	 *                     accommodate the labels
 	 * @return
 	 */
-	public boolean areColLabelsTooBig(RegionType reg) {
+	public boolean areColLabelsTooBig(final RegionType reg,
+		final boolean matrixOnly) {
+
+		/* TODO: This needs to be redone differently. This strategy of saving
+		 * the label option, changing, calculating, then restoring &
+		 * recalculating is problematic. What if the calling code had not set
+		 * calculated dimensions yet? What should be done is setting options &
+		 * calculating in the caller and then asking if it's too big. */
+		LabelExportOption save_cleo = colLabelsIncluded;
+		setColLabelsIncluded(true);
+		setCalculatedDimensions(reg);
+
+		int xdim,ydim;
+		if(matrixOnly) {
+			xdim = getNumXExportIndexes(reg) * tileWidth;
+			ydim = getNumYExportIndexes(reg) * tileHeight;
+		} else {
+			xdim = getXDim(reg);
+			ydim = getYDim(reg);
+		}
 
 		//If this region is valid for export and it is not too big
 		if(isExportValid(reg) &&
-			((((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) *
-			(double) getYDim(reg)) <= 1.0)) {
+			((double) xdim / (double) MAX_IMAGE_SIZE * (double) ydim) < 1.0) {
 
+			setColLabelsIncluded(save_cleo);
+			setCalculatedDimensions(reg);
 			return(false);
 		}
+
+		setColLabelsIncluded(save_cleo);
+		setCalculatedDimensions(reg);
 		return(true);
 	}
 
