@@ -6,9 +6,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * This class is specifically concerned with writing data to tree files.
- * 
- * @author chris0689
- *
  */
 public class TreeFileWriter extends ClusterFileWriter {
 

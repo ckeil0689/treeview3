@@ -1,5 +1,8 @@
 package Cluster;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A class used to organize and store relevant data for clustering an axis.
  * It can be passed and used throughout different phases of clustering and
@@ -15,6 +18,7 @@ public class ClusteredAxisData {
 	private String[] reorderedIDs = new String[0];
 	private String[] axisLabelTypes = new String[0];
 	private String[][] axisLabels = new String[0][];
+	private List<String[]> treeNodeData = new ArrayList<String[]>();
 	
 	private boolean isAxisClustered;
 	private boolean shouldReorderAxis;
@@ -29,6 +33,11 @@ public class ClusteredAxisData {
 	public void setReorderedIDs(final String[] newReorderedIDs) {
 		
 		this.reorderedIDs = newReorderedIDs;
+	}
+	
+  public void setTreeNodeData(final List<String[]> newTreeNodeData) {
+		
+		this.treeNodeData = newTreeNodeData;
 	}
 	
 	public void setLabelTypes(final String[] newAxisLabelTypes) {
@@ -65,6 +74,11 @@ public class ClusteredAxisData {
 	public String[] getReorderedIDs() {
 		
 		return reorderedIDs;
+	}
+	
+	public List<String[]> getTreeNodeData() {
+		
+		return treeNodeData;
 	}
 	
 	public String[] getAxisLabelTypes() {

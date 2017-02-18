@@ -106,20 +106,20 @@ public class ClusterProcessor {
 	 * Starts a SwingWorker thread to do the clustering and waits for it to
 	 * return a String array containing the reordered axis elements.
 	 *
-	 * @param distMatrix
-	 * @param linkMethod
-	 * @param spinnerInput
-	 * @param hierarchical
-	 * @param axis
-	 * 
-	 * @return Reordered matrix labels.
+	 * @param distMatrix - The distance matrix calculated for clustering
+	 * @param cad - ClusteredAxisData object which will store clustering results
+	 * @param linkMethod - The cluster linkage method to be employed
+	 * @param spinnerInput - The input values from the GUI spinners (Kmeans)
+	 * @param hierarchical - Whether we perform hierarchical clustering or Kmeans
+	 * @param axis - The matrix axis to be clustered
 	 */
-	public String[] clusterAxis(final DistanceMatrix distMatrix,
+	public void clusterAxis(final DistanceMatrix distMatrix,
+	                            final ClusteredAxisData cad,
 			final int linkMethod, final Integer[] spinnerInput,
 			final boolean hierarchical, final int axis, final File treeFile) {
 
 		try {
-			this.clusterer = new Clusterer(distMatrix, linkMethod,
+			this.clusterer = new Clusterer(distMatrix, cad, linkMethod,
 					spinnerInput, hierarchical, axis, treeFile);
 			clusterer.execute();
 
@@ -127,11 +127,11 @@ public class ClusterProcessor {
 			 * Get() blocks until this thread finishes, so the following code
 			 * waits for this procedure to finish.
 			 */
-			return clusterer.get();
+			clusterer.get();
 
 		} catch (InterruptedException | ExecutionException e) {
 			LogBuffer.logException(e);
-			return new String[] {};
+			return;
 		}
 	}
 
@@ -279,9 +279,10 @@ public class ClusterProcessor {
 	 * so it can respond appropriately. Input data is translated into output
 	 * data here.
 	 */
-	private class Clusterer extends SwingWorker<String[], Integer> {
+	private class Clusterer extends SwingWorker<Void, Integer> {
 
 		private final DistanceMatrix distMatrix;
+		private final ClusteredAxisData cad;
 		private final int linkMethod;
 		private final Integer[] spinnerInput;
 		private final int axis;
@@ -292,10 +293,12 @@ public class ClusterProcessor {
 		private final File treeFile;
 
 		public Clusterer(final DistanceMatrix distMatrix,
+		                 final ClusteredAxisData cad,
 				final int linkMethod, final Integer[] spinnerInput,
 				final boolean hier, final int axis, final File treeFile) {
 
 			this.distMatrix = distMatrix;
+			this.cad = cad;
 			this.linkMethod = linkMethod;
 			this.spinnerInput = spinnerInput;
 			this.hier = hier;
@@ -316,13 +319,15 @@ public class ClusterProcessor {
 		}
 
 		@Override
-		public String[] doInBackground() {
+		public Void doInBackground() {
 
 			if (hier) {
-				return doHierarchicalCluster();
+				doHierarchicalCluster();
+				return null;
 			}
 			
-			return doKMeansCluster();
+		  doKMeansCluster();
+		  return null;
 		}
 
 		@Override
@@ -350,19 +355,18 @@ public class ClusterProcessor {
 		 * Initializes the hierarchical clustering process, 
 		 * starts and finishes the tree file writer, and keeps tracks of
 		 * the GUI aspects such as updating the progress bar for ClusterView.
-		 * @return A reordered list of labels.
 		 */
-		private String[] doHierarchicalCluster() {
+		private void doHierarchicalCluster() {
 			
 			if(treeFile == null) {
 				LogBuffer.println("TreeFile not set, aborting cluster.");
-				return new String[] {};
+				return;
 			}
 			
 			final HierCluster clusterer = new HierCluster(linkMethod,
 					distMatrix, axis);
-			clusterer.setupTreeFileWriter(treeFile);
-			fileWriter = clusterer.getTreeFileWriter();
+//			clusterer.setupTreeFileWriter(treeFile);
+//			fileWriter = clusterer.getTreeFileWriter();
 
 			/*
 			 * Continue process until distMatrix has a size of 1, This array
@@ -384,21 +388,21 @@ public class ClusterProcessor {
 
 			/* Return empty String[] if user cancels operation */
 			if (isCancelled()) {
-				return new String[] {};
+				return;
 			}
 
 			/* Write the tree file */
 			clusterer.finish();
 
-			return clusterer.getReorderedIDs();
+			cad.setReorderedIDs(clusterer.getReorderedIDs());
+			cad.setTreeNodeData(clusterer.getTreeNodeData());
 		}
 		
 		/**
 		 * Initializes the K-Means clustering process, and keeps tracks of
 		 * the GUI aspects such as updating the progress bar for ClusterView.
-		 * @return A reordered list of labels.
 		 */
-		private String[] doKMeansCluster() {
+		private void doKMeansCluster() {
 			
 			int k;
 			int iterations;
@@ -441,13 +445,13 @@ public class ClusterProcessor {
 				LogBuffer.println("Length: " + labelArray.length);
 				LogBuffer.println("Distance Matrix: "
 						+ distMatrix.getSize());
-				return new String[] {};
+				return;
 			}
 
 			/* Write data and close writer */
 			clusterer.finish(labelArray);
 
-			return clusterer.getReorderedList();
+			cad.setReorderedIDs(clusterer.getReorderedList());
 		}
 	}
 	

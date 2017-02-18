@@ -55,6 +55,7 @@ public class HierCluster {
 	 * TEST
 	 */
 	private List<Node> nodeList;
+	private List<String[]> treeNodeData;
 
 	/*
 	 * List to keep track of all clusters during each iteration of the
@@ -65,7 +66,7 @@ public class HierCluster {
 	private List<List<Integer>> currentClusters;
 	private int[][] rowIndexTable;
 
-	private TreeFileWriter treeWriter;
+//	private TreeFileWriter treeWriter;
 
 	private String[] links; // needed for connectNodes??? better way?
 
@@ -98,10 +99,10 @@ public class HierCluster {
 		prepareCluster();
 	}
 	
-	public TreeFileWriter getTreeFileWriter() {
-		
-		return this.treeWriter;
-	}
+//	public TreeFileWriter getTreeFileWriter() {
+//		
+//		return this.treeWriter;
+//	}
 
 	/**
 	 * Goes through a bunch of steps to prepare the object and data for
@@ -186,7 +187,9 @@ public class HierCluster {
 		 * Then write data to buffer and add the new node to links, so the next
 		 * clusters can be checked in connectNodes() during future iterations.
 		 */
-		links[iterNum] = treeWriter.writeData(link, iterNum, min);
+		String[] nodeData = getNodeData(link, iterNum, min);
+		links[iterNum] = nodeData[0];
+		treeNodeData.add(nodeData);
 
 		/* Record new node with its data, so it can be sorted later. */
 		// addNodeToList(link);
@@ -471,7 +474,7 @@ public class HierCluster {
 		//
 		// LogBuffer.println("Ordered nodes: " + orderedNodes);
 
-		treeWriter.closeWriter();
+//		treeWriter.closeWriter();
 		linker.close();
 		reorderRows(currentClusters.get(0));
 
@@ -511,17 +514,17 @@ public class HierCluster {
 		}
 	}
 
-	/**
-	 * Sets up a buffered writer to write & save the tree files (GTR & ATR).
-	 * Also sets the filePath to the directory in which the resulting file was
-	 * saved. Cancels the cluster worker and alerts the user if there's a
-	 * problem with setting up the buffered writer since there wouldn't be a
-	 * filePath where the cluster data could be saved anyways.
-	 */
-	public void setupTreeFileWriter(final File file) {
-
-		this.treeWriter = new TreeFileWriter(file);
-	}
+//	/**
+//	 * Sets up a buffered writer to write & save the tree files (GTR & ATR).
+//	 * Also sets the filePath to the directory in which the resulting file was
+//	 * saved. Cancels the cluster worker and alerts the user if there's a
+//	 * problem with setting up the buffered writer since there wouldn't be a
+//	 * filePath where the cluster data could be saved anyways.
+//	 */
+//	public void setupTreeFileWriter(final File file) {
+//
+//		this.treeWriter = new TreeFileWriter(file);
+//	}
 
 	/**
 	 * Find minimum of an integer array that represents a cluster. O(n)
@@ -658,6 +661,39 @@ public class HierCluster {
 
 		return name;
 	}
+	
+	/**
+	 * Writes information about the newly clustered elements to a buffer.
+	 * 
+	 * @param link
+	 *            The pair of newly linked elements.
+	 * @param loopNum
+	 *            The current iteration step of clustering.
+	 * @param min
+	 *            The minimum value from the distance matrix associated with the
+	 *            current cluster pair.
+	 * @return The ID of the newly formed tree node.
+	 */
+	public String[] getNodeData(final String[] link, int loopNum, double min) {
+
+		/*
+		 * List to store the Strings which represent calculated data (such as
+		 * row pairs) to be added to dataTable.
+		 */
+		final int nodeInfoSize = 4;
+		final String[] nodeInfo = new String[nodeInfoSize];
+
+		/*
+		 * Create a list that stores the info of the current new node to be
+		 * formed. This will be written down in the corresponding tree file.
+		 */
+		nodeInfo[0] = "NODE" + (loopNum + 1) + "X";
+		nodeInfo[1] = link[0];
+		nodeInfo[2] = link[1];
+		nodeInfo[3] = String.valueOf(1 - min);
+
+		return nodeInfo;
+	}
 
 	/**
 	 * Reorders the finalCluster and returns it as a String[].
@@ -679,6 +715,10 @@ public class HierCluster {
 		}
 	}
 
+	public List<String[]> getTreeNodeData() {
+		
+		return treeNodeData;
+	}
 	/**
 	 * Getter for the reordered list
 	 *

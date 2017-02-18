@@ -238,7 +238,7 @@ public class ClusterDialogController {
 			// Cluster rows if user selected option
 			if (clusterCheck[ROW_IDX]) {
 //				gtrFile = ClusterFileStorage.retrieveFile(clusterFilePath, GTR_END);
-				rowClusterData.setReorderedIDs(calculateAxis(rowSimilarity, ROW, gtrFile));
+				calculateAxis(rowClusterData, rowSimilarity, ROW, gtrFile);
 				rowClusterData.shouldReorderAxis(true);
 			}
 
@@ -250,7 +250,7 @@ public class ClusterDialogController {
 			// Cluster columns if user selected option
 			if (clusterCheck[COL_IDX]) {
 //				atrFile = ClusterFileStorage.retrieveFile(clusterFilePath, ATR_END);
-				colClusterData.setReorderedIDs(calculateAxis(colSimilarity, COL, atrFile));
+				calculateAxis(colClusterData, colSimilarity, COL, atrFile);
 				colClusterData.shouldReorderAxis(true);
 			}
 			
@@ -555,8 +555,9 @@ public class ClusterDialogController {
 		 *            The chosen matrix axis.
 		 * @return A list of reordered axis elements.
 		 */
-		private String[] calculateAxis(final int similarity, final int axis,
-				final File treeFile) {
+		private void calculateAxis(final ClusteredAxisData cad, 
+		                               final int similarity, final int axis,
+		                               final File treeFile) {
 			
 			boolean isRow = (axis == ROW);
 			
@@ -571,15 +572,13 @@ public class ClusterDialogController {
 			distMatrix.setMatrix(processor.calcDistance(similarity, axis));
 
 			if (isCancelled()) {
-				return new String[] {};
+				return;
 			}
 
 			publish("Clustering " + axisType + " data...");
 
-			String[] reorderedAxisIDs =  processor.clusterAxis(distMatrix, clusterView.getLinkMethod(),
+			processor.clusterAxis(distMatrix, cad, clusterView.getLinkMethod(),
 					clusterView.getSpinnerValues(), isHierarchical(), axis, treeFile);
-			
-			return reorderedAxisIDs;
 		}
 	}
 	
