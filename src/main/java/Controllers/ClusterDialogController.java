@@ -232,12 +232,12 @@ public class ClusterDialogController {
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], clusterCheck[COL_IDX]);
 			
 			// TODO need to add drive partition part to the path when subpath is created
-			final Path clusterFilePath = ClusterFileStorage.createDirectoryStruc(oldFileName, 
-					clusterView.getLinkMethod());
+//			final Path clusterFilePath = ClusterFileStorage.createDirectoryStruc(oldFileName, 
+//					clusterView.getLinkMethod());
 			
 			// Cluster rows if user selected option
 			if (clusterCheck[ROW_IDX]) {
-				gtrFile = ClusterFileStorage.retrieveFile(clusterFilePath, GTR_END);
+//				gtrFile = ClusterFileStorage.retrieveFile(clusterFilePath, GTR_END);
 				rowClusterData.setReorderedIDs(calculateAxis(rowSimilarity, ROW, gtrFile));
 				rowClusterData.shouldReorderAxis(true);
 			}
@@ -249,7 +249,7 @@ public class ClusterDialogController {
 			
 			// Cluster columns if user selected option
 			if (clusterCheck[COL_IDX]) {
-				atrFile = ClusterFileStorage.retrieveFile(clusterFilePath, ATR_END);
+//				atrFile = ClusterFileStorage.retrieveFile(clusterFilePath, ATR_END);
 				colClusterData.setReorderedIDs(calculateAxis(colSimilarity, COL, atrFile));
 				colClusterData.shouldReorderAxis(true);
 			}
