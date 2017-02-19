@@ -95,6 +95,9 @@ public class HierCluster {
 		this.axisLabelType = (axis == ClusterDialogController.ROW) ? 
 						ClusterFileGenerator.ROW_AXIS_BASEID : 
 							ClusterFileGenerator.COL_AXIS_BASEID;
+		
+		treeNodeData = new ArrayList<String[]>(initial_matrix_size);
+		treeNodeData.add(new String[] {	"NODEID", "LEFT", "RIGHT", "CORRELATION"});
 
 		prepareCluster();
 	}

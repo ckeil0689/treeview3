@@ -263,22 +263,22 @@ public class TVModel extends Observable implements DataModel {
 		documentConfig = newVal;
 	}
 
-	protected void hashAIDs() {
+	public void hashAIDs() {
 
 		colLabelInfo.hashIDs("AID");
 	}
 
-	protected void hashGIDs() {
+	public void hashGIDs() {
 
 		rowLabelInfo.hashIDs("GID");
 	}
 
-	protected void hashATRs() {
+	public void hashATRs() {
 
 		atrLabelInfo.hashIDs("NODEID");
 	}
 
-	protected void hashGTRs() {
+	public void hashGTRs() {
 
 		gtrLabelInfo.hashIDs("NODEID");
 	}

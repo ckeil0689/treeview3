@@ -10,6 +10,11 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class ModelTreeAdder {
 	private final TVModel targetModel;
 	
+	private String[] gtrLabelTypes = new String[] {};
+	private String[][] gtrLabels = new String[][] {};
+	private String[] atrLabelTypes = new String[] {};
+	private String[][] atrLabels = new String[][] {};
+	
 	public ModelTreeAdder(final TVModel targetModel) {
 		
 		this.targetModel = targetModel;
@@ -19,20 +24,20 @@ public class ModelTreeAdder {
 	 * Parses column tree data obtained from clustering.
 	 * @param atrData - A list of String arrays in which each entry 
 	 * describes a node-node-value pair.
+	 * @return whether trees were successfully parsed
 	 */
-	public void parseATR(final List<String[]> atrData) {
+	public boolean parseATR(final List<String[]> atrData) {
 		
 		if(targetModel == null) {
 			LogBuffer.println("Cannot parse column tree data because no model was " +
 			                  "specified.");
-			return;
+			return false;
 		}
 		
 		// in case an atr file exists but is empty */
 		if(atrData == null || atrData.isEmpty()) {
 			LogBuffer.println("ATR file empty.");
-			targetModel.aidFound(false);
-			return;
+			return false;
 		}
 
 		final String[] firstRow = atrData.get(0);
@@ -41,48 +46,49 @@ public class ModelTreeAdder {
 				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
 
 			// okay, need to assign label types...
-			targetModel.setAtrLabelTypes(new String[] {	"NODEID", "LEFT", "RIGHT",
+			setAtrLabelTypes(new String[] {	"NODEID", "LEFT", "RIGHT",
 																									"CORRELATION"});
 
 			final String[][] atrLabels = new String[atrData.size()][];
 			for(int i = 0; i < atrLabels.length; i++) {
 				atrLabels[i] = atrData.get(i);
 			}
-			targetModel.setAtrLabels(atrLabels);
+			setAtrLabels(atrLabels);
 		}
 		else {// first row of tempVector is actual label type names...
-			targetModel.setAtrLabelTypes(firstRow);
+			setAtrLabelTypes(firstRow);
 
 			final String[][] atrLabels = new String[atrData.size() - 1][];
 			for(int i = 0; i < atrLabels.length; i++) {
 				atrLabels[i] = atrData.get(i + 1);
 			}
-			targetModel.setAtrLabels(atrLabels);
+			setAtrLabels(atrLabels);
 		}
 
 		targetModel.hashAIDs();
 		targetModel.hashATRs();
-		targetModel.aidFound(true);
+		
+		return true;
 	}
 	
 	/**
 	 * Parses row tree data obtained from clustering.
 	 * @param gtrData - A list of String arrays in which each entry 
 	 * describes a node-node-value pair.
+	 * @return whether trees were successfully parsed
 	 */
-	public void parseGTR(final List<String[]> gtrData) {
+	public boolean parseGTR(final List<String[]> gtrData) {
 
 		if(targetModel == null) {
 			LogBuffer.println("Cannot parse row tree data because no model was " +
 			                  "specified.");
-			return;
+			return false;
 		}
 		
 		// in case an gtr file exists but is empty
 		if(gtrData == null || gtrData.isEmpty()) {
 			LogBuffer.println("GTR file empty.");
-			targetModel.gidFound(false);
-			return;
+			return false;
 		}
 
 		final String[] firstRow = gtrData.get(0);
@@ -90,28 +96,68 @@ public class ModelTreeAdder {
 		(firstRow.length == 4)// is the length classic?
 				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
 			// okay, need to assign label types...
-			targetModel.setGtrLabelTypes(new String[] {	"NODEID", "LEFT", "RIGHT",
+			setGtrLabelTypes(new String[] {	"NODEID", "LEFT", "RIGHT",
 																									"CORRELATION"});
 
 			final String[][] gtrLabels = new String[gtrData.size()][];
 			for(int i = 0; i < gtrLabels.length; i++) {
 				gtrLabels[i] = gtrData.get(i);
 			}
-			targetModel.setGtrLabels(gtrLabels);
+			setGtrLabels(gtrLabels);
 
 		}
 		else {// first row of tempVector is actual label type names...
-			targetModel.setGtrLabelTypes(firstRow);
+			setGtrLabelTypes(firstRow);
 
 			final String[][] gtrLabels = new String[gtrData.size() - 1][];
 			for(int i = 0; i < gtrLabels.length; i++) {
 				gtrLabels[i] = gtrData.get(i + 1);
 			}
-			targetModel.setGtrLabels(gtrLabels);
+			setGtrLabels(gtrLabels);
 		}
 
 		targetModel.hashGIDs();
 		targetModel.hashGTRs();
-		targetModel.gidFound(true);
+		return true;
+	}
+
+	
+	public String[] getGtrLabelTypes() {
+		return gtrLabelTypes;
+	}
+
+	
+	public void setGtrLabelTypes(String[] gtrLabelTypes) {
+		this.gtrLabelTypes = gtrLabelTypes;
+	}
+
+	
+	public String[][] getGtrLabels() {
+		return gtrLabels;
+	}
+
+	
+	public void setGtrLabels(String[][] gtrLabels) {
+		this.gtrLabels = gtrLabels;
+	}
+
+	
+	public String[] getAtrLabelTypes() {
+		return atrLabelTypes;
+	}
+
+	
+	public void setAtrLabelTypes(String[] atrLabelTypes) {
+		this.atrLabelTypes = atrLabelTypes;
+	}
+
+	
+	public String[][] getAtrLabels() {
+		return atrLabels;
+	}
+
+	
+	public void setAtrLabels(String[][] atrLabels) {
+		this.atrLabels = atrLabels;
 	}
 }

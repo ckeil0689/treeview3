@@ -18,8 +18,8 @@ public class ClusterModelTransformator {
 	
 	private final ClusteredAxisData rowCAD;
 	private final ClusteredAxisData colCAD;
-	private final TVModel model;
 	
+	private TVModel model;
 	private boolean isHierarchical = true; 
 	
 	public ClusterModelTransformator(ClusteredAxisData rowCAD, 
@@ -79,32 +79,26 @@ public class ClusterModelTransformator {
 		int[] reorderedColIndices = getReorderedIndices(colCAD);
 		origMatrix.reorderMatrixData(reorderedRowIndices, reorderedColIndices);
 	  
-	  // update label types
-		String[] rLabelTypes = rowCAD.getAxisLabelTypes();
-		if(!model.gidFound() && rowCAD.shouldReorderAxis()) {
+	  // update labels
+		if(!model.gidFound() && rowCAD.isAxisClustered()) {
 			int idx = model.getRowLabelInfo().getNumLabelTypes();
 			model.getRowLabelInfo().addLabelType(ROW_ID_LABELTYPE, idx);
 		  ((TVModel)model).gidFound(true);
+		  
+		  final String[] orderedGIDs = rowCAD.getReorderedIDs();
+			model.getRowLabelInfo().reorderLabels(reorderedRowIndices);
+			model.getRowLabelInfo().addLabels(orderedGIDs);
 		}
 		
-		String[] cLabelTypes = colCAD.getAxisLabelTypes();
-		if(!model.aidFound() && colCAD.shouldReorderAxis()) {
+		if(!model.aidFound() && colCAD.isAxisClustered()) {
 			int idx = model.getColLabelInfo().getNumLabelTypes();
 			model.getColLabelInfo().addLabelType(COL_ID_LABELTYPE, idx);
 		  ((TVModel)model).aidFound(true);
+		  
+		  final String[] orderedAIDs = colCAD.getReorderedIDs();
+			model.getColLabelInfo().reorderLabels(reorderedColIndices);
+			model.getColLabelInfo().addLabels(orderedAIDs);
 		}
-		
-		// labels
-	  final String[] orderedGIDs = rowCAD.getReorderedIDs();
-		final String[] orderedAIDs = colCAD.getReorderedIDs();
-		
-		model.getRowLabelInfo().reorderLabels(reorderedRowIndices);
-		model.getColLabelInfo().reorderLabels(reorderedColIndices);
-		
-		model.getRowLabelInfo().setLabelTypeArray(rLabelTypes);
-		model.getColLabelInfo().setLabelTypeArray(cLabelTypes);
-		model.getRowLabelInfo().addLabels(orderedGIDs);
-		model.getColLabelInfo().addLabels(orderedAIDs);
 		
 		addTrees();
 	}
@@ -116,12 +110,24 @@ public class ClusterModelTransformator {
 		
 		ModelTreeAdder mta = new ModelTreeAdder(model);
 		
-		if(rowCAD.shouldReorderAxis()) {
-			mta.parseGTR(rowCAD.getTreeNodeData());
+		if(rowCAD.isAxisClustered()) {
+			boolean wasParsed = mta.parseGTR(rowCAD.getTreeNodeData());
+			if(wasParsed) {
+				model.setGtrLabelTypes(mta.getGtrLabelTypes());
+				model.setGtrLabels(mta.getGtrLabels());
+				model.hashGIDs();
+				model.hashGTRs();
+			}
 		}
 		
-		if(colCAD.shouldReorderAxis()) {
-			mta.parseATR(colCAD.getTreeNodeData());
+		if(colCAD.isAxisClustered()) {
+			boolean wasParsed = mta.parseATR(colCAD.getTreeNodeData());
+			if(wasParsed) {
+				model.setAtrLabelTypes(mta.getAtrLabelTypes());
+				model.setAtrLabels(mta.getAtrLabels());
+				model.hashAIDs();
+				model.hashATRs();
+			}
 		}
 	}
 	

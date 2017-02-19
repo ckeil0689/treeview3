@@ -129,6 +129,7 @@ public class ClusterProcessor {
 			LogBuffer.println("Interrupted when clustering.");
 			ClusteredAxisData cad = new ClusteredAxisData(axisID);
 			cad.shouldReorderAxis(false);
+			cad.setAxisClustered(false);
 			return cad;
 		}
 	}
@@ -285,7 +286,7 @@ public class ClusterProcessor {
 		private final int axisID;
 		private final int max;
 		private final boolean hier;
-		private final ClusteredAxisData cad;
+		private ClusteredAxisData cad;
 		
 		public Clusterer(final DistanceMatrix distMatrix,
 				final int linkMethod, final Integer[] spinnerInput,
@@ -373,6 +374,7 @@ public class ClusterProcessor {
 			cad.setReorderedIDs(clusterer.getReorderedIDs());
 			cad.setTreeNodeData(clusterer.getTreeNodeData());
 			cad.shouldReorderAxis(true);
+			cad.setAxisClustered(true);
 			
 			return cad;
 		}
@@ -427,6 +429,7 @@ public class ClusterProcessor {
 			clusterer.finish(labelArray);
 
 			cad.setReorderedIDs(clusterer.getReorderedList());
+			cad.setAxisClustered(true);
 			return cad;
 		}
 	}
