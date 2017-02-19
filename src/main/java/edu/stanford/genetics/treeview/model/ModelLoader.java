@@ -141,6 +141,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	protected void done() {
 
 		doubleData = null;
+		
+		// store load information in Preferences
+		final Preferences fileNode = controller.getConfigNode().node("File");
+		Preferences documentConfig = getConfigData(targetModel, fileNode);
+		storeDataLoadInfo(documentConfig);
+		targetModel.setDocumentConfig(documentConfig);
 
 		// Update GUI, set new DendroView
 		controller.finishLoading(dataInfo);
@@ -246,18 +252,15 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			LogBuffer.println("No GTR file found for this CDT file.");
 			targetModel.gidFound(false);
 		}
-
-		setConfigData();
 	}
 
 	/** Loads or sets up configuration data for the file. */
-	private void setConfigData() {
+	public static Preferences getConfigData(final DataModel model, 
+	                                 final Preferences fileNode) {
 
 		try {
-			final String fileName = targetModel.getFileSet().getRoot();
-			final String fileExt = targetModel.getFileSet().getExt();
-
-			final Preferences fileNode = controller.getConfigNode().node("File");
+			final String fileName = model.getFileSet().getRoot();
+			final String fileExt = model.getFileSet().getExt();
 
 			Preferences documentConfig = null;
 			final String[] childrenNodes = fileNode.childrenNames();
@@ -291,12 +294,11 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 				documentConfig.put("extension", fileExt);
 			}
 
-			storeDataLoadInfo(documentConfig);
-			targetModel.setDocumentConfig(documentConfig);
+			return documentConfig;
 		}
 		catch(final Exception e) {
 			LogBuffer.logException(e);
-			targetModel.setDocumentConfig(null);
+			return null;
 		}
 	}
 
@@ -306,6 +308,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	 * @param node - The node at which the values will be stored. */
 	private void storeDataLoadInfo(Preferences node) {
 
+		if(node == null) {
+			LogBuffer.println("Cannot store any data load information. " +
+				"The Preferences node for the model is not defined.");
+			return;
+		}
+		
 		node.putBoolean("firstLoad", false);
 		node.put("delimiter", dataInfo.getDelimiter());
 		node.putInt("rowCoord", dataInfo.getDataStartRow());
