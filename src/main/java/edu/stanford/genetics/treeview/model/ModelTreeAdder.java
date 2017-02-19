@@ -4,6 +4,9 @@ import java.util.List;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
+/**
+ * Parses supplied tree data (node-node-value) and 
+ */
 public class ModelTreeAdder {
 	private final TVModel targetModel;
 	
@@ -12,9 +15,20 @@ public class ModelTreeAdder {
 		this.targetModel = targetModel;
 	}
 	
-	public void parseATR(final List<String[]> atrData, final boolean hasAID) {
+	/**
+	 * Parses column tree data obtained from clustering.
+	 * @param atrData - A list of String arrays in which each entry 
+	 * describes a node-node-value pair.
+	 */
+	public void parseATR(final List<String[]> atrData) {
 		
-		/* In case an atr file exists but is empty */
+		if(targetModel == null) {
+			LogBuffer.println("Cannot parse column tree data because no model was " +
+			                  "specified.");
+			return;
+		}
+		
+		// in case an atr file exists but is empty */
 		if(atrData == null || atrData.isEmpty()) {
 			LogBuffer.println("ATR file empty.");
 			targetModel.aidFound(false);
@@ -48,12 +62,23 @@ public class ModelTreeAdder {
 
 		targetModel.hashAIDs();
 		targetModel.hashATRs();
-		targetModel.aidFound(hasAID);
+		targetModel.aidFound(true);
 	}
 	
-	public void parseGTR(final List<String[]> gtrData, final boolean hasGID) {
+	/**
+	 * Parses row tree data obtained from clustering.
+	 * @param gtrData - A list of String arrays in which each entry 
+	 * describes a node-node-value pair.
+	 */
+	public void parseGTR(final List<String[]> gtrData) {
 
-		// In case an gtr file exists but is empty
+		if(targetModel == null) {
+			LogBuffer.println("Cannot parse row tree data because no model was " +
+			                  "specified.");
+			return;
+		}
+		
+		// in case an gtr file exists but is empty
 		if(gtrData == null || gtrData.isEmpty()) {
 			LogBuffer.println("GTR file empty.");
 			targetModel.gidFound(false);
@@ -87,6 +112,6 @@ public class ModelTreeAdder {
 
 		targetModel.hashGIDs();
 		targetModel.hashGTRs();
-		targetModel.gidFound(hasGID);
+		targetModel.gidFound(true);
 	}
 }

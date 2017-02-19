@@ -109,11 +109,20 @@ public class ClusterModelTransformator {
 		addTrees();
 	}
 	
+	/**
+	 * Adds tree data from ClusteredAxisData of both axes to the TVModel. 
+	 */
 	private void addTrees() {
 		
 		ModelTreeAdder mta = new ModelTreeAdder(model);
-	  mta.parseATR(colCAD.getTreeNodeData(), (model.aidFound() && colCAD.shouldReorderAxis()));
-	  mta.parseGTR(rowCAD.getTreeNodeData(), (model.gidFound() && rowCAD.shouldReorderAxis()));
+		
+		if(rowCAD.shouldReorderAxis()) {
+			mta.parseGTR(rowCAD.getTreeNodeData());
+		}
+		
+		if(colCAD.shouldReorderAxis()) {
+			mta.parseATR(colCAD.getTreeNodeData());
+		}
 	}
 	
 	/** Creates a list of the post-clustering axis index order.

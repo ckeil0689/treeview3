@@ -459,6 +459,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		LogBuffer.println("Done parsing for CDT-format.");
 	}
 
+	//TODO replace with ModelTreeAdder to reduce code
 	private void parseGTR() {
 
 		// First, load the GTR File
@@ -501,6 +502,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.gidFound(hasGID);
 	}
 
+	//TODO replace with ModelTreeAdder to reduce code
 	private void parseATR() {
 
 		// First, load the ATR File
