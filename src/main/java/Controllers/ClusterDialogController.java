@@ -166,8 +166,8 @@ public class ClusterDialogController {
 	private class ClusterTask extends SwingWorker<Boolean, String> {
 		
 		/* The finished reordered axes */
-		private ClusteredAxisData rowClusterData;
-		private ClusteredAxisData colClusterData;
+		private ClusteredAxisData rowCAD;
+		private ClusteredAxisData colCAD;
 		
 		private boolean[] clusterCheck;
 
@@ -178,12 +178,12 @@ public class ClusterDialogController {
 		
 		public ClusterTask() {
 			
-			// TODO let background tasks return these
-			this.rowClusterData = new ClusteredAxisData(ROW_IDX);
-			this.colClusterData = new ClusteredAxisData(COL_IDX);
+			// defaults
+			this.rowCAD = new ClusteredAxisData(ROW_IDX);
+			this.colCAD = new ClusteredAxisData(COL_IDX);
 			
-			rowClusterData.setReorderedIDs(getOldIDs(ROW_IDX));
-			colClusterData.setReorderedIDs(getOldIDs(COL_IDX));
+			rowCAD.setReorderedIDs(getOldIDs(ROW_IDX));
+			colCAD.setReorderedIDs(getOldIDs(COL_IDX));
 		}
 
 		@Override
@@ -236,23 +236,17 @@ public class ClusterDialogController {
 //			final Path clusterFilePath = ClusterFileStorage.createDirectoryStruc(oldFileName, 
 //					clusterView.getLinkMethod());
 			
-			// Cluster rows if user selected option
-			if (clusterCheck[ROW_IDX]) {
-//				gtrFile = ClusterFileStorage.retrieveFile(clusterFilePath, GTR_END);
-				calculateAxis(rowClusterData, rowSimilarity, ROW, gtrFile);
-				rowClusterData.shouldReorderAxis(true);
+			if(clusterCheck[ROW_IDX]) {
+				rowCAD = calculateAxis(rowSimilarity, ROW);
 			}
 
 			// Check for cancellation in between axis clustering
-			if (isCancelled()) {
+			if(isCancelled()) {
 				return Boolean.FALSE;
 			}
 			
-			// Cluster columns if user selected option
 			if (clusterCheck[COL_IDX]) {
-//				atrFile = ClusterFileStorage.retrieveFile(clusterFilePath, ATR_END);
-				calculateAxis(colClusterData, colSimilarity, COL, atrFile);
-				colClusterData.shouldReorderAxis(true);
+				colCAD = calculateAxis(colSimilarity, COL);
 			}
 			
 			if(!isReorderingValid(clusterCheck)) {
@@ -260,19 +254,6 @@ public class ClusterDialogController {
 				return Boolean.FALSE;
 			}
 			
-			// TODO move to FileSaver class
-			// Determine file extensions for CDT file (varies between hierarchical and k-means)
-//			String fileEnd = ClusterFileStorage.determineClusterFileExt(
-//					isHierarchical(), clusterView.getSpinnerValues(), 
-//					rowClusterData, colClusterData);
-//			
-//			cdtFile = ClusterFileStorage.retrieveFile(clusterFilePath, fileEnd);
-//
-//			if(cdtFile == null) {
-//				this.cancel(true);
-//				return Boolean.FALSE;
-//			}
-			// finished setting reordered axis labels
 			return Boolean.TRUE;
 		}
 
@@ -283,14 +264,13 @@ public class ClusterDialogController {
 			 * Checked again here in case doInBackground() terminates before
 			 * first check (not via cancel).
 			 */
-			if(!isReorderingValid(clusterCheck)) {
+			if(!isReorderingValid(clusterCheck) || isCancelled()) {
 				LogBuffer.println("Something occurred during reordering.");
 				return;
 			}
 
 			ClusterModelTransformator cmt = 
-				new ClusterModelTransformator(rowClusterData, colClusterData, 
-				                              (TVModel) tvModel);
+				new ClusterModelTransformator(rowCAD, colCAD, (TVModel) tvModel);
 			tvController.updateModel(cmt.applyClusterChanges(isHierarchical()), true);
 			clusterDialog.dispose();
 		}
@@ -309,8 +289,8 @@ public class ClusterDialogController {
 			int numRowLabels = tvModel.getRowLabelInfo().getNumLabels();
 			int numColLabels = tvModel.getColLabelInfo().getNumLabels();
 			
-			int numReorderedRowIDs = rowClusterData.getReorderedIDs().length;
-			int numReorderedColIDs = colClusterData.getReorderedIDs().length;
+			int numReorderedRowIDs = rowCAD.getReorderedIDs().length;
+			int numReorderedColIDs = colCAD.getReorderedIDs().length;
 			
 			if(shouldClusterAxis[ROW_IDX] || tvModel.gidFound()) {
 				rowsValid = (numReorderedRowIDs == numRowLabels); 
@@ -435,8 +415,8 @@ public class ClusterDialogController {
 			final boolean checkForColTreeFile = wasColAxisClustered 
 					|| shouldClusterAxis[COL_IDX];
 			
-			rowClusterData.setAxisClustered(checkForRowTreeFile);
-			colClusterData.setAxisClustered(checkForColTreeFile);
+			rowCAD.setAxisClustered(checkForRowTreeFile);
+			colCAD.setAxisClustered(checkForColTreeFile);
 			
 			return shouldClusterAxis;
 		}
@@ -552,34 +532,32 @@ public class ClusterDialogController {
 		 *
 		 * @param similarity
 		 *            The chosen similarity measure.
-		 * @param axis
+		 * @param axisID
 		 *            The chosen matrix axis.
 		 * @return A list of reordered axis elements.
 		 */
-		private void calculateAxis(final ClusteredAxisData cad, 
-		                               final int similarity, final int axis,
-		                               final File treeFile) {
+		private ClusteredAxisData calculateAxis(final int similarity, 
+		                                        final int axisID) {
 			
-			boolean isRow = (axis == ROW);
-			
-			/* Row axis cluster */
 			final DistanceMatrix distMatrix = new DistanceMatrix(0);
-			final String axisType = (isRow) ? "row" : "column";
+			final String axisType = (axisID == ROW) ? "row" : "column";
 
-			/* ProgressBar label */
+			// progressBar label
 			publish("Calculating " + axisType + " distances...");
 
-			/* Calculating the distance matrix */
-			distMatrix.setMatrix(processor.calcDistance(similarity, axis));
+			// calculating the distance matrix
+			distMatrix.setMatrix(processor.calcDistance(similarity, axisID));
 
 			if (isCancelled()) {
-				return;
+				ClusteredAxisData cad = new ClusteredAxisData(axisID);
+				cad.shouldReorderAxis(false);
+				return cad;
 			}
 
 			publish("Clustering " + axisType + " data...");
 
-			processor.clusterAxis(distMatrix, cad, clusterView.getLinkMethod(),
-					clusterView.getSpinnerValues(), isHierarchical(), axis, treeFile);
+			return (processor.clusterAxis(distMatrix, clusterView.getLinkMethod(),
+					clusterView.getSpinnerValues(), isHierarchical(), axisID));
 		}
 	}
 	
@@ -614,8 +592,8 @@ public class ClusterDialogController {
 	 * visualized right after clustering, given that the process was not
 	 * cancelled.
 	 *
-	 * @param rowClusterData - row clustering data relevant for CDT save file
-	 * @param colClusterData - column clustering data relevant for CDT save file
+	 * @param rowCAD - row clustering data relevant for CDT save file
+	 * @param colCAD - column clustering data relevant for CDT save file
 	 * @param fileName - name of the CDT file to be written
 	 */
 	private class SaveTask extends SwingWorker<Boolean, Void> {
