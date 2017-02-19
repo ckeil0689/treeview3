@@ -22,7 +22,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 public class TVModel extends Observable implements DataModel {
 
-	// protected TreeViewFrame tvFrame;
+	private boolean wasModified = false;
+	
 	protected FileSet source = null;
 	protected String dir = null;
 	protected String root;
@@ -800,7 +801,6 @@ public class TVModel extends Observable implements DataModel {
 				}
 			}
 
-			LogBuffer.println("REORDERED");
 			setExprData(reorderedMatrixData);
 			setChanged();
 		}
@@ -1148,7 +1148,8 @@ public class TVModel extends Observable implements DataModel {
 	public boolean getModified() {
 
 		return getGtrLabelInfo().getModified() 
-				|| getAtrLabelInfo().getModified();
+				|| getAtrLabelInfo().getModified()
+				|| wasModified;
 	}
 
 	@Override
@@ -1171,5 +1172,22 @@ public class TVModel extends Observable implements DataModel {
 		}
 
 		return source.getRoot() + source.getExt();
+	}
+	
+	public void setModified(boolean wasModified) {
+		
+		this.wasModified = wasModified;
+	}
+	
+	/**
+	 * Update the file name of the underlying FileSet.
+	 */
+	public void setFileName(final String filename) {
+		
+		FileSet tmpFS = new FileSet(source);
+		tmpFS.setRoot(filename);
+		source = tmpFS;
+		
+		setModified(true);
 	}
 }

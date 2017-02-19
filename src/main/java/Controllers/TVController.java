@@ -65,7 +65,6 @@ public class TVController implements Observer {
 	private MenubarController menuController;
 	private File file;
 	private FileSet fileMenuSet;
-	private FileSet loadingFile;
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
@@ -520,10 +519,9 @@ public class TVController implements Observer {
 	 * preferences node without saving to file. This is exclusively used 
 	 * post-clustering for now.
 	 */
-	public void updateModel(final TVModel newModel, 
+	public void loadClusteredModel(final TVModel newModel, 
 	                                final boolean isFromCluster) {
 		
-		LogBuffer.println("UPDATING TVMODEL");
 		FileSet oldFileset = model.getFileSet();
 		String oldRoot = oldFileset.getRoot();
 		String oldExt = oldFileset.getExt();
@@ -538,9 +536,9 @@ public class TVController implements Observer {
 		}
 
 		dataInfo.setIsClusteredFile(isFromCluster);
+		newModel.setFileName(model.getName() + "-[clustered]");
 		model = newModel;
 		finishLoading(dataInfo);
-		
 	}
 
 	/** Used to transfer information to ModelLoader about the data

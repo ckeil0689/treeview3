@@ -79,6 +79,18 @@ public class FileSet {
 	/**
 	 * Constructor for the FileSet object
 	 *
+	 * @param fs - another FileSet to be copied.
+	 */
+	public FileSet(FileSet fs) {
+		
+		this.node = Preferences.userRoot().node(StringRes.pnode_globalMain)
+			.node("FileSet");
+		copyState(fs);
+	}
+	
+	/**
+	 * Constructor for the FileSet object
+	 *
 	 * @param configNode
 	 *            ConfigNode to base this fileset on.
 	 */
@@ -241,7 +253,7 @@ public class FileSet {
 
 	/**
 	 * Sets the root of the FileSet object. i.e. the filename without
-	 * extendsion.
+	 * extension.
 	 *
 	 * @param string
 	 *            The new root value

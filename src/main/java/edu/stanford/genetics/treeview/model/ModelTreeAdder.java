@@ -64,9 +64,6 @@ public class ModelTreeAdder {
 			}
 			setAtrLabels(atrLabels);
 		}
-
-		targetModel.hashAIDs();
-		targetModel.hashATRs();
 		
 		return true;
 	}
@@ -116,8 +113,6 @@ public class ModelTreeAdder {
 			setGtrLabels(gtrLabels);
 		}
 
-		targetModel.hashGIDs();
-		targetModel.hashGTRs();
 		return true;
 	}
 

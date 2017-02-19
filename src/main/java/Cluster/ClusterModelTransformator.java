@@ -45,6 +45,7 @@ public class ClusterModelTransformator {
 
 		prepareModel(rowLabelI, colLabelI);
 		reorderClusteredModel();
+		model.setModified(true);
 		
 		return model;
 	}
