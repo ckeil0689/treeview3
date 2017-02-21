@@ -1,17 +1,18 @@
-package Cluster;
+package edu.stanford.genetics.treeview.model;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import Cluster.ClusterFileWriter;
+import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
 
 /** This class is used to generate the .CDT tab delimited file which Java
  * TreeView will use for visualization. It takes in the previously calculated
  * data and forms String lists to make them writable.
- *
- * @deprecate */
-public class ClusterFileGenerator {
+ */
+public class ModelFileGenerator {
 
 	// Important cluster strings for the files
 	public final static String ROW_AXIS_BASEID = "ROW";
@@ -24,8 +25,9 @@ public class ClusterFileGenerator {
 	public final static String COL_WEIGHT_ID = "EWEIGHT";
 
 	private double[][] origMatrix;
-	private final ClusteredAxisData rowClusterData;
-	private final ClusteredAxisData colClusterData;
+	private final IntLabelInfo rowLI;
+	private final IntLabelInfo colLI;
+	private final boolean isClustered;
 	private final boolean isHier;
 
 	private ClusterFileWriter clusterFileWriter;
@@ -41,15 +43,12 @@ public class ClusterFileGenerator {
 	 * the columns of the original matrix. 
 	 * @param isHier Indicates type of clustering. If true, clustering is
 	 *          hierarchical. If false, clustering is k-means. */
-	public ClusterFileGenerator(final double[][] origMatrix,
-															final ClusteredAxisData rowClusterData,
-															final ClusteredAxisData colClusterData,
-															final boolean isHier) {
+	public ModelFileGenerator(final DataModel model) {
 
-		this.origMatrix = origMatrix;
-		this.rowClusterData = rowClusterData;
-		this.colClusterData = colClusterData;
-		this.isHier = isHier;
+		this.origMatrix = model.getDataMatrix().getExprData();
+		this.rowLI = model.getRowLabelInfo();
+		this.colLI = model.getColLabelInfo();
+		this.isHier = model.;
 	}
 
 	/** Sets up a buffered writer to generate the .cdt file from the previously

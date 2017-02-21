@@ -20,7 +20,6 @@ public class ClusterModelTransformator {
 	private final ClusteredAxisData colCAD;
 	
 	private TVModel model;
-	private boolean isHierarchical = true; 
 	
 	public ClusterModelTransformator(ClusteredAxisData rowCAD, 
 	                                 ClusteredAxisData colCAD, TVModel model) {
@@ -33,12 +32,10 @@ public class ClusterModelTransformator {
 	/**
 	 * Uses ClusteredAxisData for both axes to apply clustering changes directly
 	 * to the underlying TVModel without the need to store data in files beforehand.
-	 * @return A tranformed TVModel with reordered data, labels and added 
+	 * @return A transformed TVModel with reordered data, labels and added 
 	 * Dendrograms, if applicable.
 	 */
 	public TVModel applyClusterChanges(boolean isHierarchical) {
-		
-		this.isHierarchical = isHierarchical;
 		
 		final IntLabelInfo rowLabelI = model.getRowLabelInfo();
 		final IntLabelInfo colLabelI = model.getColLabelInfo();
@@ -46,6 +43,8 @@ public class ClusterModelTransformator {
 		prepareModel(rowLabelI, colLabelI);
 		reorderClusteredModel();
 		model.setModified(true);
+		model.setClustered(true);
+		model.setHierarchical(isHierarchical);
 		
 		return model;
 	}
@@ -169,7 +168,7 @@ public class ClusterModelTransformator {
 		// Make list of gene names to quickly access indexes
 		final String[] geneNames = new String[cd.getNumLabels()];
 
-		if(!isHierarchical) {
+		if(!model.isHierarchical()) {
 			for(int i = 0; i < geneNames.length; i++) {
 				geneNames[i] = cd.getAxisLabels()[i][0];
 			}
@@ -180,7 +179,7 @@ public class ClusterModelTransformator {
 		for(int i = 0; i < reorderedIndices.length; i++) {
 			final String id = cd.getReorderedIDs()[i];
 
-			if(isHierarchical) {
+			if(model.isHierarchical()) {
 				// extract numerical part of element ID
 				final String adjusted = id.replaceAll("[\\D]", "");
 				// gets index from ordered list, e.g. COL45X --> 45;

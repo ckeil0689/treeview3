@@ -162,4 +162,10 @@ public interface DataModel {
 	 * @return true if data model has been sucessfully loaded.
 	 */
 	public boolean isLoaded();
+	
+	public void setHierarchical(final boolean isHierarchical);
+	public boolean isHierarchical();
+	
+	public void setClustered(final boolean isClustered);
+	public boolean isClustered();
 }

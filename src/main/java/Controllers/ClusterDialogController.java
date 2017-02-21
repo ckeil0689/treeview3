@@ -269,6 +269,9 @@ public class ClusterDialogController {
 				return;
 			}
 
+			tvModel.setClustered(true);
+			tvModel.setHierarchical(isHierarchical());
+			
 			ClusterModelTransformator cmt = 
 				new ClusterModelTransformator(rowCAD, colCAD, (TVModel) tvModel);
 			tvController.loadClusteredModel(cmt.applyClusterChanges(isHierarchical()), true);

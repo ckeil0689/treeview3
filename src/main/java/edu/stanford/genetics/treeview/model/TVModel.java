@@ -23,6 +23,8 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class TVModel extends Observable implements DataModel {
 
 	private boolean wasModified = false;
+	private boolean isHierarchical = false;
+	private boolean isClustered = false;
 	
 	protected FileSet source = null;
 	protected String dir = null;
@@ -1190,5 +1192,29 @@ public class TVModel extends Observable implements DataModel {
 		source = tmpFS;
 		
 		setModified(true);
+	}
+
+	@Override
+	public void setHierarchical(boolean isHierarchical) {
+		
+		this.isHierarchical = isHierarchical;
+	}
+
+	@Override
+	public boolean isHierarchical() {
+		
+		return isHierarchical;
+	}
+
+	@Override
+	public void setClustered(boolean isClustered) {
+
+		this.isClustered = isClustered;
+	}
+
+	@Override
+	public boolean isClustered() {
+
+		return isClustered;
 	}
 }

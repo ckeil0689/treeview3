@@ -17,6 +17,14 @@ package edu.stanford.genetics.treeview;
  * @author aloksaldanha
  */
 public interface DataMatrix {
+	
+	/**
+	 * Gets the 2D double array representing the underlying matrix data.
+	 * 
+	 * @return A 2D double array.
+	 */
+	public double[][] getExprData();
+	
 	/**
 	 * Gets the value attribute of the DataMatrix object
 	 *
