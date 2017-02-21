@@ -72,15 +72,8 @@ public class ModelFileGenerator {
 		else {
 			createKMeansCDT();
 		}
-	}
-
-	/** Finishes up <code>ClusterFileGenerator</code> by closing the buffered
-	 * writer. Returns the file path where the cdt file was saved. */
-	public String finish() {
-
-		final String filePath = modelFileWriter.getFilePath();
+		
 		modelFileWriter.closeWriter();
-		return filePath;
 	}
 
 	/** Generates a Clustered Data Table (CDT) file formatted for

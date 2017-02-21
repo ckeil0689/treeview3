@@ -20,6 +20,8 @@ public class ClusteredAxisData {
 	private String[][] axisLabels = new String[0][];
 	private List<String[]> treeNodeData = new ArrayList<String[]>();
 	
+	private int kmeans_clusterN = 0;
+	
 	private boolean isAxisClustered;
 	private boolean shouldReorderAxis;
 	
@@ -27,6 +29,11 @@ public class ClusteredAxisData {
 		
 		this.AXIS_ID = axisID;
 		this.AXIS_BASEID = (axisID == 0) ? "ROW" : "COL";
+	}
+	
+	public void setKmeansClusterNum(final int clusterNum) {
+		
+		this.kmeans_clusterN = clusterNum;
 	}
 	
 	/* Setters */
@@ -61,6 +68,11 @@ public class ClusteredAxisData {
 	}
 	
 	/* Getters */
+	public int getKmeansClusterNum() {
+		
+		return kmeans_clusterN;
+	}
+	
 	public int getAxisID() {
 		
 		return AXIS_ID;

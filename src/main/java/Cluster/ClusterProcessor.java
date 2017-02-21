@@ -395,10 +395,9 @@ public class ClusterProcessor {
 				k = spinnerInput[2];
 				iterations = spinnerInput[3];
 			}
-
+			
 			final KMeansCluster clusterer = new KMeansCluster(distMatrix, axisID, k);
 
-			
 			/*
 			 * Begin iteration of recalculating means and reassigning row
 			 * distance means to clusters.
@@ -428,6 +427,7 @@ public class ClusterProcessor {
 
 			clusterer.finish(labelArray);
 
+			cad.setKmeansClusterNum(k);
 			cad.setReorderedIDs(clusterer.getReorderedList());
 			cad.setAxisClustered(true);
 			return cad;

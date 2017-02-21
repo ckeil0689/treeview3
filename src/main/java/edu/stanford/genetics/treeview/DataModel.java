@@ -171,4 +171,7 @@ public interface DataModel {
 	
 	public void setColClustered(final boolean isColClustered);
 	public boolean isColClustered();
+	
+	public void setKMeansClusterNum(final int rowN, final int colN);
+	public int[] getKMeansClusterNum();
 }

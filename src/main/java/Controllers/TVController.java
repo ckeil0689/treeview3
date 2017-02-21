@@ -55,6 +55,7 @@ import edu.stanford.genetics.treeview.ViewType;
 import edu.stanford.genetics.treeview.model.DataLoadInfo;
 import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
+import edu.stanford.genetics.treeview.model.ModelSaver;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;
 
@@ -849,43 +850,47 @@ public class TVController implements Observer {
 	 * @return */
 	public boolean doModelSave(final boolean incremental) {
 
-		final DataModelWriter writer = new DataModelWriter(model);
-		final Set<DataModelFileType> written;
-
-		if(incremental) {
-			written = writer.writeIncremental(model.getFileSet());
-
-		}
-		else {
-			written = writer.writeAll(model.getFileSet());
-		}
-
-		if(written.isEmpty()) {
-			tvFrame.openSaveDialog(written.isEmpty(), null);
-			return false;
-		}
-
-		String msg = "Model changes were written to ";
-		int i = 0;
-
-		for(final DataModelFileType type : written) {
-			msg += type.name();
-			i++;
-
-			if(i == written.size()) {
-				// nothing after last one.
-
-			}
-			else if(i + 1 == written.size()) {
-				msg += " and ";
-
-			}
-			else {
-				msg += ",";
-			}
-		}
-
-		tvFrame.openSaveDialog(written.isEmpty(), msg);
+		ModelSaver ms = new ModelSaver();
+		ms.save(model);
+		model.setModified(false);
+		
+//		final DataModelWriter writer = new DataModelWriter(model);
+//		final Set<DataModelFileType> written;
+//
+//		if(incremental) {
+//			written = writer.writeIncremental(model.getFileSet());
+//
+//		}
+//		else {
+//			written = writer.writeAll(model.getFileSet());
+//		}
+//
+//		if(written.isEmpty()) {
+//			tvFrame.openSaveDialog(written.isEmpty(), null);
+//			return false;
+//		}
+//
+//		String msg = "Model changes were written to ";
+//		int i = 0;
+//
+//		for(final DataModelFileType type : written) {
+//			msg += type.name();
+//			i++;
+//
+//			if(i == written.size()) {
+//				// nothing after last one.
+//
+//			}
+//			else if(i + 1 == written.size()) {
+//				msg += " and ";
+//
+//			}
+//			else {
+//				msg += ",";
+//			}
+//		}
+//
+//		tvFrame.openSaveDialog(written.isEmpty(), msg);
 		return true;
 
 	}
@@ -1099,6 +1104,10 @@ public class TVController implements Observer {
 				// there's reason to keep it. However, note that resizing the
 				// window without data loaded does not save settings because
 				// it's tied to the matrix jpanel
+				if(model != null && model.getModified()) {
+					if(checkIfSaveNecessary()) doModelSave(false);
+				}
+				
 				tvFrame.storeState();
 				tvFrame.getAppFrame().dispose();
 
@@ -1122,6 +1131,33 @@ public class TVController implements Observer {
 				LogBuffer.println("User closed the confirmation window (same " +
 					"as cancel).");
 				return;
+		}
+	}
+	
+	/**
+	 * checks if DataModel has been modified. Stores a configFile when closing
+	 * the window.
+	 */
+	public boolean checkIfSaveNecessary() {
+
+		// Confirm user's intent to exit the application.
+		String[] options = {"No","Yes"};
+		final int choice = JOptionPane.showOptionDialog(tvFrame.getAppFrame(),
+			"It appears there is unsaved data. Do you want to save now?", 
+			"Save data", JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.WARNING_MESSAGE,null,options,options[1]);
+
+		switch (choice) {
+
+			case JOptionPane.OK_OPTION:
+				return true;
+			case JOptionPane.CANCEL_OPTION:
+				LogBuffer.println("User decided not to save to file.");
+				return false;
+			default:
+				LogBuffer.println("User closed the confirmation window (same " +
+					"as not saving to file).");
+				return false;
 		}
 	}
 }

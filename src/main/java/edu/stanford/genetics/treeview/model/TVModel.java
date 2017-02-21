@@ -27,6 +27,10 @@ public class TVModel extends Observable implements DataModel {
 	private boolean isRowClustered = false;
 	private boolean isColClustered = false;
 	
+	private int kmeans_rowClusterNum = 0;
+	private int kmeans_colClusterNum = 0;
+	
+	
 	protected FileSet source = null;
 	protected String dir = null;
 	protected String root;
@@ -1229,5 +1233,18 @@ public class TVModel extends Observable implements DataModel {
 	public boolean isColClustered() {
 
 		return isColClustered;
+	}
+
+	@Override
+	public void setKMeansClusterNum(int rowN, int colN) {
+		
+		this.kmeans_rowClusterNum = rowN;
+		this.kmeans_colClusterNum = colN;
+	}
+
+	@Override
+	public int[] getKMeansClusterNum() {
+
+		return new int[] {kmeans_rowClusterNum, kmeans_colClusterNum};
 	}
 }

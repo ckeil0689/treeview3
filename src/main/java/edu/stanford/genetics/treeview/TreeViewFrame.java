@@ -539,19 +539,21 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			fileMenu.add(exportMenuItem);
 			stackMenuList.add(exportMenuItem);
-		}
+			
+			fileMenu.addSeparator();
 
-		// final JMenuItem saveMenuItem = new JMenuItem(StringRes.menu_Save,
-		// KeyEvent.VK_S);
-		// saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-		// Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		// fileMenu.add(saveMenuItem);
-		// stackMenuList.add(saveMenuItem);
-		//
-		// final JMenuItem saveAsMenuItem = new
-		// JMenuItem(StringRes.menu_SaveAs);
-		// fileMenu.add(saveAsMenuItem);
-		// stackMenuList.add(saveAsMenuItem);
+			final JMenuItem saveMenuItem = new JMenuItem(StringRes.menu_Save, 
+			                                             KeyEvent.VK_S);
+			saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+			Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			fileMenu.add(saveMenuItem);
+			stackMenuList.add(saveMenuItem);
+		}
+		
+//		 final JMenuItem saveAsMenuItem = new
+//		 JMenuItem(StringRes.menu_SaveAs);
+//		 fileMenu.add(saveAsMenuItem);
+//		 stackMenuList.add(saveAsMenuItem);
 
 		menuBar.add(fileMenu);
 

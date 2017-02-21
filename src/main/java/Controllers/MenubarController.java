@@ -57,9 +57,9 @@ public class MenubarController {
 		case StringRes.menu_Import:
 			controller.openFile(null, true);
 			break;
-		// case StringRes.menu_Save:
-		// controller.doModelSave(true);
-		// break;
+		case StringRes.menu_Save:
+		  controller.doModelSave(true);
+		  break;
 		// case StringRes.menu_SaveAs:
 		// controller.saveModelAs();
 		// break;
