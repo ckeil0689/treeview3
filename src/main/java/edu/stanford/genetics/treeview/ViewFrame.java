@@ -14,6 +14,10 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -26,16 +30,11 @@ import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
 import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import javax.swing.Timer;
 
 /* BEGIN_HEADER                                                   TreeView 3
 *
@@ -47,7 +46,6 @@ import javax.swing.Timer;
 // controller class
 public abstract class ViewFrame extends Observable implements Observer,
 		ConfigNodePersistent {
-	// extends JFrame implements Observer {
 
 	// Main application frame
 	protected JFrame appFrame;
@@ -100,7 +98,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 		this.appFrame = new JFrame(title);
 		this.configNode = mainConfigNode;
 		
-		/* maximize frame first */
+		// maximize frame first
 		setupFrameSize();
 
 		final int init_width = appFrame.getWidth();
@@ -117,9 +115,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 		//operation to do nothing. Closing will be handled by an explicit call
 		//to dispose.
 		appFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-
-		setupWindowListener();
-
 		setupWindowPosListener();
 	}
 
@@ -129,7 +124,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 	public ViewFrame() {
 
 		this.appFrame = new JFrame();
-		setupWindowListener();
 	}
 
 	/**
@@ -242,32 +236,37 @@ public abstract class ViewFrame extends Observable implements Observer,
 				screenSize.height * 2 / 3));
 	}
 
-	/**
-	 * Sets a listener on self, so that we can grab focus when activated, and
-	 * close ourselves when closed.
-	 */
-	private void setupWindowListener() {
-
-		appFrame.addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowActivated(final WindowEvent windowEvent) {
-
-				setWindowActive(true);
-			}
-
-			@Override
-			public void windowClosing(final WindowEvent windowEvent) {
-
-				closeWindow();
-			}
-
-			@Override
-			public void windowDeactivated(final WindowEvent windowEvent) {
-
-				setWindowActive(false);
-			}
-		});
+//	/**
+//	 * Sets a listener on self, so that we can grab focus when activated, and
+//	 * close ourselves when closed.
+//	 */
+//	private void setupWindowListener() {
+//
+//		appFrame.addWindowListener(new WindowAdapter() {
+//
+//			@Override
+//			public void windowActivated(final WindowEvent windowEvent) {
+//
+//				setWindowActive(true);
+//			}
+//
+//			@Override
+//			public void windowClosing(final WindowEvent windowEvent) {
+//
+//				closeWindow();
+//			}
+//
+//			@Override
+//			public void windowDeactivated(final WindowEvent windowEvent) {
+//
+//				setWindowActive(false);
+//			}
+//		});
+//	}
+	
+	public void addWindowListener(final WindowAdapter wa) {
+		
+		appFrame.addWindowListener(wa);
 	}
 
 	/**
@@ -277,7 +276,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 * @param flag
 	 *            The new windowActive value
 	 */
-	protected void setWindowActive(final boolean flag) {
+	public void setWindowActive(final boolean flag) {
 
 		windowActive = flag;
 	}
@@ -288,7 +287,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 *
 	 * @return True if window is active.
 	 */
-	public boolean windowActive() {
+	public boolean isWindowActive() {
 
 		return windowActive;
 	}
@@ -340,56 +339,56 @@ public abstract class ViewFrame extends Observable implements Observer,
 		addAppWindowPosListener();
 	}
 
-	/**
-	 * checks if DataModel has been modified. Stores a configFile when closing
-	 * the window.
-	 */
-	public void closeWindow() {
-
-		// Confirm user's intent to exit the application.
-		String[] options = {"Quit","Cancel"};
-		final int choice = JOptionPane.showOptionDialog(appFrame,
-			"Quit TreeView?", "Quit TreeView?",JOptionPane.OK_CANCEL_OPTION,
-			JOptionPane.WARNING_MESSAGE,null,options,options[1]);
-
-		switch (choice) {
-
-			case JOptionPane.OK_OPTION:
-				LogBuffer.println("Saving settings before window close.");
-
-				// Not sure a call to storeState is necessary anymore because
-				// added calls upon window resize and window move in
-				// DendroController and ViewFrame respectively. If it does
-				// something other than save those two things, then sure,
-				// there's reason to keep it. However, note that resizing the
-				// window without data loaded does not save settings because
-				// it's tied to the matrix jpanel
-				storeState();
-
-				appFrame.dispose();
-
-				//The JVM exits when the last non-daemon thread exits.
-				//System.exit(0) is called here because there are some threads
-				//which I have found to be in wait-mode after execution (via
-				//profiling). Plain termination of the main() method does not
-				//guarantee that the JVM fully shuts down, since non-daemon
-				//threads may still be alive.  It's a fail-safe for now and
-				//could probably be removed at some point if we can ensure those
-				//threads get cleaned up.  Refer to issue #74 on bitbucket for
-				//more info:
-				//https://bitbucket.org/TreeView3Dev/treeview3/issues/74/selecting-close-window-leaves-the-app-in-a
-				System.exit(0);
-
-				break;
-			case JOptionPane.CANCEL_OPTION:
-				LogBuffer.println("User decided not to quit treeview.");
-				return;
-			default:
-				LogBuffer.println("User closed the confirmation window (same " +
-					"as cancel).");
-				return;
-		}
-	}
+//	/**
+//	 * checks if DataModel has been modified. Stores a configFile when closing
+//	 * the window.
+//	 */
+//	public void closeWindow() {
+//
+//		// Confirm user's intent to exit the application.
+//		String[] options = {"Quit","Cancel"};
+//		final int choice = JOptionPane.showOptionDialog(appFrame,
+//			"Quit TreeView?", "Quit TreeView?",JOptionPane.OK_CANCEL_OPTION,
+//			JOptionPane.WARNING_MESSAGE,null,options,options[1]);
+//
+//		switch (choice) {
+//
+//			case JOptionPane.OK_OPTION:
+//				LogBuffer.println("Saving settings before window close.");
+//
+//				// Not sure a call to storeState is necessary anymore because
+//				// added calls upon window resize and window move in
+//				// DendroController and ViewFrame respectively. If it does
+//				// something other than save those two things, then sure,
+//				// there's reason to keep it. However, note that resizing the
+//				// window without data loaded does not save settings because
+//				// it's tied to the matrix jpanel
+//				storeState();
+//
+//				appFrame.dispose();
+//
+//				//The JVM exits when the last non-daemon thread exits.
+//				//System.exit(0) is called here because there are some threads
+//				//which I have found to be in wait-mode after execution (via
+//				//profiling). Plain termination of the main() method does not
+//				//guarantee that the JVM fully shuts down, since non-daemon
+//				//threads may still be alive.  It's a fail-safe for now and
+//				//could probably be removed at some point if we can ensure those
+//				//threads get cleaned up.  Refer to issue #74 on bitbucket for
+//				//more info:
+//				//https://bitbucket.org/TreeView3Dev/treeview3/issues/74/selecting-close-window-leaves-the-app-in-a
+//				System.exit(0);
+//
+//				break;
+//			case JOptionPane.CANCEL_OPTION:
+//				LogBuffer.println("User decided not to quit treeview.");
+//				return;
+//			default:
+//				LogBuffer.println("User closed the confirmation window (same " +
+//					"as cancel).");
+//				return;
+//		}
+//	}
 
 	/**
 	 * required by all <code>ModelPanel</code>s

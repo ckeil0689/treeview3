@@ -1174,6 +1174,7 @@ public class TVModel extends Observable implements DataModel {
 		return source.getRoot() + source.getExt();
 	}
 	
+	@Override
 	public void setModified(boolean wasModified) {
 		
 		this.wasModified = wasModified;

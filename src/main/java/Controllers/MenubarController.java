@@ -70,7 +70,7 @@ public class MenubarController {
 			controller.resetPreferences();
 			break;
 		case StringRes.menu_QuitWindow:
-			tvFrame.closeWindow();
+			controller.closeWindow();
 			break;
 		case StringRes.menu_Export:
 			controller.openExportMenu();

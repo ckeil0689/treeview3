@@ -47,9 +47,6 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 /**
  * This class is the main window of TreeView 3. It holds all views to be
  * displayed and serves as parent JFrame to other windows.
- *
- * @author ckeil
- *
  */
 public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		ConfigNodePersistent {
@@ -105,9 +102,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// Initialize main views
 		this.welcomeView = new WelcomeView();
 		this.dendroView = new DendroView(this);
-
-		setWindowActive(true);
-
 		this.mainPanel = GUIFactory.createJPanel(true, GUIFactory.NO_INSETS);
 
 		/* Setting up main panels */
@@ -887,12 +881,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	  
 		appFrame.setTitle(newTitle);
 	}
-
-	// @Override
-	// public void setDataModel(final DataModel model) {
-	//
-	// this.dataModel = model;
-	// }
 
 	public void setTitleString(final String title) {
 

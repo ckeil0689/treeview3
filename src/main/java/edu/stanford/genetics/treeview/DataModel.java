@@ -144,6 +144,13 @@ public interface DataModel {
 	public boolean gidFound();
 
 	/**
+	 * Set the modified member which can be used to check if changes occurred
+	 * and need to be saved.
+	 * @param wasModified - indicate whether the model was modified
+	 */
+	public void setModified(boolean wasModified);
+	
+	/**
 	 * @return true if data model has been modified since last save to source.
 	 *         always returning false is generally a safe thing, if you have an
 	 *         immutable data model.

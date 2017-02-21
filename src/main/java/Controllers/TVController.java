@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
@@ -77,6 +79,7 @@ public class TVController implements Observer {
 
 		tvFrame.addObserver(this);
 		tvFrame.getAppFrame().addComponentListener(new AppFrameListener());
+		tvFrame.addWindowListener(new WindowActivityListener());
 
 		addViewListeners();
 		addMenuListeners();
@@ -283,6 +286,30 @@ public class TVController implements Observer {
 		}
 	}
 
+	/**
+	 * Controls window activity.
+	 */
+	private class WindowActivityListener extends WindowAdapter {
+		
+		@Override
+		public void windowActivated(final WindowEvent windowEvent) {
+
+			tvFrame.setWindowActive(true);
+		}
+
+		@Override
+		public void windowClosing(final WindowEvent windowEvent) {
+
+			closeWindow();
+		}
+
+		@Override
+		public void windowDeactivated(final WindowEvent windowEvent) {
+
+			tvFrame.setWindowActive(false);
+		}
+	}
+	
 	/** Load data into the model.
 	 * 
 	 * @param fileSet - The fileSet to be loaded.
@@ -1046,5 +1073,55 @@ public class TVController implements Observer {
 	public void copyLabels(final CopyType copyType, final boolean isRows) {
 
 		dendroController.copyLabels(copyType, isRows);
+	}
+	
+	/**
+	 * checks if DataModel has been modified. Stores a configFile when closing
+	 * the window.
+	 */
+	public void closeWindow() {
+
+		// Confirm user's intent to exit the application.
+		String[] options = {"Quit","Cancel"};
+		final int choice = JOptionPane.showOptionDialog(tvFrame.getAppFrame(),
+			"Quit TreeView?", "Quit TreeView?",JOptionPane.OK_CANCEL_OPTION,
+			JOptionPane.WARNING_MESSAGE,null,options,options[1]);
+
+		switch (choice) {
+
+			case JOptionPane.OK_OPTION:
+				LogBuffer.println("Saving settings before window close.");
+
+				// Not sure a call to storeState is necessary anymore because
+				// added calls upon window resize and window move in
+				// DendroController and ViewFrame respectively. If it does
+				// something other than save those two things, then sure,
+				// there's reason to keep it. However, note that resizing the
+				// window without data loaded does not save settings because
+				// it's tied to the matrix jpanel
+				tvFrame.storeState();
+				tvFrame.getAppFrame().dispose();
+
+				//The JVM exits when the last non-daemon thread exits.
+				//System.exit(0) is called here because there are some threads
+				//which I have found to be in wait-mode after execution (via
+				//profiling). Plain termination of the main() method does not
+				//guarantee that the JVM fully shuts down, since non-daemon
+				//threads may still be alive.  It's a fail-safe for now and
+				//could probably be removed at some point if we can ensure those
+				//threads get cleaned up.  Refer to issue #74 on bitbucket for
+				//more info:
+				//https://bitbucket.org/TreeView3Dev/treeview3/issues/74/selecting-close-window-leaves-the-app-in-a
+				System.exit(0);
+
+				break;
+			case JOptionPane.CANCEL_OPTION:
+				LogBuffer.println("User decided not to quit treeview.");
+				return;
+			default:
+				LogBuffer.println("User closed the confirmation window (same " +
+					"as cancel).");
+				return;
+		}
 	}
 }
