@@ -166,6 +166,9 @@ public interface DataModel {
 	public void setHierarchical(final boolean isHierarchical);
 	public boolean isHierarchical();
 	
-	public void setClustered(final boolean isClustered);
-	public boolean isClustered();
+	public void setRowClustered(final boolean isRowClustered);
+	public boolean isRowClustered();
+	
+	public void setColClustered(final boolean isColClustered);
+	public boolean isColClustered();
 }

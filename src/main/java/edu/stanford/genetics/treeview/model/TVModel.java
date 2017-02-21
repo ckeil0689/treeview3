@@ -24,7 +24,8 @@ public class TVModel extends Observable implements DataModel {
 
 	private boolean wasModified = false;
 	private boolean isHierarchical = false;
-	private boolean isClustered = false;
+	private boolean isRowClustered = false;
+	private boolean isColClustered = false;
 	
 	protected FileSet source = null;
 	protected String dir = null;
@@ -1207,14 +1208,26 @@ public class TVModel extends Observable implements DataModel {
 	}
 
 	@Override
-	public void setClustered(boolean isClustered) {
+	public void setRowClustered(boolean isRowClustered) {
 
-		this.isClustered = isClustered;
+		this.isRowClustered = isRowClustered;
 	}
 
 	@Override
-	public boolean isClustered() {
+	public boolean isRowClustered() {
 
-		return isClustered;
+		return isRowClustered;
+	}
+
+	@Override
+	public void setColClustered(boolean isColClustered) {
+		
+		this.isColClustered = isColClustered;
+	}
+
+	@Override
+	public boolean isColClustered() {
+
+		return isColClustered;
 	}
 }

@@ -11,13 +11,10 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
  * Performs the calculations of the k-means algorithm.
- *
- * @author CKeil
- *
  */
 public class KMeansCluster {
 
-	protected final static int KMEANS = 3;
+	public final static int KMEANS = 3;
 
 	private ClusterFileWriter bufferedWriter; /* Writer to save data */
 

@@ -6,12 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,8 +16,6 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import Cluster.ClusterFileGenerator;
-import Cluster.ClusterFileStorage;
 import Cluster.ClusterModelTransformator;
 import Cluster.ClusterProcessor;
 import Cluster.ClusteredAxisData;
@@ -57,24 +49,17 @@ public class ClusterDialogController {
 	/* Axes identifiers */
 	public final static String ROW_ID_LABELTYPE = "GID";
 	public final static String COL_ID_LABELTYPE = "AID";
-	public final static String CDT_END = ".cdt";
-	public final static String GTR_END = ".gtr";
-	public final static String ATR_END = ".atr";
 	
 	public final static int ROW = 1;
 	public final static int COL = 2;
 	
-	private final int ROW_IDX = 0;
-	private final int COL_IDX = 1;
+	public final static int ROW_IDX = 0;
+	public final static int COL_IDX = 1;
 
 	private final DataModel tvModel;
 	private final TVController tvController;
 	private final ClusterView clusterView;
 	private final ClusterDialog clusterDialog;
-	
-	private File cdtFile;
-	private File atrFile;
-	private File gtrFile;
 
 	/* Delegates the clustering process */
 	private ClusterProcessor processor;
@@ -232,10 +217,6 @@ public class ClusterDialogController {
 			
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], clusterCheck[COL_IDX]);
 			
-			// TODO need to add drive partition part to the path when subpath is created
-//			final Path clusterFilePath = ClusterFileStorage.createDirectoryStruc(oldFileName, 
-//					clusterView.getLinkMethod());
-			
 			if(clusterCheck[ROW_IDX]) {
 				rowCAD = calculateAxis(rowSimilarity, ROW);
 			}
@@ -266,11 +247,9 @@ public class ClusterDialogController {
 			 */
 			if(!isReorderingValid(clusterCheck) || isCancelled()) {
 				LogBuffer.println("Something occurred during reordering.");
+				// TODO make sure tvController doesnt crash the app here!
 				return;
 			}
-
-			tvModel.setClustered(true);
-			tvModel.setHierarchical(isHierarchical());
 			
 			ClusterModelTransformator cmt = 
 				new ClusterModelTransformator(rowCAD, colCAD, (TVModel) tvModel);
@@ -563,336 +542,6 @@ public class ClusterDialogController {
 					clusterView.getSpinnerValues(), isHierarchical(), axisID));
 		}
 	}
-	
-	/**
-	 * Saves the clustering output (reordered axes) to a new CDT file, so it
-	 * can later be loaded and displayed.
-	 */
-	private void saveClusterFile(final String fileName, 
-			final ClusteredAxisData rowClusterData, 
-			final ClusteredAxisData colClusterData) {
-
-		if (rowClusterData.getReorderedIDs() != null 
-				|| colClusterData.getReorderedIDs() != null) {
-			ClusterView.setStatusText("Saving...");
-			
-			saveTask = new SaveTask(rowClusterData, colClusterData, 
-					fileName);
-			saveTask.execute();
-
-		} else {
-			final String message = "Cannot save. No clustered data "
-					+ "was created.";
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
-					"Error", JOptionPane.ERROR_MESSAGE);
-			LogBuffer.println("Alert: " + message);
-		}
-	}
-
-	/**
-	 * Worker with the task to generate and write a new CDT file which contains
-	 * the newly clustered matrix. Makes sure that the newly created file is
-	 * visualized right after clustering, given that the process was not
-	 * cancelled.
-	 *
-	 * @param rowCAD - row clustering data relevant for CDT save file
-	 * @param colCAD - column clustering data relevant for CDT save file
-	 * @param fileName - name of the CDT file to be written
-	 */
-	private class SaveTask extends SwingWorker<Boolean, Void> {
-
-		/* The finished reordered axes */
-		private final ClusteredAxisData rowClusterData;
-		private final ClusteredAxisData colClusterData;
-
-		private final String fileName;
-		private String filePath;
-
-		public SaveTask(final ClusteredAxisData rowClusterData, 
-				final ClusteredAxisData colClusterData, 
-				final String fileName) {
-
-			this.rowClusterData = rowClusterData;
-			this.colClusterData = colClusterData;
-			
-			this.fileName = fileName;
-		}
-
-		@Override
-		protected Boolean doInBackground() throws Exception {
-
-			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
-					.getDataMatrix();
-			final double[][] data = originalMatrix.getExprData();
-
-			final ClusterFileGenerator cdtGen = new ClusterFileGenerator(data, 
-					rowClusterData, colClusterData, isHierarchical());
-
-			cdtGen.setupWriter(cdtFile);
-			cdtGen.generateCDT();
-
-			filePath = cdtGen.finish();
-			
-			if(isCancelled()) {
-				return Boolean.FALSE;
-			}
-			
-			if(filePath == null) {
-				LogBuffer.println("Generating a CDT failed. Cancelling...");
-				this.cancel(true);
-				return Boolean.FALSE;
-			}
-
-			return Boolean.TRUE;
-		}
-
-		@Override
-		protected void done() {
-
-			if (!isCancelled() && hasEnsuredTreeFilePresence()) {
-				ClusterView.setStatusText("Saving done!");
-				loadClusteredData(filePath);
-				LogBuffer.println("SaveTask is done: success.");
-				
-			} else {
-				clusterView.setClustering(false);
-				LogBuffer.println("Saving did not finish successfully.");
-				deleteAllFiles();
-			}
-		}
-		
-		/**
-		 * Makes sure that a tree file exists for an axis that is supposed to
-		 * be clustered. If not, it attempts to take one from a previous 
-		 * cluster and if that does not exist either it will consider an axis
-		 * as not clustered. In that case, a tree file will not be present. Returns
-		 * true upon successful completion.
-		 */
-		private boolean hasEnsuredTreeFilePresence() {
-	
-			if(filePath == null || fileName == null) {
-				return false;
-			}
-			
-			final int fileRootNameSize = filePath.length() - CDT_END.length();
-			final String newFileRoot = filePath.substring(0, fileRootNameSize);
-			
-			ensureTreeFilePresence(fileName, newFileRoot, GTR_END, ROW_IDX);
-			ensureTreeFilePresence(fileName, newFileRoot, ATR_END, COL_IDX);
-			
-			return true;
-		}
-		
-		/**
-		 * For a given axis, this ensures that its tree file exists in case
-		 * it is considered to be clustered. This is useful especially if
-		 * an axis was already clustered before so that the old tree file can
-		 * be carried over to the new FileSet.
-		 * @param oldFileRoot The root name of the older cdt file.
-		 * @param newFileRoot The root name of the new cdt file.
-		 * @param treeFileSuffix The tree file suffix to be used if a new file
-		 * is created.
-		 * @param axisIdx An integer identifying the axis.
-		 */
-		private void ensureTreeFilePresence(final String oldFileRoot, 
-				final String newFileRoot, final String treeFileSuffix, 
-				final int axisIdx) { 
-			
-			String axis_id;
-			boolean axisNeedsTreeFileCheck;
-			
-			if(axisIdx == ROW_IDX) {
-				axis_id = "row";
-				axisNeedsTreeFileCheck = rowClusterData.isAxisClustered();
-			} else {
-				axis_id = "column";
-				axisNeedsTreeFileCheck = colClusterData.isAxisClustered();
-			}
-			
-			if(axisNeedsTreeFileCheck) {
-				String newTreeFilePath = newFileRoot + treeFileSuffix;
-				String oldTreeFilePath = oldFileRoot + treeFileSuffix;
-				
-				if(!doesFileExist(newTreeFilePath)) {
-					LogBuffer.println("No file found for " + axis_id 
-							+ " trees.");
-					if(doesFileExist(oldTreeFilePath)) {
-						LogBuffer.println("But old " + axis_id 
-								+ " tree file was found!");
-						copyFile(oldTreeFilePath, newTreeFilePath);
-					} else {
-						String message = "The tree file for the " + axis_id 
-								+ " axis could not be recovered. No trees "
-								+ "can be shown.";
-						JOptionPane.showMessageDialog(clusterDialog, message);
-					}
-				} else {
-					LogBuffer.println("Success! The " + axis_id 
-							+ " tree file was found.");
-				}
-			} else {
-				LogBuffer.println("The " + axis_id 
-						+ "s have not been clustered.");
-			}
-		}
-		
-		/**
-		 * Copies an old file to a new one with the correct file name. This 
-		 * is used for transferring old tree files to new clustered matrices.
-		 * @param oldTreeFilePath The path of the file to be copied.
-		 * @param newTreeFilePath The path to which the old file will be copied.
-		 */
-		private boolean copyFile(final String oldTreeFilePath, 
-				final String newTreeFilePath) {
-			
-			try(FileInputStream srcStream = 
-					new FileInputStream(oldTreeFilePath); 
-				FileOutputStream dstStream = 
-						new FileOutputStream(newTreeFilePath)) {
-				
-				dstStream.getChannel().transferFrom(srcStream.getChannel(), 
-						0, srcStream.getChannel().size());
-				return true;
-				
-			} catch (IOException e) {
-				LogBuffer.logException(e);
-				return false;
-			} 
-		}
-		
-		/**
-		 * Checks if a file at a given path exists or not.
-		 * @param path - The complete file path which to check.
-		 * @return Whether the checked file exists or not.
-		 */
-		private boolean doesFileExist(final String path) {
-			
-			File f = new File(path);
-			return (f.exists() && !f.isDirectory());
-		}
-	}
-	
-	/**
-	 * Deletes all files associated with the last clustering step. Also
-	 * deletes the directory of the files if it is empty.
-	 */
-	public void deleteAllFiles() {
-		
-		File dir = getClusterDir(cdtFile, gtrFile, atrFile);
-		
-		deleteFile(cdtFile);
-		deleteFile(atrFile);
-		deleteFile(gtrFile);
-		
-		deleteEmptyDir(dir);
-	}
-	
-	/**
-	 * TODO move to ClusterFileStorage
-	 * Attempt to extract the directory from any of the cluster files, if 
-	 * they exist.
-	 * @param cdtF The CDT file of the current cluster operation.
-	 * @param gtrF The GTR file of the current cluster operation.
-	 * @param atrF The ATR file of the current cluster operation.
-	 * @return File The directory where the files are stored or null if neither
-	 * of the files exists. 
-	 */
-	private static File getClusterDir(File cdtF, File gtrF, File atrF) {
-		
-		File dir;
-		if(cdtF != null && cdtF.exists()) {
-			dir = cdtF.getParentFile();
-			
-		} else if(gtrF != null && gtrF.exists()) {
-			dir = gtrF.getParentFile();
-			
-		} else if(atrF != null && atrF.exists()) {
-			dir = atrF.getParentFile();
-			
-		} else {
-			dir = null;
-		}
-		
-		if(dir != null) {
-			LogBuffer.println("Determined dir: " + dir.getAbsolutePath());
-		}
-		
-		return dir;
-	}
-	
-	/**
-	 * TODO move to ClusterFileStorage
-	 * If the passed File object exists and is indeed a normal file, it deletion
-	 * will be attempted. The passed object will also be set to null to avoid
-	 * lingering of object data.
-	 * @param file - The File to be deleted.
-	 */
-	private static void deleteFile(File file) {
-		
-		if(file == null) {
-			return;
-		}
-		
-		boolean success = false;
-		String name = file.getName();
-		
-		if(file.isFile() && file.exists()) {
-			success = file.delete();
-			LogBuffer.println("Attempted delete of " + name);
-			
-		} else {
-			LogBuffer.println(name + " is not a file or file does not exist.");
-		}
-		
-		if(success) {
-			LogBuffer.println(name + " was successfully deleted.");
-			//file = null;
-			// got a warning for this assignment, not sure what effects of deletion would be. can be deleted if
-			// process is not affected
-			
-		} else {
-			LogBuffer.println(name + " could not be deleted.");
-		}
-	}
-	
-	/**
-	 * TODO Move to ClusterFileStorage
-	 * Checks if the passed File object is a directory, if it is empty, and if
-	 * that is true it attempts to delete the directory.
-	 * @param dir - The File object to be deleted. It should represent 
-	 * an empty directory.
-	 */
-	private static void deleteEmptyDir(File dir) {
-		
-		if(dir == null) {
-			return;
-		}
-		
-		boolean success = false;
-		String name = dir.getName();
-		
-		if(dir.isDirectory()) {
-			File[] files = dir.listFiles();
-			if(files.length == 0) {
-				success = dir.delete();
-				
-			} else {
-				LogBuffer.println("Directory " + name + " still has " 
-						+ files.length + " files.");
-			}
-		} else {
-			LogBuffer.println(name + " is not a directory.");
-		}
-		
-		if(success) {
-			LogBuffer.println(name + " was successfully deleted.");
-			//dir = null;
-			// got a warning for this assignment, not sure what effects of deletion would be. can be deleted if
-			// process is not affected
-		} else {
-			LogBuffer.println(name + " could not be deleted.");
-		}
-	}
 
 	/**
 	 * @deprecated
@@ -1121,7 +770,6 @@ public class ClusterDialogController {
 	 */
 	private boolean isHierarchical() {
 
-		return clusterView.getClusterMethod().equalsIgnoreCase(
-				StringRes.menu_Hier);
+		return clusterView.getClusterMethod().equalsIgnoreCase(StringRes.menu_Hier);
 	}
 }

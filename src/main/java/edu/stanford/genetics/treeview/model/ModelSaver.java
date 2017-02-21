@@ -5,24 +5,31 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import Cluster.ClusterFileGenerator;
-import Cluster.ClusteredAxisData;
+import Views.ClusterDialog;
 import Views.ClusterView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.TreeViewFrame;
-import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 public class ModelSaver {
 
+	private final int ROW_IDX = 0;
+	private final int COL_IDX = 1;
+	
+	public final static String CDT_EXT = ".cdt";
+	public final static String GTR_EXT = ".gtr";
+	public final static String ATR_EXT = ".atr";
+	
+	private final JDialog clusterDialog;
 	private DataModel model;
 	
-	public ModelSaver() {
+	public ModelSaver(final ClusterDialog cd) {
 		
+		this.clusterDialog = cd;
 	}
 	
 	public void save(final DataModel model) {
@@ -32,12 +39,12 @@ public class ModelSaver {
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		chooser.showSaveDialog(null);
 
-		String path=chooser.getSelectedFile().getAbsolutePath();
-		String filename=chooser.getSelectedFile().getName();
+		String path = chooser.getSelectedFile().getAbsolutePath();
+		String filename = chooser.getSelectedFile().getName();
 		
 		this.model = model;
 		
-		new SaveTask(filename).execute();
+		new SaveTask(path, filename).execute();
 	}
 	
 	/**
@@ -54,25 +61,26 @@ public class ModelSaver {
 
 		private final String fileName;
 		private String filePath;
+		
+		private File cdtFile;
+		private File atrFile;
+		private File gtrFile;
 
-		public SaveTask(final String fileName) {
+		public SaveTask(final String path, final String fileName) {
 
+			this.filePath = path;
 			this.fileName = fileName;
 		}
 
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
-			final TVDataMatrix originalMatrix = (TVDataMatrix) model.getDataMatrix();
-			final double[][] data = originalMatrix.getExprData();
+			final ModelFileGenerator modelGen = new ModelFileGenerator((TVModel) model);
 
-			final ClusterFileGenerator cdtGen = new ClusterFileGenerator(data, 
-					rowClusterData, colClusterData, isHierarchical());
+			modelGen.setupWriter(cdtFile);
+			modelGen.generateCDT();
 
-			cdtGen.setupWriter(cdtFile);
-			cdtGen.generateCDT();
-
-			filePath = cdtGen.finish();
+			filePath = modelGen.finish();
 			
 			if(isCancelled()) {
 				return Boolean.FALSE;
@@ -92,11 +100,9 @@ public class ModelSaver {
 
 			if (!isCancelled() && hasEnsuredTreeFilePresence()) {
 				ClusterView.setStatusText("Saving done!");
-				loadClusteredData(filePath);
 				LogBuffer.println("SaveTask is done: success.");
 				
 			} else {
-				clusterView.setClustering(false);
 				LogBuffer.println("Saving did not finish successfully.");
 				deleteAllFiles();
 			}
@@ -115,11 +121,11 @@ public class ModelSaver {
 				return false;
 			}
 			
-			final int fileRootNameSize = filePath.length() - CDT_END.length();
+			final int fileRootNameSize = filePath.length() - CDT_EXT.length();
 			final String newFileRoot = filePath.substring(0, fileRootNameSize);
 			
-			ensureTreeFilePresence(fileName, newFileRoot, GTR_END, ROW_IDX);
-			ensureTreeFilePresence(fileName, newFileRoot, ATR_END, COL_IDX);
+			ensureTreeFilePresence(fileName, newFileRoot, GTR_EXT, ROW_IDX);
+			ensureTreeFilePresence(fileName, newFileRoot, ATR_EXT, COL_IDX);
 			
 			return true;
 		}
@@ -144,10 +150,10 @@ public class ModelSaver {
 			
 			if(axisIdx == ROW_IDX) {
 				axis_id = "row";
-				axisNeedsTreeFileCheck = rowClusterData.isAxisClustered();
+				axisNeedsTreeFileCheck = model.isRowClustered();
 			} else {
 				axis_id = "column";
-				axisNeedsTreeFileCheck = colClusterData.isAxisClustered();
+				axisNeedsTreeFileCheck = model.isColClustered();
 			}
 			
 			if(axisNeedsTreeFileCheck) {
@@ -211,6 +217,52 @@ public class ModelSaver {
 			File f = new File(path);
 			return (f.exists() && !f.isDirectory());
 		}
+		
+		/**
+		 * Deletes all files associated with the last clustering step. Also
+		 * deletes the directory of the files if it is empty.
+		 */
+		public void deleteAllFiles() {
+			
+			deleteFile(cdtFile);
+			deleteFile(atrFile);
+			deleteFile(gtrFile);
+		}
+		
+		/**
+		 * TODO move to ClusterFileStorage
+		 * If the passed File object exists and is indeed a normal file, it deletion
+		 * will be attempted. The passed object will also be set to null to avoid
+		 * lingering of object data.
+		 * @param file - The File to be deleted.
+		 */
+		private void deleteFile(File file) {
+			
+			if(file == null) {
+				return;
+			}
+			
+			boolean success = false;
+			String name = file.getName();
+			
+			if(file.isFile() && file.exists()) {
+				success = file.delete();
+				LogBuffer.println("Attempted delete of " + name);
+				
+			} else {
+				LogBuffer.println(name + " is not a file or file does not exist.");
+			}
+			
+			if(success) {
+				LogBuffer.println(name + " was successfully deleted.");
+				//file = null;
+				// got a warning for this assignment, not sure what effects of deletion would be. can be deleted if
+				// process is not affected
+				
+			} else {
+				LogBuffer.println(name + " could not be deleted.");
+			}
+		}
 	}
-	
+
 }
