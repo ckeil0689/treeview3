@@ -1,5 +1,6 @@
 package Cluster;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
 import edu.stanford.genetics.treeview.model.ModelTreeAdder;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -41,11 +42,11 @@ public class ClusterModelTransformator {
 		final IntLabelInfo colLabelI = model.getColLabelInfo();
 
 		prepareModel(rowLabelI, colLabelI);
+		model.setHierarchical(isHierarchical);
 		reorderClusteredModel();
 		model.setModified(true);
 		model.setRowClustered(rowCAD.isAxisClustered());
 		model.setColClustered(colCAD.isAxisClustered());
-		model.setHierarchical(isHierarchical);
 		
 		return model;
 	}
@@ -142,18 +143,28 @@ public class ClusterModelTransformator {
 		int[] reorderedIndices = new int[cd.getNumLabels()];
 		int orderedIDNum = cd.getReorderedIDs().length;
 
-		if(cd.shouldReorderAxis() && cd.isAxisClustered() && orderedIDNum != 0) {
-			reorderedIndices = orderElements(cd);
+		try {
+			if(cd.shouldReorderAxis() && cd.isAxisClustered() && orderedIDNum != 0) {
+				reorderedIndices = orderElements(cd);
+	
+				/* old order simply remains */
+			}
+			else {
+				for(int i = 0; i < reorderedIndices.length; i++) {
+					reorderedIndices[i] = i;
+				}
+			}
 
-			/* old order simply remains */
-		}
-		else {
+			return reorderedIndices;
+		} catch(ArrayIndexOutOfBoundsException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Problem when reordering model data. " +
+				"Data will remain in original order.");
 			for(int i = 0; i < reorderedIndices.length; i++) {
 				reorderedIndices[i] = i;
 			}
+			return reorderedIndices;
 		}
-
-		return reorderedIndices;
 	}
 	
 	/** Orders the labels for the CDT data based on the ordered ID String arrays.
