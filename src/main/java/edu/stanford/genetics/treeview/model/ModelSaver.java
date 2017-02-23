@@ -2,15 +2,11 @@ package edu.stanford.genetics.treeview.model;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import Views.ClusterDialog;
-import Views.ClusterView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -25,23 +21,24 @@ public class ModelSaver {
 	
 	private DataModel model;
 	
+	/**
+	 * Handles the process of saving a DataModel object to file.
+	 * @param parent - The parent Component over which the Save-dialog will 
+	 * appear.
+	 */
 	public ModelSaver() {
 		
 	}
 	
-	public void save(final DataModel model) {
-		
-		// get file name
-		JFileChooser chooser=new JFileChooser();
-		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		chooser.showSaveDialog(null);
-
-		Path path = Paths.get(chooser.getSelectedFile().getAbsolutePath());
-		String filename = chooser.getSelectedFile().getName();
+	/**
+	 * Pops up a dialog to define path and filename for the model to be saved.
+	 * It then initiates a SaveTask SwingWorker.
+	 * @param model - the DataModel to be saved.
+	 */
+	public void save(final DataModel model, final Path path) {
 		
 		this.model = model;
-		
-		new SaveTask(path, filename).execute();
+		new SaveTask(path).execute();
 	}
 	
 	/**
@@ -50,22 +47,20 @@ public class ModelSaver {
 	 * visualized right after clustering, given that the process was not
 	 * cancelled.
 	 *
-	 * @param fileName - name of the CDT file to be written
 	 * @param path - The path where the new file is to be saved
 	 */
 	private class SaveTask extends SwingWorker<Boolean, Void> {
 
-		private final String fileName;
+		private boolean hadProblem = false;
 		private Path filePath;
 		
 		private File matrixFile;
 		private File atrFile;
 		private File gtrFile;
 
-		public SaveTask(final Path path, final String fileName) {
+		public SaveTask(final Path path) {
 
 			this.filePath = path;
-			this.fileName = fileName;
 			
 			// Determine file extensions for CDT file (varies between hierarchical and k-means)
 			String fileEnd = ModelFileCreator.determineClusterFileExt(
@@ -87,36 +82,43 @@ public class ModelSaver {
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
-			final ModelFileGenerator modelGen = new ModelFileGenerator((TVModel) model);
+			try {
+				return writeFile();
+				
+			} catch(Exception e) {
+				hadProblem = true;
+				LogBuffer.logException(e);
+				String msg = "There was a problem. Could not save the file.";
+				JOptionPane.showMessageDialog(JFrame.getFrames()[0], msg);
+				LogBuffer.println(msg);
+				return Boolean.FALSE;
+			}
+		}
 
+		@Override
+		protected void done() {
+
+			if (!isCancelled() && !hadProblem) {// && hasEnsuredTreeFilePresence()) {
+				JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Saving complete.");
+				LogBuffer.println("SaveTask is done: success.");
+				
+			} else {
+				deleteAllFiles();
+			}
+		}
+		
+		private boolean writeFile() {
+			
+			final ModelFileGenerator modelGen = 
+				new ModelFileGenerator((TVModel) model);
 			modelGen.setupWriter(matrixFile);
 			modelGen.generateCDT();
 			
 			if(isCancelled()) {
 				return Boolean.FALSE;
 			}
-			
-			if(filePath == null) {
-				LogBuffer.println("Generating a CDT failed. Cancelling...");
-				this.cancel(true);
-				return Boolean.FALSE;
-			}
 
 			return Boolean.TRUE;
-		}
-
-		@Override
-		protected void done() {
-
-			if (!isCancelled()) {// && hasEnsuredTreeFilePresence()) {
-				JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Saving complete.");
-				ClusterView.setStatusText("Saving done!");
-				LogBuffer.println("SaveTask is done: success.");
-				
-			} else {
-				LogBuffer.println("Saving did not finish successfully.");
-				deleteAllFiles();
-			}
 		}
 		
 //		/**

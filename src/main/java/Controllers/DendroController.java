@@ -34,7 +34,7 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import Utilities.Helper;
-import edu.stanford.genetics.treeview.CdtFilter;
+import edu.stanford.genetics.treeview.AllowedFilesFilter;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.CopyType;
 import edu.stanford.genetics.treeview.DataModel;
@@ -1011,7 +1011,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 *          the dialog to setup */
 	protected static void setupATRFileDialog(final JFileChooser fileDialog) {
 
-		final CdtFilter ff = new CdtFilter();
+		final AllowedFilesFilter ff = new AllowedFilesFilter();
 		try {
 			fileDialog.addChoosableFileFilter(ff);
 			// will fail on pre-1.3 swings

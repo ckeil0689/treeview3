@@ -10,9 +10,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -33,11 +34,10 @@ import Views.ClusterDialog;
 import Views.ClusterView;
 import Views.DataImportController;
 import Views.DataImportDialog;
-import edu.stanford.genetics.treeview.CdtFilter;
+import edu.stanford.genetics.treeview.AllowedFilesFilter;
 import edu.stanford.genetics.treeview.CopyType;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialogController;
 import edu.stanford.genetics.treeview.FileSet;
@@ -53,7 +53,6 @@ import edu.stanford.genetics.treeview.UrlPresets;
 import edu.stanford.genetics.treeview.ViewFrame;
 import edu.stanford.genetics.treeview.ViewType;
 import edu.stanford.genetics.treeview.model.DataLoadInfo;
-import edu.stanford.genetics.treeview.model.DataModelWriter;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.ModelSaver;
 import edu.stanford.genetics.treeview.model.TVModel;
@@ -846,53 +845,21 @@ public class TVController implements Observer {
 
 	/** Saves the current model, GUI handled by TVFrame.
 	 *
-	 * @param incremental
+	 * @param The path at which the file should be saved.
 	 * @return */
-	public boolean doModelSave(final boolean incremental) {
+	private boolean doModelSave(final Path path) {
 
-		ModelSaver ms = new ModelSaver();
-		ms.save(model);
-		model.setModified(false);
+		if(path == null) {
+			String msg = "No defined file path. Could not save the file.";
+			JOptionPane.showMessageDialog(JFrame.getFrames()[0], msg);
+			LogBuffer.println(msg);
+			return false;
+		}
 		
-//		final DataModelWriter writer = new DataModelWriter(model);
-//		final Set<DataModelFileType> written;
-//
-//		if(incremental) {
-//			written = writer.writeIncremental(model.getFileSet());
-//
-//		}
-//		else {
-//			written = writer.writeAll(model.getFileSet());
-//		}
-//
-//		if(written.isEmpty()) {
-//			tvFrame.openSaveDialog(written.isEmpty(), null);
-//			return false;
-//		}
-//
-//		String msg = "Model changes were written to ";
-//		int i = 0;
-//
-//		for(final DataModelFileType type : written) {
-//			msg += type.name();
-//			i++;
-//
-//			if(i == written.size()) {
-//				// nothing after last one.
-//
-//			}
-//			else if(i + 1 == written.size()) {
-//				msg += " and ";
-//
-//			}
-//			else {
-//				msg += ",";
-//			}
-//		}
-//
-//		tvFrame.openSaveDialog(written.isEmpty(), msg);
+		ModelSaver ms = new ModelSaver();
+		ms.save(model, path);
+		model.setModified(false);
 		return true;
-
 	}
 
 	/** Saves the model as a user specified file. */
@@ -901,52 +868,45 @@ public class TVController implements Observer {
 		if(model.getFileSet() == null) {
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], "Saving of datamodels not backed by " +
 																													"files is not yet supported.");
-
+			return;
 		}
-		else {
-			final JFileChooser fileDialog = new JFileChooser();
-			final CdtFilter ff = new CdtFilter();
-			fileDialog.setFileFilter(ff);
+	  
+		final JFileChooser fileDialog = new JFileChooser();
+	  final AllowedFilesFilter ff = new AllowedFilesFilter();
+		fileDialog.setFileFilter(ff);
 
-			final String string = model.getFileSet().getDir();
+		final String string = model.getFileSet().getDir();
+		if(string != null) {
+			fileDialog.setCurrentDirectory(new File(string));
+		}
 
-			if(string != null) {
+		final int retVal = fileDialog.showSaveDialog(JFrame.getFrames()[0]);
 
-				fileDialog.setCurrentDirectory(new File(string));
-			}
+		if(retVal == JFileChooser.APPROVE_OPTION) {
+			String spath = fileDialog.getSelectedFile().getAbsolutePath();
+			Path path = Paths.get(spath);
+			String name = path.getFileName().toString();
 
-			final int retVal = fileDialog.showSaveDialog(Frame.getFrames()[0]);
+			FileSet fileSet2 = new FileSet(name, fileDialog.getParent() +
+																						File.separator);
+			fileSet2.copyState(model.getFileSet());
 
-			if(retVal == JFileChooser.APPROVE_OPTION) {
-				final File chosen = fileDialog.getSelectedFile();
-				String name = chosen.getName();
-
-				if(!name.toLowerCase().endsWith(".cdt") && !name.toLowerCase()
-																												.endsWith(".pcl")) {
-					name += ".cdt";
-				}
-
-				FileSet fileSet2 = new FileSet(name, chosen.getParent() +
-																							File.separator);
-				fileSet2.copyState(model.getFileSet());
-
-				final FileSet fileSet1 = new FileSet(name, chosen.getParent() +
+			final FileSet fileSet1 = new FileSet(name, fileDialog.getParent() +
 																										File.separator);
-				fileSet1.setName(model.getFileSet().getName());
+			fileSet1.setName(model.getFileSet().getName());
 
-				model.getFileSet().copyState(fileSet1);
-				doModelSave(false);
+			model.getFileSet().copyState(fileSet1);
+			doModelSave(path);
 
-				model.getFileSet().notifyMoved();
-				tvFrame.getFileMRU().removeDuplicates(model.getFileSet());
-				fileSet2 = tvFrame.getFileMRU().addUnique(fileSet2);
-				tvFrame.getFileMRU().setLast(model.getFileSet());
-				tvFrame.addFileMenuListeners(new FileMenuListener());
+			model.getFileSet().notifyMoved();
+			tvFrame.getFileMRU().removeDuplicates(model.getFileSet());
+			fileSet2 = tvFrame.getFileMRU().addUnique(fileSet2);
+			tvFrame.getFileMRU().setLast(model.getFileSet());
+			tvFrame.addFileMenuListeners(new FileMenuListener());
 
-				if(model instanceof TVModel) {
-					((TVModel) model).getDocumentConfig().put("jtv", model.getFileSet()
+			if(model instanceof TVModel) {
+				((TVModel) model).getDocumentConfig().put("jtv", model.getFileSet()
 																																.getJtv());
-				}
 			}
 		}
 	}
@@ -1105,7 +1065,7 @@ public class TVController implements Observer {
 				// window without data loaded does not save settings because
 				// it's tied to the matrix jpanel
 				if(model != null && model.getModified()) {
-					if(checkIfSaveNecessary()) doModelSave(false);
+					if(checkIfSaveNecessary()) saveModelAs();
 				}
 				
 				tvFrame.storeState();
@@ -1141,17 +1101,16 @@ public class TVController implements Observer {
 	public boolean checkIfSaveNecessary() {
 
 		// Confirm user's intent to exit the application.
-		String[] options = {"No","Yes"};
 		final int choice = JOptionPane.showOptionDialog(tvFrame.getAppFrame(),
 			"It appears there is unsaved data. Do you want to save now?", 
-			"Save data", JOptionPane.OK_CANCEL_OPTION,
-			JOptionPane.WARNING_MESSAGE,null,options,options[1]);
+			"Save data", JOptionPane.YES_NO_OPTION,
+			JOptionPane.WARNING_MESSAGE,null,null,null);
 
 		switch (choice) {
-
-			case JOptionPane.OK_OPTION:
+			case JOptionPane.YES_OPTION:
+				LogBuffer.println("User decided to save to file.");
 				return true;
-			case JOptionPane.CANCEL_OPTION:
+			case JOptionPane.NO_OPTION:
 				LogBuffer.println("User decided not to save to file.");
 				return false;
 			default:

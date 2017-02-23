@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FilenameUtils;
+
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /** This class determines the file name structure (full path) for a file
@@ -27,7 +29,8 @@ public class ModelFileCreator {
 	public static File retrieveFile(final Path clusterPath,
 																	final String fileEnd) {
 
-		final String fullFilePath = clusterPath.toString() + fileEnd;
+		
+		final String fullFilePath = FilenameUtils.removeExtension(clusterPath.toString()) + fileEnd;
 		File tempFile = Paths.get(fullFilePath).toFile();
 
 		try {
