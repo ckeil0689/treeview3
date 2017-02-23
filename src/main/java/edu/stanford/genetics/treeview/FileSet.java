@@ -14,6 +14,8 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.io.FilenameUtils;
+
 import Utilities.StringRes;
 
 /**
@@ -238,16 +240,14 @@ public class FileSet {
 	/**
 	 * Sets the base of the FileSet object. Parses out extension, root
 	 *
-	 * @param string1
+	 * @param fileSetBasename
 	 *            Name of base of the FileSet
 	 */
-	public void setCdt(final String string1) {
+	public void setCdt(final String fileSetBasename) {
 
-		if (string1 != null) {
-			int i = string1.lastIndexOf('.');
-			
-			setRoot(string1.substring(0, i));
-			setExt(string1.substring(i, string1.length()));
+		if (fileSetBasename != null) {
+			setRoot(FilenameUtils.removeExtension(fileSetBasename));
+			setExt(FilenameUtils.getExtension(fileSetBasename));
 		}
 	}
 
