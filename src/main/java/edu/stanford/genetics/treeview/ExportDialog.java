@@ -911,14 +911,17 @@ public class ExportDialog extends CustomDialog {
 			if(option.isSelected()) {
 				selectedRegion = RegionType.getRegion(option.getText());
 			}
+			LogBuffer.println("Region " + RegionType.getRegion(option.getText()).toString() + " is ");
 			if(RegionType.getRegion(option.getText()) != RegionType.SELECTION ||
 				selectionsExist) {
 
 				option.setEnabled(isEnabled);
 				if(isEnabled) {
+					LogBuffer.println("small enough to include\n");
 					option.setToolTipText(null);
 				} else {
-					option.setToolTipText("Too big for PNG/JPG/PPM export");
+					LogBuffer.println("too big to include\n");
+					option.setToolTipText("Too big for PNG/PPM export");
 					if(option.isSelected()) {
 						option.setSelected(false);
 						selectedRegion = null;
@@ -926,6 +929,7 @@ public class ExportDialog extends CustomDialog {
 					}
 				}
 			} else {
+				LogBuffer.println("non-existant\n");
 				option.setEnabled(false);
 				option.setToolTipText("No selection has been made");
 			}
