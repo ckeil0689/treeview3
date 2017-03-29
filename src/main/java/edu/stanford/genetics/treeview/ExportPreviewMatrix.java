@@ -17,7 +17,7 @@ public class ExportPreviewMatrix extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final int D_SIDE = 350;
+	public static final int D_SIDE = 300;
 	
 	private final Image paintImage;
 	private int matrixWidth;
@@ -34,10 +34,10 @@ public class ExportPreviewMatrix extends JPanel {
 		this.paintImage = matrix;
 		this.matrixWidth = matrixWidth;
 		this.matrixHeight = matrixHeight;
-		
+		LogBuffer.println("Preview matrix WxH: [" + matrixWidth + "x" + matrixHeight + "].");
 		setLayout(new MigLayout());
 	}
-	
+
 	/*
 	 * The double buffer in Swing doesn't seem to be persistent across draws.
 	 * for instance, every time another window obscures one of our windows and

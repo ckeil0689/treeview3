@@ -109,17 +109,21 @@ public class ExportDialogController {
 		int matrixWidth = width -
 			(eh.isRowTreeIncluded() ? treesHeight + gapSize : 0) -
 			(eh.areRowLabelsIncluded() ? rowLabelsLen + gapSize : 0);
+		LogBuffer.println("New real matrix WxH: [" + matrixWidth + "x" + matrixHeight + "].");
 
 		ExportPreviewTrees expRowTrees =
 			tvFrame.getDendroView().getRowTreeSnapshot(
 				options.isShowSelections(),options.getRegionType(),
-				treesHeight,matrixHeight);
+				treesHeight,matrixHeight,
+				(matrixWidth > matrixHeight ? matrixWidth : matrixHeight));
 		ExportPreviewTrees expColTrees =
 			tvFrame.getDendroView().getColTreeSnapshot(
 				options.isShowSelections(),options.getRegionType(),
-				matrixWidth,treesHeight);
+				matrixWidth,treesHeight,
+				(matrixWidth > matrixHeight ? matrixWidth : matrixHeight));
 		ExportPreviewLabels expRowLabels = null;
 		if(options.getRowLabelOption() != LabelExportOption.NO) {
+			LogBuffer.println("Creating row labels snapshot because lebl export option is " + options.getRowLabelOption());
 			expRowLabels =
 				tvFrame.getDendroView().getRowLabelsSnapshot(
 					options.isShowSelections(),options.getRegionType(),
@@ -130,6 +134,7 @@ public class ExportDialogController {
 		}
 		ExportPreviewLabels expColLabels = null;
 		if(options.getColLabelOption() != LabelExportOption.NO) {
+			LogBuffer.println("Creating col labels snapshot because lebl export option is " + options.getRowLabelOption());
 			expColLabels =
 				tvFrame.getDendroView().getColLabelsSnapshot(
 					options.isShowSelections(),options.getRegionType(),
@@ -343,6 +348,7 @@ public class ExportDialogController {
 			// Don't update when deselected or highlighted...
 			if(event.getStateChange() == ItemEvent.SELECTED) {
 				updatePreview();
+				LogBuffer.println("Update done");
 			}
 		}
 
@@ -364,6 +370,7 @@ public class ExportDialogController {
 			if((event.getStateChange() == ItemEvent.SELECTED)
 				|| (event.getStateChange() == ItemEvent.DESELECTED)) {
 				updatePreview();
+				LogBuffer.println("Update done");
 			}
 		}
 

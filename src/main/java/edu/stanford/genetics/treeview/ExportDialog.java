@@ -624,24 +624,29 @@ public class ExportDialog extends CustomDialog {
 		}
 
 		background.removeAll();
-		
+
 		JPanel previews = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
-		
+
+		LogBuffer.println("Defining gap size: [" + gapsize + "].");
+
 		/* Tree panels need to have the same size as the matrix */
 		JPanel filler1 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevTrees != null) {
+			LogBuffer.println("Filler1 preview panel HxW as: [" + rowPrevTrees.getShortSide() + "x" + colPrevTrees.getShortSide() + "].");
 			previews.add(filler1, "w " + rowPrevTrees.getShortSide() + "!, "
 				+ "h " + colPrevTrees.getShortSide() + "!,"
 				+ "gap " + gapsize + "! " + gapsize);
 		}
 		JPanel filler2 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevLabels != null && colPrevTrees != null) {
+			LogBuffer.println("Filler2 preview panel HxW as: [" + colPrevTrees.getShortSide() + "x" + rowPrevLabels.getShortSide() + "].");
 			previews.add(filler2, "w " + rowPrevLabels.getShortSide() + "!, "
 				+ "h " + colPrevTrees.getShortSide() + "!,"
 				+ "gap " + gapsize + "! " + gapsize);
 		}
 
 		if(colPrevTrees != null) {
+			LogBuffer.println("Defining col trees preview panel HxW as: [" + colPrevTrees.getShortSide() + "x" + colPrevTrees.getLongSide() + "].");
 			colPrevTrees.setLongSide(matrix.getMatrixWidth());
 			previews.add(colPrevTrees, "growx, pushx, "
 				+ "h " + colPrevTrees.getShortSide() + "!,"
@@ -651,12 +656,14 @@ public class ExportDialog extends CustomDialog {
 
 		JPanel filler3 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevLabels != null) {
+			LogBuffer.println("Filler3 preview panel HxW as: [" + colPrevLabels.getShortSide() + "x" + rowPrevTrees.getShortSide() + "].");
 			previews.add(filler3, "w " + rowPrevTrees.getShortSide() + "!, "
 				+ "h " + colPrevLabels.getShortSide() + "!,"
 				+ "gap " + gapsize + "! " + gapsize);
 		}
 		JPanel filler4 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevLabels != null && colPrevLabels != null) {
+			LogBuffer.println("Filler4 preview panel HxW as: [" + colPrevLabels.getShortSide() + "x" + rowPrevLabels.getShortSide() + "].");
 			previews.add(filler4, "w " + rowPrevLabels.getShortSide() + "!, "
 				+ "h " + colPrevLabels.getShortSide() + "!,"
 				+ "gap " + gapsize + "! " + gapsize);
@@ -664,6 +671,7 @@ public class ExportDialog extends CustomDialog {
 
 		if(colPrevLabels != null) {
 			colPrevLabels.setLongSide(matrix.getMatrixWidth());
+			LogBuffer.println("Defining col label preview panel HxW as: [" + colPrevLabels.getShortSide() + "x" + colPrevLabels.getLongSide() + "].");
 			previews.add(colPrevLabels, "growx, pushx, "
 				+ "h " + colPrevLabels.getShortSide() + "!,"
 				+ " w " + colPrevLabels.getLongSide() + "!, "
@@ -672,6 +680,7 @@ public class ExportDialog extends CustomDialog {
 
 		if(rowPrevTrees != null) {
 			rowPrevTrees.setLongSide(matrix.getMatrixHeight());
+			LogBuffer.println("Defining row trees preview panel HxW as: [" + rowPrevTrees.getLongSide() + "x" + rowPrevTrees.getShortSide() + "].");
 			previews.add(rowPrevTrees, "growy, aligny 0, pushy, "
 				+ "h " + rowPrevTrees.getLongSide() + "!, "
 				+ "w " + rowPrevTrees.getShortSide() + "!, "
@@ -680,15 +689,24 @@ public class ExportDialog extends CustomDialog {
 
 		if(rowPrevLabels != null) {
 			rowPrevLabels.setLongSide(matrix.getMatrixHeight());
+			LogBuffer.println("Defining row labels preview panel HxW as: [" + rowPrevLabels.getLongSide() + "x" + rowPrevLabels.getShortSide() + "].");
 			previews.add(rowPrevLabels, "growx, pushx, "
 				+ "h " + rowPrevLabels.getLongSide() + "!,"
 				+ " w " + rowPrevLabels.getShortSide() + "!, "
 				+ "gapy " + gapsize);
 		}
 
+		LogBuffer.println("Defining matrix preview panel HxW as: [" + matrix.getMatrixHeight() + "x" + matrix.getMatrixWidth() + "].");
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
 			+ matrix.getMatrixWidth() + "!, aligny 0, push, grow");
-		
+
+		LogBuffer.println("Preview Row segment 1 width = [" + rowPrevTrees.getShortSide() + " + " + colPrevTrees.getLongSide() + "] = [" + (rowPrevTrees.getShortSide() + colPrevTrees.getLongSide()) + "].");
+		LogBuffer.println("Preview Row segment 3 width = [" + rowPrevTrees.getShortSide() + " + " + matrix.getMatrixWidth() + "] = [" + (rowPrevTrees.getShortSide() + matrix.getMatrixWidth()) + "].");
+
+		LogBuffer.println("Preview Column segment 1 width = [" + colPrevTrees.getShortSide() + " + " + rowPrevTrees.getLongSide() + "] = [" + (colPrevTrees.getShortSide() + rowPrevTrees.getLongSide()) + "].");
+		LogBuffer.println("Preview Column segment 3 width = [" + colPrevTrees.getShortSide() + " + " + matrix.getMatrixHeight() + "] = [" + (colPrevTrees.getShortSide() + matrix.getMatrixHeight()) + "].");
+
+		LogBuffer.println("Defining background preview panel HxW as: [" + bgHeight + "x" + bgWidth + "].");
 		background.add(previews, "push, align center");
 		previewComp.add(background, "w " + bgWidth + "!, h " 
 			+ bgHeight + "!, push, align center");
@@ -842,8 +860,12 @@ public class ExportDialog extends CustomDialog {
 		/* Get scaled sizes for trees and gaps */
 		int treeSize = (int)(scaleWidth * scaleHeight * eh.getTreesHeight());
 		this.gapsize = (int)(scaleWidth * scaleHeight * eh.getGapSize());
+		LogBuffer.println("Setting row label preview size to: [" + eh.getRowLabelPanelWidth(exportOptions.getRegionType(),
+			exportOptions.getRowLabelOption()) + " * " + scaleWidth + " * " + scaleHeight + "].");
 		int rowLabelSize = (int)(eh.getRowLabelPanelWidth(exportOptions.getRegionType(),
 			exportOptions.getRowLabelOption()) * scaleWidth * scaleHeight);
+		LogBuffer.println("Setting col label preview size to: [" + eh.getColLabelPanelHeight(exportOptions.getRegionType(),
+			exportOptions.getColLabelOption()) + " * " + scaleWidth + " * " + scaleHeight + "].");
 		int colLabelSize = (int)(eh.getColLabelPanelHeight(exportOptions.getRegionType(),
 			exportOptions.getColLabelOption()) * scaleWidth * scaleHeight);
 
@@ -878,8 +900,25 @@ public class ExportDialog extends CustomDialog {
 			previewImgHeight -= gapsize;
 		}
 
+		LogBuffer.println("Updating preview matrix WxH: [" + previewImgWidth + "x" + previewImgHeight + "].");
+
 		matrix.setMatrixWidth(previewImgWidth);
 		matrix.setMatrixHeight(previewImgHeight);
+
+		//Now that we know the dimensions of the matrix, set the long side of
+		//the trees and labels
+		if(rowPrevTrees != null) {
+			rowPrevTrees.setLongSide(previewImgHeight);
+		}
+		if(rowPrevLabels != null) {
+			rowPrevLabels.setLongSide(previewImgHeight);
+		}
+		if(colPrevTrees != null) {
+			colPrevTrees.setLongSide(previewImgWidth);
+		}
+		if(colPrevLabels != null) {
+			colPrevLabels.setLongSide(previewImgWidth);
+		}
 	}
 	
 	/**

@@ -1384,9 +1384,11 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	public ExportPreviewTrees getRowTreeSnapshot(final boolean withSelections,
-		final RegionType region,final int width,final int height) {
+		final RegionType region,final int width,final int height,
+		final int longMatrixEdge) {
 
-		return getTreeSnapshot(rowTreeView,region,withSelections,true,width,height);
+		return getTreeSnapshot(rowTreeView,region,withSelections,true,width,
+			height,longMatrixEdge);
 	}
 
 	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections,
@@ -1412,9 +1414,10 @@ public class DendroView implements Observer, DendroPanel {
 	}
 
 	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections,
-		final RegionType region,final int width,final int height) {
+		final RegionType region,final int width,final int height,final int longMatrixEdge) {
 
-		return getTreeSnapshot(colTreeView,region,withSelections,false,width,height);
+		return getTreeSnapshot(colTreeView,region,withSelections,false,width,
+			height,longMatrixEdge);
 	}
 
 	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
@@ -1452,32 +1455,56 @@ public class DendroView implements Observer, DendroPanel {
 
 	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
 		RegionType region,final boolean withSelections,final boolean isRows,
-		final int width,final int height) {
+		final int width,final int height,final int longMatrixEdge) {
 
 		if(treeAxisView == null) {
 			LogBuffer.println("Cannot generate tree snapshot. TRView object is null.");
 			return new ExportPreviewTrees(null, isRows); // empty panel
 		}
 
-		int shortLen = 0;
-		int longLen = 0;
-		if(isRows) {
-			shortLen = width;
-			longLen = height;
-		} else {
-			shortLen = height;
-			longLen = width;
-		}
+		//The max preview matrix edge length is D_LONG. If there's not the same
+		//number of cols & rows, the long edge length is smaller than the max.
+		//The fraction smaller that the real long tree edge is than the longest
+		//matrix edge is the fraction we must reduce the max for this long edge
+		LogBuffer.println("Calculating length of long tree edge: (isRows ? " + height + " : " + width + ") / " + longMatrixEdge + ") * " + ExportPreviewTrees.D_LONG);
+		int longLen =
+			(int) Math.floor(((double) (isRows ? height : width) /
+				(double) longMatrixEdge) *
+				(double) ExportPreviewTrees.D_LONG);
+		int shortLen = calculatePrevShortLen(longLen,width,height,isRows);
 
 		/* Set up column tree image */
 		BufferedImage treeSnapshot = null;
 		ExportPreviewTrees expTrees = null;
 		if(treeAxisView.isEnabled()) {
-			treeSnapshot = treeAxisView.getSnapshot(width, height, region, withSelections);
-			expTrees = new ExportPreviewTrees(treeSnapshot,isRows,shortLen,longLen);
+			treeSnapshot = treeAxisView.getSnapshot(width, height, region,
+				withSelections);
+			expTrees = new ExportPreviewTrees(treeSnapshot,isRows,shortLen,
+				longLen);
 		}
 
 		return expTrees;
+	}
+
+	/**
+	 * This method determines the short length of the tree based on actual tree
+	 * area dimensions and using the fixed long length for the preview for
+	 * scaling down the short length
+	 * 
+	 * @param 
+	 */
+	private int calculatePrevShortLen(final int prevLongLen,
+		final int realWidth,final int realHeight,final boolean isRows) {
+
+		int realLongLen  = (isRows ? realHeight : realWidth );
+		int realShortLen = (isRows ? realWidth  : realHeight);
+		int prevShortLen =
+			(int) Math.round(((double) realShortLen / (double) realLongLen) *
+				(double) prevLongLen);
+		if(prevShortLen < ExportPreviewTrees.D_MIN) {
+			prevShortLen = ExportPreviewTrees.D_MIN;
+		}
+		return(prevShortLen);
 	}
 
 	private ExportPreviewLabels getLabelsSnapshot(LabelView labelsAxisView,
@@ -1493,9 +1520,11 @@ public class DendroView implements Observer, DendroPanel {
 		int shortLen = 0;
 		int longLen = 0;
 		if(isRows) {
+			LogBuffer.println("Actually creating row labels snapshot.");
 			shortLen = width;
 			longLen = height;
 		} else {
+			LogBuffer.println("Actually creating col labels snapshot.");
 			shortLen = height;
 			longLen = width;
 		}

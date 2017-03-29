@@ -18,8 +18,10 @@ public class ExportPreviewTrees extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	/* Initial default sizes */
-	public static final int D_LONG = 400;
-	public static final int D_SHORT = 80;
+	public static final int D_LONG = 300;
+	public static final int D_SHORT = 85;
+	//Minimum dimension of an element (e.g. tree height)
+	public static final int D_MIN = 3;
 	
 	private final Image paintImage;
 	private final boolean isRows;
@@ -42,10 +44,12 @@ public class ExportPreviewTrees extends JPanel {
 
 	public ExportPreviewTrees(final BufferedImage trees,final boolean isRows,
 		final int shortLen,final int longLen) {
-		
+
 		this.paintImage = trees;
 		this.isRows = isRows;
-		
+
+		LogBuffer.println("Setting short/long " + (isRows ? "row " : "col ") + "tree dimensions: [" + shortLen + "," + longLen + "]");
+
 		setLayout(new MigLayout());
 		setShortSide(shortLen);
 		setLongSide(longLen);	
