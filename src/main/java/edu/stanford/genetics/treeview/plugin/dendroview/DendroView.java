@@ -1455,7 +1455,7 @@ public class DendroView implements Observer, DendroPanel {
 
 	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
 		RegionType region,final boolean withSelections,final boolean isRows,
-		final int width,final int height,final int longMatrixEdge) {
+		int width,int height,final int longMatrixEdge) {
 
 		if(treeAxisView == null) {
 			LogBuffer.println("Cannot generate tree snapshot. TRView object is null.");
@@ -1472,6 +1472,9 @@ public class DendroView implements Observer, DendroPanel {
 				(double) longMatrixEdge) *
 				(double) ExportPreviewTrees.D_LONG);
 		int shortLen = calculatePrevShortLen(longLen,width,height,isRows);
+
+		height = (isRows ? longLen : shortLen);
+		width = (isRows ? shortLen : longLen);
 
 		/* Set up column tree image */
 		BufferedImage treeSnapshot = null;
