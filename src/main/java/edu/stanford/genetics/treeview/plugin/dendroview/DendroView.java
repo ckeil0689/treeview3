@@ -1399,18 +1399,20 @@ public class DendroView implements Observer, DendroPanel {
 
 	public ExportPreviewLabels getRowLabelsSnapshot(final boolean withSelections,
 		final RegionType region,final int width,final int height,
-		final boolean drawSelectionOnly,final int tileHeight,final int fontSize) {
+		final boolean drawSelectionOnly,final int tileHeight,final int fontSize,
+		final int longMatrixEdge) {
 
 		return getLabelsSnapshot(rowLabelView,region,withSelections,true,width,height,
-			drawSelectionOnly,tileHeight,fontSize);
+			drawSelectionOnly,tileHeight,fontSize,longMatrixEdge);
 	}
 
 	public ExportPreviewLabels getColLabelsSnapshot(final boolean withSelections,
 		RegionType region,final int width,final int height,
-		final boolean drawSelectionOnly,final int tileWidth,final int fontSize) {
+		final boolean drawSelectionOnly,final int tileWidth,final int fontSize,
+		final int longMatrixEdge) {
 
 		return getLabelsSnapshot(colLabelView,region,withSelections,false,width,height,
-			drawSelectionOnly,tileWidth,fontSize);
+			drawSelectionOnly,tileWidth,fontSize,longMatrixEdge);
 	}
 
 	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections,
@@ -1512,27 +1514,24 @@ public class DendroView implements Observer, DendroPanel {
 
 	private ExportPreviewLabels getLabelsSnapshot(LabelView labelsAxisView,
 		RegionType region,final boolean withSelections,final boolean isRows,
-		final int width,final int height,final boolean drawSelectionOnly,
-		final int tileHeight,final int fontSize) {
+		int width,int height,final boolean drawSelectionOnly,
+		final int tileHeight,final int fontSize,final int longMatrixEdge) {
 
 		if(labelsAxisView == null) {
 			LogBuffer.println("Cannot generate labels snapshot. Label object is null.");
 			return new ExportPreviewLabels(null,isRows); // empty panel
 		}
 
-		int shortLen = 0;
-		int longLen = 0;
-		if(isRows) {
-			LogBuffer.println("Actually creating row labels snapshot.");
-			shortLen = width;
-			longLen = height;
-		} else {
-			LogBuffer.println("Actually creating col labels snapshot.");
-			shortLen = height;
-			longLen = width;
-		}
+		int longLen =
+			(int) Math.floor(((double) (isRows ? height : width) /
+				(double) longMatrixEdge) *
+				(double) ExportPreviewTrees.D_LONG);
+		int shortLen = calculatePrevShortLen(longLen,width,height,isRows);
 
-		/* Set up column tree image */
+		height = (isRows ? longLen : shortLen);
+		width = (isRows ? shortLen : longLen);
+
+		/* Set up column label image */
 		BufferedImage labelsSnapshot = null;
 		ExportPreviewLabels expLabels = null;
 

@@ -130,7 +130,8 @@ public class ExportDialogController {
 					rowLabelsLen,matrixHeight,
 					options.getRowLabelOption() == LabelExportOption.SELECTION,
 					eh.getTileHeight(),
-					eh.getLabelAreaHeight() - ExportHandler.SQUEEZE);
+					eh.getLabelAreaHeight() - ExportHandler.SQUEEZE,
+					(matrixWidth > matrixHeight ? matrixWidth : matrixHeight));
 		}
 		ExportPreviewLabels expColLabels = null;
 		if(options.getColLabelOption() != LabelExportOption.NO) {
@@ -141,7 +142,8 @@ public class ExportDialogController {
 					matrixWidth,colLabelsLen,
 					options.getColLabelOption() == LabelExportOption.SELECTION,
 					eh.getTileWidth(),
-					eh.getLabelAreaHeight() - ExportHandler.SQUEEZE);
+					eh.getLabelAreaHeight() - ExportHandler.SQUEEZE,
+					(matrixWidth > matrixHeight ? matrixWidth : matrixHeight));
 		}
 		ExportPreviewMatrix expMatrix =
 			tvFrame.getDendroView().getMatrixSnapshot(

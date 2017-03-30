@@ -26,6 +26,8 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
+import net.miginfocom.swing.MigLayout;
+
 import org.freehep.graphicsio.PageConstants;
 
 import Controllers.ExportHandler;
@@ -625,24 +627,24 @@ public class ExportDialog extends CustomDialog {
 
 		background.removeAll();
 
-		JPanel previews = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
-
 		LogBuffer.println("Defining gap size: [" + gapsize + "].");
+
+//		JPanel previews = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
+		JPanel previews = new JPanel();
+		previews.setLayout(new MigLayout("ins 0, gap " + gapsize + "!"));
 
 		/* Tree panels need to have the same size as the matrix */
 		JPanel filler1 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevTrees != null) {
 			LogBuffer.println("Filler1 preview panel HxW as: [" + rowPrevTrees.getShortSide() + "x" + colPrevTrees.getShortSide() + "].");
 			previews.add(filler1, "w " + rowPrevTrees.getShortSide() + "!, "
-				+ "h " + colPrevTrees.getShortSide() + "!,"
-				+ "gap " + gapsize + "! " + gapsize);
+				+ "h " + colPrevTrees.getShortSide() + "!");
 		}
 		JPanel filler2 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevLabels != null && colPrevTrees != null) {
 			LogBuffer.println("Filler2 preview panel HxW as: [" + colPrevTrees.getShortSide() + "x" + rowPrevLabels.getShortSide() + "].");
 			previews.add(filler2, "w " + rowPrevLabels.getShortSide() + "!, "
-				+ "h " + colPrevTrees.getShortSide() + "!,"
-				+ "gap " + gapsize + "! " + gapsize);
+				+ "h " + colPrevTrees.getShortSide() + "!");
 		}
 
 		if(colPrevTrees != null) {
@@ -650,23 +652,20 @@ public class ExportDialog extends CustomDialog {
 			colPrevTrees.setLongSide(matrix.getMatrixWidth());
 			previews.add(colPrevTrees, "growx, pushx, "
 				+ "h " + colPrevTrees.getShortSide() + "!,"
-				+ " w " + colPrevTrees.getLongSide() + "!, "
-				+ "gapy " + gapsize + "!, wrap");
+				+ " w " + colPrevTrees.getLongSide() + "!, wrap");
 		}
 
 		JPanel filler3 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevLabels != null) {
 			LogBuffer.println("Filler3 preview panel HxW as: [" + colPrevLabels.getShortSide() + "x" + rowPrevTrees.getShortSide() + "].");
 			previews.add(filler3, "w " + rowPrevTrees.getShortSide() + "!, "
-				+ "h " + colPrevLabels.getShortSide() + "!,"
-				+ "gap " + gapsize + "! " + gapsize);
+				+ "h " + colPrevLabels.getShortSide() + "!");
 		}
 		JPanel filler4 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevLabels != null && colPrevLabels != null) {
 			LogBuffer.println("Filler4 preview panel HxW as: [" + colPrevLabels.getShortSide() + "x" + rowPrevLabels.getShortSide() + "].");
 			previews.add(filler4, "w " + rowPrevLabels.getShortSide() + "!, "
-				+ "h " + colPrevLabels.getShortSide() + "!,"
-				+ "gap " + gapsize + "! " + gapsize);
+				+ "h " + colPrevLabels.getShortSide() + "!");
 		}
 
 		if(colPrevLabels != null) {
@@ -674,8 +673,7 @@ public class ExportDialog extends CustomDialog {
 			LogBuffer.println("Defining col label preview panel HxW as: [" + colPrevLabels.getShortSide() + "x" + colPrevLabels.getLongSide() + "].");
 			previews.add(colPrevLabels, "growx, pushx, "
 				+ "h " + colPrevLabels.getShortSide() + "!,"
-				+ " w " + colPrevLabels.getLongSide() + "!, "
-				+ "gapy " + gapsize + "!, wrap");
+				+ " w " + colPrevLabels.getLongSide() + "!, wrap");
 		}
 
 		if(rowPrevTrees != null) {
@@ -683,8 +681,7 @@ public class ExportDialog extends CustomDialog {
 			LogBuffer.println("Defining row trees preview panel HxW as: [" + rowPrevTrees.getLongSide() + "x" + rowPrevTrees.getShortSide() + "].");
 			previews.add(rowPrevTrees, "growy, aligny 0, pushy, "
 				+ "h " + rowPrevTrees.getLongSide() + "!, "
-				+ "w " + rowPrevTrees.getShortSide() + "!, "
-				+ "gapx " + gapsize + "!");
+				+ "w " + rowPrevTrees.getShortSide() + "!");
 		}
 
 		if(rowPrevLabels != null) {
@@ -692,13 +689,12 @@ public class ExportDialog extends CustomDialog {
 			LogBuffer.println("Defining row labels preview panel HxW as: [" + rowPrevLabels.getLongSide() + "x" + rowPrevLabels.getShortSide() + "].");
 			previews.add(rowPrevLabels, "growx, pushx, "
 				+ "h " + rowPrevLabels.getLongSide() + "!,"
-				+ " w " + rowPrevLabels.getShortSide() + "!, "
-				+ "gapy " + gapsize);
+				+ " w " + rowPrevLabels.getShortSide() + "!");
 		}
 
 		LogBuffer.println("Defining matrix preview panel HxW as: [" + matrix.getMatrixHeight() + "x" + matrix.getMatrixWidth() + "].");
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
-			+ matrix.getMatrixWidth() + "!, aligny 0, push, grow");
+			+ matrix.getMatrixWidth() + "!, aligny 0, push, grow, gap 0!");
 
 		LogBuffer.println("Preview Row segment 1 width = [" + rowPrevTrees.getShortSide() + " + " + colPrevTrees.getLongSide() + "] = [" + (rowPrevTrees.getShortSide() + colPrevTrees.getLongSide()) + "].");
 		LogBuffer.println("Preview Row segment 3 width = [" + rowPrevTrees.getShortSide() + " + " + matrix.getMatrixWidth() + "] = [" + (rowPrevTrees.getShortSide() + matrix.getMatrixWidth()) + "].");
@@ -707,9 +703,9 @@ public class ExportDialog extends CustomDialog {
 		LogBuffer.println("Preview Column segment 3 width = [" + colPrevTrees.getShortSide() + " + " + matrix.getMatrixHeight() + "] = [" + (colPrevTrees.getShortSide() + matrix.getMatrixHeight()) + "].");
 
 		LogBuffer.println("Defining background preview panel HxW as: [" + bgHeight + "x" + bgWidth + "].");
-		background.add(previews, "push, align center");
+		background.add(previews, "push, align center, gap 0!");
 		previewComp.add(background, "w " + bgWidth + "!, h " 
-			+ bgHeight + "!, push, align center");
+			+ bgHeight + "!, push, align center, gap 0!");
 		
 		mainPanel.revalidate();
 		mainPanel.repaint();
