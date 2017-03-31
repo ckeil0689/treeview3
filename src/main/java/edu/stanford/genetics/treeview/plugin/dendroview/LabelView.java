@@ -3531,6 +3531,154 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 	}
 
+	public void createApproxPreview(final Graphics g,final int xIndent,
+		final int yIndent,final int size,final boolean showSelections,
+		final boolean drawSelectedOnly,final int fontSize,
+		final RegionType region,final double shrinkFactor) {
+
+		int start = 0;
+		int end = 0;
+		if(region == RegionType.ALL) {
+			start = map.getMinIndex();
+			end = map.getMaxIndex();
+		} else if(region == RegionType.VISIBLE) {
+			start = map.getFirstVisible();
+			end = map.getLastVisible();
+		} else if(region == RegionType.SELECTION) {
+			start = drawSelection.getMinIndex();
+			end = drawSelection.getMaxIndex();
+		} else {
+			LogBuffer.println("Invalid region type.");
+			return;
+		}
+
+		final Graphics2D g2d = (Graphics2D) g;
+
+		//Set up the font and establish
+		double fontSizeShrunk = (double) fontSize * shrinkFactor;
+		Font exportFont;
+		boolean approxMode = false;
+		//If the font size is less than 1.5, switch to approx mode
+		if(fontSizeShrunk < 1.5) {
+			approxMode = true;
+			LogBuffer.println("Approximating labels for the preview.");
+			//Create the export font size so that we can calculate the string
+			//length and shrink it
+			exportFont = new Font(labelAttr.getFace(),
+				labelAttr.getStyle(),fontSize);
+		} else {
+			LogBuffer.println("Drawing real labels for the preview.");
+			//Turn on anti-aliasing so the text looks better
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+			exportFont = new Font(labelAttr.getFace(),
+				labelAttr.getStyle(),(int) Math.round(fontSizeShrunk));
+		}
+		final FontMetrics metrics = getFontMetrics(exportFont);
+
+		int xSize = getMaxExportStringLength(region,drawSelectedOnly,fontSize);
+		int ascent = 0;
+		double xSizeShrunk   = (double) xSize    * shrinkFactor;
+		double xIndentShrunk = (double) xIndent * shrinkFactor;
+		double yIndentShrunk = (double) yIndent * shrinkFactor;
+		double sizeShrunk    = (double) size    * shrinkFactor;
+		if(!approxMode) {
+			ascent = metrics.getAscent();
+		}
+ 
+		/* Rotate plane for array axis (not for zoomHint) */
+		orientLabelsForPreview(g2d,(int) Math.round(xSizeShrunk));
+
+		//Labels are always drawn horizontally.  orientLabelPane does its magic
+		//to rotate the whole thing, so we don't have to worry about it.  Thus
+		//yPos is the "pixel" (i.e. "point") position referring to lines of
+		//labels.  yOffset is to center the label on a tile.
+		//yPos and xPos are assumed to start at 0.
+		double yPos    = yIndentShrunk;
+		double yOffset = sizeShrunk / 2.0;
+		double xPos    = xIndentShrunk;
+
+		//This really just defines the size of the drawing area
+		//g.clearRect(0,0,xSize,ySize);
+
+		for(int j = start;j <= end;j++) {
+
+			try {
+				String out = labelSummary.getSummary(labelInfo,j);
+
+				if(out == null) {
+					out = "No Label";
+				}
+
+				/*
+				 * This will draw the label background if selected
+				 */
+				if(drawSelection.isIndexSelected(j) && showSelections) {
+
+					g.setColor(selectionTextBGColor);
+
+					g.fillRect((int) Math.round(xIndentShrunk),
+						(int) Math.round(yPos),
+						(int) Math.round(xSizeShrunk),
+						(int) Math.round(sizeShrunk));
+				} else if(!drawSelection.isIndexSelected(j) &&
+					drawSelectedOnly) {
+
+					//Skip this label if it is not selected and we're only
+					//drawing selected labels
+					yPos += sizeShrunk;
+					continue;
+				}
+
+				/* Set label color */
+				g2d.setColor(Color.black);
+
+				//Set the font or the line length
+				int strLen = 0;
+				if(!approxMode) {
+					g2d.setFont(exportFont);
+				} else {
+					strLen = (int) Math.round(shrinkFactor *
+						(double) metrics.stringWidth(out));
+					if(strLen < 1) {
+						strLen = 1;
+					}
+				}
+
+				/* Finally draw label (alignment-dependent) */
+				xPos = xIndentShrunk;
+				if(labelAttr.isRightJustified()) {
+					if(approxMode) {
+						xPos += (xSizeShrunk - strLen);
+					} else {
+						xPos += (xSizeShrunk - metrics.stringWidth(out));
+					}
+				}
+
+				//If we're in approx mode, just draw a line.  No need to draw a
+				//font at this scale for a shrunken preview image.  Also, we're
+				//Keeping track of the position using doubles so that each
+				//drawn piece gets into the closest position
+				if(approxMode) {
+					g2d.drawLine((int) Math.round(xPos),
+						(int) Math.round(yPos + yOffset),
+						(int) Math.round(xPos) + strLen,
+						(int) Math.round(yPos));
+				} else {
+					g2d.drawString(out,
+						(int) Math.round(xPos),
+						(int) Math.round(yPos + yOffset) + (ascent / 2));
+				}
+			}
+			catch(final java.lang.ArrayIndexOutOfBoundsException e) {
+				LogBuffer.logException(e);
+				break;
+			}
+
+			yPos += sizeShrunk;
+		}
+	}
+
 	/**
 	 * Get a scaled snapshot of the trees. The snapshot will be taken in
 	 * the specified region.
@@ -3542,7 +3690,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	public BufferedImage getSnapshot(final int width,final int height, 
 		final RegionType region,final boolean withSelections,
-		final boolean drawSelectionOnly,final int tileSize,final int fontSize) {
+		final boolean drawSelectionOnly,final int tileSize,final int fontSize,
+		final double shrinkby) {
 
 		BufferedImage img = new BufferedImage(width,height,
 			BufferedImage.TYPE_INT_ARGB);
@@ -3550,12 +3699,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		BufferedImage scaled = new BufferedImage(width, height,
 			BufferedImage.TYPE_INT_ARGB);
 
-		createPreview(img.getGraphics(),0,0,tileSize,withSelections,
-			drawSelectionOnly,fontSize,region);
+		createApproxPreview(img.getGraphics(),0,0,tileSize,withSelections,
+			drawSelectionOnly,fontSize,region,shrinkby);
+//		createApproxPreview(img.getGraphics(),0,0,tileSize,withSelections,
+//			drawSelectionOnly,fontSize,region,0.5);
+//		createPreview(img.getGraphics(),0,0,tileSize,withSelections,
+//			drawSelectionOnly,fontSize,region);
 
 		/* Draw a scaled version of the old image to a new image */
 		Graphics g = scaled.getGraphics();
-		g.drawImage(img, 0, 0, width, height, null);
+		g.drawImage(img, 0, 0, (int) Math.round(width * (1.0 / shrinkby)), (int) Math.round(height * (1.0 / shrinkby)), null);
 
 		return scaled;
 	}
