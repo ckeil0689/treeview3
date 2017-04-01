@@ -1534,8 +1534,8 @@ public class DendroView implements Observer, DendroPanel {
 		//shrunken and rounded font size, I decided to pass the real values and
 		//a shrink factor to do the shrinking after determining the font length
 		//of each label
-//		height = (isRows ? longLen : shortLen);
-//		width = (isRows ? shortLen : longLen);
+		height = (isRows ? longLen : shortLen);
+		width = (isRows ? shortLen : longLen);
 
 		/* Set up column label image */
 		BufferedImage labelsSnapshot = null;

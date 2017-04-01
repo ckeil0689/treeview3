@@ -21,7 +21,7 @@ public class ExportPreviewTrees extends JPanel {
 	public static final int D_LONG = 300;
 	public static final int D_SHORT = 85;
 	//Minimum dimension of an element (e.g. tree height)
-	public static final int D_MIN = 3;
+	public static final int D_MIN = 1;
 	
 	private final Image paintImage;
 	private final boolean isRows;

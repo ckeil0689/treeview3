@@ -3578,7 +3578,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		int xSize = getMaxExportStringLength(region,drawSelectedOnly,fontSize);
 		int ascent = 0;
-		double xSizeShrunk   = (double) xSize    * shrinkFactor;
+		double xSizeShrunk   = (double) xSize   * shrinkFactor;
 		double xIndentShrunk = (double) xIndent * shrinkFactor;
 		double yIndentShrunk = (double) yIndent * shrinkFactor;
 		double sizeShrunk    = (double) size    * shrinkFactor;
@@ -3677,6 +3677,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			yPos += sizeShrunk;
 		}
+		LogBuffer.println("Last label position: [" + yPos + "] longest label length: [" + xSizeShrunk + "]");
 	}
 
 	/**
@@ -3696,7 +3697,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		BufferedImage img = new BufferedImage(width,height,
 			BufferedImage.TYPE_INT_ARGB);
 		
-		BufferedImage scaled = new BufferedImage(width, height,
+		BufferedImage scaled = new BufferedImage(width,height,
 			BufferedImage.TYPE_INT_ARGB);
 
 		createApproxPreview(img.getGraphics(),0,0,tileSize,withSelections,
@@ -3708,7 +3709,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		/* Draw a scaled version of the old image to a new image */
 		Graphics g = scaled.getGraphics();
-		g.drawImage(img, 0, 0, (int) Math.round(width * (1.0 / shrinkby)), (int) Math.round(height * (1.0 / shrinkby)), null);
+		g.drawImage(img, 0, 0, width,height, null);
 
 		return scaled;
 	}

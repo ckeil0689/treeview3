@@ -696,11 +696,11 @@ public class ExportDialog extends CustomDialog {
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
 			+ matrix.getMatrixWidth() + "!, aligny 0, push, grow, gap 0!");
 
-		LogBuffer.println("Preview Row segment 1 width = [" + rowPrevTrees.getShortSide() + " + " + colPrevTrees.getLongSide() + "] = [" + (rowPrevTrees.getShortSide() + colPrevTrees.getLongSide()) + "].");
-		LogBuffer.println("Preview Row segment 3 width = [" + rowPrevTrees.getShortSide() + " + " + matrix.getMatrixWidth() + "] = [" + (rowPrevTrees.getShortSide() + matrix.getMatrixWidth()) + "].");
-
-		LogBuffer.println("Preview Column segment 1 width = [" + colPrevTrees.getShortSide() + " + " + rowPrevTrees.getLongSide() + "] = [" + (colPrevTrees.getShortSide() + rowPrevTrees.getLongSide()) + "].");
-		LogBuffer.println("Preview Column segment 3 width = [" + colPrevTrees.getShortSide() + " + " + matrix.getMatrixHeight() + "] = [" + (colPrevTrees.getShortSide() + matrix.getMatrixHeight()) + "].");
+//		LogBuffer.println("Preview Row segment 1 width = [" + rowPrevTrees.getShortSide() + " + " + colPrevTrees.getLongSide() + "] = [" + (rowPrevTrees.getShortSide() + colPrevTrees.getLongSide()) + "].");
+//		LogBuffer.println("Preview Row segment 3 width = [" + rowPrevTrees.getShortSide() + " + " + matrix.getMatrixWidth() + "] = [" + (rowPrevTrees.getShortSide() + matrix.getMatrixWidth()) + "].");
+//
+//		LogBuffer.println("Preview Column segment 1 width = [" + colPrevTrees.getShortSide() + " + " + rowPrevTrees.getLongSide() + "] = [" + (colPrevTrees.getShortSide() + rowPrevTrees.getLongSide()) + "].");
+//		LogBuffer.println("Preview Column segment 3 width = [" + colPrevTrees.getShortSide() + " + " + matrix.getMatrixHeight() + "] = [" + (colPrevTrees.getShortSide() + matrix.getMatrixHeight()) + "].");
 
 		LogBuffer.println("Defining background preview panel HxW as: [" + bgHeight + "x" + bgWidth + "].");
 		background.add(previews, "push, align center, gap 0!");
