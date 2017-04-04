@@ -1527,13 +1527,14 @@ public class DendroView implements Observer, DendroPanel {
 			(int) Math.floor((double) (isRows ? height : width) * shrinkby);
 		int shortLen = calculatePrevShortLen(shrinkby,width,height,isRows);
 
-		LogBuffer.println("Shrinking by " + shrinkby + ".  From w" + width + "/h" + height + " using D_LONG: " + ExportPreviewTrees.D_LONG + " and longMatrixEdge: " + longMatrixEdge + " to make shortlen: " + shortLen + " & longLen: " + longLen);
+		LogBuffer.println("Shrinking by " + shrinkby + ".  From w" + width +
+			"/h" + height + " using D_LONG: " + ExportPreviewTrees.D_LONG +
+			" and longMatrixEdge: " + longMatrixEdge + " to make shortlen: " +
+			shortLen + " & longLen: " + longLen);
 
-		//Previously, I was shrinking the dimensions before passing them in, but
-		//given the fact that I cannot determine shrunken font lengths using a
-		//shrunken and rounded font size, I decided to pass the real values and
-		//a shrink factor to do the shrinking after determining the font length
-		//of each label
+		//Scale down the dimensions for the preview, but do not scale down the
+		//other components such as font size, as that is needed to measure
+		//string length which can be subsequently scaled
 		height = (isRows ? longLen : shortLen);
 		width = (isRows ? shortLen : longLen);
 
@@ -1541,8 +1542,8 @@ public class DendroView implements Observer, DendroPanel {
 		BufferedImage labelsSnapshot = null;
 		ExportPreviewLabels expLabels = null;
 
-		labelsSnapshot = labelsAxisView.getSnapshot(width, height, region,
-			withSelections, drawSelectionOnly,tileHeight,fontSize,shrinkby);
+		labelsSnapshot = labelsAxisView.getSnapshot(width,height,region,
+			withSelections,drawSelectionOnly,tileHeight,fontSize,shrinkby);
 		expLabels =
 			new ExportPreviewLabels(labelsSnapshot,isRows,shortLen,longLen);
 

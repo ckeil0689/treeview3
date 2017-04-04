@@ -1069,13 +1069,20 @@ public class ExportHandler {
 				BigDecimal bd = new BigDecimal(tooBig);
 				bd = bd.round(new MathContext(4));
 				double rounded = bd.doubleValue();
+				int overflow = 0;
+				if(tooBig < 2.0) {
+					overflow = (int) Math.round((double) MAX_IMAGE_SIZE * (tooBig - 1.0));
+				}
+				LogBuffer.println("Export too big.  [x" + getXDim(region) +
+					" * y" + getYDim(region) + "] > [" + MAX_IMAGE_SIZE + "].");
 				throw new Exception("Error: Unable to export image.\n\n" +
 					"Exported region [" + region.toString() + ": " +
 					getNumXExportIndexes(region) + "cols x " +
 					getNumYExportIndexes(region) + "rows] is about [" +
-					rounded +
-					"] times too big to export.\n\nPlease zoom to a smaller " +
-					"area and try exporting only that visible portion.",iae);
+					(overflow == 0 ?
+						rounded + "] times" : overflow + "] points") +
+					" too big for image export.\n\nPlease select a smaller " +
+					"area or fewer options to include (e.g. labels) and try again.",iae);
 			}
 			catch(Exception exc) {
 				double tooBig = ((double) getXDim(region) /
@@ -1084,14 +1091,22 @@ public class ExportHandler {
 					BigDecimal bd = new BigDecimal(tooBig);
 					bd = bd.round(new MathContext(4));
 					double rounded = bd.doubleValue();
+					int overflow = 0;
+					if(tooBig < 2.0) {
+						overflow = (int) Math.round((double) MAX_IMAGE_SIZE * (tooBig - 1.0));
+					}
+					LogBuffer.println("Export too big.  [x" + getXDim(region) +
+						" * y" + getYDim(region) + "] > [" + MAX_IMAGE_SIZE +
+						"].");
 					throw new Exception("Error: Unable to export image.\n\n" +
 						"Exported region [" + region.toString() + ": " +
 						getNumXExportIndexes(region) + "cols x " +
 						getNumYExportIndexes(region) + "rows] is about [" +
-						rounded +
-						"] times too big to export.\n\nPlease zoom to " +
-						"a smaller area and try exporting only that visible " +
-						"portion.",exc);
+						(overflow == 0 ?
+							rounded + "] times" : overflow + "] points") +
+						" too big for image export.\n\nPlease select " +
+						"a smaller area or fewer options to include (e.g. " +
+						"labels) and try again.",exc);
 				} else {
 					exc.printStackTrace();
 					throw new Exception(

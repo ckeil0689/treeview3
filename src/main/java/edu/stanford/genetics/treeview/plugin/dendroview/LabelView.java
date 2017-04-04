@@ -3435,103 +3435,26 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 	}
 
+	/**
+	 * Create a scaled preview image based on export sizes scaled by
+	 * shrinkFactor.  If the font size ends up shorter than 1 pixel, lines are
+	 * drawn to the resulting string length.  Resulting string lengths WRT
+	 * actually drawing fonts could end up inaccurate due to rounding after
+	 * shrinking a font size.  Worst case would be something like a font size of
+	 * 1.5 and a resulting long string length being relatively 30% longer than
+	 * the actual export image
+	 * 
+	 * @param g - Graphics object.
+	 * @param xIndent - Where to start drawing the labels on the x axis.
+	 * @param yIndent - Where to start drawing the labels on the y axis.
+	 * @param size - Actual tile size ("points") in the exported image.
+	 * @param showSelections - Whether to include highlights in the snapshot.
+	 * @param drawSelectionOnly - Whether to only draw selected labels.
+	 * @param fontSize - Actual font size ("points") in the exported image.
+	 * @param region - The region from which to take a snapshot.
+	 * @param shrinkFactor - Fraction by which to shrink the image.
+	 */
 	public void createPreview(final Graphics g,final int xIndent,
-		final int yIndent,final int size,final boolean showSelections,
-		final boolean drawSelectedOnly,final int fontSize,
-		final RegionType region) {
-
-		int start = 0;
-		int end = 0;
-		if(region == RegionType.ALL) {
-			start = map.getMinIndex();
-			end = map.getMaxIndex();
-		} else if(region == RegionType.VISIBLE) {
-			start = map.getFirstVisible();
-			end = map.getLastVisible();
-		} else if(region == RegionType.SELECTION) {
-			start = drawSelection.getMinIndex();
-			end = drawSelection.getMaxIndex();
-		} else {
-			LogBuffer.println("Invalid region type.");
-			return;
-		}
-
-		final Graphics2D g2d = (Graphics2D) g;
-
-		//Turn on anti-aliasing so the text looks better
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-			RenderingHints.VALUE_ANTIALIAS_ON);
-
-		Font exportFont = new Font(labelAttr.getFace(),
-				labelAttr.getStyle(),fontSize);
-		final FontMetrics metrics = getFontMetrics(exportFont);
-		int xSize = getMaxExportStringLength(region,drawSelectedOnly,fontSize);
-		final int ascent = metrics.getAscent();
- 
-		/* Rotate plane for array axis (not for zoomHint) */
-		orientLabelsForPreview(g2d,xSize);
-
-		//Labels are always drawn horizontally.  orientLabelPane does its magic
-		//to rotate the whole thing, so we don't have to worry about it.  Thus
-		//yPos is the "pixel" (i.e. "point") position referring to lines of
-		//labels.  yOffset is to center the label on a tile.
-		//yPos and xPos are assumed to start at 0.
-		int yPos = yIndent;
-		int yOffset = (int) Math.floor((double) size / 2.0);
-		int xPos = xIndent;
-
-		//This really just defines the size of the drawing area
-		//g.clearRect(0,0,xSize,ySize);
-
-		for(int j = start;j <= end;j++) {
-
-			try {
-				String out = labelSummary.getSummary(labelInfo,j);
-
-				if(out == null) {
-					out = "No Label";
-				}
-
-				/*
-				 * This will draw the label background if selected
-				 */
-				if(drawSelection.isIndexSelected(j) && showSelections) {
-
-					g.setColor(selectionTextBGColor);
-
-					g.fillRect(xIndent,yPos,xSize,size);
-				} else if(!drawSelection.isIndexSelected(j) &&
-					drawSelectedOnly) {
-
-					//Skip this label if it is not selected and we're only
-					//drawing selected labels
-					yPos += size;
-					continue;
-				}
-
-				/* Set label color */
-				g2d.setColor(Color.black);
-				g2d.setFont(exportFont);
-				
-
-				/* Finally draw label (alignment-dependent) */
-				xPos = xIndent;
-				if(labelAttr.isRightJustified()) {
-					xPos += (xSize - metrics.stringWidth(out));
-				}
-
-				g2d.drawString(out,xPos,yPos + yOffset + (ascent / 2));
-			}
-			catch(final java.lang.ArrayIndexOutOfBoundsException e) {
-				LogBuffer.logException(e);
-				break;
-			}
-
-			yPos += size;
-		}
-	}
-
-	public void createApproxPreview(final Graphics g,final int xIndent,
 		final int yIndent,final int size,final boolean showSelections,
 		final boolean drawSelectedOnly,final int fontSize,
 		final RegionType region,final double shrinkFactor) {
@@ -3686,7 +3609,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @param width - The width of the scaled image to be returned.
 	 * @param height - The height of the scaled image to be returned.
 	 * @param region - The region from which to take a snapshot.
-	 * @param withSelections - Whether to include selections in the snapshot.
+	 * @param withSelections - Whether to include highlights in the snapshot.
+	 * @param drawSelectionOnly - Whether to only draw selected labels.
+	 * @param tileSize - Actual tile size ("points") in the exported image.
+	 * @param fontSize - Actual font size ("points") in the exported image.
+	 * @param shrinkby - Fraction to scale the image down for the preview.
 	 * @return A scaled BufferedImage representing the trees.
 	 */
 	public BufferedImage getSnapshot(final int width,final int height, 
@@ -3700,12 +3627,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		BufferedImage scaled = new BufferedImage(width,height,
 			BufferedImage.TYPE_INT_ARGB);
 
-		createApproxPreview(img.getGraphics(),0,0,tileSize,withSelections,
+		createPreview(img.getGraphics(),0,0,tileSize,withSelections,
 			drawSelectionOnly,fontSize,region,shrinkby);
-//		createApproxPreview(img.getGraphics(),0,0,tileSize,withSelections,
-//			drawSelectionOnly,fontSize,region,0.5);
-//		createPreview(img.getGraphics(),0,0,tileSize,withSelections,
-//			drawSelectionOnly,fontSize,region);
 
 		/* Draw a scaled version of the old image to a new image */
 		Graphics g = scaled.getGraphics();

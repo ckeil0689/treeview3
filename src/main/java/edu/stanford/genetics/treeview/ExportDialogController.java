@@ -109,7 +109,8 @@ public class ExportDialogController {
 		int matrixWidth = width -
 			(eh.isRowTreeIncluded() ? treesHeight + gapSize : 0) -
 			(eh.areRowLabelsIncluded() ? rowLabelsLen + gapSize : 0);
-		LogBuffer.println("New real matrix WxH: [" + matrixWidth + "x" + matrixHeight + "].");
+		LogBuffer.println("New real matrix WxH: [" + matrixWidth + "x" +
+			matrixHeight + "].");
 
 		ExportPreviewTrees expRowTrees = null;
 		if(eh.isRowTreeIncluded()) {
@@ -129,7 +130,8 @@ public class ExportDialogController {
 		}
 		ExportPreviewLabels expRowLabels = null;
 		if(options.getRowLabelOption() != LabelExportOption.NO) {
-			LogBuffer.println("Creating row labels snapshot because label export option is " + options.getRowLabelOption());
+			LogBuffer.println("Creating row labels snapshot because label " +
+				"export option is " + options.getRowLabelOption());
 			expRowLabels =
 				tvFrame.getDendroView().getRowLabelsSnapshot(
 					options.isShowSelections(),options.getRegionType(),
@@ -141,7 +143,8 @@ public class ExportDialogController {
 		}
 		ExportPreviewLabels expColLabels = null;
 		if(options.getColLabelOption() != LabelExportOption.NO) {
-			LogBuffer.println("Creating col labels snapshot because label export option is " + options.getRowLabelOption());
+			LogBuffer.println("Creating col labels snapshot because label " +
+				"export option is " + options.getRowLabelOption());
 			expColLabels =
 				tvFrame.getDendroView().getColLabelsSnapshot(
 					options.isShowSelections(),options.getRegionType(),

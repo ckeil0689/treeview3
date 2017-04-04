@@ -1070,23 +1070,23 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 */
 	public BufferedImage getSnapshot(final int width, final int height, 
 			final RegionType region, final boolean withSelections) {
-	
+
 		BufferedImage img = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
 		Rectangle dest = new Rectangle(width, height);
-		
+
 		BufferedImage scaled = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
 		
 		setExportPreviewScale(dest);
-		
+
 		/* 
 		 * Temporarily update MapContainer for this TreeView to get user
 		 * selected region. Reset after drawing the image.
 		 */
 		int firstVisible = map.getFirstVisible();
 		int numVisible = map.getNumVisible();
-		
+
 		/* These depend on the selected region */
 		int tempFirstVisible;
 		int tempNumVisible;
