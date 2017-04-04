@@ -153,8 +153,7 @@ public class ExportDialog extends CustomDialog {
 			selectedFormat = FormatType.getDefaultDocumentFormat();
 			formatBox = new JComboBox<FormatType>(FormatType.getDocumentFormats());
 			formatBox.setSelectedItem(FormatType.getDefaultDocumentFormat());
-			formatBox.setToolTipText("All regions too big for PNG/JPG/PPM " +
-				"export");
+			formatBox.setToolTipText("All regions too big for PNG/PPM export");
 		}
 
 		this.paperBox = new JComboBox<PaperType>(PaperType.values());
@@ -264,7 +263,7 @@ public class ExportDialog extends CustomDialog {
 			
 			if(!selectedFormat.isDocumentFormat() && bigRegs.contains(reg)) {
 				option.setEnabled(false);
-				option.setToolTipText("Too big for PNG/JPG/PPM export");
+				option.setToolTipText("Too big for PNG/PPM export");
 			}
 			//Default region pre-selected
 			if(reg == defReg && (selectedFormat.isDocumentFormat() ||
@@ -468,7 +467,7 @@ public class ExportDialog extends CustomDialog {
 			}
 			if(tooBigs.contains(asp)) {
 				option.setEnabled(false);
-				option.setToolTipText("Too big for PNG/JPG/PPM export");
+				option.setToolTipText("Too big for PNG/PPM export");
 			}
 			aspectRadioBtns.add(option);
 
@@ -636,19 +635,25 @@ public class ExportDialog extends CustomDialog {
 		/* Tree panels need to have the same size as the matrix */
 		JPanel filler1 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevTrees != null) {
-			LogBuffer.println("Filler1 preview panel HxW as: [" + rowPrevTrees.getShortSide() + "x" + colPrevTrees.getShortSide() + "].");
+			LogBuffer.println("Filler1 preview panel HxW as: [" +
+				rowPrevTrees.getShortSide() + "x" +
+				colPrevTrees.getShortSide() + "].");
 			previews.add(filler1, "w " + rowPrevTrees.getShortSide() + "!, "
 				+ "h " + colPrevTrees.getShortSide() + "!");
 		}
 		JPanel filler2 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevLabels != null && colPrevTrees != null) {
-			LogBuffer.println("Filler2 preview panel HxW as: [" + colPrevTrees.getShortSide() + "x" + rowPrevLabels.getShortSide() + "].");
+			LogBuffer.println("Filler2 preview panel HxW as: [" +
+				colPrevTrees.getShortSide() + "x" +
+				rowPrevLabels.getShortSide() + "].");
 			previews.add(filler2, "w " + rowPrevLabels.getShortSide() + "!, "
 				+ "h " + colPrevTrees.getShortSide() + "!");
 		}
 
 		if(colPrevTrees != null) {
-			LogBuffer.println("Defining col trees preview panel HxW as: [" + colPrevTrees.getShortSide() + "x" + colPrevTrees.getLongSide() + "].");
+			LogBuffer.println("Defining col trees preview panel HxW as: [" +
+				colPrevTrees.getShortSide() + "x" + colPrevTrees.getLongSide() +
+				"].");
 			colPrevTrees.setLongSide(matrix.getMatrixWidth());
 			previews.add(colPrevTrees, "growx, pushx, "
 				+ "h " + colPrevTrees.getShortSide() + "!,"
@@ -657,20 +662,26 @@ public class ExportDialog extends CustomDialog {
 
 		JPanel filler3 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevLabels != null) {
-			LogBuffer.println("Filler3 preview panel HxW as: [" + colPrevLabels.getShortSide() + "x" + rowPrevTrees.getShortSide() + "].");
+			LogBuffer.println("Filler3 preview panel HxW as: [" +
+				colPrevLabels.getShortSide() + "x" +
+				rowPrevTrees.getShortSide() + "].");
 			previews.add(filler3, "w " + rowPrevTrees.getShortSide() + "!, "
 				+ "h " + colPrevLabels.getShortSide() + "!");
 		}
 		JPanel filler4 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevLabels != null && colPrevLabels != null) {
-			LogBuffer.println("Filler4 preview panel HxW as: [" + colPrevLabels.getShortSide() + "x" + rowPrevLabels.getShortSide() + "].");
+			LogBuffer.println("Filler4 preview panel HxW as: [" +
+				colPrevLabels.getShortSide() + "x" +
+				rowPrevLabels.getShortSide() + "].");
 			previews.add(filler4, "w " + rowPrevLabels.getShortSide() + "!, "
 				+ "h " + colPrevLabels.getShortSide() + "!");
 		}
 
 		if(colPrevLabels != null) {
 			colPrevLabels.setLongSide(matrix.getMatrixWidth());
-			LogBuffer.println("Defining col label preview panel HxW as: [" + colPrevLabels.getShortSide() + "x" + colPrevLabels.getLongSide() + "].");
+			LogBuffer.println("Defining col label preview panel HxW as: [" +
+				colPrevLabels.getShortSide() + "x" +
+				colPrevLabels.getLongSide() + "].");
 			previews.add(colPrevLabels, "growx, pushx, "
 				+ "h " + colPrevLabels.getShortSide() + "!,"
 				+ " w " + colPrevLabels.getLongSide() + "!, wrap");
@@ -678,7 +689,9 @@ public class ExportDialog extends CustomDialog {
 
 		if(rowPrevTrees != null) {
 			rowPrevTrees.setLongSide(matrix.getMatrixHeight());
-			LogBuffer.println("Defining row trees preview panel HxW as: [" + rowPrevTrees.getLongSide() + "x" + rowPrevTrees.getShortSide() + "].");
+			LogBuffer.println("Defining row trees preview panel HxW as: [" +
+				rowPrevTrees.getLongSide() + "x" + rowPrevTrees.getShortSide() +
+				"].");
 			previews.add(rowPrevTrees, "growy, aligny 0, pushy, "
 				+ "h " + rowPrevTrees.getLongSide() + "!, "
 				+ "w " + rowPrevTrees.getShortSide() + "!");
@@ -686,23 +699,21 @@ public class ExportDialog extends CustomDialog {
 
 		if(rowPrevLabels != null) {
 			rowPrevLabels.setLongSide(matrix.getMatrixHeight());
-			LogBuffer.println("Defining row labels preview panel HxW as: [" + rowPrevLabels.getLongSide() + "x" + rowPrevLabels.getShortSide() + "].");
+			LogBuffer.println("Defining row labels preview panel HxW as: [" +
+				rowPrevLabels.getLongSide() + "x" +
+				rowPrevLabels.getShortSide() + "].");
 			previews.add(rowPrevLabels, "growx, pushx, "
 				+ "h " + rowPrevLabels.getLongSide() + "!,"
 				+ " w " + rowPrevLabels.getShortSide() + "!");
 		}
 
-		LogBuffer.println("Defining matrix preview panel HxW as: [" + matrix.getMatrixHeight() + "x" + matrix.getMatrixWidth() + "].");
+		LogBuffer.println("Defining matrix preview panel HxW as: [" +
+			matrix.getMatrixHeight() + "x" + matrix.getMatrixWidth() + "].");
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
 			+ matrix.getMatrixWidth() + "!, aligny 0, push, grow, gap 0!");
 
-//		LogBuffer.println("Preview Row segment 1 width = [" + rowPrevTrees.getShortSide() + " + " + colPrevTrees.getLongSide() + "] = [" + (rowPrevTrees.getShortSide() + colPrevTrees.getLongSide()) + "].");
-//		LogBuffer.println("Preview Row segment 3 width = [" + rowPrevTrees.getShortSide() + " + " + matrix.getMatrixWidth() + "] = [" + (rowPrevTrees.getShortSide() + matrix.getMatrixWidth()) + "].");
-//
-//		LogBuffer.println("Preview Column segment 1 width = [" + colPrevTrees.getShortSide() + " + " + rowPrevTrees.getLongSide() + "] = [" + (colPrevTrees.getShortSide() + rowPrevTrees.getLongSide()) + "].");
-//		LogBuffer.println("Preview Column segment 3 width = [" + colPrevTrees.getShortSide() + " + " + matrix.getMatrixHeight() + "] = [" + (colPrevTrees.getShortSide() + matrix.getMatrixHeight()) + "].");
-
-		LogBuffer.println("Defining background preview panel HxW as: [" + bgHeight + "x" + bgWidth + "].");
+		LogBuffer.println("Defining background preview panel HxW as: [" +
+			bgHeight + "x" + bgWidth + "].");
 		background.add(previews, "push, align center, gap 0!");
 		previewComp.add(background, "w " + bgWidth + "!, h " 
 			+ bgHeight + "!, push, align center, gap 0!");
@@ -1373,18 +1384,19 @@ public class ExportDialog extends CustomDialog {
 	private static void onPressCancelButton(ExportWorker worker, Component c){
 		Object[] options = {"Yes", "No"};
 		/* returns -1 if window is closed,
-         * change the window to DO_NOTHING_ON_CLOSE
-         */
-        int answer = JOptionPane.showOptionDialog(c, "Are your sure you want to cancel the export?",
-                                                  "Cancelling Export!",
-                                                  JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-                                                  null, options, options[0]);
-        
-        if(answer != 0)
-        	return;
-  
-        worker.ebd.dispose();
-        LogBuffer.println("User closed the Export Progress bar");
+		 * change the window to DO_NOTHING_ON_CLOSE
+		 */
+		int answer = JOptionPane.showOptionDialog(c,
+			"Are your sure you want to cancel the export?",
+			"Cancelling Export!",
+			JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+			null, options, options[0]);
+
+		if(answer != 0)
+			return;
+
+		worker.ebd.dispose();
+		LogBuffer.println("User closed the Export Progress bar");
 		//set the boolean
 		worker.setExportSuccessful(false);
 		/* Now gracefully try to end the SwingWorker. The call worker.cancel(true) will

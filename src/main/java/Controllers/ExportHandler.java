@@ -58,7 +58,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 public class ExportHandler {
 
 	//This is the maximum size for an exported image format imposed by the fact
-	//that the ImageIO class for writing PNG/JPG/PPM uses BufferedImage which
+	//that the ImageIO class for writing PNG/PPM uses BufferedImage which
 	//uses this maximum
 	static final Integer MAX_IMAGE_SIZE = Integer.MAX_VALUE;
 
@@ -608,7 +608,7 @@ public class ExportHandler {
 	}
 
 	/**
-	 * Determines whether an region can be exported as a PNG/JPG/PPM
+	 * Determines whether an region can be exported as a PNG/PPM
 	 *
 	 * @return
 	 */
@@ -1031,7 +1031,7 @@ public class ExportHandler {
 					getYDim(region),colorProfile);
 				Graphics2D g2d = (Graphics2D) im.getGraphics();
 
-				//Formats JPG and PPM default to a black background, so we need
+				//Format PPM defaults to a black background, so we need
 				//to draw a white canvas.  Note, setting the background color
 				//did not work
 				if((format == FormatType.JPG) || (format == FormatType.PPM)) {
