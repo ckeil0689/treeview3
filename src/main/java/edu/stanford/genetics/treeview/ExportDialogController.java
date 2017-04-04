@@ -170,6 +170,10 @@ public class ExportDialogController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
+			if(arg0.getSource() != exportDialog.getExportButton()) {
+				return;
+			}
+
 			//This will open a file chooser dialog
 			String exportFilename =
 				chooseSaveFile(exportOptions.getFormatType());
@@ -180,6 +184,9 @@ public class ExportDialogController {
 				LogBuffer.println("Could not export. A file name could " +
 					"not be created.");
 				return;
+			} else {
+				LogBuffer.println("Exporting to file: [" + exportFilename +
+					"]");
 			}
 
 			//Now export the file

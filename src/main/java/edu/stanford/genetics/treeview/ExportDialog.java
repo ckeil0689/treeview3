@@ -1492,4 +1492,12 @@ public class ExportDialog extends CustomDialog {
 		/* Show selections */
 		exportOptions.setShowSelections(selectionsBox.isSelected());
 	}
+
+	/**
+	 * Returns the export button object so we can tell if actions came from it.
+	 * @return
+	 */
+	public Object getExportButton() {
+		return(exportBtn);
+	}
 }
