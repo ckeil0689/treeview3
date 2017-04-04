@@ -209,7 +209,7 @@ public class ExportDialogController {
 					//Open the file in the default system app
 					Desktop.getDesktop().open(new File(exportFilename));
 				} else {
-					String msg = "Could not export the file : [" +
+					String msg = "Could not export the file: [" +
 						exportFilename + "].";
 					LogBuffer.println(msg);
 				}

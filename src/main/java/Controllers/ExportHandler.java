@@ -776,22 +776,27 @@ public class ExportHandler {
 
 		@Override
 		protected Void doInBackground() throws Exception {
-			if(format.isDocumentFormat()) {
-
-				exportDocument(format,defPageSize,fileName,region,
-					showSelections,rowLabelOption,colLabelOption);
-			} else {
-				try {
+			try {
+				if(format.isDocumentFormat()) {
+					exportDocument(format,defPageSize,fileName,region,
+						showSelections,rowLabelOption,colLabelOption);
+				} else {
 					exportImage(format,fileName,region,showSelections,
 						rowLabelOption,colLabelOption);
 				}
-				catch(OutOfMemoryError oome) {
-					showWarning("ERROR: Out of memory.  Note, you may be " +
-						"able to export a smaller portion of the matrix.");
-				}
-				catch(Exception e) {
-					showWarning(e.getLocalizedMessage());
-				}
+			}
+			catch(OutOfMemoryError oome) {
+				LogBuffer.println(oome.getLocalizedMessage());
+				showWarning("Out of memory.\n\nNote, you may be able to " +
+					"export a smaller portion of the matrix or select fewer\n" +
+					"options which increase image size or resolution " +
+					"(such as the inclusion of labels\nor selecting the as-" +
+					"seen-on-screen aspect ratio).");
+				setExportSuccessful(false);
+			}
+			catch(Exception e) {
+				showWarning(e.getLocalizedMessage());
+				setExportSuccessful(false);
 			}
 			return null;
 		}
@@ -1075,6 +1080,7 @@ public class ExportHandler {
 				}
 				LogBuffer.println("Export too big.  [x" + getXDim(region) +
 					" * y" + getYDim(region) + "] > [" + MAX_IMAGE_SIZE + "].");
+				setExportSuccessful(false);
 				throw new Exception("Error: Unable to export image.\n\n" +
 					"Exported region [" + region.toString() + ": " +
 					getNumXExportIndexes(region) + "cols x " +
@@ -1082,7 +1088,8 @@ public class ExportHandler {
 					(overflow == 0 ?
 						rounded + "] times" : overflow + "] points") +
 					" too big for image export.\n\nPlease select a smaller " +
-					"area or fewer options to include (e.g. labels) and try again.",iae);
+					"area, fewer options to include (e.g. labels), or reduce " +
+					"the minimum font size and try again.",iae);
 			}
 			catch(Exception exc) {
 				double tooBig = ((double) getXDim(region) /
@@ -1098,17 +1105,20 @@ public class ExportHandler {
 					LogBuffer.println("Export too big.  [x" + getXDim(region) +
 						" * y" + getYDim(region) + "] > [" + MAX_IMAGE_SIZE +
 						"].");
+					setExportSuccessful(false);
 					throw new Exception("Error: Unable to export image.\n\n" +
 						"Exported region [" + region.toString() + ": " +
 						getNumXExportIndexes(region) + "cols x " +
 						getNumYExportIndexes(region) + "rows] is about [" +
 						(overflow == 0 ?
 							rounded + "] times" : overflow + "] points") +
-						" too big for image export.\n\nPlease select " +
-						"a smaller area or fewer options to include (e.g. " +
-						"labels) and try again.",exc);
+						" too big for image export.\n\nPlease select a " +
+						"smaller area, fewer options to include (e.g. " +
+						"labels), or reduce the minimum font size and try " +
+						"again.",exc);
 				} else {
 					exc.printStackTrace();
+					setExportSuccessful(false);
 					throw new Exception(
 						"Unknown Error: Unable to export image.\n" +
 							"Try exporting a smaller area.",exc);
