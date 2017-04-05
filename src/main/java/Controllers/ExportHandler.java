@@ -28,6 +28,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
@@ -42,6 +43,7 @@ import org.freehep.graphicsio.svg.SVGGraphics2D;
 import edu.stanford.genetics.treeview.AspectType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialog.ExportBarDialog;
+import edu.stanford.genetics.treeview.ExportOptions;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PaperType;
 import edu.stanford.genetics.treeview.PpmWriter;
@@ -70,6 +72,7 @@ public class ExportHandler {
 
 	protected PaperType defPageSize = PaperType.getDefault();
 	protected static String defPageOrientation = PageConstants.LANDSCAPE;
+	protected boolean showSelecions = true; //Regardless of selec. existence
 
 	protected double aspectRatio = 1.0; //x / y
 	protected double treeRatio = 0.2; //fraction of the long content dimension
@@ -145,12 +148,8 @@ public class ExportHandler {
 	/**
 	 * Allows one to set the page size that is given to freehep.
 	 * 
-	 * @param dps - default page size
+	 * @param pT - default page size
 	 */
-	public void setDefaultPageSize(String dps) {
-		defPageSize = PaperType.getPaperType(dps);
-	}
-
 	public void setDefaultPageSize(PaperType pT) {
 		defPageSize = pT;
 	}
@@ -608,7 +607,7 @@ public class ExportHandler {
 	}
 
 	/**
-	 * Determines whether an region can be exported as a PNG/PPM
+	 * Determines whether a region can be exported as a PNG/PPM
 	 *
 	 * @return
 	 */
@@ -1447,8 +1446,8 @@ public class ExportHandler {
 
 	/**
 	 * Grabs the minimum (or fixed) font height (plus SQUEEZE) and updates
-	 * labelAreaHeight and cutMinTileDim (if labels are included).
-	 * Adds 1 to cutMinTileDim if the height is less than 10 and even, so that
+	 * labelAreaHeight and curMinTileDim (if labels are included).
+	 * Adds 1 to curMinTileDim if the height is less than 10 and even, so that
 	 * the tree branch and label will look centered on the tile
 	 * @param region the region whose labels are being exported
 	 */
@@ -1523,5 +1522,224 @@ public class ExportHandler {
 
 	public void setTileWidth(int tileWidth) {
 		this.tileWidth = tileWidth;
+	}
+
+	/**
+	 * 
+	 * @return the defShowSelecions
+	 */
+	public boolean isShowSelecions() {
+		return(showSelecions);
+	}
+
+	/**
+	 * 
+	 * @param showSelecions the defShowSelecions to set
+	 */
+	public void setShowSelecions(boolean showSelecions) {
+		this.showSelecions = showSelecions;
+	}
+
+	public void setOptions(ExportOptions eo) {
+		setRowLabelsIncluded(eo.getRowLabelOption());
+		setColLabelsIncluded(eo.getColLabelOption());
+		setRowTreeIncluded(eo.getRowTreeOption());
+		setColTreeIncluded(eo.getColTreeOption());
+		setTileAspectRatio(eo.getAspectType());
+		setDefaultPageOrientation(eo.getOrientation());
+		setDefaultPageSize(eo.getPaperType());
+		setShowSelecions(eo.isShowSelections());
+	}
+
+	/**
+	 * This creates and returns an ExportOptions object, set with valid default
+	 * values based on the data, but regardless of whether the sizes are too
+	 * big.  Use getSetBestOptions for that.
+	 * 
+	 * @return
+	 */
+	public ExportOptions getDefaultOptions() {
+		ExportOptions eo = new ExportOptions();
+
+		//We're not going to worry about whether the settings are too big - just
+		//retrieve otherwise valid defaults
+		eo.setAspectType(AspectType.getDefault());
+
+		//We can assume labels exist
+		eo.setRowLabelOption(LabelExportOption.getDefault());
+		eo.setColLabelOption(LabelExportOption.getDefault());
+
+		//Make sure there are trees before including them as a default
+		eo.setColTreeOption(isColTreeIncluded() ?
+			TreeExportOption.getDefault() : TreeExportOption.NO);
+		eo.setRowTreeOption(isRowTreeIncluded() ?
+			TreeExportOption.getDefault() : TreeExportOption.NO);
+
+		eo.setFormatType(FormatType.getDefault());
+		eo.setOrientation(defPageOrientation);
+		eo.setPaperType(PaperType.getDefault());
+
+		//Make sure the region exists, otherwise default to ALL
+		eo.setRegionType(isExportValid(RegionType.getDefault()) ?
+			RegionType.getDefault() : RegionType.ALL);
+
+		//Arbitrarily don't show selections by default
+		eo.setShowSelections(isExportValid(RegionType.SELECTION) ?
+			showSelecions : false);
+
+		return(eo);
+	}
+
+	/**
+	 * Returns default option settings for size of the exported image.  Tries to
+	 * adhere to the default settings where possible, but reduces options to the
+	 * smallest possible if the resulting export is too big for the
+	 * BufferedImage class.  Catches an exception from its helper method
+	 * (getSetBestOptionsHelper) if no size will work, shows a warning dialog,
+	 * and returns null.
+	 * 
+	 * @return
+	 */
+	public ExportOptions getSetBestOptions() {
+		ExportOptions eo = getDefaultOptions();
+		ExportOptions beo = eo;
+		try {
+			beo = getSetBestOptionsHelper(eo);
+		} catch(Exception e) {
+			LogBuffer.println(e.getLocalizedMessage());
+			JOptionPane.showMessageDialog(new JFrame(),e.getLocalizedMessage(),
+				"Warning",JOptionPane.ERROR_MESSAGE);
+			return(null);
+		}
+		return(beo);
+	}
+
+	/**
+	 * This is an internal helper method to getSetBestOptions().  It takes a set
+	 * of options and explores options that would result in a smaller image to
+	 * see if the image is small enough for export.  It checks lesser options in
+	 * reverse hierarchical order, starting with labels, aspect ratio, region,
+	 * and format type.  If no other modifications can be made to the options to
+	 * result in a small enough export, an exception is thrown.
+	 * 
+	 * @param eo
+	 * @return
+	 * @throws Exception
+	 */
+	protected ExportOptions getSetBestOptionsHelper(ExportOptions eo) throws
+		Exception {
+
+		setOptions(eo);
+		setCalculatedDimensions(eo.getRegionType());
+
+		//First, try eliminating one or both sets of labels
+		if(isOversized(eo.getRegionType())) {
+			if(areColLabelsIncluded()) {
+				setColLabelsIncluded(false);
+				eo.setColLabelOption(LabelExportOption.NO);
+				setCalculatedDimensions(eo.getRegionType());
+				if(isOversized(eo.getRegionType())) {
+					setColLabelsIncluded(true);
+					eo.setColLabelOption(LabelExportOption.YES);
+					setCalculatedDimensions(eo.getRegionType());
+					if(areRowLabelsIncluded()) {
+						setRowLabelsIncluded(false);
+						eo.setRowLabelOption(LabelExportOption.NO);
+						setCalculatedDimensions(eo.getRegionType());
+						if(isOversized(eo.getRegionType())) {
+							setColLabelsIncluded(false);
+							eo.setColLabelOption(LabelExportOption.NO);
+							setCalculatedDimensions(eo.getRegionType());
+						} else {
+							return(eo);
+						}
+					}
+				} else {
+					return(eo);
+				}
+			} else if(areRowLabelsIncluded()) {
+				setRowLabelsIncluded(false);
+				eo.setRowLabelOption(LabelExportOption.NO);
+				setCalculatedDimensions(eo.getRegionType());
+			}
+		} else {
+			return(eo);
+		}
+
+		//If that wasn't enough, try minimizing the tile aspect
+		if(isOversized(eo.getRegionType())) {
+			if(eo.getAspectType() == AspectType.ASSEEN) {
+				setTileAspectRatio(AspectType.ONETOONE);
+				eo.setAspectType(AspectType.ONETOONE);
+				setCalculatedDimensions(eo.getRegionType());
+			}
+		} else {
+			return(eo);
+		}
+
+		//If that wasn't enough, try minimizing the region
+		if(isOversized(eo.getRegionType())) {
+			if(eo.getRegionType() == RegionType.ALL) {
+				eo.setRegionType(RegionType.VISIBLE);
+				setCalculatedDimensions(RegionType.VISIBLE);
+				if(isOversized(RegionType.VISIBLE)) {
+					if(isExportValid(RegionType.SELECTION)) {
+						eo.setRegionType(RegionType.SELECTION);
+						setCalculatedDimensions(RegionType.SELECTION);
+					}
+				} else {
+					return(eo);
+				}
+			} else if(eo.getRegionType() == RegionType.VISIBLE) {
+				if(isExportValid(RegionType.SELECTION)) {
+					eo.setRegionType(RegionType.SELECTION);
+					setCalculatedDimensions(RegionType.SELECTION);
+				}
+			} else if(eo.getRegionType() == RegionType.SELECTION) {
+				if(isOversized(RegionType.VISIBLE)) {
+					eo.setRegionType(RegionType.VISIBLE);
+					setCalculatedDimensions(RegionType.VISIBLE);
+				} else {
+					return(eo);
+				}
+			}
+		} else {
+			return(eo);
+		}
+
+		//Currently, it's not possible to export without trees if they exist, so
+		//the last resort is trying to switch from an image format to document
+		//We'll use recursion so that we can re-use the above code
+		if(!eo.getFormatType().isDocumentFormat() &&
+			isOversized(eo.getRegionType())) {
+
+			//Make a recursive call using a document format
+			ExportOptions neo = getDefaultOptions();
+			neo.setFormatType(FormatType.getDefaultDocumentFormat());
+			eo = getSetBestOptionsHelper(neo);
+			setCalculatedDimensions(eo.getRegionType());
+
+			double tooBig = ((double) getXDim(eo.getRegionType()) /
+				(double) MAX_IMAGE_SIZE) * (double) getYDim(eo.getRegionType());
+			BigDecimal bd = new BigDecimal(tooBig);
+			bd = bd.round(new MathContext(4));
+			double rounded = bd.doubleValue();
+			int overflow = 0;
+			if(tooBig < 2.0) {
+				overflow = (int) Math.round((double) MAX_IMAGE_SIZE *
+					(tooBig - 1.0));
+			}
+			throw new Exception("Error: Unable to export image.\n\n" +
+				"The smallest available export region [" +
+				eo.getRegionType().toString() + ": " +
+				getNumXExportIndexes(eo.getRegionType()) + "cols x " +
+				getNumYExportIndexes(eo.getRegionType()) + "rows] is about [" +
+				(overflow == 0 ?
+					rounded + "] times" : overflow + "] points") +
+				" too big for image export.\n\n  Try selecting or zooming to " +
+				"a smaller area to export.");
+		}
+
+		return(eo);
 	}
 }

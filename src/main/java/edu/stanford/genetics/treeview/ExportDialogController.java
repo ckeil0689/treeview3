@@ -30,36 +30,44 @@ public class ExportDialogController {
 	private final TreeSelectionI colSelection;
 	private final TreeSelectionI rowSelection;
 	private DataModel model;
+	private ExportHandler eh;
 
 	public ExportDialogController(final ExportDialog expD,
 		final TreeViewFrame tvFrame,final MapContainer interactiveXmap,
 		final MapContainer interactiveYmap,final DataModel model) {
 
-		exportDialog = expD;
+		this.exportDialog = expD;
 		this.tvFrame = tvFrame;
-		dendroView = tvFrame.getDendroView();
+		this.dendroView = tvFrame.getDendroView();
 		this.interactiveXmap = interactiveXmap;
 		this.interactiveYmap = interactiveYmap;
-		colSelection = tvFrame.getColSelection();
-		rowSelection = tvFrame.getRowSelection();
+		this.colSelection = tvFrame.getColSelection();
+		this.rowSelection = tvFrame.getRowSelection();
 		this.model = model;
+		this.eh = new ExportHandler(dendroView,
+			interactiveXmap,interactiveYmap,colSelection,rowSelection);
 
-		exportOptions = new ExportOptions();
+		exportOptions = eh.getSetBestOptions();
 
-		addListeners();
-
-		setNewPreviewComponents(exportOptions);
-		exportDialog.arrangePreviewPanel();
-		updatePreview();
-		try {
-			exportDialog.setVisible(true);
-		} catch(Exception oome) {
-			LogBuffer.println("Out of memory during exportDialog.setVisible(true).");
-			oome.printStackTrace();
-			showWarning(oome.getLocalizedMessage());
+		//If the exported image is too large for BufferedImage to handle,
+		//getSetBestOptions has already popped up a warning to the user and
+		//returned null.  We just need to make sure the result is not null.
+		if(exportOptions != null) {
+			addListeners();
+	
+			setNewPreviewComponents(exportOptions);
+			exportDialog.arrangePreviewPanel();
+			updatePreview();
+			try {
+				exportDialog.setVisible(true);
+			} catch(Exception oome) {
+				LogBuffer.println("Out of memory during exportDialog.setVisible(true).");
+				oome.printStackTrace();
+				showWarning(oome.getLocalizedMessage());
+			}
+	
+			LogBuffer.println("ExportDialogController ready");
 		}
-
-		LogBuffer.println("ExportDialogController ready");
 	}
 
 	/**
@@ -85,14 +93,9 @@ public class ExportDialogController {
 	private void setNewPreviewComponents(final ExportOptions options) {
 
 		//Obtain the dimensions of the exported image components
-		ExportHandler eh = new ExportHandler(dendroView,
-			interactiveXmap,interactiveYmap,colSelection,rowSelection);
-		eh.setDefaultPageSize(exportOptions.getPaperType());
-		eh.setDefaultPageOrientation(exportOptions.getOrientation());
-		eh.setTileAspectRatio(exportOptions.getAspectType());
-		eh.setColLabelsIncluded(exportOptions.getColLabelOption());
-		eh.setRowLabelsIncluded(exportOptions.getRowLabelOption());
-		eh.setCalculatedDimensions(exportOptions.getRegionType());
+		eh.setOptions(options);
+
+		//We need to get the export dimensions to update the export preview
 		int height = eh.getYDim(exportOptions.getRegionType());
 		int width = eh.getXDim(exportOptions.getRegionType());
 		int treesHeight = eh.getTreesHeight();

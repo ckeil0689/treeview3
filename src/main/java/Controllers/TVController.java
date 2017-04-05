@@ -966,19 +966,18 @@ public class TVController implements Observer {
 
 		if(tvFrame.getDendroView() == null || !tvFrame.isLoaded()) {
 			LogBuffer.println("DendroView is not instantiated. " +
-												"Nothing to export.");
+				"Nothing to export.");
 			return;
 		}
 
-		ExportHandler eh = new ExportHandler(	tvFrame.getDendroView(),
-																					dendroController.getInteractiveXMap(),
-																					dendroController.getInteractiveYMap(),
-																					tvFrame.getColSelection(), tvFrame
-																																						.getRowSelection());
+		ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
+			dendroController.getInteractiveXMap(),
+			dendroController.getInteractiveYMap(),
+			tvFrame.getColSelection(),
+			tvFrame.getRowSelection());
 
-		boolean selectionsExist = (tvFrame.getColSelection() != null && tvFrame
-																																						.getColSelection()
-																																						.getNSelectedIndexes() > 0);
+		boolean selectionsExist = (tvFrame.getColSelection() != null &&
+			tvFrame.getColSelection().getNSelectedIndexes() > 0);
 
 		ExportDialog exportDialog = new ExportDialog(selectionsExist, eh);
 
