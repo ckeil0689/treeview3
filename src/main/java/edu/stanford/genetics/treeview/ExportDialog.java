@@ -518,9 +518,17 @@ public class ExportDialog extends CustomDialog {
 			btn.addActionListener(l);
 		}
 	}
-	
+
+	public void addAspectListener(final ActionListener l) {
+		Enumeration<AbstractButton> rab = aspectRadioBtns.getElements();
+		while(rab.hasMoreElements()) {
+			AbstractButton btn = rab.nextElement();
+			btn.addActionListener(l);
+		}
+	}
+
 	public void addRowLabelListener(final ActionListener l) {
-		Enumeration<AbstractButton> rlb = regionRadioBtns.getElements();
+		Enumeration<AbstractButton> rlb = rowLabelBtns.getElements();
 		while(rlb.hasMoreElements()) {
 			AbstractButton btn = rlb.nextElement();
 			btn.addActionListener(l);
@@ -528,7 +536,7 @@ public class ExportDialog extends CustomDialog {
 	}
 	
 	public void addColLabelListener(final ActionListener l) {
-		Enumeration<AbstractButton> clb = regionRadioBtns.getElements();
+		Enumeration<AbstractButton> clb = colLabelBtns.getElements();
 		while(clb.hasMoreElements()) {
 			AbstractButton btn = clb.nextElement();
 			btn.addActionListener(l);
@@ -941,30 +949,40 @@ public class ExportDialog extends CustomDialog {
 		boolean changeSelected = false;
 		RegionType selectedRegion = null;
 
-		//Set minimum options in order to determine whether region options should be disabled
+		//Set minimum options in order to determine whether region options
+		//should be disabled
 		eh.setRowLabelsIncluded(LabelExportOption.NO);
 		eh.setColLabelsIncluded(LabelExportOption.NO);
 		eh.setRowTreeIncluded(TreeExportOption.AUTO);
 		eh.setColTreeIncluded(TreeExportOption.AUTO);
 		eh.setTileAspectRatio(AspectType.ONETOONE);
+		//Which specific format does not matter here - only whether it's a
+		//document format or image format because of the size limits imposed by
+		//BufferedImage.  Doc format uses BufferedImage for the matrix only.
+		//Image format uses it for the whole image.
+		eh.setFormat(isDocFormat ?
+			FormatType.getDefaultDocumentFormat() : FormatType.PNG);
 
 		//Check if region radio buttons need to be disabled/enabled based on
 		//selected region
+		RegionType backupReg = null;
 		while(rBtns.hasMoreElements()) {
 			AbstractButton option = rBtns.nextElement();
-			final boolean isEnabled = isDocFormat ||
-					!bigRegs.contains(RegionType.getRegion(option.getText()));
+			RegionType reg = RegionType.getRegion(option.getText());
 			if(option.isSelected()) {
-				selectedRegion = RegionType.getRegion(option.getText());
+				selectedRegion = reg;
 			}
-			LogBuffer.println("Region " + RegionType.getRegion(option.getText()).toString() + " is ");
-			if(RegionType.getRegion(option.getText()) != RegionType.SELECTION ||
-				selectionsExist) {
+			LogBuffer.println("Region " +
+				RegionType.getRegion(option.getText()).toString() + " is ");
+			if(reg != RegionType.SELECTION || selectionsExist) {
 
+				eh.setCalculatedDimensions(reg);
+				final boolean isEnabled = !eh.isOversized(reg);
 				option.setEnabled(isEnabled);
 				if(isEnabled) {
 					LogBuffer.println("small enough to include\n");
 					option.setToolTipText(null);
+					backupReg = reg;
 				} else {
 					LogBuffer.println("too big to include\n");
 					option.setToolTipText("Too big for PNG/PPM export");
@@ -978,29 +996,28 @@ public class ExportDialog extends CustomDialog {
 				LogBuffer.println("non-existant\n");
 				option.setEnabled(false);
 				option.setToolTipText("No selection has been made");
+				if(option.isSelected()) {
+					option.setSelected(false);
+					selectedRegion = null;
+					changeSelected = true;
+				}
 			}
 		}
 
 		//If the selected option was disabled, select a new default
-		if(changeSelected) {
+		if(changeSelected && backupReg != null) {
 			rBtns = regionRadioBtns.getElements();
 
-			RegionType defReg;
-			if(isDocFormat) {
-				defReg = RegionType.getDefault();
-			} else {
-				defReg = RegionType.getDefault(bigRegs,selectionsExist);
-			}
-
-			if(defReg != null) {
-				while(rBtns.hasMoreElements()) {
-					AbstractButton option = rBtns.nextElement();
-					if(RegionType.getRegion(option.getText()) == defReg) {
-						selectedRegion = RegionType.getRegion(option.getText());
-						option.setSelected(true);
-					}
+			while(rBtns.hasMoreElements()) {
+				AbstractButton option = rBtns.nextElement();
+				if(RegionType.getRegion(option.getText()) == backupReg) {
+					selectedRegion = RegionType.getRegion(option.getText());
+					option.setSelected(true);
 				}
 			}
+		} else if(changeSelected) {
+			LogBuffer.println("ERROR: No regions suffice as a valid default " +
+				"in the export dialog.");
 		}
 
 		//The aspect radio buttons should be updated based on the selected
@@ -1022,6 +1039,13 @@ public class ExportDialog extends CustomDialog {
 		eh.setColLabelsIncluded(LabelExportOption.NO);
 		eh.setRowTreeIncluded(TreeExportOption.AUTO);
 		eh.setColTreeIncluded(TreeExportOption.AUTO);
+		//Which specific format does not matter here - only whether it's a
+		//document format or image format because of the size limits imposed by
+		//BufferedImage.  Doc format uses BufferedImage for the matrix only.
+		//Image format uses it for the whole image.
+		eh.setFormat(isDocFormat ?
+			FormatType.getDefaultDocumentFormat() : FormatType.PNG);
+
 		Enumeration<AbstractButton> aBtns = aspectRadioBtns.getElements();
 		boolean changeSelected = false;
 		List<AspectType> bigAsps = new ArrayList<AspectType>();
@@ -1029,16 +1053,18 @@ public class ExportDialog extends CustomDialog {
 
 		//Check if aspect radio buttons need to be disabled/enabled based on
 		//selected region
+		AspectType backupAsp = null;
 		while(aBtns.hasMoreElements()) {
 			AbstractButton option = aBtns.nextElement();
 			AspectType asp = AspectType.getAspect(option.getText());
 			eh.setTileAspectRatio(asp);
 			eh.setCalculatedDimensions(selectedRegion);
-			final boolean tooBig = eh.isOversized(selectedRegion);
-			if(tooBig) {
+			final boolean enabled = !eh.isOversized(selectedRegion);
+			if(!enabled) {
 				bigAsps.add(asp);
+			} else {
+				backupAsp = asp;
 			}
-			final boolean enabled = isDocFormat || !tooBig;
 			if(option.isSelected()) {
 				selectedAspect = asp;
 			}
@@ -1055,31 +1081,31 @@ public class ExportDialog extends CustomDialog {
 		}
 
 		//If the selected option was disabled, select a new default
-		if(changeSelected) {
-			AspectType defAsp;
-			if(isDocFormat) {
-				defAsp = AspectType.getDefault();
-			} else {
-				defAsp = AspectType.getDefault(bigAsps);
-			}
-
-			if(defAsp != null) {
-				aBtns = aspectRadioBtns.getElements();
-				while(aBtns.hasMoreElements()) {
-					AbstractButton option = aBtns.nextElement();
-					AspectType asp = AspectType.getAspect(option.getText());
-					if(asp == defAsp) {
-						option.setSelected(true);
-						selectedAspect = asp;
-					}
+		if(changeSelected && backupAsp != null) {
+			aBtns = aspectRadioBtns.getElements();
+			while(aBtns.hasMoreElements()) {
+				AbstractButton option = aBtns.nextElement();
+				AspectType asp = AspectType.getAspect(option.getText());
+				if(asp == backupAsp) {
+					option.setSelected(true);
+					selectedAspect = asp;
 				}
 			}
+		} else if(changeSelected) {
+			LogBuffer.println("ERROR: No aspect ratios suffice as a valid " +
+				"default in the export dialog.");
 		}
 
-		//Get the current selected column label option or set default to be used
+		updateLabelBtns(isDocFormat,selectedRegion,selectedAspect);
+	}
+
+	public void updateLabelBtns(final boolean isDocFormat,
+		final RegionType selectedRegion,final AspectType selectedAspect) {
+
+		//Get the current selected column label option or set to NO to be used
 		//in deciding whether the row label options should be enabled
 		Enumeration<AbstractButton> cBtns = colLabelBtns.getElements();
-		LabelExportOption selectedCLEO = LabelExportOption.getDefault();
+		LabelExportOption selectedCLEO = LabelExportOption.NO;
 		boolean oneIsSelected = false;
 		while(cBtns.hasMoreElements()) {
 			AbstractButton option = cBtns.nextElement();
@@ -1091,7 +1117,7 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 		/* TODO: This should actually be done in updateRowLabelBtns or
-		 * updateColLabelBtns.  If there's code there toi do it already, it
+		 * updateColLabelBtns.  If there's code there to do it already, it
 		 * should be fixed, because it's not working */
 		if(!oneIsSelected) {
 			cBtns = colLabelBtns.getElements();
@@ -1108,12 +1134,13 @@ public class ExportDialog extends CustomDialog {
 
 		//The label buttons should be updated based on the selected
 		//format, region, and aspect (and column/row labels)
-		updateRowLabelBtns(isDocFormat,selectedRegion,selectedAspect,selectedCLEO);
+		updateRowLabelBtns(isDocFormat,selectedRegion,selectedAspect,
+			selectedCLEO);
 
-		//Get the current selected row label option or set default to be used
+		//Get the current selected row label option or set to NO to be used
 		//in deciding whether the column label options should be enabled
 		Enumeration<AbstractButton> rBtns = rowLabelBtns.getElements();
-		LabelExportOption selectedRLEO = LabelExportOption.getDefault();
+		LabelExportOption selectedRLEO = LabelExportOption.NO;
 		oneIsSelected = false;
 		while(rBtns.hasMoreElements()) {
 			AbstractButton option = rBtns.nextElement();
@@ -1140,7 +1167,8 @@ public class ExportDialog extends CustomDialog {
 			}
 		}
 
-		updateColLabelBtns(isDocFormat,selectedRegion,selectedAspect,selectedRLEO);
+		updateColLabelBtns(isDocFormat,selectedRegion,selectedAspect,
+			selectedRLEO);
 	}
 
 	/* TODO: Make sure this takes inclusion of trees into account */
@@ -1162,28 +1190,45 @@ public class ExportDialog extends CustomDialog {
 
 		eh.setTileAspectRatio(selectedAsp);
 		eh.setColLabelsIncluded(selectedColLEO);
-		//Any labels included uses the same image space, so we only need to test 1 option that includes labels
-		eh.setRowLabelsIncluded(LabelExportOption.YES);
-		eh.setCalculatedDimensions(selectedRegion);
-		rowLabelsTooBig = eh.areRowLabelsTooBig(selectedRegion,isDocFormat);
+		eh.setRowTreeIncluded(TreeExportOption.AUTO);
+		eh.setColTreeIncluded(TreeExportOption.AUTO);
+		//Which specific format does not matter here - only whether it's a
+		//document format or image format because of the size limits imposed by
+		//BufferedImage.  Doc format uses BufferedImage for the matrix only.
+		//Image format uses it for the whole image.
+		eh.setFormat(isDocFormat ?
+			FormatType.getDefaultDocumentFormat() : FormatType.PNG);
 
 		//Check if row label buttons need to be disabled/enabled based on
 		//selected region
+		LabelExportOption backupLEO = LabelExportOption.NO;
+		LabelExportOption selectedRLEO = LabelExportOption.NO;
 		while(rlBtns.hasMoreElements()) {
 			AbstractButton option = rlBtns.nextElement();
 			LabelExportOption leo =
-					LabelExportOption.getLabelExportOption(option.getText());
+				LabelExportOption.getLabelExportOption(option.getText());
 			boolean enabled = true;
-			if((!selectionsExist && leo == LabelExportOption.SELECTION) ||
-				(rowLabelsTooBig && leo != LabelExportOption.NO)) {
-
+			if(leo != LabelExportOption.SELECTION || selectionsExist) {
+				eh.setRowLabelsIncluded(leo);
+				eh.setCalculatedDimensions(selectedRegion);
+				enabled = !eh.isOversized(selectedRegion);
+			}
+			LogBuffer.println("Format: " + eh.getFormat().toString() + "\nAspect: " + selectedAsp.toString() + "\nRow/Col Trees are both: " + TreeExportOption.AUTO.toString() + "\nCol labels: " + selectedColLEO.toString() + "\nRow label option: " + leo.toString() + " is " + (enabled ? "enabled" : "disabled"));
+			if(!selectionsExist && leo == LabelExportOption.SELECTION) {
 				enabled = false;
 			}
 			if(!enabled && option.isSelected()) {
 				option.setSelected(false);
 				changeSelected = true;
+			} else {
+				if(enabled) {
+					backupLEO = leo;
+				}
+				if(option.isSelected()) {
+					selectedRLEO = leo;
+				}
 			}
-			option.setEnabled(enabled);
+			option.setEnabled(leo == LabelExportOption.NO ? true : enabled);
 			if(enabled) {
 				option.setToolTipText(null);
 			} else if(!selectionsExist && leo == LabelExportOption.SELECTION) {
@@ -1195,20 +1240,18 @@ public class ExportDialog extends CustomDialog {
 
 		//If the selected option was disabled, select a new default
 		if(changeSelected) {
-			LabelExportOption defLeo;
-			defLeo = LabelExportOption.getDefault();
-
-			if(defLeo != null) {
-				rlBtns = rowLabelBtns.getElements();
-				while(rlBtns.hasMoreElements()) {
-					AbstractButton option = rlBtns.nextElement();
-					LabelExportOption leo =
-							LabelExportOption.getLabelExportOption(option.getText());
-					if(leo == defLeo) {
-						option.setSelected(true);
-					}
+			rlBtns = rowLabelBtns.getElements();
+			while(rlBtns.hasMoreElements()) {
+				AbstractButton option = rlBtns.nextElement();
+				LabelExportOption leo =
+					LabelExportOption.getLabelExportOption(option.getText());
+				if(leo == backupLEO) {
+					option.setSelected(true);
+					eh.setRowLabelsIncluded(leo);
 				}
 			}
+		} else {
+			eh.setRowLabelsIncluded(selectedRLEO);
 		}
 	}
 
@@ -1231,22 +1274,30 @@ public class ExportDialog extends CustomDialog {
 
 		eh.setTileAspectRatio(selectedAsp);
 		eh.setRowLabelsIncluded(selectedRowLEO);
-		//Any labels included uses the same image space, so we only need to test 1 option that includes labels
-		eh.setColLabelsIncluded(LabelExportOption.YES);
-		eh.setCalculatedDimensions(selectedRegion);
-		colLabelsTooBig = eh.areColLabelsTooBig(selectedRegion,isDocFormat);
- 
+		eh.setRowTreeIncluded(TreeExportOption.AUTO);
+		eh.setColTreeIncluded(TreeExportOption.AUTO);
+		//Which specific format does not matter here - only whether it's a
+		//document format or image format because of the size limits imposed by
+		//BufferedImage.  Doc format uses BufferedImage for the matrix only.
+		//Image format uses it for the whole image.
+		eh.setFormat(isDocFormat ?
+			FormatType.getDefaultDocumentFormat() : FormatType.PNG);
+
 		//Check if col label buttons need to be disabled/enabled based on
 		//selected region
+		LabelExportOption backupLEO = LabelExportOption.NO;
+		LabelExportOption selectedCLEO = LabelExportOption.NO;
 		while(clBtns.hasMoreElements()) {
 			AbstractButton option = clBtns.nextElement();
 			LabelExportOption leo =
 				LabelExportOption.getLabelExportOption(option.getText());
 			boolean enabled = true;
-			//If the column label option is invalid or would result in an image
-			//that is too big, disable it
-			if((!selectionsExist && leo == LabelExportOption.SELECTION) ||
-				(colLabelsTooBig && leo != LabelExportOption.NO)) {
+			if(leo != LabelExportOption.SELECTION || selectionsExist) {
+				eh.setColLabelsIncluded(leo);
+				eh.setCalculatedDimensions(selectedRegion);
+				enabled = !eh.isOversized(selectedRegion);
+			}
+			if(!selectionsExist && leo == LabelExportOption.SELECTION) {
 				enabled = false;
 			}
 			//If the column label option was disabled, yet is selected, mark the
@@ -1254,8 +1305,15 @@ public class ExportDialog extends CustomDialog {
 			if(!enabled && option.isSelected()) {
 				option.setSelected(false);
 				changeSelected = true;
+			} else {
+				if(enabled) {
+					backupLEO = leo;
+				}
+				if(option.isSelected()) {
+					selectedCLEO = leo;
+				}
 			}
-			option.setEnabled(enabled);
+			option.setEnabled(leo == LabelExportOption.NO ? true : enabled);
 			//Update the tool tip
 			if(enabled) {
 				option.setToolTipText(null);
@@ -1268,20 +1326,18 @@ public class ExportDialog extends CustomDialog {
 
 		//If the selected option was disabled, select a new default
 		if(changeSelected) {
-			LabelExportOption defLeo;
-			defLeo = LabelExportOption.getDefault();
-
-			if(defLeo != null) {
-				clBtns = colLabelBtns.getElements();
-				while(clBtns.hasMoreElements()) {
-					AbstractButton option = clBtns.nextElement();
-					LabelExportOption leo =
-							LabelExportOption.getLabelExportOption(option.getText());
-					if(leo == defLeo) {
-						option.setSelected(true);
-					}
+			clBtns = colLabelBtns.getElements();
+			while(clBtns.hasMoreElements()) {
+				AbstractButton option = clBtns.nextElement();
+				LabelExportOption leo =
+						LabelExportOption.getLabelExportOption(option.getText());
+				if(leo == backupLEO) {
+					option.setSelected(true);
+					eh.setColLabelsIncluded(leo);
 				}
 			}
+		} else {
+			eh.setColLabelsIncluded(selectedCLEO);
 		}
 	}
 

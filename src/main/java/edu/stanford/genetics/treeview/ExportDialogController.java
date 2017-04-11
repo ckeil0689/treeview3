@@ -54,7 +54,11 @@ public class ExportDialogController {
 		//returned null.  We just need to make sure the result is not null.
 		if(exportOptions != null) {
 			addListeners();
-	
+
+			//Make sure the radio buttons are properly enabled/disabled
+			exportDialog.updateRegionRadioBtns(
+				exportOptions.getFormatType().isDocumentFormat());
+
 			setNewPreviewComponents(exportOptions);
 			exportDialog.arrangePreviewPanel();
 			updatePreview();
@@ -78,6 +82,7 @@ public class ExportDialogController {
 		exportDialog.addExportListener(new ExportListener());
 		exportDialog.addFormatListener(new FormatListener());
 		exportDialog.addRegionListener(new RegionListener());
+		exportDialog.addAspectListener(new AspectListener());
 		exportDialog.addItemStateListener(new RadioItemStateListener());
 		exportDialog.addCheckBoxItemStateListener(new CheckItemStateListener());
 		exportDialog.addRowLabelListener(new RowLabelListener());
@@ -317,6 +322,20 @@ public class ExportDialogController {
 
 			exportDialog.updateAspectRadioBtns(selFormat.isDocumentFormat(),
 				selRegion);
+		}
+	}
+
+	private class AspectListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			FormatType selFormat = exportOptions.getFormatType();
+			RegionType selRegion = exportOptions.getRegionType();
+			AspectType selAspect = exportOptions.getAspectType();
+
+			exportDialog.updateLabelBtns(selFormat.isDocumentFormat(),
+				selRegion,selAspect);
 		}
 	}
 

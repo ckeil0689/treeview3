@@ -25,6 +25,16 @@ public enum FormatType {
 		return(FormatType.PNG);
 	}
 
+	/**
+	 * This returns the format that has the least required amount of memory, as
+	 * imposed by BufferedImage to create the preview
+	 * 
+	 * @return
+	 */
+	public static FormatType getMinDefault() {
+		return(FormatType.PDF);
+	}
+
 	public static FormatType getDefaultDocumentFormat() {
 		return(FormatType.PDF);
 	}

@@ -21,6 +21,16 @@ public enum LabelExportOption {
 	}
 
 	public static LabelExportOption getDefault() {
+		return(LabelExportOption.YES);
+	}
+
+	/**
+	 * Returns the option that will result in the smallest resolution exported
+	 * image
+	 * 
+	 * @return
+	 */
+	public static LabelExportOption getMinDefault() {
 		return(LabelExportOption.NO);
 	}
 

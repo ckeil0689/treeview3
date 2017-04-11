@@ -73,6 +73,8 @@ public class ExportHandler {
 	protected PaperType defPageSize = PaperType.getDefault();
 	protected static String defPageOrientation = PageConstants.LANDSCAPE;
 	protected boolean showSelecions = true; //Regardless of selec. existence
+	protected FormatType format; //Only important to know doc or image
+
 
 	protected double aspectRatio = 1.0; //x / y
 	protected double treeRatio = 0.2; //fraction of the long content dimension
@@ -183,7 +185,20 @@ public class ExportHandler {
 	}
 
 	/**
-	 * Gets the minimum possible x dimension size (bases on a 1:1 aspect ratio).
+	 * This determines the pre-calculated matrix-only width.  Used for
+	 * determining whether the matrix is too big for document format because it
+	 * uses an embedded PNG that is limited by BufferedImage
+	 * 
+	 * @param region
+	 * @return
+	 */
+	public int getMatrixXDim(final RegionType region) {
+		int xDim = (getNumXExportIndexes(region) * tileWidth);
+		return(xDim);
+	}
+
+	/**
+	 * Gets the minimum possible x dimension size (based on a 1:1 aspect ratio).
 	 * All other aspect ratios increase the overall size.
 	 *
 	 * @param region
@@ -207,6 +222,19 @@ public class ExportHandler {
 		int yDim = (getNumYExportIndexes(region) * tileHeight) +
 			(isColTreeIncluded() ? treesHeight + gapSize : 0) +
 			(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0);
+		return(yDim);
+	}
+
+	/**
+	 * This determines the pre-calculated matrix-only height.  Used for
+	 * determining whether the matrix is too big for document format because it
+	 * uses an embedded PNG that is limited by BufferedImage
+	 * 
+	 * @param region
+	 * @return
+	 */
+	public int getMatrixYDim(final RegionType region) {
+		int yDim = (getNumYExportIndexes(region) * tileHeight);
 		return(yDim);
 	}
 
@@ -586,6 +614,12 @@ public class ExportHandler {
 		List<RegionType> regs = new ArrayList<RegionType>();
 		for(int i = 0;i < RegionType.values().length;i++) {
 			RegionType rt = RegionType.values()[i];
+
+			//Skip regions like selection when no selection exists
+			if(!isExportValid(rt)) {
+				continue;
+			}
+
 			int xdim,ydim;
 			if(matrixOnly) {
 				xdim = getNumXExportIndexes(rt) * curMinTileDim;
@@ -595,11 +629,8 @@ public class ExportHandler {
 				ydim = getMinYDim(rt);
 			}
 
-			//If this region is valid for export and it is not too big
-			if(isExportValid(rt) &&
-				((double) xdim / (double) MAX_IMAGE_SIZE * (double) ydim <=
-				1.0)) {
-
+			//If this region is not too big
+			if((double) xdim / (double) MAX_IMAGE_SIZE * (double) ydim <= 1.0) {
 				regs.add(rt);
 			}
 		}
@@ -630,6 +661,12 @@ public class ExportHandler {
 		List<RegionType> regs = new ArrayList<RegionType>();
 		for(int i = 0;i < RegionType.values().length;i++) {
 			RegionType rt = RegionType.values()[i];
+
+			//Skip regions like selection when no selection exists
+			if(!isExportValid(rt)) {
+				continue;
+			}
+
 			int xdim,ydim;
 			if(matrixOnly) {
 				xdim = getNumXExportIndexes(rt) *
@@ -640,10 +677,10 @@ public class ExportHandler {
 				xdim = minimum ? getMinXDim(rt) : getXDim(rt);
 				ydim = minimum ? getMinYDim(rt) : getYDim(rt);
 			}
-			//If this region is valid for export and it is too big
-			if(isExportValid(RegionType.values()[i]) &&
-				((((double) xdim / (double) MAX_IMAGE_SIZE) * (double) ydim) >
-				1.0)) {
+
+			//If this region is too big
+			if((((double) xdim / (double) MAX_IMAGE_SIZE) * (double) ydim) >
+				1.0) {
 
 				regs.add(RegionType.values()[i]);
 			}
@@ -724,11 +761,23 @@ public class ExportHandler {
 	 * @return
 	 */
 	public boolean isOversized(RegionType reg) {
-		//If this region is too big
-		if((((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) *
-			(double) getYDim(reg)) > 1.0) {
+		if(format == null || !format.isDocumentFormat()) {
+			LogBuffer.println("Format: [" + format.toString() + "] Aspect: [" + aspectRatio + "] Tile height: [" + tileHeight + "] Tile width: [" + tileWidth + "] Row labels included: [" + rowLabelsIncluded + "] Row label length: [" + maxRowLabelLength + "] Col labels included: [" + colLabelsIncluded + "] Col label length: [" + maxColLabelLength + "] Row trees included: [" + rowTreeIncluded + "] Col tree included: [" + colTreeIncluded + "].\nisOversized(>1?): [(x" + getXDim(reg) + " / " + MAX_IMAGE_SIZE + ") * y" + getYDim(reg) + "] = " + (((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) * (double) getYDim(reg)));
+			if((((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) *
+				(double) getYDim(reg)) > 1.0) {
 
-		return(true); }
+				return(true);
+			}
+		} else {
+			LogBuffer.println("Format: [" + format.toString() + "] Aspect: [" + aspectRatio + "] Tile height: [" + tileHeight + "] Tile width: [" + tileWidth + "] Row labels included: [" + rowLabelsIncluded + "] Row label length: [" + maxRowLabelLength + "] Col labels included: [" + colLabelsIncluded + "] Col label length: [" + maxColLabelLength + "] Row trees included: [" + rowTreeIncluded + "] Col tree included: [" + colTreeIncluded + "].\nisOversized(>1?): [(x" + getMatrixXDim(reg) + " / " + MAX_IMAGE_SIZE + ") * y" + getMatrixYDim(reg) + "] = " + (((double) getMatrixXDim(reg) / (double) MAX_IMAGE_SIZE) * (double) getMatrixYDim(reg)));
+			if((((double) getMatrixXDim(reg) / (double) MAX_IMAGE_SIZE) *
+				(double) getMatrixYDim(reg)) > 1.0) {
+
+				return(true);
+			}
+		}
+
+		//If this region is too big
 		return(false);
 	}
 
@@ -786,11 +835,37 @@ public class ExportHandler {
 			}
 			catch(OutOfMemoryError oome) {
 				LogBuffer.println(oome.getLocalizedMessage());
-				showWarning("Out of memory.\n\nNote, you may be able to " +
-					"export a smaller portion of the matrix or select fewer\n" +
-					"options which increase image size or resolution " +
-					"(such as the inclusion of labels\nor selecting the as-" +
-					"seen-on-screen aspect ratio).");
+				double tooBig = ((double) getXDim(region) /
+					(double) MAX_IMAGE_SIZE) * (double) getYDim(region);
+				if(tooBig > 1.0) {
+					BigDecimal bd = new BigDecimal(tooBig);
+					bd = bd.round(new MathContext(4));
+					double rounded = bd.doubleValue();
+					int overflow = 0;
+					if(tooBig < 2.0) {
+						overflow = (int) Math.round((double) MAX_IMAGE_SIZE * (tooBig - 1.0));
+					}
+					LogBuffer.println("Export too big.  [x" + getXDim(region) +
+						" * y" + getYDim(region) + "] > [" + MAX_IMAGE_SIZE +
+						"].");
+					setExportSuccessful(false);
+					throw new Exception("Error: Unable to export image.\n\n" +
+						"Exported region [" + region.toString() + ": " +
+						getNumXExportIndexes(region) + "cols x " +
+						getNumYExportIndexes(region) + "rows] is about [" +
+						(overflow == 0 ?
+							rounded + "] times" : overflow + "] points") +
+						" too big for image export.\n\nPlease select a " +
+						"smaller area, fewer options to include (e.g. " +
+						"labels), or reduce the minimum font size and try " +
+						"again.",oome);
+				} else {
+					showWarning("Out of memory.\n\nNote, you may be able to " +
+						"export a smaller portion of the matrix or select " +
+						"fewer\noptions which increase image size or " +
+						"resolution (such as the inclusion of labels\nor " +
+						"selecting the as-seen-on-screen aspect ratio).");
+				}
 				setExportSuccessful(false);
 			}
 			catch(Exception e) {
@@ -1480,7 +1555,7 @@ public class ExportHandler {
 			maxColLabelLength = 0;
 		}
 
-		//Update the height of the row label area
+		//Update the length of the row label area
 		if(getRowLabelsIncluded() == LabelExportOption.YES) {
 			maxRowLabelLength =
 				dendroView.getRowLabelView().getMaxExportStringLength(rt,false,labelAreaHeight - SQUEEZE);
@@ -1540,6 +1615,22 @@ public class ExportHandler {
 		this.showSelecions = showSelecions;
 	}
 
+	/**
+	 * 
+	 * @return the format
+	 */
+	public FormatType getFormat() {
+		return(format);
+	}
+
+	/**
+	 * 
+	 * @param format the format to set
+	 */
+	public void setFormat(FormatType format) {
+		this.format = format;
+	}
+
 	public void setOptions(ExportOptions eo) {
 		setRowLabelsIncluded(eo.getRowLabelOption());
 		setColLabelsIncluded(eo.getColLabelOption());
@@ -1549,6 +1640,7 @@ public class ExportHandler {
 		setDefaultPageOrientation(eo.getOrientation());
 		setDefaultPageSize(eo.getPaperType());
 		setShowSelecions(eo.isShowSelections());
+		setFormat(eo.getFormatType());
 	}
 
 	/**
@@ -1717,6 +1809,8 @@ public class ExportHandler {
 			ExportOptions neo = getDefaultOptions();
 			neo.setFormatType(FormatType.getDefaultDocumentFormat());
 			eo = getSetBestOptionsHelper(neo);
+
+			setOptions(eo);
 			setCalculatedDimensions(eo.getRegionType());
 
 			double tooBig = ((double) getXDim(eo.getRegionType()) /
