@@ -638,6 +638,7 @@ public class ExportDialog extends CustomDialog {
 
 //		JPanel previews = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		JPanel previews = new JPanel();
+		previews.setOpaque(false);
 		previews.setLayout(new MigLayout("ins 0, gap " + gapsize + "!"));
 
 		/* Tree panels need to have the same size as the matrix */
@@ -766,7 +767,8 @@ public class ExportDialog extends CustomDialog {
 	private void updateBackground(final ExportOptions exportOptions) {
 
 		/* First, set the background color depending on document format */
-		final boolean isPaper = exportOptions.getFormatType().isDocumentFormat();
+		final boolean isPaper =
+			exportOptions.getFormatType().isDocumentFormat();
 
 		if(rowPrevTrees != null) {
 			rowPrevTrees.setPaperBackground(isPaper);
