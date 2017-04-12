@@ -1567,20 +1567,26 @@ public class ExportHandler {
 		}
 	}
 
-	public int getRowLabelPanelWidth(final RegionType region,LabelExportOption rowLabelOption) {
+	public int getRowLabelPanelWidth(final RegionType region,
+		LabelExportOption rowLabelOption) {
+
 		if(rowLabelOption == LabelExportOption.NO) {
 			return(0);
 		}
 		return(dendroView.getRowLabelView().getMaxExportStringLength(region,
-			rowLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE));
+			rowLabelOption == LabelExportOption.SELECTION,
+			labelAreaHeight - SQUEEZE));
 	}
 
-	public int getColLabelPanelHeight(final RegionType region,LabelExportOption colLabelOption) {
+	public int getColLabelPanelHeight(final RegionType region,
+		LabelExportOption colLabelOption) {
+
 		if(colLabelOption == LabelExportOption.NO) {
 			return(0);
 		}
 		return(dendroView.getColLabelView().getMaxExportStringLength(region,
-			colLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE));
+			colLabelOption == LabelExportOption.SELECTION,
+			labelAreaHeight - SQUEEZE));
 	}
 
 	public int getTileHeight() {

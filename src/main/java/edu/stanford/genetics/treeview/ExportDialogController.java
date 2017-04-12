@@ -99,11 +99,13 @@ public class ExportDialogController {
 
 		//Obtain the dimensions of the exported image components
 		eh.setOptions(options);
+		eh.setCalculatedDimensions(exportOptions.getRegionType());
 
 		//We need to get the export dimensions to update the export preview
 		int height = eh.getYDim(exportOptions.getRegionType());
 		int width = eh.getXDim(exportOptions.getRegionType());
 		int treesHeight = eh.getTreesHeight();
+		LogBuffer.println("treesHeight is: [" + treesHeight + "].");
 		int gapSize = eh.getGapSize();
 		int rowLabelsLen =
 			eh.getRowLabelPanelWidth(exportOptions.getRegionType(),

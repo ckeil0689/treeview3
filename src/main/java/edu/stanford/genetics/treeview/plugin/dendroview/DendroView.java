@@ -1460,7 +1460,8 @@ public class DendroView implements Observer, DendroPanel {
 		int width,int height,final int longMatrixEdge) {
 
 		if(treeAxisView == null) {
-			LogBuffer.println("Cannot generate tree snapshot. TRView object is null.");
+			LogBuffer.println("Cannot generate tree snapshot. TRView object " +
+				"is null.");
 			return new ExportPreviewTrees(null, isRows); // empty panel
 		}
 

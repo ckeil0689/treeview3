@@ -1875,7 +1875,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @param selected
 	 * @return
 	 */
-	public int getMaxExportStringLength(RegionType rt,final boolean selected,final int fontSize) {
+	public int getMaxExportStringLength(RegionType rt,final boolean selected,
+		final int fontSize) {
+
 		int start = 0;
 		int end = 0;
 		//Error check the parameters sent in
@@ -1905,7 +1907,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		//If we want to global max string length
 		if(!selected && start == map.getMinIndex() && end == map.getMaxIndex()) {
-			//Calling this because it updates longest_str (which may not have been calculated if labels were never drawn on the screen)
+			//Calling this because it updates longest_str (which may not have
+			//been calculated if labels were never drawn on the screen)
 			getMaxStringLength(fm);
 			maxStrLen = fm.stringWidth(labelAttr.getLongestStr());
 		}
@@ -3600,7 +3603,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			yPos += sizeShrunk;
 		}
-		LogBuffer.println("Last label position: [" + yPos + "] longest label length: [" + xSizeShrunk + "]");
+		LogBuffer.println("Last label position: [" + yPos + "] longest label length: [" + xSizeShrunk + "]. Printed [" + (end - start + 1) + "] labels at every [" + sizeShrunk + "] pixel");
 	}
 
 	/**
@@ -3624,16 +3627,18 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		BufferedImage img = new BufferedImage(width,height,
 			BufferedImage.TYPE_INT_ARGB);
 		
-		BufferedImage scaled = new BufferedImage(width,height,
-			BufferedImage.TYPE_INT_ARGB);
+//		BufferedImage scaled = new BufferedImage(width,height,
+//			BufferedImage.TYPE_INT_ARGB);
 
 		createPreview(img.getGraphics(),0,0,tileSize,withSelections,
 			drawSelectionOnly,fontSize,region,shrinkby);
 
-		/* Draw a scaled version of the old image to a new image */
-		Graphics g = scaled.getGraphics();
-		g.drawImage(img, 0, 0, width,height, null);
+		LogBuffer.println("Creating label preview in WxH dims: [" + width + "x" + height + "]");
 
-		return scaled;
+//		/* Draw a scaled version of the old image to a new image */
+//		Graphics g = scaled.getGraphics();
+//		g.drawImage(img, 0, 0, width,height, null);
+
+		return img;
 	}
 }
