@@ -4,7 +4,6 @@ import java.awt.Adjustable;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.Observable;
@@ -13,7 +12,6 @@ import java.util.prefs.Preferences;
 import javax.swing.JScrollBar;
 
 import Utilities.StringRes;
-import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class ColumnLabelView extends LabelView {
@@ -47,7 +45,8 @@ public class ColumnLabelView extends LabelView {
 	public void setConfigNode(final Preferences parentNode) {
 
 		if(parentNode == null) {
-			LogBuffer.println("Error: Could not find or create ColumnLabelView node because parentNode was null.");
+			LogBuffer.println("Error: Could not find or create " +
+				"ColumnLabelView node because parentNode was null.");
 			return;
 		}
 

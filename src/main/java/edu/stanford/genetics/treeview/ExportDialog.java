@@ -634,9 +634,8 @@ public class ExportDialog extends CustomDialog {
 
 		background.removeAll();
 
-		LogBuffer.println("Defining gap size: [" + gapsize + "].");
-
-//		JPanel previews = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
+		//Cannot use the factory here because the gap layout settings explicitly
+		//set below aren't respected when the factory is used
 		JPanel previews = new JPanel();
 		previews.setOpaque(false);
 		previews.setLayout(new MigLayout("ins 0, gap " + gapsize + "!"));
@@ -644,25 +643,16 @@ public class ExportDialog extends CustomDialog {
 		/* Tree panels need to have the same size as the matrix */
 		JPanel filler1 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevTrees != null) {
-			LogBuffer.println("Filler1 preview panel HxW as: [" +
-				rowPrevTrees.getShortSide() + "x" +
-				colPrevTrees.getShortSide() + "].");
 			previews.add(filler1, "w " + rowPrevTrees.getShortSide() + "!, "
 				+ "h " + colPrevTrees.getShortSide() + "!");
 		}
 		JPanel filler2 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevLabels != null && colPrevTrees != null) {
-			LogBuffer.println("Filler2 preview panel HxW as: [" +
-				colPrevTrees.getShortSide() + "x" +
-				rowPrevLabels.getShortSide() + "].");
 			previews.add(filler2, "w " + rowPrevLabels.getShortSide() + "!, "
 				+ "h " + colPrevTrees.getShortSide() + "!");
 		}
 
 		if(colPrevTrees != null) {
-			LogBuffer.println("Defining col trees preview panel HxW as: [" +
-				colPrevTrees.getShortSide() + "x" + colPrevTrees.getLongSide() +
-				"].");
 			colPrevTrees.setLongSide(matrix.getMatrixWidth());
 			previews.add(colPrevTrees, "growx, pushx, "
 				+ "h " + colPrevTrees.getShortSide() + "!,"
@@ -671,26 +661,17 @@ public class ExportDialog extends CustomDialog {
 
 		JPanel filler3 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevLabels != null) {
-			LogBuffer.println("Filler3 preview panel HxW as: [" +
-				colPrevLabels.getShortSide() + "x" +
-				rowPrevTrees.getShortSide() + "].");
 			previews.add(filler3, "w " + rowPrevTrees.getShortSide() + "!, "
 				+ "h " + colPrevLabels.getShortSide() + "!");
 		}
 		JPanel filler4 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevLabels != null && colPrevLabels != null) {
-			LogBuffer.println("Filler4 preview panel HxW as: [" +
-				colPrevLabels.getShortSide() + "x" +
-				rowPrevLabels.getShortSide() + "].");
 			previews.add(filler4, "w " + rowPrevLabels.getShortSide() + "!, "
 				+ "h " + colPrevLabels.getShortSide() + "!");
 		}
 
 		if(colPrevLabels != null) {
 			colPrevLabels.setLongSide(matrix.getMatrixWidth());
-			LogBuffer.println("Defining col label preview panel HxW as: [" +
-				colPrevLabels.getShortSide() + "x" +
-				colPrevLabels.getLongSide() + "].");
 			previews.add(colPrevLabels, "growx, pushx, "
 				+ "h " + colPrevLabels.getShortSide() + "!,"
 				+ " w " + colPrevLabels.getLongSide() + "!, wrap");
@@ -698,9 +679,6 @@ public class ExportDialog extends CustomDialog {
 
 		if(rowPrevTrees != null) {
 			rowPrevTrees.setLongSide(matrix.getMatrixHeight());
-			LogBuffer.println("Defining row trees preview panel HxW as: [" +
-				rowPrevTrees.getLongSide() + "x" + rowPrevTrees.getShortSide() +
-				"].");
 			previews.add(rowPrevTrees, "growy, aligny 0, pushy, "
 				+ "h " + rowPrevTrees.getLongSide() + "!, "
 				+ "w " + rowPrevTrees.getShortSide() + "!");
@@ -708,21 +686,14 @@ public class ExportDialog extends CustomDialog {
 
 		if(rowPrevLabels != null) {
 			rowPrevLabels.setLongSide(matrix.getMatrixHeight());
-			LogBuffer.println("Defining row labels preview panel HxW as: [" +
-				rowPrevLabels.getLongSide() + "x" +
-				rowPrevLabels.getShortSide() + "].");
 			previews.add(rowPrevLabels, "growx, pushx, "
 				+ "h " + rowPrevLabels.getLongSide() + "!,"
 				+ " w " + rowPrevLabels.getShortSide() + "!");
 		}
 
-		LogBuffer.println("Defining matrix preview panel HxW as: [" +
-			matrix.getMatrixHeight() + "x" + matrix.getMatrixWidth() + "].");
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
 			+ matrix.getMatrixWidth() + "!, aligny 0, push, grow, gap 0!");
 
-		LogBuffer.println("Defining background preview panel HxW as: [" +
-			bgHeight + "x" + bgWidth + "].");
 		background.add(previews, "push, align center, gap 0!");
 		previewComp.add(background, "w " + bgWidth + "!, h " 
 			+ bgHeight + "!, push, align center, gap 0!");
@@ -877,13 +848,11 @@ public class ExportDialog extends CustomDialog {
 		/* Get scaled sizes for trees and gaps */
 		int treeSize = (int)(scaleWidth * scaleHeight * eh.getTreesHeight());
 		this.gapsize = (int)(scaleWidth * scaleHeight * eh.getGapSize());
-		LogBuffer.println("Setting row label preview size to: [" + eh.getRowLabelPanelWidth(exportOptions.getRegionType(),
-			exportOptions.getRowLabelOption()) + " * " + scaleWidth + " * " + scaleHeight + "].");
-		int rowLabelSize = (int)(eh.getRowLabelPanelWidth(exportOptions.getRegionType(),
+		int rowLabelSize = (int)(eh.getRowLabelPanelWidth(
+			exportOptions.getRegionType(),
 			exportOptions.getRowLabelOption()) * scaleWidth * scaleHeight);
-		LogBuffer.println("Setting col label preview size to: [" + eh.getColLabelPanelHeight(exportOptions.getRegionType(),
-			exportOptions.getColLabelOption()) + " * " + scaleWidth + " * " + scaleHeight + "].");
-		int colLabelSize = (int)(eh.getColLabelPanelHeight(exportOptions.getRegionType(),
+		int colLabelSize = (int)(eh.getColLabelPanelHeight(
+			exportOptions.getRegionType(),
 			exportOptions.getColLabelOption()) * scaleWidth * scaleHeight);
 
 		// adjust maximum matrix side length for tree thickness and gaps
@@ -916,8 +885,6 @@ public class ExportDialog extends CustomDialog {
 			previewImgHeight -= colLabelSize;
 			previewImgHeight -= gapsize;
 		}
-
-		LogBuffer.println("Updating preview matrix WxH: [" + previewImgWidth + "x" + previewImgHeight + "].");
 
 		matrix.setMatrixWidth(previewImgWidth);
 		matrix.setMatrixHeight(previewImgHeight);
@@ -974,19 +941,15 @@ public class ExportDialog extends CustomDialog {
 			if(option.isSelected()) {
 				selectedRegion = reg;
 			}
-			LogBuffer.println("Region " +
-				RegionType.getRegion(option.getText()).toString() + " is ");
 			if(reg != RegionType.SELECTION || selectionsExist) {
 
 				eh.setCalculatedDimensions(reg);
 				final boolean isEnabled = !eh.isOversized(reg);
 				option.setEnabled(isEnabled);
 				if(isEnabled) {
-					LogBuffer.println("small enough to include\n");
 					option.setToolTipText(null);
 					backupReg = reg;
 				} else {
-					LogBuffer.println("too big to include\n");
 					option.setToolTipText("Too big for PNG/PPM export");
 					if(option.isSelected()) {
 						option.setSelected(false);
@@ -995,7 +958,6 @@ public class ExportDialog extends CustomDialog {
 					}
 				}
 			} else {
-				LogBuffer.println("non-existant\n");
 				option.setEnabled(false);
 				option.setToolTipText("No selection has been made");
 				if(option.isSelected()) {
@@ -1215,7 +1177,6 @@ public class ExportDialog extends CustomDialog {
 				eh.setCalculatedDimensions(selectedRegion);
 				enabled = !eh.isOversized(selectedRegion);
 			}
-			LogBuffer.println("Format: " + eh.getFormat().toString() + "\nAspect: " + selectedAsp.toString() + "\nRow/Col Trees are both: " + TreeExportOption.AUTO.toString() + "\nCol labels: " + selectedColLEO.toString() + "\nRow label option: " + leo.toString() + " is " + (enabled ? "enabled" : "disabled"));
 			if(!selectionsExist && leo == LabelExportOption.SELECTION) {
 				enabled = false;
 			}

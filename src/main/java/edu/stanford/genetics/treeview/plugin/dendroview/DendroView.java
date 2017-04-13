@@ -1469,7 +1469,6 @@ public class DendroView implements Observer, DendroPanel {
 		//number of cols & rows, the long edge length is smaller than the max.
 		//The fraction smaller that the real long tree edge is than the longest
 		//matrix edge is the fraction we must reduce the max for this long edge
-		LogBuffer.println("Calculating length of long tree edge: (isRows ? " + height + " : " + width + ") / " + longMatrixEdge + ") * " + ExportPreviewTrees.D_LONG);
 		double shrinkby =
 			(double) ExportPreviewTrees.D_LONG / (double) longMatrixEdge;
 		int longLen =
@@ -1516,7 +1515,8 @@ public class DendroView implements Observer, DendroPanel {
 		final int tileHeight,int fontSize,final int longMatrixEdge) {
 
 		if(labelsAxisView == null) {
-			LogBuffer.println("Cannot generate labels snapshot. Label object is null.");
+			LogBuffer.println("Cannot generate labels snapshot. Label object " +
+				"is null.");
 			return new ExportPreviewLabels(null,isRows); // empty panel
 		}
 
@@ -1527,11 +1527,6 @@ public class DendroView implements Observer, DendroPanel {
 		int longLen =
 			(int) Math.floor((double) (isRows ? height : width) * shrinkby);
 		int shortLen = calculatePrevShortLen(shrinkby,width,height,isRows);
-
-		LogBuffer.println("Shrinking by " + shrinkby + ".  From w" + width +
-			"/h" + height + " using D_LONG: " + ExportPreviewTrees.D_LONG +
-			" and longMatrixEdge: " + longMatrixEdge + " to make shortlen: " +
-			shortLen + " & longLen: " + longLen);
 
 		//Scale down the dimensions for the preview, but do not scale down the
 		//other components such as font size, as that is needed to measure

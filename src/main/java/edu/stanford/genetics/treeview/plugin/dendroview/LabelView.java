@@ -46,7 +46,6 @@ import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LabelSummary;
-import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelView;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -3487,13 +3486,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		//If the font size is less than 1.5, switch to approx mode
 		if(fontSizeShrunk < 1.5) {
 			approxMode = true;
-			LogBuffer.println("Approximating labels for the preview.");
 			//Create the export font size so that we can calculate the string
 			//length and shrink it
 			exportFont = new Font(labelAttr.getFace(),
 				labelAttr.getStyle(),fontSize);
 		} else {
-			LogBuffer.println("Drawing real labels for the preview.");
 			//Turn on anti-aliasing so the text looks better
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
@@ -3603,12 +3600,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			yPos += sizeShrunk;
 		}
-		LogBuffer.println("Last label position: [" + yPos + "] longest label length: [" + xSizeShrunk + "]. Printed [" + (end - start + 1) + "] labels at every [" + sizeShrunk + "] pixel");
 	}
 
 	/**
-	 * Get a scaled snapshot of the trees. The snapshot will be taken in
-	 * the specified region.
+	 * Get a snapshot of the trees. The snapshot will be taken in the specified
+	 * region.
 	 * @param width - The width of the scaled image to be returned.
 	 * @param height - The height of the scaled image to be returned.
 	 * @param region - The region from which to take a snapshot.
@@ -3626,18 +3622,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		BufferedImage img = new BufferedImage(width,height,
 			BufferedImage.TYPE_INT_ARGB);
-		
-//		BufferedImage scaled = new BufferedImage(width,height,
-//			BufferedImage.TYPE_INT_ARGB);
 
 		createPreview(img.getGraphics(),0,0,tileSize,withSelections,
 			drawSelectionOnly,fontSize,region,shrinkby);
-
-		LogBuffer.println("Creating label preview in WxH dims: [" + width + "x" + height + "]");
-
-//		/* Draw a scaled version of the old image to a new image */
-//		Graphics g = scaled.getGraphics();
-//		g.drawImage(img, 0, 0, width,height, null);
 
 		return img;
 	}

@@ -131,7 +131,7 @@ public class MapContainer extends Observable implements Observer,
 
 		if(parentNode == null) {
 			LogBuffer.println("Could not find or create MapContainer " +
-												"node because parentNode was null.");
+				"node because parentNode was null.");
 			return;
 		}
 
@@ -149,8 +149,8 @@ public class MapContainer extends Observable implements Observer,
 	public void requestStoredState() {
 		
 		if (configNode == null) {
-			LogBuffer.println("Unable to get stored MapContainer state. ConfigNode"
-					+ " was null.");
+			LogBuffer.println("Unable to get stored MapContainer state. " +
+				"ConfigNode was null.");
 			return;
 		}
 		importStateFrom(configNode);
@@ -161,7 +161,7 @@ public class MapContainer extends Observable implements Observer,
 
 		if(configNode == null) {
 			LogBuffer.println("Unable to store MapContainer state. ConfigNode" +
-												" was null.");
+				" was null.");
 			return;
 		}
 
@@ -660,9 +660,8 @@ public class MapContainer extends Observable implements Observer,
 			//If the left/top side is closer than or equal to half the
 			//difference in area sizes
 			else if((firstIndex - initialFirstVisible) <= (diff / 2) &&
-							((initialFirstVisible + prevNumVisible - 1) - (firstIndex +
-																															numIndexes - 1)) > (diff /
-																																									2)) {
+				((initialFirstVisible + prevNumVisible - 1) - (firstIndex +
+					numIndexes - 1)) > (diff / 2)) {
 				newFirstVisible = initialFirstVisible;
 				//LogBuffer.println("zoomToward: Left/top is remaining fixed.");
 
@@ -671,12 +670,11 @@ public class MapContainer extends Observable implements Observer,
 			//If the right/bottom side is closer than or equal to half the
 			//difference in area sizes
 			else if(((initialFirstVisible + prevNumVisible - 1) - (firstIndex +
-																															numIndexes -
-																															1)) <= (diff /
-																																			2) &&
-							(firstIndex - initialFirstVisible) > (diff / 2)) {
+				numIndexes - 1)) <= (diff / 2) &&
+				(firstIndex - initialFirstVisible) > (diff / 2)) {
+
 				newFirstVisible = (initialFirstVisible + prevNumVisible - 1) -
-													numVisible + 1;
+					numVisible + 1;
 
 				updateAspectRatio = 1;
 			}
@@ -920,11 +918,11 @@ public class MapContainer extends Observable implements Observer,
 		//Catch errors - If num indexes is less than 1 or greater than the
 		//number of pixels available
 		if(firstIndex < 0 || firstIndex > getMaxIndex()) {
-			LogBuffer.println("ERROR: Either firstIndex [" +	firstIndex +
-												"] derived from pixelIndex [" + pixelPos + " out of " +
-												getAvailablePixels() +
-												" available] is less than 0 or greater than " +
-												"maxIndex [" + getMaxIndex() + "]");
+			LogBuffer.println("ERROR: Either firstIndex [" + firstIndex +
+				"] derived from pixelIndex [" + pixelPos + " out of " +
+				getAvailablePixels() +
+				" available] is less than 0 or greater than maxIndex [" +
+				getMaxIndex() + "]");
 			return(updateAspectRatio);
 		}
 
@@ -1002,8 +1000,8 @@ public class MapContainer extends Observable implements Observer,
 				//If the result of pixelPos / newScale is a whole number,
 				//newFirstVisible must be decremented (discovered via trial &
 				//error)
-				if(newFirstVisible > 0 && pixelPos / newScale == (int) (pixelPos /
-																																newScale)) {
+				if(newFirstVisible > 0 && pixelPos / newScale == (int)
+					(pixelPos / newScale)) {
 					newFirstVisible--;
 				}
 
@@ -1043,13 +1041,13 @@ public class MapContainer extends Observable implements Observer,
 			}
 			else {
 				LogBuffer.println("WARNING: The data cell hovered over has " +
-													"shifted. It was over [" + dotOver +
-													"].  Now it is over: [" + getIndex(pixelPos) +
-													"].  Previous dotOver calculation: " +
-													"[firstVisible + (int) ((double) pixelPos / newScale))] = [" +
-													firstVisible + " + (int) ((double) " + pixelPos +
-													" / " + newScale +
-													"))].  Correcting this retroactively...");
+					"shifted. It was over [" + dotOver +
+					"].  Now it is over: [" + getIndex(pixelPos) +
+					"].  Previous dotOver calculation: " +
+					"[firstVisible + (int) ((double) pixelPos / newScale))] = [" +
+					firstVisible + " + (int) ((double) " + pixelPos +
+					" / " + newScale +
+					"))].  Correcting this retroactively...");
 			}
 
 			scrollToFirstIndex(newFirstVisible/*,true*/);
@@ -1194,9 +1192,9 @@ public class MapContainer extends Observable implements Observer,
 
 		int cells = getNumVisible();
 		//If the targetZoomFrac is 1.0, return the remainder of this dimension
-		if((targetZoomFrac % 1) == 0 && ((int) Math
-																								.round(targetZoomFrac)) == 1) { return(getTotalTileNum() -
-																																												cells); }
+		if((targetZoomFrac % 1) == 0 &&
+			((int) Math.round(targetZoomFrac)) == 1) {
+			return(getTotalTileNum() - cells); }
 		int zoomVal = (int) Math.round(cells * targetZoomFrac);
 		int numPixels = getAvailablePixels();
 		//LogBuffer.println("getBestZoomOutVal: Called with pixel [" + pixel +
@@ -1282,8 +1280,8 @@ public class MapContainer extends Observable implements Observer,
 			//		"/ numPixels * z)] = [" + relCell + " = (int) (" + pixel +
 			//		" / " + numPixels + " * " + z + ")].");
 			if(z == 0) continue;
-			diff = Math.abs(((double) relCell / (double) z) - ((double) (pixel + 1) /
-																													(double) numPixels));
+			diff = Math.abs(((double) relCell / (double) z) -
+				((double) (pixel + 1) / (double) numPixels));
 			//LogBuffer.println("getBestZoomOutVal: [diff = relCell / z - " +
 			//		"pixel / numPixels] = [" +
 			//		diff + " = " + relCell + " / " + z + " - " + pixel + " / " +
@@ -1315,7 +1313,8 @@ public class MapContainer extends Observable implements Observer,
 	 * should zoom more when there are large amounts of squares to zoom
 	 * through */
 	public double getOptimalZoomIncrement(int targetNumIndexes,
-																				boolean zoomingOut) {
+		boolean zoomingOut) {
+
 		//double maxZoomFrac = 0.5;
 		double maxZoomFrac = 0.6;
 		if(ZOOM_INCREMENT > maxZoomFrac) { return(maxZoomFrac); }
@@ -1364,10 +1363,9 @@ public class MapContainer extends Observable implements Observer,
 		//remaining for the next step, just go all the way
 		//This is an approximation because I should actually be using the next
 		//step, not this one
-		if((zoomingOut && targetZoomFrac * largerXSize > Math.abs(largerXSize +	1 *
-																																						(int) Math.round(targetZoomFrac *
-																																															largerXSize) -
-																															targetNumIndexes))) {
+		if((zoomingOut && targetZoomFrac * largerXSize >
+			Math.abs(largerXSize +	1 * (int) Math.round(targetZoomFrac *
+				largerXSize) - targetNumIndexes))) {
 			//The above seems only necessary for zoom out (for speed)
 			// ||
 			//(!zoomingOut && targetZoomFrac * largerXSize <
@@ -1578,8 +1576,8 @@ public class MapContainer extends Observable implements Observer,
 				break;
 
 			default:
-				LogBuffer.println("Map type (" +	type + ") not found. " +
-													"Setting fixed map.");
+				LogBuffer.println("Map type (" + type + ") not found. " +
+					"Setting fixed map.");
 				newMap = fixedMap;
 		}
 
@@ -1737,8 +1735,7 @@ public class MapContainer extends Observable implements Observer,
 	public void update(final Observable observable, final Object object) {
 
 		LogBuffer.println(new StringBuffer("MapContainer Got an " +
-																				"update from unknown ")	.append(observable)
-																																.toString());
+			"update from unknown ").append(observable).toString());
 		notifyObservers(object);
 	}
 
@@ -2034,14 +2031,14 @@ public class MapContainer extends Observable implements Observer,
 		if(numVisible > getTotalTileNum()) {
 			if(getMaxIndex() > 0) {
 				LogBuffer.println("Warning: Encountered invalid/too-large " +
-													"numVisible value: [" + numVisible +
-													"].  Resetting.");
+					"numVisible value: [" + numVisible +
+					"].  Resetting.");
 				numVisible = getMaxIndex() + 1;
 			}
 		}
 		if(numVisible < 1) {
 			LogBuffer.println("Warning: Encountered invalid/too-small " +
-												"numVisible value: [" + numVisible + "].  Resetting.");
+				"numVisible value: [" + numVisible + "].  Resetting.");
 			numVisible = 1;
 		}
 		return(numVisible);
@@ -2055,14 +2052,12 @@ public class MapContainer extends Observable implements Observer,
 		 * eventually. */
 		if(firstVisible + numVisible - 1 > getMaxIndex() && getMaxIndex() > -1) {
 			LogBuffer.println("Warning: Encountered invalid/too-large " +
-												"firstVisible value: [" + firstVisible +
-												"].  Resetting.");
+				"firstVisible value: [" + firstVisible + "].  Resetting.");
 			firstVisible = getMaxIndex() - numVisible;
 		}
 		if(firstVisible < 0) {
 			LogBuffer.println("Warning: Encountered invalid/negative " +
-												"firstVisible value: [" + firstVisible +
-												"].  Resetting.");
+				"firstVisible value: [" + firstVisible + "].  Resetting.");
 			firstVisible = 0;
 		}
 		return(firstVisible);
@@ -2077,8 +2072,7 @@ public class MapContainer extends Observable implements Observer,
 		 * eventually. */
 		if(lastVisible > getMaxIndex()) {
 			LogBuffer.println("Warning: Encountered invalid/too-large " +
-												"lastVisible value: [" + lastVisible +
-												"].  Resetting.");
+				"lastVisible value: [" + lastVisible + "].  Resetting.");
 			lastVisible = getMaxIndex();
 		}
 		return(lastVisible);
@@ -2111,8 +2105,8 @@ public class MapContainer extends Observable implements Observer,
 	public boolean nodeHasAttribute(final String nodeName, final String key) {
 
 		if(configNode == null) {
-			LogBuffer.println("Could not find " + key + ". No preferences node defined for " 
-					+ this.getClass().getName());
+			LogBuffer.println("Could not find " + key + ". No preferences " +
+				"node defined for " + this.getClass().getName());
 			return false;
 		}
 		
@@ -2128,8 +2122,8 @@ public class MapContainer extends Observable implements Observer,
 
 		}
 		catch(final BackingStoreException e) {
-			LogBuffer.println("Error in MapContainer/nodeHasAttribute: " + e
-																																			.getMessage());
+			LogBuffer.println("Error in MapContainer/nodeHasAttribute: " +
+				e.getMessage());
 			e.printStackTrace();
 		}
 

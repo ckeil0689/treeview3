@@ -50,7 +50,6 @@ import edu.stanford.genetics.treeview.PpmWriter;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
-import edu.stanford.genetics.treeview.plugin.dendroview.LabelAttributes;
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
@@ -762,14 +761,12 @@ public class ExportHandler {
 	 */
 	public boolean isOversized(RegionType reg) {
 		if(format == null || !format.isDocumentFormat()) {
-			LogBuffer.println("Format: [" + format.toString() + "] Aspect: [" + aspectRatio + "] Tile height: [" + tileHeight + "] Tile width: [" + tileWidth + "] Row labels included: [" + rowLabelsIncluded + "] Row label length: [" + maxRowLabelLength + "] Col labels included: [" + colLabelsIncluded + "] Col label length: [" + maxColLabelLength + "] Row trees included: [" + rowTreeIncluded + "] Col tree included: [" + colTreeIncluded + "].\nisOversized(>1?): [(x" + getXDim(reg) + " / " + MAX_IMAGE_SIZE + ") * y" + getYDim(reg) + "] = " + (((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) * (double) getYDim(reg)));
 			if((((double) getXDim(reg) / (double) MAX_IMAGE_SIZE) *
 				(double) getYDim(reg)) > 1.0) {
 
 				return(true);
 			}
 		} else {
-			LogBuffer.println("Format: [" + format.toString() + "] Aspect: [" + aspectRatio + "] Tile height: [" + tileHeight + "] Tile width: [" + tileWidth + "] Row labels included: [" + rowLabelsIncluded + "] Row label length: [" + maxRowLabelLength + "] Col labels included: [" + colLabelsIncluded + "] Col label length: [" + maxColLabelLength + "] Row trees included: [" + rowTreeIncluded + "] Col tree included: [" + colTreeIncluded + "].\nisOversized(>1?): [(x" + getMatrixXDim(reg) + " / " + MAX_IMAGE_SIZE + ") * y" + getMatrixYDim(reg) + "] = " + (((double) getMatrixXDim(reg) / (double) MAX_IMAGE_SIZE) * (double) getMatrixYDim(reg)));
 			if((((double) getMatrixXDim(reg) / (double) MAX_IMAGE_SIZE) *
 				(double) getMatrixYDim(reg)) > 1.0) {
 
@@ -1248,8 +1245,8 @@ public class ExportHandler {
 				p.setProperty(PDFGraphics2D.PAGE_SIZE,pageSize.toString());
 				p.setProperty(PDFGraphics2D.ORIENTATION,defPageOrientation);
 
-				//These 3 commands are entirely what makes the labels selectable/editable
-				//in PDF and other vector formats
+				//These 3 commands are entirely what makes the labels
+				//selectable/editable in PDF and other vector formats
 				p.setProperty(PDFGraphics2D.EMBED_FONTS,"true");
 				p.setProperty(PDFGraphics2D.EMBED_FONTS_AS,
 					FontConstants.EMBED_FONTS_TYPE3);

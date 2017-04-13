@@ -78,9 +78,9 @@ public class ColorChooserController extends Observable {
 	private void restoreStateFromColorPresets() {
 
 		if(colorPresets == null) {
-			LogBuffer.println("Could not restore state in " +	this																.getClass()
-																														.getSimpleName() +
-												" because ColorPresets were null.");
+			LogBuffer.println("Could not restore state in " +
+				this.getClass().getSimpleName() +
+				" because ColorPresets were null.");
 			return;
 		}
 
@@ -100,9 +100,9 @@ public class ColorChooserController extends Observable {
 			return;
 		}
 
-		ColorSchemeType activeColorScheme = (ColorSchemeType) colorChooserUI
-																																				.getPresetChoices()
-																																				.getSelectedItem();
+		ColorSchemeType activeColorScheme =
+			(ColorSchemeType) colorChooserUI.getPresetChoices()
+			.getSelectedItem();
 		colorPresets.setLastActiveColorScheme(activeColorScheme);
 
 		if(colorChooserUI.isCustomSelected()) {
@@ -176,15 +176,19 @@ public class ColorChooserController extends Observable {
 		public SaveChangesListener() {
 
 			if(colorPresets == null) {
-				LogBuffer.println("Cannot check ColorPreset nodes for existing Custom node " +
-													"because the member is null.");
+				LogBuffer.println("Cannot check ColorPreset nodes for " +
+					"existing Custom node because the member is null.");
 				return;
 			}
 
-			// make a copy of the initial Custom ColorSet in case we want to revert
-			if(colorPresets.checkNodeExists(ColorSchemeType.CUSTOM.toString()) > -1) {
+			// make a copy of the initial Custom ColorSet in case we want to
+			//revert
+			if(colorPresets.checkNodeExists(ColorSchemeType.CUSTOM.toString()) >
+				-1) {
+
 				this.wasCustomPresentOnLoad = true;
-				ColorSet initialCustomCS = colorPresets.getColorSet(ColorSchemeType.CUSTOM.toString());
+				ColorSet initialCustomCS =
+					colorPresets.getColorSet(ColorSchemeType.CUSTOM.toString());
 				this.initialCustomCopy = new ColorSet(initialCustomCS);
 			}
 		}
@@ -482,7 +486,8 @@ public class ColorChooserController extends Observable {
 			colorPresets.removeColorSet(ColorSchemeType.CUSTOM);
 			if(saveChangesListener.wasCustomPresentOnLoad()) {
 				// re-add initial custom ColorSet
-				colorPresets.addColorSet(saveChangesListener.getInitialCustomCopy());
+				colorPresets.addColorSet(
+					saveChangesListener.getInitialCustomCopy());
 			}
 
 			// revert to active scheme when dialog was opened

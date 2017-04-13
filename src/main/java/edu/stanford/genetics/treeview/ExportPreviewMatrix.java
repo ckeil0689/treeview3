@@ -34,7 +34,6 @@ public class ExportPreviewMatrix extends JPanel {
 		this.paintImage = matrix;
 		this.matrixWidth = matrixWidth;
 		this.matrixHeight = matrixHeight;
-		LogBuffer.println("Preview matrix WxH: [" + matrixWidth + "x" + matrixHeight + "].");
 		setLayout(new MigLayout());
 	}
 

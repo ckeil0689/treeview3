@@ -65,7 +65,8 @@ public class ExportDialogController {
 			try {
 				exportDialog.setVisible(true);
 			} catch(Exception oome) {
-				LogBuffer.println("Out of memory during exportDialog.setVisible(true).");
+				LogBuffer.println("Out of memory during " +
+					"exportDialog.setVisible(true).");
 				oome.printStackTrace();
 				showWarning(oome.getLocalizedMessage());
 			}
@@ -105,7 +106,6 @@ public class ExportDialogController {
 		int height = eh.getYDim(exportOptions.getRegionType());
 		int width = eh.getXDim(exportOptions.getRegionType());
 		int treesHeight = eh.getTreesHeight();
-		LogBuffer.println("treesHeight is: [" + treesHeight + "].");
 		int gapSize = eh.getGapSize();
 		int rowLabelsLen =
 			eh.getRowLabelPanelWidth(exportOptions.getRegionType(),
@@ -119,8 +119,6 @@ public class ExportDialogController {
 		int matrixWidth = width -
 			(eh.isRowTreeIncluded() ? treesHeight + gapSize : 0) -
 			(eh.areRowLabelsIncluded() ? rowLabelsLen + gapSize : 0);
-		LogBuffer.println("New real matrix WxH: [" + matrixWidth + "x" +
-			matrixHeight + "].");
 
 		ExportPreviewTrees expRowTrees = null;
 		if(eh.isRowTreeIncluded()) {
@@ -140,8 +138,6 @@ public class ExportDialogController {
 		}
 		ExportPreviewLabels expRowLabels = null;
 		if(options.getRowLabelOption() != LabelExportOption.NO) {
-			LogBuffer.println("Creating row labels snapshot because label " +
-				"export option is " + options.getRowLabelOption());
 			expRowLabels =
 				tvFrame.getDendroView().getRowLabelsSnapshot(
 					options.isShowSelections(),options.getRegionType(),
@@ -153,8 +149,6 @@ public class ExportDialogController {
 		}
 		ExportPreviewLabels expColLabels = null;
 		if(options.getColLabelOption() != LabelExportOption.NO) {
-			LogBuffer.println("Creating col labels snapshot because label " +
-				"export option is " + options.getRowLabelOption());
 			expColLabels =
 				tvFrame.getDendroView().getColLabelsSnapshot(
 					options.isShowSelections(),options.getRegionType(),
@@ -203,12 +197,7 @@ public class ExportDialogController {
 			try {
 				ExportHandler eh = new ExportHandler(dendroView,
 					interactiveXmap,interactiveYmap,colSelection,rowSelection);
-				//TODO use and pass ExportOptions object instead
-				eh.setDefaultPageSize(exportOptions.getPaperType());
-				eh.setDefaultPageOrientation(exportOptions.getOrientation());
-				eh.setTileAspectRatio(exportOptions.getAspectType());
-				eh.setColLabelsIncluded(exportOptions.getColLabelOption());
-				eh.setRowLabelsIncluded(exportOptions.getRowLabelOption());
+				eh.setOptions(exportOptions);
 				eh.setCalculatedDimensions(exportOptions.getRegionType());
 				boolean exportSucess = eh.export(exportOptions.getFormatType(),
 					exportFilename,
@@ -390,7 +379,6 @@ public class ExportDialogController {
 			// Don't update when deselected or highlighted...
 			if(event.getStateChange() == ItemEvent.SELECTED) {
 				updatePreview();
-				LogBuffer.println("Update done");
 			}
 		}
 
@@ -412,7 +400,6 @@ public class ExportDialogController {
 			if((event.getStateChange() == ItemEvent.SELECTED)
 				|| (event.getStateChange() == ItemEvent.DESELECTED)) {
 				updatePreview();
-				LogBuffer.println("Update done");
 			}
 		}
 
@@ -425,8 +412,8 @@ public class ExportDialogController {
 	private void updatePreview() {
 
 		if(exportDialog == null) {
-			LogBuffer.println("No exportDialog object defined. Could "
-				+ "not update preview components.");
+			LogBuffer.println("No exportDialog object defined. Could not " +
+				"update preview components.");
 			return;
 		}
 

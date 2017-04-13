@@ -48,8 +48,6 @@ public class ExportPreviewTrees extends JPanel {
 		this.paintImage = trees;
 		this.isRows = isRows;
 
-		LogBuffer.println("Setting short/long " + (isRows ? "row " : "col ") + "tree dimensions: [" + shortLen + "," + longLen + "]");
-
 		setLayout(new MigLayout());
 		setShortSide(shortLen);
 		setLongSide(longLen);	
