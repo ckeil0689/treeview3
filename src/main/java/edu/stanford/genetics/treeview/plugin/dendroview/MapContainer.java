@@ -301,7 +301,8 @@ public class MapContainer extends Observable implements Observer,
 
 	/** This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
-	 * and set first. */
+	 * and set first.
+	 */
 	public void zoomOutBegin() {
 
 		incrementalZoom(false, true, true);
@@ -309,7 +310,8 @@ public class MapContainer extends Observable implements Observer,
 
 	/** This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
-	 * and set first. */
+	 * and set first. 
+	 */
 	public void zoomInBegin() {
 
 		incrementalZoom(true, true, true);
@@ -317,7 +319,8 @@ public class MapContainer extends Observable implements Observer,
 
 	/** This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
-	 * and set first. */
+	 * and set first. 
+	 * @deprecated*/
 	public void zoomOutEnd() {
 
 		incrementalZoom(false, false, true);
@@ -325,7 +328,8 @@ public class MapContainer extends Observable implements Observer,
 
 	/** This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
-	 * and set first. */
+	 * and set first. 
+	 * @deprecated*/
 	public void zoomInEnd() {
 
 		incrementalZoom(true, false, true);
