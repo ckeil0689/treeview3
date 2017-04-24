@@ -364,9 +364,9 @@ public class ExportHandler {
 	 * Returns the fraction of the longest edge of the image that is reserved
 	 * for the gap between the tree and the matrix
 	 * 
-	 * @return the treeMatrixGapRatio
+	 * @return the gapRatio
 	 */
-	public double getTreeMatrixGapRatio() {
+	public double getGapRatio() {
 		return(gapRatio);
 	}
 
@@ -374,10 +374,10 @@ public class ExportHandler {
 	 * Sets the fraction of the longest edge of the image that is reserved
 	 * for the gap between the tree and the matrix
 	 * 
-	 * @param treeMatrixGapRatio the treeMatrixGapRatio to set
+	 * @param gapRatio the treeMatrixGapRatio to set
 	 */
-	public void setTreeMatrixGapRatio(double treeMatrixGapRatio) {
-		this.gapRatio = treeMatrixGapRatio;
+	public void setGapRatio(double gapRatio) {
+		this.gapRatio = gapRatio;
 	}
 
 	public void setCalculatedDimensions(final RegionType region,
