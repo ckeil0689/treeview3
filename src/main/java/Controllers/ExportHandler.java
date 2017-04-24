@@ -104,8 +104,8 @@ public class ExportHandler {
 	protected int minFontPoints = 1;
 	public final static int SQUEEZE = LabelView.getSqueeze(); //static
 	protected int labelAreaHeight = minFontPoints + SQUEEZE; //Hght for 1 label
-	protected int maxRowLabelLength = 0;
-	protected int maxColLabelLength = 0;
+	protected int rowLabelPaneWidth = 0;
+	protected int colLabelPaneWidth = 0;
 
 	/**
 	 * Constructor. All the parameters are necessary unless you are not
@@ -179,7 +179,7 @@ public class ExportHandler {
 	public int getXDim(final RegionType region) {
 		int xDim = (getNumXExportIndexes(region) * tileWidth) +
 			(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-			(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0);
+			(areRowLabelsIncluded() ? rowLabelPaneWidth + gapSize : 0);
 		return(xDim);
 	}
 
@@ -206,7 +206,7 @@ public class ExportHandler {
 	public int getMinXDim(final RegionType region) {
 		int minXDim = (getNumXExportIndexes(region) * curMinTileDim) +
 			(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-			(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0);
+			(areRowLabelsIncluded() ? rowLabelPaneWidth + gapSize : 0);
 		return(minXDim);
 	}
 
@@ -220,7 +220,7 @@ public class ExportHandler {
 	public int getYDim(final RegionType region) {
 		int yDim = (getNumYExportIndexes(region) * tileHeight) +
 			(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-			(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0);
+			(areColLabelsIncluded() ? colLabelPaneWidth + gapSize : 0);
 		return(yDim);
 	}
 
@@ -247,7 +247,7 @@ public class ExportHandler {
 	public int getMinYDim(final RegionType region) {
 		int minYDim = (getNumYExportIndexes(region) * curMinTileDim) +
 			(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-			(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0);
+			(areColLabelsIncluded() ? colLabelPaneWidth + gapSize : 0);
 		return(minYDim);
 	}
 
@@ -491,11 +491,11 @@ public class ExportHandler {
 	public int calculateMaxFinalImageDim(final RegionType region) {
 		int matrixLabelWidth = getNumXExportIndexes(region) * tileWidth;
 		if(areRowLabelsIncluded()) {
-			matrixLabelWidth += maxRowLabelLength;
+			matrixLabelWidth += rowLabelPaneWidth;
 		}
 		int matrixLabelHeight = getNumYExportIndexes(region) * tileHeight;
 		if(areColLabelsIncluded()) {
-			matrixLabelHeight += maxColLabelLength;
+			matrixLabelHeight += colLabelPaneWidth;
 		}
 		//This is the size component that is determined statically (not by
 		//proportion, like trees height or gap sizes)
@@ -936,7 +936,7 @@ public class ExportHandler {
 				dendroView.getColumnTreeView().export(g2d,
 					(isRowTreeIncluded() ?
 						treesHeight + gapSize : 0) +
-					(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0),
+					(areRowLabelsIncluded() ? rowLabelPaneWidth + gapSize : 0),
 					treesHeight,
 					tileWidth,
 					region,showSelections);
@@ -949,7 +949,7 @@ public class ExportHandler {
 
 				dendroView.getRowTreeView().export(g2d,treesHeight,
 					(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-						(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0),
+						(areColLabelsIncluded() ? colLabelPaneWidth + gapSize : 0),
 					tileHeight,region,
 					showSelections);
 			} 
@@ -984,16 +984,16 @@ public class ExportHandler {
 				g2d.drawImage(im,
 					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
 						(areRowLabelsIncluded() ?
-							maxRowLabelLength + gapSize : 0),
+							rowLabelPaneWidth + gapSize : 0),
 					(isColTreeIncluded() ? treesHeight + gapSize : 0) +
 						(areColLabelsIncluded() ?
-							maxColLabelLength + gapSize : 0), null);
+							colLabelPaneWidth + gapSize : 0), null);
 			} else {
 				dendroView.getInteractiveMatrixView().export(this,g2d,
 					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-						(areRowLabelsIncluded() ? maxRowLabelLength + gapSize : 0),
+						(areRowLabelsIncluded() ? rowLabelPaneWidth + gapSize : 0),
 					(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-						(areColLabelsIncluded() ? maxColLabelLength + gapSize : 0),
+						(areColLabelsIncluded() ? colLabelPaneWidth + gapSize : 0),
 					tileWidth,tileHeight,region,showSelections);
 				// Checks if the worker has been cancelled
 				if(isCancelled()) {
@@ -1543,24 +1543,28 @@ public class ExportHandler {
 
 		//Update the height of the col label area
 		if(getColLabelsIncluded() == LabelExportOption.YES) {
-			maxColLabelLength =
-				dendroView.getColLabelView().getMaxExportStringLength(rt,false,labelAreaHeight - SQUEEZE);
+			colLabelPaneWidth =
+				dendroView.getColLabelView().getMaxExportStringLength(rt,false,
+					labelAreaHeight - SQUEEZE);
 		} else if(getColLabelsIncluded() == LabelExportOption.SELECTION) {
-			maxColLabelLength =
-				dendroView.getColLabelView().getMaxExportStringLength(rt,true,labelAreaHeight - SQUEEZE);
+			colLabelPaneWidth =
+				dendroView.getColLabelView().getMaxExportStringLength(rt,true,
+					labelAreaHeight - SQUEEZE);
 		} else {
-			maxColLabelLength = 0;
+			colLabelPaneWidth = 0;
 		}
 
 		//Update the length of the row label area
 		if(getRowLabelsIncluded() == LabelExportOption.YES) {
-			maxRowLabelLength =
-				dendroView.getRowLabelView().getMaxExportStringLength(rt,false,labelAreaHeight - SQUEEZE);
+			rowLabelPaneWidth =
+				dendroView.getRowLabelView().getMaxExportStringLength(rt,false,
+					labelAreaHeight - SQUEEZE);
 		} else if(getRowLabelsIncluded() == LabelExportOption.SELECTION) {
-			maxRowLabelLength =
-				dendroView.getRowLabelView().getMaxExportStringLength(rt,true,labelAreaHeight - SQUEEZE);
+			rowLabelPaneWidth =
+				dendroView.getRowLabelView().getMaxExportStringLength(rt,true,
+					labelAreaHeight - SQUEEZE);
 		} else {
-			maxRowLabelLength = 0;
+			rowLabelPaneWidth = 0;
 		}
 	}
 
