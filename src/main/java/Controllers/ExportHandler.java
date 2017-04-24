@@ -69,8 +69,8 @@ public class ExportHandler {
 	final protected TreeSelectionI colSelection;
 	final protected TreeSelectionI rowSelection;
 
-	protected PaperType defPageSize = PaperType.getDefault();
-	protected static String defPageOrientation = PageConstants.LANDSCAPE;
+	protected PaperType pageSize = PaperType.getDefault();
+	protected static String pageOrientation = PageConstants.LANDSCAPE;
 	protected boolean showSelecions = true; //Regardless of selec. existence
 	protected FormatType format; //Only important to know doc or image
 
@@ -149,24 +149,24 @@ public class ExportHandler {
 	/**
 	 * Allows one to set the page size that is given to freehep.
 	 * 
-	 * @param pT - default page size
+	 * @param pT - page size
 	 */
-	public void setDefaultPageSize(PaperType pT) {
-		defPageSize = pT;
+	public void setPageSize(PaperType pT) {
+		pageSize = pT;
 	}
 
 	/**
-	 * @return the defPageOrientation
+	 * @return the pageOrientation
 	 */
-	public static String getDefaultPageOrientation() {
-		return(defPageOrientation);
+	public static String getPageOrientation() {
+		return(pageOrientation);
 	}
 
 	/**
-	 * @param defPageOrientation the defPageOrientation to set
+	 * @param pageOrientation the pageOrientation to set
 	 */
-	public void setDefaultPageOrientation(String defPageOrientation) {
-		ExportHandler.defPageOrientation = defPageOrientation;
+	public void setPageOrientation(String pageOrientation) {
+		ExportHandler.pageOrientation = pageOrientation;
 	}
 
 	/**
@@ -822,29 +822,27 @@ public class ExportHandler {
 		@Override
 		protected Void doInBackground() throws Exception {
 			try {
-				if(format.isDocumentFormat()) {
-					exportDocument(format,defPageSize,fileName,region,
-						showSelections,rowLabelOption,colLabelOption);
-				} else {
-					exportImage(format,fileName,region,showSelections,
-						rowLabelOption,colLabelOption);
-				}
+				export();
 			}
 			catch(OutOfMemoryError oome) {
 				LogBuffer.println(oome.getLocalizedMessage());
-				double tooBig = ((double) getXDim(region) /
-					(double) MAX_IMAGE_SIZE) * (double) getYDim(region);
+				int x = (format.isDocumentFormat() ?
+					getMatrixXDim(region) : getXDim(region));
+				int y = (format.isDocumentFormat() ?
+					getMatrixYDim(region) : getYDim(region));
+				double tooBig =
+					((double) x / (double) MAX_IMAGE_SIZE) * (double) y;
 				if(tooBig > 1.0) {
 					BigDecimal bd = new BigDecimal(tooBig);
 					bd = bd.round(new MathContext(4));
 					double rounded = bd.doubleValue();
 					int overflow = 0;
 					if(tooBig < 2.0) {
-						overflow = (int) Math.round((double) MAX_IMAGE_SIZE * (tooBig - 1.0));
+						overflow = (int) Math.round((double) MAX_IMAGE_SIZE *
+							(tooBig - 1.0));
 					}
-					LogBuffer.println("Export too big.  [x" + getXDim(region) +
-						" * y" + getYDim(region) + "] > [" + MAX_IMAGE_SIZE +
-						"].");
+					LogBuffer.println("Export too big.  [x" + x + " * y" + y +
+						"] > [" + MAX_IMAGE_SIZE + "].");
 					setExportSuccessful(false);
 					throw new Exception("Error: Unable to export image.\n\n" +
 						"Exported region [" + region.toString() + ": " +
@@ -857,6 +855,9 @@ public class ExportHandler {
 						"labels), or reduce the minimum font size and try " +
 						"again.",oome);
 				} else {
+					LogBuffer.println("Export NOT too big.  [x" + x + " * y" +
+						y + "] <= [" + MAX_IMAGE_SIZE + "].");
+					oome.printStackTrace();
 					showWarning("Out of memory.\n\nNote, you may be able to " +
 						"export a smaller portion of the matrix or select " +
 						"fewer\noptions which increase image size or " +
@@ -1063,217 +1064,10 @@ public class ExportHandler {
 		 */
 		private void createContentForIMVAlone(final Graphics2D g2d,
 			final RegionType region, final boolean showSelections) {
-			//ls.setProgress(0);
 			ls.setStatus("Exporting matrix ...");
 			publish(ls);
 			dendroView.getInteractiveMatrixView().export(this,g2d,0,0,
 				tileWidth,tileHeight,region,showSelections);
-		}
-
-		/**
-		 * Export an image file (not on a "page")
-		 * 
-		 * @param format
-		 * @param fileName
-		 * @param region
-		 */
-		private void exportImage(final FormatType format,final String fileName,
-			final RegionType region,final boolean showSelections,
-			final LabelExportOption rowLabelOption,
-			final LabelExportOption colLabelOption)
-			throws Exception {
-
-			try {
-				int colorProfile;
-				//JPG is the only format that doesn't support an alpha channel,
-				//so we must create a buffered image object without the ARGB
-				//type
-				if(format == FormatType.JPG) {
-					colorProfile = BufferedImage.TYPE_INT_RGB;
-					LogBuffer.println("Exporting withOUT an alpha channel");
-				} else {
-					colorProfile = BufferedImage.TYPE_INT_ARGB;
-					LogBuffer.println("Exporting with an alpha channel");
-				}
-
-				setCalculatedDimensions(region);
-
-				BufferedImage im = new BufferedImage(getXDim(region),
-					getYDim(region),colorProfile);
-				Graphics2D g2d = (Graphics2D) im.getGraphics();
-
-				//Format PPM defaults to a black background, so we need
-				//to draw a white canvas.  Note, setting the background color
-				//did not work
-				if((format == FormatType.JPG) || (format == FormatType.PPM)) {
-					g2d.setBackground(Color.WHITE);
-					g2d.setColor(Color.WHITE);
-					g2d.fillRect(0,0,getXDim(region),getYDim(region));
-				}
-
-				createContent(g2d,region,showSelections,rowLabelOption,
-					colLabelOption,false);
-
-				File exportFile = new File(fileName);
-				if(format == FormatType.PNG) {
-					ImageIO.write(im,"png",exportFile);
-				} else if(format == FormatType.JPG) {
-					//Code from http://stackoverflow.com/questions/17108234/
-					//setting-jpg-compression-level-with-imageio-in-java
-					JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(
-						null);
-					jpegParams.setCompressionMode(
-						ImageWriteParam.MODE_EXPLICIT);
-					jpegParams.setCompressionQuality(1f);
-					final ImageWriter writer =
-						ImageIO.getImageWritersByFormatName("jpg").next();
-					writer.setOutput(new FileImageOutputStream(exportFile));
-					writer.write(null,new IIOImage(im,null,null),jpegParams);
-				} else if(format == FormatType.PPM) { //ppm = bitmat
-					final OutputStream os = new BufferedOutputStream(
-						new FileOutputStream(exportFile));
-					PpmWriter.writePpm(im,os);
-				} else {
-					LogBuffer.println("Unrecognized export format: [" + format +
-						"].");
-					return;
-				}
-			}
-			catch(IllegalArgumentException iae) {
-				double tooBig = ((double) getXDim(region) /
-					(double) MAX_IMAGE_SIZE) * (double) getYDim(region);
-				BigDecimal bd = new BigDecimal(tooBig);
-				bd = bd.round(new MathContext(4));
-				double rounded = bd.doubleValue();
-				int overflow = 0;
-				if(tooBig < 2.0) {
-					overflow = (int) Math.round((double) MAX_IMAGE_SIZE * (tooBig - 1.0));
-				}
-				LogBuffer.println("Export too big.  [x" + getXDim(region) +
-					" * y" + getYDim(region) + "] > [" + MAX_IMAGE_SIZE + "].");
-				setExportSuccessful(false);
-				throw new Exception("Error: Unable to export image.\n\n" +
-					"Exported region [" + region.toString() + ": " +
-					getNumXExportIndexes(region) + "cols x " +
-					getNumYExportIndexes(region) + "rows] is about [" +
-					(overflow == 0 ?
-						rounded + "] times" : overflow + "] points") +
-					" too big for image export.\n\nPlease select a smaller " +
-					"area, fewer options to include (e.g. labels), or reduce " +
-					"the minimum font size and try again.",iae);
-			}
-			catch(Exception exc) {
-				double tooBig = ((double) getXDim(region) /
-					(double) MAX_IMAGE_SIZE) * (double) getYDim(region);
-				if(tooBig > 1.0) {
-					BigDecimal bd = new BigDecimal(tooBig);
-					bd = bd.round(new MathContext(4));
-					double rounded = bd.doubleValue();
-					int overflow = 0;
-					if(tooBig < 2.0) {
-						overflow = (int) Math.round((double) MAX_IMAGE_SIZE * (tooBig - 1.0));
-					}
-					LogBuffer.println("Export too big.  [x" + getXDim(region) +
-						" * y" + getYDim(region) + "] > [" + MAX_IMAGE_SIZE +
-						"].");
-					setExportSuccessful(false);
-					throw new Exception("Error: Unable to export image.\n\n" +
-						"Exported region [" + region.toString() + ": " +
-						getNumXExportIndexes(region) + "cols x " +
-						getNumYExportIndexes(region) + "rows] is about [" +
-						(overflow == 0 ?
-							rounded + "] times" : overflow + "] points") +
-						" too big for image export.\n\nPlease select a " +
-						"smaller area, fewer options to include (e.g. " +
-						"labels), or reduce the minimum font size and try " +
-						"again.",exc);
-				} else {
-					exc.printStackTrace();
-					setExportSuccessful(false);
-					throw new Exception(
-						"Unknown Error: Unable to export image.\n" +
-							"Try exporting a smaller area.",exc);
-				}
-			}
-		}
-
-		/**
-		 * Export an image file as a part of a document in a vector format
-		 *
-		 * @param format
-		 * @param pageSize
-		 * @param fileName
-		 * @param region
-		 */
-		private void exportDocument(final FormatType format,
-			final PaperType pageSize, String fileName,final RegionType region,
-			final boolean showSelections,
-			final LabelExportOption rowLabelOption,
-			final LabelExportOption colLabelOption) {
-
-			try {
-				setCalculatedDimensions(region);
-
-				Dimension dims =
-					new Dimension(getXDim(region),getYDim(region));
-				File exportFile = new File(fileName);
-
-				VectorGraphics g;
-				if(format == FormatType.PDF) {
-					if(!fileName.endsWith(".pdf")) {
-						fileName += ".pdf";
-					}
-					g = new PDFGraphics2D(exportFile,dims);
-				} else if(format == FormatType.PS) {
-					if(!fileName.endsWith(".ps")) {
-						fileName += ".ps";
-					}
-					g = new PSGraphics2D(exportFile,dims);
-				} else if(format == FormatType.SVG) {
-					if(!fileName.endsWith(".svg")) {
-						fileName += ".svg";
-					}
-					g = new SVGGraphics2D(exportFile,dims);
-				} else {
-					g = null;
-					LogBuffer.println("Unrecognized export format: [" + format +
-						"].");
-					return;
-				}
-
-				Properties p = new Properties();
-				p.setProperty(PDFGraphics2D.PAGE_SIZE,pageSize.toString());
-				p.setProperty(PDFGraphics2D.ORIENTATION,defPageOrientation);
-
-				//These 3 commands are entirely what makes the labels
-				//selectable/editable in PDF and other vector formats
-				p.setProperty(PDFGraphics2D.EMBED_FONTS,"true");
-				p.setProperty(PDFGraphics2D.EMBED_FONTS_AS,
-					FontConstants.EMBED_FONTS_TYPE3);
-				p.setProperty(AbstractVectorGraphicsIO.TEXT_AS_SHAPES,
-					"false");
-
-				g.setProperties(p);
-
-				g.startExport();
-
-				createContent(g,region,showSelections,rowLabelOption,
-					colLabelOption,true);
-
-				g.endExport();
-			}
-			catch(FileNotFoundException exc) {
-				LogBuffer.println("File [" + fileName +
-					"] could not be written " +
-					"to.");
-				LogBuffer.logException(exc);
-			}
-			catch(IOException exc) {
-				LogBuffer.println("File [" + fileName +
-					"] could not be written " +
-					"to.");
-				LogBuffer.logException(exc);
-			}
 		}
 
 		public boolean isExportSuccessful() {
@@ -1289,6 +1083,154 @@ public class ExportHandler {
 			JOptionPane.showMessageDialog(ebd,
 				message,"Warning",JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println(message);
+		}
+
+		/**
+		 * Export a file
+		 */
+		private void export() throws Exception {
+			try {
+				fileName = format.appendExtension(fileName);
+				File exportFile = new File(fileName);
+
+				setCalculatedDimensions(region);
+				Dimension dims =
+					new Dimension(getXDim(region),getYDim(region));
+
+				if(format.isDocumentFormat()) {
+					VectorGraphics g;
+					if(format == FormatType.PDF) {
+						g = new PDFGraphics2D(exportFile,dims);
+					} else if(format == FormatType.PS) {
+						g = new PSGraphics2D(exportFile,dims);
+					} else if(format == FormatType.SVG) {
+						g = new SVGGraphics2D(exportFile,dims);
+					} else {
+						LogBuffer.println("Unrecognized export format: [" +
+							format + "].");
+						return;
+					}
+
+					Properties p = new Properties();
+					p.setProperty(PDFGraphics2D.PAGE_SIZE,pageSize.toString());
+					p.setProperty(PDFGraphics2D.ORIENTATION,pageOrientation);
+
+					//These 3 commands are entirely what makes the labels
+					//selectable/editable in PDF and other vector formats
+					p.setProperty(PDFGraphics2D.EMBED_FONTS,"true");
+					p.setProperty(PDFGraphics2D.EMBED_FONTS_AS,
+						FontConstants.EMBED_FONTS_TYPE3);
+					p.setProperty(AbstractVectorGraphicsIO.TEXT_AS_SHAPES,
+						"false");
+
+					g.setProperties(p);
+
+					g.startExport();
+
+					createContent(g,region,showSelections,rowLabelOption,
+						colLabelOption,true);
+
+					g.endExport();
+				} else {
+					int colorProfile;
+					if(format.hasAlpha()) {
+						colorProfile = BufferedImage.TYPE_INT_ARGB;
+						LogBuffer.println("Exporting with an alpha channel");
+					} else {
+						colorProfile = BufferedImage.TYPE_INT_RGB;
+						LogBuffer.println("Exporting withOUT an alpha channel");
+					}
+
+					BufferedImage im = new BufferedImage(getXDim(region),
+						getYDim(region),colorProfile);
+					Graphics2D g2d = (Graphics2D) im.getGraphics();
+
+					//Formats JPG and PPM default to a black background, so we
+					//need to draw a white canvas.  Note, setting the background
+					//color did not work
+					if(format.hasDefaultBackground()) {
+						g2d.setBackground(Color.WHITE);
+						g2d.setColor(Color.WHITE);
+						g2d.fillRect(0,0,getXDim(region),getYDim(region));
+					}
+
+					createContent(g2d,region,showSelections,rowLabelOption,
+						colLabelOption,false);
+
+					if(format == FormatType.PNG) {
+						ImageIO.write(im,"png",exportFile);
+					} else if(format == FormatType.JPG) {
+						//Code from http://stackoverflow.com/questions/17108234/
+						//setting-jpg-compression-level-with-imageio-in-java
+						JPEGImageWriteParam jpegParams =
+							new JPEGImageWriteParam(null);
+						jpegParams.setCompressionMode(
+							ImageWriteParam.MODE_EXPLICIT);
+						jpegParams.setCompressionQuality(1f);
+						final ImageWriter writer =
+							ImageIO.getImageWritersByFormatName("jpg").next();
+						writer.setOutput(new FileImageOutputStream(exportFile));
+						writer.write(null,new IIOImage(im,null,null),
+							jpegParams);
+					} else if(format == FormatType.PPM) { //ppm = bitmat
+						final OutputStream os = new BufferedOutputStream(
+							new FileOutputStream(exportFile));
+						PpmWriter.writePpm(im,os);
+					} else {
+						LogBuffer.println("Unrecognized export format: [" +
+							format + "].");
+						return;
+					}
+				}
+			}
+			catch(FileNotFoundException fnfe) {
+				LogBuffer.println("File [" + fileName + "] not found.");
+				LogBuffer.logException(fnfe);
+			}
+			catch(IOException ioe) {
+				LogBuffer.println("File [" + fileName +
+					"] could not be written to.");
+				LogBuffer.logException(ioe);
+			}
+			catch(Exception exc) {
+				int x = (format.isDocumentFormat() ?
+					getMatrixXDim(region) : getXDim(region));
+				int y = (format.isDocumentFormat() ?
+					getMatrixYDim(region) : getYDim(region));
+				double tooBig =
+					((double) x / (double) MAX_IMAGE_SIZE) * (double) y;
+				if(tooBig > 1.0) {
+					BigDecimal bd = new BigDecimal(tooBig);
+					bd = bd.round(new MathContext(4));
+					double rounded = bd.doubleValue();
+					int overflow = 0;
+					if(tooBig < 2.0) {
+						overflow = (int) Math.round((double) MAX_IMAGE_SIZE *
+							(tooBig - 1.0));
+					}
+					LogBuffer.println("Export too big.  [x" + x + " * y" + y +
+						"] > [" + MAX_IMAGE_SIZE + "].");
+					setExportSuccessful(false);
+					throw new Exception("Error: Unable to export image.\n\n" +
+						"Exported region [" + region.toString() + ": " +
+						getNumXExportIndexes(region) + "cols x " +
+						getNumYExportIndexes(region) + "rows] is about [" +
+						(overflow == 0 ?
+							rounded + "] times" : overflow + "] points") +
+						" too big for image export.\n\nPlease select a " +
+						"smaller area, fewer options to include (e.g. " +
+						"labels), or reduce the minimum font size and try " +
+						"again.",exc);
+				} else {
+					LogBuffer.println("Export NOT too big.  [x" + x + " * y" +
+						y + "] <= [" + MAX_IMAGE_SIZE + "].");
+					exc.printStackTrace();
+					setExportSuccessful(false);
+					throw new Exception(
+						"Unknown Error: Unable to export image.\n" +
+							"Try exporting a smaller area.",exc);
+				}
+			}
 		}
 	}
 
@@ -1644,8 +1586,8 @@ public class ExportHandler {
 		setRowTreeIncluded(eo.getRowTreeOption());
 		setColTreeIncluded(eo.getColTreeOption());
 		setTileAspectRatio(eo.getAspectType());
-		setDefaultPageOrientation(eo.getOrientation());
-		setDefaultPageSize(eo.getPaperType());
+		setPageOrientation(eo.getOrientation());
+		setPageSize(eo.getPaperType());
 		setShowSelecions(eo.isShowSelections());
 		setFormat(eo.getFormatType());
 	}
@@ -1675,7 +1617,7 @@ public class ExportHandler {
 			TreeExportOption.getDefault() : TreeExportOption.NO);
 
 		eo.setFormatType(FormatType.getDefault());
-		eo.setOrientation(defPageOrientation);
+		eo.setOrientation(pageOrientation);
 		eo.setPaperType(PaperType.getDefault());
 
 		//Make sure the region exists, otherwise default to ALL

@@ -31,7 +31,7 @@ public class ExportOptions {
 		this.paperType = PaperType.getDefault();
 		this.regionType = RegionType.getDefault();
 		this.aspectType = AspectType.getDefault();
-		this.orientation = ExportHandler.getDefaultPageOrientation();
+		this.orientation = ExportHandler.getPageOrientation();
 		this.showSelections = false;
 		this.rowLabelOption = LabelExportOption.getDefault();
 		this.colLabelOption = LabelExportOption.getDefault();
