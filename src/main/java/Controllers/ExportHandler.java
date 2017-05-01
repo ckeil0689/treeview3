@@ -868,7 +868,6 @@ public class ExportHandler {
 			}
 			catch(Exception e) {
 				showWarning(e.getLocalizedMessage());
-				setExportSuccessful(false);
 			}
 			return null;
 		}
