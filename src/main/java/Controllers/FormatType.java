@@ -41,8 +41,28 @@ public enum FormatType {
 		return(FormatType.PDF);
 	}
 
+	/**
+	 * Returns the default document format.  Document and image formats have
+	 * different memory requirements.  This method allows switching between
+	 * different default formats when memory is not an issue for one or the
+	 * other.
+	 * 
+	 * @return
+	 */
 	public static FormatType getDefaultDocumentFormat() {
 		return(FormatType.PDF);
+	}
+
+	/**
+	 * Returns the default image format.  Document and image formats have
+	 * different memory requirements.  This method allows switching between
+	 * different default formats when memory is not an issue for one or the
+	 * other.
+	 * 
+	 * @return
+	 */
+	public static FormatType getDefaultImageFormat() {
+		return(FormatType.PNG);
 	}
 
 	public static FormatType[] getHiResFormats() {

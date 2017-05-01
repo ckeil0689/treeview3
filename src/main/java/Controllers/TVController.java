@@ -38,6 +38,7 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialogController;
+import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.LoadException;
@@ -986,7 +987,15 @@ public class TVController implements Observer {
 		boolean selectionsExist = (tvFrame.getColSelection() != null &&
 			tvFrame.getColSelection().getNSelectedIndexes() > 0);
 
-		ExportDialog exportDialog = new ExportDialog(selectionsExist, eh);
+		ExportDialog exportDialog = null;
+		try {
+			exportDialog = new ExportDialog(selectionsExist, eh);
+		} catch(ExportException ee) {
+			LogBuffer.println(ee.getLocalizedMessage());
+			ee.printStackTrace();
+			showWarning(ee.getLocalizedMessage());
+			return;
+		}
 
 		try {
 			new ExportDialogController(exportDialog, tvFrame,
@@ -1011,11 +1020,10 @@ public class TVController implements Observer {
 
 		ColorExtractor colorExtractor = dendroController.getColorExtractor();
 
-		final ColorChooserUI colorChooserUI = new ColorChooserUI(	colorExtractor,
-																															min, max, mean,
-																															median);
+		final ColorChooserUI colorChooserUI = new ColorChooserUI(colorExtractor,
+			min,max,mean,median);
 		ColorChooserController controller = new ColorChooserController(
-																																		colorChooserUI);
+			colorChooserUI);
 
 		controller.addObserver(dendroController.getInteractiveMatrixView());
 		controller.addObserver(dendroController.getGlobalMatrixView());

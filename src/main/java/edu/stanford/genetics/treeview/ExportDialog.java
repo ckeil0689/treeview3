@@ -73,7 +73,8 @@ public class ExportDialog extends CustomDialog {
 	private boolean selectionsExist;
 	private ExportHandler eh;
 
-	public ExportDialog(final boolean selectionsExist, final ExportHandler eh) {
+	public ExportDialog(final boolean selectionsExist, final ExportHandler eh)
+		throws ExportException {
 
 		super("Export");
 		this.eh = eh;
@@ -101,7 +102,8 @@ public class ExportDialog extends CustomDialog {
 		setupLayout();
 
 		//This will cause a cascade of updates
-		updateRegionRadioBtns(ft.isDocumentFormat());
+		updateFormatSelectList();
+		//updateRegionRadioBtns(ft.isDocumentFormat());
 
 		LogBuffer.println("ExportDialog ready.");
 	}
@@ -904,7 +906,93 @@ public class ExportDialog extends CustomDialog {
 			colPrevLabels.setLongSide(previewImgWidth);
 		}
 	}
-	
+
+	/**
+	 * Updates the availability and the selection of the format select list
+	 * options based on the selected file format, whether a selection exists,
+	 * and on whether the 1:1 size of the region is exportable (in an image
+	 * format).  Calls updateRegionRadioBtns.
+	 * @param isDocFormat
+	 */
+	public void updateFormatSelectList() throws ExportException {
+
+		//Set minimum options in order to determine whether format options
+		//should be disabled
+		eh.setRowLabelsIncluded(LabelExportOption.NO);
+		eh.setColLabelsIncluded(LabelExportOption.NO);
+		eh.setRowTreeIncluded(TreeExportOption.AUTO);
+		eh.setColTreeIncluded(TreeExportOption.AUTO);
+		eh.setTileAspectRatio(AspectType.ONETOONE);
+
+		//Determine whether image and document formats are too big
+		RegionType minReg = RegionType.getMinDefault();
+
+		boolean docTooBig = false;
+		eh.setFormat(FormatType.getDefaultDocumentFormat());
+		eh.setCalculatedDimensions(minReg);
+		docTooBig = eh.isOversized(minReg);
+		boolean imageTooBig = false;
+		eh.setFormat(FormatType.getDefaultImageFormat());
+		eh.setCalculatedDimensions(minReg);
+		imageTooBig = eh.isOversized(minReg);
+
+		if(docTooBig && imageTooBig) {
+			throw new ExportException("All export options are too big for " +
+				"export.");
+		}
+
+		FormatType selectedFormat = (FormatType) formatBox.getSelectedItem();
+		if(selectedFormat == null) {
+			selectedFormat = FormatType.getDefault();
+		}
+		if(selectedFormat.isDocumentFormat() && docTooBig) {
+			//This is technically impossible because document format is smaller
+			//than image format, but I'm putting it here in case that changes in
+			//the future.  Besides, ExportDialog shouldn't know this.
+			selectedFormat = FormatType.getDefaultImageFormat();
+		} else if(!selectedFormat.isDocumentFormat() && imageTooBig) {
+			selectedFormat = FormatType.getDefaultDocumentFormat();
+		}
+
+		//If both image and document format types are not oversized
+		if(!docTooBig && !imageTooBig) {
+			if(formatBox.getItemCount() != FormatType.getHiResFormats().length) {
+				formatBox.removeAll();
+				FormatType[] fts = FormatType.getHiResFormats();
+				for(int i = 0;i < fts.length;i++) {
+					FormatType ft = fts[i];
+					formatBox.addItem(ft);
+				}
+				formatBox.setToolTipText(null);
+			}
+		}
+		//Else if image format is not oversized
+		else if(!imageTooBig) {
+			formatBox.removeAll();
+			FormatType[] fts = FormatType.getImageFormats();
+			for(int i = 0;i < fts.length;i++) {
+				FormatType ft = fts[i];
+				formatBox.addItem(ft);
+			}
+			formatBox.setToolTipText("Too big for document format export");
+		}
+		//Else if document format is not oversized
+		else if(!docTooBig) {
+			formatBox.removeAll();
+			FormatType[] fts = FormatType.getDocumentFormats();
+			for(int i = 0;i < fts.length;i++) {
+				FormatType ft = fts[i];
+				formatBox.addItem(ft);
+			}
+			formatBox.setToolTipText("Too big for image format export");
+		}
+		formatBox.setSelectedItem(selectedFormat);
+
+		//The aspect radio buttons should be updated based on the selected
+		//region
+		updateRegionRadioBtns(selectedFormat.isDocumentFormat());
+	}
+
 	/**
 	 * Updates the availability and the selection of the region radio buttons
 	 * based on the selected file format, whether a selection exists, and on
