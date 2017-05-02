@@ -1455,7 +1455,7 @@ public class ExportHandler {
 		//grabbing the row view's label height
 		try {
 			setLabelAreaHeight(
-				dendroView.getRowLabelView().getMinLabelAreaHeight());
+				dendroView.getRowLabelView().getMinLabelTileHeight());
 		} catch(Exception e) {
 			setLabelAreaHeight(minFontPoints + SQUEEZE);
 		}

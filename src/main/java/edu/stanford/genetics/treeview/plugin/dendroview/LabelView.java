@@ -2361,12 +2361,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	public boolean doDrawLabelPort() {
 		return(inLabelPortMode() && map.overALabelLinkedView() &&
-			map.getScale() < getMinLabelAreaHeight());
+			map.getScale() < getMinLabelTileHeight());
 	}
 
 	public boolean doDrawLabels() {
 		return(doDrawLabelPort() ||
-			(map.getScale() >= getMinLabelAreaHeight()));
+			(map.getScale() >= getMinLabelTileHeight()));
 	}
 
 	/**
@@ -2375,7 +2375,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * 
 	 * @return
 	 */
-	public int getMinLabelAreaHeight() {
+	public int getMinLabelTileHeight() {
 		return((labelAttr.isFixed() ?
 			labelAttr.getLastSize() : labelAttr.getMinSize()) + SQUEEZE);
 	}
