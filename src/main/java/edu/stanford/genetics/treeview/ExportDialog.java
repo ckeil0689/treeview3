@@ -1173,9 +1173,6 @@ public class ExportDialog extends CustomDialog {
 				break;
 			}
 		}
-		/* TODO: This should actually be done in updateRowLabelBtns or
-		 * updateColLabelBtns.  If there's code there to do it already, it
-		 * should be fixed, because it's not working */
 		if(!oneIsSelected) {
 			cBtns = colLabelBtns.getElements();
 			while(cBtns.hasMoreElements()) {
@@ -1208,12 +1205,9 @@ public class ExportDialog extends CustomDialog {
 				break;
 			}
 		}
-		/* TODO: This should actually be done in updateRowLabelBtns or
-		 * updateColLabelBtns.  If there's code there toi do it already, it
-		 * should be fixed, because it's not working */
 		if(!oneIsSelected) {
 			rBtns = rowLabelBtns.getElements();
-			while(cBtns.hasMoreElements()) {
+			while(rBtns.hasMoreElements()) {
 				AbstractButton option = rBtns.nextElement();
 				LabelExportOption leo =
 					LabelExportOption.getLabelExportOption(option.getText());
