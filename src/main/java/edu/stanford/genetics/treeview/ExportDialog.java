@@ -642,7 +642,7 @@ public class ExportDialog extends CustomDialog {
 		background.removeAll();
 
 		//Cannot use the factory here because the gap layout settings explicitly
-		//set below aren't respected when the factory is used
+		//set below aren't respected when the factory is used (on Macs only)
 		JPanel previews = new JPanel();
 		previews.setOpaque(false);
 		previews.setLayout(new MigLayout("ins 0, gap " + gapsize + "!"));
