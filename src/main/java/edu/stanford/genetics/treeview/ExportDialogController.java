@@ -22,7 +22,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 public class ExportDialogController {
 
 	private final ExportDialog exportDialog;
-	private final ExportOptions exportOptions;
+	private ExportOptions exportOptions;
 	private final TreeViewFrame tvFrame;
 	private final DendroView dendroView;
 	private final MapContainer interactiveXmap;
@@ -47,7 +47,15 @@ public class ExportDialogController {
 		this.eh = new ExportHandler(dendroView,
 			interactiveXmap,interactiveYmap,colSelection,rowSelection);
 
-		exportOptions = eh.getSetBestOptions();
+		try {
+			exportOptions = eh.getSetBestOptions();
+		} catch(ExportException ee) {
+			exportOptions = eh.getDefaultOptions();
+			LogBuffer.println(ee.getLocalizedMessage());
+			ee.printStackTrace();
+			showWarning(ee.getLocalizedMessage());
+			return;
+		}
 
 		//If the exported image is too large for BufferedImage to handle,
 		//getSetBestOptions has already popped up a warning to the user and

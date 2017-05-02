@@ -78,16 +78,21 @@ public class ExportDialog extends CustomDialog {
 
 		super("Export");
 		this.eh = eh;
+		this.eh.getSetBestOptions();
 		final boolean useMinimums = true;
 		FormatType ft = getDefaultFormatType();
+		this.selectionsExist = selectionsExist;
 		this.bigRegs = eh.getOversizedRegions(useMinimums,
 			ft.isDocumentFormat());
-		this.selectionsExist = selectionsExist;
 
 		//This interface interactively sets its own defaults based on user
 		//selections and what turns out to be too big, so let's set a minimum
 		//calculated size to start based on the defaults selected in this class
-		RegionType rt = getDefaultRegion(ft);
+		RegionType rt = getDefaultRegion();
+		if(rt == null) {
+			throw new ExportException(this.eh,rt);
+		}
+		LogBuffer.println("Default region: " + rt);
 		eh.setCalculatedDimensions(rt, getDefaultAspectType(ft,
 			eh.getOversizedAspects(rt,ft.isDocumentFormat())));
 
@@ -147,15 +152,17 @@ public class ExportDialog extends CustomDialog {
 
 		FormatType selectedFormat = FormatType.getDefault();
 		if(eh.isImageExportPossible()) {
-			this.formatBox = new JComboBox<FormatType>(FormatType
-					.getHiResFormats());
+			this.formatBox = new JComboBox<FormatType>(
+				FormatType.getHiResFormats());
 
 			formatBox.setSelectedItem(FormatType.getDefault());
 		} else {
 			selectedFormat = FormatType.getDefaultDocumentFormat();
 			formatBox = new JComboBox<FormatType>(FormatType.getDocumentFormats());
 			formatBox.setSelectedItem(FormatType.getDefaultDocumentFormat());
-			formatBox.setToolTipText("All regions too big for PNG/PPM export");
+			formatBox.setToolTipText("All regions too big for " +
+				(selectedFormat.isDocumentFormat() ? "document" : "image") +
+				" export");
 		}
 
 		this.paperBox = new JComboBox<PaperType>(PaperType.values());
@@ -253,9 +260,7 @@ public class ExportDialog extends CustomDialog {
 		final FormatType selectedFormat) {
 
 		RegionType selectedRegion = null;
-		RegionType defReg = (selectedFormat.isDocumentFormat() ?
-			RegionType.getDefault(selectionsExist) :
-			RegionType.getDefault(bigRegs,selectionsExist));
+		RegionType defReg = RegionType.getMinDefault(selectionsExist);
 		
 		// Switched to normal for loop to handle last button via index
 		RegionType[] vals = RegionType.values(); 
@@ -263,20 +268,20 @@ public class ExportDialog extends CustomDialog {
 			RegionType reg = vals[i];
 			JRadioButton option = new JRadioButton(reg.toString());
 			
-			if(!selectedFormat.isDocumentFormat() && bigRegs.contains(reg)) {
+			if(bigRegs.contains(reg)) {
 				option.setEnabled(false);
-				option.setToolTipText("Too big for PNG/PPM export");
+				option.setToolTipText("Too big for " +
+					(selectedFormat.isDocumentFormat() ? "document" : "image") +
+					" export");
 			}
 			//Default region pre-selected
-			if(reg == defReg && (selectedFormat.isDocumentFormat() ||
-				!bigRegs.contains(reg))) {
+			if(reg == defReg && !bigRegs.contains(reg)) {
 
 				option.setSelected(true);
 				selectedRegion = reg;
 			}
 			//If this is the selection region and it's valid
-			if(reg == RegionType.SELECTION && (selectedFormat.isDocumentFormat() ||
-				!bigRegs.contains(reg))) {
+			if(reg == RegionType.SELECTION && !bigRegs.contains(reg)) {
 
 				option.setEnabled(selectionsExist);
 				if(!selectionsExist) {
@@ -297,32 +302,30 @@ public class ExportDialog extends CustomDialog {
 	}
 
 	/**
-	 * Adds radio buttons to regionRadioBtns and to the supplied rangePanel and
-	 * also disables invalid regions with a tooltip explaining why based on
-	 * bigRegs and selectionsExist.  The default region is pre-selected.
+	 * Returns a valid (likely minimum) default region
 	 * 
-	 * @param selectedFormat
 	 * @return
 	 */
-	public RegionType getDefaultRegion(final FormatType selectedFormat) {
+	public RegionType getDefaultRegion() {
 
-		RegionType selectedRegion = null;
-		RegionType defReg = (selectedFormat.isDocumentFormat() ?
-			RegionType.getDefault(selectionsExist) :
-			RegionType.getDefault(bigRegs,selectionsExist));
+		RegionType selectedRegion = RegionType.getMinDefault(selectionsExist);
+
+		if(!bigRegs.contains(selectedRegion)) {
+			return(selectedRegion);
+		}
 
 		RegionType[] vals = RegionType.values(); 
 		for (int i = 0; i < vals.length; i++) {
 
-			RegionType reg = vals[i];
+			selectedRegion = vals[i];
+			if((selectionsExist || selectedRegion != RegionType.SELECTION) &&
+				!bigRegs.contains(selectedRegion)) {
 
-			if(reg == defReg && (selectedFormat.isDocumentFormat() ||
-				!bigRegs.contains(reg))) {
-
-				selectedRegion = reg;
+				return(selectedRegion);
 			}
 		}
-		return(selectedRegion);
+
+		return(null);
 	}
 
 	/**
@@ -469,7 +472,9 @@ public class ExportDialog extends CustomDialog {
 			}
 			if(tooBigs.contains(asp)) {
 				option.setEnabled(false);
-				option.setToolTipText("Too big for PNG/PPM export");
+				option.setToolTipText("Too big for " +
+					(selectedFormat.isDocumentFormat() ? "document" : "image") +
+					" export");
 			}
 			aspectRadioBtns.add(option);
 
@@ -925,7 +930,7 @@ public class ExportDialog extends CustomDialog {
 		eh.setTileAspectRatio(AspectType.ONETOONE);
 
 		//Determine whether image and document formats are too big
-		RegionType minReg = RegionType.getMinDefault();
+		RegionType minReg = RegionType.getMinDefault(selectionsExist);
 
 		boolean docTooBig = false;
 		eh.setFormat(FormatType.getDefaultDocumentFormat());
@@ -937,8 +942,7 @@ public class ExportDialog extends CustomDialog {
 		imageTooBig = eh.isOversized(minReg);
 
 		if(docTooBig && imageTooBig) {
-			throw new ExportException("All export options are too big for " +
-				"export.");
+			throw new ExportException(eh,minReg);
 		}
 
 		FormatType selectedFormat = (FormatType) formatBox.getSelectedItem();
@@ -957,7 +961,7 @@ public class ExportDialog extends CustomDialog {
 		//If both image and document format types are not oversized
 		if(!docTooBig && !imageTooBig) {
 			if(formatBox.getItemCount() != FormatType.getHiResFormats().length) {
-				formatBox.removeAll();
+				formatBox.removeAllItems();
 				FormatType[] fts = FormatType.getHiResFormats();
 				for(int i = 0;i < fts.length;i++) {
 					FormatType ft = fts[i];
@@ -968,7 +972,7 @@ public class ExportDialog extends CustomDialog {
 		}
 		//Else if image format is not oversized
 		else if(!imageTooBig) {
-			formatBox.removeAll();
+			formatBox.removeAllItems();
 			FormatType[] fts = FormatType.getImageFormats();
 			for(int i = 0;i < fts.length;i++) {
 				FormatType ft = fts[i];
@@ -978,11 +982,10 @@ public class ExportDialog extends CustomDialog {
 		}
 		//Else if document format is not oversized
 		else if(!docTooBig) {
-			formatBox.removeAll();
+			formatBox.removeAllItems();
 			FormatType[] fts = FormatType.getDocumentFormats();
 			for(int i = 0;i < fts.length;i++) {
-				FormatType ft = fts[i];
-				formatBox.addItem(ft);
+				formatBox.addItem(fts[i]);
 			}
 			formatBox.setToolTipText("Too big for image format export");
 		}
@@ -1038,7 +1041,8 @@ public class ExportDialog extends CustomDialog {
 					option.setToolTipText(null);
 					backupReg = reg;
 				} else {
-					option.setToolTipText("Too big for PNG/PPM export");
+					option.setToolTipText("Too big for " +
+						(isDocFormat ? "document" : "image") + " export");
 					if(option.isSelected()) {
 						option.setSelected(false);
 						selectedRegion = null;
@@ -1128,7 +1132,8 @@ public class ExportDialog extends CustomDialog {
 			if(enabled) {
 				option.setToolTipText(null);
 			} else {
-				option.setToolTipText("Too big for image export");
+				option.setToolTipText("Too big for " +
+					(isDocFormat ? "document" : "image") + " export");
 			}
 		}
 
@@ -1285,7 +1290,8 @@ public class ExportDialog extends CustomDialog {
 			} else if(!selectionsExist && leo == LabelExportOption.SELECTION) {
 				option.setToolTipText("No selection has been made");
 			} else {
-				option.setToolTipText("Too big for image export");
+				option.setToolTipText("Too big for " +
+					(isDocFormat ? "document" : "image") + " export");
 			}
 		}
 
@@ -1371,7 +1377,8 @@ public class ExportDialog extends CustomDialog {
 			} else if(!selectionsExist && leo == LabelExportOption.SELECTION) {
 				option.setToolTipText("No selection has been made");
 			} else {
-				option.setToolTipText("Too big for image export");
+				option.setToolTipText("Too big for " +
+					(isDocFormat ? "document" : "image") + " export");
 			}
 		}
 

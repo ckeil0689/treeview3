@@ -43,6 +43,7 @@ import org.freehep.graphicsio.svg.SVGGraphics2D;
 import edu.stanford.genetics.treeview.AspectType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialog.ExportBarDialog;
+import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.ExportOptions;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.PaperType;
@@ -88,7 +89,7 @@ public class ExportHandler {
 
 	/* Note: The line width of the tree is 1, so the more points thicker the
 	 * tile is, the relatively more narrow the tree lines are */
-	protected int minTileDim = 20; //Min number of "points" for a tile's edge
+	protected int minTileDim = 7; //Min number of "points" for a tile's edge
 	protected int curMinTileDim = minTileDim; //Changed by label height
 	protected int tileHeight = curMinTileDim; //Number of "points" for a tile's height
 	protected int tileWidth = curMinTileDim; //Number of "points" for a tile's width
@@ -408,6 +409,12 @@ public class ExportHandler {
 	 */
 	public void setCalculatedDimensions(final RegionType region,
 		final double aspectRatio) {
+
+		if(!isExportValid(region)) {
+			LogBuffer.println("ERROR: Invalid export region: [" + region +
+				"].");
+			return;
+		}
 
 		//Calculates: treesHeight,treeMatrixGapSize,tileHeight, and tileWidth
 		//Using: treeMatrixGapRatio,aspectRatio,treeRatio
@@ -833,27 +840,7 @@ public class ExportHandler {
 				double tooBig =
 					((double) x / (double) MAX_IMAGE_SIZE) * (double) y;
 				if(tooBig > 1.0) {
-					BigDecimal bd = new BigDecimal(tooBig);
-					bd = bd.round(new MathContext(4));
-					double rounded = bd.doubleValue();
-					int overflow = 0;
-					if(tooBig < 2.0) {
-						overflow = (int) Math.round((double) MAX_IMAGE_SIZE *
-							(tooBig - 1.0));
-					}
-					LogBuffer.println("Export too big.  [x" + x + " * y" + y +
-						"] > [" + MAX_IMAGE_SIZE + "].");
-					setExportSuccessful(false);
-					throw new Exception("Error: Unable to export image.\n\n" +
-						"Exported region [" + region.toString() + ": " +
-						getNumXExportIndexes(region) + "cols x " +
-						getNumYExportIndexes(region) + "rows] is about [" +
-						(overflow == 0 ?
-							rounded + "] times" : overflow + "] points") +
-						" too big for image export.\n\nPlease select a " +
-						"smaller area, fewer options to include (e.g. " +
-						"labels), or reduce the minimum font size and try " +
-						"again.",oome);
+					throw new ExportException(ExportHandler.this,region);
 				} else {
 					LogBuffer.println("Export NOT too big.  [x" + x + " * y" +
 						y + "] <= [" + MAX_IMAGE_SIZE + "].");
@@ -1640,16 +1627,13 @@ public class ExportHandler {
 	 * 
 	 * @return
 	 */
-	public ExportOptions getSetBestOptions() {
+	public ExportOptions getSetBestOptions() throws ExportException {
 		ExportOptions eo = getDefaultOptions();
 		ExportOptions beo = eo;
 		try {
 			beo = getSetBestOptionsHelper(eo);
-		} catch(Exception e) {
-			LogBuffer.println(e.getLocalizedMessage());
-			JOptionPane.showMessageDialog(new JFrame(),e.getLocalizedMessage(),
-				"Warning",JOptionPane.ERROR_MESSAGE);
-			return(null);
+		} catch(ExportException e) {
+			throw new ExportException(this,eo.getRegionType());
 		}
 		return(beo);
 	}
@@ -1667,7 +1651,7 @@ public class ExportHandler {
 	 * @throws Exception
 	 */
 	protected ExportOptions getSetBestOptionsHelper(ExportOptions eo) throws
-		Exception {
+		ExportException {
 
 		setOptions(eo);
 		setCalculatedDimensions(eo.getRegionType());
@@ -1753,35 +1737,21 @@ public class ExportHandler {
 		if(!eo.getFormatType().isDocumentFormat() &&
 			isOversized(eo.getRegionType())) {
 
-			//Make a recursive call using a document format
-			ExportOptions neo = getDefaultOptions();
-			neo.setFormatType(FormatType.getDefaultDocumentFormat());
-			eo = getSetBestOptionsHelper(neo);
-
-			setOptions(eo);
-			setCalculatedDimensions(eo.getRegionType());
-
-			double tooBig = ((double) getXDim(eo.getRegionType()) /
-				(double) MAX_IMAGE_SIZE) * (double) getYDim(eo.getRegionType());
-			BigDecimal bd = new BigDecimal(tooBig);
-			bd = bd.round(new MathContext(4));
-			double rounded = bd.doubleValue();
-			int overflow = 0;
-			if(tooBig < 2.0) {
-				overflow = (int) Math.round((double) MAX_IMAGE_SIZE *
-					(tooBig - 1.0));
-			}
-			throw new Exception("Error: Unable to export image.\n\n" +
-				"The smallest available export region [" +
-				eo.getRegionType().toString() + ": " +
-				getNumXExportIndexes(eo.getRegionType()) + "cols x " +
-				getNumYExportIndexes(eo.getRegionType()) + "rows] is about [" +
-				(overflow == 0 ?
-					rounded + "] times" : overflow + "] points") +
-				" too big for image export.\n\n  Try selecting or zooming to " +
-				"a smaller area to export.");
+			setFormat(FormatType.getDefaultDocumentFormat());
+			eo.setFormatType(FormatType.getDefaultDocumentFormat());
+			return(getSetBestOptionsHelper(eo));
+		} else if(isOversized(eo.getRegionType())) {
+			throw new ExportException(this,eo.getRegionType());
 		}
 
 		return(eo);
+	}
+
+	/**
+	 * 
+	 * @return the maxImageSize
+	 */
+	public static Integer getMaxImageSize() {
+		return(MAX_IMAGE_SIZE);
 	}
 }

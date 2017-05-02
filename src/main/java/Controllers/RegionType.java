@@ -49,9 +49,8 @@ public enum RegionType {
 	 * @param selectionsExist
 	 * @return
 	 */
-	public static RegionType getDefault(final boolean selectionsExist) {
-		return(getDefault() == RegionType.SELECTION && !selectionsExist ?
-			RegionType.VISIBLE : RegionType.SELECTION);
+	public static RegionType getMinDefault(final boolean selectionsExist) {
+		return(selectionsExist ? RegionType.SELECTION : RegionType.VISIBLE);
 	}
 
 	/**

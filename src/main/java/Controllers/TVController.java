@@ -989,7 +989,7 @@ public class TVController implements Observer {
 
 		ExportDialog exportDialog = null;
 		try {
-			exportDialog = new ExportDialog(selectionsExist, eh);
+			exportDialog = new ExportDialog(selectionsExist,eh);
 		} catch(ExportException ee) {
 			LogBuffer.println(ee.getLocalizedMessage());
 			ee.printStackTrace();
