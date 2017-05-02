@@ -522,11 +522,7 @@ public class ExportHandler {
 				(1.0 - (areColLabelsIncluded() ? gapRatio : 0.0)));
 			//If the final width is larger than the final height in the case of
 			//only the row tree being present
-			if(finalWidth > finalHeight) {
-				return(finalWidth);
-			} else {
-				return(finalHeight);
-			}
+			return(Math.max(finalHeight,finalWidth));
 		} else if(isColTreeIncluded()) {
 			int finalWidth = (int) Math.round(matrixLabelWidth / (1.0 -
 				(areRowLabelsIncluded() ? gapRatio : 0.0)));
@@ -534,11 +530,7 @@ public class ExportHandler {
 				treeRatio - gapRatio * (areColLabelsIncluded() ? 2.0 : 1.0)));
 			//If the final width is larger than the final height in the case of
 			//only the row tree being present
-			if(finalHeight > finalWidth) {
-				return(finalHeight);
-			} else {
-				return(finalWidth);
-			}
+			return(Math.max(finalHeight,finalWidth));
 		} else {
 			return((int) Math.round((double) maxPartialDimSize /
 				(1.0 - (maxDimIncludesLabels ? gapRatio : 0.0))));
