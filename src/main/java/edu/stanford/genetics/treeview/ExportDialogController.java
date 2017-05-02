@@ -114,19 +114,16 @@ public class ExportDialogController {
 		int height = eh.getYDim(exportOptions.getRegionType());
 		int width = eh.getXDim(exportOptions.getRegionType());
 		int treesHeight = eh.getTreesHeight();
-		int gapSize = eh.getGapSize();
 		int rowLabelsLen =
 			eh.getRowLabelPanelWidth(exportOptions.getRegionType(),
 				exportOptions.getRowLabelOption());
 		int colLabelsLen =
 			eh.getColLabelPanelHeight(exportOptions.getRegionType(),
 				exportOptions.getColLabelOption());
-		int matrixHeight = height -
-			(eh.isColTreeIncluded() ? treesHeight + gapSize : 0) -
-			(eh.areColLabelsIncluded() ? colLabelsLen + gapSize : 0);
-		int matrixWidth = width -
-			(eh.isRowTreeIncluded() ? treesHeight + gapSize : 0) -
-			(eh.areRowLabelsIncluded() ? rowLabelsLen + gapSize : 0);
+		int matrixHeight = height - eh.getColTreeAndGapLen() -
+			eh.getColLabelAndGapLen();
+		int matrixWidth = width - eh.getRowTreeAndGapLen() -
+			eh.getRowLabelAndGapLen();
 
 		ExportPreviewTrees expRowTrees = null;
 		if(eh.isRowTreeIncluded()) {

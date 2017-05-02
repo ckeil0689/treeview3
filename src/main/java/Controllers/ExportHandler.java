@@ -149,9 +149,9 @@ public class ExportHandler {
 	/**
 	 * Allows one to set the page size that is given to freehep.
 	 * 
-	 * @param pT - page size
+	 * @param pT - paper type
 	 */
-	public void setPageSize(PaperType pT) {
+	public void setPaperType(PaperType pT) {
 		pageSize = pT;
 	}
 
@@ -178,8 +178,7 @@ public class ExportHandler {
 	 */
 	public int getXDim(final RegionType region) {
 		int xDim = (getNumXExportIndexes(region) * tileWidth) +
-			(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-			(areRowLabelsIncluded() ? rowLabelPaneWidth + gapSize : 0);
+			getRowTreeAndGapLen() + getRowLabelAndGapLen();
 		return(xDim);
 	}
 
@@ -205,8 +204,7 @@ public class ExportHandler {
 	 */
 	public int getMinXDim(final RegionType region) {
 		int minXDim = (getNumXExportIndexes(region) * curMinTileDim) +
-			(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-			(areRowLabelsIncluded() ? rowLabelPaneWidth + gapSize : 0);
+			getRowTreeAndGapLen() + getRowLabelAndGapLen();
 		return(minXDim);
 	}
 
@@ -219,8 +217,7 @@ public class ExportHandler {
 	 */
 	public int getYDim(final RegionType region) {
 		int yDim = (getNumYExportIndexes(region) * tileHeight) +
-			(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-			(areColLabelsIncluded() ? colLabelPaneWidth + gapSize : 0);
+			getColTreeAndGapLen() + getColLabelAndGapLen();
 		return(yDim);
 	}
 
@@ -246,8 +243,7 @@ public class ExportHandler {
 	 */
 	public int getMinYDim(final RegionType region) {
 		int minYDim = (getNumYExportIndexes(region) * curMinTileDim) +
-			(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-			(areColLabelsIncluded() ? colLabelPaneWidth + gapSize : 0);
+			getColTreeAndGapLen() + getColLabelAndGapLen();
 		return(minYDim);
 	}
 
@@ -912,9 +908,7 @@ public class ExportHandler {
 				publish(ls);
 
 				dendroView.getColumnTreeView().export(g2d,
-					(isRowTreeIncluded() ?
-						treesHeight + gapSize : 0) +
-					(areRowLabelsIncluded() ? rowLabelPaneWidth + gapSize : 0),
+					getRowTreeAndGapLen() + getRowLabelAndGapLen(),
 					treesHeight,
 					tileWidth,
 					region,showSelections);
@@ -926,8 +920,7 @@ public class ExportHandler {
 				publish(ls);
 
 				dendroView.getRowTreeView().export(g2d,treesHeight,
-					(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-						(areColLabelsIncluded() ? colLabelPaneWidth + gapSize : 0),
+					getColTreeAndGapLen() + getColLabelAndGapLen(),
 					tileHeight,region,
 					showSelections);
 			} 
@@ -960,18 +953,12 @@ public class ExportHandler {
 				createContentForIMVAlone(imGraphics,region,showSelections);
 				// draw the image to the vector graphics g
 				g2d.drawImage(im,
-					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-						(areRowLabelsIncluded() ?
-							rowLabelPaneWidth + gapSize : 0),
-					(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-						(areColLabelsIncluded() ?
-							colLabelPaneWidth + gapSize : 0), null);
+					getRowTreeAndGapLen() + getRowLabelAndGapLen(),
+					getColTreeAndGapLen() + getColLabelAndGapLen(),null);
 			} else {
 				dendroView.getInteractiveMatrixView().export(this,g2d,
-					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
-						(areRowLabelsIncluded() ? rowLabelPaneWidth + gapSize : 0),
-					(isColTreeIncluded() ? treesHeight + gapSize : 0) +
-						(areColLabelsIncluded() ? colLabelPaneWidth + gapSize : 0),
+					getRowTreeAndGapLen() + getRowLabelAndGapLen(),
+					getColTreeAndGapLen() + getColLabelAndGapLen(),
 					tileWidth,tileHeight,region,showSelections);
 				// Checks if the worker has been cancelled
 				if(isCancelled()) {
@@ -993,10 +980,8 @@ public class ExportHandler {
 						colLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE);
 
 				dendroView.getRowLabelView().export(g2d,
-					(isRowTreeIncluded() ?
-						treesHeight + gapSize : 0),
-					(isColTreeIncluded() ?
-						treesHeight + gapSize : 0) +
+					getRowTreeAndGapLen(),
+					getColTreeAndGapLen() +
 					(colLabelOption != LabelExportOption.NO ?
 						labelLength + gapSize : 0),
 					tileHeight,region,showSelections,
@@ -1016,11 +1001,10 @@ public class ExportHandler {
 						rowLabelOption == LabelExportOption.SELECTION,labelAreaHeight - SQUEEZE);
 
 				dendroView.getColLabelView().export(g2d,
-					(isRowTreeIncluded() ? treesHeight + gapSize : 0) +
+					getRowTreeAndGapLen() +
 						(rowLabelOption != LabelExportOption.NO ?
 								labelLength + gapSize : 0),
-					(isColTreeIncluded() ? treesHeight + gapSize : 0),
-					tileWidth,region,showSelections,
+					getColTreeAndGapLen(),tileWidth,region,showSelections,
 					colLabelOption == LabelExportOption.SELECTION,
 					labelAreaHeight - SQUEEZE);
 			}
@@ -1309,10 +1293,46 @@ public class ExportHandler {
 
 	/**
 	 * 
-	 * @return boolean wehter any labels are included or not
+	 * @return boolean whether any labels are included or not
 	 */
 	public boolean areRowLabelsIncluded() {
 		return(rowLabelsIncluded != LabelExportOption.NO);
+	}
+
+	/**
+	 * Calculate and return the space needed for the labels and gap
+	 * 
+	 * @return
+	 */
+	public int getRowLabelAndGapLen() {
+		return(areRowLabelsIncluded() ? rowLabelPaneWidth + gapSize : 0);
+	}
+
+	/**
+	 * Calculate and return the space needed for the labels and gap
+	 * 
+	 * @return
+	 */
+	public int getColLabelAndGapLen() {
+		return(areColLabelsIncluded() ? colLabelPaneWidth + gapSize : 0);
+	}
+
+	/**
+	 * Calculate and return the space needed for the tree and gap
+	 * 
+	 * @return
+	 */
+	public int getRowTreeAndGapLen() {
+		return(isRowTreeIncluded() ? treesHeight + gapSize : 0);
+	}
+
+	/**
+	 * Calculate and return the space needed for the tree and gap
+	 * 
+	 * @return
+	 */
+	public int getColTreeAndGapLen() {
+		return(isColTreeIncluded() ? treesHeight + gapSize : 0);
 	}
 
 	/**
@@ -1564,7 +1584,7 @@ public class ExportHandler {
 		setColTreeIncluded(eo.getColTreeOption());
 		setTileAspectRatio(eo.getAspectType());
 		setPageOrientation(eo.getOrientation());
-		setPageSize(eo.getPaperType());
+		setPaperType(eo.getPaperType());
 		setShowSelecions(eo.isShowSelections());
 		setFormat(eo.getFormatType());
 	}
