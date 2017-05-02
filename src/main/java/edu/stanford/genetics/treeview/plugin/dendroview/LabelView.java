@@ -543,8 +543,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	abstract public void orientLabelPane(Graphics2D g2d);
 
-	abstract public void orientLabelsForPreview(Graphics2D g2d,final int maxLabelLen);
-	abstract public void orientLabelsForExport(Graphics2D g2d,
+	abstract public void orientLabelPreview(Graphics2D g2d,final int maxLabelLen);
+	abstract public void orientLabelExport(Graphics2D g2d,
 		final int xIndent,final int yIndent,final int longestXLabelLen);
 
 	abstract public void orientHintPane(Graphics2D g2d);
@@ -3369,7 +3369,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		final int ascent = metrics.getAscent();
  
 		/* Rotate plane for array axis (not for zoomHint) */
-		orientLabelsForExport(g2d,xIndent,yIndent,xSize);
+		orientLabelExport(g2d,xIndent,yIndent,xSize);
 
 		//Labels are always drawn horizontally.  orientLabelPane does its magic
 		//to rotate the whole thing, so we don't have to worry about it.  Thus
@@ -3510,7 +3510,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
  
 		/* Rotate plane for array axis (not for zoomHint) */
-		orientLabelsForPreview(g2d,(int) Math.round(xSizeShrunk));
+		orientLabelPreview(g2d,(int) Math.round(xSizeShrunk));
 
 		//Labels are always drawn horizontally.  orientLabelPane does its magic
 		//to rotate the whole thing, so we don't have to worry about it.  Thus

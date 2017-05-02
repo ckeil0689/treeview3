@@ -67,13 +67,13 @@ public class ColumnLabelView extends LabelView {
 	}
 
 	@Override
-	public void orientLabelsForPreview(Graphics2D g2d,final int maxLabelLen) {
+	public void orientLabelPreview(Graphics2D g2d,final int maxLabelLen) {
 		g2d.rotate(Math.PI * 3 / 2);
 		g2d.translate(-maxLabelLen,0);
 	}
 
 	@Override
-	public void orientLabelsForExport(Graphics2D g2d,final int xIndent,
+	public void orientLabelExport(Graphics2D g2d,final int xIndent,
 		final int yIndent,final int longestLabelLen) {
 
 		g2d.rotate(Math.PI * 3 / 2);

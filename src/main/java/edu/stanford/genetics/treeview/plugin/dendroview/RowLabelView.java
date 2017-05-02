@@ -126,10 +126,10 @@ public class RowLabelView extends LabelView {
 	public void orientLabelPane(Graphics2D g2d) {}
 
 	@Override
-	public void orientLabelsForPreview(Graphics2D g2d,final int maxLabelLen) {}
+	public void orientLabelPreview(Graphics2D g2d,final int maxLabelLen) {}
 
 	@Override
-	public void orientLabelsForExport(Graphics2D g2d,final int xIndent,
+	public void orientLabelExport(Graphics2D g2d,final int xIndent,
 		final int yIndent,final int longestLabelLen) {}
 
 	@Override
