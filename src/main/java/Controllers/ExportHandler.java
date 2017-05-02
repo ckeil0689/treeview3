@@ -28,7 +28,6 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.FileImageOutputStream;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
@@ -89,7 +88,7 @@ public class ExportHandler {
 
 	/* Note: The line width of the tree is 1, so the more points thicker the
 	 * tile is, the relatively more narrow the tree lines are */
-	protected int minTileDim = 7; //Min number of "points" for a tile's edge
+	protected int minTileDim = 3; //Min number of "points" for a tile's edge
 	protected int curMinTileDim = minTileDim; //Changed by label height
 	protected int tileHeight = curMinTileDim; //Number of "points" for a tile's height
 	protected int tileWidth = curMinTileDim; //Number of "points" for a tile's width
