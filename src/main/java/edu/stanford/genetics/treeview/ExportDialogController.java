@@ -72,11 +72,11 @@ public class ExportDialogController {
 			updatePreview();
 			try {
 				exportDialog.setVisible(true);
-			} catch(Exception oome) {
-				LogBuffer.println("Out of memory during " +
+			} catch(Exception e) {
+				LogBuffer.println("Possible memory exception during " +
 					"exportDialog.setVisible(true).");
-				oome.printStackTrace();
-				showWarning(oome.getLocalizedMessage());
+				e.printStackTrace();
+				throw e;
 			}
 	
 			LogBuffer.println("ExportDialogController ready");
