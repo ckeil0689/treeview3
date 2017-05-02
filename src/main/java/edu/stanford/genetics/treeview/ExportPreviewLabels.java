@@ -18,8 +18,8 @@ public class ExportPreviewLabels extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	/* Initial default sizes */
-	public static final int D_LONG = 400;
-	public static final int D_SHORT = 80;
+	public static final int PRIMARY_SIDE_LEN_DEFAULT = 400;
+	public static final int SECONDARY_SIDE_LEN_DEFAULT = 80;
 	
 	private final Image paintImage;
 	private final boolean isRows;
@@ -35,8 +35,8 @@ public class ExportPreviewLabels extends JPanel {
 		this.isRows = isRows;
 		
 		setLayout(new MigLayout());
-		setShortSide(D_SHORT);
-		setLongSide(D_LONG);
+		setShortSide(SECONDARY_SIDE_LEN_DEFAULT);
+		setLongSide(PRIMARY_SIDE_LEN_DEFAULT);
 		setPaperBackground(false);
 	}
 

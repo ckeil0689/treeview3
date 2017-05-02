@@ -1206,13 +1206,13 @@ public class DendroView implements Observer, DendroPanel {
 		int width;
 		int height;
 		if(isRows) {
-			width = ExportPreviewTrees.D_SHORT;
-			height = ExportPreviewTrees.D_LONG;
+			width = ExportPreviewTrees.SECONDARY_SIDE_LEN_DEFAULT;
+			height = ExportPreviewTrees.PRIMARY_SIDE_LEN_DEFAULT;
 
 		}
 		else {
-			width = ExportPreviewTrees.D_LONG;
-			height = ExportPreviewTrees.D_SHORT;
+			width = ExportPreviewTrees.PRIMARY_SIDE_LEN_DEFAULT;
+			height = ExportPreviewTrees.SECONDARY_SIDE_LEN_DEFAULT;
 		}
 
 		/* Set up column tree image */
@@ -1236,12 +1236,14 @@ public class DendroView implements Observer, DendroPanel {
 			return new ExportPreviewTrees(null, isRows); // empty panel
 		}
 
-		//The max preview matrix edge length is D_LONG. If there's not the same
-		//number of cols & rows, the long edge length is smaller than the max.
-		//The fraction smaller that the real long tree edge is than the longest
-		//matrix edge is the fraction we must reduce the max for this long edge
+		//The max preview matrix edge length is PRIMARY_SIDE_LEN_DEFAULT. If
+		//there's not the same number of cols & rows, the long edge length is
+		//smaller than the max.  The fraction smaller that the real long tree
+		//edge is than the longest matrix edge is the fraction we must reduce
+		//the max for this long edge
 		double shrinkby =
-			(double) ExportPreviewTrees.D_LONG / (double) longMatrixEdge;
+			(double) ExportPreviewTrees.PRIMARY_SIDE_LEN_DEFAULT /
+			(double) longMatrixEdge;
 		int longLen =
 			(int) Math.floor((double) (isRows ? height : width) * shrinkby);
 		int shortLen = calculatePrevShortLen(shrinkby,width,height,isRows);
@@ -1293,7 +1295,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		//Determine how much the preview needs to be shrunk
 		double shrinkby =
-			(double) ExportPreviewTrees.D_LONG / (double) longMatrixEdge;
+			(double) ExportPreviewTrees.PRIMARY_SIDE_LEN_DEFAULT / (double) longMatrixEdge;
 
 		int longLen =
 			(int) Math.floor((double) (isRows ? height : width) * shrinkby);

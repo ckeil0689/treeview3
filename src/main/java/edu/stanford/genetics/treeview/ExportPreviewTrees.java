@@ -18,8 +18,8 @@ public class ExportPreviewTrees extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	/* Initial default sizes */
-	public static final int D_LONG = 300;
-	public static final int D_SHORT = 85;
+	public static final int PRIMARY_SIDE_LEN_DEFAULT = 300;
+	public static final int SECONDARY_SIDE_LEN_DEFAULT = 85;
 	//Minimum dimension of an element (e.g. tree height)
 	public static final int D_MIN = 1;
 	
@@ -37,8 +37,8 @@ public class ExportPreviewTrees extends JPanel {
 		this.isRows = isRows;
 		
 		setLayout(new MigLayout());
-		setShortSide(D_SHORT);
-		setLongSide(D_LONG);
+		setShortSide(SECONDARY_SIDE_LEN_DEFAULT);
+		setLongSide(PRIMARY_SIDE_LEN_DEFAULT);
 		setPaperBackground(false);
 	}
 
