@@ -599,6 +599,9 @@ public class ExportHandler {
 	 * Returns a list of regions that are at least possible to be exported at
 	 * the minimum size (i.e. aspect ratio is 1:1)
 	 *
+	 * @param matrixOnly - Whether or not to base available options on the
+	 *                     entire image (for image formats) or just on the
+	 *                     matrix (for document formats that embed a PNG)
 	 * @return
 	 */
 	public List<RegionType> getMinimumAvailableRegions(
@@ -646,6 +649,9 @@ public class ExportHandler {
 	 *
 	 * @param minimum - whether to determine if the minimum size is too big or
 	 *            if the current size is too big
+	 * @param matrixOnly - Whether or not to base exportability on the
+	 *                     entire image (for image formats) or just on the
+	 *                     matrix (for document formats that embed a PNG)
 	 * @return
 	 */
 	public List<RegionType> getOversizedRegions(final boolean minimum,
@@ -1284,7 +1290,7 @@ public class ExportHandler {
 	}
 
 	/**
-	 * 
+	 * Getter for rowLabelsIncluded
 	 * @return the rowLabelsIncluded
 	 */
 	public LabelExportOption getRowLabelsIncluded() {
@@ -1292,7 +1298,7 @@ public class ExportHandler {
 	}
 
 	/**
-	 * 
+	 * Check whether or not any row labels are included
 	 * @return boolean whether any labels are included or not
 	 */
 	public boolean areRowLabelsIncluded() {

@@ -93,7 +93,7 @@ public class ExportDialog extends CustomDialog {
 			throw new ExportException(this.eh,rt);
 		}
 		LogBuffer.println("Default region: " + rt);
-		eh.setCalculatedDimensions(rt, getDefaultAspectType(ft,
+		eh.setCalculatedDimensions(rt, getDefaultAspectType(
 			eh.getOversizedAspects(rt,ft.isDocumentFormat())));
 
 		this.rowLabelsTooBig = eh.areRowLabelsTooBig(rt,ft.isDocumentFormat());
@@ -239,6 +239,15 @@ public class ExportDialog extends CustomDialog {
 		mainPanel.repaint();
 	}
 
+	/**
+	 * Returns a format type that, if it is not possible to export, no other
+	 * formats are possible as well.  I.e. if the default format is an image
+	 * format and it cannot be exported, it returns a document format, which
+	 * might also not be exportable, but might be exportable because the size
+	 * limitations are less.
+	 * 
+	 * @return
+	 */
 	public FormatType getDefaultFormatType() {
 		FormatType defaultFormat = FormatType.getDefault();
 		if(!eh.isImageExportPossible()) {
@@ -460,7 +469,7 @@ public class ExportDialog extends CustomDialog {
 		//Default region pre-selected
 		List<AspectType> tooBigs = eh.getOversizedAspects(selectedRegion,
 			selectedFormat.isDocumentFormat());
-		AspectType defAsp = getDefaultAspectType(selectedFormat,tooBigs);
+		AspectType defAsp = getDefaultAspectType(tooBigs);
 
 		// Switched to normal for loop to handle last button via index
 		AspectType[] vals = AspectType.values();
@@ -487,11 +496,14 @@ public class ExportDialog extends CustomDialog {
 		}
 	}
 
-	public AspectType getDefaultAspectType(FormatType ft,
-		List<AspectType> tooBigs) {
-
-		AspectType defAsp = (ft.isDocumentFormat() ?
-			AspectType.getDefault() : AspectType.getDefault(tooBigs));
+	/**
+	 * Returns a default aspect type that is not too big.
+	 * 
+	 * @param tooBigs - A list of aspects that would be too big to export
+	 * @return
+	 */
+	public AspectType getDefaultAspectType(List<AspectType> tooBigs) {
+		AspectType defAsp = AspectType.getDefault(tooBigs);
 		return(defAsp);
 	}
 
@@ -655,7 +667,7 @@ public class ExportDialog extends CustomDialog {
 		}
 		JPanel filler2 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevLabels != null && colPrevTrees != null) {
-			previews.add(filler2, "w " + rowPrevLabels.getShortSide() + "!, "
+			previews.add(filler2, "w " + rowPrevLabels.getSecondarySideLen() + "!, "
 				+ "h " + colPrevTrees.getShortSide() + "!");
 		}
 
@@ -669,19 +681,19 @@ public class ExportDialog extends CustomDialog {
 		JPanel filler3 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevTrees != null && colPrevLabels != null) {
 			previews.add(filler3, "w " + rowPrevTrees.getShortSide() + "!, "
-				+ "h " + colPrevLabels.getShortSide() + "!");
+				+ "h " + colPrevLabels.getSecondarySideLen() + "!");
 		}
 		JPanel filler4 = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
 		if(rowPrevLabels != null && colPrevLabels != null) {
-			previews.add(filler4, "w " + rowPrevLabels.getShortSide() + "!, "
-				+ "h " + colPrevLabels.getShortSide() + "!");
+			previews.add(filler4, "w " + rowPrevLabels.getSecondarySideLen() + "!, "
+				+ "h " + colPrevLabels.getSecondarySideLen() + "!");
 		}
 
 		if(colPrevLabels != null) {
-			colPrevLabels.setLongSide(matrix.getMatrixWidth());
+			colPrevLabels.setPrimarySideLen(matrix.getMatrixWidth());
 			previews.add(colPrevLabels, "growx, pushx, "
-				+ "h " + colPrevLabels.getShortSide() + "!,"
-				+ " w " + colPrevLabels.getLongSide() + "!, wrap");
+				+ "h " + colPrevLabels.getSecondarySideLen() + "!,"
+				+ " w " + colPrevLabels.getPrimarySideLen() + "!, wrap");
 		}
 
 		if(rowPrevTrees != null) {
@@ -692,10 +704,10 @@ public class ExportDialog extends CustomDialog {
 		}
 
 		if(rowPrevLabels != null) {
-			rowPrevLabels.setLongSide(matrix.getMatrixHeight());
+			rowPrevLabels.setPrimarySideLen(matrix.getMatrixHeight());
 			previews.add(rowPrevLabels, "growx, pushx, "
-				+ "h " + rowPrevLabels.getLongSide() + "!,"
-				+ " w " + rowPrevLabels.getShortSide() + "!");
+				+ "h " + rowPrevLabels.getPrimarySideLen() + "!,"
+				+ " w " + rowPrevLabels.getSecondarySideLen() + "!");
 		}
 
 		previews.add(matrix, "h " + matrix.getMatrixHeight() + "!, w " 
@@ -870,7 +882,7 @@ public class ExportDialog extends CustomDialog {
 		}
 
 		if(rowPrevLabels != null) {
-			rowPrevLabels.setShortSide(rowLabelSize);
+			rowPrevLabels.setSecondarySideLen(rowLabelSize);
 		}
 
 		if(exportOptions.getRowLabelOption() != LabelExportOption.NO) {
@@ -885,7 +897,7 @@ public class ExportDialog extends CustomDialog {
 		}
 
 		if(colPrevLabels != null) {
-			colPrevLabels.setShortSide(colLabelSize);
+			colPrevLabels.setSecondarySideLen(colLabelSize);
 		}
 
 		if(exportOptions.getColLabelOption() != LabelExportOption.NO) {
@@ -902,13 +914,13 @@ public class ExportDialog extends CustomDialog {
 			rowPrevTrees.setLongSide(previewImgHeight);
 		}
 		if(rowPrevLabels != null) {
-			rowPrevLabels.setLongSide(previewImgHeight);
+			rowPrevLabels.setPrimarySideLen(previewImgHeight);
 		}
 		if(colPrevTrees != null) {
 			colPrevTrees.setLongSide(previewImgWidth);
 		}
 		if(colPrevLabels != null) {
-			colPrevLabels.setLongSide(previewImgWidth);
+			colPrevLabels.setPrimarySideLen(previewImgWidth);
 		}
 	}
 
@@ -1156,6 +1168,19 @@ public class ExportDialog extends CustomDialog {
 		updateLabelBtns(isDocFormat,selectedRegion,selectedAspect);
 	}
 
+	/**
+	 * Updates the selection and enabled/disabled states of the 2 sets of radio
+	 * buttons for labels.  Buttons are disabled if the size of the image needed
+	 * to accommodate the increased resolution necessary for a font of the
+	 * minimum size in the interface exceeds the size limitation imposed by the
+	 * BufferedImage class.
+	 * 
+	 * @param isDocFormat - Whether or not the selected format is a document
+	 *                      format or not, which has a matrix-only size
+	 *                      limitation.
+	 * @param selectedRegion - The region selected for export
+	 * @param selectedAspect - The tile aspect option selected for export
+	 */
 	public void updateLabelBtns(final boolean isDocFormat,
 		final RegionType selectedRegion,final AspectType selectedAspect) {
 

@@ -97,7 +97,7 @@ public class ExportOptions {
 	}
 
 	/**
-	 * 
+	 * Getter for rowLabelOption
 	 * @return the rowLabelOption
 	 */
 	public LabelExportOption getRowLabelOption() {

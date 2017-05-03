@@ -30,7 +30,13 @@ public class ExportPreviewTrees extends JPanel {
 	
 	private int xSide; 
 	private int ySide;
-	
+
+	/**
+	 * Constructor
+	 * 
+	 * @param trees - buffered image object
+	 * @param isRows - whether this is for row trees or not
+	 */
 	public ExportPreviewTrees(final BufferedImage trees, final boolean isRows) {
 		
 		this.paintImage = trees;
@@ -42,15 +48,23 @@ public class ExportPreviewTrees extends JPanel {
 		setPaperBackground(false);
 	}
 
+	/**
+	 * Constructor
+	 * 
+	 * @param trees - buffered image object
+	 * @param isRows - whether this is for row trees or not
+	 * @param secondaryLen - Tree height
+	 * @param primaryLen - Tree width
+	 */
 	public ExportPreviewTrees(final BufferedImage trees,final boolean isRows,
-		final int shortLen,final int longLen) {
+		final int secondaryLen,final int primaryLen) {
 
 		this.paintImage = trees;
 		this.isRows = isRows;
 
 		setLayout(new MigLayout());
-		setShortSide(shortLen);
-		setLongSide(longLen);	
+		setShortSide(secondaryLen);
+		setLongSide(primaryLen);	
 		setPaperBackground(false);
 	}
 

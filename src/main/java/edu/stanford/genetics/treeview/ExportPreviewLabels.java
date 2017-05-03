@@ -28,27 +28,42 @@ public class ExportPreviewLabels extends JPanel {
 	
 	private int xSide; 
 	private int ySide;
-	
+
+	/**
+	 * Constructor
+	 * 
+	 * @param labels - the image of the labels
+	 * @param isRows - whether they are row or column labels
+	 */
 	public ExportPreviewLabels(final BufferedImage labels, final boolean isRows) {
 		
 		this.paintImage = labels;
 		this.isRows = isRows;
 		
 		setLayout(new MigLayout());
-		setShortSide(SECONDARY_SIDE_LEN_DEFAULT);
-		setLongSide(PRIMARY_SIDE_LEN_DEFAULT);
+		setSecondarySideLen(SECONDARY_SIDE_LEN_DEFAULT);
+		setPrimarySideLen(PRIMARY_SIDE_LEN_DEFAULT);
 		setPaperBackground(false);
 	}
 
+	/**
+	 * Constructor
+	 * 
+	 * @param labels - the image of the labels
+	 * @param isRows - whether they are row or column labels
+	 * @param secondaryLen - Length of the panel side perpendicular to the
+	 *                       adjacent matrix side
+	 * @param primaryLen - Length of the panel side adjacent to the matrix
+	 */
 	public ExportPreviewLabels(final BufferedImage labels,final boolean isRows,
-		final int shortLen,final int longLen) {
+		final int secondaryLen,final int primaryLen) {
 		
 		this.paintImage = labels;
 		this.isRows = isRows;
 		
 		setLayout(new MigLayout());
-		setShortSide(shortLen);
-		setLongSide(longLen);	
+		setSecondarySideLen(secondaryLen);
+		setPrimarySideLen(primaryLen);	
 		setPaperBackground(false);
 	}
 
@@ -74,15 +89,15 @@ public class ExportPreviewLabels extends JPanel {
 	 * The label panels can vary in thickness. This method can be used to 
 	 * adapt the length to represent the calculated label thickness according 
 	 * to calculated matrix-label ratios in ExportHandler.
-	 * @param shortSide - The thickness of the label preview panel.
+	 * @param secondaryLen - The thickness of the label preview panel.
 	 */
-	public void setShortSide(final int shortSide) {
+	public void setSecondarySideLen(final int secondaryLen) {
 		
 		if(isRows) {
-			this.xSide = shortSide;
+			this.xSide = secondaryLen;
 			
 		} else {
-			this.ySide = shortSide;
+			this.ySide = secondaryLen;
 		}
 	}
 	
@@ -90,22 +105,22 @@ public class ExportPreviewLabels extends JPanel {
 	 * The label panels can vary in length depending on the matrix. This method
 	 * can be used to adapt the length to retain the same size as the matrix
 	 * they belong to.
-	 * @param longSide - The size of the long side of the label preview panel.
+	 * @param primaryLen - The size of the long side of the label preview panel.
 	 */
-	public void setLongSide(final int longSide) {
+	public void setPrimarySideLen(final int primaryLen) {
 		
 		if(isRows) {
-			this.ySide = longSide;
+			this.ySide = primaryLen;
 			
 		} else {
-			this.xSide = longSide;
+			this.xSide = primaryLen;
 		}
 	}
 	
 	/**
 	 * @return the longest side length for the preview labels.
 	 */
-	public int getLongSide() {
+	public int getPrimarySideLen() {
 		
 		return (isRows) ? ySide : xSide;
 	}
@@ -113,7 +128,7 @@ public class ExportPreviewLabels extends JPanel {
 	/**
 	 * @return the shortest side length (thickness) for the preview labels.
 	 */
-	public int getShortSide() {
+	public int getSecondarySideLen() {
 		
 		return (isRows) ? xSide : ySide;
 	}
@@ -125,6 +140,10 @@ public class ExportPreviewLabels extends JPanel {
 	 * 
 	 * We apparently need to maintain our own persistent offscreen buffer for
 	 * speed reasons...
+	 */
+	/**
+	 * Paints the label panel
+	 * @param g - Graphics object
 	 */
 	@Override
 	public synchronized void paintComponent(final Graphics g) {

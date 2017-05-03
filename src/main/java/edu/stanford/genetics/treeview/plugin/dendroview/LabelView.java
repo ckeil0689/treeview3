@@ -1870,8 +1870,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 	/**
 	 * Find the length of the longest exported label
-	 * @param rt
-	 * @param selected
+	 * @param rt - The region to search through labels for longest length
+	 * @param selected - Whether to only find the max among selected labels
+	 * @param fontSize - Size of the font
 	 * @return
 	 */
 	public int getMaxExportStringLength(RegionType rt,final boolean selected,
@@ -2381,7 +2382,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	/**
-	 * 
+	 * Getter for SQUEEZE
 	 * @return the squeeze
 	 */
 	public static int getSqueeze() {
@@ -3312,6 +3313,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @param yIndent - size of the indent where to start drawing the labels
 	 * @param size - size of a matrix tile or rather, font height area
 	 * @param region - what portion of the labels to export
+	 * @param showSelections - whether of not to highlight selections
+	 * @param drawSelectedOnly - whether or not to only draw labels that are selected
+	 * @param fontSize - the size of the font to use for export
 	 */
 	public void export(final Graphics g,final int xIndent,final int yIndent,
 		final int size,final RegionType region,final boolean showSelections,
