@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -23,6 +24,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -38,6 +40,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.miginfocom.swing.MigLayout;
+import Controllers.RegionType;
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
@@ -539,6 +542,10 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @param g2d
 	 */
 	abstract public void orientLabelPane(Graphics2D g2d);
+
+	abstract public void orientLabelPreview(Graphics2D g2d,final int maxLabelLen);
+	abstract public void orientLabelExport(Graphics2D g2d,
+		final int xIndent,final int yIndent,final int longestXLabelLen);
 
 	abstract public void orientHintPane(Graphics2D g2d);
 
@@ -1443,7 +1450,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	public Color drawLabelBackground(final Graphics g,int j,int yPos) {
 
-		if(j > (labelInfo.getNumLabels() - 1)) { return Color.black; }
+		if(j > (labelInfo.getNumLabels() - 1)) {
+			return Color.black;
+		}
 
 		final int bgColorIndex = labelInfo.getIndex("BGCOLOR");
 		final String[] strings = labelInfo.getLabels(j);
@@ -1706,7 +1715,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 * @param metrics
 	 *            - font details
 	 */
-	public int getLabelAreaSize(FontMetrics metrics) {
+	public int getLabelAreaLength(FontMetrics metrics) {
 		int min = getSecondaryViewportSize() - getLabelShiftSize();
 		int len = getMaxStringLength(metrics);
 		return len > min ? len : min;
@@ -1758,15 +1767,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 
 		// TODO - ideally this code would not be necessary because a data change
-		// should prompt a state reset of the
-		// entire class.
+		// should prompt a state reset of the entire class.
 		// If we detect that the data has changed, re-initialize the last drawn
 		// longest string variables. Note, this can be thwarted in the rare case
 		// that 2 different data files happen to have the same label in the same
 		// position and there exists a longer label elsewhere
 		if(labelAttr.isLongestStrIdxDefined() &&
-			((labelAttr.getLongestStrIdx() > map
-				.getMaxIndex()) ||
+			((labelAttr.getLongestStrIdx() > map.getMaxIndex()) ||
 				(labelAttr.getLongestStr() == null) ||
 				"".equals(labelAttr.getLongestStr()) ||
 				(labelAttr.getLongestStrIdx() == -1) ||
@@ -1781,8 +1788,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		boolean isLongestStrEqual = false;
 		String tempLongest = null;
 		if(labelAttr.isLongestStrIdxDefined()) {
-			tempLongest = labelSummary.getSummary(labelInfo,labelAttr
-				.getLongestStrIdx());
+			tempLongest = labelSummary.getSummary(labelInfo,
+				labelAttr.getLongestStrIdx());
 			isLongestStrEqual = labelAttr.isLongestStrEqualTo(tempLongest);
 		}
 
@@ -1815,18 +1822,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				"&& lastDrawnStyle == style && longest_str_index > -1 && " +
 				"lastDrawnSize != size && longest_str.equals(labelSummary." +
 				"getSummary(labelInfo,longest_str_index))]",18);
-			debug("Calculating maxstrlen because not [" + labelAttr
-				.getLastDrawnFace() +
-				" == " + labelAttr.getFace() + " && " + labelAttr
-				.getLastDrawnStyle() +
-				" == " + labelAttr.getStyle() + " && " + labelAttr
-				.getLastDrawnStyle() +
-				" > -1 && " + labelAttr.getLastDrawnSize() + " != " + labelAttr
-				.getPoints() +
-				" && " + labelAttr.getLongestStr() +
-				".equals(labelSummary.getSummary(labelInfo," + labelAttr
-				.getLongestStrIdx() +
-				"))]",18);
+			debug("Calculating maxstrlen because not [" +
+				labelAttr.getLastDrawnFace() + " == " + labelAttr.getFace() +
+				" && " + labelAttr.getLastDrawnStyle() + " == " +
+				labelAttr.getStyle() + " && " + labelAttr.getLastDrawnStyle() +
+				" > -1 && " + labelAttr.getLastDrawnSize() + " != " +
+				labelAttr.getPoints() + " && " + labelAttr.getLongestStr() +
+				".equals(labelSummary.getSummary(labelInfo," +
+				labelAttr.getLongestStrIdx() + "))]",18);
 			for(int j = 0;j <= end;j++) {
 				try {
 					String out = labelSummary.getSummary(labelInfo,j);
@@ -1861,6 +1864,77 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			labelAttr.getLongestStr() + "] Start Index: [" + 0 +
 			"] End Index: [" + end + "] height [" + offscreenSize.height +
 			"] width [" + offscreenSize.width + "]",1);
+
+		return(maxStrLen);
+	}
+
+	/**
+	 * Find the length of the longest exported label
+	 * @param rt - The region to search through labels for longest length
+	 * @param selected - Whether to only find the max among selected labels
+	 * @param fontSize - Size of the font
+	 * @return
+	 */
+	public int getMaxExportStringLength(RegionType rt,final boolean selected,
+		final int fontSize) {
+
+		int start = 0;
+		int end = 0;
+		//Error check the parameters sent in
+		if(rt == RegionType.ALL) {
+			start = map.getMinIndex();
+			end = map.getMaxIndex();
+		} else if(rt == RegionType.VISIBLE) {
+			start = map.getFirstVisible();
+			end = map.getLastVisible();
+		} else if(rt == RegionType.SELECTION) {
+			start = drawSelection.getMinIndex();
+			end = drawSelection.getMaxIndex();
+		} else {
+			LogBuffer.println("ERROR: Invalid region type.");
+			return(0);
+		}
+		if(selected && drawSelection.getNSelectedIndexes() == 0) {
+			return(0);
+		}
+
+		//Establish the export font size
+		Font tmpFont = new Font(labelAttr.getFace(),labelAttr.getStyle(),
+			fontSize);
+		FontMetrics fm = getFontMetrics(tmpFont);
+
+		int maxStrLen = 0;
+
+		//If we want to global max string length
+		if(!selected && start == map.getMinIndex() && end == map.getMaxIndex()) {
+			//Calling this because it updates longest_str (which may not have
+			//been calculated if labels were never drawn on the screen)
+			getMaxStringLength(fm);
+			maxStrLen = fm.stringWidth(labelAttr.getLongestStr());
+		}
+		//This isn't fully implemented yet...
+		else {
+			for(int j = start;j <= end;j++) {
+				if(selected && !drawSelection.isIndexSelected(j)) {
+					continue;
+				}
+				try {
+					String out = labelSummary.getSummary(labelInfo,j);
+
+					if(out == null) {
+						out = "No Label";
+					}
+
+					if(maxStrLen < fm.stringWidth(out)) {
+						maxStrLen = fm.stringWidth(out);
+					}
+				}
+				catch(final java.lang.ArrayIndexOutOfBoundsException e) {
+					LogBuffer.logException(e);
+					break;
+				}
+			}
+		}
 
 		return(maxStrLen);
 	}
@@ -2288,17 +2362,31 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	 */
 	public boolean doDrawLabelPort() {
 		return(inLabelPortMode() && map.overALabelLinkedView() &&
-			((!labelAttr.isFixed() &&
-				(map.getScale() < (labelAttr.getMinSize() + SQUEEZE))) ||
-				(labelAttr.isFixed() &&
-					(map.getScale() < (labelAttr.getLastSize() + SQUEEZE)))));
+			map.getScale() < getMinLabelTileHeight());
 	}
 
 	public boolean doDrawLabels() {
-		return(doDrawLabelPort() || (!labelAttr.isFixed() &&
-			(map.getScale() >= (labelAttr.getMinSize() + SQUEEZE))) ||
-			(labelAttr.isFixed() &&
-				(map.getScale() >= (labelAttr.getLastSize() + SQUEEZE))));
+		return(doDrawLabelPort() ||
+			(map.getScale() >= getMinLabelTileHeight()));
+	}
+
+	/**
+	 * Returns the font height plus the SQUEEZE (i.e. all the height needed for
+	 * a single label)
+	 * 
+	 * @return
+	 */
+	public int getMinLabelTileHeight() {
+		return((labelAttr.isFixed() ?
+			labelAttr.getLastSize() : labelAttr.getMinSize()) + SQUEEZE);
+	}
+
+	/**
+	 * Getter for SQUEEZE
+	 * @return the squeeze
+	 */
+	public static int getSqueeze() {
+		return(SQUEEZE);
 	}
 
 	/**
@@ -2459,9 +2547,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		if(labelAndScrollCoordsAreOpposite()) {
 			if(labelAttr.isRightJustified()) {
 				debug("Top justified columns. Extent: [" +
-					getSecondaryScrollBar()
-					.getModel()
-					.getExtent() +
+					getSecondaryScrollBar().getModel().getExtent() +
 					"] Pane Size: [" + getSavedSecondaryPaneSize() + "]",11);
 				if((lastScrollEndPos != -1) && (lastScrollPos != -1) &&
 					((labelLen +
@@ -2476,8 +2562,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						if(offset < 0) {
 							debug("Case 1.",20);
 						}
-					}
-					else if(lastScrollEndGap != -1) {
+					} else if(lastScrollEndGap != -1) {
 						offset = lastScrollEndGap + indent;
 						debug(
 							"Setting offset to (lastScrollEndGap + indent) [" +
@@ -2488,8 +2573,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							debug("Case 2.",20);
 						}
 					}
-				}
-				else if((lastScrollEndPos != -1) && (lastScrollPos != -1) &&
+				} else if((lastScrollEndPos != -1) && (lastScrollPos != -1) &&
 					(lastScrollEndGap != -1)) {
 					offset = (lastScrollEndGap + (/* Extent */lastScrollEndPos -
 						lastScrollPos)) -
@@ -2504,8 +2588,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						debug("Case 2.",20);
 					}
 				}
-			}
-			else {
+			} else {
 				debug("Bottom justified columns. Extent: [" +
 					getSecondaryScrollBar()
 					.getModel()
@@ -2523,34 +2606,28 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						if(offset < 0) {
 							debug("Case 3.",20);
 						}
-					}
-					else {
+					} else {
 						offset += indent;
 						if(offset < 0) {
 							debug("Case 4.",20);
 						}
 					}
-				}
-				else if(lastScrollEndGap != -1) {
+				} else if(lastScrollEndGap != -1) {
 					offset = lastScrollEndGap + indent;
 					if(offset < 0) {
 						debug("Case 5.",20);
 					}
-				}
-				else {
+				} else {
 					offset = indent;
 					if(offset < 0) {
 						debug("Case 5.1.",20);
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			if(labelAttr.isRightJustified()) {
 				debug("Right justified rows. Extent: [" +
-					getSecondaryScrollBar()
-					.getModel()
-					.getExtent() +
+					getSecondaryScrollBar().getModel().getExtent() +
 					"] Pane Size: [" + getSavedSecondaryPaneSize() + "]",11);
 				if((lastScrollEndPos != -1) && (lastScrollPos != -1) &&
 					((labelLen +
@@ -2566,8 +2643,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						if((offset - indent) < 0) {
 							debug("Case 6.",20);
 						}
-					}
-					else {
+					} else {
 						offset = getSavedSecondaryPaneSize() - labelLen;
 						debug("B: offset = paneSize - labelLen [" + offset +
 							" = " +
@@ -2578,8 +2654,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						}
 					}
 					offset -= indent;
-				}
-				else if(lastScrollEndPos != -1) {
+				} else if(lastScrollEndPos != -1) {
 					offset = lastScrollEndPos - labelLen;
 					debug("C: offset = lastScrollEndPos - labelLen [" + offset +
 						" = " +
@@ -2589,12 +2664,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						debug("Case 8.",20);
 					}
 				}
-			}
-			else {
+			} else {
 				debug("Left justified rows. Extent: [" +
-					getSecondaryScrollBar()
-					.getModel()
-					.getExtent() +
+					getSecondaryScrollBar().getModel().getExtent() +
 					"] Pane Size: [" + getSavedSecondaryPaneSize() + "]",11);
 				if((lastScrollEndPos != -1) && (lastScrollPos != -1) &&
 					((labelLen +
@@ -2607,8 +2679,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							debug("Case 9.",20);
 						}
 					}
-				}
-				else if(lastScrollPos != -1) {
+				} else if(lastScrollPos != -1) {
 					offset = lastScrollPos;
 					if(offset < 0) {
 						debug("Case 10.",20);
@@ -3234,4 +3305,331 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		this.dataModel = dataModel;
 	}
 
+	/**
+	 * Exports an image with a set of labels
+	 *
+	 * @param g - graphics object
+	 * @param xIndent - size of the indent where to start drawing the labels
+	 * @param yIndent - size of the indent where to start drawing the labels
+	 * @param size - size of a matrix tile or rather, font height area
+	 * @param region - what portion of the labels to export
+	 * @param showSelections - whether of not to highlight selections
+	 * @param drawSelectedOnly - whether or not to only draw labels that are selected
+	 * @param fontSize - the size of the font to use for export
+	 */
+	public void export(final Graphics g,final int xIndent,final int yIndent,
+		final int size,final RegionType region,final boolean showSelections,
+		final boolean drawSelectedOnly,final int fontSize) {
+
+		exportRange(g,xIndent,yIndent,size,showSelections,drawSelectedOnly,
+			fontSize,region);
+	}
+
+	/**
+	 * Exports the portion of the labels corresponding to the visible portion of
+	 * the matrix
+	 *
+	 * @param g - graphics object
+	 * @param xIndent - size of the indent where to start drawing the labels
+	 * @param yIndent - size of the indent where to start drawing the labels
+	 * @param size - size of a matrix tile or rather, font height area
+	 * @param showSelections - whether of not to highlight selections
+	 * @param drawSelectedOnly - whether or not to only draw labels that are selected
+	 * @param fontSize - the size of the font to use for export
+	 * @param start - the first index to be included in the label export
+	 * @param end - the last index to include in the label export
+	 */
+	public void exportRange(final Graphics g,final int xIndent,
+		final int yIndent,final int size,final boolean showSelections,
+		final boolean drawSelectedOnly,final int fontSize,
+		final RegionType region) {
+
+		int start = 0;
+		int end = 0;
+		if(region == RegionType.ALL) {
+			start = map.getMinIndex();
+			end = map.getMaxIndex();
+		} else if(region == RegionType.VISIBLE) {
+			start = map.getFirstVisible();
+			end = map.getLastVisible();
+		} else if(region == RegionType.SELECTION) {
+			start = drawSelection.getMinIndex();
+			end = drawSelection.getMaxIndex();
+		} else {
+			LogBuffer.println("Invalid region type.");
+			return;
+		}
+
+		final Graphics2D g2d = (Graphics2D) g;
+
+		//Turn on anti-aliasing so the text looks better
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+
+		Font exportFont = new Font(labelAttr.getFace(),
+				labelAttr.getStyle(),fontSize);
+		final FontMetrics metrics = getFontMetrics(exportFont);
+		int xSize = getMaxExportStringLength(region,drawSelectedOnly,fontSize);
+		final int ascent = metrics.getAscent();
+ 
+		/* Rotate plane for array axis (not for zoomHint) */
+		orientLabelExport(g2d,xIndent,yIndent,xSize);
+
+		//Labels are always drawn horizontally.  orientLabelPane does its magic
+		//to rotate the whole thing, so we don't have to worry about it.  Thus
+		//yPos is the "pixel" (i.e. "point") position referring to lines of
+		//labels.  yOffset is to center the label on a tile.
+		//yPos and xPos are assumed to start at 0.
+		int yPos = yIndent;
+		int yOffset = (int) Math.floor((double) size / 2.0);
+		int xPos = xIndent;
+
+		for(int j = start;j <= end;j++) {
+
+			debug("Getting data index [" + j + "]",1);
+
+			try {
+				String out = labelSummary.getSummary(labelInfo,j);
+
+				if(out == null) {
+					out = "No Label";
+				}
+
+				/*
+				 * This will draw the label background if selected
+				 */
+				if(drawSelection.isIndexSelected(j) && showSelections) {
+
+					debug("Drawing yellow background for selected index [" +
+						j + "] because shpwSelections is [" +
+						(showSelections ? "true" : "false") + "]",7);
+
+					g.setColor(selectionTextBGColor);
+
+					g.fillRect(xIndent,yPos,xSize,size);
+				} else if(!drawSelection.isIndexSelected(j) &&
+					drawSelectedOnly) {
+
+					//Skip this label if it is not selected and we're only
+					//drawing selected labels
+					yPos += size;
+					continue;
+				}
+
+				/* Set label color */
+				g2d.setColor(Color.black);
+				g2d.setFont(exportFont);
+				
+
+				/* Finally draw label (alignment-dependent) */
+				xPos = xIndent;
+				if(labelAttr.isRightJustified()) {
+					//Changed this method because it fixes the width calculation for
+					//labels in document format exports (only an issue when right-justified)
+					//xPos += (xSize - metrics.stringWidth(out));
+					xPos += (xSize - (int)Math.round(metrics.getStringBounds(out,g2d).getWidth()));
+				}
+
+				g2d.drawString(out,xPos,yPos + yOffset + (ascent / 2));
+			}
+			catch(final java.lang.ArrayIndexOutOfBoundsException e) {
+				LogBuffer.logException(e);
+				break;
+			}
+
+			yPos += size;
+		}
+	}
+
+	/**
+	 * Create a scaled preview image based on export sizes scaled by
+	 * shrinkFactor.  If the font size ends up shorter than 1 pixel, lines are
+	 * drawn to the resulting string length.  Resulting string lengths WRT
+	 * actually drawing fonts could end up inaccurate due to rounding after
+	 * shrinking a font size.  Worst case would be something like a font size of
+	 * 1.5 and a resulting long string length being relatively 30% longer than
+	 * the actual export image
+	 * 
+	 * @param g - Graphics object.
+	 * @param xIndent - Where to start drawing the labels on the x axis.
+	 * @param yIndent - Where to start drawing the labels on the y axis.
+	 * @param size - Actual tile size ("points") in the exported image.
+	 * @param showSelections - Whether to include highlights in the snapshot.
+	 * @param drawSelectionOnly - Whether to only draw selected labels.
+	 * @param fontSize - Actual font size ("points") in the exported image.
+	 * @param region - The region from which to take a snapshot.
+	 * @param shrinkFactor - Fraction by which to shrink the image.
+	 */
+	public void createPreview(final Graphics g,final int xIndent,
+		final int yIndent,final int size,final boolean showSelections,
+		final boolean drawSelectedOnly,final int fontSize,
+		final RegionType region,final double shrinkFactor) {
+
+		int start = 0;
+		int end = 0;
+		if(region == RegionType.ALL) {
+			start = map.getMinIndex();
+			end = map.getMaxIndex();
+		} else if(region == RegionType.VISIBLE) {
+			start = map.getFirstVisible();
+			end = map.getLastVisible();
+		} else if(region == RegionType.SELECTION) {
+			start = drawSelection.getMinIndex();
+			end = drawSelection.getMaxIndex();
+		} else {
+			LogBuffer.println("Invalid region type.");
+			return;
+		}
+
+		final Graphics2D g2d = (Graphics2D) g;
+
+		//Set up the font and establish
+		double fontSizeShrunk = (double) fontSize * shrinkFactor;
+		Font exportFont;
+		boolean approxMode = false;
+		//If the font size is less than 1.5, switch to approx mode
+		if(fontSizeShrunk < 1.5) {
+			approxMode = true;
+			//Create the export font size so that we can calculate the string
+			//length and shrink it
+			exportFont = new Font(labelAttr.getFace(),
+				labelAttr.getStyle(),fontSize);
+		} else {
+			//Turn on anti-aliasing so the text looks better
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+			exportFont = new Font(labelAttr.getFace(),
+				labelAttr.getStyle(),(int) Math.round(fontSizeShrunk));
+		}
+		final FontMetrics metrics = getFontMetrics(exportFont);
+
+		int xSize = getMaxExportStringLength(region,drawSelectedOnly,fontSize);
+		int ascent = 0;
+		double xSizeShrunk   = (double) xSize   * shrinkFactor;
+		double xIndentShrunk = (double) xIndent * shrinkFactor;
+		double yIndentShrunk = (double) yIndent * shrinkFactor;
+		double sizeShrunk    = (double) size    * shrinkFactor;
+		if(!approxMode) {
+			ascent = metrics.getAscent();
+		}
+ 
+		/* Rotate plane for array axis (not for zoomHint) */
+		orientLabelPreview(g2d,(int) Math.round(xSizeShrunk));
+
+		//Labels are always drawn horizontally.  orientLabelPane does its magic
+		//to rotate the whole thing, so we don't have to worry about it.  Thus
+		//yPos is the "pixel" (i.e. "point") position referring to lines of
+		//labels.  yOffset is to center the label on a tile.
+		//yPos and xPos are assumed to start at 0.
+		double yPos    = yIndentShrunk;
+		double yOffset = sizeShrunk / 2.0;
+		double xPos    = xIndentShrunk;
+
+		//This really just defines the size of the drawing area
+		//g.clearRect(0,0,xSize,ySize);
+
+		for(int j = start;j <= end;j++) {
+
+			try {
+				String out = labelSummary.getSummary(labelInfo,j);
+
+				if(out == null) {
+					out = "No Label";
+				}
+
+				/*
+				 * This will draw the label background if selected
+				 */
+				if(drawSelection.isIndexSelected(j) && showSelections) {
+
+					g.setColor(selectionTextBGColor);
+
+					g.fillRect((int) Math.round(xIndentShrunk),
+						(int) Math.round(yPos),
+						(int) Math.round(xSizeShrunk),
+						(int) Math.round(sizeShrunk));
+				} else if(!drawSelection.isIndexSelected(j) &&
+					drawSelectedOnly) {
+
+					//Skip this label if it is not selected and we're only
+					//drawing selected labels
+					yPos += sizeShrunk;
+					continue;
+				}
+
+				/* Set label color */
+				g2d.setColor(Color.black);
+
+				//Set the font or the line length
+				int strLen = 0;
+				if(!approxMode) {
+					g2d.setFont(exportFont);
+				} else {
+					strLen = (int) Math.round(shrinkFactor *
+						(double) metrics.stringWidth(out));
+					if(strLen < 1) {
+						strLen = 1;
+					}
+				}
+
+				/* Finally draw label (alignment-dependent) */
+				xPos = xIndentShrunk;
+				if(labelAttr.isRightJustified()) {
+					if(approxMode) {
+						xPos += (xSizeShrunk - strLen);
+					} else {
+						xPos += (xSizeShrunk - metrics.stringWidth(out));
+					}
+				}
+
+				//If we're in approx mode, just draw a line.  No need to draw a
+				//font at this scale for a shrunken preview image.  Also, we're
+				//Keeping track of the position using doubles so that each
+				//drawn piece gets into the closest position
+				if(approxMode) {
+					g2d.drawLine((int) Math.round(xPos),
+						(int) Math.round(yPos + yOffset),
+						(int) Math.round(xPos) + strLen,
+						(int) Math.round(yPos));
+				} else {
+					g2d.drawString(out,
+						(int) Math.round(xPos),
+						(int) Math.round(yPos + yOffset) + (ascent / 2));
+				}
+			}
+			catch(final java.lang.ArrayIndexOutOfBoundsException e) {
+				LogBuffer.logException(e);
+				break;
+			}
+
+			yPos += sizeShrunk;
+		}
+	}
+
+	/**
+	 * Get a snapshot of the trees. The snapshot will be taken in the specified
+	 * region.
+	 * @param width - The width of the scaled image to be returned.
+	 * @param height - The height of the scaled image to be returned.
+	 * @param region - The region from which to take a snapshot.
+	 * @param withSelections - Whether to include highlights in the snapshot.
+	 * @param drawSelectionOnly - Whether to only draw selected labels.
+	 * @param tileSize - Actual tile size ("points") in the exported image.
+	 * @param fontSize - Actual font size ("points") in the exported image.
+	 * @param shrinkby - Fraction to scale the image down for the preview.
+	 * @return A scaled BufferedImage representing the trees.
+	 */
+	public BufferedImage getSnapshot(final int width,final int height, 
+		final RegionType region,final boolean withSelections,
+		final boolean drawSelectionOnly,final int tileSize,final int fontSize,
+		final double shrinkby) {
+
+		BufferedImage img = new BufferedImage(width,height,
+			BufferedImage.TYPE_INT_ARGB);
+
+		createPreview(img.getGraphics(),0,0,tileSize,withSelections,
+			drawSelectionOnly,fontSize,region,shrinkby);
+
+		return img;
+	}
 }

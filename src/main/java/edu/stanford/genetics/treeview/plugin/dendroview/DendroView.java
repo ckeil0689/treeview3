@@ -49,6 +49,8 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.LabelFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
+import edu.stanford.genetics.treeview.DragGridPanel;
+import edu.stanford.genetics.treeview.ExportPreviewLabels;
 
 /** TODO Refactor this JavaDoc. It's not applicable to the current program
  * anymore.
@@ -220,21 +222,21 @@ public class DendroView implements Observer, DendroPanel {
 
 		if((rowFinderBox == null) || (colFinderBox == null)) {
 			LogBuffer.println("Could not set up search. A search bar has" +
-												" not been set up.");
+				" not been set up.");
 			return;
 		}
 
 		searchPanel.removeAll();
 
 		final String tooltip = "You can use wildcards to search (*, ?). " +
-														"E.g.: *complex* --> Rpd3s complex, ATP Synthase " +
-														"(complex V), etc...";
+			"E.g.: *complex* --> Rpd3s complex, ATP Synthase " +
+			"(complex V), etc...";
 		searchPanel.setToolTipText(tooltip);
 
 		searchPanel.add(rowFinderBox.getSearchTermBox(), "w 80::, growx, " +
-																											"pushx, al right");
+			"pushx, al right");
 		searchPanel.add(colFinderBox.getSearchTermBox(), "w 80::, growx, " +
-																											"pushx, al right");
+			"pushx, al right");
 
 		searchPanel.revalidate();
 		searchPanel.repaint();
@@ -1062,16 +1064,12 @@ public class DendroView implements Observer, DendroPanel {
 
 	public boolean isAFinderBoxFocussed() {
 		return(rowFinderBox	.getSearchTermBox().getEditor().getEditorComponent()
-												.isFocusOwner() || colFinderBox	.getSearchTermBox()
-																												.getEditor()
-																												.getEditorComponent()
-																												.isFocusOwner());
+			.isFocusOwner() || colFinderBox	.getSearchTermBox().getEditor()
+			.getEditorComponent().isFocusOwner());
 	}
 
 	public void updateSearchTermBoxes(final LabelInfo rowHI,
-																		final LabelInfo columnHI,
-																		final MapContainer xmap,
-																		final MapContainer ymap) {
+		final LabelInfo columnHI,final MapContainer xmap,final MapContainer ymap) {
 
 		rowFinderBox.setLabelInfo(rowHI);
 		rowFinderBox.setLabelSummary(getRowLabelView().getLabelSummary());
@@ -1096,7 +1094,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		if((colTreeView == null) || (colDataPane == null)) {
 			LogBuffer.println("colTreeView could not be enabled/ disabled " +
-												"because it was null");
+				"because it was null");
 			return;
 		}
 
@@ -1112,7 +1110,7 @@ public class DendroView implements Observer, DendroPanel {
 
 		if((rowTreeView == null) || (rowDataPane == null)) {
 			LogBuffer.println("rowTreeView could not be enabled/ disabled " +
-												"because it was null");
+				"because it was null");
 			return;
 		}
 
@@ -1128,8 +1126,8 @@ public class DendroView implements Observer, DendroPanel {
 	 * @param region - The RegionType defines which region of the matrix
 	 *          will be shown.
 	 * @return A new ExportPreviewMatrix panel containing the matrix. */
-	public ExportPreviewMatrix getMatrixSnapshot(	final boolean withSelections,
-																								final RegionType region) {
+	public ExportPreviewMatrix getMatrixSnapshot(final boolean withSelections,
+		RegionType region) {
 
 		Image image;
 
@@ -1150,26 +1148,127 @@ public class DendroView implements Observer, DendroPanel {
 		return new ExportPreviewMatrix(image);
 	}
 
-	public ExportPreviewTrees getRowTreeSnapshot(	final boolean withSelections,
-																								final RegionType region) {
+	/**
+	 * Get an image of the row tree for the export preview
+	 * 
+	 * @param withSelections - Whether to include selection highlighting
+	 * @param region - region of the matrix to export
+	 * @return
+	 */
+	public ExportPreviewTrees getRowTreeSnapshot(final boolean withSelections,
+		RegionType region) {
 
 		return getTreeSnapshot(rowTreeView, region, withSelections, true);
 	}
 
-	public ExportPreviewTrees getColTreeSnapshot(	final boolean withSelections,
-																								final RegionType region) {
+	/**
+	 * Get an image of the row tree for the export preview
+	 * 
+	 * @param withSelections - Whether to include selection highlighting
+	 * @param region - region of the matrix to export
+	 * @param width - preview image width
+	 * @param height - preview image height
+	 * @param longMatrixEdge - Length of the matrix edge adjacent to the tree
+	 * @return
+	 */
+	public ExportPreviewTrees getRowTreeSnapshot(final boolean withSelections,
+		final RegionType region,final int width,final int height,
+		final int longMatrixEdge) {
+
+		return getTreeSnapshot(rowTreeView,region,withSelections,true,width,
+			height,longMatrixEdge);
+	}
+
+	/**
+	 * Get an image of the col tree for the export preview
+	 * 
+	 * @param withSelections - Whether to include selection highlighting
+	 * @param region - region of the matrix to export
+	 * @return
+	 */
+	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections,
+		RegionType region) {
 
 		return getTreeSnapshot(colTreeView, region, withSelections, false);
 	}
 
-	private ExportPreviewTrees getTreeSnapshot(	final TRView treeAxisView,
-																							final RegionType region,
-																							final boolean withSelections,
-																							final boolean isRows) {
+	/**
+	 * Get an image of the row labels for the export preview
+	 * 
+	 * @param withSelections - Whether to include selection highlighting
+	 * @param region - region of the matrix to export
+	 * @param width - preview image width
+	 * @param height - preview image height
+	 * @param drawSelectionOnly - Only draw labels that are selected
+	 * @param tileHeight - The height of the tiles in the final exported image
+	 * @param fontSize - The height of the font in the final exported image
+	 * @param longMatrixEdge - Length of the matrix edge adjacent to the tree
+	 * @return
+	 */
+	public ExportPreviewLabels getRowLabelsSnapshot(
+		final boolean withSelections,final RegionType region,final int width,
+		final int height,final boolean drawSelectionOnly,final int tileHeight,
+		final int fontSize,final int longMatrixEdge) {
+
+		return getLabelsSnapshot(rowLabelView,region,withSelections,true,width,
+			height,drawSelectionOnly,tileHeight,fontSize,longMatrixEdge);
+	}
+
+	/**
+	 * Get an image of the column labels for the export preview
+	 * 
+	 * @param withSelections - Whether to include selection highlighting
+	 * @param region - region of the matrix to export
+	 * @param width - preview image width
+	 * @param height - preview image height
+	 * @param drawSelectionOnly - Only draw labels that are selected
+	 * @param tileHeight - The height of the tiles in the final exported image
+	 * @param fontSize - The height of the font in the final exported image
+	 * @param longMatrixEdge - Length of the matrix edge adjacent to the tree
+	 * @return
+	 */
+	public ExportPreviewLabels getColLabelsSnapshot(
+		final boolean withSelections,RegionType region,final int width,
+		final int height,final boolean drawSelectionOnly,final int tileWidth,
+		final int fontSize,final int longMatrixEdge) {
+
+		return getLabelsSnapshot(colLabelView,region,withSelections,false,width,
+			height,drawSelectionOnly,tileWidth,fontSize,longMatrixEdge);
+	}
+
+	/**
+	 * Get an image of the col tree for the export preview
+	 * 
+	 * @param withSelections - Whether to include selection highlighting
+	 * @param region - region of the matrix to export
+	 * @param width - preview image width
+	 * @param height - preview image height
+	 * @param longMatrixEdge - Length of the matrix edge adjacent to the tree
+	 * @return
+	 */
+	public ExportPreviewTrees getColTreeSnapshot(final boolean withSelections,
+		final RegionType region,final int width,final int height,
+		final int longMatrixEdge) {
+
+		return getTreeSnapshot(colTreeView,region,withSelections,false,width,
+			height,longMatrixEdge);
+	}
+
+	/**
+	 * Get an image of a tree for the export preview
+	 * 
+	 * @param treeAxisView - TRView object
+	 * @param region - region of the matrix to export
+	 * @param withSelections - Whether to include selection highlighting
+	 * @param isRows - Whether this is for a row tree or not
+	 * @return
+	 */
+	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
+		RegionType region,final boolean withSelections,final boolean isRows) {
 
 		if(treeAxisView == null) {
-			LogBuffer.println("Cannot generate tree snapshot. " +
-												"TRView object is null.");
+			LogBuffer.println("Cannot generate tree snapshot. TRView object " +
+				"is null.");
 			return new ExportPreviewTrees(null, isRows); // empty panel
 		}
 
@@ -1178,119 +1277,328 @@ public class DendroView implements Observer, DendroPanel {
 		int width;
 		int height;
 		if(isRows) {
-			width = ExportPreviewTrees.D_SHORT;
-			height = ExportPreviewTrees.D_LONG;
+			width = ExportPreviewTrees.SECONDARY_SIDE_LEN_DEFAULT;
+			height = ExportPreviewTrees.PRIMARY_SIDE_LEN_DEFAULT;
 
 		}
 		else {
-			width = ExportPreviewTrees.D_LONG;
-			height = ExportPreviewTrees.D_SHORT;
+			width = ExportPreviewTrees.PRIMARY_SIDE_LEN_DEFAULT;
+			height = ExportPreviewTrees.SECONDARY_SIDE_LEN_DEFAULT;
 		}
 
 		/* Set up column tree image */
 		BufferedImage treeSnapshot = null;
 		ExportPreviewTrees expTrees = null;
 		if(treeAxisView.isEnabled()) {
-			treeSnapshot = treeAxisView.getSnapshot(width, height, region, withSelections);
+			treeSnapshot = treeAxisView.getSnapshot(width, height, region,
+				withSelections);
 			expTrees = new ExportPreviewTrees(treeSnapshot, isRows);
 		}
 
 		return expTrees;
 	}
 
+	/**
+	 * Get an image of a tree for the export preview
+	 * 
+	 * @param treeAxisView - TRView object
+	 * @param region - region of the matrix to export
+	 * @param withSelections - Whether to include selection highlighting
+	 * @param isRows - Whether this is for a row tree or not
+	 * @param width - preview image width
+	 * @param height - preview image height
+	 * @param longMatrixEdge - Length of the matrix edge adjacent to the tree
+	 * @return
+	 */
+	private ExportPreviewTrees getTreeSnapshot(TRView treeAxisView,
+		RegionType region,final boolean withSelections,final boolean isRows,
+		int width,int height,final int longMatrixEdge) {
+
+		if(treeAxisView == null) {
+			LogBuffer.println("Cannot generate tree snapshot. TRView object " +
+				"is null.");
+			return new ExportPreviewTrees(null, isRows); // empty panel
+		}
+
+		//The max preview matrix edge length is PRIMARY_SIDE_LEN_DEFAULT. If
+		//there's not the same number of cols & rows, the long edge length is
+		//smaller than the max.  The fraction smaller that the real long tree
+		//edge is than the longest matrix edge is the fraction we must reduce
+		//the max for this long edge
+		double shrinkby =
+			(double) ExportPreviewTrees.PRIMARY_SIDE_LEN_DEFAULT /
+			(double) longMatrixEdge;
+		int longLen =
+			(int) Math.floor((double) (isRows ? height : width) * shrinkby);
+		int shortLen = calculatePrevSecondaryLen(shrinkby,width,height,isRows);
+
+		height = (isRows ? longLen : shortLen);
+		width = (isRows ? shortLen : longLen);
+
+		/* Set up column tree image */
+		BufferedImage treeSnapshot = null;
+		ExportPreviewTrees expTrees = null;
+		if(treeAxisView.isEnabled()) {
+			treeSnapshot = treeAxisView.getSnapshot(width, height, region,
+				withSelections);
+			expTrees = new ExportPreviewTrees(treeSnapshot,isRows,shortLen,
+				longLen);
+		}
+
+		return expTrees;
+	}
+
+	/**
+	 * This method determines the short length of the tree based on actual tree
+	 * area dimensions and using the fixed long length for the preview for
+	 * scaling down the short length
+	 * 
+	 * @param shrinkby - The ratio by which to shrink the image
+	 * @param realWidth - export image width
+	 * @param realHeight - export image height
+	 * @param isRows - Whether this is for a row tree or not
+	 */
+	private int calculatePrevSecondaryLen(final double shrinkby,
+		final int realWidth,final int realHeight,final boolean isRows) {
+
+		int realShortLen = (isRows ? realWidth  : realHeight);
+		int prevShortLen = (int) Math.round((double) realShortLen * shrinkby);
+		if(prevShortLen < ExportPreviewTrees.D_MIN) {
+			prevShortLen = ExportPreviewTrees.D_MIN;
+		}
+		return(prevShortLen);
+	}
+
+	/**
+	 * Get a labels pane snapshot for the export preview
+	 * 
+	 * @param labelsAxisView - A LabelView object
+	 * @param region - region of the matrix to export
+	 * @param withSelections - Whether to include selection highlighting
+	 * @param isRows - Whether this is for a row tree or not
+	 * @param width - preview image width
+	 * @param height - preview image height
+	 * @param drawSelectionOnly - Only draw labels that are selected
+	 * @param tileHeight - The height of the tiles in the final exported image
+	 * @param fontSize - The height of the font in the final exported image
+	 * @param longMatrixEdge - Length of the matrix edge adjacent to the tree
+	 * @return
+	 */
+	private ExportPreviewLabels getLabelsSnapshot(LabelView labelsAxisView,
+		RegionType region,final boolean withSelections,final boolean isRows,
+		int width,int height,final boolean drawSelectionOnly,
+		final int tileHeight,int fontSize,final int longMatrixEdge) {
+
+		if(labelsAxisView == null) {
+			LogBuffer.println("Cannot generate labels snapshot. Label object " +
+				"is null.");
+			return new ExportPreviewLabels(null,isRows); // empty panel
+		}
+
+		//Determine how much the preview needs to be shrunk
+		double shrinkby =
+			(double) ExportPreviewTrees.PRIMARY_SIDE_LEN_DEFAULT /
+			(double) longMatrixEdge;
+
+		int primaryLen =
+			(int) Math.floor((double) (isRows ? height : width) * shrinkby);
+		int secondaryLen = calculatePrevSecondaryLen(shrinkby,width,height,
+			isRows);
+
+		//Scale down the dimensions for the preview, but do not scale down the
+		//other components such as font size, as that is needed to measure
+		//string length which can be subsequently scaled
+		height = (isRows ? primaryLen : secondaryLen);
+		width = (isRows ? secondaryLen : primaryLen);
+
+		/* Set up column label image */
+		BufferedImage labelsSnapshot = null;
+		ExportPreviewLabels expLabels = null;
+
+		labelsSnapshot = labelsAxisView.getSnapshot(width,height,region,
+			withSelections,drawSelectionOnly,tileHeight,fontSize,shrinkby);
+		expLabels =
+			new ExportPreviewLabels(labelsSnapshot,isRows,secondaryLen,
+				primaryLen);
+
+		return expLabels;
+	}
+
+	/**
+	 * Getter for name
+	 * @return name
+	 */
 	@Override
 	public String getName() {
 
 		return name;
 	}
 
+	/**
+	 * Setter for name
+	 * 
+	 * @param name - Name string
+	 */
 	public void setName(final String name) {
 
 		this.name = name;
 	}
 
-	// Getters
+	/**
+	 * Getter for scaleIncXY
+	 * 
+	 * @return
+	 */
 	public JButton getXYPlusButton() {
 
 		return scaleIncXY;
 	}
 
+	/**
+	 * Getter for scaleDecXY
+	 * 
+	 * @return
+	 */
 	public JButton getXYMinusButton() {
 
 		return scaleDecXY;
 	}
 
+	/**
+	 * Getter for scaleDefaultAll
+	 * 
+	 * @return
+	 */
 	public JButton getHomeButton() {
 
 		return scaleDefaultAll;
 	}
 
-	/* TODO: This needs to be better integrated into the interface */
-//	public JButton getExportButton() {
-//
-//		return exportBtn;
-//	}
-
+	/**
+	 * Getter for zoomBtn
+	 * 
+	 * @return
+	 */
 	public JButton getZoomButton() {
 
 		return zoomBtn;
 	}
 
+	/**
+	 * Getter for matrixXscrollbar
+	 * 
+	 * @return
+	 */
 	public JScrollBar getMatrixXScroll() {
 
 		return matrixXscrollbar;
 	}
 
+	/**
+	 * Getter for matrixYscrollbar
+	 * 
+	 * @return
+	 */
 	public JScrollBar getMatrixYScroll() {
 
 		return matrixYscrollbar;
 	}
 
+	/**
+	 * Getter for colLabelScroll
+	 * 
+	 * @return
+	 */
 	public JScrollBar getColLabelLengthScroll() {
 
 		return colLabelScroll;
 	}
 
+	/**
+	 * Getter for rowLabelScroll
+	 * 
+	 * @return
+	 */
 	public JScrollBar getRowLabelLengthScroll() {
 
 		return rowLabelScroll;
 	}
 
+	/**
+	 * Getter for interactiveMatrixView
+	 * 
+	 * @return
+	 */
 	public InteractiveMatrixView getInteractiveMatrixView() {
 
 		return interactiveMatrixView;
 	}
 
+	/**
+	 * Getter for globalMatrixView
+	 * 
+	 * @return
+	 */
 	public GlobalMatrixView getGlobalMatrixView() {
 
 		return globalMatrixView;
 	}
 
+	/**
+	 * Getter for colLabelView
+	 * 
+	 * @return
+	 */
 	public LabelView getColLabelView() {
 
 		return colLabelView;
 	}
 
+	/**
+	 * Getter for colTreeView
+	 * 
+	 * @return
+	 */
 	public ColumnTreeView getColumnTreeView() {
 
 		return colTreeView;
 	}
 
+	/**
+	 * Getter for rowTreeView
+	 * 
+	 * @return
+	 */
 	public RowTreeView getRowTreeView() {
 
 		return rowTreeView;
 	}
 
+	/**
+	 * Getter for rowLabelView
+	 * 
+	 * @return
+	 */
 	public LabelView getRowLabelView() {
 
 		return rowLabelView;
 	}
 
+	/**
+	 * Getter for rowDataPane
+	 * 
+	 * @return
+	 */
 	public JSplitPane getRowSplitPane() {
 
 		return rowDataPane;
 	}
 
+	/**
+	 * Getter for colDataPane
+	 * 
+	 * @return
+	 */
 	public JSplitPane getColSplitPane() {
 
 		return colDataPane;

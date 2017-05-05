@@ -17,7 +17,7 @@ public class ExportPreviewMatrix extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final int D_SIDE = 350;
+	public static final int D_SIDE = 300;
 	
 	private final Image paintImage;
 	private int matrixWidth;
@@ -34,10 +34,9 @@ public class ExportPreviewMatrix extends JPanel {
 		this.paintImage = matrix;
 		this.matrixWidth = matrixWidth;
 		this.matrixHeight = matrixHeight;
-		
 		setLayout(new MigLayout());
 	}
-	
+
 	/*
 	 * The double buffer in Swing doesn't seem to be persistent across draws.
 	 * for instance, every time another window obscures one of our windows and
@@ -66,29 +65,29 @@ public class ExportPreviewMatrix extends JPanel {
 			g2d.drawImage(img, 0, 0, null);
 		}
 	}
-	
+
 	/* Methods to manipulate image dimensions */
 	public void setMatrixWidth(final int newWidth) {
-		
+
 		this.matrixWidth = newWidth;
 	}
-	
+
 	public void setMatrixHeight(final int newHeight) {
-		
+
 		this.matrixHeight = newHeight;
 	}
-	
+
 	public void setDefaultSideLength() {
-		
+
 		this.matrixWidth = D_SIDE;
 		this.matrixHeight = D_SIDE;
 	}
-	
+
 	public int getMatrixWidth() {
-		
+
 		return(matrixWidth);
 	}
-	
+
 	public int getMatrixHeight() {
 		
 		return(matrixHeight);

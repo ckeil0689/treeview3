@@ -38,6 +38,7 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialogController;
+import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.LoadException;
@@ -90,25 +91,25 @@ public class TVController implements Observer {
 	public void resetPreferences() {
 
 		try {
-			CustomDetailsConfirmDialog dlg = new CustomDetailsConfirmDialog("Reset Preferences?",
-																																			"Are you sure you want to reset the preferences and quit " +
-																																														"TreeView?<BR>\nCustom settings such as colors will be reset to " +
-																																														"default for all files.",
-																																			"Resetting the application-wide preferences can frequently " +
-																																																											"resolve behavior and display problems. TreeView3 keeps track " +
-																																																											"of input-file-specific settings independent of the input " +
-																																																											"file itself, so resetting the preferences affects things " +
-																																																											"like custom label and color settings for all previously " +
-																																																											"viewed files. These are things like, selected fonts, custom " +
-																																																											"color selections, the data values associated with those " +
-																																																											"colors in the chosen spectrum, minimum font size, and the " +
-																																																											"selected label type to display as the row/column labels. " +
-																																																											"Other things such as 'last file opened', the starting " +
-																																																											"directory in the open file dialog, and window size/position " +
-																																																											"will also be lost. Your data in the files remains untouched. " +
-																																																											"Only superficial data is lost. Clustering, trees, and data " +
-																																																											"values remain intact.",
-																																			"Reset");
+			CustomDetailsConfirmDialog dlg = new CustomDetailsConfirmDialog(
+				"Reset Preferences?",
+				"Are you sure you want to reset the preferences and quit " +
+				"TreeView?<BR>\nCustom settings such as colors will be reset " +
+				"to default for all files.",
+				"Resetting the application-wide preferences can frequently " +
+				"resolve behavior and display problems. TreeView3 keeps " +
+				"track of input-file-specific settings independent of the " +
+				"input file itself, so resetting the preferences affects " +
+				"things like custom label and color settings for all " +
+				"previously viewed files. These are things like, selected " +
+				"fonts, custom color selections, the data values associated " +
+				"with those colors in the chosen spectrum, minimum font " +
+				"size, and the selected label type to display as the row/" +
+				"column labels. Other things such as 'last file opened', the " +
+				"starting directory in the open file dialog, and window size/" +
+				"position will also be lost. Your data in the files remains " +
+				"untouched. Only superficial data is lost. Clustering, " +
+				"trees, and data values remain intact.","Reset");
 			int option = dlg.showDialog();
 
 			switch(option) {
@@ -356,7 +357,7 @@ public class TVController implements Observer {
 			}
 			else {
 				LogBuffer.println("FileSet is null. Could not load old " +
-													"preferences and add last file to recent file list.");
+					"preferences and add last file to recent file list.");
 			}
 
 			dendroController.restoreComponentStates();
@@ -366,9 +367,10 @@ public class TVController implements Observer {
 		}
 		else {
 			final String message = "No numeric data could be found in the " +
-															"input file.\nThe input file must contain tab-delimited " +
-															"numeric values.";
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], message, "Alert", JOptionPane.WARNING_MESSAGE);
+				"input file.\nThe input file must contain tab-delimited " +
+				"numeric values.";
+			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,"Alert",
+				JOptionPane.WARNING_MESSAGE);
 			LogBuffer.println("Alert: " + message);
 
 			// Set model status, which will update the view.
@@ -420,7 +422,7 @@ public class TVController implements Observer {
 
 		if(loadedNode == null) {
 			LogBuffer.println("No old node was found when trying to copy old" +
-												" preferences. Aborting import attempt.");
+				" preferences. Aborting import attempt.");
 			return;
 		}
 
@@ -443,9 +445,9 @@ public class TVController implements Observer {
 	 * @param srcExtension
 	 * @return The target Preferences node.
 	 * @throws BackingStoreException */
-	private static Preferences getTargetNode(	final Preferences root,
-																						final String srcName,
-																						final String srcExtension) throws BackingStoreException {
+	private static Preferences getTargetNode(final Preferences root,
+		final String srcName,final String srcExtension) throws
+		BackingStoreException {
 
 		String[] fileNodes = root.childrenNames();
 
@@ -455,8 +457,9 @@ public class TVController implements Observer {
 			String name = node.get("name", "none");
 			String extension = node.get("extension", ".txt");
 
-			if(name.equalsIgnoreCase(srcName) && extension
-																										.equalsIgnoreCase(srcExtension)) {
+			if(name.equalsIgnoreCase(srcName) &&
+				extension.equalsIgnoreCase(srcExtension)) {
+
 				targetNode = node;
 				break;
 			}
@@ -464,7 +467,7 @@ public class TVController implements Observer {
 
 		/* Interrupt if no node is found to copy old data. */
 		if(targetNode == null) {
-			LogBuffer.println("Target node not found. Could not" + " copy data.");
+			LogBuffer.println("Target node not found. Could not copy data.");
 			return null;
 		}
 
@@ -536,21 +539,23 @@ public class TVController implements Observer {
 	 * @param isFromCluster Whether the loading happens as a result of
 	 *          clustering. */
 	public void getDataInfoAndLoad(	final FileSet newFileSet, final String oldRoot,
-																	final String oldExt, boolean isFromCluster,
-																	boolean shouldUseImport) {
+		final String oldExt, boolean isFromCluster,boolean shouldUseImport) {
 
 		Preferences oldNode;
 
 		// Transfer settings to clustered file
 		if(isFromCluster && oldRoot != null && oldExt != null) {
-			LogBuffer.println("Getting preferences for transfer to clustered file.");
+			LogBuffer.println("Getting preferences for transfer to clustered " +
+				"file.");
 			oldNode = getOldPreferences(oldRoot, oldExt);
 
 			// Check if file was loaded before
 		}
 		else {
-			LogBuffer.println("Checking if preferences exist for the new file.");
-			oldNode = getOldPreferences(newFileSet.getRoot(), newFileSet.getExt());
+			LogBuffer.println("Checking if preferences exist for the new " +
+				"file.");
+			oldNode = getOldPreferences(newFileSet.getRoot(),
+				newFileSet.getExt());
 		}
 
 		DataLoadInfo dataInfo;
@@ -582,10 +587,10 @@ public class TVController implements Observer {
 	private static DataLoadInfo useImportDialog(final FileSet fileSet) {
 
 		DataImportDialog loadPreview = new DataImportDialog(fileSet.getRoot() +
-																												fileSet.getExt());
+			fileSet.getExt());
 
 		DataImportController importController = new DataImportController(
-																																			loadPreview);
+			loadPreview);
 
 		String[][] previewData;
 		importController.setFileSet(fileSet);
@@ -604,14 +609,15 @@ public class TVController implements Observer {
 	 * @param fileSet The <code>FileSet</code> for the file to be loaded.
 	 * @return A <code>DataLoadInfo</code> object which contains information
 	 *         relevant for setting up the <code>DataLoadDialog</code>. */
-	public static DataLoadInfo getStoredDataLoadInfo(	final FileSet fileSet,
-																										final Preferences node) {
+	public static DataLoadInfo getStoredDataLoadInfo(final FileSet fileSet,
+		final Preferences node) {
 
 		DataLoadInfo dataInfo = new DataLoadInfo(node);
 
-		// Amount of label types may vary when loading, so they have to be re-detected
-		DataImportController importController = new DataImportController(dataInfo
-																																							.getDelimiter());
+		// Amount of label types may vary when loading, so they have to be re-
+		// detected
+		DataImportController importController =
+			new DataImportController(dataInfo.getDelimiter());
 		importController.setFileSet(fileSet);
 
 		// FIXME detection does not work
@@ -619,15 +625,17 @@ public class TVController implements Observer {
 
 		// the number of label types may have been altered, e.g. by clustering
 		if(dataInfo.needsDataCoordsUpdate(newDataCoords)) {
-			LogBuffer.println("Data start coordinates have shifted because more " +
-												"label types were added.");
+			LogBuffer.println("Data start coordinates have shifted because " +
+				"more label types were added.");
 			dataInfo.setDataStartCoords(newDataCoords);
 
-			/* prevent old node from updating coordinates unless fileSet represents
-			 * the exact same file as the node. In this case coordinates need to 
-			 * be updated here, as found by dataInfo.needsDataCoordsUpdate() but
-			 * otherwise the new coordinates are unrelated to the old node! */
-			String oldFileName = node.get("name", "") + node.get("extension", "");
+			/* prevent old node from updating coordinates unless fileSet
+			 * represents the exact same file as the node. In this case
+			 * coordinates need to be updated here, as found by
+			 * dataInfo.needsDataCoordsUpdate() but otherwise the new
+			 * coordinates are unrelated to the old node! */
+			String oldFileName = node.get("name", "") +
+				node.get("extension", "");
 			String newFileName = fileSet.getRoot() + fileSet.getExt();
 
 			if(oldFileName.equals(newFileName)) {
@@ -966,25 +974,39 @@ public class TVController implements Observer {
 
 		if(tvFrame.getDendroView() == null || !tvFrame.isLoaded()) {
 			LogBuffer.println("DendroView is not instantiated. " +
-												"Nothing to export.");
+				"Nothing to export.");
 			return;
 		}
 
-		ExportHandler eh = new ExportHandler(	tvFrame.getDendroView(),
-																					dendroController.getInteractiveXMap(),
-																					dendroController.getInteractiveYMap(),
-																					tvFrame.getColSelection(), tvFrame
-																																						.getRowSelection());
+		ExportHandler eh = new ExportHandler(tvFrame.getDendroView(),
+			dendroController.getInteractiveXMap(),
+			dendroController.getInteractiveYMap(),
+			tvFrame.getColSelection(),
+			tvFrame.getRowSelection());
 
-		boolean selectionsExist = (tvFrame.getColSelection() != null && tvFrame
-																																						.getColSelection()
-																																						.getNSelectedIndexes() > 0);
+		boolean selectionsExist = (tvFrame.getColSelection() != null &&
+			tvFrame.getColSelection().getNSelectedIndexes() > 0);
 
-		ExportDialog exportDialog = new ExportDialog(selectionsExist, eh);
+		ExportDialog exportDialog = null;
+		try {
+			exportDialog = new ExportDialog(selectionsExist,eh);
+		} catch(ExportException ee) {
+			LogBuffer.println(ee.getLocalizedMessage());
+			ee.printStackTrace();
+			showWarning(ee.getLocalizedMessage());
+			return;
+		}
 
-		new ExportDialogController(	exportDialog, tvFrame, dendroController
-																																			.getInteractiveXMap(),
-																dendroController.getInteractiveYMap(), model);
+		try {
+			new ExportDialogController(exportDialog, tvFrame,
+				dendroController.getInteractiveXMap(),
+				dendroController.getInteractiveYMap(), model);
+		} catch(Exception oome) {
+			LogBuffer.println("Out of memory when trying to create the " +
+				"ExportDialogController.");
+			oome.printStackTrace();
+			showWarning(oome.getLocalizedMessage());
+		}
 	}
 
 	/** Opens up the color chooser dialog. */
@@ -998,11 +1020,10 @@ public class TVController implements Observer {
 
 		ColorExtractor colorExtractor = dendroController.getColorExtractor();
 
-		final ColorChooserUI colorChooserUI = new ColorChooserUI(	colorExtractor,
-																															min, max, mean,
-																															median);
+		final ColorChooserUI colorChooserUI = new ColorChooserUI(colorExtractor,
+			min,max,mean,median);
 		ColorChooserController controller = new ColorChooserController(
-																																		colorChooserUI);
+			colorChooserUI);
 
 		controller.addObserver(dendroController.getInteractiveMatrixView());
 		controller.addObserver(dendroController.getGlobalMatrixView());
@@ -1012,7 +1033,8 @@ public class TVController implements Observer {
 
 	private void showWarning(final String message) {
 
-		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, "Warning", JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, "Warning",
+			JOptionPane.WARNING_MESSAGE);
 		LogBuffer.println(message);
 	}
 

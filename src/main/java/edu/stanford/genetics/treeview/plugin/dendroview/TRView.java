@@ -451,8 +451,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * Exports a tree to a file
 	 * @author rleach
 	 * @param g - graphics object
-	 * @param xIndent - size of the indent where to start drawing the tree
-	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param xIndent - size of the indent where to start drawing the tree OR
+	 *        the height of the tree area (depending on whether row or column
+	 *        trees are being drawn)
+	 * @param yIndent - size of the indent where to start drawing the tree OR
+	 *        the height of the tree area (depending on whether row or column
+	 *        trees are being drawn)
 	 * @param size - size of a matrix tile in this tree's dimension
 	 * @param region - what portion of the tree to export
 	 */
@@ -475,8 +479,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * Exports the entire tree
 	 * @author rleach
 	 * @param g - graphics object
-	 * @param xIndent - size of the indent where to start drawing the tree
-	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param xIndent - size of the indent where to start drawing the tree OR
+	 *        the height of the tree area (depending on whether row or column
+	 *        trees are being drawn)
+	 * @param yIndent - size of the indent where to start drawing the tree OR
+	 *        the height of the tree area (depending on whether row or column
+	 *        trees are being drawn)
 	 * @param size - size of a matrix tile in this tree's dimension
 	 */
 	public void exportAll(final Graphics g,final int xIndent,final int yIndent,
@@ -491,8 +499,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * the matrix
 	 * @author rleach
 	 * @param g - graphics object
-	 * @param xIndent - size of the indent where to start drawing the tree
-	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param xIndent - size of the indent where to start drawing the tree OR
+	 *        the height of the tree area (depending on whether row or column
+	 *        trees are being drawn)
+	 * @param yIndent - size of the indent where to start drawing the tree OR
+	 *        the height of the tree area (depending on whether row or column
+	 *        trees are being drawn)
 	 * @param size - size of a matrix tile in this tree's dimension
 	 */
 	public void exportVisible(final Graphics g,final int xIndent,
@@ -508,8 +520,12 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * selected portions of the matrix/tree
 	 * @author rleach
 	 * @param g - graphics object
-	 * @param xIndent - size of the indent where to start drawing the tree
-	 * @param yIndent - size of the indent where to start drawing the tree
+	 * @param xIndent - size of the indent where to start drawing the tree OR
+	 *        the height of the tree area (depending on whether row or column
+	 *        trees are being drawn)
+	 * @param yIndent - size of the indent where to start drawing the tree OR
+	 *        the height of the tree area (depending on whether row or column
+	 *        trees are being drawn)
 	 * @param size - size of a matrix tile in this tree's dimension
 	 */
 	public void exportSelection(final Graphics g,final int xIndent,
@@ -1042,7 +1058,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	public boolean treeExists() {
 		return(treePainter != null && treePainter.getRootNode() != null);
 	}
-	
+
 	/**
 	 * Get a scaled snapshot of the trees. The snapshot will be taken in
 	 * the specified region.
@@ -1054,23 +1070,23 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 */
 	public BufferedImage getSnapshot(final int width, final int height, 
 			final RegionType region, final boolean withSelections) {
-	
+
 		BufferedImage img = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
 		Rectangle dest = new Rectangle(width, height);
-		
+
 		BufferedImage scaled = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
 		
 		setExportPreviewScale(dest);
-		
+
 		/* 
 		 * Temporarily update MapContainer for this TreeView to get user
 		 * selected region. Reset after drawing the image.
 		 */
 		int firstVisible = map.getFirstVisible();
 		int numVisible = map.getNumVisible();
-		
+
 		/* These depend on the selected region */
 		int tempFirstVisible;
 		int tempNumVisible;
@@ -1121,8 +1137,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 		
 		return scaled;
 	}
-	  
-    public void setDataModel(final DataModel dataModel) {
+
+	public void setDataModel(final DataModel dataModel) {
 		
 		this.dataModel = dataModel;
 	}

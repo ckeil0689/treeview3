@@ -221,10 +221,10 @@ public class RowTreeView extends TRView {
 		
 		return(!e.isShiftDown());
 	}
-	
+
 	@Override
 	protected void setExportPreviewScale(Rectangle dest) {
-		
+
 		/* Scale trees for complete painting */
 		int firstVisIndex = map.getIndex(getFittedDestRectStart());
 		int lastVisIndex  = map.getIndex(getFittedDestRectEnd());
@@ -234,7 +234,7 @@ public class RowTreeView extends TRView {
 				dest.y,
 				lastVisIndex,
 				dest.y + dest.height));
-			
+
 		setSecondaryScaleEq(new LinearTransformation(
 				treePainter.getCorrMin(),
 				dest.x,

@@ -33,14 +33,24 @@ public enum RegionType {
 	}
 
 	/**
+	 * Get the default that is likely to result in the smallest valid default
+	 * image.  Note, selection is likely to be smaller, but is not guaranteed to
+	 * exist
+	 * 
+	 * @return
+	 */
+	public static RegionType getMinDefault() {
+		return(RegionType.VISIBLE);
+	}
+
+	/**
 	 * Get the default when only selections may be invalid
 	 * 
 	 * @param selectionsExist
 	 * @return
 	 */
-	public static RegionType getDefault(final boolean selectionsExist) {
-		return(getDefault() == RegionType.SELECTION && !selectionsExist ?
-			RegionType.VISIBLE : RegionType.SELECTION);
+	public static RegionType getMinDefault(final boolean selectionsExist) {
+		return(selectionsExist ? RegionType.SELECTION : RegionType.VISIBLE);
 	}
 
 	/**

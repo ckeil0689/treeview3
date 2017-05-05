@@ -2114,16 +2114,16 @@ public class InteractiveMatrixView extends MatrixView {
 		 * creating selection rectangles makes it very difficult to circumvent.
 		 */
 		// Store for reset
-		int firstVisX = xmap.getFirstVisible();
-		int lastVisX = xmap.getLastVisible();
+		int firstVisX  = xmap.getFirstVisible();
+		int lastVisX   = xmap.getLastVisible();
 		int xScrollPos = xmap.getScroll().getValue();
-		int firstVisY = ymap.getFirstVisible();
-		int lastVisY = ymap.getLastVisible();
+		int firstVisY  = ymap.getFirstVisible();
+		int lastVisY   = ymap.getLastVisible();
 		int yScrollPos = ymap.getScroll().getValue();
 		
 		// defines the matrix region
 		setBoundedSubImage(xmap.getMinIndex(), ymap.getMinIndex(), 
-				xmap.getTotalTileNum(), ymap.getTotalTileNum());
+			xmap.getTotalTileNum(), ymap.getTotalTileNum());
 		
 		// Temporary zoom to get the scale right for drawing selection rects
 		xmap.zoomToSelected(xmap.getMinIndex(), xmap.getMaxIndex());

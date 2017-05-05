@@ -236,7 +236,7 @@ public class ColumnTreeView extends TRView {
 	protected boolean isAPrimaryScroll(final MouseWheelEvent e) {
 		return(e.isShiftDown());
 	}
-	
+
 	@Override
 	protected void setExportPreviewScale(Rectangle dest) {
 		
@@ -256,7 +256,7 @@ public class ColumnTreeView extends TRView {
 				treePainter.getCorrMax(),
 				dest.y + dest.height));
 	}
-	
+
 	@Override
 	protected int getSnapShotDestRectStart(final Rectangle dest) {
 		if(dest == null) {

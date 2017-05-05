@@ -3,6 +3,12 @@
  */
 package Controllers;
 
+import org.freehep.graphicsio.pdf.PDFGraphics2D;
+import org.freehep.graphicsio.ps.PSGraphics2D;
+import org.freehep.graphicsio.svg.SVGGraphics2D;
+
+import edu.stanford.genetics.treeview.LogBuffer;
+
 /**
  * The export file formats supported.
  * @author rleach
@@ -25,8 +31,38 @@ public enum FormatType {
 		return(FormatType.PNG);
 	}
 
+	/**
+	 * This returns the format that has the least required amount of memory, as
+	 * imposed by BufferedImage to create the preview
+	 * 
+	 * @return
+	 */
+	public static FormatType getMinDefault() {
+		return(FormatType.PDF);
+	}
+
+	/**
+	 * Returns the default document format.  Document and image formats have
+	 * different memory requirements.  This method allows switching between
+	 * different default formats when memory is not an issue for one or the
+	 * other.
+	 * 
+	 * @return
+	 */
 	public static FormatType getDefaultDocumentFormat() {
 		return(FormatType.PDF);
+	}
+
+	/**
+	 * Returns the default image format.  Document and image formats have
+	 * different memory requirements.  This method allows switching between
+	 * different default formats when memory is not an issue for one or the
+	 * other.
+	 * 
+	 * @return
+	 */
+	public static FormatType getDefaultImageFormat() {
+		return(FormatType.PNG);
 	}
 
 	public static FormatType[] getHiResFormats() {
@@ -50,6 +86,51 @@ public enum FormatType {
 			if(this == docFormats[i]) {
 				return(true);
 			}
+		}
+		return(false);
+	}
+
+	public String appendExtension(String fileName) {
+		if(this == PDF) {
+			if(!fileName.endsWith(".pdf") && !fileName.endsWith(".PDF")) {
+				fileName += ".pdf";
+			}
+		} else if(this == PS) {
+			if(!fileName.endsWith(".ps") && !fileName.endsWith(".PS")) {
+				fileName += ".ps";
+			}
+		} else if(this == SVG) {
+			if(!fileName.endsWith(".svg") && !fileName.endsWith(".SVG")) {
+				fileName += ".svg";
+			}
+		} else if(this == PNG) {
+			if(!fileName.endsWith(".png") && !fileName.endsWith(".PNG")) {
+				fileName += ".png";
+			}
+		} else if(this == JPG) {
+			if(!fileName.endsWith(".jpg") && !fileName.endsWith(".JPG") &&
+				!fileName.endsWith(".jpeg") && !fileName.endsWith(".JPEG")) {
+				fileName += ".jpg";
+			}
+		} else if(this == PPM) {
+			if(!fileName.endsWith(".ppm") && !fileName.endsWith(".PPM")) {
+				fileName += ".ppm";
+			}
+		}
+		return(fileName);
+	}
+
+	public boolean hasAlpha() {
+		if(this.isDocumentFormat() || this == FormatType.JPG) {
+			return(false);
+		} else {
+			return(true);
+		}
+	}
+
+	public boolean hasDefaultBackground() {
+		if((this == FormatType.JPG) || (this == FormatType.PPM)) {
+			return(true);
 		}
 		return(false);
 	}

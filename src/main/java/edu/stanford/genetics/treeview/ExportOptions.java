@@ -4,11 +4,12 @@ import org.freehep.graphicsio.PageConstants;
 
 import Controllers.ExportHandler;
 import Controllers.FormatType;
+import Controllers.LabelExportOption;
 import Controllers.RegionType;
+import Controllers.TreeExportOption;
 
 /**
  * This class holds and manages selected export options.
- * @author CKeil
  *
  */
 public class ExportOptions {
@@ -19,6 +20,10 @@ public class ExportOptions {
 	private AspectType aspectType;
 	private String orientation;
 	private boolean showSelections;
+	private LabelExportOption rowLabelOption;
+	private LabelExportOption colLabelOption;
+	private TreeExportOption rowTreeOption;
+	private TreeExportOption colTreeOption;
 	
 	public ExportOptions() {
 		
@@ -26,8 +31,13 @@ public class ExportOptions {
 		this.paperType = PaperType.getDefault();
 		this.regionType = RegionType.getDefault();
 		this.aspectType = AspectType.getDefault();
-		this.orientation = ExportHandler.getDefaultPageOrientation();
+		this.orientation = ExportHandler.getPageOrientation();
 		this.showSelections = false;
+		this.rowLabelOption = LabelExportOption.getDefault();
+		this.colLabelOption = LabelExportOption.getDefault();
+		//This currently never changes
+		this.rowTreeOption = TreeExportOption.getDefault();
+		this.colTreeOption = TreeExportOption.getDefault();
 	}
 	
 	public FormatType getFormatType() {
@@ -84,5 +94,53 @@ public class ExportOptions {
 
 	public void setShowSelections(boolean showSelections) {
 		this.showSelections = showSelections;
+	}
+
+	/**
+	 * Getter for rowLabelOption
+	 * @return the rowLabelOption
+	 */
+	public LabelExportOption getRowLabelOption() {
+		return(rowLabelOption);
+	}
+
+	/**
+	 * 
+	 * @param rowLabelOption the rowLabelOption to set
+	 */
+	public void setRowLabelOption(LabelExportOption rowLabelOption) {
+		this.rowLabelOption = rowLabelOption;
+	}
+
+	/**
+	 * 
+	 * @return the colLabelOption
+	 */
+	public LabelExportOption getColLabelOption() {
+		return(colLabelOption);
+	}
+
+	/**
+	 * 
+	 * @param colLabelOption the colLabelOption to set
+	 */
+	public void setColLabelOption(LabelExportOption colLabelOption) {
+		this.colLabelOption = colLabelOption;
+	}
+
+	public TreeExportOption getRowTreeOption() {
+		return rowTreeOption;
+	}
+
+	public void setRowTreeOption(TreeExportOption rowTreeOption) {
+		this.rowTreeOption = rowTreeOption;
+	}
+
+	public TreeExportOption getColTreeOption() {
+		return colTreeOption;
+	}
+
+	public void setColTreeOption(TreeExportOption colTreeOption) {
+		this.colTreeOption = colTreeOption;
 	}
 }
