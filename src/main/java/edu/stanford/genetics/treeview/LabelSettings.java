@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
@@ -219,13 +220,20 @@ public class LabelSettings extends CustomDialog {
 		public AnnotationPanel() {
 
 			annotationMainPanel = GUIFactory.createJPanel(false,
-				GUIFactory.NO_INSETS);
+				GUIFactory.DEFAULT);
+			annotationMainPanel.setMinimumSize(new Dimension(400,400));
 
-			rowPanel = new LabelSummaryPanel(rowLabelInfo,dendroView
-				.getRowLabelView());
+			/* Label alignment */
+			JPanel includePanel = GUIFactory.createJPanel(false,
+				GUIFactory.TINY_GAPS_AND_INSETS);
+			includePanel.setBorder(BorderFactory.createTitledBorder(
+				"Show Label Type(s)"));
 
-			colPanel = new LabelSummaryPanel(colLabelInfo,dendroView
-				.getColLabelView());
+			rowPanel = new LabelSummaryPanel(rowLabelInfo,
+				dendroView.getRowLabelView());
+
+			colPanel = new LabelSummaryPanel(colLabelInfo,
+				dendroView.getColLabelView());
 
 			final JPanel loadLabelPanel = GUIFactory
 				.createJPanel(false,GUIFactory.NO_INSETS);
@@ -236,9 +244,9 @@ public class LabelSettings extends CustomDialog {
 
 			/* Label alignment */
 			JPanel justifyPanel = GUIFactory.createJPanel(false,
-				GUIFactory.DEFAULT);
+				GUIFactory.TINY_GAPS_AND_INSETS);
 			justifyPanel.setBorder(BorderFactory.createTitledBorder(
-				"Label justification"));
+				"Justification"));
 
 			final ButtonGroup rowJustifyBtnGroup = new ButtonGroup();
 
@@ -282,10 +290,12 @@ public class LabelSettings extends CustomDialog {
 			colRadioBtnPanel.add(colRightJustBtn,"span, wrap");
 			colRadioBtnPanel.add(colLeftJustBtn,"span");
 
-			annotationMainPanel.add(rows,"pushx, alignx 50%");
-			annotationMainPanel.add(cols,"pushx, alignx 50%, wrap");
-			annotationMainPanel.add(rowPanel,"pushx, alignx 50%, w 45%");
-			annotationMainPanel.add(colPanel,"pushx, alignx 50%, w 45%, wrap");
+			annotationMainPanel.add(rows,"pushx, alignx 50%, aligny 0%, h 15%");
+			annotationMainPanel.add(cols,"pushx, alignx 50%, aligny 0%, h 15%, wrap");
+			includePanel.add(rowPanel,"pushx, alignx 50%, w 45%");
+			includePanel.add(colPanel,"pushx, alignx 50%, w 45%");
+			annotationMainPanel.add(includePanel,
+				"push, grow, alignx 50%, span, wrap");
 			justifyPanel.add(rowRadioBtnPanel,"pushx, alignx 50%, w 45%");
 			justifyPanel.add(colRadioBtnPanel,"pushx, alignx 50%, w 45%");
 			annotationMainPanel.add(justifyPanel,
