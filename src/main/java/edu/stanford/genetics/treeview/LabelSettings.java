@@ -12,6 +12,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
@@ -37,6 +39,11 @@ public class LabelSettings extends CustomDialog {
 	private final DendroView dendroView;
 	private JButton okBtn;
 
+	//This determines what spacebar toggling will toggle between: show as many
+	//labels as possible will toggle to either show none (when this is true) or
+	//show some (when this is false)
+	private boolean showBaseIsNone = false;
+
 	// Menus
 	private AnnotationPanel annotationSettings;
 
@@ -50,6 +57,12 @@ public class LabelSettings extends CustomDialog {
 		super(StringRes.dlg_Labels);
 		this.tvFrame = tvFrame;
 		dendroView = tvFrame.getDendroView();
+
+		if(!dendroView.getRowLabelView().inLabelPortMode()) {
+			showBaseIsNone = true;
+		} else {
+			showBaseIsNone = false;
+		}
 	}
 
 	public void setLabelInfo(final LabelInfo rowLabelInfo,
@@ -217,6 +230,11 @@ public class LabelSettings extends CustomDialog {
 		private final JRadioButton colRightJustBtn;
 		private final JRadioButton colLeftJustBtn;
 
+		private final JRadioButton showAllPossible;
+		private final JRadioButton showSome;
+		private final JRadioButton showNone;
+		private final JSpinner neighborSpinner;
+
 		public AnnotationPanel() {
 
 			annotationMainPanel = GUIFactory.createJPanel(false,
@@ -290,12 +308,56 @@ public class LabelSettings extends CustomDialog {
 			colRadioBtnPanel.add(colRightJustBtn,"span, wrap");
 			colRadioBtnPanel.add(colLeftJustBtn,"span");
 
+			/* Label alignment */
+			JPanel showPanel = GUIFactory.createJPanel(false,
+				GUIFactory.TINY_GAPS_AND_INSETS);
+			showPanel.setBorder(BorderFactory.createTitledBorder(
+				"When labels don't fit, show..."));
+			showAllPossible = GUIFactory.createRadioBtn("As many as " +
+				"possible [Spacebar toggles]");
+			showSome =
+				GUIFactory.createRadioBtn("Hovered label and ");
+			neighborSpinner = new JSpinner(new SpinnerNumberModel(
+				dendroView.getInteractiveMatrixView().getMaxLabelPortFlankSize(),
+				0,getMaxNumLabels(),1));
+			showNone =
+				GUIFactory.createRadioBtn("None");
+
+			//Both row & column label views have this, but we only need to check
+			//one because we synch their behavior
+			if(dendroView.getRowLabelView().inLabelPortMode() &&
+				!dendroView.getRowLabelView().isLabelPortFlankMode()) {
+
+				showAllPossible.setSelected(true);
+				setShowBaseIsNone(false);
+			} else if(dendroView.getRowLabelView().inLabelPortMode() &&
+				dendroView.getRowLabelView().isLabelPortFlankMode()) {
+
+				showSome.setSelected(true);
+				setShowBaseIsNone(false);
+			} else {
+				showNone.setSelected(true);
+				setShowBaseIsNone(true);
+			}
+
+			final ButtonGroup showBtnGroup = new ButtonGroup();
+			showBtnGroup.add(showAllPossible);
+			showBtnGroup.add(showSome);
+			showBtnGroup.add(showNone);
+
+			showPanel.add(showAllPossible,"span, wrap");
+			showPanel.add(showSome,"");
+			showPanel.add(neighborSpinner,"alignx left");
+			showPanel.add(new JLabel(" neighboring labels"),
+				"alignx left, wrap");
+			showPanel.add(showNone);
+
 			annotationMainPanel.add(rows,"pushx, alignx 50%, aligny 0%, h 15%");
 			annotationMainPanel.add(cols,"pushx, alignx 50%, aligny 0%, h 15%, wrap");
 			includePanel.add(rowPanel,"pushx, alignx 50%, w 45%");
 			includePanel.add(colPanel,"pushx, alignx 50%, w 45%");
 			annotationMainPanel.add(includePanel,
-				"push, grow, alignx 50%, span, wrap");
+				"push, grow, alignx 50%, span, aligny 0%, h 25%:null:null, wrap");
 			justifyPanel.add(rowRadioBtnPanel,"pushx, alignx 50%, w 45%");
 			justifyPanel.add(colRadioBtnPanel,"pushx, alignx 50%, w 45%");
 			annotationMainPanel.add(justifyPanel,
@@ -303,7 +365,10 @@ public class LabelSettings extends CustomDialog {
 
 			JPanel fontPanel = new FontPanel().makeFontPanel();
 
-			annotationMainPanel.add(fontPanel,"push, grow, alignx 50%, span");
+			annotationMainPanel.add(fontPanel,
+				"push, grow, alignx 50%, span, wrap");
+
+			annotationMainPanel.add(showPanel,"push, grow, alignx 50%, span");
 
 			annotationMainPanel.revalidate();
 			annotationMainPanel.repaint();
@@ -328,6 +393,17 @@ public class LabelSettings extends CustomDialog {
 			colRightJustBtn.addActionListener(l);
 		}
 
+		public void addShowListener(final ActionListener l) {
+
+			showAllPossible.addActionListener(l);
+			showSome.addActionListener(l);
+			showNone.addActionListener(l);
+		}
+
+		public void addFlankSizeListener(final ActionListener l) {
+//			neighborSpinner.addActionListener(l);
+		}
+
 		public int getSelectedRowIndex() {
 
 			return rowPanel.getSmallestSelectedIndex();
@@ -337,6 +413,37 @@ public class LabelSettings extends CustomDialog {
 
 			return colPanel.getSmallestSelectedIndex();
 		}
+	}
+
+	public void addShowListener(ActionListener l) {
+		annotationSettings.addShowListener(l);
+	}
+
+	/**
+	 * 
+	 * @return the showBaseIsNone
+	 */
+	public boolean isShowBaseIsNone() {
+		return(showBaseIsNone);
+	}
+
+	/**
+	 * 
+	 * @param showBaseIsNone the showBaseIsNone to set
+	 */
+	public void setShowBaseIsNone(boolean showBaseIsNone) {
+		this.showBaseIsNone = showBaseIsNone;
+	}
+
+	protected int getMaxNumLabels() {
+		int numXLabels =
+			dendroView.getInteractiveMatrixView().getXMap().getTotalTileNum();
+		int numYLabels =
+			dendroView.getInteractiveMatrixView().getYMap().getTotalTileNum();
+		if(numXLabels > numYLabels) {
+			return(numXLabels);
+		}
+		return(numYLabels);
 	}
 
 	/**

@@ -61,6 +61,7 @@ public class LabelSettingsController {
 		preferences.addOKButtonListener(new ConfirmationListener());
 		preferences.addResizeDialogListener(new PreferencesComponentListener());
 		preferences.addJustifyListener(new LabelJustifyListener());
+		preferences.addShowListener(new LabelShowListener());
 	}
 
 	class MenuPanelListener implements MouseListener {
@@ -212,6 +213,59 @@ public class LabelSettingsController {
 			}
 
 			tvFrame.getDendroView().setLabelAlignment(isRowRight, isColRight);
+		}
+	}
+
+	/**
+	 * Listens to changing radio buttons in the AnnotationSettings and sets the
+	 * various label port settings.
+	 *
+	 * @author chris0689
+	 *
+	 */
+	class LabelShowListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			/* counter to recognize the selected JRadioButton */
+			switch (((JRadioButton) e.getSource()).getText()) {
+				case "As many as possible [Spacebar toggles]":
+					LogBuffer.println("Setting as many as possible.");
+					tvFrame.getDendroView().getRowLabelView()
+						.setLabelPortMode(true);
+					tvFrame.getDendroView().getRowLabelView()
+						.setLabelPortFlankMode(false);
+					tvFrame.getDendroView().getColLabelView()
+						.setLabelPortMode(true);
+					tvFrame.getDendroView().getColLabelView()
+						.setLabelPortFlankMode(false);
+					break;
+				case "Hovered label and ":
+					LogBuffer.println("Setting some.");
+					tvFrame.getDendroView().getRowLabelView()
+						.setLabelPortMode(true);
+					tvFrame.getDendroView().getRowLabelView()
+						.setLabelPortFlankMode(true);
+					tvFrame.getDendroView().getColLabelView()
+						.setLabelPortMode(true);
+					tvFrame.getDendroView().getColLabelView()
+						.setLabelPortFlankMode(true);
+					//New behavior for spacebar toggling
+					preferences.setShowBaseIsNone(false);
+					break;
+				case "None":
+					LogBuffer.println("Setting none.");
+					tvFrame.getDendroView().getRowLabelView()
+						.setLabelPortMode(false);
+					tvFrame.getDendroView().getColLabelView()
+						.setLabelPortMode(false);
+					//New behavior for spacebar toggling
+					preferences.setShowBaseIsNone(true);
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
