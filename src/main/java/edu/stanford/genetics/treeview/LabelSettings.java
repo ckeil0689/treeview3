@@ -39,11 +39,6 @@ public class LabelSettings extends CustomDialog {
 	private final DendroView dendroView;
 	private JButton okBtn;
 
-	//This determines what spacebar toggling will toggle between: show as many
-	//labels as possible will toggle to either show none (when this is true) or
-	//show some (when this is false)
-	private boolean showBaseIsNone = false;
-
 	// Menus
 	private AnnotationPanel annotationSettings;
 
@@ -57,12 +52,6 @@ public class LabelSettings extends CustomDialog {
 		super(StringRes.dlg_Labels);
 		this.tvFrame = tvFrame;
 		dendroView = tvFrame.getDendroView();
-
-		if(!dendroView.getRowLabelView().inLabelPortMode()) {
-			showBaseIsNone = true;
-		} else {
-			showBaseIsNone = false;
-		}
 	}
 
 	public void setLabelInfo(final LabelInfo rowLabelInfo,
@@ -420,19 +409,22 @@ public class LabelSettings extends CustomDialog {
 	}
 
 	/**
-	 * 
+	 * This method determines what toggling the labels from show as many as
+	 * possible will result in (either no labels or some labels)
 	 * @return the showBaseIsNone
 	 */
 	public boolean isShowBaseIsNone() {
-		return(showBaseIsNone);
+		return(dendroView.getRowLabelView().isLabelPortDefaultNone());
 	}
 
 	/**
-	 * 
+	 * This method sets what toggling the labels from show as many as
+	 * possible will be toggled to (either no labels or some labels)
 	 * @param showBaseIsNone the showBaseIsNone to set
 	 */
 	public void setShowBaseIsNone(boolean showBaseIsNone) {
-		this.showBaseIsNone = showBaseIsNone;
+		dendroView.getRowLabelView().setLabelPortDefaultNone(showBaseIsNone);
+		dendroView.getColLabelView().setLabelPortDefaultNone(showBaseIsNone);
 	}
 
 	protected int getMaxNumLabels() {

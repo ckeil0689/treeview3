@@ -163,7 +163,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * 
 	 * @param dendroView Instance of the main UI class for viewing matrices.
 	 * @param tvModel Instance of the underling data model. */
-	public void setNewMatrix(	final DendroView dendroView,
+	public void setNewMatrix(final DendroView dendroView,
 		final DataModel tvModel) {
 
 		this.dendroView = dendroView;
@@ -171,7 +171,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		this.mvController = new MatrixViewController(
 			dendroView.getInteractiveMatrixView(),
 			dendroView.getGlobalMatrixView(),
-			tvModel);
+			tvModel,dendroView.getRowLabelView(),dendroView.getColLabelView());
 
 		resetComponentDefaults();
 

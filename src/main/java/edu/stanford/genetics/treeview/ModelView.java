@@ -49,6 +49,7 @@ public abstract class ModelView extends JPanel implements Observer,
 	protected boolean labelPortMode = false;
 	protected boolean labelPortFlankMode = true;
 	protected int maxLabelPortFlankSize = 0; //<1 = unlimited
+	protected boolean labelPortDefaultNone = false;
 
 	protected DataTicker ticker;
 
@@ -262,6 +263,22 @@ public abstract class ModelView extends JPanel implements Observer,
 	 */
 	public void setMaxLabelPortFlankSize(int maxLabelPortFlankSize) {
 		this.maxLabelPortFlankSize = maxLabelPortFlankSize;
+	}
+
+	/**
+	 * 
+	 * @return the labelPortDefaultNone
+	 */
+	public boolean isLabelPortDefaultNone() {
+		return(labelPortDefaultNone);
+	}
+
+	/**
+	 * 
+	 * @param labelPortDefaultNone the labelPortDefaultNone to set
+	 */
+	public void setLabelPortDefaultNone(boolean labelPortDefaultNone) {
+		this.labelPortDefaultNone = labelPortDefaultNone;
 	}
 
 	public void debug(String msg, int level) {

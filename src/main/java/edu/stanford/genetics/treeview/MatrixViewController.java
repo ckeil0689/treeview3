@@ -36,6 +36,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.GlobalMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
+import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
 /** This controller explicitly handles direct user interaction with the
@@ -62,15 +63,21 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	private DataModel model;
 	protected Preferences configNode;
 
+	protected LabelView rowLabelView;
+	protected LabelView colLabelView;
+
 	// Data ticker reference, so it can be updated by the MouseAdapter
 	private DataTicker ticker;
 
 	public MatrixViewController(final InteractiveMatrixView imView,
-		final GlobalMatrixView gmView,final DataModel model) {
+		final GlobalMatrixView gmView,final DataModel model,
+		final LabelView rowLabelView,final LabelView colLabelView) {
 
 		this.imView = imView;
 		this.gmView = gmView;
 		this.model = model;
+		this.rowLabelView = rowLabelView;
+		this.colLabelView = colLabelView;
 	}
 
 	/** Setting up the main components of the controller. Separate from
@@ -336,6 +343,10 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
 
+		/* Show more/fewer labels */
+		input_map.put(KeyStroke.getKeyStroke("SPACE"), "labelToggle");
+		action_map.put("labelToggle", new LabelToggleAction());
+
 		//Holding control and/or shift controls a col/row highlight that follows
 		//the hover position
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 1),
@@ -577,7 +588,6 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		}
 	}
 
-
 	/** Resets the GlobalView to all zoomed-out state */
 	private class HomeAction extends AbstractAction {
 
@@ -590,6 +600,32 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			imView.setAspectRatio( //TODO move into matrixview.resetView
 				interactiveXmap.getTotalTileNum(),
 				interactiveYmap.getTotalTileNum());
+		}
+	}
+
+	/** Toggles whizzing labels from as many as is possible to either no or some
+	 * labels (depending on the "showBaseIsNone" variable in LabelSettings). */
+	private class LabelToggleAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+
+			if(!rowLabelView.inLabelPortMode() ||
+				rowLabelView.isLabelPortFlankMode()) {
+
+				rowLabelView.setLabelPortMode(true);
+				rowLabelView.setLabelPortFlankMode(false);
+				colLabelView.setLabelPortMode(true);
+				colLabelView.setLabelPortFlankMode(false);
+			} else if(rowLabelView.isLabelPortDefaultNone()) {
+				rowLabelView.setLabelPortMode(false);
+				colLabelView.setLabelPortMode(false);
+			} else {
+				rowLabelView.setLabelPortFlankMode(true);
+				colLabelView.setLabelPortFlankMode(true);
+			}
 		}
 	}
 
