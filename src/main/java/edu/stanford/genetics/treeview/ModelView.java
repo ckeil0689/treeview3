@@ -47,7 +47,9 @@ public abstract class ModelView extends JPanel implements Observer,
 	/* Stores whether to draw a port around squares corresponding to what's
 	 * shown in the label pane(s) */
 	protected boolean labelPortMode = false;
-	
+	protected boolean labelPortFlankMode = true;
+	protected int maxLabelPortFlankSize = 0; //<1 = unlimited
+
 	protected DataTicker ticker;
 
 	public int debug; //This is a verbosity level
@@ -228,6 +230,38 @@ public abstract class ModelView extends JPanel implements Observer,
 	public void setLabelPortMode(boolean m) {
 		
 		this.labelPortMode = m;
+	}
+
+	/**
+	 * 
+	 * @return the labelPortFlankMode
+	 */
+	public boolean isLabelPortFlankMode() {
+		return(labelPortFlankMode);
+	}
+
+	/**
+	 * 
+	 * @param labelPortFlankMode the labelPortFlankMode to set
+	 */
+	public void setLabelPortFlankMode(boolean labelPortFlankMode) {
+		this.labelPortFlankMode = labelPortFlankMode;
+	}
+
+	/**
+	 * 
+	 * @return the maxLabelPortFlankSize
+	 */
+	public int getMaxLabelPortFlankSize() {
+		return(maxLabelPortFlankSize);
+	}
+
+	/**
+	 * 
+	 * @param maxPortFlankSize the maxPortFlankSize to set
+	 */
+	public void setMaxLabelPortFlankSize(int maxLabelPortFlankSize) {
+		this.maxLabelPortFlankSize = maxLabelPortFlankSize;
 	}
 
 	public void debug(String msg, int level) {

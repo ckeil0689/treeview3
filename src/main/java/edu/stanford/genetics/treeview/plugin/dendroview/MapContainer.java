@@ -95,6 +95,8 @@ public class MapContainer extends Observable implements Observer,
 	private boolean deselecting = false;
 	private int selectingStart = -1;
 	private boolean whizMode = false;
+	private boolean whizFlankMode = true;
+	private int whizFlankSize = 0; //<0 = unlimited
 
 	//These allow modifier keys in the label/tree areas to reveal the row/col
 	//highlight bar
@@ -2435,7 +2437,6 @@ public class MapContainer extends Observable implements Observer,
 	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
 	 * zooming that is aware of aspect ratio
 	 * 
-	 * @author rleach
 	 * @return double ZOOM_INCREMENT */
 	public static double getZoomIncrement() {
 
@@ -2446,7 +2447,6 @@ public class MapContainer extends Observable implements Observer,
 	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
 	 * zooming that is aware of aspect ratio
 	 * 
-	 * @author rleach
 	 * @return double ZOOM_INCREMENT_FAST */
 	public static double getZoomIncrementFast() {
 
@@ -2456,7 +2456,6 @@ public class MapContainer extends Observable implements Observer,
 	/** Set the first visible label data index. For use by LabelView.
 	 * -1 = unset
 	 * 
-	 * @author rleach
 	 * @param p */
 	public void setFirstVisibleLabel(int p) {
 		if(p < getMinIndex() || p > getMaxIndex()) firstVisibleLabel = -1;
@@ -2465,7 +2464,6 @@ public class MapContainer extends Observable implements Observer,
 
 	/** Retrieves the first visible label data index
 	 * 
-	 * @author rleach
 	 * @return firstVisiblelabel data index */
 	public int getFirstVisibleLabel() {
 		return(firstVisibleLabel);
@@ -2474,7 +2472,6 @@ public class MapContainer extends Observable implements Observer,
 	/** Set the last visible label data index. For use by LabelView.
 	 * -1 = unset
 	 * 
-	 * @author rleach
 	 * @param p */
 	public void setLastVisibleLabel(int p) {
 		if(p < getMinIndex() || p > getMaxIndex()) lastVisibleLabel = -1;
@@ -2483,7 +2480,6 @@ public class MapContainer extends Observable implements Observer,
 
 	/** Retrieves the last visible label data index
 	 * 
-	 * @author rleach
 	 * @return lastVisiblelabel data index */
 	public int getLastVisibleLabel() {
 		return(lastVisibleLabel);
@@ -2491,7 +2487,6 @@ public class MapContainer extends Observable implements Observer,
 
 	/** Retrieves the last visible label data index
 	 * 
-	 * @author rleach
 	 * @return lastVisiblelabel data index */
 	public int getNumVisibleLabels() {
 		if(lastVisibleLabel < 0) { return(-1); }
@@ -2502,7 +2497,6 @@ public class MapContainer extends Observable implements Observer,
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @author rleach
 	 * @return the firstVisibleLabelOffset */
 	public int getFirstVisibleLabelOffset() {
 		return(firstVisibleLabelOffset);
@@ -2512,7 +2506,6 @@ public class MapContainer extends Observable implements Observer,
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @author rleach
 	 * @param firstVisibleLabelOffset the firstVisibleLabelOffset to set */
 	public void setFirstVisibleLabelOffset(int firstVisibleLabelOffset) {
 		this.firstVisibleLabelOffset = firstVisibleLabelOffset;
@@ -2522,7 +2515,6 @@ public class MapContainer extends Observable implements Observer,
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @author rleach
 	 * @return the lastVisibleLabelOffset */
 	public int getLastVisibleLabelOffset() {
 		return(lastVisibleLabelOffset);
@@ -2532,32 +2524,31 @@ public class MapContainer extends Observable implements Observer,
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @author rleach
 	 * @param lastVisibleLabelOffset the lastVisibleLabelOffset to set */
 	public void setLastVisibleLabelOffset(int lastVisibleLabelOffset) {
 		this.lastVisibleLabelOffset = lastVisibleLabelOffset;
 	}
 
 
-	/** @author rleach
+	/**
 	 * @return the lastTreeModeGlobal */
 	public boolean wasLastTreeModeGlobal() {
 		return(lastTreeModeGlobal);
 	}
 
-	/** @author rleach
+	/**
 	 * @param lastTreeModeGlobal the lastTreeModeGlobal to set */
 	public void setLastTreeModeGlobal(boolean lastTreeModeGlobal) {
 		this.lastTreeModeGlobal = lastTreeModeGlobal;
 	}
 
-	/** @author rleach
+	/**
 	 * @return the keepTreeGlobal */
 	public boolean shouldKeepTreeGlobal() {
 		return(keepTreeGlobal);
 	}
 
-	/** @author rleach
+	/**
 	 * @param keepTreeGlobal the keepTreeGlobal to set */
 	public void setKeepTreeGlobal(boolean keepTreeGlobal) {
 		this.keepTreeGlobal = keepTreeGlobal;
@@ -2567,16 +2558,48 @@ public class MapContainer extends Observable implements Observer,
 		return(selecting || labelsBeingScrolled || draggingDivider);
 	}
 
-	/** @author rleach
+	/**
 	 * @return the whizMode */
 	public boolean isWhizMode() {
 		return(whizMode);
 	}
 
-	/** @author rleach
+	/**
 	 * @param whizMode the whizMode to set */
 	public void setWhizMode(boolean whizMode) {
 		this.whizMode = whizMode;
+	}
+
+	/**
+	 * 
+	 * @return the whizFlankMode
+	 */
+	public boolean isWhizFlankMode() {
+		return(whizFlankMode);
+	}
+
+	/**
+	 * 
+	 * @param whizFlankMode the whizFlankMode to set
+	 */
+	public void setWhizFlankMode(boolean whizFlankMode) {
+		this.whizFlankMode = whizFlankMode;
+	}
+
+	/**
+	 * 
+	 * @return the whizFlankSize
+	 */
+	public int getWhizFlankSize() {
+		return(whizFlankSize);
+	}
+
+	/**
+	 * 
+	 * @param whizFlankSize the whizFlankSize to set
+	 */
+	public void setWhizFlankSize(int whizFlankSize) {
+		this.whizFlankSize = whizFlankSize;
 	}
 
 	public void debug(String msg, int level) {
