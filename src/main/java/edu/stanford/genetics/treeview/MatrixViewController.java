@@ -1,9 +1,11 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -22,6 +24,7 @@ import javax.swing.JComponent;
 import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSNumber;
@@ -101,6 +104,13 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		imView.addMouseMotionListener(mmListener);
 
 		imView.addMouseWheelListener(new MatrixMouseWheelListener());
+
+//		//Add the spacebar listener to everything
+//		imView.addKeyListener(new SpaceBarListener());
+//		Component c[] = imView.getComponents();
+//		for(int i = 0;i < c.length;i++) {
+//			c[i].addKeyListener(new SpaceBarListener());
+//		}
 	}
 
 	/** Simply ensures that no listeners are added on top of others. This is
@@ -343,6 +353,15 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
 
+		//Disable spacebar clicks focussed button behavior.  See:
+		//http://stackoverflow.com/questions/4472530/jbutton-referring-to-space-bar-the-same-as-a-click
+		InputMap btn_input_map = (InputMap) UIManager.get("Button.focusInputMap");
+		btn_input_map.put(KeyStroke.getKeyStroke("pressed SPACE"), "none");
+		btn_input_map.put(KeyStroke.getKeyStroke("released SPACE"), "none");
+		//Now let's swap out the spacebar default behavior with the enter key
+		btn_input_map.put( KeyStroke.getKeyStroke( "ENTER" ), "pressed" );
+		btn_input_map.put( KeyStroke.getKeyStroke( "released ENTER" ), "released" );
+
 		/* Show more/fewer labels */
 		input_map.put(KeyStroke.getKeyStroke("SPACE"), "labelToggle");
 		action_map.put("labelToggle", new LabelToggleAction());
@@ -386,6 +405,36 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			"columnHoverStop");
 		action_map.put("columnHoverStop", new ColumnHoverStopAction());
 	}
+
+//	/**
+//	 * This class is necessary to catch spacebar key presses to initiate the
+//	 * toggling of the whizzing labels because a key binding as above will not
+//	 * work when a GUI button has a highlight indicating focus
+//	 */
+//	class SpaceBarListener extends KeyAdapter {
+//
+//		@Override
+//		public void keyPressed(final KeyEvent e) {
+//			if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+//				e.consume();
+//				toggleLabels();
+//			}
+//		}
+//
+//		@Override
+//		public void keyReleased(final KeyEvent e) {
+//			if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+//				e.consume();
+//			}
+//		}
+//
+//		@Override
+//		public void keyTyped(final KeyEvent e) {
+//			if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+//				e.consume();
+//			}
+//		}
+//	}
 
 	/* -------------- Listeners --------------------- */
 	private class HomeKeyYAction extends AbstractAction {
@@ -611,21 +660,24 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
+			toggleLabels();
+		}
+	}
 
-			if(!rowLabelView.inLabelPortMode() ||
-				rowLabelView.isLabelPortFlankMode()) {
+	public void toggleLabels() {
+		if(!rowLabelView.inLabelPortMode() ||
+			rowLabelView.isLabelPortFlankMode()) {
 
-				rowLabelView.setLabelPortMode(true);
-				rowLabelView.setLabelPortFlankMode(false);
-				colLabelView.setLabelPortMode(true);
-				colLabelView.setLabelPortFlankMode(false);
-			} else if(rowLabelView.isLabelPortDefaultNone()) {
-				rowLabelView.setLabelPortMode(false);
-				colLabelView.setLabelPortMode(false);
-			} else {
-				rowLabelView.setLabelPortFlankMode(true);
-				colLabelView.setLabelPortFlankMode(true);
-			}
+			rowLabelView.setLabelPortMode(true);
+			rowLabelView.setLabelPortFlankMode(false);
+			colLabelView.setLabelPortMode(true);
+			colLabelView.setLabelPortFlankMode(false);
+		} else if(rowLabelView.isLabelPortDefaultNone()) {
+			rowLabelView.setLabelPortMode(false);
+			colLabelView.setLabelPortMode(false);
+		} else {
+			rowLabelView.setLabelPortFlankMode(true);
+			colLabelView.setLabelPortFlankMode(true);
 		}
 	}
 
