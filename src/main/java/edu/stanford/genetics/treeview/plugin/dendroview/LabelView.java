@@ -334,6 +334,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		secondaryPaneSize = -1;
 		secondaryViewportSize = -1;
 
+		labelPortMode = true;
+		labelPortFlankMode = true;
+		maxLabelPortFlankSize = 0; //<1 = unlimited
+		labelPortDefaultNone = false;
+
 		if(labelAttr != null) {
 			labelAttr.resetDefaults();
 		}
@@ -475,6 +480,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		labelAttr.requestStoredState();
 
+		setLabelPortMode(configNode.getBoolean("labelPortMode",labelPortMode));
+		setLabelPortFlankMode(configNode.getBoolean("labelPortFlankMode",
+			labelPortFlankMode));
+		setMaxLabelPortFlankSize(configNode.getInt("maxLabelPortFlankSize",
+			maxLabelPortFlankSize));
+		setLabelPortDefaultNone(configNode.getBoolean("labelPortDefaultNone",
+			labelPortDefaultNone));
+
 		resetSecondaryScroll();
 
 		if(labelSummary == null) {
@@ -489,6 +502,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void storeState() {
 
 		labelAttr.storeState();
+
+		//Save the preferred port label states
+		configNode.putBoolean("labelPortMode",labelPortMode);
+		configNode.putBoolean("labelPortFlankMode",labelPortFlankMode);
+		configNode.putInt("maxLabelPortFlankSize",maxLabelPortFlankSize);
+		configNode.putBoolean("labelPortDefaultNone",labelPortDefaultNone);
+
 		resetSecondaryScroll();
 	}
 
@@ -502,6 +522,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	public void importStateFrom(final Preferences node) {
 
 		labelAttr.importStateFrom(node);
+
+		setLabelPortMode(node.getBoolean("labelPortMode",labelPortMode));
+		setLabelPortFlankMode(node.getBoolean("labelPortFlankMode",
+			labelPortFlankMode));
+		setMaxLabelPortFlankSize(node.getInt("maxLabelPortFlankSize",
+			maxLabelPortFlankSize));
+		setLabelPortDefaultNone(node.getBoolean("labelPortDefaultNone",
+			labelPortDefaultNone));
 
 		// Signal that the secondary scroll position should be reset the next
 		// time it is needed
