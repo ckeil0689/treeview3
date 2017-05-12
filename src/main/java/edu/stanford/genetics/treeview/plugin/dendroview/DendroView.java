@@ -319,8 +319,6 @@ public class DendroView implements Observer, DendroPanel {
 		navBtnPanel.add(scaleDecXY);
 		navBtnPanel.add(zoomBtn);
 		navBtnPanel.add(scaleDefaultAll);
-		/* TODO: This needs to be better integrated into the interface */
-//		navBtnPanel.add(exportBtn);
 
 		return navBtnPanel;
 	}
