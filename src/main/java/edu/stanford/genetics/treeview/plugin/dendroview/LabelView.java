@@ -41,6 +41,7 @@ import javax.swing.event.ChangeListener;
 import net.miginfocom.swing.MigLayout;
 import Controllers.RegionType;
 import Utilities.GUIFactory;
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LabelInfo;
@@ -156,6 +157,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		setLabelSummary(new LabelSummary(getSummaryName()));
 		labelAttr = new LabelAttributes(this);
 		// this.urlExtractor = uExtractor;
+
+		zoomHint = StringRes.lbl_ZoomLabels;
 
 		addMouseMotionListener(this);
 		addMouseListener(this);
@@ -1312,9 +1315,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		debug(getPaneType() + " Hint position: [" + xPos + "/" + yPos +
 			"] zoomHint: [" + zoomHint + "] height [" + offscreenSize.height +
-			"] width [" + offscreenSize.width + "] + HintStrLen [" + metrics
-			.stringWidth(zoomHint) +
-			"]",3);
+			"] width [" + offscreenSize.width + "] + HintStrLen [" +
+			metrics.stringWidth(zoomHint) + "]",3);
 
 		// Adding this useless scroll causes the pane size and scrollbar
 		// attributes to update correctly - and reflect the settings made
