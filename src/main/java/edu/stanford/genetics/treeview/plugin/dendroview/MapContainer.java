@@ -2570,38 +2570,6 @@ public class MapContainer extends Observable implements Observer,
 		this.whizMode = whizMode;
 	}
 
-	/**
-	 * 
-	 * @return the whizFlankMode
-	 */
-	public boolean isWhizFlankMode() {
-		return(whizFlankMode);
-	}
-
-	/**
-	 * 
-	 * @param whizFlankMode the whizFlankMode to set
-	 */
-	public void setWhizFlankMode(boolean whizFlankMode) {
-		this.whizFlankMode = whizFlankMode;
-	}
-
-	/**
-	 * 
-	 * @return the whizFlankSize
-	 */
-	public int getWhizFlankSize() {
-		return(whizFlankSize);
-	}
-
-	/**
-	 * 
-	 * @param whizFlankSize the whizFlankSize to set
-	 */
-	public void setWhizFlankSize(int whizFlankSize) {
-		this.whizFlankSize = whizFlankSize;
-	}
-
 	public void debug(String msg, int level) {
 
 		if(level == debug) {

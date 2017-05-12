@@ -754,8 +754,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			updateFontSize(g);
 
 			boolean drawLabelPort = doDrawLabelPort();
-			boolean flankMode = isLabelPortFlankMode();
-			int flankSize = getMaxLabelPortFlankSize();
 			final FontMetrics metrics = getFontMetrics(g.getFont());
 			int realMaxStrLen = getMaxStringLength(metrics);
 			int paneSizeShouldBe = getLabelPaneContentSize(metrics);
@@ -763,8 +761,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				map.getPixel(0);
 
 			map.setWhizMode(drawLabelPort);
-			map.setWhizFlankMode(flankMode);
-			map.setWhizFlankSize(flankSize);
 
 			// If the label pane's secondary dimension changed sizes or if the
 			// font size has changed
