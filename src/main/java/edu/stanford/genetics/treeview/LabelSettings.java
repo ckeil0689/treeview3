@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeListener;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
@@ -307,7 +308,7 @@ public class LabelSettings extends CustomDialog {
 			showSome =
 				GUIFactory.createRadioBtn("Hovered label and ");
 			neighborSpinner = new JSpinner(new SpinnerNumberModel(
-				dendroView.getInteractiveMatrixView().getMaxLabelPortFlankSize(),
+				dendroView.getRowLabelView().getMaxLabelPortFlankSize(),
 				0,getMaxNumLabels(),1));
 			showNone =
 				GUIFactory.createRadioBtn("None");
@@ -389,8 +390,8 @@ public class LabelSettings extends CustomDialog {
 			showNone.addActionListener(l);
 		}
 
-		public void addFlankSizeListener(final ActionListener l) {
-//			neighborSpinner.addActionListener(l);
+		public void addFlankSizeListener(final ChangeListener l) {
+			neighborSpinner.addChangeListener(l);
 		}
 
 		public int getSelectedRowIndex() {
@@ -402,10 +403,22 @@ public class LabelSettings extends CustomDialog {
 
 			return colPanel.getSmallestSelectedIndex();
 		}
+
+		public int getNumNeighbors() {
+			return((int) neighborSpinner.getValue());
+		}
+	}
+
+	public int getNumNeighbors() {
+		return(annotationSettings.getNumNeighbors());
 	}
 
 	public void addShowListener(ActionListener l) {
 		annotationSettings.addShowListener(l);
+	}
+
+	public void addFlankSizeListener(final ChangeListener l) {
+		annotationSettings.addFlankSizeListener(l);
 	}
 
 	/**
@@ -425,6 +438,11 @@ public class LabelSettings extends CustomDialog {
 	public void setShowBaseIsNone(boolean showBaseIsNone) {
 		dendroView.getRowLabelView().setLabelPortDefaultNone(showBaseIsNone);
 		dendroView.getColLabelView().setLabelPortDefaultNone(showBaseIsNone);
+	}
+
+	public void setFlankSize(final int s) {
+		dendroView.getColLabelView().setMaxLabelPortFlankSize(s);
+		dendroView.getRowLabelView().setMaxLabelPortFlankSize(s);
 	}
 
 	protected int getMaxNumLabels() {

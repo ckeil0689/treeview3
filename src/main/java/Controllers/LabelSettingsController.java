@@ -15,6 +15,8 @@ import java.util.List;
 
 import javax.swing.JRadioButton;
 import javax.swing.SwingWorker;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataModel;
@@ -62,6 +64,7 @@ public class LabelSettingsController {
 		preferences.addResizeDialogListener(new PreferencesComponentListener());
 		preferences.addJustifyListener(new LabelJustifyListener());
 		preferences.addShowListener(new LabelShowListener());
+		preferences.addFlankSizeListener(new SpinnerListener(preferences));
 	}
 
 	class MenuPanelListener implements MouseListener {
@@ -394,6 +397,28 @@ public class LabelSettingsController {
 			 */
 //			preferences.setupLayout(StringRes.menu_RowAndCol);
 			addListeners();
+		}
+	}
+
+	/**
+	 * Listens to a change in selection in the JSpinner for label neighbors.
+	 */
+	private class SpinnerListener implements ChangeListener {
+
+		LabelSettings labelSettings;
+
+		// To avoid synthetic compiler creation of a constructor
+		protected SpinnerListener(){}
+
+		public SpinnerListener(final LabelSettings labelSettings) {
+
+			this.labelSettings = labelSettings;
+		}
+
+		@Override
+		public void stateChanged(final ChangeEvent arg0) {
+
+			labelSettings.setFlankSize(labelSettings.getNumNeighbors());
 		}
 	}
 }
