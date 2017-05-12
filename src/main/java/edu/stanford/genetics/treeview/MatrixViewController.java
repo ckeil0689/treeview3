@@ -72,6 +72,8 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	// Data ticker reference, so it can be updated by the MouseAdapter
 	private DataTicker ticker;
 
+	private final boolean swap_animation_modifiers = true;
+
 	public MatrixViewController(final InteractiveMatrixView imView,
 		final GlobalMatrixView gmView,final DataModel model,
 		final LabelView rowLabelView,final LabelView colLabelView) {
@@ -944,8 +946,13 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		final boolean rowsSelected = rowSelection.getNSelectedIndexes() > 0;
 
 		if(rowsSelected) {
-			if((modifiers & InputEvent.SHIFT_MASK) != 0 ||
-				(modifiers & InputEvent.META_MASK) != 0) {
+			if((swap_animation_modifiers &&
+				(modifiers & InputEvent.SHIFT_MASK) == 0 &&
+				(modifiers & InputEvent.META_MASK) == 0) ||
+				(!swap_animation_modifiers &&
+				((modifiers & InputEvent.SHIFT_MASK) != 0 ||
+				(modifiers & InputEvent.META_MASK) != 0))) {
+
 				// Zoom in (or out)
 				interactiveXmap.zoomToSelected(colSelection.getMinIndex(),
 					colSelection.getMaxIndex());

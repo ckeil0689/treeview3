@@ -105,6 +105,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	private TreeSelectionI rowSelection = null;
 	private TreeSelectionI colSelection = null;
 
+	private final boolean swap_animation_modifiers = true;
+
 	public DendroController(final TreeViewFrame tvFrame,
 		final TVController tvController) {
 
@@ -589,8 +591,13 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			}
 			else if(e.getSource() == dendroView.getHomeButton()) {
 
-				if((e.getModifiers() & InputEvent.META_MASK) != 0 ||
-					(e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
+				if((swap_animation_modifiers &&
+					(e.getModifiers() & InputEvent.META_MASK) == 0 &&
+					(e.getModifiers() & InputEvent.SHIFT_MASK) == 0) ||
+					(!swap_animation_modifiers &&
+					((e.getModifiers() & InputEvent.META_MASK) != 0 ||
+					(e.getModifiers() & InputEvent.SHIFT_MASK) != 0))) {
+
 					mvController.resetMatrixViews();
 					dendroView.getInteractiveMatrixView().setAspectRatio(
 						interactiveXmap.getMaxIndex() + 1,
