@@ -679,6 +679,8 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			rowLabelView.setLabelPortFlankMode(true);
 			colLabelView.setLabelPortFlankMode(true);
 		}
+		rowLabelView.storeState();
+		colLabelView.storeState();
 	}
 
 	/** Starts highlighting the hovered row and column */
