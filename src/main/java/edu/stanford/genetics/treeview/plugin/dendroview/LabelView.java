@@ -501,6 +501,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public void storeState() {
 
+		if(labelAttr == null) {
+			LogBuffer.println("Could not store labelAttributes state.");
+			return;
+		}
+
 		labelAttr.storeState();
 
 		//Save the preferred port label states
@@ -539,11 +544,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			Preferences summaryNode;
 			if(node.nodeExists("RowSummary")) {
 				summaryNode = node.node("RowSummary");
-
 			}
 			else if(node.nodeExists("ColSummary")) {
 				summaryNode = node.node("ColSummary");
-
 			}
 			else {
 				summaryNode = null;

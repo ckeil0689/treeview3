@@ -737,10 +737,9 @@ public class DendroView implements Observer, DendroPanel {
 	 * @return [isRowRight, isColRight] */
 	public boolean[] getLabelAligns() {
 
-		final boolean[] alignments = {getRowLabelView()	.getLabelAttributes()
-																										.isRightJustified(),
-																	getColLabelView()	.getLabelAttributes()
-																										.isRightJustified()};
+		final boolean[] alignments = {
+			getRowLabelView().getLabelAttributes().isRightJustified(),
+			getColLabelView().getLabelAttributes().isRightJustified()};
 
 		return alignments;
 	}
@@ -752,9 +751,11 @@ public class DendroView implements Observer, DendroPanel {
 	 * @param isColRight
 	 *          ArrayNameView label justification. */
 	public void setLabelAlignment(final boolean isRowRight,
-																final boolean isColRight) {
+		final boolean isColRight) {
 
-		if((getRowLabelView() == null) || (getColLabelView() == null)) { return; }
+		if((getRowLabelView() == null) || (getColLabelView() == null)) {
+			return;
+		}
 
 		getRowLabelView().getLabelAttributes().setRightJustified(isRowRight);
 		getColLabelView().getLabelAttributes().setRightJustified(isColRight);

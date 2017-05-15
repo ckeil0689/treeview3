@@ -82,7 +82,6 @@ public class LabelSettings extends CustomDialog {
 
 		if(annotationSettings != null) {
 			annotationSettings.synchronize();
-
 		}
 		else {
 			LogBuffer.println("AnnotationSettings object was null. " +
@@ -373,6 +372,15 @@ public class LabelSettings extends CustomDialog {
 
 			rowPanel.synchronizeTo();
 			colPanel.synchronizeTo();
+
+			//State is stored elsewhere, so this is somewhat redundant, however
+			//if these are not called, then the state is only stored for either
+			//the column labels or row labels based on which panel was clicked
+			//to get the label settings dialog from the contextual menu (I could
+			//be wrong about this, but that's what seemed to be happening for a
+			//few settings, such as the whizzing label settings.
+			dendroView.getRowLabelView().storeState();
+			dendroView.getColLabelView().storeState();
 		}
 
 		public void addJustifyListener(final ActionListener l) {
