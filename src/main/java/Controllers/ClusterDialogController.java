@@ -287,9 +287,9 @@ public class ClusterDialogController {
 			}
 			
 			if (!isCancelled() && shouldSave) {
+				LogBuffer.println("ClusterTask is done: success.  Saving to " +
+					oldFileName);
 				saveClusterFile(oldFileName, rowClusterData, colClusterData);
-				LogBuffer.println("ClusterTask is done: success.");
-
 			} else {
 				rowClusterData.setReorderedIDs(new String[] {});
 				colClusterData.setReorderedIDs(new String[] {});
@@ -391,82 +391,87 @@ public class ClusterDialogController {
 		 */
 		private boolean[] reaffirmClusterChoice(final boolean shouldClusterRow, 
 				final boolean shouldClusterCol) {
-			
+
 			// default: depends on ready status
 			boolean[] shouldClusterAxis = new boolean[] {shouldClusterRow, shouldClusterCol};
-			
-			boolean wasRowAxisClustered = wasAxisClustered(
+
+			boolean wasRowAxisClustered = isAxisClustered(
 					tvModel.getFileSet().getGtr(), tvModel.gidFound());
-			boolean wasColAxisClustered = wasAxisClustered(
+			boolean wasColAxisClustered = isAxisClustered(
 					tvModel.getFileSet().getAtr(), tvModel.aidFound());
-			
+
 			// only warn if axis was clustered before AND user wants to cluster
 			boolean warnRowAxis = wasRowAxisClustered && shouldClusterRow;
 			boolean warnColAxis = wasColAxisClustered && shouldClusterCol;
-			
+
 			String message = "Something happened :(";
 			if(warnRowAxis && warnColAxis) {
-				message = "Both axes have been clustered before. "
-						+ "Would you like to cluster your selected axes again?";
-				
+				message = "Both axes have been clustered before.\nPreviously " +
+					"clustered files are located in a directory of the same " +
+					"name as the original matrix file.\nWould you like to " +
+					"cluster your selected axes again?";
+
 				if(!confirmChoice(message)) {
 					shouldClusterAxis[ROW_IDX] = false;
 					shouldClusterAxis[COL_IDX] = false;
 					this.cancel(true);
 					return shouldClusterAxis;
 				}
-				
+
 			} else if(warnRowAxis && !warnColAxis) {
-				message = "The row axis has been clustered before. "
-						+ "Would you like to cluster the rows again?";
-				
+				message = "The row axis has been clustered before.\n" +
+					"Previously clustered files are located in a directory " +
+					"of the same name as the original matrix file.\nWould " +
+					"you like to cluster the rows again?";
+
 				shouldClusterAxis[ROW_IDX]= confirmChoice(message);
-					
+
 			} else if(!warnRowAxis && warnColAxis){
-				message = "The column axis has been clustered before. "
-						+ "Would you like to cluster the columns again?";
-				
+				message = "The column axis has been clustered before.\n" +
+					"Previously clustered files are located in a directory " +
+					"of the same name as the original matrix file.\nWould " +
+					"you like to cluster the columns again?";
+
 				shouldClusterAxis[COL_IDX]= confirmChoice(message);
 			}
-			
+
 			/* 
 			 * Keeping track of cluster status for both axes here which is
 			 * later used to ensure tree file presence if an axis is 
 			 * considered to be clustered. 
 			 */
-			final boolean checkForRowTreeFile = wasRowAxisClustered 
-					|| shouldClusterAxis[ROW_IDX];
-			final boolean checkForColTreeFile = wasColAxisClustered 
-					|| shouldClusterAxis[COL_IDX];
-			
+			final boolean checkForRowTreeFile = wasRowAxisClustered ||
+				shouldClusterAxis[ROW_IDX];
+			final boolean checkForColTreeFile = wasColAxisClustered ||
+				shouldClusterAxis[COL_IDX];
+
 			rowClusterData.setAxisClustered(checkForRowTreeFile);
 			colClusterData.setAxisClustered(checkForColTreeFile);
-			
+
 			return shouldClusterAxis;
 		}
 		
 		/**
 		 * Checks if axis was clustered using its tree file if available and 
 		 * the axis specific ID if available. 
-		 * If neither is present, it will assume that the axis was NOT 
-		 * clustered.
+		 * If both are present, it will assume that the axis was clustered.
 		 * @param treeFilePath Path of the axis tree file, if it exists.
 		 * @param treeFileSuffix Axis associated tree file suffix (GTR, ATR).
 		 * @param hasAxisID When loading a file, a check is performed for the
 		 * axis ID label (GID, AID). This can be queried from the TVModel.
 		 * @return Whether an axis is considered to have been clustered before.
 		 */
-		private boolean wasAxisClustered(final String treeFilePath, 
+		private boolean isAxisClustered(final String treeFilePath, 
 				final boolean hasAxisID) {
-			
+
 			boolean hasTreeFile = false;
-			
+
 			File f = new File(treeFilePath);
 			if(f.exists() && !f.isDirectory()) { 
-			    hasTreeFile = true;
+				hasTreeFile = true;
 			}
-			
-			return hasAxisID || hasTreeFile;
+
+			return hasAxisID && hasTreeFile;
 		}
 		
 		/**
@@ -598,19 +603,21 @@ public class ClusterDialogController {
 			final ClusteredAxisData rowClusterData, 
 			final ClusteredAxisData colClusterData) {
 
-		if (rowClusterData.getReorderedIDs() != null 
-				|| colClusterData.getReorderedIDs() != null) {
+		if (rowClusterData.getReorderedIDs() != null ||
+			colClusterData.getReorderedIDs() != null) {
+
+			LogBuffer.println("Saving...");
 			ClusterView.setStatusText("Saving...");
-			
+
 			saveTask = new SaveTask(rowClusterData, colClusterData, 
-					fileName);
+				fileName);
 			saveTask.execute();
 
 		} else {
-			final String message = "Cannot save. No clustered data "
-					+ "was created.";
+			final String message = "Cannot save. No clustered data was " +
+				"created.";
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
-					"Error", JOptionPane.ERROR_MESSAGE);
+				"Error", JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println("Alert: " + message);
 		}
 	}
@@ -635,8 +642,8 @@ public class ClusterDialogController {
 		private String filePath;
 
 		public SaveTask(final ClusteredAxisData rowClusterData, 
-				final ClusteredAxisData colClusterData, 
-				final String fileName) {
+			final ClusteredAxisData colClusterData, 
+			final String fileName) {
 
 			this.rowClusterData = rowClusterData;
 			this.colClusterData = colClusterData;
@@ -647,12 +654,12 @@ public class ClusterDialogController {
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
-			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
-					.getDataMatrix();
+			final TVDataMatrix originalMatrix =
+				(TVDataMatrix) tvModel.getDataMatrix();
 			final double[][] data = originalMatrix.getExprData();
 
 			final ClusterFileGenerator cdtGen = new ClusterFileGenerator(data, 
-					rowClusterData, colClusterData, isHierarchical());
+				rowClusterData, colClusterData, isHierarchical());
 
 			cdtGen.setupWriter(cdtFile);
 
@@ -663,7 +670,7 @@ public class ClusterDialogController {
 			cdtGen.generateCDT();
 
 			filePath = cdtGen.finish();
-			
+
 			if(isCancelled()) {
 				return Boolean.FALSE;
 			}
@@ -701,7 +708,14 @@ public class ClusterDialogController {
 		 */
 		private boolean hasEnsuredTreeFilePresence() {
 	
-			if(filePath == null || fileName == null) {
+			if(filePath == null && fileName == null) {
+				LogBuffer.println("File path and name is null");
+				return false;
+			} else if(filePath == null) {
+				LogBuffer.println("File path is null");
+				return false;
+			} else if(fileName == null) {
+				LogBuffer.println("File name is null");
 				return false;
 			}
 			
