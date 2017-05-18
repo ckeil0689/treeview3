@@ -232,7 +232,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	/**
 	 * Sets the hoveredNode to null
-	 * @author rleach
 	 */
 	public void unsetHoveredNode() {
 		hoveredNode = null;
@@ -444,7 +443,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	/**
 	 * Exports a tree to a file
-	 * @author rleach
 	 * @param g - graphics object
 	 * @param xIndent - size of the indent where to start drawing the tree OR
 	 *        the height of the tree area (depending on whether row or column
@@ -472,7 +470,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	/**
 	 * Exports the entire tree
-	 * @author rleach
 	 * @param g - graphics object
 	 * @param xIndent - size of the indent where to start drawing the tree OR
 	 *        the height of the tree area (depending on whether row or column
@@ -492,7 +489,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	/**
 	 * Exports the portion of the tree corresponding to the visible portion of
 	 * the matrix
-	 * @author rleach
 	 * @param g - graphics object
 	 * @param xIndent - size of the indent where to start drawing the tree OR
 	 *        the height of the tree area (depending on whether row or column
@@ -513,7 +509,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	/**
 	 * Exports the portion of the tree corresponding to the minimum and maximum
 	 * selected portions of the matrix/tree
-	 * @author rleach
 	 * @param g - graphics object
 	 * @param xIndent - size of the indent where to start drawing the tree OR
 	 *        the height of the tree area (depending on whether row or column
@@ -578,8 +573,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	}
 
 	/**
-	 * 
-	 * @author rleach
 	 * @return the length of the area the whizzing labels represent in data
 	 * pixels
 	 */
@@ -827,7 +820,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * Gets the data index that is hovered over, including edges if the mouse is
 	 * hovered off a label linked view (especially useful when dragging off an
 	 * edge)
-	 * @author rleach
 	 * @return data index
 	 */
 	public int getPrimaryHoverIndex() {
@@ -837,7 +829,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	/**
 	 * Gets the data index that is hovered over, or -1 if not a valid hover
 	 * position
-	 * @author rleach
 	 * @return data index
 	 */
 	public int getAbsolutePrimaryHoverIndex() {
@@ -963,7 +954,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	/**
 	 * Sets the hover index to -1
-	 * @author rleach
 	 */
 	public void unsetPrimaryHoverIndex() {
 		map.unsetHoverIndex();
@@ -971,7 +961,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	/**
 	 * Determines whether the tree exists or not
-	 * @author rleach
 	 * @return boolean
 	 */
 	public boolean treeExists() {
