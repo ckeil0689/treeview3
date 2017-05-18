@@ -2898,7 +2898,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			paneLabelPortOffTimer = null;
 		}
 
-		map.setKeepTreeGlobal(false);
+		//Will more than 1 label be drawn in port mode?
+		boolean whizOverOne = !isLabelPortFlankMode() ||
+			getMaxLabelPortFlankSize() > 0;
+		//If whizeOverOne is true, we want setKeepTreeGlobal to be false so that
+		//the tree links to the labels
+		map.setKeepTreeGlobal(!whizOverOne);
 		map.setOverLabels(true);
 
 		super.mouseEntered(e);

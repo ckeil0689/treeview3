@@ -1001,7 +1001,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		map.setOverTree(false);
 		unsetHoveredNode();
-    super.mouseExited(e);
+		super.mouseExited(e);
 	}
 
 	@Override
