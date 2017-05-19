@@ -922,7 +922,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * @param xmap
 	 * @param ymap */
 	public void setGlobalMapContainers(	final MapContainer xmap,
-																			final MapContainer ymap) {
+		final MapContainer ymap) {
 
 		this.globalXmap = xmap;
 		this.globalYmap = ymap;

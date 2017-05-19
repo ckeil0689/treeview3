@@ -200,15 +200,15 @@ public class ClusterDialogController {
 
 			/* Initialize the clustering processor and pass the data */
 			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel.getDataMatrix();
-			
+
 			/* Initialize the cluster processor */
 			if(isHierarchical()) {
 				processor = new ClusterProcessor(originalMatrix);
-				
+
 			} else {
 				final IntLabelInfo rowLabelI = tvModel.getRowLabelInfo();
 				final IntLabelInfo colLabelI = tvModel.getColLabelInfo();
-				
+
 				processor = new ClusterProcessor(originalMatrix, oldFileName, rowLabelI, colLabelI);
 			}
 
@@ -219,20 +219,20 @@ public class ClusterDialogController {
 
 			final boolean isRowReady = isReady(rowSimilarity, ROW);
 			final boolean isColReady = isReady(colSimilarity, COL);
-			
+
 			this.clusterCheck = reaffirmClusterChoice(isRowReady, isColReady);
-			
+
 			if(!clusterCheck[ROW_IDX] && !clusterCheck[COL_IDX]) {
 				this.cancel(true);
 				return Boolean.FALSE;
 			}
-			
+
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], clusterCheck[COL_IDX]);
-			
+
 			// TODO need to add drive partition part to the path when subpath is created
 			final Path clusterFilePath = ClusterFileStorage.createDirectoryStruc(oldFileName, 
 					clusterView.getLinkMethod());
-			
+
 			// Cluster rows if user selected option
 			if (clusterCheck[ROW_IDX]) {
 				gtrFile = ClusterFileStorage.retrieveFile(clusterFilePath, GTR_END);
@@ -244,24 +244,25 @@ public class ClusterDialogController {
 			if (isCancelled()) {
 				return Boolean.FALSE;
 			}
-			
+
 			// Cluster columns if user selected option
 			if (clusterCheck[COL_IDX]) {
 				atrFile = ClusterFileStorage.retrieveFile(clusterFilePath, ATR_END);
 				colClusterData.setReorderedIDs(calculateAxis(colSimilarity, COL, atrFile));
 				colClusterData.shouldReorderAxis(true);
 			}
-			
+
 			if(!isReorderingValid(clusterCheck)) {
 				this.cancel(true);
 				return Boolean.FALSE;
 			}
-			
-			// Determine file extensions for CDT file (varies between hierarchical and k-means)
+
+			// Determine file extensions for CDT file (varies between
+			// hierarchical and k-means)
 			String fileEnd = ClusterFileStorage.determineClusterFileExt(
-					isHierarchical(), clusterView.getSpinnerValues(), 
-					rowClusterData, colClusterData);
-			
+				isHierarchical(), clusterView.getSpinnerValues(), 
+				rowClusterData, colClusterData);
+
 			cdtFile = ClusterFileStorage.retrieveFile(clusterFilePath, fileEnd);
 
 			if(cdtFile == null) {
@@ -337,45 +338,49 @@ public class ClusterDialogController {
 		 * @return
 		 */
 		private String[] getOldIDs(final int axisID) {
-			
+
 			String[][] labelArray;
 			String[] oldIDs; 
 			Pattern p;
 			int pos = 0;
-			
-            if(axisID == ROW_IDX) {
-            	labelArray = tvModel.getRowLabelInfo().getLabelArray();
-            	
-            	if(!tvModel.gidFound()) {
-            		return new String[]{};
-            	}
-            	/* Find ID index */
-            	p = Pattern.compile("ROW\\d+X");
-            	
-            } else {
-            	labelArray = tvModel.getColLabelInfo().getLabelArray();
-            	
-            	if(!tvModel.aidFound()) {
-            		return new String[]{};
-            	}
-            	p = Pattern.compile("COL\\d+X");
-            }
-			
-            /* Find ID index */
-        	for(int i = 0; i < labelArray[0].length; i++) {
-        		Matcher m = p.matcher(labelArray[0][i]);
-        		if(m.find()) {
-        			pos = i;
-        			break;
-        		}
-        	}
-        	
+
+			if(axisID == ROW_IDX) {
+				labelArray = tvModel.getRowLabelInfo().getLabelArray();
+
+				if(!tvModel.gidFound()) {
+					return new String[]{};
+				}
+				/* Find ID index */
+				p = Pattern.compile("ROW\\d+X");
+
+			} else {
+				labelArray = tvModel.getColLabelInfo().getLabelArray();
+
+				if(!tvModel.aidFound()) {
+					return new String[]{};
+				}
+				//"ARRY" is the old ID style and is retained here for backward
+				//compatibility with both previous versions and with the Cluster
+				//3.0 app.  Note, for whatever reason, "GENE" is not needed
+				//above as an alternative to "ROW".  See issue #539.
+				p = Pattern.compile("(ARRY|COL)\\d+X");
+			}
+
+			/* Find ID index */
+			for(int i = 0; i < labelArray[0].length; i++) {
+				Matcher m = p.matcher(labelArray[0][i]);
+				if(m.find()) {
+					pos = i;
+					break;
+				}
+			}
+
 			oldIDs = new String[labelArray.length];
-			
+
 			for(int i = 0; i < labelArray.length; i++) {
 				oldIDs[i] = labelArray[i][pos];
 			}
-			
+
 			return oldIDs;
 		}
 		
@@ -567,9 +572,9 @@ public class ClusterDialogController {
 		 */
 		private String[] calculateAxis(final int similarity, final int axis,
 				final File treeFile) {
-			
+
 			boolean isRow = (axis == ROW);
-			
+
 			/* Row axis cluster */
 			final DistanceMatrix distMatrix = new DistanceMatrix(0);
 			final String axisType = (isRow) ? "row" : "column";
@@ -590,7 +595,7 @@ public class ClusterDialogController {
 					clusterView.getLinkMethod(),
 					clusterView.getSpinnerValues(), isHierarchical(), axis, 
 					treeFile);
-			
+
 			return reorderedAxisLabels;
 		}
 	}
