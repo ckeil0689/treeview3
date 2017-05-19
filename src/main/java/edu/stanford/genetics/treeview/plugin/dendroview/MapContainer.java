@@ -67,12 +67,20 @@ public class MapContainer extends Observable implements Observer,
 	private int firstVisible;
 
 	//track the first and last visible labels (controlled by LabelView) so that
-	//it can be used in other classes (e.g. for matching the trees to the
-	//labels)
+	//it can be used in other classes (e.g. for matching the blue tree
+	//backgrounds to the drawn labels)
 	private int firstVisibleLabel = -1;
 	private int lastVisibleLabel = -1;
 	private int firstVisibleLabelOffset = 0;
 	private int lastVisibleLabelOffset = 0;
+
+	//track the first and last visible label spaces (controlled by LabelView) so
+	//that it can be used in other classes (e.g. for matching the trees to the
+	//label positions)
+	private int firstVisibleLabelCapacity = -1;
+	private int lastVisibleLabelCapacity = -1;
+	private int firstVisibleLabelOffsetCapacity = 0;
+	private int lastVisibleLabelOffsetCapacity = 0;
 
 	//Track the explicitly manipulated visible labels. These can change as a
 	//result of a scroll in the label pane
@@ -2453,81 +2461,221 @@ public class MapContainer extends Observable implements Observer,
 		return(ZOOM_INCREMENT_FAST);
 	}
 
-	/** Set the first visible label data index. For use by LabelView.
+	/**
+	 * Set the first visible label data index. For use by LabelView.
 	 * -1 = unset
 	 * 
-	 * @param p */
+	 * @param p
+	 */
 	public void setFirstVisibleLabel(int p) {
 		if(p < getMinIndex() || p > getMaxIndex()) firstVisibleLabel = -1;
 		else firstVisibleLabel = p;
 	}
 
-	/** Retrieves the first visible label data index
+	/**
+	 * Retrieves the first visible label data index
 	 * 
-	 * @return firstVisiblelabel data index */
+	 * @return firstVisiblelabel data index
+	 */
 	public int getFirstVisibleLabel() {
 		return(firstVisibleLabel);
 	}
 
-	/** Set the last visible label data index. For use by LabelView.
+	/**
+	 * Set the last visible label data index. For use by LabelView.
 	 * -1 = unset
 	 * 
-	 * @param p */
+	 * @param p
+	 */
 	public void setLastVisibleLabel(int p) {
 		if(p < getMinIndex() || p > getMaxIndex()) lastVisibleLabel = -1;
 		else lastVisibleLabel = p;
 	}
 
-	/** Retrieves the last visible label data index
+	/**
+	 * Retrieves the last visible label data index
 	 * 
-	 * @return lastVisiblelabel data index */
+	 * @return lastVisiblelabel data index
+	 */
 	public int getLastVisibleLabel() {
 		return(lastVisibleLabel);
 	}
 
-	/** Retrieves the last visible label data index
+	/**
+	 * Calculates the number of visible labels
 	 * 
-	 * @return lastVisiblelabel data index */
+	 * @return number of visible labels
+	 */
 	public int getNumVisibleLabels() {
 		if(lastVisibleLabel < 0) { return(-1); }
 		return(lastVisibleLabel - firstVisibleLabel + 1);
 	}
 
-	/** This provides the number of pixels the first label is offset from the
+	/**
+	 * This provides the number of pixels the first label is offset from the
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @return the firstVisibleLabelOffset */
+	 * @return the firstVisibleLabelOffset
+	 */
 	public int getFirstVisibleLabelOffset() {
 		return(firstVisibleLabelOffset);
 	}
 
-	/** This sets the number of pixels the first label is offset from the
+	/**
+	 * This sets the number of pixels the first label is offset from the
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @param firstVisibleLabelOffset the firstVisibleLabelOffset to set */
+	 * @param firstVisibleLabelOffset the firstVisibleLabelOffset to set
+	 */
 	public void setFirstVisibleLabelOffset(int firstVisibleLabelOffset) {
 		this.firstVisibleLabelOffset = firstVisibleLabelOffset;
 	}
 
-	/** This provides the number of pixels the last label is offset from the
+	/**
+	 * This provides the number of pixels the last label is offset from the
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @return the lastVisibleLabelOffset */
+	 * @return the lastVisibleLabelOffset
+	 */
 	public int getLastVisibleLabelOffset() {
 		return(lastVisibleLabelOffset);
 	}
 
-	/** This sets the number of pixels the last label is offset from the
+	/**
+	 * This sets the number of pixels the last label is offset from the
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @param lastVisibleLabelOffset the lastVisibleLabelOffset to set */
+	 * @param lastVisibleLabelOffset the lastVisibleLabelOffset to set
+	 */
 	public void setLastVisibleLabelOffset(int lastVisibleLabelOffset) {
 		this.lastVisibleLabelOffset = lastVisibleLabelOffset;
 	}
+
+
+
+
+
+
+
+
+
+	/**
+	 * Set the first visible label capacity data index. For use by LabelView.
+	 * -1 = unset
+	 * 
+	 * @param p
+	 */
+	public void setFirstVisibleLabelCapacity(int p) {
+		if(p < getMinIndex() || p > getMaxIndex()) {
+			firstVisibleLabelCapacity = -1;
+		} else {
+			firstVisibleLabelCapacity = p;
+		}
+	}
+
+	/**
+	 * Retrieves the first visible label capacity data index
+	 * 
+	 * @return firstVisibleLabelCapacity data index
+	 */
+	public int getFirstVisibleLabelCapacity() {
+		return(firstVisibleLabelCapacity);
+	}
+
+	/**
+	 * Set the last visible label capacity data index. For use by LabelView.
+	 * -1 = unset
+	 * 
+	 * @param p
+	 */
+	public void setLastVisibleLabelCapacity(int p) {
+		if(p < getMinIndex() || p > getMaxIndex()) {
+			lastVisibleLabelCapacity = -1;
+		} else {
+			lastVisibleLabelCapacity = p;
+		}
+	}
+
+	/**
+	 * Retrieves the last visible label capacity data index
+	 * 
+	 * @return lastVisibleLabelCapacity data index
+	 */
+	public int getLastVisibleLabelCapacity() {
+		return(lastVisibleLabelCapacity);
+	}
+
+	/**
+	 * Calculates the number of labels that fit the label area
+	 * 
+	 * @return number of label spaces
+	 */
+	public int getNumVisibleLabelsCapacity() {
+		if(lastVisibleLabelCapacity < 0) {
+			return(-1);
+		}
+		return(lastVisibleLabelCapacity - firstVisibleLabelCapacity + 1);
+	}
+
+	/**
+	 * This provides the number of pixels the first label space is offset from
+	 * the nearest edge. This is required by the trees in order to align the
+	 * leaves with the labels
+	 * 
+	 * @return the firstVisibleLabelOffsetCapacity
+	 */
+	public int getFirstVisibleLabelOffsetCapacity() {
+		return(firstVisibleLabelOffsetCapacity);
+	}
+
+	/**
+	 * This sets the number of pixels the first label space is offset from the
+	 * nearest edge. This is required by the trees in order to align the leaves
+	 * with the labels
+	 * 
+	 * @param firstVisibleLabelOffsetCapacity
+	 */
+	public void setFirstVisibleLabelOffsetCapacity(
+		int firstVisibleLabelOffsetCapacity) {
+
+		this.firstVisibleLabelOffsetCapacity = firstVisibleLabelOffsetCapacity;
+	}
+
+	/**
+	 * This provides the number of pixels the last label space is offset from
+	 * the nearest edge. This is required by the trees in order to align the
+	 * leaves with the labels
+	 * 
+	 * @return the lastVisibleLabelOffsetCapacity
+	 */
+	public int getLastVisibleLabelOffsetCapacity() {
+		return(lastVisibleLabelOffsetCapacity);
+	}
+
+	/**
+	 * This sets the number of pixels the last label space is offset from the
+	 * nearest edge. This is required by the trees in order to align the leaves
+	 * with the labels
+	 * 
+	 * @param lastVisibleLabelOffsetCapacity
+	 */
+	public void setLastVisibleLabelOffsetCapacity(
+		int lastVisibleLabelOffsetCapacity) {
+
+		this.lastVisibleLabelOffsetCapacity = lastVisibleLabelOffsetCapacity;
+	}
+
+
+
+
+
+
+
+
 
 
 	/**

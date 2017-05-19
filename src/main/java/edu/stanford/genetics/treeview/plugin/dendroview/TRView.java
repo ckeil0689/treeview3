@@ -55,11 +55,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	protected boolean isLeft;
 
 	private final static int REPAINT_INTERVAL = 50;  //update every 50 millisecs
-	/* TODO: If anastasia doesn't like trees linked to whizzing labels,
-	 * uncomment the following commented code. If she likes it, delete. This
-	 * code saves compute cycles, but makes the trees sometimes move out of sync
-	 * with the labels. */
-//	private int slowRepaintInterval = 1000;//update every 1s if mouse not moving
 	private int lastHoverIndex = -1;
 	
 	/* Used to update data ticker
@@ -237,7 +232,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	/**
 	 * Sets the hoveredNode to null
-	 * @author rleach
 	 */
 	public void unsetHoveredNode() {
 		hoveredNode = null;
@@ -390,8 +384,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 					map.getLastVisibleLabelOffset() + "]",
 					16);
 
-				firstVisIndex = map.getFirstVisibleLabel();
-				lastVisIndex  = map.getLastVisibleLabel();
+				firstVisIndex = map.getFirstVisibleLabelCapacity();
+				lastVisIndex  = map.getLastVisibleLabelCapacity();
 
 				debug("first visible label index [" + firstVisIndex +
 					"] last visible label index [" + lastVisIndex + "]",16);
@@ -411,7 +405,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			} else {
 				//If we are looking at a global/data-linked tree with whizzing
 				//labels
-				if(map.isWhizMode() && map.overALabelLinkedView()) {
+				if(map.isWhizMode() && map.overALabelLinkedView() &&
+					map.getNumVisibleLabels() > 1) {
 
 					g.setColor(whiz_bg_color);
 
@@ -449,7 +444,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	/**
 	 * Exports a tree to a file
-	 * @author rleach
 	 * @param g - graphics object
 	 * @param xIndent - size of the indent where to start drawing the tree OR
 	 *        the height of the tree area (depending on whether row or column
@@ -477,7 +471,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	/**
 	 * Exports the entire tree
-	 * @author rleach
 	 * @param g - graphics object
 	 * @param xIndent - size of the indent where to start drawing the tree OR
 	 *        the height of the tree area (depending on whether row or column
@@ -497,7 +490,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	/**
 	 * Exports the portion of the tree corresponding to the visible portion of
 	 * the matrix
-	 * @author rleach
 	 * @param g - graphics object
 	 * @param xIndent - size of the indent where to start drawing the tree OR
 	 *        the height of the tree area (depending on whether row or column
@@ -518,7 +510,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	/**
 	 * Exports the portion of the tree corresponding to the minimum and maximum
 	 * selected portions of the matrix/tree
-	 * @author rleach
 	 * @param g - graphics object
 	 * @param xIndent - size of the indent where to start drawing the tree OR
 	 *        the height of the tree area (depending on whether row or column
@@ -583,8 +574,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	}
 
 	/**
-	 * 
-	 * @author rleach
 	 * @return the length of the area the whizzing labels represent in data
 	 * pixels
 	 */
@@ -776,39 +765,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			}
 		});
 
-	/* TODO: If anastasia doesn't like trees linked to whizzing labels,
-	 * uncomment the following commented code. If she likes it, delete. This
-	 * code saves compute cycles, but makes the trees sometimes move out of sync
-	 * with the labels. */
-//	//Timer to wait a bit before slowing down the slice _timer for painting.
-//	//This conserves processor cycles in the interests of performance.  Note
-//	//that there is a pair of timers for each axis.
-//	final private int delay = 1000;
-//	private javax.swing.Timer slowDownRepaintTimer;
-//	ActionListener slowDownRepaintListener = new ActionListener() {
-//
-//		@Override
-//		public void actionPerformed(ActionEvent evt) {
-//			if(evt.getSource() == slowDownRepaintTimer) {
-//				/* Stop timer */
-//				slowDownRepaintTimer.stop();
-//				slowDownRepaintTimer = null;
-//
-//				//If we are still over a label port view panel, just slow the
-//				//repaint timer, because this was triggered by the mouse not
-//				//moving
-//				if(map.overALabelPortLinkedView()) {
-//					debug("Slowing the repaint interval presumably because " +
-//					      "of lack of mouse movement",9);
-//					repaintTimer.setDelay(slowRepaintInterval);
-//				} else {
-//					repaintTimer.stop();
-//					map.setLabelAnimeRunning(false);
-//				}
-//			}
-//		}
-//	};
-
 	public void updateTreeRepaintTimers() {
 		//If the mouse is not hovering over the IMV, stop both timers, set the
 		//last hover index, and tell mapcontainer that the animation has stopped
@@ -818,16 +774,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 					"animation",9);
 				repaintTimer.stop();
 				lastHoverIndex = -1;
-				/* TODO: If anastasia doesn't like trees linked to whizzing labels,
-				 * uncomment the following commented code. If she likes it, delete. This
-				 * code saves compute cycles, but makes the trees sometimes move out of sync
-				 * with the labels. */
-//				//Disable the turnOffRepaintTimer if it is running, because
-//				//we've already stopped repaints
-//				if(slowDownRepaintTimer != null) {
-//					slowDownRepaintTimer.stop();
-//					slowDownRepaintTimer = null;
-//				}
 			} else {
 				debug("The repaint timer is not running. This updateBuffer " +
 					"call was initiated by something else.",9);
@@ -840,15 +786,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 				debug("Hovering across matrix - starting up animation",9);
 				repaintTimer.start();
 				lastHoverIndex = getPrimaryHoverIndex();
-				/* TODO: If anastasia doesn't like trees linked to whizzing labels,
-				 * uncomment the following commented code. If she likes it, delete. This
-				 * code saves compute cycles, but makes the trees sometimes move out of sync
-				 * with the labels. */
-//				//Disable any slowDownRepaintTimer that might've been left over
-//				if(slowDownRepaintTimer != null) {
-//					slowDownRepaintTimer.stop();
-//					slowDownRepaintTimer = null;
-//				}
 			} else {
 				debug("The repaint timer was in fact running even though " +
 					"map.isLabelAnimeRunning() said it wasn't.",9);
@@ -862,15 +799,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			if(repaintTimer.getDelay() == REPAINT_INTERVAL) {
 				debug("Hovering on one spot [" + lastHoverIndex +
 				      "] - slowing animation",9);
-				/* TODO: If anastasia doesn't like trees linked to whizzing labels,
-				 * uncomment the following commented code. If she likes it, delete. This
-				 * code saves compute cycles, but makes the trees sometimes move out of sync
-				 * with the labels. */
-//				if(slowDownRepaintTimer == null) {
-//					slowDownRepaintTimer =
-//						new Timer(delay,slowDownRepaintListener);
-//					slowDownRepaintTimer.start();
-//				}
 			} else {
 				debug("Animation already slowed down to [" +
 					repaintTimer.getDelay() + "ms].",9);
@@ -884,22 +812,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 				"] current hover index [" + getPrimaryHoverIndex() + "]",9);
 			if(repaintTimer != null && !repaintTimer.isRunning()) {
 				repaintTimer.start();
-				/* TODO: If anastasia doesn't like trees linked to whizzing labels,
-				 * uncomment the following commented code. If she likes it, delete. This
-				 * code saves compute cycles, but makes the trees sometimes move out of sync
-				 * with the labels. */
-//			} else if(repaintTimer.getDelay() == slowRepaintInterval) {
-//				debug("Speeding up the repaint interval because mouse " +
-//				      "movement detected",9);
-//				repaintTimer.setDelay(REPAINT_INTERVAL);
-//				repaintTimer.restart();
 			}
-//			//Disable the slowDownRepaintTimer because we have detected
-//			//continued mouse motion
-//			if(slowDownRepaintTimer != null) {
-//				slowDownRepaintTimer.stop();
-//				slowDownRepaintTimer = null;
-//			}
 			lastHoverIndex = getPrimaryHoverIndex();
 		}
 	}
@@ -908,7 +821,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	 * Gets the data index that is hovered over, including edges if the mouse is
 	 * hovered off a label linked view (especially useful when dragging off an
 	 * edge)
-	 * @author rleach
 	 * @return data index
 	 */
 	public int getPrimaryHoverIndex() {
@@ -918,7 +830,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 	/**
 	 * Gets the data index that is hovered over, or -1 if not a valid hover
 	 * position
-	 * @author rleach
 	 * @return data index
 	 */
 	public int getAbsolutePrimaryHoverIndex() {
@@ -1001,7 +912,7 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 		map.setOverTree(false);
 		unsetHoveredNode();
-    super.mouseExited(e);
+		super.mouseExited(e);
 	}
 
 	@Override
@@ -1044,7 +955,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	/**
 	 * Sets the hover index to -1
-	 * @author rleach
 	 */
 	public void unsetPrimaryHoverIndex() {
 		map.unsetHoverIndex();
@@ -1052,7 +962,6 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 
 	/**
 	 * Determines whether the tree exists or not
-	 * @author rleach
 	 * @return boolean
 	 */
 	public boolean treeExists() {
