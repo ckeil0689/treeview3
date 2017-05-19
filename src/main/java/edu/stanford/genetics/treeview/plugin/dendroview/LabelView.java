@@ -891,8 +891,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		Color bgColor;
 		int minPortLabel = getPrimaryHoverIndex();
 		int maxPortLabel = getPrimaryHoverIndex();
+		int minPortLabelCapacity = minPortLabel;
+		int maxPortLabelCapacity = maxPortLabel;
 		int minPortLabelOffset = 0;
 		int maxPortLabelOffset = 0;
+		int minPortLabelOffsetCapacity = 0;
+		int maxPortLabelOffsetCapacity = 0;
 		int hoverStyle = Font.BOLD | labelAttr.getStyle();
 		boolean flankMode = isLabelPortFlankMode();
 		int flankSize = getMaxLabelPortFlankSize();
@@ -977,6 +981,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 							minPortLabel = j;
 							minPortLabelOffset = yPos - ascent;
 						}
+						minPortLabelCapacity = j;
+						minPortLabelOffsetCapacity = yPos - ascent;
 					}
 					else if(indexDiff != 0) {
 						debug("Lightening edge-labels",24);
@@ -988,6 +994,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						// label
 						maxPortLabelOffset = getPrimaryViewportSize() -
 							((yPos - ascent) + labelAttr.getPoints());
+						maxPortLabelOffsetCapacity = maxPortLabelOffset;
 						debug("Drawing " + getPaneType() +
 							" hover font BOLD [" +
 							hoverStyle + "].",5);
@@ -1088,9 +1095,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 							maxPortLabel = j;
 							maxPortLabelOffset = getPrimaryViewportSize() -
-								((yPos - ascent) +
-									labelAttr.getPoints());
+								((yPos - ascent) + labelAttr.getPoints());
 						}
+						maxPortLabelCapacity = j;
+						maxPortLabelOffsetCapacity = getPrimaryViewportSize() -
+							((yPos - ascent) + labelAttr.getPoints());
 					}
 					else {
 						debug("Lightening edge-labels",24);
@@ -1115,11 +1124,18 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			}
 		}
 
-		// Set the first and last visible label for the tree drawing positions
+		// Set the first and last visible label for the tree's blue background
+		// drawing positions
 		map.setFirstVisibleLabel(minPortLabel);
 		map.setLastVisibleLabel(maxPortLabel);
 		map.setFirstVisibleLabelOffset(minPortLabelOffset);
 		map.setLastVisibleLabelOffset(maxPortLabelOffset);
+		// Set the first and last visible label spaces for the tree drawing
+		// positions
+		map.setFirstVisibleLabelCapacity(minPortLabelCapacity);
+		map.setLastVisibleLabelCapacity(maxPortLabelCapacity);
+		map.setFirstVisibleLabelOffsetCapacity(minPortLabelOffsetCapacity);
+		map.setLastVisibleLabelOffsetCapacity(maxPortLabelOffsetCapacity);
 
 		// Switch to the background color
 		g2d.setColor(textBGColor);
@@ -2901,7 +2917,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			paneLabelPortOffTimer = null;
 		}
 
-		map.setKeepTreeGlobal(false);
+		//Will more than 1 label be drawn in port mode?
+		boolean whizOverOne = !isLabelPortFlankMode() ||
+			getMaxLabelPortFlankSize() > 0;
+		//If whizeOverOne is true, we want setKeepTreeGlobal to be false so that
+		//the tree links to the labels
+		map.setKeepTreeGlobal(!whizOverOne);
 		map.setOverLabels(true);
 
 		super.mouseEntered(e);

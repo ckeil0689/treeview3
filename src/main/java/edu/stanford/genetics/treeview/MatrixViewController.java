@@ -104,13 +104,6 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		imView.addMouseMotionListener(mmListener);
 
 		imView.addMouseWheelListener(new MatrixMouseWheelListener());
-
-//		//Add the spacebar listener to everything
-//		imView.addKeyListener(new SpaceBarListener());
-//		Component c[] = imView.getComponents();
-//		for(int i = 0;i < c.length;i++) {
-//			c[i].addKeyListener(new SpaceBarListener());
-//		}
 	}
 
 	/** Simply ensures that no listeners are added on top of others. This is
@@ -406,36 +399,6 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		action_map.put("columnHoverStop", new ColumnHoverStopAction());
 	}
 
-//	/**
-//	 * This class is necessary to catch spacebar key presses to initiate the
-//	 * toggling of the whizzing labels because a key binding as above will not
-//	 * work when a GUI button has a highlight indicating focus
-//	 */
-//	class SpaceBarListener extends KeyAdapter {
-//
-//		@Override
-//		public void keyPressed(final KeyEvent e) {
-//			if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-//				e.consume();
-//				toggleLabels();
-//			}
-//		}
-//
-//		@Override
-//		public void keyReleased(final KeyEvent e) {
-//			if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-//				e.consume();
-//			}
-//		}
-//
-//		@Override
-//		public void keyTyped(final KeyEvent e) {
-//			if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-//				e.consume();
-//			}
-//		}
-//	}
-
 	/* -------------- Listeners --------------------- */
 	private class HomeKeyYAction extends AbstractAction {
 
@@ -679,6 +642,23 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			rowLabelView.setLabelPortFlankMode(true);
 			colLabelView.setLabelPortFlankMode(true);
 		}
+
+		if(rowLabelView.hasMouse) {
+			//Will more than 1 label be drawn in port mode?
+			boolean whizOverOne = !rowLabelView.isLabelPortFlankMode() ||
+				rowLabelView.getMaxLabelPortFlankSize() > 0;
+			//If whizeOverOne is true, we want setKeepTreeGlobal to be false so
+			//that the tree links to the labels
+			interactiveYmap.setKeepTreeGlobal(!whizOverOne);
+		} else if(colLabelView.hasMouse) {
+			//Will more than 1 label be drawn in port mode?
+			boolean whizOverOne = !colLabelView.isLabelPortFlankMode() ||
+				colLabelView.getMaxLabelPortFlankSize() > 0;
+			//If whizeOverOne is true, we want setKeepTreeGlobal to be false so
+			//that the tree links to the labels
+			interactiveXmap.setKeepTreeGlobal(!whizOverOne);
+		}
+
 		rowLabelView.storeState();
 		colLabelView.storeState();
 	}

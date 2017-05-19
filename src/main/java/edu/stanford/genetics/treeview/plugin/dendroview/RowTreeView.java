@@ -69,6 +69,13 @@ public class RowTreeView extends TRView {
 			getSecondaryPaneSize(offscreenSize),getWhizzingDestRectLength());
 	}
 
+	/**
+	 * When the whizzing labels are active, but the tree is drawn static/linked
+	 * to the data instead of the labels, this is used to draw a different color
+	 * background behind the portion of the tree the labels are shown for
+	 * @param g - graphics object
+	 * @param scaleEq - scaling factor object
+	 */
 	@Override
 	protected void drawFittedWhizBackground(final Graphics g,
 		LinearTransformation scaleEq) {
@@ -79,7 +86,8 @@ public class RowTreeView extends TRView {
 			return;
 		}
 
-		g.fillRect(0,(int) scaleEq.transform((double) map.getFirstVisibleLabel()),
+		g.fillRect(0,(int) scaleEq.transform(
+			(double) map.getFirstVisibleLabel()),
 			getSecondaryPaneSize(offscreenSize),
 			(int) scaleEq.transform((double) map.getFirstVisible() +
 				(double) map.getNumVisibleLabels()));
@@ -90,7 +98,7 @@ public class RowTreeView extends TRView {
 		if(destRect == null) {
 			return(-1);
 		}
-		return(destRect.y + map.getFirstVisibleLabelOffset());
+		return(destRect.y + map.getFirstVisibleLabelOffsetCapacity());
 	}
 
 	@Override
@@ -98,7 +106,8 @@ public class RowTreeView extends TRView {
 		if(destRect == null) {
 			return(-1);
 		}
-		return(destRect.y + map.getFirstVisibleLabelOffset() + destRect.height);
+		return(destRect.y + map.getFirstVisibleLabelOffsetCapacity() +
+			destRect.height);
 	}
 
 	@Override
@@ -152,8 +161,8 @@ public class RowTreeView extends TRView {
 
 	@Override
 	protected int getUsedWhizzingLength() {
-		return(map.getUsedPixels() - map.getFirstVisibleLabelOffset() -
-			map.getLastVisibleLabelOffset());
+		return(map.getUsedPixels() - map.getFirstVisibleLabelOffsetCapacity() -
+			map.getLastVisibleLabelOffsetCapacity());
 	}
 
 	@Override
