@@ -405,7 +405,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 			} else {
 				//If we are looking at a global/data-linked tree with whizzing
 				//labels
-				if(map.isWhizMode() && map.overALabelLinkedView()) {
+				if(map.isWhizMode() && map.overALabelLinkedView() &&
+					map.getNumVisibleLabels() > 1) {
 
 					g.setColor(whiz_bg_color);
 
