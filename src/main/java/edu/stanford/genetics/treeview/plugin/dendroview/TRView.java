@@ -384,8 +384,8 @@ public abstract class TRView extends ModelViewBuffered implements KeyListener,
 					map.getLastVisibleLabelOffset() + "]",
 					16);
 
-				firstVisIndex = map.getFirstVisibleLabel();
-				lastVisIndex  = map.getLastVisibleLabel();
+				firstVisIndex = map.getFirstVisibleLabelCapacity();
+				lastVisIndex  = map.getLastVisibleLabelCapacity();
 
 				debug("first visible label index [" + firstVisIndex +
 					"] last visible label index [" + lastVisIndex + "]",16);
