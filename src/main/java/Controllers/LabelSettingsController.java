@@ -233,7 +233,7 @@ public class LabelSettingsController {
 
 			/* counter to recognize the selected JRadioButton */
 			switch (((JRadioButton) e.getSource()).getText()) {
-				case "As many as possible [Spacebar toggles]":
+				case "As many as possible":
 					LogBuffer.println("Setting as many as possible.");
 					tvFrame.getDendroView().getRowLabelView()
 						.setLabelPortMode(true);

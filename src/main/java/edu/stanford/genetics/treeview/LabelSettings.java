@@ -302,9 +302,8 @@ public class LabelSettings extends CustomDialog {
 			JPanel showPanel = GUIFactory.createJPanel(false,
 				GUIFactory.TINY_GAPS_AND_INSETS);
 			showPanel.setBorder(BorderFactory.createTitledBorder(
-				"When labels don't fit, show..."));
-			showAllPossible = GUIFactory.createRadioBtn("As many as " +
-				"possible [Spacebar toggles]");
+				"When labels don't fit, show...  [spacebar toggles]"));
+			showAllPossible = GUIFactory.createRadioBtn("As many as possible");
 			showSome =
 				GUIFactory.createRadioBtn("Hovered label and ");
 			neighborSpinner = new JSpinner(new SpinnerNumberModel(
