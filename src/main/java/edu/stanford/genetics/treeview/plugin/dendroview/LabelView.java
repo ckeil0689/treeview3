@@ -621,7 +621,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			if(!map.isLabelAnimeRunning()) {
 				repaintTimer.stop();
 			}
-			repaint();
+			//Added an argument (based on https://stackoverflow.com/questions/
+			//13453331/repaint-in-java-doesnt-re-paint-immediately) which states
+			//that the repaint should happen before repaintInterval has expired
+			//(milliseconds)
+			repaint(repaintInterval);
 		}
 	});
 
