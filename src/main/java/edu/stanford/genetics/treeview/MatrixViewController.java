@@ -1,8 +1,10 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
@@ -22,6 +24,7 @@ import javax.swing.JComponent;
 import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 
 import com.dd.plist.NSDictionary;
@@ -71,6 +74,9 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	private DataTicker ticker;
 
 	private final boolean swap_animation_modifiers = true;
+
+	private int spacePressInitialDelay = 350;
+	private int spacePressRepeatDelay = 50;
 
 	public MatrixViewController(final InteractiveMatrixView imView,
 		final GlobalMatrixView gmView,final DataModel model,
@@ -347,13 +353,15 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		action_map.put("resetZoom", new HomeAction());
 
 		//Disable spacebar clicks focussed button behavior.  See:
-		//http://stackoverflow.com/questions/4472530/jbutton-referring-to-space-bar-the-same-as-a-click
-		InputMap btn_input_map = (InputMap) UIManager.get("Button.focusInputMap");
-		btn_input_map.put(KeyStroke.getKeyStroke("pressed SPACE"), "none");
-		btn_input_map.put(KeyStroke.getKeyStroke("released SPACE"), "none");
+		//http://stackoverflow.com/questions/4472530/jbutton-referring-to-space-
+		//bar-the-same-as-a-click
+		InputMap btn_input_map =
+			(InputMap) UIManager.get("Button.focusInputMap");
+		btn_input_map.put(KeyStroke.getKeyStroke("pressed SPACE"),"none");
+		btn_input_map.put(KeyStroke.getKeyStroke("released SPACE"),"none");
 		//Now let's swap out the spacebar default behavior with the enter key
-		btn_input_map.put( KeyStroke.getKeyStroke( "ENTER" ), "pressed" );
-		btn_input_map.put( KeyStroke.getKeyStroke( "released ENTER" ), "released" );
+		btn_input_map.put(KeyStroke.getKeyStroke("ENTER"),"pressed");
+		btn_input_map.put(KeyStroke.getKeyStroke("released ENTER"),"released");
 
 		/* Show more/fewer labels */
 		input_map.put(KeyStroke.getKeyStroke("SPACE"), "labelToggle");
@@ -615,15 +623,60 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		}
 	}
 
-	/** Toggles whizzing labels from as many as is possible to either no or some
-	 * labels (depending on the "showBaseIsNone" variable in LabelSettings). */
+	/**
+	 * This timer prevents the holding of the spacebar from making the label
+	 * toggle flicker.  The fact that this timer is running prevents the toggle
+	 * action from happening.  Once the timer expires, hitting the spacebar
+	 * again will allow the toggle to happen.  The timer restarts itself when
+	 * the spacebar is "pressed" again during the running timer, which is what
+	 * results repeatedly from holding down the spacebar.
+	 */
+	private javax.swing.Timer spacePressTimer;
+	private ActionListener spacePressTimerListener = new ActionListener() {
+
+		/**
+		 * When a space press timer expires, this is called.  Since all we need
+		 * to know is whether the timer is running or not in order to do the
+		 * right thing (e.g. there's nothing to do upon release - only press is
+		 * what toggles the labels - holding the spacebar down does nothing -
+		 * this timer only prevents repeated rapid toggles)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			if(evt.getSource() == spacePressTimer) {
+				//Stop timer so it doesn't repeat
+				spacePressTimer.stop();
+				spacePressTimer = null;
+			}
+		}
+	};
+
+
+	/**
+	 * Toggles whizzing labels from as many as is possible to either no or some
+	 * labels (depending on the "showBaseIsNone" variable in LabelSettings).
+	 */
 	private class LabelToggleAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
-			toggleLabels();
+			if(spacePressTimer != null && spacePressTimer.isRunning()) {
+				spacePressTimer.setDelay(spacePressRepeatDelay);
+				spacePressTimer.restart();
+			} else {
+				toggleLabels();
+				if(spacePressTimer != null) {
+					spacePressTimer.setDelay(spacePressInitialDelay);
+					spacePressTimer.start();
+					
+				} else {
+					spacePressTimer = new Timer(spacePressInitialDelay,
+						spacePressTimerListener);
+					spacePressTimer.start();
+				}
+			}
 		}
 	}
 
@@ -880,9 +933,6 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * @param end A Point representing the last index of each axis to be
 	 *          selected. */
 	public void selectRectangle(final Point start, final Point end) {
-
-//		LogBuffer.println("Selecting a rectangle: " + start.toString() 
-//				+ ", " + end.toString());
 
 		// sort so that ep is upper left corner
 		if(end.x < start.x) {
