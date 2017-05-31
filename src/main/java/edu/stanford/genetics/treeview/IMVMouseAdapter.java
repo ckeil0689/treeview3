@@ -97,8 +97,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 		xmap.setHoverIndex(colIdx);
 		ymap.setHoverIndex(rowIdx);
 
-		imView.repaint();
-
 		mvController.setDataValueAt(rowIdx, colIdx);
 	}
 	

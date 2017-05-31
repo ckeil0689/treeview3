@@ -10,7 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -197,8 +196,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		// 19 = Debug the blanking out of scrolled labels
 		// 20 = Debug whether the label offset calculations yield negatives
 		// 21 = Test whether the pixel index determined by 2 different methods
-		// is
-		// the same
+		// is the same
 		// 22 = Debug the ChangeListener attached to the secondary scrollbar
 		// 23 = Debug tree-hover label coloring & option-click deselect when
 		// nothing is selected
@@ -590,8 +588,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	// This is an attempt to get the hovering of the mouse over the matrix to
-	// get
-	// the label panes to update more quickly and regularly, as the
+	// get the label panes to update more quickly and regularly, as the
 	// notifyObservers method called from MapContainer was resulting in sluggish
 	// updates
 	private int repaintInterval = 50; // update every 50 milliseconds
@@ -1036,9 +1033,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				/* Finally draw label (alignment-dependent) */
 				int labelStrStart =
 					getLabelStartOffset(metrics.stringWidth(out));
-				debug("Label offset 1: [" + getLabelStartOffset(metrics
-					.stringWidth(out)) +
-					"]",11);
+				debug("Label offset 1: [" + getLabelStartOffset(
+					metrics.stringWidth(out)) + "]",11);
 
 				int indexDiff = j - getPrimaryHoverIndex();
 				int yPos = hoverYPos +
@@ -1103,6 +1099,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					drawOverrunArrows(metrics.stringWidth(out),g,yPos -
 						ascent,labelAttr.getPoints(),g2d.getColor(),bgColor,
 						labelStrStart);
+				} else {
+					//No more labels can fit, so we can stop the loop early
+					break;
 				}
 			}
 			catch(final java.lang.ArrayIndexOutOfBoundsException e) {
@@ -1188,6 +1187,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					drawOverrunArrows(metrics.stringWidth(out),g,yPos -
 						ascent,labelAttr.getPoints(),labelColor,bgColor,
 						labelStrStart);
+				} else {
+					//No more labels can fit, so we can stop the loop early
+					break;
 				}
 			}
 			catch(final java.lang.ArrayIndexOutOfBoundsException e) {
@@ -2003,8 +2005,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		// repaintTimer.restart();
 		// }
 
-		repaint();
-
 		/*
 		 * TODO: Handle the temporary outlining of the matrix NOT SURE HOW TO DO
 		 * THIS YET - CANNOT TALK TO IMV
@@ -2275,8 +2275,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		 * Rounding off to 4 decimals
 		 */
 		setDataTickerValue(e);
-
-		repaint();
 	}
 
 	/**
