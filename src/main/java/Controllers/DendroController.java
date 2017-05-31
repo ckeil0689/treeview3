@@ -159,7 +159,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		return; // no stored state, so nothing to import yet
 	}
 
-	/** Initiates the controller for a new data matrix by setting up all
+	/**
+	 * Initiates the controller for a new data matrix by setting up all
 	 * necessary components.
 	 * TODO - Layout reset necessary?
 	 * 
@@ -855,8 +856,10 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		globalYmap.setIndexRange(0, tvModel.getDataMatrix().getNumRow() - 1);
 	}
 
-	/** Connects all sub components with DendroView's configuration node, so that
-	 * the hierarchical structure of Java's Preferences API can be followed. */
+	/**
+	 * Connects all sub components with DendroView's configuration node, so that
+	 * the hierarchical structure of Java's Preferences API can be followed.
+	 */
 	private void setComponentPreferences() {
 
 		setConfigNode(tvFrame.getConfigNode());

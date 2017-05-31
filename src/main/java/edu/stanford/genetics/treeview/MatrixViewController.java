@@ -711,6 +711,9 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			//that the tree links to the labels
 			interactiveXmap.setKeepTreeGlobal(!whizOverOne);
 		}
+
+		rowLabelView.storeState();
+		colLabelView.storeState();
 	}
 
 	/** Starts highlighting the hovered row and column */

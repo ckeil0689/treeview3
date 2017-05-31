@@ -352,7 +352,20 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 				for(int i = 0; i < nColLabelType; i++) {
 					// do not add known row label types
 					String colLabelType = stringLabels[i][0];
-					if(PreviewLoader.isCommonLabel(colLabelType, PreviewLoader.COMMON_ROW_LABELS)) {
+					if(PreviewLoader.isCommonLabel(colLabelType,
+						PreviewLoader.COMMON_ROW_LABELS)) {
+						if(dataInfo.getDataStartCol() > 1) {
+							//The following is a kludge because clustering
+							//inserts a new column at the beinning which renames
+							//the original first row header.  This assumes that
+							//the first column is now the second column and that
+							//this will only occur on the first row.  This also
+							//assumes that the label type is the same for the
+							//first row and (original) "first" column
+							//TODO: The bug that causes this issue must be
+							//fixed.
+							readColLabelTypes[i] = stringLabels[i][1];
+						}
 						continue;
 					}
 					readColLabelTypes[i] = stringLabels[i][0];
@@ -383,7 +396,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	 * @param axis - the axis type for the labels (row or column)
 	 * @return an adjusted String array without empty or null values. */
 	private String[] replaceEmptyLabelTypes(String[] originalLabelTypes,
-																					final String axis) {
+		final String axis) {
 
 		String[] newLabelTypes = new String[originalLabelTypes.length];
 		Pattern p = Pattern.compile("(^\\s*$)", Pattern.UNICODE_CHARACTER_CLASS);

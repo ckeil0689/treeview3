@@ -501,6 +501,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public void storeState() {
 
+		if(labelAttr == null) {
+			LogBuffer.println("Could not store labelAttributes state.");
+			return;
+		}
+
 		labelAttr.storeState();
 
 		//Save the preferred port label states
@@ -539,11 +544,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			Preferences summaryNode;
 			if(node.nodeExists("RowSummary")) {
 				summaryNode = node.node("RowSummary");
-
 			}
 			else if(node.nodeExists("ColSummary")) {
 				summaryNode = node.node("ColSummary");
-
 			}
 			else {
 				summaryNode = null;
@@ -790,10 +793,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			map.setWhizMode(drawLabelPort);
 
-			// If the label pane's secondary dimension changed sizes or if the
-			// font size has changed
+			// If the label pane's visible portion changed sizes (e.g. the user
+			//dragged the splitpane divider) or if the content has dictated a
+			//change in the offscreen size
 			if(secondaryViewportSizeChanged() ||
-				(lastFontSize != labelAttr.getPoints())) {
+				(paneSizeShouldBe != getSavedSecondaryPaneSize())) {
 				debug("Viewport size change detected. Previous scroll " +
 					"positions: lastScrollPos [" + lastScrollPos +
 					"] lastScrollEndPos [" + lastScrollEndPos +

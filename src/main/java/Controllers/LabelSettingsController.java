@@ -149,9 +149,6 @@ public class LabelSettingsController {
 
 	/**
 	 * Listener for the "Ok" button in the preferences frame.
-	 *
-	 * @author CKeil
-	 *
 	 */
 	class ConfirmationListener implements ActionListener {
 
@@ -160,14 +157,12 @@ public class LabelSettingsController {
 
 			checkForColorSave();
 			preferences.getPreferencesFrame().dispose();
+			preferences.synchronizeAnnotation();
 		}
 	}
 
 	/**
 	 * WindowAdapter for the Preferences menu.
-	 *
-	 * @author CKeil
-	 *
 	 */
 	class SaveAndCloseListener extends WindowAdapter {
 
@@ -182,17 +177,14 @@ public class LabelSettingsController {
 	/**
 	 * Listens to changing radio buttons in the AnnotationSettings and sets the
 	 * justify-flag in TextView and ArrayNameView respectively.
-	 *
-	 * @author chris0689
-	 *
 	 */
 	class LabelJustifyListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final boolean[] labelAligns = tvFrame.getDendroView()
-					.getLabelAligns();
+			final boolean[] labelAligns =
+				tvFrame.getDendroView().getLabelAligns();
 
 			boolean isRowRight = labelAligns[0];
 			boolean isColRight = labelAligns[1];
