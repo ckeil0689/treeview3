@@ -793,10 +793,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			map.setWhizMode(drawLabelPort);
 
-			// If the label pane's secondary dimension changed sizes or if the
-			// font size has changed
+			// If the label pane's visible portion changed sizes (e.g. the user
+			//dragged the splitpane divider) or if the content has dictated a
+			//change in the offscreen size
 			if(secondaryViewportSizeChanged() ||
-				(lastFontSize != labelAttr.getPoints())) {
+				(paneSizeShouldBe != getSavedSecondaryPaneSize())) {
 				debug("Viewport size change detected. Previous scroll " +
 					"positions: lastScrollPos [" + lastScrollPos +
 					"] lastScrollEndPos [" + lastScrollEndPos +

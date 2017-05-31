@@ -24,10 +24,10 @@ public final class PreviewLoader {
 	 * ROWID, COLID
 	 */
 	public final static String COMMON_LABELS = "(?i)(COMPLEX|NAME|^Y?ORF$|" +
-																							"^(GENE|G|ARRAY|A|U|ROW|COL)?ID$|^.*WEIGHT$)";
+		"^(GENE|G|ARRAY|A|U|ROW|COL)?ID$|^.*WEIGHT$)";
 
-	public final static String COMMON_ROW_LABELS = "(?i)(COMPLEX|NAME|^Y?ORF$|" +
-																									"^(GENE|G|U|ROW)?ID$|^.*WEIGHT$)";
+	public final static String COMMON_ROW_LABELS =
+		"(?i)(^Y?ORF$|^(GENE|G|U|ROW)?ID$)";
 
 	/*
 	 * For recognizing supposed numeric data in a file. Matches (non
