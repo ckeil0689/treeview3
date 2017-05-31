@@ -88,9 +88,8 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 
 		removeAllMouseListeners();
 
-		IMVMouseAdapter mmListener = new IMVMouseAdapter(	this, imView,
-																											interactiveXmap,
-																											interactiveYmap);
+		IMVMouseAdapter mmListener = new IMVMouseAdapter(this, imView,
+			interactiveXmap,interactiveYmap);
 
 		imView.addMouseListener(mmListener);
 		imView.addMouseMotionListener(mmListener);
@@ -687,7 +686,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 				 * determined in TreeView3.java instead of replicating that code
 				 * here. */
 				onamac = System	.getProperty("os.name").toLowerCase()
-												.startsWith("mac os x");
+					.startsWith("mac os x");
 			}
 			catch(Exception ex) {
 				LogBuffer.println("Failed to determine os: " + ex.getMessage());
@@ -701,13 +700,13 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			try {
 				if(onAMac()) {
 					File globalPref = new File(System.getProperty("user.home") +
-																			"/Library/Preferences/.GlobalPreferences.plist");
+						"/Library/Preferences/.GlobalPreferences.plist");
 
-					NSDictionary dict = (NSDictionary) PropertyListParser
-																																.parse(globalPref);
+					NSDictionary dict =
+						(NSDictionary) PropertyListParser.parse(globalPref);
 
-					NSNumber pref = (NSNumber) dict.objectForKey("com.apple.swipescroll" +
-																												"direction");
+					NSNumber pref = (NSNumber) dict.objectForKey(
+						"com.apple.swipescrolldirection");
 
 					if(pref.boolValue()) {
 						natural = true;
@@ -729,13 +728,14 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			if(!imView.hasMouse()) { return; }
 
 			final int notches = e.getWheelRotation();
-			final int shift = (notches < 0) ? -3 : 3;
+			final int shift = notches;
+			final double scroll_ratio = 0.05;
 
 			//On macs' magic mouse, horizontal scroll comes in as if the shift
 			//was down
 			if(e.isAltDown()) {
-				if((!reverseZoomDirection && notches < 0) || (reverseZoomDirection &&
-																											notches > 0)) {
+				if((!reverseZoomDirection && notches < 0) ||
+					(reverseZoomDirection && notches > 0)) {
 
 					//This ensures we only zoom toward the cursor when the
 					//cursor is over the map
@@ -759,13 +759,13 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 				}
 			}
 			else if(e.isShiftDown()) {
-				interactiveXmap.scrollBy(shift);
+				interactiveXmap.scrollBy(shift * (int) Math.ceil(scroll_ratio * interactiveXmap.getNumVisible()));
 				//Now we are hovered over a new index
 				interactiveXmap.setHoverIndex(interactiveXmap.getIndex(e.getX()));
 
 			}
 			else {
-				interactiveYmap.scrollBy(shift);
+				interactiveYmap.scrollBy(shift * (int) Math.ceil(scroll_ratio * interactiveYmap.getNumVisible()));
 				//Now we are hovered over a new index
 				interactiveYmap.setHoverIndex(interactiveYmap.getIndex(e.getY()));
 			}
