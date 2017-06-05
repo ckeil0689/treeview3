@@ -168,11 +168,8 @@ public class DataTicker implements Observer{
 	 */
 	private boolean isZoomed() {
 	
-		return(
-			!(ymap.getMaxIndex()+1 ==
-			ymap.getNumVisible() &&
-			xmap.getMaxIndex()+1 ==
-			xmap.getNumVisible()));
+		return(!(ymap.getMaxIndex()+1 == ymap.getNumVisible() &&
+			xmap.getMaxIndex()+1 == xmap.getNumVisible()));
 	}
 
 	@Override
