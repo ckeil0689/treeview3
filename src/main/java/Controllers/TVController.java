@@ -67,7 +67,6 @@ public class TVController implements Observer {
 	private MenubarController menuController;
 	private File file;
 	private FileSet fileMenuSet;
-	private FileSet loadingFile;
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 

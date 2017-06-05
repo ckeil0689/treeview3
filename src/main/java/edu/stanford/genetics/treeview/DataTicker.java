@@ -7,6 +7,8 @@
 
 package edu.stanford.genetics.treeview;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -14,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 
 import Utilities.GUIFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
@@ -33,6 +36,12 @@ public class DataTicker implements Observer{
 	/* Maps to know the position of the matrix*/
 	private MapContainer xmap;
 	private MapContainer ymap;
+
+	//Timer to delay performing costly mean calculations until matrix navigation
+	//is done
+	private int meanCalcDelay = 500;
+	private javax.swing.Timer meanCalcTimer;
+
 	/**
 	 * Creates a new DataTicker instance.
 	 */
@@ -99,7 +108,7 @@ public class DataTicker implements Observer{
 		if(isZoomed()){
 			setZoomMeanDataTickerValue();
 		}else{
-		  setMeanDataValue();
+			setMeanDataValue();
 		}
 	}
 	
@@ -135,7 +144,7 @@ public class DataTicker implements Observer{
 	 */
 	public void setMeanDataValue() {
 		setText("Data Average:");
-		setValue( dataModel.getDataMatrix().getMean());
+		setValue(dataModel.getDataMatrix().getMean());
 	}
 	
 	/**
@@ -147,7 +156,8 @@ public class DataTicker implements Observer{
 		int startingCol = xmap.getFirstVisible();
 		int endingCol = xmap.getLastVisible();
 		setText("Zoom Average:");
-		setValue( dataModel.getDataMatrix().getZoomedMean(startingRow, endingRow, startingCol, endingCol));
+		setValue(dataModel.getDataMatrix().getZoomedMean(startingRow,endingRow,
+			startingCol, endingCol));
 	}
 	/**
 	 * Returns true if the visible area is a part of the matrix, 
@@ -167,11 +177,31 @@ public class DataTicker implements Observer{
 	@Override
 	public void update(Observable o, Object arg) {
 		if(o == xmap || o == ymap ) {
-			setAppropriateValue();
+			if(meanCalcTimer == null) {
+				meanCalcTimer = new Timer(
+					meanCalcDelay,
+					meanCalcListener);
+				meanCalcTimer.start();
+			} else if(meanCalcTimer.isRunning()) {
+				meanCalcTimer.restart();
+			} else {
+				meanCalcTimer = null;
+			}
 		}
 		else {
 			LogBuffer.println("Warning: Data Ticker got funny update!");
 		}
 	}
-	
+
+	ActionListener meanCalcListener = new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			if(evt.getSource() == meanCalcTimer) {
+				meanCalcTimer.stop();
+				meanCalcTimer = null;
+				setAppropriateValue();
+			}
+		}
+	};
 }
