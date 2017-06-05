@@ -104,7 +104,7 @@ public class DataTicker implements Observer{
 		textLabel.setText(text);
 	}
 	
-	public void setAppropriateValue(){
+	public void setVisibleMean(){
 		if(isZoomed()){
 			setZoomMeanDataTickerValue();
 		}else{
@@ -159,6 +159,7 @@ public class DataTicker implements Observer{
 		setValue(dataModel.getDataMatrix().getZoomedMean(startingRow,endingRow,
 			startingCol, endingCol));
 	}
+
 	/**
 	 * Returns true if the visible area is a part of the matrix, 
 	 * false if whole matrix is visible
@@ -200,7 +201,7 @@ public class DataTicker implements Observer{
 			if(evt.getSource() == meanCalcTimer) {
 				meanCalcTimer.stop();
 				meanCalcTimer = null;
-				setAppropriateValue();
+				setVisibleMean();
 			}
 		}
 	};
