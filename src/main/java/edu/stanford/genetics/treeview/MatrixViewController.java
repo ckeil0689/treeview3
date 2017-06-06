@@ -729,7 +729,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 
 			final int notches = e.getWheelRotation();
 			final int shift = notches;
-			final double scroll_ratio = 0.05;
+			final double scroll_ratio = 0.01;
 
 			//On macs' magic mouse, horizontal scroll comes in as if the shift
 			//was down
