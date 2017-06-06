@@ -136,44 +136,6 @@ public class GlobalMatrixView extends MatrixView {
 	}
 
 	/**
-	 * DEPRECATE set the xmapping for this view
-	 *
-	 * @param m
-	 *            the new mapping
-	 */
-	@Override
-	public void setXMap(final MapContainer m) {
-
-		super.setXMap(m);
-
-		if(xmap.getMaxIndex() > MAP_SIZE_LIMIT) {
-			this.xViewMin = (xmap.getMaxIndex() / 100) * 2;
-
-		} else {
-			this.xViewMin = MIN_VIEWPORT_SIZE;
-		}
-	}
-
-	/**
-	 * DEPRECATE set the ymapping for this view
-	 *
-	 * @param m
-	 *            the new mapping
-	 */
-	@Override
-	public void setYMap(final MapContainer m) {
-
-		super.setYMap(m);
-
-		if(ymap.getMaxIndex() > MAP_SIZE_LIMIT) {
-			this.yViewMin = (ymap.getMaxIndex() / 100) * 2;
-
-		} else {
-			this.yViewMin = MIN_VIEWPORT_SIZE;
-		}
-	}
-
-	/**
 	 * Checks the current view of rows and columns and calculates the
 	 * appropriate viewport rectangle.
 	 */
@@ -477,6 +439,11 @@ public class GlobalMatrixView extends MatrixView {
 		repaint();
 	}
 
+	/**
+	 * This is called when the underlying data has changed.  It updates the x
+	 * and y view minimums for the viewport rectangle.  A larger minimum is
+	 * needed for large datasets so that the rectangle is visible.
+	 */
 	@Override
 	protected void updateMatrix() {
 		super.updateMatrix();
