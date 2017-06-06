@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelection;
 
 public class GlobalMatrixView extends MatrixView {
@@ -71,8 +72,9 @@ public class GlobalMatrixView extends MatrixView {
 		if (viewPortRect != null) {
 			g2.setColor(Color.white);
 
+			LogBuffer.println("Drawing viewport rect at x: " + viewPortRect.x + " and y: " + viewPortRect.y + " with width: " + viewPortRect.width + " and height: " + viewPortRect.height);
 			g2.drawRect(viewPortRect.x, viewPortRect.y, viewPortRect.width,
-					viewPortRect.height);
+				viewPortRect.height);
 		}
 		
 		/* yellow selection rectangles */
@@ -186,7 +188,7 @@ public class GlobalMatrixView extends MatrixView {
 			indicatorSelectionCircleList = null;
 			return;
 		}
-		
+
 		setSelectionRectangles();
 		setIndicatorSelectionCircleBounds();
 	}
@@ -421,21 +423,21 @@ public class GlobalMatrixView extends MatrixView {
 				h = (yBoundaries.get(1) - yBoundaries.get(0));
 
 				if(w < 5 && h < 5 &&
-				   //This is not the first selection and the last selection
-				   //is far away OR this is the first selection and the next
-				   //selection either doesn't exists or is far away
-				   ((lastxb >= 0 &&
-				     Math.abs(xBoundaries.get(0) - lastxb) > 5) ||
-				    (lastxb < 0 &&
-				     (arrayBoundaryList.size() == 1 ||
-				      Math.abs(arrayBoundaryList.get(1).get(0) -
-				               xBoundaries.get(1)) > 5))) &&
-				   ((lastyb >= 0 &&
-				     Math.abs(yBoundaries.get(0) - lastyb) > 5) ||
-				    (lastyb < 0 &&
-				     (geneBoundaryList.size() == 1 ||
-				      Math.abs(geneBoundaryList.get(1).get(0) -
-				               yBoundaries.get(1)) > 5)))) {
+					//This is not the first selection and the last selection
+					//is far away OR this is the first selection and the next
+					//selection either doesn't exists or is far away
+					((lastxb >= 0 &&
+						Math.abs(xBoundaries.get(0) - lastxb) > 5) ||
+							(lastxb < 0 &&
+								(arrayBoundaryList.size() == 1 ||
+								Math.abs(arrayBoundaryList.get(1).get(0) -
+									xBoundaries.get(1)) > 5))) &&
+						((lastyb >= 0 &&
+						Math.abs(yBoundaries.get(0) - lastyb) > 5) ||
+							(lastyb < 0 &&
+								(geneBoundaryList.size() == 1 ||
+								Math.abs(geneBoundaryList.get(1).get(0) -
+									yBoundaries.get(1)) > 5)))) {
 					// coords for top left of circle
 					x = xBoundaries.get(0) + (w / 2.0) - 5;
 					y = yBoundaries.get(0) + (h / 2.0) - 5;
@@ -462,14 +464,35 @@ public class GlobalMatrixView extends MatrixView {
 	public void setIMVViewportRange(final int firstXVisible, 
 			final int firstYVisible, final int numXVisible, 
 			final int numYVisible) {
-		
+
 		this.imv_firstXVisible = firstXVisible;
 		this.imv_firstYVisible = firstYVisible;
 		this.imv_numXVisible = numXVisible;
 		this.imv_numYVisible = numYVisible;
-		
+
+		LogBuffer.println("Setting num visible x: " + numXVisible + " and y: " + numYVisible);
+
 		recalculateOverlay();
 		offscreenValid = false;	
 		repaint();
+	}
+
+	@Override
+	protected void updateMatrix() {
+		super.updateMatrix();
+
+		if(xmap.getMaxIndex() > MAP_SIZE_LIMIT) {
+			this.xViewMin = (xmap.getMaxIndex() / 100) * 2;
+
+		} else {
+			this.xViewMin = MIN_VIEWPORT_SIZE;
+		}
+
+		if(ymap.getMaxIndex() > MAP_SIZE_LIMIT) {
+			this.yViewMin = (ymap.getMaxIndex() / 100) * 2;
+
+		} else {
+			this.yViewMin = MIN_VIEWPORT_SIZE;
+		}
 	}
 }

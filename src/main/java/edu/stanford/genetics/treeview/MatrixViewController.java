@@ -163,7 +163,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * @param node
 	 * @throws BackingStoreException */
 	public void importColorPreferences(final Preferences oldNode)
-																																throws BackingStoreException {
+		throws BackingStoreException {
 
 		LogBuffer.println("Importing color settings...");
 
@@ -171,9 +171,9 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		String colorPresetsNode = colorPresets.getClass().getSimpleName();
 
 		if(!oldNode.nodeExists(colorPresetsNode)) {
-			LogBuffer.println(colorPresetsNode +	" node not found when trying " +
-												"to import previous color settings. " +
-												"Aborting import attempt.");
+			LogBuffer.println(colorPresetsNode + " node not found when " +
+				"trying to import previous color settings. Aborting import " +
+				"attempt.");
 			return;
 		}
 
@@ -201,7 +201,8 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		int numXVisible = interactiveXmap.getNumVisible();
 		int numYVisible = interactiveYmap.getNumVisible();
 
-		gmView.setIMVViewportRange(firstXVisible, firstYVisible, numXVisible, numYVisible);
+		gmView.setIMVViewportRange(firstXVisible, firstYVisible, numXVisible,
+			numYVisible);
 	}
 
 	/** Sets a new ColorExtractor with different data
@@ -735,7 +736,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			//was down
 			if(e.isAltDown()) {
 				if((!reverseZoomDirection && notches < 0) || (reverseZoomDirection &&
-																											notches > 0)) {
+					notches > 0)) {
 
 					//This ensures we only zoom toward the cursor when the
 					//cursor is over the map
