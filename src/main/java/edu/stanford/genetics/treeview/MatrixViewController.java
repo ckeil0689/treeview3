@@ -770,7 +770,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 				interactiveYmap.setHoverIndex(interactiveYmap.getIndex(e.getY()));
 			}
 
-			imView.repaint();
+			imView.repaint(250);
 		}
 	}
 
