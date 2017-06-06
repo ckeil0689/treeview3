@@ -14,7 +14,8 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 
 	private String[] labelTypeArray = new String[0];
 	private String[][] labelArray = new String[0][];
-	private Hashtable<String, Integer> id2row = new Hashtable<String, Integer>();
+	private Hashtable<String, Integer> id2row =
+		new Hashtable<String, Integer>();
 
 	private boolean modified = false;
 
@@ -110,12 +111,12 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 		if(labelType == null) {
 			return -1;
 		}
-		
+
 		for (int i = 0; i < labelTypeArray.length; i++) {
 			if (labelType.equalsIgnoreCase(labelTypeArray[i]))
 				return i;
 		}
-		
+
 		return -1;
 	}
 

@@ -165,15 +165,14 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * 
 	 * @param dendroView Instance of the main UI class for viewing matrices.
 	 * @param tvModel Instance of the underling data model. */
-	public void setNewMatrix(	final DendroView dendroView,
-														final DataModel tvModel) {
+	public void setNewMatrix(final DendroView dendroView,
+		final DataModel tvModel) {
 
 		this.dendroView = dendroView;
 		this.tvModel = tvModel;
-		this.mvController = new MatrixViewController(	dendroView
-																														.getInteractiveMatrixView(),
-																									dendroView.getGlobalMatrixView(),
-																									tvModel);
+		this.mvController = new MatrixViewController(
+			dendroView.getInteractiveMatrixView(),
+				dendroView.getGlobalMatrixView(),tvModel);
 
 		resetComponentDefaults();
 
@@ -183,7 +182,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		updateLabelInfo();
 		bindComponentFunctions();
 
-		dendroView.setupSearch(tvModel.getRowLabelInfo(), tvModel.getColLabelInfo(), interactiveXmap, interactiveYmap);
+		dendroView.setupSearch(tvModel.getRowLabelInfo(),
+			tvModel.getColLabelInfo(), interactiveXmap, interactiveYmap);
 
 		dendroView.setupLayout();
 		setModelAndTicker(dendroView, tvModel);
@@ -1235,16 +1235,19 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				final LabelInfo trLabelInfo = tvModel.getAtrLabelInfo();
 
 				if(trLabelInfo.getIndex("NODECOLOR") >= 0) {
-					TreeColorer.colorUsingLabelType(invertedTreeDrawer.getRootNode(), trLabelInfo, trLabelInfo.getIndex("NODECOLOR"));
+					TreeColorer.colorUsingLabelType(
+						invertedTreeDrawer.getRootNode(), trLabelInfo,
+						trLabelInfo.getIndex("NODECOLOR"));
 				}
 
 			}
 			catch(final DendroException e) {
 				String message = "The ATR and CDT files appear to be " +
-													"corrupted/out-of-sync.  Rebuilding the ATR file's tree " +
-													"structure.";
+					"corrupted/out-of-sync.  Rebuilding the ATR file's tree " +
+					"structure.";
 
-				JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message,
+					"Error", JOptionPane.ERROR_MESSAGE);
 				LogBuffer.logException(e);
 
 				dendroView.getColumnTreeView().setEnabled(false);
@@ -1255,9 +1258,10 @@ public class DendroController implements ConfigNodePersistent, Observer,
 				}
 				catch(final DendroException ex) {
 					message = "Got DendroException in setData() for " +
-										"invertedTreeDrawer in bindTrees(): " + e.getMessage();
+						"invertedTreeDrawer in bindTrees(): " + e.getMessage();
 
-					JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(tvFrame.getAppFrame(),
+						message, "Error", JOptionPane.ERROR_MESSAGE);
 					LogBuffer.logException(ex);
 				}
 			}
@@ -1271,10 +1275,10 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			}
 			catch(final DendroException e) {
 				final String message = "Got DendroException in setData() " +
-																"for invertedTreeDrawer in bindTrees(): " + e
-																																							.getMessage();
+					"for invertedTreeDrawer in bindTrees(): " + e.getMessage();
 
-				JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message, "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(tvFrame.getAppFrame(), message,
+					"Error", JOptionPane.ERROR_MESSAGE);
 				LogBuffer.logException(e);
 			}
 		}

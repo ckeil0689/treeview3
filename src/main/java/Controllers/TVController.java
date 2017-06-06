@@ -725,8 +725,7 @@ public class TVController implements Observer {
 
 		/* Creating the Controller for this view. */
 		ClusterDialogController cController = new ClusterDialogController(
-																																			clusterView,
-																																			TVController.this);
+			clusterView,TVController.this);
 
 		cController.displayView();
 	}
@@ -742,13 +741,12 @@ public class TVController implements Observer {
 		}
 	}
 
-	public void showSubDataModel(	final int[] geneIndexes,
-																final int[] arrayIndexes, final String source,
-																final String name) {
+	public void showSubDataModel(final int[] geneIndexes,
+		final int[] arrayIndexes, final String source,
+		final String name) {
 
 		final ReorderedDataModel dataModel = new ReorderedDataModel(model,
-																																geneIndexes,
-																																arrayIndexes);
+			geneIndexes,arrayIndexes);
 		if(source != null) {
 			dataModel.setSource(source);
 		}
@@ -777,12 +775,12 @@ public class TVController implements Observer {
 				def = source.getDir() + source.getRoot() + "_list.txt";
 			}
 
-			final RowListMaker t = new RowListMaker((JFrame) Frame.getFrames()[0],
-																							tvFrame.getRowSelection(), model
-																																							.getRowLabelInfo(),
-																							def);
+			final RowListMaker t =
+				new RowListMaker((JFrame) Frame.getFrames()[0],
+				tvFrame.getRowSelection(), model.getRowLabelInfo(),def);
 
-			t.setDataMatrix(model.getDataMatrix(), model.getColLabelInfo(), DataModel.NAN);
+			t.setDataMatrix(model.getDataMatrix(), model.getColLabelInfo(),
+				DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
 

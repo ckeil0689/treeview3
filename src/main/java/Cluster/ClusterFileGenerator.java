@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
 
 /** This class is used to generate the .CDT tab delimited file which Java
@@ -108,7 +109,6 @@ public class ClusterFileGenerator {
 		// Add some string elements, as well as row/ column names
 		if(isHier) {
 			createHierCDT();
-
 		}
 		else {
 			createKMeansCDT();
@@ -277,10 +277,12 @@ public class ClusterFileGenerator {
 		return index;
 	}
 
-	/** Generates a Clustered Data Table (CDT) file formatted for
+	/**
+	 * Generates a Clustered Data Table (CDT) file formatted for
 	 * hierarchical clustering. Each line of the table is first created
 	 * as String array and then passed to the BufferedWriter. The process
-	 * moves through the labels and data line by line. */
+	 * moves through the labels and data line by line.
+	 */
 	private void createHierCDT() {
 
 		final String[] rowLabelTypes = rowClusterData.getAxisLabelTypes();
@@ -367,15 +369,22 @@ public class ClusterFileGenerator {
 			String[] labels = rowClusterData.getOrderedLabels()[i];
 
 			if(rowClusterData.isAxisClustered() && !foundGIDs) {
-				row[idxTracker] = orderedGIDs[i];
-				idxTracker++;
+
+				try {
+					row[idxTracker] = orderedGIDs[i];
+					idxTracker++;
+				} catch(Exception e) {
+					LogBuffer.println("Encountered an exception when mapping " +
+						"row IDs from the previously clustered file: " +
+						e.getLocalizedMessage());
+				}
 
 				/* 
 				 * Ensure the labels are consistent with what was created for 
 				 * orderedGIDs. For example, an old file might already contain 
 				 * GENE23X etc. but the naming was ditched for ROW23X. If this
 				 * isn't corrected, then tree files will not match up with the
-				 * cdt.	
+				 * cdt.
 				 */
 			}
 			else if(rowClusterData.isAxisClustered() && foundGIDs) {

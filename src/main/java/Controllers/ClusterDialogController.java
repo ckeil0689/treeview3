@@ -200,15 +200,15 @@ public class ClusterDialogController {
 
 			/* Initialize the clustering processor and pass the data */
 			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel.getDataMatrix();
-			
+
 			/* Initialize the cluster processor */
 			if(isHierarchical()) {
 				processor = new ClusterProcessor(originalMatrix);
-				
+
 			} else {
 				final IntLabelInfo rowLabelI = tvModel.getRowLabelInfo();
 				final IntLabelInfo colLabelI = tvModel.getColLabelInfo();
-				
+
 				processor = new ClusterProcessor(originalMatrix, oldFileName, rowLabelI, colLabelI);
 			}
 
@@ -219,20 +219,20 @@ public class ClusterDialogController {
 
 			final boolean isRowReady = isReady(rowSimilarity, ROW);
 			final boolean isColReady = isReady(colSimilarity, COL);
-			
+
 			this.clusterCheck = reaffirmClusterChoice(isRowReady, isColReady);
-			
+
 			if(!clusterCheck[ROW_IDX] && !clusterCheck[COL_IDX]) {
 				this.cancel(true);
 				return Boolean.FALSE;
 			}
-			
+
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], clusterCheck[COL_IDX]);
-			
+
 			// TODO need to add drive partition part to the path when subpath is created
 			final Path clusterFilePath = ClusterFileStorage.createDirectoryStruc(oldFileName, 
 					clusterView.getLinkMethod());
-			
+
 			// Cluster rows if user selected option
 			if (clusterCheck[ROW_IDX]) {
 				gtrFile = ClusterFileStorage.retrieveFile(clusterFilePath, GTR_END);
@@ -244,24 +244,25 @@ public class ClusterDialogController {
 			if (isCancelled()) {
 				return Boolean.FALSE;
 			}
-			
+
 			// Cluster columns if user selected option
 			if (clusterCheck[COL_IDX]) {
 				atrFile = ClusterFileStorage.retrieveFile(clusterFilePath, ATR_END);
 				colClusterData.setReorderedIDs(calculateAxis(colSimilarity, COL, atrFile));
 				colClusterData.shouldReorderAxis(true);
 			}
-			
+
 			if(!isReorderingValid(clusterCheck)) {
 				this.cancel(true);
 				return Boolean.FALSE;
 			}
-			
-			// Determine file extensions for CDT file (varies between hierarchical and k-means)
+
+			// Determine file extensions for CDT file (varies between
+			// hierarchical and k-means)
 			String fileEnd = ClusterFileStorage.determineClusterFileExt(
-					isHierarchical(), clusterView.getSpinnerValues(), 
-					rowClusterData, colClusterData);
-			
+				isHierarchical(), clusterView.getSpinnerValues(), 
+				rowClusterData, colClusterData);
+
 			cdtFile = ClusterFileStorage.retrieveFile(clusterFilePath, fileEnd);
 
 			if(cdtFile == null) {
@@ -287,9 +288,9 @@ public class ClusterDialogController {
 			}
 			
 			if (!isCancelled() && shouldSave) {
+				LogBuffer.println("ClusterTask is done: success.  Saving to " +
+					oldFileName);
 				saveClusterFile(oldFileName, rowClusterData, colClusterData);
-				LogBuffer.println("ClusterTask is done: success.");
-
 			} else {
 				rowClusterData.setReorderedIDs(new String[] {});
 				colClusterData.setReorderedIDs(new String[] {});
@@ -337,45 +338,49 @@ public class ClusterDialogController {
 		 * @return
 		 */
 		private String[] getOldIDs(final int axisID) {
-			
+
 			String[][] labelArray;
 			String[] oldIDs; 
 			Pattern p;
 			int pos = 0;
-			
-            if(axisID == ROW_IDX) {
-            	labelArray = tvModel.getRowLabelInfo().getLabelArray();
-            	
-            	if(!tvModel.gidFound()) {
-            		return new String[]{};
-            	}
-            	/* Find ID index */
-            	p = Pattern.compile("ROW\\d+X");
-            	
-            } else {
-            	labelArray = tvModel.getColLabelInfo().getLabelArray();
-            	
-            	if(!tvModel.aidFound()) {
-            		return new String[]{};
-            	}
-            	p = Pattern.compile("COL\\d+X");
-            }
-			
-            /* Find ID index */
-        	for(int i = 0; i < labelArray[0].length; i++) {
-        		Matcher m = p.matcher(labelArray[0][i]);
-        		if(m.find()) {
-        			pos = i;
-        			break;
-        		}
-        	}
-        	
+
+			if(axisID == ROW_IDX) {
+				labelArray = tvModel.getRowLabelInfo().getLabelArray();
+
+				if(!tvModel.gidFound()) {
+					return new String[]{};
+				}
+				/* Find ID index */
+				p = Pattern.compile("ROW\\d+X");
+
+			} else {
+				labelArray = tvModel.getColLabelInfo().getLabelArray();
+
+				if(!tvModel.aidFound()) {
+					return new String[]{};
+				}
+				//"ARRY" is the old ID style and is retained here for backward
+				//compatibility with both previous versions and with the Cluster
+				//3.0 app.  Note, for whatever reason, "GENE" is not needed
+				//above as an alternative to "ROW".  See issue #539.
+				p = Pattern.compile("(ARRY|COL)\\d+X");
+			}
+
+			/* Find ID index */
+			for(int i = 0; i < labelArray[0].length; i++) {
+				Matcher m = p.matcher(labelArray[0][i]);
+				if(m.find()) {
+					pos = i;
+					break;
+				}
+			}
+
 			oldIDs = new String[labelArray.length];
-			
+
 			for(int i = 0; i < labelArray.length; i++) {
 				oldIDs[i] = labelArray[i][pos];
 			}
-			
+
 			return oldIDs;
 		}
 		
@@ -391,82 +396,87 @@ public class ClusterDialogController {
 		 */
 		private boolean[] reaffirmClusterChoice(final boolean shouldClusterRow, 
 				final boolean shouldClusterCol) {
-			
+
 			// default: depends on ready status
 			boolean[] shouldClusterAxis = new boolean[] {shouldClusterRow, shouldClusterCol};
-			
-			boolean wasRowAxisClustered = wasAxisClustered(
+
+			boolean wasRowAxisClustered = isAxisClustered(
 					tvModel.getFileSet().getGtr(), tvModel.gidFound());
-			boolean wasColAxisClustered = wasAxisClustered(
+			boolean wasColAxisClustered = isAxisClustered(
 					tvModel.getFileSet().getAtr(), tvModel.aidFound());
-			
+
 			// only warn if axis was clustered before AND user wants to cluster
 			boolean warnRowAxis = wasRowAxisClustered && shouldClusterRow;
 			boolean warnColAxis = wasColAxisClustered && shouldClusterCol;
-			
+
 			String message = "Something happened :(";
 			if(warnRowAxis && warnColAxis) {
-				message = "Both axes have been clustered before. "
-						+ "Would you like to cluster your selected axes again?";
-				
+				message = "Both axes have been clustered before.\nPreviously " +
+					"clustered files are located in a directory of the same " +
+					"name as the original matrix file.\nWould you like to " +
+					"cluster your selected axes again?";
+
 				if(!confirmChoice(message)) {
 					shouldClusterAxis[ROW_IDX] = false;
 					shouldClusterAxis[COL_IDX] = false;
 					this.cancel(true);
 					return shouldClusterAxis;
 				}
-				
+
 			} else if(warnRowAxis && !warnColAxis) {
-				message = "The row axis has been clustered before. "
-						+ "Would you like to cluster the rows again?";
-				
+				message = "The row axis has been clustered before.\n" +
+					"Previously clustered files are located in a directory " +
+					"of the same name as the original matrix file.\nWould " +
+					"you like to cluster the rows again?";
+
 				shouldClusterAxis[ROW_IDX]= confirmChoice(message);
-					
+
 			} else if(!warnRowAxis && warnColAxis){
-				message = "The column axis has been clustered before. "
-						+ "Would you like to cluster the columns again?";
-				
+				message = "The column axis has been clustered before.\n" +
+					"Previously clustered files are located in a directory " +
+					"of the same name as the original matrix file.\nWould " +
+					"you like to cluster the columns again?";
+
 				shouldClusterAxis[COL_IDX]= confirmChoice(message);
 			}
-			
+
 			/* 
 			 * Keeping track of cluster status for both axes here which is
 			 * later used to ensure tree file presence if an axis is 
 			 * considered to be clustered. 
 			 */
-			final boolean checkForRowTreeFile = wasRowAxisClustered 
-					|| shouldClusterAxis[ROW_IDX];
-			final boolean checkForColTreeFile = wasColAxisClustered 
-					|| shouldClusterAxis[COL_IDX];
-			
+			final boolean checkForRowTreeFile = wasRowAxisClustered ||
+				shouldClusterAxis[ROW_IDX];
+			final boolean checkForColTreeFile = wasColAxisClustered ||
+				shouldClusterAxis[COL_IDX];
+
 			rowClusterData.setAxisClustered(checkForRowTreeFile);
 			colClusterData.setAxisClustered(checkForColTreeFile);
-			
+
 			return shouldClusterAxis;
 		}
 		
 		/**
 		 * Checks if axis was clustered using its tree file if available and 
 		 * the axis specific ID if available. 
-		 * If neither is present, it will assume that the axis was NOT 
-		 * clustered.
+		 * If both are present, it will assume that the axis was clustered.
 		 * @param treeFilePath Path of the axis tree file, if it exists.
 		 * @param treeFileSuffix Axis associated tree file suffix (GTR, ATR).
 		 * @param hasAxisID When loading a file, a check is performed for the
 		 * axis ID label (GID, AID). This can be queried from the TVModel.
 		 * @return Whether an axis is considered to have been clustered before.
 		 */
-		private boolean wasAxisClustered(final String treeFilePath, 
+		private boolean isAxisClustered(final String treeFilePath, 
 				final boolean hasAxisID) {
-			
+
 			boolean hasTreeFile = false;
-			
+
 			File f = new File(treeFilePath);
 			if(f.exists() && !f.isDirectory()) { 
-			    hasTreeFile = true;
+				hasTreeFile = true;
 			}
-			
-			return hasAxisID || hasTreeFile;
+
+			return hasAxisID && hasTreeFile;
 		}
 		
 		/**
@@ -562,9 +572,9 @@ public class ClusterDialogController {
 		 */
 		private String[] calculateAxis(final int similarity, final int axis,
 				final File treeFile) {
-			
+
 			boolean isRow = (axis == ROW);
-			
+
 			/* Row axis cluster */
 			final DistanceMatrix distMatrix = new DistanceMatrix(0);
 			final String axisType = (isRow) ? "row" : "column";
@@ -585,7 +595,7 @@ public class ClusterDialogController {
 					clusterView.getLinkMethod(),
 					clusterView.getSpinnerValues(), isHierarchical(), axis, 
 					treeFile);
-			
+
 			return reorderedAxisLabels;
 		}
 	}
@@ -598,19 +608,21 @@ public class ClusterDialogController {
 			final ClusteredAxisData rowClusterData, 
 			final ClusteredAxisData colClusterData) {
 
-		if (rowClusterData.getReorderedIDs() != null 
-				|| colClusterData.getReorderedIDs() != null) {
+		if (rowClusterData.getReorderedIDs() != null ||
+			colClusterData.getReorderedIDs() != null) {
+
+			LogBuffer.println("Saving...");
 			ClusterView.setStatusText("Saving...");
-			
+
 			saveTask = new SaveTask(rowClusterData, colClusterData, 
-					fileName);
+				fileName);
 			saveTask.execute();
 
 		} else {
-			final String message = "Cannot save. No clustered data "
-					+ "was created.";
+			final String message = "Cannot save. No clustered data was " +
+				"created.";
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
-					"Error", JOptionPane.ERROR_MESSAGE);
+				"Error", JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println("Alert: " + message);
 		}
 	}
@@ -635,8 +647,8 @@ public class ClusterDialogController {
 		private String filePath;
 
 		public SaveTask(final ClusteredAxisData rowClusterData, 
-				final ClusteredAxisData colClusterData, 
-				final String fileName) {
+			final ClusteredAxisData colClusterData, 
+			final String fileName) {
 
 			this.rowClusterData = rowClusterData;
 			this.colClusterData = colClusterData;
@@ -647,12 +659,12 @@ public class ClusterDialogController {
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
-			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel
-					.getDataMatrix();
+			final TVDataMatrix originalMatrix =
+				(TVDataMatrix) tvModel.getDataMatrix();
 			final double[][] data = originalMatrix.getExprData();
 
 			final ClusterFileGenerator cdtGen = new ClusterFileGenerator(data, 
-					rowClusterData, colClusterData, isHierarchical());
+				rowClusterData, colClusterData, isHierarchical());
 
 			cdtGen.setupWriter(cdtFile);
 
@@ -663,7 +675,7 @@ public class ClusterDialogController {
 			cdtGen.generateCDT();
 
 			filePath = cdtGen.finish();
-			
+
 			if(isCancelled()) {
 				return Boolean.FALSE;
 			}
@@ -701,7 +713,14 @@ public class ClusterDialogController {
 		 */
 		private boolean hasEnsuredTreeFilePresence() {
 	
-			if(filePath == null || fileName == null) {
+			if(filePath == null && fileName == null) {
+				LogBuffer.println("File path and name is null");
+				return false;
+			} else if(filePath == null) {
+				LogBuffer.println("File path is null");
+				return false;
+			} else if(fileName == null) {
+				LogBuffer.println("File name is null");
 				return false;
 			}
 			

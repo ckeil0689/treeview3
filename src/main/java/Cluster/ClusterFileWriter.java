@@ -56,12 +56,11 @@ public class ClusterFileWriter {
 	 * @param data - A String array of data to be written to a file.
 	 */
 	public void writeData(final String[] data) {
-			
+
 		final String content = doParse(data);
 
 		try {
 			bw.write(content);
-
 		} catch (final IOException e) {
 			LogBuffer.logException(e);
 		}
@@ -95,7 +94,7 @@ public class ClusterFileWriter {
 			
 		} catch (final IOException e) {
 			LogBuffer.logException(e);
-      bw = null;
+			bw = null;
 		}
 	}
 	
