@@ -68,7 +68,9 @@ public class InteractiveMatrixView extends MatrixView {
 
 		super();
 
-		setLabelPortMode(true);
+		//This sets the mode in a separate object from the one that matters
+		//setLabelPortMode(true);
+
 		debug = 0;
 		//1 = Debug double-click detection
 		//10 = Debug click dragging

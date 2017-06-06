@@ -44,8 +44,8 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 	public void setConfigNode(final Preferences parentNode) {
 
 		if(parentNode == null) {
-			LogBuffer.println("Could not find or create " +	type +
-												" node because parentNode was null.");
+			LogBuffer.println("Could not find or create " + type +
+				" node because parentNode was null.");
 			return;
 		}
 
@@ -68,8 +68,8 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 	public void storeState() {
 
 		if(configNode == null) {
-			LogBuffer.println("Could not store state for " +	type +
-												" because configNode was null.");
+			LogBuffer.println("Could not store state for " + type +
+				" because configNode was null.");
 			return;
 		}
 
@@ -78,7 +78,7 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 
 		if(labelTypes == null) {
 			LogBuffer.println("Could not store label types. " +
-												"No label types defined yet.");
+				"No label types defined yet.");
 			return;
 		}
 
@@ -109,12 +109,13 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 			final String incString = oldNode.get("included", "[0]");
 			if(incString.equals("[]")) {
 				LogBuffer.println("The included key has no values stored. " +
-													"Including nothing. (" + type + ")");
+					"Including nothing. (" + type + ")");
 				setIncluded(new int[0]);
 
 			}
 			else {
-				String[] inclArray = Helper.getStringValuesFromKeyString(incString);
+				String[] inclArray =
+					Helper.getStringValuesFromKeyString(incString);
 				int[] array = new int[inclArray.length];
 
 				try {
@@ -127,8 +128,8 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 				catch(final NumberFormatException e) {
 					LogBuffer.logException(e);
 					LogBuffer.println("LabelSummary has trouble " +
-														"restoring included list from " + Arrays
-																																		.toString(inclArray));
+						"restoring included list from " +
+						Arrays.toString(inclArray));
 					setIncluded(new int[0]);
 					return;
 				}
@@ -139,14 +140,14 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 		}
 		else if(labelTypes != null && labelTypes.length > 0) {
 			LogBuffer.println("There are labels defined but no key stored " +
-												"for included indices. Setting a default. " + "(" +
-												type + ")");
+				"for included indices. Setting a default. (" +
+				type + ")");
 			setIncluded(new int[] {0});
 
 		}
 		else {
 			LogBuffer.println("There are no labels defined. " +
-												"Including nothing. (" + type + ")");
+				"Including nothing. (" + type + ")");
 			setIncluded(new int[0]);
 		}
 	}
@@ -166,10 +167,12 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 		notifyObservers();
 	}
 
-	/** Setter for the current available label types in a loaded file. Setting the
-	 * label types is vital for ensuring label type selection consistency because
-	 * a purely index-based approach does not account for label types that moved
-	 * their position in the label type list, for example after clustering.
+	/**
+	 * Setter for the current available label types in a loaded file. Setting
+	 * the label types is vital for ensuring label type selection consistency
+	 * because a purely index-based approach does not account for label types
+	 * that moved their position in the label type list, for example after
+	 * clustering.
 	 * 
 	 * @param label types - The current label types of a loaded file. */
 	public void setLabelTypes(final String[] labelTypes) {
@@ -177,7 +180,6 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 		this.labelTypes = labelTypes;
 		int[] adjustedIncluded = adjustIncl(getIncluded());
 		setIncluded(adjustedIncluded);
-		storeState();
 		setChanged();
 		notifyObservers();
 	}
@@ -189,7 +191,7 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 	}
 
 	/** @return the best possible summary for the specified index.
-	 *         If no label types are applicable, will return the empty string. */
+	 *         If no label types are applicable, will return the empty string.*/
 	public String getSummary(final LabelInfo labelInfo, final int index) {
 
 		String[] strings = null;
@@ -198,10 +200,10 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 
 		}
 		catch(final java.lang.ArrayIndexOutOfBoundsException e) {
-			LogBuffer.println("index: " +	index +
-												" out of bounds on labels, continuing");
+			LogBuffer.println("index: " + index +
+				" out of bounds on labels, continuing");
 			LogBuffer.println("ArrayIndexOutOfBoundsException in " +
-												"getSummary() in LabelSummary: " + e.getMessage());
+				"getSummary() in LabelSummary: " + e.getMessage());
 			return null;
 		}
 
@@ -269,33 +271,6 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 		return out;
 	}
 
-//	/** Preferences nodes can only store String arrays as a single string.
-//	 * This method is a helper used to convert such strings back to an array
-//	 * by removing brackets, spaces, and splitting the String up at commas.
-//	 * 
-//	 * @param keyString - A String object, should be a single String
-//	 *          representing comma-separated String array.
-//	 * @return An array of Strings */
-//	private String[] getStringValuesFromKeyString(final String keyString) {
-//
-//		String[] storedVals = keyString	.replaceAll("\\[", "").replaceAll("\\]", "")
-//																		.split(",");
-//
-//		/* No stored values case. Previous code will create a String array of
-//		 * size 1 (empty string) if "[]" was stored in Preferences node, but
-//		 * we need an empty String array */
-//		if(storedVals.length == 1 && storedVals[0]
-//																							.equals("")) { return new String[0]; }
-//
-//		/* Strings may have spaces within them, so extra trimming here. */
-//		for(int i = 0; i < storedVals.length; i++) {
-//			String s = storedVals[i];
-//			storedVals[i] = s.trim();
-//		}
-//
-//		return storedVals;
-//	}
-
 	/** Checks if the included indices match with the stored label type strings.
 	 * During clustering or reworking a file, actual label types may shift in
 	 * their position and the stored index alone may not be representative
@@ -361,7 +336,9 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 
 		/* Make sure to display first label type as default. Note, this must
 		 * still allow the user to explicitly included nothing. */
-		if(labelTypes.length > 0 && newIncluded.length == 0 && inclNames == null) {
+		if(labelTypes.length > 0 && newIncluded.length == 0 &&
+			inclNames == null) {
+
 			newIncluded = new int[] {0};
 		}
 
@@ -397,10 +374,10 @@ public class LabelSummary extends Observable implements ConfigNodePersistent,
 
 		String str = super.toString();
 		str += "// included_class (" +	Arrays.toString(included) + "/ " +
-						"included_stored (" + configNode.get("included", "default") +
-						")/ includedNames_stored (" + configNode
-																										.get("includedNames", "default") +
-						")/ headers_class (" + Arrays.toString(labelTypes) + ")";
+			"included_stored (" + configNode.get("included", "default") +
+			")/ includedNames_stored (" +
+			configNode.get("includedNames", "default") +
+			")/ headers_class (" + Arrays.toString(labelTypes) + ")";
 		return str;
 	}
 }

@@ -1,8 +1,10 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
@@ -22,6 +24,8 @@ import javax.swing.JComponent;
 import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.UIManager;
 
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSNumber;
@@ -36,6 +40,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.DendrogramFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.DoubleArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.GlobalMatrixView;
 import edu.stanford.genetics.treeview.plugin.dendroview.InteractiveMatrixView;
+import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 
 /** This controller explicitly handles direct user interaction with the
@@ -62,16 +67,26 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	private DataModel model;
 	protected Preferences configNode;
 
+	protected LabelView rowLabelView;
+	protected LabelView colLabelView;
+
 	// Data ticker reference, so it can be updated by the MouseAdapter
 	private DataTicker ticker;
 
+	private final boolean swap_animation_modifiers = true;
+
+	private int spacePressInitialDelay = 350;
+	private int spacePressRepeatDelay = 50;
+
 	public MatrixViewController(final InteractiveMatrixView imView,
-															final GlobalMatrixView gmView,
-															final DataModel model) {
+		final GlobalMatrixView gmView,final DataModel model,
+		final LabelView rowLabelView,final LabelView colLabelView) {
 
 		this.imView = imView;
 		this.gmView = gmView;
 		this.model = model;
+		this.rowLabelView = rowLabelView;
+		this.colLabelView = colLabelView;
 	}
 
 	/** Setting up the main components of the controller. Separate from
@@ -88,9 +103,8 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 
 		removeAllMouseListeners();
 
-		IMVMouseAdapter mmListener = new IMVMouseAdapter(	this, imView,
-																											interactiveXmap,
-																											interactiveYmap);
+		IMVMouseAdapter mmListener = new IMVMouseAdapter(this, imView,
+			interactiveXmap,interactiveYmap);
 
 		imView.addMouseListener(mmListener);
 		imView.addMouseMotionListener(mmListener);
@@ -125,7 +139,8 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	public void setConfigNode(final Preferences parentNode) {
 
 		if(parentNode == null) {
-			LogBuffer.println("Could not find or create MatrixViewController node because parentNode was null.");
+			LogBuffer.println("Could not find or create MatrixViewController " +
+				"node because parentNode was null.");
 			return;
 		}
 
@@ -163,7 +178,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * @param node
 	 * @throws BackingStoreException */
 	public void importColorPreferences(final Preferences oldNode)
-																																throws BackingStoreException {
+		throws BackingStoreException {
 
 		LogBuffer.println("Importing color settings...");
 
@@ -171,9 +186,9 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		String colorPresetsNode = colorPresets.getClass().getSimpleName();
 
 		if(!oldNode.nodeExists(colorPresetsNode)) {
-			LogBuffer.println(colorPresetsNode +	" node not found when trying " +
-												"to import previous color settings. " +
-												"Aborting import attempt.");
+			LogBuffer.println(colorPresetsNode +
+				" node not found when trying to import previous color " +
+				"settings. Aborting import attempt.");
 			return;
 		}
 
@@ -201,7 +216,8 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		int numXVisible = interactiveXmap.getNumVisible();
 		int numYVisible = interactiveYmap.getNumVisible();
 
-		gmView.setIMVViewportRange(firstXVisible, firstYVisible, numXVisible, numYVisible);
+		gmView.setIMVViewportRange(firstXVisible, firstYVisible, numXVisible,
+			numYVisible);
 	}
 
 	/** Sets a new ColorExtractor with different data
@@ -216,9 +232,9 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 
 	private void setupDrawingComponents() {
 
-		this.colorExtractor = new ColorExtractor(	model.getDataMatrix().getMinVal(),
-																							model	.getDataMatrix()
-																										.getMaxVal());
+		this.colorExtractor = new ColorExtractor(
+			model.getDataMatrix().getMinVal(),
+			model.getDataMatrix().getMaxVal());
 		colorExtractor.setMissing(DataModel.NAN, DataModel.EMPTY);
 
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
@@ -237,11 +253,13 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	@Override
 	public void addKeyBindings() {
 
-		final InputMap input_map = imView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		final InputMap input_map = imView.getInputMap(
+			JComponent.WHEN_IN_FOCUSED_WINDOW);
 		final ActionMap action_map = imView.getActionMap();
 
 		/* Gets the system's modifier key (CTRL for Windows, CMD for OS X) */
-		final int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		final int modifier =
+			Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		final int shift_mask = InputEvent.SHIFT_MASK;
 
 		/* Scroll through GlobalView with HOME, END, PgUP, PgDOWN */
@@ -251,10 +269,12 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		input_map.put(KeyStroke.getKeyStroke("END"), "pageYToEnd");
 		action_map.put("pageYToEnd", new EndKeyYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, modifier), "pageXToStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, modifier),
+			"pageXToStart");
 		action_map.put("pageXToStart", new HomeKeyXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier), "pageXToEnd");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier),
+			"pageXToEnd");
 		action_map.put("pageXToEnd", new EndKeyXAction());
 
 		input_map.put(KeyStroke.getKeyStroke("PAGE_UP"), "pageYUp");
@@ -263,35 +283,45 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		input_map.put(KeyStroke.getKeyStroke("PAGE_DOWN"), "pageYDown");
 		action_map.put("pageYDown", new PageDownYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, modifier), "pageXUp");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, modifier),
+			"pageXUp");
 		action_map.put("pageXUp", new PageUpXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, modifier), "pageXDown");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, modifier),
+			"pageXDown");
 		action_map.put("pageXDown", new PageDownXAction());
 
 		/* Scroll through GlobalView with arrow keys */
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier), "arrowYToStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier),
+			"arrowYToStart");
 		action_map.put("arrowYToStart", new HomeKeyYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier), "arrowYToEnd");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier),
+			"arrowYToEnd");
 		action_map.put("arrowYToEnd", new EndKeyYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, modifier), "arrowXToStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, modifier),
+			"arrowXToStart");
 		action_map.put("arrowXToStart", new HomeKeyXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, modifier), "arrowXToEnd");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, modifier),
+			"arrowXToEnd");
 		action_map.put("arrowXToEnd", new EndKeyXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, shift_mask), "arrowYUp");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, shift_mask),
+			"arrowYUp");
 		action_map.put("arrowYUp", new PageUpYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, shift_mask), "arrowYDown");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, shift_mask),
+			"arrowYDown");
 		action_map.put("arrowYDown", new PageDownYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, shift_mask), "arrowXUp");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, shift_mask),
+			"arrowXUp");
 		action_map.put("arrowXUp", new PageUpXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, shift_mask), "arrowXDown");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, shift_mask),
+			"arrowXDown");
 		action_map.put("arrowXDown", new PageDownXAction());
 
 		/* arrow 1-step */
@@ -314,41 +344,66 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		input_map.put(KeyStroke.getKeyStroke("EQUALS"), "zoomIn");
 		action_map.put("zoomIn", new ZoomInAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier), "zoomSelection");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, modifier),
+			"zoomSelection");
 		action_map.put("zoomSelection", new ZoomSelectionAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier), "resetZoom");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, modifier),
+			"resetZoom");
 		action_map.put("resetZoom", new HomeAction());
+
+		//Disable spacebar clicks focussed button behavior.  See:
+		//http://stackoverflow.com/questions/4472530/jbutton-referring-to-space-
+		//bar-the-same-as-a-click
+		InputMap btn_input_map =
+			(InputMap) UIManager.get("Button.focusInputMap");
+		btn_input_map.put(KeyStroke.getKeyStroke("pressed SPACE"),"none");
+		btn_input_map.put(KeyStroke.getKeyStroke("released SPACE"),"none");
+		//Now let's swap out the spacebar default behavior with the enter key
+		btn_input_map.put(KeyStroke.getKeyStroke("ENTER"),"pressed");
+		btn_input_map.put(KeyStroke.getKeyStroke("released ENTER"),"released");
+
+		/* Show more/fewer labels */
+		input_map.put(KeyStroke.getKeyStroke("SPACE"), "labelToggle");
+		action_map.put("labelToggle", new LabelToggleAction());
 
 		//Holding control and/or shift controls a col/row highlight that follows
 		//the hover position
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 1), "rowHoverStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 1),
+			"rowHoverStart");
 		action_map.put("rowHoverStart", new RowHoverStartAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, true), "rowHoverStop");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, true),
+			"rowHoverStop");
 		action_map.put("rowHoverStop", new RowHoverStopAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, 2), "columnHoverStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, 2),
+			"columnHoverStart");
 		action_map.put("columnHoverStart", new ColumnHoverStartAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, 0, true), "columnHoverStop");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, 0, true),
+			"columnHoverStop");
 		action_map.put("columnHoverStop", new ColumnHoverStopAction());
 
 		//The following cases handle various combinations of row/col highlights
 		//occurring in different orders of both the shift and control modifiers
 		//being pressed/released
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, InputEvent.SHIFT_DOWN_MASK |
-																														InputEvent.CTRL_DOWN_MASK), "bothHoverStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT,
+			InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK),
+			"bothHoverStart");
 		action_map.put("bothHoverStart", new BothHoverStartAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 2, true), "rowHoverStop");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 2, true),
+			"rowHoverStop");
 		action_map.put("rowHoverStop", new RowHoverStopAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, InputEvent.SHIFT_DOWN_MASK |
-																															InputEvent.CTRL_DOWN_MASK), "bothHoverStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL,
+			InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK),
+			"bothHoverStart");
 		action_map.put("bothHoverStart", new BothHoverStartAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, 1, true), "columnHoverStop");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTROL, 1, true),
+			"columnHoverStop");
 		action_map.put("columnHoverStop", new ColumnHoverStopAction());
 	}
 
@@ -504,13 +559,17 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			final boolean genesSelected = rowSelection.getNSelectedIndexes() > 0;
-			final boolean arraysSelected = colSelection.getNSelectedIndexes() > 0;
+			final boolean genesSelected =
+				rowSelection.getNSelectedIndexes() > 0;
+			final boolean arraysSelected =
+				colSelection.getNSelectedIndexes() > 0;
 
 			if(genesSelected || arraysSelected) {
 				// Zoom in (or out)
-				interactiveXmap.zoomToSelected(colSelection.getMinIndex(), colSelection.getMaxIndex());
-				interactiveYmap.zoomToSelected(rowSelection.getMinIndex(), rowSelection.getMaxIndex());
+				interactiveXmap.zoomToSelected(colSelection.getMinIndex(),
+					colSelection.getMaxIndex());
+				interactiveYmap.zoomToSelected(rowSelection.getMinIndex(),
+					rowSelection.getMaxIndex());
 
 				// Then scroll
 				interactiveXmap.scrollToFirstIndex(colSelection.getMinIndex());
@@ -549,7 +608,6 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		}
 	}
 
-
 	/** Resets the GlobalView to all zoomed-out state */
 	private class HomeAction extends AbstractAction {
 
@@ -560,8 +618,102 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 
 			resetMatrixViews();
 			imView.setAspectRatio( //TODO move into matrixview.resetView
-														interactiveXmap.getTotalTileNum(), interactiveYmap.getTotalTileNum());
+				interactiveXmap.getTotalTileNum(),
+				interactiveYmap.getTotalTileNum());
 		}
+	}
+
+	/**
+	 * This timer prevents the holding of the spacebar from making the label
+	 * toggle flicker.  The fact that this timer is running prevents the toggle
+	 * action from happening.  Once the timer expires, hitting the spacebar
+	 * again will allow the toggle to happen.  The timer restarts itself when
+	 * the spacebar is "pressed" again during the running timer, which is what
+	 * results repeatedly from holding down the spacebar.
+	 */
+	private javax.swing.Timer spacePressTimer;
+	private ActionListener spacePressTimerListener = new ActionListener() {
+
+		/**
+		 * When a space press timer expires, this is called.  Since all we need
+		 * to know is whether the timer is running or not in order to do the
+		 * right thing (e.g. there's nothing to do upon release - only press is
+		 * what toggles the labels - holding the spacebar down does nothing -
+		 * this timer only prevents repeated rapid toggles)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			if(evt.getSource() == spacePressTimer) {
+				//Stop timer so it doesn't repeat
+				spacePressTimer.stop();
+				spacePressTimer = null;
+			}
+		}
+	};
+
+
+	/**
+	 * Toggles whizzing labels from as many as is possible to either no or some
+	 * labels (depending on the "showBaseIsNone" variable in LabelSettings).
+	 */
+	private class LabelToggleAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(final ActionEvent arg0) {
+			if(spacePressTimer != null && spacePressTimer.isRunning()) {
+				spacePressTimer.setDelay(spacePressRepeatDelay);
+				spacePressTimer.restart();
+			} else {
+				toggleLabels();
+				if(spacePressTimer != null) {
+					spacePressTimer.setDelay(spacePressInitialDelay);
+					spacePressTimer.start();
+					
+				} else {
+					spacePressTimer = new Timer(spacePressInitialDelay,
+						spacePressTimerListener);
+					spacePressTimer.start();
+				}
+			}
+		}
+	}
+
+	public void toggleLabels() {
+		if(!rowLabelView.inLabelPortMode() ||
+			rowLabelView.isLabelPortFlankMode()) {
+
+			rowLabelView.setLabelPortMode(true);
+			rowLabelView.setLabelPortFlankMode(false);
+			colLabelView.setLabelPortMode(true);
+			colLabelView.setLabelPortFlankMode(false);
+		} else if(rowLabelView.isLabelPortDefaultNone()) {
+			rowLabelView.setLabelPortMode(false);
+			colLabelView.setLabelPortMode(false);
+		} else {
+			rowLabelView.setLabelPortFlankMode(true);
+			colLabelView.setLabelPortFlankMode(true);
+		}
+
+		if(rowLabelView.hasMouse) {
+			//Will more than 1 label be drawn in port mode?
+			boolean whizOverOne = !rowLabelView.isLabelPortFlankMode() ||
+				rowLabelView.getMaxLabelPortFlankSize() > 0;
+			//If whizeOverOne is true, we want setKeepTreeGlobal to be false so
+			//that the tree links to the labels
+			interactiveYmap.setKeepTreeGlobal(!whizOverOne);
+		} else if(colLabelView.hasMouse) {
+			//Will more than 1 label be drawn in port mode?
+			boolean whizOverOne = !colLabelView.isLabelPortFlankMode() ||
+				colLabelView.getMaxLabelPortFlankSize() > 0;
+			//If whizeOverOne is true, we want setKeepTreeGlobal to be false so
+			//that the tree links to the labels
+			interactiveXmap.setKeepTreeGlobal(!whizOverOne);
+		}
+
+		rowLabelView.storeState();
+		colLabelView.storeState();
 	}
 
 	/** Starts highlighting the hovered row and column */
@@ -701,13 +853,13 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			try {
 				if(onAMac()) {
 					File globalPref = new File(System.getProperty("user.home") +
-																			"/Library/Preferences/.GlobalPreferences.plist");
+						"/Library/Preferences/.GlobalPreferences.plist");
 
-					NSDictionary dict = (NSDictionary) PropertyListParser
-																																.parse(globalPref);
+					NSDictionary dict =
+						(NSDictionary) PropertyListParser.parse(globalPref);
 
-					NSNumber pref = (NSNumber) dict.objectForKey("com.apple.swipescroll" +
-																												"direction");
+					NSNumber pref = (NSNumber) dict.objectForKey(
+						"com.apple.swipescrolldirection");
 
 					if(pref.boolValue()) {
 						natural = true;
@@ -734,8 +886,8 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			//On macs' magic mouse, horizontal scroll comes in as if the shift
 			//was down
 			if(e.isAltDown()) {
-				if((!reverseZoomDirection && notches < 0) || (reverseZoomDirection &&
-																											notches > 0)) {
+				if((!reverseZoomDirection && notches < 0) ||
+					(reverseZoomDirection && notches > 0)) {
 
 					//This ensures we only zoom toward the cursor when the
 					//cursor is over the map
@@ -761,13 +913,15 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			else if(e.isShiftDown()) {
 				interactiveXmap.scrollBy(shift);
 				//Now we are hovered over a new index
-				interactiveXmap.setHoverIndex(interactiveXmap.getIndex(e.getX()));
+				interactiveXmap.setHoverIndex(interactiveXmap.getIndex(
+					e.getX()));
 
 			}
 			else {
 				interactiveYmap.scrollBy(shift);
 				//Now we are hovered over a new index
-				interactiveYmap.setHoverIndex(interactiveYmap.getIndex(e.getY()));
+				interactiveYmap.setHoverIndex(interactiveYmap.getIndex(
+					e.getY()));
 			}
 
 			imView.repaint();
@@ -782,9 +936,6 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * @param end A Point representing the last index of each axis to be
 	 *          selected. */
 	public void selectRectangle(final Point start, final Point end) {
-
-//		LogBuffer.println("Selecting a rectangle: " + start.toString() 
-//				+ ", " + end.toString());
 
 		// sort so that ep is upper left corner
 		if(end.x < start.x) {
@@ -825,11 +976,18 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		final boolean rowsSelected = rowSelection.getNSelectedIndexes() > 0;
 
 		if(rowsSelected) {
-			if((modifiers & InputEvent.SHIFT_MASK) != 0 || (modifiers &
-																											InputEvent.META_MASK) != 0) {
+			if((swap_animation_modifiers &&
+				(modifiers & InputEvent.SHIFT_MASK) == 0 &&
+				(modifiers & InputEvent.META_MASK) == 0) ||
+				(!swap_animation_modifiers &&
+				((modifiers & InputEvent.SHIFT_MASK) != 0 ||
+				(modifiers & InputEvent.META_MASK) != 0))) {
+
 				// Zoom in (or out)
-				interactiveXmap.zoomToSelected(colSelection.getMinIndex(), colSelection.getMaxIndex());
-				interactiveYmap.zoomToSelected(rowSelection.getMinIndex(), rowSelection.getMaxIndex());
+				interactiveXmap.zoomToSelected(colSelection.getMinIndex(),
+					colSelection.getMaxIndex());
+				interactiveYmap.zoomToSelected(rowSelection.getMinIndex(),
+					rowSelection.getMaxIndex());
 
 				// Then scroll
 				interactiveXmap.scrollToFirstIndex(colSelection.getMinIndex());
@@ -837,18 +995,18 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 
 			}
 			else if((modifiers & InputEvent.ALT_MASK) != 0) {
-				imView.smoothZoomTowardSelection(colSelection.getMinIndex(), (colSelection.getMaxIndex() -
-																																			colSelection.getMinIndex() +
-																																			1), rowSelection.getMinIndex(), (rowSelection.getMaxIndex() -
-																																																				rowSelection.getMinIndex() +
-																																																				1));
+				imView.smoothZoomTowardSelection(colSelection.getMinIndex(),
+					(colSelection.getMaxIndex() - colSelection.getMinIndex() +
+						1), rowSelection.getMinIndex(),
+						(rowSelection.getMaxIndex() -
+							rowSelection.getMinIndex() + 1));
 			}
 			else {
-				imView.smoothAnimatedZoomToTarget(colSelection.getMinIndex(), (colSelection.getMaxIndex() -
-																																				colSelection.getMinIndex() +
-																																				1), rowSelection.getMinIndex(), (rowSelection.getMaxIndex() -
-																																																					rowSelection.getMinIndex() +
-																																																					1));
+				imView.smoothAnimatedZoomToTarget(colSelection.getMinIndex(),
+					(colSelection.getMaxIndex() - colSelection.getMinIndex() +
+						1), rowSelection.getMinIndex(),
+						(rowSelection.getMaxIndex() -
+							rowSelection.getMinIndex() + 1));
 			}
 		}
 	}
@@ -904,7 +1062,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * @param interactiveXmap
 	 * @param interactiveYmap */
 	public void setInteractiveMapContainers(final MapContainer interactiveXmap,
-																					final MapContainer interactiveYmap) {
+		final MapContainer interactiveYmap) {
 
 		this.interactiveXmap = interactiveXmap;
 		this.interactiveYmap = interactiveYmap;
@@ -975,7 +1133,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * @param rowScroll Scrollbar for scrolling through matrix rows.
 	 * @param colScroll Scrollbar for scrolling through matrix columns. */
 	public void setScrollBars(final JScrollBar rowScroll,
-														final JScrollBar colScroll) {
+		final JScrollBar colScroll) {
 
 		interactiveXmap.setScrollbar(colScroll);
 		interactiveYmap.setScrollbar(rowScroll);
@@ -1024,12 +1182,12 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		// Note: A selection is "fully zoomed" if there is no selection - this
 		// will disable the zoom selection button
 		boolean isSelectionZoomed = (!rowsSelected && !colsSelected) ||
-																(rowsSelected &&	rowSelection
-																															.getMinIndex() == interactiveYmap.getFirstVisible() &&
-																	(rowSelection.getFullSelectionRange()) == yTilesVisible &&
-																	colsSelected && colSelection
-																															.getMinIndex() == interactiveXmap.getFirstVisible() &&
-																	(colSelection.getFullSelectionRange()) == xTilesVisible);
+			(rowsSelected && rowSelection.getMinIndex() ==
+			interactiveYmap.getFirstVisible() &&
+			(rowSelection.getFullSelectionRange()) == yTilesVisible &&
+			colsSelected &&
+			colSelection.getMinIndex() == interactiveXmap.getFirstVisible() &&
+			(colSelection.getFullSelectionRange()) == xTilesVisible);
 
 		zoomStatus = new boolean[] {isXMin, isYMin, isSelectionZoomed};
 
