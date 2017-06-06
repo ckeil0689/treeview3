@@ -258,8 +258,8 @@ abstract class TreeDrawer extends Observable implements Observer {
 
 		final int nodeIndex = nodeInfo.getIndex("NODEID");
 		if (nodeIndex == -1)
-			throw new DendroException("Could not find header NODEID "
-					+ "in tree header info");
+			throw new DendroException("Could not find header NODEID in tree " +
+				"header info");
 
 		for (int j = 0; j < nodeInfo.getNumLabels(); j++) {
 
@@ -274,8 +274,8 @@ abstract class TreeDrawer extends Observable implements Observer {
 			TreeDrawerNode rightn = id2node.get(rightId);
 
 			if (newn != null) {
-				LogBuffer.println("Symbol '" + newn
-						+ "' appeared twice, building weird tree");
+				LogBuffer.println("Symbol '" + newn + "' appeared twice, " +
+					"building weird tree");
 			}
 
 			if (leftn == null) {
@@ -283,9 +283,10 @@ abstract class TreeDrawer extends Observable implements Observer {
 				int val; // stores index (y location)
 				val = rowInfo.getLabelIndex(leftId);
 
-				if (val == -1)
-					throw new DendroException("Identifier " + leftId
-							+ " from tree file not found in CDT.");
+				if (val == -1) {
+					throw new DendroException("Identifier " + leftId +
+						" from tree file not found in CDT.");
+				}
 
 				leftn = new TreeDrawerNode(leftId, 1.0, val);
 				leafList[val] = leftn;

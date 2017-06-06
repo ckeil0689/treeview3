@@ -321,7 +321,7 @@ public class ClusterProcessor {
 			if (hier) {
 				return doHierarchicalCluster();
 			}
-			
+
 			return doKMeansCluster();
 		}
 

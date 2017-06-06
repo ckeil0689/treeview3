@@ -42,7 +42,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private boolean hasGWeight = false;
 
 	public ModelLoader(	final DataModel model, final TVController controller,
-											final DataLoadInfo dataInfo) {
+		final DataLoadInfo dataInfo) {
 
 		this.controller = controller;
 		this.targetModel = (TVModel) model;
@@ -416,7 +416,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		return newLabelTypes;
 	}
 
-	/** Reads the label types and labels from the data and stores the data in
+	/**
+	 * Reads the label types and labels from the data and stores the data in
 	 * the TVModel.
 	 *
 	 * @param stringLabels */
@@ -528,12 +529,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		final String[] firstRow = atrData.get(0);
 		if( // decide if this is not an extended file..
-		(firstRow.length == 4)// is the length classic?
+			(firstRow.length == 4)// is the length classic?
 				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
 
 			// okay, need to assign label types...
-			targetModel.setAtrLabelTypes(new String[] {	"NODEID", "LEFT", "RIGHT",
-																									"CORRELATION"});
+			targetModel.setAtrLabelTypes(new String[] {"NODEID", "LEFT",
+				"RIGHT","CORRELATION"});
 
 			final String[][] atrLabels = new String[atrData.size()][];
 			for(int i = 0; i < atrLabels.length; i++) {
