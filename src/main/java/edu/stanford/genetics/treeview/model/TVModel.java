@@ -102,9 +102,14 @@ public class TVModel extends Observable implements DataModel {
 	@Override
 	public DataMatrix getDataMatrix() {
 
+		LogBuffer.println("getDataMatrix called");
+		LogBuffer.println("compareModel... is ");
 		if (compareModel != null) {
-
+			LogBuffer.println("not... ");
+			return dataMatrix;
 		}
+		LogBuffer.println("null.");
+		LogBuffer.println("Returning data matrix");
 		return dataMatrix;
 	}
 
@@ -139,6 +144,7 @@ public class TVModel extends Observable implements DataModel {
 
 		LogBuffer.println("Adding data to model...");
 		dataMatrix.setExprData(newData);
+		LogBuffer.println("Data was added to model");
 	}
 
 	public double getValue(final int x, final int y) {
@@ -603,9 +609,9 @@ public class TVModel extends Observable implements DataModel {
 			double roundedMedian = Double.NaN;
 			
 			if (exprData == null) {
-			    LogBuffer.println("Could not calculate base values for data (min, max, median, mean). "
-			    		+ "Data matrix was null.");
-			    return;
+				LogBuffer.println("Could not calculate base values for data " +
+					"(min, max, median, mean). Data matrix was null.");
+				return;
 			}
 			
 			final int nRows = nRows();
@@ -617,17 +623,17 @@ public class TVModel extends Observable implements DataModel {
 			int i = 0, j = 0;
 			for (i = 0; i < nRows; i++) {
 				for (j = 0; j < nCols; j++) {
-					
+
 					final double dataPoint = exprData[i][j];
-					
+
 					if(!Double.isNaN(dataPoint) 
 							&& !Double.isInfinite(dataPoint)) {
 						sum += dataPoint;
-						
+
 						if (dataPoint > maxVal) {
 							maxVal = dataPoint;
 						}
-						
+
 						if (dataPoint < minVal) {
 							minVal = dataPoint;
 						}
@@ -636,10 +642,10 @@ public class TVModel extends Observable implements DataModel {
 					}
 				}
 			}
-				
+
 			roundedMean = calculateMean(sum, skipped);
 			roundedMedian = calculateMedian(exprData);
-			
+
 			LogBuffer.println("Setting base values.");
 			setMinVal(minVal);
 			setMaxVal(maxVal);
@@ -693,8 +699,9 @@ public class TVModel extends Observable implements DataModel {
 					}
 				}
 			}
-		  
-      roundedMean = calculateZoomMean(startingRow, endingRow, startingCol, endingCol, sum, skipped);
+
+			roundedMean = calculateZoomMean(startingRow, endingRow, startingCol,
+				endingCol, sum, skipped);
 			return roundedMean;
 		}
 
@@ -707,21 +714,21 @@ public class TVModel extends Observable implements DataModel {
 		 * @param skipped
 		 * @return
 		 */
-		private double calculateZoomMean(	int startingRow, int endingRow,
-																			int startingCol, int endingCol,
-																			double sum, int skipped) {
+		private double calculateZoomMean(int startingRow,int endingRow,
+			int startingCol,int endingCol,double sum, int skipped) {
+
 			double roundedMean;
-			
+
 			double mean;
 			int numDataPoints = ((endingRow-startingRow+1) * (endingCol-startingCol+1)) - skipped;
-			
+
 			if(numDataPoints < 1) {
 				LogBuffer.println("Not enough data points for calculation of mean: " + numDataPoints);
 				return Double.NaN;
 			}
-			
+
 			mean = sum / numDataPoints;
-			
+
 			roundedMean = Helper.roundDouble(mean, 4);
 			return roundedMean;
 		}
@@ -753,50 +760,44 @@ public class TVModel extends Observable implements DataModel {
 				}
 			}
 			Arrays.sort(newData); /* Good night cpu...*/
-			
-			newData = truncateSortedData(newData);
-			
+
+			LogBuffer.println("Length before truncation: " + newData.length);
+
+			/* This should just get the "size" of the data without the nans instead of make a copy */
+			int realDataSize = getRealDataSize(newData);
+
+			LogBuffer.println("Length after truncation: " + newData.length);
+
 			/* Even length case */
-			if(newData.length % 2 == 0) {
-				int idxLeft = newData.length / 2;
-				int idxRight = (newData.length / 2) + 1;
+			if(realDataSize % 2 == 0) {
+				int idxLeft = realDataSize / 2;
+				int idxRight = (realDataSize / 2) + 1;
 				result = (newData[idxLeft] + newData[idxRight]) / 2;
 				
 			} else {
-				result = newData[newData.length / 2];
+				//E.g. size of 3 results in 1.5. Floor is 1. Indexes start from
+				//0, so 1 is element 2 (the middle of the 3 element array)
+				result = newData[(int) Math.floor(realDataSize / 2)];
 			}
 			
 			return Helper.roundDouble(result, 4);
 		}
 		
-		/**
-		 * This method truncates a sorted array at the first occurrence of
-		 * NaN or Infinity as defined in the Double class.
-		 * @param data
-		 * @return A truncated data array.
-		 */
-		private double[] truncateSortedData(final double[] data) {
-			
-			LogBuffer.println("Truncating sorted data array.");
-			
-			int idx = data.length;
-			
+		private int getRealDataSize(final double[] data) {
+			int size = data.length;
+
 			// find first NaN or Infinity value
 			for(int i = 0; i < data.length; i++) {
-				
 				double dataPoint = data[i];
-				if(Double.isNaN(dataPoint) 
-						|| Double.isInfinite(dataPoint)) {
-					idx = i;
+				if(Double.isNaN(dataPoint) || Double.isInfinite(dataPoint)) {
+					size = i;
 					break;
 				}
 			}
-			
-			double[] correctedData = Arrays.copyOfRange(data, 0, idx);
-			
-			return correctedData;
+
+			return size;
 		}
-		
+
 		/**
 		 * Helper for calculateBaseValues().
 		 * Finds the mean value of a 2D double array given the sum of the data values and the amount of skipped values.

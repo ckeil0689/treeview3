@@ -216,7 +216,6 @@ public abstract class TreeViewApp {// implements WindowListener {
 
 		try {
 			return openNew(null);
-
 		} catch (final LoadException e) {
 			// ignore, since not loading anything shouldn't throw.
 			return null;

@@ -67,13 +67,14 @@ public class TVController implements Observer {
 	private MenubarController menuController;
 	private File file;
 	private FileSet fileMenuSet;
-	private FileSet loadingFile;
+	private boolean loadSuccess;
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
 		this.dendroController = new DendroController(tvFrame, this);
+		this.loadSuccess = false;
 
 		// Add the view as observer to the model
 		((TVModel) model).addObserver(tvFrame);
@@ -310,6 +311,9 @@ public class TVController implements Observer {
 		// Loading TVModel
 		final TVModel tvModel = (TVModel) model;
 
+		LogBuffer.println("tvModel upon loadData is " +
+			(model == null ? "null" : "defined"));
+
 		setFileMenuSet(fileSet);
 
 		try {
@@ -318,9 +322,9 @@ public class TVController implements Observer {
 			tvModel.setSource(fileMenuSet);
 
 			final ModelLoader loader = new ModelLoader(tvModel, this, dataInfo);
+			loadSuccess = false;
 			loader.execute();
-		}
-		catch(final OutOfMemoryError e) {
+		} catch(final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. " +
 				"Increase the JVM's heap size. Error: " + e.getMessage();
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], oomError,
@@ -336,7 +340,7 @@ public class TVController implements Observer {
 	 *          available. */
 	public void finishLoading(final DataLoadInfo dataInfo) {
 
-		if(model.getDataMatrix().getNumRow() > 0) {
+		if(loadSuccess && model.getDataMatrix().getNumRow() > 0) {
 			tvFrame.setTitleString(model.getFileName());
 
 			/* Will notify view of successful loading. */
@@ -367,8 +371,24 @@ public class TVController implements Observer {
 
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
-		}
-		else {
+		} else if(!loadSuccess) {
+			final String message = "Something went wrong with the data " +
+				"load.  The thread could have run out of memory or some " +
+				"other system resource.";
+			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,"Alert",
+				JOptionPane.ERROR_MESSAGE);
+			LogBuffer.println("Alert: " + message);
+
+			// Set model status, which will update the view.
+			((TVModel) model).setLoaded(false);
+
+			//Bring the user "back" to the load dialog to try again or cancel load
+			//TODO: The user may have tried to open the file using the "Open
+			//Last File" button, so calling openFile should not happen in that
+			//instance.  Keep track of the method used to open the file and call
+			//openFile only when appropriate.  Create an issue for this TODO
+			openFile(null, true);
+		} else {
 			final String message = "No numeric data could be found in the " +
 				"input file.\nThe input file must contain tab-delimited " +
 				"numeric values.";
@@ -379,7 +399,12 @@ public class TVController implements Observer {
 			// Set model status, which will update the view.
 			((TVModel) model).setLoaded(false);
 
-			//Bring the user back to the load dialog to try again or cancel load
+			//Bring the user "back" to the load dialog to try again or cancel
+			//load
+			//TODO: The user may have tried to open the file using the "Open
+			//Last File" button, so calling openFile should not happen in that
+			//instance.  Keep track of the method used to open the file and call
+			//openFile only when appropriate.  Create an issue for this TODO
 			openFile(null, true);
 		}
 
@@ -440,14 +465,16 @@ public class TVController implements Observer {
 		}
 	}
 
-	/** Finds a specific sub-node in a root node by looking for keys with the
+	/**
+	 * Finds a specific sub-node in a root node by looking for keys with the
 	 * srcName and srcExtension.
 	 * 
 	 * @param root
 	 * @param srcName
 	 * @param srcExtension
 	 * @return The target Preferences node.
-	 * @throws BackingStoreException */
+	 * @throws BackingStoreException
+	 */
 	private static Preferences getTargetNode(final Preferences root,
 		final String srcName,final String srcExtension) throws
 		BackingStoreException {
@@ -470,7 +497,8 @@ public class TVController implements Observer {
 
 		/* Interrupt if no node is found to copy old data. */
 		if(targetNode == null) {
-			LogBuffer.println("Target node not found. Could not copy data.");
+			LogBuffer.println("WARNING: Target node not found. Could not " +
+				"retrieve preferences.");
 			return null;
 		}
 
@@ -566,7 +594,6 @@ public class TVController implements Observer {
 		if(oldNode == null || shouldUseImport) {
 			LogBuffer.println("Using import dialog.");
 			dataInfo = useImportDialog(newFileSet);
-
 		}
 		else {
 			LogBuffer.println("Loading with info from existing node.");
@@ -963,7 +990,8 @@ public class TVController implements Observer {
 		final LabelSettings labelSettingsView = new LabelSettings(tvFrame);
 
 		if(menu.equalsIgnoreCase(StringRes.menu_RowAndCol)) {
-			labelSettingsView.setLabelInfo(model.getRowLabelInfo(), model.getColLabelInfo());
+			labelSettingsView.setLabelInfo(model.getRowLabelInfo(),
+				model.getColLabelInfo());
 		}
 
 		labelSettingsView.setMenu(menu);
@@ -1078,5 +1106,13 @@ public class TVController implements Observer {
 	public void copyLabels(final CopyType copyType, final boolean isRows) {
 
 		dendroController.copyLabels(copyType, isRows);
+	}
+
+	/**
+	 * 
+	 * @param loadSuccess the loadSuccess to set
+	 */
+	public void setLoadSuccess(boolean loadSuccess) {
+		this.loadSuccess = loadSuccess;
 	}
 }

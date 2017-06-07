@@ -131,7 +131,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 					+ this.getClass().toString() + " because parent was null.");
 			return;
 		}
-		
+
 		this.configNode = parentNode.node(StringRes.pnode_TVFrame);
 	}
 	

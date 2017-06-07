@@ -34,14 +34,12 @@ public class ColorPresets implements ConfigNodePersistent {
 
 	static {
 		defaultColorSets = new ColorSet[2];
-		defaultColorSets[0] = new ColorSet(	ColorSchemeType.REDGREEN.toString(),
-																				new String[] {"#FF0000", "#000000",
-																											"#00FF00"}, "#8E8E8E",
-																				"#FFFFFF");
-		defaultColorSets[1] = new ColorSet(	ColorSchemeType.YELLOWBLUE.toString(),
-																				new String[] {"#FEFF00", "#000000",
-																											"#1BB7E5"}, "#8E8E8E",
-																				"#FFFFFF");
+		defaultColorSets[0] = new ColorSet(ColorSchemeType.REDGREEN.toString(),
+			new String[] {"#FF0000","#000000","#00FF00"},"#8E8E8E","#FFFFFF");
+		defaultColorSets[1] =
+			new ColorSet(ColorSchemeType.YELLOWBLUE.toString(),
+				new String[] {"#FEFF00","#000000","#1BB7E5"},"#8E8E8E",
+				"#FFFFFF");
 	}
 
 	private Preferences configNode;
@@ -50,8 +48,8 @@ public class ColorPresets implements ConfigNodePersistent {
 	/** creates a new ColorPresets object and binds it to the node adds default
 	 * Presets if none are currently set.
 	 *
-	 * @param parent
-	 *          node to bind to */
+	 * @param parent - node to bind to
+	 */
 	public ColorPresets(final Preferences parent) {
 
 		super();
@@ -77,7 +75,7 @@ public class ColorPresets implements ConfigNodePersistent {
 
 		if(parentNode == null) {
 			LogBuffer.println("Could not find or create ColorPresets " +
-												"node because parentNode was null.");
+				"node because parentNode was null.");
 			return;
 		}
 
@@ -310,20 +308,22 @@ public class ColorPresets implements ConfigNodePersistent {
 	public ColorSet getColorSet(final String colorSchemeName) {
 
 		if(colorSchemeName == null) {
-			LogBuffer.println("ColorSet could not be returned because 'name' was null. Returned default Red-Green.");
+			LogBuffer.println("ColorSet could not be returned because 'name' " +
+				"was null. Returned default Red-Green.");
 			return defaultColorSets[0];
 		}
 
 		if(configNode == null) {
-			LogBuffer.println("ColorSet could not be returned because no Preferences node was defined. " +
-												"Returned default Red-Green.");
+			LogBuffer.println("ColorSet could not be returned because no " +
+				"Preferences node was defined. Returned default Red-Green.");
 			return defaultColorSets[0];
 		}
 
 		// Checking the defaults
 		for(final ColorSet defaultColorSet : defaultColorSets) {
-			if(defaultColorSet.getColorSchemeName()
-												.equals(colorSchemeName)) { return defaultColorSet; }
+			if(defaultColorSet.getColorSchemeName().equals(colorSchemeName)) {
+				return defaultColorSet;
+			}
 		}
 
 		// Checking existing nodes

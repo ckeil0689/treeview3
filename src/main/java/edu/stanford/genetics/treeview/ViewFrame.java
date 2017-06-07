@@ -92,11 +92,11 @@ public abstract class ViewFrame extends Observable implements Observer,
 		// TODO replace with static method when PR is merged
 		final String os = System.getProperty("os.name").toLowerCase();
 		final boolean isMac = os.startsWith("mac os x");
-	  if(isMac) {
-	  	// no app name in frame title
-	  	title = "";
-	  }
-	  
+		if(isMac) {
+			// no app name in frame title
+			title = "";
+		}
+
 		this.appFrame = new JFrame(title);
 		this.configNode = mainConfigNode;
 		
@@ -309,7 +309,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 					saveResizeTimer.stop();
 					saveResizeTimer = null;
 					LogBuffer.println("Saving window dimensions & position.");
-				
+
 					storeState();
 				}
 			}
@@ -322,7 +322,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 				 * call actionPerformed of the ActionListener
 				 * "saveWindowAttrs". */
 				this.saveResizeTimer = new Timer(this.saveResizeDelay,
-												 saveWindowAttrs);
+					saveWindowAttrs);
 				this.saveResizeTimer.start();
 			} else {
 				/* Event came too soon, swallow it by resetting the timer.. */
@@ -332,8 +332,8 @@ public abstract class ViewFrame extends Observable implements Observer,
 	}
 
 	public void addAppWindowPosListener() {
-		
-		appFrame.addComponentListener( new AppWindowPosListener());
+
+		appFrame.addComponentListener(new AppWindowPosListener());
 	}
 
 	private void setupWindowPosListener() {
