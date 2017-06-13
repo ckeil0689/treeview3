@@ -1470,7 +1470,7 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	public void centerScrollOnSelection(final int startIndex,
-																			final int endIndex) {
+		final int endIndex) {
 
 		int scrollVal = (int) Math.round((endIndex + startIndex) / 2.0);
 
@@ -2347,24 +2347,23 @@ public class MapContainer extends Observable implements Observer,
 		hoverChanged = false;
 	}
 
-	/** @author rleach
+	/**
 	 * @return the hoverTreeMinIndex */
 	public int getHoverTreeMinIndex() {
 		return(hoverTreeMinIndex);
 	}
 
-	/** @author rleach
+	/**
 	 * @param hoverTreeMinIndex the hoverTreeMinIndex to set */
 	public void setHoverTreeMinIndex(int hoverTreeMinIndex) {
 		this.hoverTreeMinIndex = hoverTreeMinIndex;
 		debug("Setting new tree min index hover to [" +	hoverTreeMinIndex +
-					"].", 18);
+			"].", 18);
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
 	}
 
-	/** @author rleach */
 	public void unsetHoverTreeMinIndex() {
 		this.hoverTreeMinIndex = -1;
 		setChanged();
@@ -2372,24 +2371,23 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
-	/** @author rleach
+	/**
 	 * @return the hoverTreeMaxIndex */
 	public int getHoverTreeMaxIndex() {
 		return(hoverTreeMaxIndex);
 	}
 
-	/** @author rleach
+	/**
 	 * @param hoverTreeMaxIndex the hoverTreeMaxIndex to set */
 	public void setHoverTreeMaxIndex(int hoverTreeMaxIndex) {
 		this.hoverTreeMaxIndex = hoverTreeMaxIndex;
 		debug("Setting new tree max index hover to [" +	hoverTreeMaxIndex +
-					"].", 18);
+			"].", 18);
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
 	}
 
-	/** @author rleach */
 	public void unsetHoverTreeMaxIndex() {
 		this.hoverTreeMaxIndex = -1;
 		setChanged();
