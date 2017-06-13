@@ -966,7 +966,8 @@ public class ClusterDialogController {
 					file.getParent() + File.separator);
 			
 			clusterDialog.dispose();
-			tvController.getDataInfoAndLoad(clusteredFileSet, oldRoot, oldExt, true, false);
+			tvController.getDataInfoAndLoad(clusteredFileSet,oldRoot,oldExt,
+				true,false,false);
 
 		} else {
 			final String alert = "When trying to load the clustered file, no "

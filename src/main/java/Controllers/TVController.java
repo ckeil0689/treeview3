@@ -68,6 +68,9 @@ public class TVController implements Observer {
 	private File file;
 	private FileSet fileMenuSet;
 	private boolean loadSuccess;
+	private boolean isFromRecents;
+	private boolean isFromCluster;
+	private String loadThreadError;
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
@@ -75,6 +78,9 @@ public class TVController implements Observer {
 		this.tvFrame = tvFrame;
 		this.dendroController = new DendroController(tvFrame, this);
 		this.loadSuccess = false;
+		this.isFromRecents = false;
+		this.isFromCluster = false;
+		this.loadThreadError = "";
 
 		// Add the view as observer to the model
 		((TVModel) model).addObserver(tvFrame);
@@ -162,8 +168,8 @@ public class TVController implements Observer {
 
 		if(tvFrame.getWelcomeView() != null) {
 			tvFrame.getWelcomeView().addLoadListener(new LoadButtonListener());
-			tvFrame	.getWelcomeView()
-							.addLoadLastListener(new LoadLastButtonListener());
+			tvFrame.getWelcomeView().addLoadLastListener(
+				new LoadLastButtonListener());
 		}
 	}
 
@@ -172,9 +178,10 @@ public class TVController implements Observer {
 		dendroController.toggleTrees();
 	}
 
-	/** Generates the menubar controller. Causes listeners to be added for the
-	 * main menubar as well as the listed file names in 'Recent Files'. file
-	 * names in . */
+	/**
+	 * Generates the menubar controller. Causes listeners to be added for the
+	 * main menubar as well as the listed file names in 'Recent Files'.
+	 */
 	private void addMenuListeners() {
 
 		menuController = new MenubarController(tvFrame, TVController.this);
@@ -183,29 +190,29 @@ public class TVController implements Observer {
 		tvFrame.addFileMenuListeners(new FileMenuListener());
 	}
 
-	/** Calls a sequence of methods related to loading a file, when its button is
+	/**
+	 * Calls a sequence of methods related to loading a file, when its button is
 	 * clicked.
-	 *
-	 * @author CKeil */
+	 */
 	private class LoadButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
-			openFile(null, false);
+			openFile(null,false,false);
 		}
 	}
 
-	/** Initiates loading of last used file.
-	 *
-	 * @author CKeil */
+	/**
+	 * Initiates loading of last used file.
+	 */
 	private class LoadLastButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 
 			final FileSet last = tvFrame.getFileMRU().getLast();
-			openFile(last, false);
+			openFile(last,false,true);
 		}
 	}
 
@@ -303,16 +310,14 @@ public class TVController implements Observer {
 	 *          user in the import dialog. If the file has been loaded before, the
 	 *          information can come from stored preferences
 	 *          data. */
-	public void loadData(final FileSet fileSet, final DataLoadInfo dataInfo) {
+	public void loadData(final FileSet fileSet,final DataLoadInfo dataInfo,
+		final boolean isFromCluster,final boolean isFromRecents) {
 
 		// Setting loading screen
 		tvFrame.generateView(ViewType.PROGRESS_VIEW);
 
 		// Loading TVModel
 		final TVModel tvModel = (TVModel) model;
-
-		LogBuffer.println("tvModel upon loadData is " +
-			(model == null ? "null" : "defined"));
 
 		setFileMenuSet(fileSet);
 
@@ -321,8 +326,12 @@ public class TVController implements Observer {
 			tvModel.resetState();
 			tvModel.setSource(fileMenuSet);
 
-			final ModelLoader loader = new ModelLoader(tvModel, this, dataInfo);
+			final ModelLoader loader = new ModelLoader(tvModel,this,dataInfo);
 			loadSuccess = false;
+			//Commenting to see if this is overwriting the thread's setting
+			//loadThreadError = "";
+			this.isFromRecents = isFromRecents;
+			this.isFromCluster = isFromCluster;
 			loader.execute();
 		} catch(final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. " +
@@ -373,39 +382,37 @@ public class TVController implements Observer {
 
 		} else if(!loadSuccess) {
 			final String message = "Something went wrong with the data " +
-				"load.  The thread could have run out of memory or some " +
-				"other system resource.";
+				"load" + (loadThreadError.equalsIgnoreCase("") ?
+					".\nIt could be an out of memory error or some other " +
+					"system resource issue." : ":\n" + loadThreadError);
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,"Alert",
 				JOptionPane.ERROR_MESSAGE);
-			LogBuffer.println("Alert: " + message);
+			LogBuffer.println("ERROR: " + message);
 
 			// Set model status, which will update the view.
 			((TVModel) model).setLoaded(false);
 
-			//Bring the user "back" to the load dialog to try again or cancel load
-			//TODO: The user may have tried to open the file using the "Open
-			//Last File" button, so calling openFile should not happen in that
-			//instance.  Keep track of the method used to open the file and call
-			//openFile only when appropriate.  Create an issue for this TODO
-			openFile(null, true);
+			//Bring the user back to the load dialog (if applicable) to try
+			//again or cancel load
+			if(!isFromRecents && !isFromCluster) {
+				openFile(null,true,false);
+			}
 		} else {
 			final String message = "No numeric data could be found in the " +
 				"input file.\nThe input file must contain tab-delimited " +
 				"numeric values.";
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,"Alert",
 				JOptionPane.WARNING_MESSAGE);
-			LogBuffer.println("Alert: " + message);
+			LogBuffer.println("WARNING: " + message);
 
 			// Set model status, which will update the view.
 			((TVModel) model).setLoaded(false);
 
-			//Bring the user "back" to the load dialog to try again or cancel
-			//load
-			//TODO: The user may have tried to open the file using the "Open
-			//Last File" button, so calling openFile should not happen in that
-			//instance.  Keep track of the method used to open the file and call
-			//openFile only when appropriate.  Create an issue for this TODO
-			openFile(null, true);
+			//Bring the user back to the load dialog (if applicable) to try
+			//again or cancel load
+			if(!isFromRecents && !isFromCluster) {
+				openFile(null,true,false);
+			}
 		}
 
 		addViewListeners();
@@ -520,16 +527,22 @@ public class TVController implements Observer {
 		this.fileMenuSet = newFs;
 	}
 
-	/** This method opens a file dialog to open either the visualization view or
+	/**
+	 * This method opens a file dialog to open either the visualization view or
 	 * the cluster view depending on which file type is chosen.
 	 * 
 	 * @param fileSet - A FileSet object representing the files to be loaded.
 	 * @param shouldUseImport - Explicitly tells the loader function called in
-	 *          this method to use the import dialog
-	 *          for opening a file. Only used through menubar's 'File > Open File
-	 *          With Import Dialog...' at the moment.
-	 * @throws LoadException */
-	public void openFile(FileSet fileSet, final boolean shouldUseImport) {
+	 *          this method to use the import dialog for opening a file. Only
+	 *          used through menubar's 'File > Import...' at the moment.
+	 * @param isFromRecents - Tells the loader whether the file being opened was
+	 *          from either the Open Recent File menu or the Load Last File
+	 *          button so that if an exception occurs during load, it knows
+	 *          whether to return the user to an open dialog or not.
+	 * @throws LoadException
+	 */
+	public void openFile(FileSet fileSet, final boolean shouldUseImport,
+		final boolean isFromRecents) {
 
 		String message;
 		FileSet loadFileSet = fileSet;
@@ -544,7 +557,8 @@ public class TVController implements Observer {
 				loadFileSet = ViewFrame.getFileSet(file);
 			}
 
-			getDataInfoAndLoad(loadFileSet, null, null, false, shouldUseImport);
+			getDataInfoAndLoad(loadFileSet,null,null,false,shouldUseImport,
+				isFromRecents);
 
 		}
 		catch(final LoadException e) {
@@ -571,7 +585,7 @@ public class TVController implements Observer {
 	 *          clustering. */
 	public void getDataInfoAndLoad(	final FileSet newFileSet,
 		final String oldRoot,final String oldExt, boolean isFromCluster,
-		boolean shouldUseImport) {
+		boolean shouldUseImport,final boolean isFromRecents) {
 
 		Preferences oldNode;
 
@@ -607,7 +621,7 @@ public class TVController implements Observer {
 		}
 
 		dataInfo.setIsClusteredFile(isFromCluster);
-		loadData(newFileSet, dataInfo);
+		loadData(newFileSet,dataInfo,isFromCluster,isFromRecents);
 	}
 
 	/** Show a dialog for the user to specify how his data should be loaded.
@@ -973,9 +987,10 @@ public class TVController implements Observer {
 			tvFrame.getFileMRU().setLast(tvFrame.getFileMenuSet());
 			tvFrame.getFileMRU().notifyObservers();
 
-			fileMenuSet = tvFrame.findFileSet((JMenuItem) actionEvent.getSource());
+			fileMenuSet =
+				tvFrame.findFileSet((JMenuItem) actionEvent.getSource());
 
-			openFile(fileMenuSet, false);
+			openFile(fileMenuSet,false,true);
 		}
 	}
 
@@ -1114,5 +1129,53 @@ public class TVController implements Observer {
 	 */
 	public void setLoadSuccess(boolean loadSuccess) {
 		this.loadSuccess = loadSuccess;
+	}
+
+	/**
+	 * Get the loadThreadError string
+	 * @return the loadThreadError
+	 */
+	public String getLoadThreadError() {
+		return(loadThreadError);
+	}
+
+	/**
+	 * Set the loadThreadError string
+	 * @param loadThreadError the loadThreadError to set
+	 */
+	public void setLoadThreadError(String loadThreadError) {
+		this.loadThreadError = loadThreadError;
+	}
+
+	/**
+	 * 
+	 * @return the isFromRecents
+	 */
+	public boolean isFromRecents() {
+		return(isFromRecents);
+	}
+
+	/**
+	 * 
+	 * @param isFromRecents the isFromRecents to set
+	 */
+	public void setFromRecents(boolean isFromRecents) {
+		this.isFromRecents = isFromRecents;
+	}
+
+	/**
+	 * 
+	 * @return the isFromCluster
+	 */
+	public boolean isFromCluster() {
+		return(isFromCluster);
+	}
+
+	/**
+	 * 
+	 * @param isFromCluster the isFromCluster to set
+	 */
+	public void setFromCluster(boolean isFromCluster) {
+		this.isFromCluster = isFromCluster;
 	}
 }

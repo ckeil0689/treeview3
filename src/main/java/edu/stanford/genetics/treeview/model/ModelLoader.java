@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview.model;
 
+import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import Controllers.TVController;
@@ -18,6 +21,7 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
+import java.util.concurrent.ExecutionException;
 
 /** The class responsible for loading data into the TVModel. */
 public class ModelLoader extends SwingWorker<Void, LoadStatus> {
@@ -83,7 +87,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	@Override
 	protected Void doInBackground() throws Exception {
 
-		LogBuffer.println("Starting data load");
 		/* 
 		 * Count row numbers to be able to initialize stringLabels[][] and set
 		 * progress bar maximum.
@@ -97,7 +100,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		ls.setProgress(0);
 		ls.setMaxProgress(nRows);
 		ls.setStatus("Preparing...");
-		LogBuffer.println("Preparing...");
 
 		final File file = new File(fileSet.getCdt());
 		final BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -106,7 +108,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		int row_idx = 0;
 
 		ls.setStatus("Loading...");
-		LogBuffer.println("Loading...");
 
 		// Read all lines and parse the data (creates a String matrix)
 		while((line = reader.readLine()) != null) {
@@ -126,29 +127,39 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		}
 
 		ls.setStatus("Getting ready...");
-		LogBuffer.println("Analyzing labels...");
 		publish(ls);
 
 		analyzeLabels(stringLabels);
-
-		LogBuffer.println("Assigning data to model...");
 
 		// Parse tree and config files
 		assignDataToModel(stringLabels);
 
 		ls.setStatus("Done!");
-		LogBuffer.println("Done!");
 		publish(ls);
 
 		reader.close();
 
 		controller.setLoadSuccess(true);
 
-		return null;
+		return(null);
 	}
 
 	@Override
 	protected void done() {
+
+		//Exceptions that happen in the SwingWorker are caught here.  We call
+		//get() in order to wait for the exception to be thrown properly.
+		//Otherwise, the exception happens quietly.
+		try {
+			get();
+		} catch (InterruptedException | ExecutionException e) {
+			if(e.getLocalizedMessage().contains("OutOfMemoryError")) {
+				controller.setLoadThreadError("Out of memory.");
+			} else {
+				controller.setLoadThreadError(e.getLocalizedMessage());
+			}
+			e.printStackTrace();
+		}
 
 		doubleData = null;
 
@@ -233,16 +244,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 	private void assignDataToModel(final String[][] stringLabels) {
 
-		LogBuffer.println("Calling parseCDT");
-
 		// Parse the CDT File
-		/* TODO wrap in try-catch */
 		parseCDT(stringLabels);
 
 
 		// If present, parse ATR File
 		if(hasAID) {
-			LogBuffer.println("Calling parseATR");
 			parseATR();
 		}
 		else {
@@ -252,7 +259,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		// If present, parse GTR File
 		if(hasGID) {
-			LogBuffer.println("Calling parseGTR");
 			parseGTR();
 		}
 		else {
@@ -260,7 +266,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			targetModel.gidFound(false);
 		}
 
-		LogBuffer.println("Calling setConfigData");
 		setConfigData();
 	}
 
@@ -446,8 +451,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		final int nRows = doubleData.length;
 		final int nCols = doubleData[0].length;
 
-		LogBuffer.println("Got rows/cols: " + nRows + "/" + nCols);
-
 		// fill row label array
 		String[][] rowLabels;
 		if(dataInfo.getDataStartCol() > 0) {
@@ -488,8 +491,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		targetModel.setExprData(doubleData);
 		targetModel.getDataMatrix().calculateBaseValues();
-
-		LogBuffer.println("Done parsing for CDT-format.");
 	}
 
 	private void parseGTR() {
