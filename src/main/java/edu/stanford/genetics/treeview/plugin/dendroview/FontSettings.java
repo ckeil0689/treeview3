@@ -79,7 +79,7 @@ public class FontSettings implements SettingsPanel {
 	public JPanel makeFontPanel() {
 
 		fontPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
-		fontPanel.setBorder(BorderFactory.createTitledBorder("Set Label Font"));
+		fontPanel.setBorder(BorderFactory.createTitledBorder("Font"));
 		setupFonts();
 		setupWidgets();
 

@@ -41,6 +41,7 @@ import javax.swing.event.ChangeListener;
 import net.miginfocom.swing.MigLayout;
 import Controllers.RegionType;
 import Utilities.GUIFactory;
+import Utilities.StringRes;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LabelInfo;
@@ -156,6 +157,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		setLabelSummary(new LabelSummary(getSummaryName()));
 		labelAttr = new LabelAttributes(this);
 		// this.urlExtractor = uExtractor;
+
+		zoomHint = StringRes.lbl_ZoomLabels;
 
 		addMouseMotionListener(this);
 		addMouseListener(this);
@@ -330,6 +333,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		secondaryPaneSize = -1;
 		secondaryViewportSize = -1;
 
+		labelPortMode = true;
+		labelPortFlankMode = true;
+		maxLabelPortFlankSize = 0; //<1 = unlimited
+		labelPortDefaultNone = false;
+
 		if(labelAttr != null) {
 			labelAttr.resetDefaults();
 		}
@@ -471,6 +479,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		labelAttr.requestStoredState();
 
+		setLabelPortMode(configNode.getBoolean("labelPortMode",labelPortMode));
+		setLabelPortFlankMode(configNode.getBoolean("labelPortFlankMode",
+			labelPortFlankMode));
+		setMaxLabelPortFlankSize(configNode.getInt("maxLabelPortFlankSize",
+			maxLabelPortFlankSize));
+		setLabelPortDefaultNone(configNode.getBoolean("labelPortDefaultNone",
+			labelPortDefaultNone));
+
 		resetSecondaryScroll();
 
 		if(labelSummary == null) {
@@ -484,7 +500,19 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	@Override
 	public void storeState() {
 
+		if(labelAttr == null) {
+			LogBuffer.println("Could not store labelAttributes state.");
+			return;
+		}
+
 		labelAttr.storeState();
+
+		//Save the preferred port label states
+		configNode.putBoolean("labelPortMode",labelPortMode);
+		configNode.putBoolean("labelPortFlankMode",labelPortFlankMode);
+		configNode.putInt("maxLabelPortFlankSize",maxLabelPortFlankSize);
+		configNode.putBoolean("labelPortDefaultNone",labelPortDefaultNone);
+
 		resetSecondaryScroll();
 	}
 
@@ -499,6 +527,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		labelAttr.importStateFrom(node);
 
+		setLabelPortMode(node.getBoolean("labelPortMode",labelPortMode));
+		setLabelPortFlankMode(node.getBoolean("labelPortFlankMode",
+			labelPortFlankMode));
+		setMaxLabelPortFlankSize(node.getInt("maxLabelPortFlankSize",
+			maxLabelPortFlankSize));
+		setLabelPortDefaultNone(node.getBoolean("labelPortDefaultNone",
+			labelPortDefaultNone));
+
 		// Signal that the secondary scroll position should be reset the next
 		// time it is needed
 		resetSecondaryScroll();
@@ -507,11 +543,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			Preferences summaryNode;
 			if(node.nodeExists("RowSummary")) {
 				summaryNode = node.node("RowSummary");
-
 			}
 			else if(node.nodeExists("ColSummary")) {
 				summaryNode = node.node("ColSummary");
-
 			}
 			else {
 				summaryNode = null;
@@ -592,14 +626,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	// notifyObservers method called from MapContainer was resulting in sluggish
 	// updates
 	private int repaintInterval = 50; // update every 50 milliseconds
-	/*
-	 * TODO: If anastasia doesn't like trees linked to whizzing labels,
-	 * uncomment the following commented code. If she likes it, delete. This
-	 * code saves compute cycles, but makes the trees sometimes move out of sync
-	 * with the labels.
-	 */
-	// private int slowRepaintInterval = 1000;//update every 1s if mouse not
-	// moving
 	private int lastHoverIndex = -1;
 	private Timer repaintTimer = new Timer(repaintInterval,
 		new ActionListener() {
@@ -626,41 +652,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		}
 	});
 
-	/*
-	 * TODO: If anastasia doesn't like trees linked to whizzing labels,
-	 * uncomment the following commented code. If she likes it, delete. This
-	 * code saves compute cycles, but makes the trees sometimes move out of sync
-	 * with the labels.
-	 */
-	// //Timer to wait a bit before slowing down the slice _timer for painting.
-	// //This conserves processor cycles in the interests of performance. Note
-	// //that there is a pair of timers for each axis.
-	// final private int delay = 1000;
-	// private javax.swing.Timer slowDownRepaintTimer;
-	// ActionListener slowDownRepaintListener = new ActionListener() {
-	//
-	// @Override
-	// public void actionPerformed(ActionEvent evt) {
-	// if(evt.getSource() == slowDownRepaintTimer) {
-	// /* Stop timer */
-	// slowDownRepaintTimer.stop();
-	// slowDownRepaintTimer = null;
-	//
-	// //If we are still over a label port view panel, just slow the
-	// //repaint timer, because this was triggered by the mouse not
-	// //moving
-	// if(map.overALabelPortLinkedView()) {
-	//// debug("Slowing the repaint interval presumably because " +
-	//// "of lack of mouse movement",9);
-	//// repaintTimer.setDelay(slowRepaintInterval);
-	// } else {
-	// repaintTimer.stop();
-	// map.setLabelAnimeRunning(false);
-	// }
-	// }
-	// }
-	// };
-
 	/* inherit description */
 	@Override
 	public void updateBuffer(final Graphics g) {
@@ -685,19 +676,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				repaintTimer.stop();
 				lastHoverIndex = -1;
 				map.setLabelAnimeRunning(false);
-				/*
-				 * TODO: If anastasia doesn't like trees linked to whizzing
-				 * labels, uncomment the following commented code. If she likes
-				 * it, delete. This code saves compute cycles, but makes the
-				 * trees sometimes move out of sync with the labels.
-				 */
-				// //Disable the turnOffRepaintTimer if it is running, because
-				// we've
-				// //already stopped repaints
-				// if(slowDownRepaintTimer != null) {
-				// slowDownRepaintTimer.stop();
-				// slowDownRepaintTimer = null;
-				// }
 			}
 			else {
 				debug("The repaint timer is not running. This updateBuffer " +
@@ -712,74 +690,21 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				repaintTimer.start();
 				map.setLabelAnimeRunning(true);
 				lastHoverIndex = getPrimaryHoverIndex();
-				/*
-				 * TODO: If anastasia doesn't like trees linked to whizzing
-				 * labels, uncomment the following commented code. If she likes
-				 * it, delete. This code saves compute cycles, but makes the
-				 * trees sometimes move out of sync with the labels.
-				 */
-				// //Disable any slowDownRepaintTimer that might have been left
-				// over
-				// if(slowDownRepaintTimer != null) {
-				// slowDownRepaintTimer.stop();
-				// slowDownRepaintTimer = null;
-				// }
 			}
 			else {
 				debug("The repaint timer was in fact running even though " +
 					"map.isLabelAnimeRunning() said it wasn't.",9);
 			}
 		}
-		// Else if the mouse hasn't moved, start the second timer to slow down
-		// the first after 1 second (this mitigates delays upon mouse motion
-		// after a brief period of no motion)
-		else if(map.overALabelLinkedView() &&
-			(getPrimaryHoverIndex() == lastHoverIndex)) {
-			/*
-			 * TODO: If anastasia doesn't like trees linked to whizzing labels,
-			 * uncomment the following commented code. If she likes it, delete.
-			 * This code saves compute cycles, but makes the trees sometimes
-			 * move out of sync with the labels.
-			 */
-			// if(repaintTimer.getDelay() == repaintInterval) {
-			// debug("Hovering on one spot [" + lastHoverIndex +
-			// "] - slowing animation",9);
-			// if(slowDownRepaintTimer == null) {
-			// slowDownRepaintTimer = new Timer(delay,slowDownRepaintListener);
-			// slowDownRepaintTimer.start();
-			// }
-			// } else {
-			// debug("Animation already slowed down to [" +
-			// repaintTimer.getDelay() + "ms].",9);
-			// }
-		}
-		// Else, disable the slowDownRepaintTimer, update the hover index, and
-		// set the repaint interval to normal speed
-		else {
+		// Else if the mouse has moved, disable the slowDownRepaintTimer, update
+		// the hover index, and set the repaint interval to normal speed
+		else if(!map.overALabelLinkedView() ||
+			(getPrimaryHoverIndex() != lastHoverIndex)) {
+
 			debug("Hovering across matrix - keeping animation going",9);
 			debug("Last hover Index: [" + lastHoverIndex +
 				"] current hover index [" +
 				getPrimaryHoverIndex() + "]",9);
-			/*
-			 * TODO: If anastasia doesn't like trees linked to whizzing labels,
-			 * uncomment the following commented code. If she likes it, delete.
-			 * This code saves compute cycles, but makes the trees sometimes
-			 * move out of sync with the labels.
-			 */
-			// if(repaintTimer != null && !repaintTimer.isRunning()) {
-			// repaintTimer.start();
-			// } else if(repaintTimer.getDelay() == slowRepaintInterval) {
-			// debug("Speeding up the repaint interval because mouse " +
-			// "movement detected",9);
-			// repaintTimer.setDelay(repaintInterval);
-			// repaintTimer.restart();
-			// }
-			// //Disable the slowDownRepaintTimer because we have detected
-			// //continued mouse motion
-			// if(slowDownRepaintTimer != null) {
-			// slowDownRepaintTimer.stop();
-			// slowDownRepaintTimer = null;
-			// }
 			lastHoverIndex = getPrimaryHoverIndex();
 			map.setLabelAnimeRunning(true);
 		}
@@ -870,10 +795,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 			map.setWhizMode(drawLabelPort);
 
-			// If the label pane's secondary dimension changed sizes or if the
-			// font size has changed
+			// If the label pane's visible portion changed sizes (e.g. the user
+			//dragged the splitpane divider) or if the content has dictated a
+			//change in the offscreen size
 			if(secondaryViewportSizeChanged() ||
-				(lastFontSize != labelAttr.getPoints())) {
+				(paneSizeShouldBe != getSavedSecondaryPaneSize())) {
 				debug("Viewport size change detected. Previous scroll " +
 					"positions: lastScrollPos [" + lastScrollPos +
 					"] lastScrollEndPos [" + lastScrollEndPos +
@@ -963,14 +889,20 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		final Color fore = GUIFactory.MAIN;
 		final FontMetrics metrics = getFontMetrics(g2d.getFont());
 		final int ascent = metrics.getAscent();
-		int offscreenMatrixSize = map.getPixel(map.getMaxIndex() + 1) - 1 - map
-			.getPixel(0);
+		int offscreenMatrixSize = map.getPixel(map.getMaxIndex() + 1) - 1 -
+			map.getPixel(0);
 		Color bgColor;
 		int minPortLabel = getPrimaryHoverIndex();
 		int maxPortLabel = getPrimaryHoverIndex();
+		int minPortLabelCapacity = minPortLabel;
+		int maxPortLabelCapacity = maxPortLabel;
 		int minPortLabelOffset = 0;
 		int maxPortLabelOffset = 0;
+		int minPortLabelOffsetCapacity = 0;
+		int maxPortLabelOffsetCapacity = 0;
 		int hoverStyle = Font.BOLD | labelAttr.getStyle();
+		boolean flankMode = isLabelPortFlankMode();
+		int flankSize = getMaxLabelPortFlankSize();
 
 		// See if the labels are going to be offset because they are near
 		// an edge
@@ -982,13 +914,11 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			edgeOffset = (map.getMiddlePixel(getPrimaryHoverIndex()) + ascent) -
 				getPrimaryViewportSize();
 		}
-		else if((map.getMiddlePixel(getPrimaryHoverIndex()) - (int) Math
-			.ceil(ascent /
-				2)) < 0) {
+		else if((map.getMiddlePixel(getPrimaryHoverIndex()) -
+			(int) Math.ceil(ascent / 2)) < 0) {
+
 			edgeOffset = map.getMiddlePixel(getPrimaryHoverIndex()) -
-				(int) Math
-				.ceil(ascent /
-					2);
+				(int) Math.ceil(ascent / 2);
 		}
 
 		Color labelColor;
@@ -1005,10 +935,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				}
 
 				/* Set label color */
-				if((j == getPrimaryHoverIndex()) ||
+				if(//Do not color a single drawn label as red (i.e. when
+					//flankSize is 0 in flankMode)
+					(!flankMode || flankSize != 0) &&
+					(j == getPrimaryHoverIndex() ||
 					((map.getHoverTreeMinIndex() > -1) &&
 						(j >= map.getHoverTreeMinIndex()) &&
-						(j <= map.getHoverTreeMaxIndex()))) {
+						(j <= map.getHoverTreeMaxIndex())))) {
 					labelColor = hoverTextFGColor;
 					debug("Label at index [" + j + "] is tree-hovered",23);
 				}
@@ -1045,18 +978,14 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				if(yPos > (-ascent / 2)) {
 					bgColor = drawLabelBackground(g,j,yPos - ascent);
 					if(yPos >= ascent) {
-						minPortLabel = j;
-						minPortLabelOffset = yPos - ascent;
-						/*
-						 * TODO: If anastasia doesn't like labels being colored
-						 * red on tree node hover, uncomment, otherwise delete.
-						 */
-						// if(j != getPrimaryHoverIndex() &&
-						// (map.getHoverTreeMinIndex() == -1 ||
-						// j < map.getHoverTreeMinIndex() ||
-						// j > map.getHoverTreeMaxIndex())) {
-						// labelColor = labelPortColor;
-						// }
+						if(!flankMode || flankSize < 0 ||
+							(getPrimaryHoverIndex() - j <= flankSize)) {
+
+							minPortLabel = j;
+							minPortLabelOffset = yPos - ascent;
+						}
+						minPortLabelCapacity = j;
+						minPortLabelOffsetCapacity = yPos - ascent;
 					}
 					else if(indexDiff != 0) {
 						debug("Lightening edge-labels",24);
@@ -1068,6 +997,7 @@ public abstract class LabelView extends ModelView implements MouseListener,
 						// label
 						maxPortLabelOffset = getPrimaryViewportSize() -
 							((yPos - ascent) + labelAttr.getPoints());
+						maxPortLabelOffsetCapacity = maxPortLabelOffset;
 						debug("Drawing " + getPaneType() +
 							" hover font BOLD [" +
 							hoverStyle + "].",5);
@@ -1094,11 +1024,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 								getSavedSecondaryPaneSize() +
 								"]",13);
 
-					g2d.drawString(out,labelStrStart,yPos);
+					if(!flankMode || flankSize < 0 ||
+						(getPrimaryHoverIndex() - j <= flankSize)) {
 
-					drawOverrunArrows(metrics.stringWidth(out),g,yPos -
-						ascent,labelAttr.getPoints(),g2d.getColor(),bgColor,
-						labelStrStart);
+						g2d.drawString(out,labelStrStart,yPos);
+
+						drawOverrunArrows(metrics.stringWidth(out),g,yPos -
+							ascent,labelAttr.getPoints(),g2d.getColor(),bgColor,
+							labelStrStart);
+					}
 				} else {
 					//No more labels can fit, so we can stop the loop early
 					break;
@@ -1162,19 +1096,16 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				if(yPos < (offscreenMatrixSize + (ascent / 2))) {
 					bgColor = drawLabelBackground(g,j,yPos - ascent);
 					if(yPos <= getPrimaryViewportSize()) {
-						maxPortLabel = j;
-						maxPortLabelOffset = getPrimaryViewportSize() -
-							((yPos - ascent) +
-								labelAttr.getPoints());
-						/*
-						 * TODO: If anastasia doesn't like labels being colored
-						 * red on tree node hover, uncomment, otherwise delete.
-						 */
-						// if(map.getHoverTreeMinIndex() == -1 ||
-						// j < map.getHoverTreeMinIndex() ||
-						// j > map.getHoverTreeMaxIndex()) {
-						// labelColor = labelPortColor;
-						// }
+						if(!flankMode || flankSize < 0 ||
+							(j - getPrimaryHoverIndex() <= flankSize)) {
+
+							maxPortLabel = j;
+							maxPortLabelOffset = getPrimaryViewportSize() -
+								((yPos - ascent) + labelAttr.getPoints());
+						}
+						maxPortLabelCapacity = j;
+						maxPortLabelOffsetCapacity = getPrimaryViewportSize() -
+							((yPos - ascent) + labelAttr.getPoints());
 					}
 					else {
 						debug("Lightening edge-labels",24);
@@ -1182,11 +1113,15 @@ public abstract class LabelView extends ModelView implements MouseListener,
 					}
 					g2d.setColor(labelColor);
 
-					g2d.drawString(out,labelStrStart,yPos);
+					if(!flankMode || flankSize < 0 ||
+						(j - getPrimaryHoverIndex() <= flankSize)) {
 
-					drawOverrunArrows(metrics.stringWidth(out),g,yPos -
-						ascent,labelAttr.getPoints(),labelColor,bgColor,
-						labelStrStart);
+						g2d.drawString(out,labelStrStart,yPos);
+
+						drawOverrunArrows(metrics.stringWidth(out),g,yPos -
+							ascent,labelAttr.getPoints(),labelColor,bgColor,
+							labelStrStart);
+					}
 				} else {
 					//No more labels can fit, so we can stop the loop early
 					break;
@@ -1198,18 +1133,25 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			}
 		}
 
-		// Set the first and last visible label for the tree drawing positions
+		// Set the first and last visible label for the tree's blue background
+		// drawing positions
 		map.setFirstVisibleLabel(minPortLabel);
 		map.setLastVisibleLabel(maxPortLabel);
 		map.setFirstVisibleLabelOffset(minPortLabelOffset);
 		map.setLastVisibleLabelOffset(maxPortLabelOffset);
+		// Set the first and last visible label spaces for the tree drawing
+		// positions
+		map.setFirstVisibleLabelCapacity(minPortLabelCapacity);
+		map.setLastVisibleLabelCapacity(maxPortLabelCapacity);
+		map.setFirstVisibleLabelOffsetCapacity(minPortLabelOffsetCapacity);
+		map.setLastVisibleLabelOffsetCapacity(maxPortLabelOffsetCapacity);
 
 		// Switch to the background color
 		g2d.setColor(textBGColor);
 
 		/* Draw the "position indicator" since the label port is active */
 		// See variables initialized above the string drawing section
-		if(indicatorThickness > 0) {
+		if(doDrawIndicator()) {
 			// Draw a background box to blank-out any partially scrolled labels
 			debug("Blanking out the scrolled " + getPaneType() +
 				" labels from xpos: [" + (labelAndScrollCoordsAreOpposite()
@@ -1281,6 +1223,12 @@ public abstract class LabelView extends ModelView implements MouseListener,
 				labelIndent),0,labelIndent,
 				getPrimaryPaneSize(offscreenSize));
 		}
+	}
+
+	private boolean doDrawIndicator() {
+		return(doDrawLabelPort() &&
+			(!isLabelPortFlankMode() || getMaxLabelPortFlankSize() != 0) &&
+			indicatorThickness > 0);
 	}
 
 	/**
@@ -1419,9 +1367,8 @@ public abstract class LabelView extends ModelView implements MouseListener,
 
 		debug(getPaneType() + " Hint position: [" + xPos + "/" + yPos +
 			"] zoomHint: [" + zoomHint + "] height [" + offscreenSize.height +
-			"] width [" + offscreenSize.width + "] + HintStrLen [" + metrics
-			.stringWidth(zoomHint) +
-			"]",3);
+			"] width [" + offscreenSize.width + "] + HintStrLen [" +
+			metrics.stringWidth(zoomHint) + "]",3);
 
 		// Adding this useless scroll causes the pane size and scrollbar
 		// attributes to update correctly - and reflect the settings made
@@ -1463,19 +1410,27 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		final int bgColorIndex = labelInfo.getIndex("BGCOLOR");
 		final String[] strings = labelInfo.getLabels(j);
 		Color bgColor = textBGColor;
-		boolean isSelecting = (map.isSelecting() && (((j >= map
-			.getSelectingStart()) &&
+		boolean isSelecting = (map.isSelecting() &&
+			(((j >= map.getSelectingStart()) &&
 			(j <= getPrimaryHoverIndex())) ||
 			((j <= map.getSelectingStart()) &&
 				(j >= getPrimaryHoverIndex()))));
 		boolean drawingSelectColor = false;
 		try {
-			if((drawSelection.isIndexSelected(j) && !isSelecting) ||
+			if(//If we're in port mode and the label is going to be drawn given
+				//the flank settings
+				(!doDrawLabelPort() || !isLabelPortFlankMode() ||
+				getMaxLabelPortFlankSize() < 0 ||
+				(Math.abs(j - getPrimaryHoverIndex()) <=
+				getMaxLabelPortFlankSize())) &&
+
+				//The label is selected or in the process of being selected
+				((drawSelection.isIndexSelected(j) && !isSelecting) ||
 				(isSelecting &&
 					((!map.isDeSelecting() &&
 						!map.isToggling()) ||
 						(map.isToggling() &&
-							!drawSelection.isIndexSelected(j))))) {
+							!drawSelection.isIndexSelected(j)))))) {
 
 				debug("Drawing yellow background for selected index [" + j +
 					"] because isSelecting is [" +
@@ -1993,19 +1948,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			.getIndex(getPrimaryHoverPosition(e)),8);
 
 		/*
-		 * TODO: If anastasia doesn't like trees linked to whizzing labels,
-		 * uncomment the following commented code. If she likes it, delete. This
-		 * code saves compute cycles, but makes the trees sometimes move out of
-		 * sync with the labels.
-		 */
-		// //This is not necessary, but makes things a tad more responsive
-		// if(repaintTimer != null &&
-		// repaintTimer.getDelay() == slowRepaintInterval) {
-		// repaintTimer.setDelay(repaintInterval);
-		// repaintTimer.restart();
-		// }
-
-		/*
 		 * TODO: Handle the temporary outlining of the matrix NOT SURE HOW TO DO
 		 * THIS YET - CANNOT TALK TO IMV
 		 */
@@ -2256,19 +2198,6 @@ public abstract class LabelView extends ModelView implements MouseListener,
 		setHoverPosition(e);
 		// Note that the hover index is updated by forceUpdatePrimaryHoverIndex
 		// which is called from updateBuffer
-
-		/*
-		 * TODO: If anastasia doesn't like trees linked to whizzing labels,
-		 * uncomment the following commented code. If she likes it, delete. This
-		 * code saves compute cycles, but makes the trees sometimes move out of
-		 * sync with the labels.
-		 */
-		// //This is not necessary, but makes things a tad more responsive
-		// if(repaintTimer != null &&
-		// repaintTimer.getDelay() == slowRepaintInterval) {
-		// repaintTimer.setDelay(repaintInterval);
-		// repaintTimer.restart();
-		// }
 
 		/*
 		 * Set the Data ticker value to average value of the current row/column
@@ -2861,7 +2790,9 @@ public abstract class LabelView extends ModelView implements MouseListener,
 	}
 
 	public int getLabelShiftSize() {
-		return(doDrawLabelPort() ? indicatorThickness : labelIndent);
+		return(doDrawLabelPort() &&
+			(!isLabelPortFlankMode() || getMaxLabelPortFlankSize() != 0) ?
+				indicatorThickness : labelIndent);
 	}
 
 	public int getLabelShift() {
@@ -2990,17 +2921,13 @@ public abstract class LabelView extends ModelView implements MouseListener,
 			paneLabelPortOffTimer.stop();
 			paneLabelPortOffTimer = null;
 		}
-		/*
-		 * TODO: If anastasia doesn't like trees linked to whizzing labels,
-		 * uncomment the following commented code. If she likes it, delete. This
-		 * code saves compute cycles, but makes the trees sometimes move out of
-		 * sync with the labels.
-		 */
-		// if(map.wasLastTreeModeGlobal() && map.shouldKeepTreeGlobal()) {
-		// map.setKeepTreeGlobal(true);
-		// } else {
-		map.setKeepTreeGlobal(false);
-		// }
+
+		//Will more than 1 label be drawn in port mode?
+		boolean whizOverOne = !isLabelPortFlankMode() ||
+			getMaxLabelPortFlankSize() > 0;
+		//If whizeOverOne is true, we want setKeepTreeGlobal to be false so that
+		//the tree links to the labels
+		map.setKeepTreeGlobal(!whizOverOne);
 		map.setOverLabels(true);
 
 		super.mouseEntered(e);

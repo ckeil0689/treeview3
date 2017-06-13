@@ -61,7 +61,6 @@ public class TreePainter extends TreeDrawer {
 	/**
 	 * Export to file method which paints a portion of a tree in a position
 	 * aligned with the matrix and the other tree.
-	 * @author rleach
 	 * @param graphics - the graphics object with which to paint
 	 * @param xScaleEq - X coord calculations object
 	 * @param yScaleEq - Y coord calculations object
@@ -96,7 +95,6 @@ public class TreePainter extends TreeDrawer {
 
 	/**
 	 * Paints a subtree
-	 * @author rleach
 	 * @param graphics - the graphics object with which to paint
 	 * @param xScaleEq - X coord calculations object
 	 * @param yScaleEq - Y coord calculations object
@@ -192,7 +190,6 @@ public class TreePainter extends TreeDrawer {
 		 * top of the tree for all selected subtrees and leaves, as well as the
 		 * hovered node after the tree is finished (so that the dots don't get
 		 * drawn over).
-		 * @author rleach
 		 * @param node - The top node whose subtree to draw.
 		 * @param hoverIndex - The data index the cursor is in alignment with
 		 *                     over the matrix
@@ -214,7 +211,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Export a portion of the tree
-		 * @author rleach
 		 * @param node - root node of the tree
 		 * @param treeSelection - selection object
 		 * @param xIndent - where to start drawing the (entire) tree
@@ -242,7 +238,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Determines whether a given node is the hovered node
-		 * @author rleach
 		 * @param node - the node to test
 		 * @return boolean
 		 */
@@ -257,7 +252,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Returns whether a node is currently hovered over
-		 * @author rleach
 		 * @return boolean
 		 */
 		public boolean aNodeIsHovered() {
@@ -267,7 +261,6 @@ public class TreePainter extends TreeDrawer {
 		/**
 		 * The drawing method works recursively and returns a stack of the
 		 * selected nodes
-		 * @author rleach
 		 * @param node - The top node to draw
 		 * @param hoverIndex - The data index the cursor is in alignment with
 		 *                     over the matrix
@@ -365,7 +358,6 @@ public class TreePainter extends TreeDrawer {
 		/**
 		 * Exports a portion of a tree to a file in a position aligned with the
 		 * matrix and other tree
-		 * @author rleach
 		 * @param node - root node of the tree
 		 * @param hoverIndex - 
 		 * @param isNodeHovered
@@ -467,7 +459,6 @@ public class TreePainter extends TreeDrawer {
 		/**
 		 * Determines whether all the leaves under a given node have indexes
 		 * that are selected
-		 * @author rleach
 		 * @param node - the tree node to check the leaves of
 		 * @param treeSelection - contains the selected data indexes
 		 * @return boolean
@@ -492,7 +483,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Accessor
-		 * @author rleach
 		 * @return the hoveredNode
 		 */
 		public TreeDrawerNode getHoveredNode() {
@@ -501,7 +491,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Setter
-		 * @author rleach
 		 * @param hoveredNode the hoveredNode to set
 		 */
 		public void setHoveredNode(TreeDrawerNode hoveredNode) {
@@ -512,7 +501,6 @@ public class TreePainter extends TreeDrawer {
 		 * This method is intended to draw a dot over a hovered or selected top
 		 * node after its parent branch has been drawn so that the dot ends up
 		 * on top of the branch lines
-		 * @author rleach
 		 * @param node
 		 */
 		public void drawNodeDot(final TreeDrawerNode node) {
@@ -555,7 +543,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Draws all the tree node dots in a stack of nodes
-		 * @author rleach
 		 * @param nodeStack
 		 */
 		public void drawNodeDots(final Stack<TreeDrawerNode> nodeStack) {
@@ -585,7 +572,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Draws 2 branches stemming from a given node
-		 * @author rleach
 		 * @param node - the node from which to draw the branches
 		 * @param hoverIndex - the data index corresponding to the cursor
 		 * @param isNodeHovered - if we are under a hovered node
@@ -627,7 +613,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Export a single node and it's extending branches
-		 * @author rleach
 		 * @param node - node being exported
 		 * @param isSelected - Whether the node is selected
 		 * @param xIndent - where to start drawing the (entire) tree
@@ -670,7 +655,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Draws the left branch stemming from a given node
-		 * @author rleach
 		 * @param node - the node from which to draw the branches
 		 * @param hoverIndex - the data index corresponding to the cursor
 		 * @param isNodeHovered - if we are under a hovered node
@@ -826,7 +810,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Export the left branch of a node
-		 * @author rleach
 		 * @param node - node being exported
 		 * @param isSelected - Whether the node is selected
 		 * @param xIndent - where to start drawing the (entire) tree
@@ -1052,7 +1035,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Draws the right branch stemming from a given node
-		 * @author rleach
 		 * @param node - the node from which to draw the branches
 		 * @param hoverIndex - the data index corresponding to the cursor
 		 * @param isNodeHovered - if we are under a hovered node
@@ -1208,7 +1190,6 @@ public class TreePainter extends TreeDrawer {
 
 		/**
 		 * Export the right branch of a node
-		 * @author rleach
 		 * @param node - node being exported
 		 * @param isSelected - Whether the node is selected
 		 * @param xIndent - where to start drawing the (entire) tree

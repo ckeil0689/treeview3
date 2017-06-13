@@ -24,7 +24,7 @@ public class StringRes {
 
 	/** url of announcements mailing list */
 	public final static String announcementUrl = "https://www.princeton.edu/"
-			+ "~abarysh/treeview/";
+		+ "~abarysh/treeview/";
 
 	public static final String appName = "TreeView 3";
 
@@ -135,21 +135,19 @@ public class StringRes {
 	public static final String tt_home = "Zoom into the selected area";
 
 	// Labels
-	public static final String lbl_ZoomColLabels = "Hover, zoom, or change "
-			+ "font size to see labels";
-	public static final String lbl_ZoomRowLabels = "Hover, zoom, or change "
-			+ "font size to see labels";
+	public static final String lbl_ZoomLabels = "Zoom, reduce font, or hover " +
+		"& hit spacebar to see labels";
 
 	/* Distance Measures */
 	public static final String cluster_LeaveUnchanged = "Leave unchanged";
 	public static final String cluster_pearsonUn = "Pearson Correlation "
-			+ "(uncentered)";
+		+ "(uncentered)";
 	public static final String cluster_pearsonCtrd = "Pearson Correlation "
-			+ "(centered)";
+		+ "(centered)";
 	public static final String cluster_absCorrUn = "Absolute Correlation "
-			+ "(uncentered)";
+		+ "(uncentered)";
 	public static final String cluster_absCorrCtrd = "Absolute Correlation "
-			+ "(centered)";
+		+ "(centered)";
 	public static final String cluster_spearman = "Spearman Ranked Correlation";
 	public static final String cluster_euclidean = "Euclidean Distance";
 	public static final String cluster_cityBlock = "City Block Distance";
@@ -160,85 +158,85 @@ public class StringRes {
 	/* Linkage Method & clustering infos */
 	/* Single Linkage */
 	public static final String clusterInfo_Single_Similarity = "Joins the "
-			+ "closest two clusters by finding the most similar pair of points.";
+		+ "closest two clusters by finding the most similar pair of points.";
 
 	public static final String clusterInfo_Single_Type = "Long straggly, "
-			+ "chains, ellipsoidal.";
+		+ "chains, ellipsoidal.";
 
 	public static final String clusterInfo_Single_Time = "O(N log N) to "
-			+ "O(N**5). Implementation of SLINK (Sibson, 1972) will reduce "
-			+ "complexity to O(N**2).";
+		+ "O(N**5). Implementation of SLINK (Sibson, 1972) will reduce "
+		+ "complexity to O(N**2).";
 
 	public static final String clusterInfo_Single_Adv = "Theoretical "
-			+ "properties, efficient implementations, widely used. "
-			+ "No cluster centroid or representative required: "
-			+ "no need to recalculate similarity matrix.";
+		+ "properties, efficient implementations, widely used. "
+		+ "No cluster centroid or representative required: "
+		+ "no need to recalculate similarity matrix.";
 
 	public static final String clusterInfo_Single_DisAdv = "Unsuitable for "
-			+ "isolating spherical or poorly separated clusters.";
+		+ "isolating spherical or poorly separated clusters.";
 
 	public static final String clusterInfo_Ready = "Ready to cluster!";
 
 	/* Complete Linkage */
 	public static final String clusterInfo_Compl_Similarity = "Joins the "
-			+ "most distant two clusters by finding the least similar pair "
-			+ "of points.";
+		+ "most distant two clusters by finding the least similar pair "
+		+ "of points.";
 
 	public static final String clusterInfo_Compl_Type = "All entries in a "
-			+ "cluster are linked to one another within some minimum "
-			+ "similarity. Small, tightly bound clusters.";
+		+ "cluster are linked to one another within some minimum "
+		+ "similarity. Small, tightly bound clusters.";
 
 	public static final String clusterInfo_Compl_Time = "O(N**3).";
 
 	public static final String clusterInfo_Compl_Adv = "Good results from "
-			+ "(Voorhees) comparative studies.";
+		+ "(Voorhees) comparative studies.";
 
 	public static final String clusterInfo_Compl_DisAdv = "Difficult to "
-			+ "apply to large data sets due to computational complexity.";
+		+ "apply to large data sets due to computational complexity.";
 
 	/* Average Linkage */
 	public static final String clusterInfo_Avg_Similarity = "Use the average "
-			+ "value of the pairwise links within a cluster, based upon all "
-			+ "objects in the cluster.";
+		+ "value of the pairwise links within a cluster, based upon all "
+		+ "objects in the cluster.";
 
 	public static final String clusterInfo_Avg_Type = "Intermediate in "
-			+ "tightness between single link and complete link.";
+		+ "tightness between single link and complete link.";
 
 	public static final String clusterInfo_Avg_Time = "O(N**2).";
 
 	public static final String clusterInfo_Avg_Adv = "Ranked well in "
-			+ "evaluation studies.";
+		+ "evaluation studies.";
 
 	public static final String clusterInfo_Avg_DisAdv = "Expensive for "
-			+ "large collections.";
+		+ "large collections.";
 
 	/* k-means */
 	public static final String clusterInfo_KMeans = "Splits the data into "
-			+ "k clusters by initially choosing k random centroids (means) "
-			+ "from the distance matrix rows or columns. The rest of the "
-			+ "rows or columns is then each assigned to the group with the "
-			+ "closest centroid. ";
+		+ "k clusters by initially choosing k random centroids (means) "
+		+ "from the distance matrix rows or columns. The rest of the "
+		+ "rows or columns is then each assigned to the group with the "
+		+ "closest centroid. ";
 
 	public static final String clusterInfo_KMeans_Adv = "Faster than "
-			+ "hierarchical clustering, if k is small; "
-			+ "Produces tighter clusters than hierarchical clustering.";
+		+ "hierarchical clustering, if k is small; "
+		+ "Produces tighter clusters than hierarchical clustering.";
 
 	public static final String clusterInfo_KMeans_DisAdv = "Fixed number of "
-			+ "clusters: User has to decide what value k should be; "
-			+ "Unsuitable for non-globular clusters; "
-			+ "Randomly selected seed clusters generate different clusters.";
+		+ "clusters: User has to decide what value k should be; "
+		+ "Unsuitable for non-globular clusters; "
+		+ "Randomly selected seed clusters generate different clusters.";
 
 	// Cluster Info - Tip
 	public static final String clusterTip_Memory = "Memory tip.";
 	public static final String clusterTip_completed = "The file has been saved "
-			+ "in the original directory.";
+		+ "in the original directory.";
 	public static final String clusterTip_filePath = "File Path: ";
 
 	// Cluster Error - Hints
 	public static final String clusterError_invalid = "Clustering parameters"
-			+ " are missing or incorrect. Check the input again!";
+		+ " are missing or incorrect. Check the input again!";
 	public static final String clusterError_notLoaded = "DataModel not "
-			+ "properly loaded.";
+		+ "properly loaded.";
 
 	// Frame Title - Testing
 	public static final String test_title_FontSelector = "Font Settings Test";

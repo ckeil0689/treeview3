@@ -92,8 +92,8 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 		configNode.put("face", face);
 		configNode.putInt("style", style);
 		configNode.putInt("size", size);
-		configNode.putBoolean("isRightJustified", d_justified);
-		configNode.putBoolean("isFixed", d_fixed);
+		configNode.putBoolean("isRightJustified", isRightJustified);
+		configNode.putBoolean("isFixed", isFixed);
 	}
 
 	@Override
@@ -186,7 +186,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	@Override
 	public void setFace(String face) {
 		this.face = face;
-		storeState();
 		updateLabelView();
 	}
 
@@ -198,7 +197,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	@Override
 	public void setStyle(int style) {
 		this.style = style;
-		storeState();
 		updateLabelView();
 	}
 
@@ -210,7 +208,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	@Override
 	public void setPoints(int size) {
 		this.size = size;
-		storeState();
 		updateLabelView();
 	}
 
@@ -250,7 +247,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 		if(minSize < 1 || maxSize > 0 && minSize > maxSize) { return; }
 
 		this.minSize = minSize;
-		storeState();
 		updateLabelView();
 	}
 
@@ -266,7 +262,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 		if(maxSize < 1 || minSize > 0 && maxSize < minSize) { return; }
 
 		this.maxSize = maxSize;
-		storeState();
 		updateLabelView();
 	}
 
@@ -289,7 +284,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	@Override
 	public void setFixed(boolean isFixed) {
 		this.isFixed = isFixed;
-		storeState();
 		updateLabelView();
 	}
 
@@ -325,7 +319,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	@Override
 	public void setRightJustified(boolean isRightJustified) {
 		this.isRightJustified = isRightJustified;
-		storeState();
 		updateLabelView();
 	}
 

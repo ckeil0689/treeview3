@@ -46,9 +46,9 @@ public class LabelSummaryPanel extends JPanel implements SettingsPanel,
 		setLayout(new MigLayout());
 		setOpaque(false);
 
-		final JLabel label = GUIFactory.createLabel("Select headers to "
-				+ "display:", GUIFactory.FONTS);
-		add(label, "span, wrap");
+//		final JLabel label = GUIFactory.createLabel("Label type(s) to " +
+//			"display:", GUIFactory.FONTS);
+//		add(label, "span, wrap");
 
 		setLabelTypeList(labelInfo.getLabelTypes());
 		labelTypeList.setVisibleRowCount(5);
