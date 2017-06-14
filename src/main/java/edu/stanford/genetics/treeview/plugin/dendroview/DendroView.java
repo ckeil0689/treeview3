@@ -1635,8 +1635,8 @@ public class DendroView implements Observer, DendroPanel {
 	public double getDivLoc(final TRView dendrogram) {
 
 		/* Get value for correct dendrogram JSplitPane */
-		final JSplitPane treePane = (dendrogram == colTreeView)	? colDataPane
-																														: rowDataPane;
+		final JSplitPane treePane = (dendrogram == colTreeView) ?
+			colDataPane : rowDataPane;
 
 		final double abs_div_loc = treePane.getDividerLocation();
 		final double max_div_loc = treePane.getMaximumDividerLocation();
@@ -1652,8 +1652,32 @@ public class DendroView implements Observer, DendroPanel {
 	 * @return boolean */
 	public boolean treesEnabled() {
 
-		final boolean treesEnabled = rowTreeView.isEnabled() || colTreeView
-																																				.isEnabled();
+		final boolean treesEnabled =
+			rowTreeView.isEnabled() || colTreeView.isEnabled();
 		return treesEnabled;
+	}
+
+	/**
+	 * 
+	 * @return the bORDER_THICKNESS
+	 */
+	public static int getBORDER_THICKNESS() {
+		return(BORDER_THICKNESS);
+	}
+
+	/**
+	 * 
+	 * @return the mIN_GRID_CELL_SIZE
+	 */
+	public static int getMIN_GRID_CELL_SIZE() {
+		return(MIN_GRID_CELL_SIZE);
+	}
+
+	/**
+	 * 
+	 * @return the lABEL_AREA_HEIGHT
+	 */
+	public static int getLABEL_AREA_HEIGHT() {
+		return(LABEL_AREA_HEIGHT);
 	}
 }
