@@ -215,9 +215,9 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 
 	private void setupDrawingComponents() {
 
-		this.colorExtractor = new ColorExtractor(	model.getDataMatrix().getMinVal(),
-																							model	.getDataMatrix()
-																										.getMaxVal());
+		this.colorExtractor = new ColorExtractor(
+			model.getDataMatrix().getMinVal(),
+			model.getDataMatrix().getMaxVal());
 		colorExtractor.setMissing(DataModel.NAN, DataModel.EMPTY);
 
 		final DoubleArrayDrawer dArrayDrawer = new DoubleArrayDrawer();
@@ -236,11 +236,13 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	@Override
 	public void addKeyBindings() {
 
-		final InputMap input_map = imView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		final InputMap input_map =
+			imView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 		final ActionMap action_map = imView.getActionMap();
 
 		/* Gets the system's modifier key (CTRL for Windows, CMD for OS X) */
-		final int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		final int modifier =
+			Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		final int shift_mask = InputEvent.SHIFT_MASK;
 
 		/* Scroll through GlobalView with HOME, END, PgUP, PgDOWN */
@@ -250,10 +252,12 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		input_map.put(KeyStroke.getKeyStroke("END"), "pageYToEnd");
 		action_map.put("pageYToEnd", new EndKeyYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, modifier), "pageXToStart");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, modifier),
+			"pageXToStart");
 		action_map.put("pageXToStart", new HomeKeyXAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier), "pageXToEnd");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier),
+			"pageXToEnd");
 		action_map.put("pageXToEnd", new EndKeyXAction());
 
 		input_map.put(KeyStroke.getKeyStroke("PAGE_UP"), "pageYUp");
@@ -262,7 +266,8 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		input_map.put(KeyStroke.getKeyStroke("PAGE_DOWN"), "pageYDown");
 		action_map.put("pageYDown", new PageDownYAction());
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, modifier), "pageXUp");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, modifier),
+			"pageXUp");
 		action_map.put("pageXUp", new PageUpXAction());
 
 		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, modifier), "pageXDown");
@@ -720,8 +725,10 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			return(natural);
 		}
 
-		/** Zooming when the mouse wheel is used in conjunction with the alt/
-		 * option key. Vertical scrolling if the shift key is not pressed. */
+		/**
+		 * Zooming when the mouse wheel is used in conjunction with the alt/
+		 * option key. Vertical scrolling if the shift key is not pressed.
+		 */
 		@Override
 		public void mouseWheelMoved(final MouseWheelEvent e) {
 
@@ -904,7 +911,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * @param interactiveXmap
 	 * @param interactiveYmap */
 	public void setInteractiveMapContainers(final MapContainer interactiveXmap,
-																					final MapContainer interactiveYmap) {
+		final MapContainer interactiveYmap) {
 
 		this.interactiveXmap = interactiveXmap;
 		this.interactiveYmap = interactiveYmap;
@@ -921,7 +928,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * 
 	 * @param xmap
 	 * @param ymap */
-	public void setGlobalMapContainers(	final MapContainer xmap,
+	public void setGlobalMapContainers(final MapContainer xmap,
 																			final MapContainer ymap) {
 
 		this.globalXmap = xmap;
