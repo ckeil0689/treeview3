@@ -1,6 +1,5 @@
 package edu.stanford.genetics.treeview;
 
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -224,7 +223,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * 
 	 * @param minVal - data minimum value.
 	 * @param maxVal - data maximum value. */
-	public void setColorExtractorData(final double minVal, final double maxVal) {
+	public void setColorExtractorData(final double minVal,final double maxVal) {
 
 		colorExtractor.setMin(minVal);
 		colorExtractor.setMax(maxVal);
