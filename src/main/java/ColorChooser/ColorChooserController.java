@@ -449,8 +449,9 @@ public class ColorChooserController extends Observable {
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final Color missing = JColorChooser.showDialog(colorChooserUI
-																																		.getMainPanel(), "Pick Color for Missing", colorPicker.getMissing());
+			final Color missing = JColorChooser.showDialog(
+				colorChooserUI.getMainPanel(), "Pick Color for Missing",
+				colorPicker.getMissing());
 
 			if(missing != null) {
 				colorPicker.setMissing(missing);

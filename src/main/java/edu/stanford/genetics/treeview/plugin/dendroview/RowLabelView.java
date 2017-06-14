@@ -23,7 +23,6 @@ public class RowLabelView extends LabelView {
 		super();
 
 		labelAttr.setDefaultJustified(true);
-		zoomHint = StringRes.lbl_ZoomRowLabels;
 	}
 
 	@Override

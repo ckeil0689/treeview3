@@ -15,6 +15,8 @@ import java.util.List;
 
 import javax.swing.JRadioButton;
 import javax.swing.SwingWorker;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.DataModel;
@@ -61,6 +63,8 @@ public class LabelSettingsController {
 		preferences.addOKButtonListener(new ConfirmationListener());
 		preferences.addResizeDialogListener(new PreferencesComponentListener());
 		preferences.addJustifyListener(new LabelJustifyListener());
+		preferences.addShowListener(new LabelShowListener());
+		preferences.addFlankSizeListener(new SpinnerListener(preferences));
 	}
 
 	class MenuPanelListener implements MouseListener {
@@ -145,9 +149,6 @@ public class LabelSettingsController {
 
 	/**
 	 * Listener for the "Ok" button in the preferences frame.
-	 *
-	 * @author CKeil
-	 *
 	 */
 	class ConfirmationListener implements ActionListener {
 
@@ -156,14 +157,12 @@ public class LabelSettingsController {
 
 			checkForColorSave();
 			preferences.getPreferencesFrame().dispose();
+			preferences.synchronizeAnnotation();
 		}
 	}
 
 	/**
 	 * WindowAdapter for the Preferences menu.
-	 *
-	 * @author CKeil
-	 *
 	 */
 	class SaveAndCloseListener extends WindowAdapter {
 
@@ -178,17 +177,14 @@ public class LabelSettingsController {
 	/**
 	 * Listens to changing radio buttons in the AnnotationSettings and sets the
 	 * justify-flag in TextView and ArrayNameView respectively.
-	 *
-	 * @author chris0689
-	 *
 	 */
 	class LabelJustifyListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
 
-			final boolean[] labelAligns = tvFrame.getDendroView()
-					.getLabelAligns();
+			final boolean[] labelAligns =
+				tvFrame.getDendroView().getLabelAligns();
 
 			boolean isRowRight = labelAligns[0];
 			boolean isColRight = labelAligns[1];
@@ -212,6 +208,59 @@ public class LabelSettingsController {
 			}
 
 			tvFrame.getDendroView().setLabelAlignment(isRowRight, isColRight);
+		}
+	}
+
+	/**
+	 * Listens to changing radio buttons in the AnnotationSettings and sets the
+	 * various label port settings.
+	 *
+	 * @author chris0689
+	 *
+	 */
+	class LabelShowListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+
+			/* counter to recognize the selected JRadioButton */
+			switch (((JRadioButton) e.getSource()).getText()) {
+				case "As many as possible":
+					LogBuffer.println("Setting as many as possible.");
+					tvFrame.getDendroView().getRowLabelView()
+						.setLabelPortMode(true);
+					tvFrame.getDendroView().getRowLabelView()
+						.setLabelPortFlankMode(false);
+					tvFrame.getDendroView().getColLabelView()
+						.setLabelPortMode(true);
+					tvFrame.getDendroView().getColLabelView()
+						.setLabelPortFlankMode(false);
+					break;
+				case "Hovered label and ":
+					LogBuffer.println("Setting some.");
+					tvFrame.getDendroView().getRowLabelView()
+						.setLabelPortMode(true);
+					tvFrame.getDendroView().getRowLabelView()
+						.setLabelPortFlankMode(true);
+					tvFrame.getDendroView().getColLabelView()
+						.setLabelPortMode(true);
+					tvFrame.getDendroView().getColLabelView()
+						.setLabelPortFlankMode(true);
+					//New behavior for spacebar toggling
+					preferences.setShowBaseIsNone(false);
+					break;
+				case "None":
+					LogBuffer.println("Setting none.");
+					tvFrame.getDendroView().getRowLabelView()
+						.setLabelPortMode(false);
+					tvFrame.getDendroView().getColLabelView()
+						.setLabelPortMode(false);
+					//New behavior for spacebar toggling
+					preferences.setShowBaseIsNone(true);
+					break;
+				default:
+					break;
+			}
 		}
 	}
 
@@ -340,6 +389,28 @@ public class LabelSettingsController {
 			 */
 //			preferences.setupLayout(StringRes.menu_RowAndCol);
 			addListeners();
+		}
+	}
+
+	/**
+	 * Listens to a change in selection in the JSpinner for label neighbors.
+	 */
+	private class SpinnerListener implements ChangeListener {
+
+		LabelSettings labelSettings;
+
+		// To avoid synthetic compiler creation of a constructor
+		protected SpinnerListener(){}
+
+		public SpinnerListener(final LabelSettings labelSettings) {
+
+			this.labelSettings = labelSettings;
+		}
+
+		@Override
+		public void stateChanged(final ChangeEvent arg0) {
+
+			labelSettings.setFlankSize(labelSettings.getNumNeighbors());
 		}
 	}
 }
