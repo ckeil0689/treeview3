@@ -75,8 +75,10 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 
 	private final boolean swap_animation_modifiers = true;
 
-	private int spacePressInitialDelay = 350;
-	private int spacePressRepeatDelay = 50;
+	private static int SCROLL_REPAINT_INTERVAL_MS = 250;
+
+	private static int SPACE_PRESS_INIT_DELAY = 350;
+	private static int SPACE_PRESS_REPEAT_DELAY = 50;
 
 	public MatrixViewController(final InteractiveMatrixView imView,
 		final GlobalMatrixView gmView,final DataModel model,
@@ -224,7 +226,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * 
 	 * @param minVal - data minimum value.
 	 * @param maxVal - data maximum value. */
-	public void setColorExtractorData(final double minVal, final double maxVal) {
+	public void setColorExtractorData(final double minVal,final double maxVal) {
 
 		colorExtractor.setMin(minVal);
 		colorExtractor.setMax(maxVal);
@@ -663,16 +665,16 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 			if(spacePressTimer != null && spacePressTimer.isRunning()) {
-				spacePressTimer.setDelay(spacePressRepeatDelay);
+				spacePressTimer.setDelay(SPACE_PRESS_REPEAT_DELAY);
 				spacePressTimer.restart();
 			} else {
 				toggleLabels();
 				if(spacePressTimer != null) {
-					spacePressTimer.setDelay(spacePressInitialDelay);
+					spacePressTimer.setDelay(SPACE_PRESS_INIT_DELAY);
 					spacePressTimer.start();
 					
 				} else {
-					spacePressTimer = new Timer(spacePressInitialDelay,
+					spacePressTimer = new Timer(SPACE_PRESS_INIT_DELAY,
 						spacePressTimerListener);
 					spacePressTimer.start();
 				}
@@ -914,20 +916,22 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 				}
 			}
 			else if(e.isShiftDown()) {
-				interactiveXmap.scrollBy(shift * (int) Math.ceil(scroll_ratio * interactiveXmap.getNumVisible()));
+				interactiveXmap.scrollBy(shift * (int) Math.ceil(scroll_ratio *
+					interactiveXmap.getNumVisible()));
 				//Now we are hovered over a new index
 				interactiveXmap.setHoverIndex(interactiveXmap.getIndex(
 					e.getX()));
 
 			}
 			else {
-				interactiveYmap.scrollBy(shift * (int) Math.ceil(scroll_ratio * interactiveYmap.getNumVisible()));
+				interactiveYmap.scrollBy(shift * (int) Math.ceil(scroll_ratio *
+					interactiveYmap.getNumVisible()));
 				//Now we are hovered over a new index
 				interactiveYmap.setHoverIndex(interactiveYmap.getIndex(
 					e.getY()));
 			}
 
-			imView.repaint(250);
+			imView.repaint(SCROLL_REPAINT_INTERVAL_MS);
 		}
 	}
 
