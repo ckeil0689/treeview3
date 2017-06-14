@@ -22,7 +22,6 @@ public class ColumnLabelView extends LabelView {
 
 		super();
 		labelAttr.setDefaultJustified(false);
-		zoomHint = StringRes.lbl_ZoomColLabels;
 	}
 
 	@Override

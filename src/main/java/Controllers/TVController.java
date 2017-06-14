@@ -132,7 +132,8 @@ public class TVController implements Observer {
 		}
 		catch(final BackingStoreException e) {
 			final String message = "Issue while resetting preferences.";
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], message, "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
+				"Error", JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println(e.getMessage());
 			return;
 		}
@@ -148,7 +149,8 @@ public class TVController implements Observer {
 		/* Gets the system's modifier key (Ctrl or Cmd) */
 		final int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
-		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, modifier), "openCluster");
+		input_map.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, modifier),
+			"openCluster");
 		action_map.put("openCluster", new ClusterAction());
 	}
 
@@ -279,7 +281,8 @@ public class TVController implements Observer {
 				 * Start waiting for saveResizeDelay millis to elapse and then
 				 * call actionPerformed of the ActionListener "saveWindowAttrs".
 				 */
-				this.saveResizeTimer = new Timer(this.saveResizeDelay, saveWindowAttrs);
+				this.saveResizeTimer = new Timer(this.saveResizeDelay,
+					saveWindowAttrs);
 				this.saveResizeTimer.start();
 
 			}
@@ -318,9 +321,9 @@ public class TVController implements Observer {
 		}
 		catch(final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. " +
-															"Increase the JVM's heap size. Error: " + e
-																																					.getMessage();
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], oomError, "Out of memory", JOptionPane.ERROR_MESSAGE);
+				"Increase the JVM's heap size. Error: " + e.getMessage();
+			JOptionPane.showMessageDialog(Frame.getFrames()[0], oomError,
+				"Out of memory", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -390,7 +393,7 @@ public class TVController implements Observer {
 	 * @param srcExtension
 	 * @return The target Preferences node, if it exists. Otherwise null. */
 	private Preferences getOldPreferences(final String srcName,
-																				final String srcExtension) {
+		final String srcExtension) {
 
 		try {
 			/* First, get the relevant old node... */
@@ -537,8 +540,9 @@ public class TVController implements Observer {
 	 * @param oldExt The extension of the old FileSet (FileSet.getExt())
 	 * @param isFromCluster Whether the loading happens as a result of
 	 *          clustering. */
-	public void getDataInfoAndLoad(	final FileSet newFileSet, final String oldRoot,
-		final String oldExt, boolean isFromCluster,boolean shouldUseImport) {
+	public void getDataInfoAndLoad(	final FileSet newFileSet,
+		final String oldRoot,final String oldExt, boolean isFromCluster,
+		boolean shouldUseImport) {
 
 		Preferences oldNode;
 
@@ -660,7 +664,8 @@ public class TVController implements Observer {
 		 * BorderLayout.CENTER);
 		 */
 		// get string from user...
-		final String urlString = JOptionPane.showInputDialog(this, "Enter a Url");
+		final String urlString = JOptionPane.showInputDialog(this,
+			"Enter a Url");
 
 		if(urlString != null) {
 			// must parse out name, parent + sep...
@@ -672,7 +677,7 @@ public class TVController implements Observer {
 		}
 		else {
 			throw new LoadException("Input Dialog closed without selection...",
-															LoadException.NOFILE);
+				LoadException.NOFILE);
 		}
 
 		return fileSet1;
@@ -693,15 +698,15 @@ public class TVController implements Observer {
 
 		// extractors...
 		final UrlPresets genePresets = tvFrame.getGeneUrlPresets();
-		final UrlExtractor urlExtractor = new UrlExtractor(	model.getRowLabelInfo(),
-																												genePresets);
+		final UrlExtractor urlExtractor = new UrlExtractor(
+			model.getRowLabelInfo(),genePresets);
 
 		urlExtractor.bindConfig(documentConfig.node("UrlExtractor"));
 		tvFrame.setUrlExtractor(urlExtractor);
 
 		final UrlPresets arrayPresets = tvFrame.getArrayUrlPresets();
-		final UrlExtractor arrayUrlExtractor = new UrlExtractor(model.getColLabelInfo(),
-																														arrayPresets);
+		final UrlExtractor arrayUrlExtractor = new UrlExtractor(
+			model.getColLabelInfo(),arrayPresets);
 
 		arrayUrlExtractor.bindConfig(documentConfig.node("ArrayUrlExtractor"));
 		tvFrame.setArrayUrlExtractor(arrayUrlExtractor);
@@ -724,8 +729,7 @@ public class TVController implements Observer {
 
 		/* Creating the Controller for this view. */
 		ClusterDialogController cController = new ClusterDialogController(
-																																			clusterView,
-																																			TVController.this);
+			clusterView,TVController.this);
 
 		cController.displayView();
 	}
@@ -741,13 +745,11 @@ public class TVController implements Observer {
 		}
 	}
 
-	public void showSubDataModel(	final int[] geneIndexes,
-																final int[] arrayIndexes, final String source,
-																final String name) {
+	public void showSubDataModel(final int[] geneIndexes,
+		final int[] arrayIndexes,final String source,final String name) {
 
 		final ReorderedDataModel dataModel = new ReorderedDataModel(model,
-																																geneIndexes,
-																																arrayIndexes);
+			geneIndexes,arrayIndexes);
 		if(source != null) {
 			dataModel.setSource(source);
 		}
@@ -776,12 +778,12 @@ public class TVController implements Observer {
 				def = source.getDir() + source.getRoot() + "_list.txt";
 			}
 
-			final RowListMaker t = new RowListMaker((JFrame) Frame.getFrames()[0],
-																							tvFrame.getRowSelection(), model
-																																							.getRowLabelInfo(),
-																							def);
+			final RowListMaker t =
+				new RowListMaker((JFrame) Frame.getFrames()[0],
+				tvFrame.getRowSelection(), model.getRowLabelInfo(),def);
 
-			t.setDataMatrix(model.getDataMatrix(), model.getColLabelInfo(), DataModel.NAN);
+			t.setDataMatrix(model.getDataMatrix(), model.getColLabelInfo(),
+				DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
 
@@ -795,12 +797,13 @@ public class TVController implements Observer {
 
 		if(warnSelectionEmpty()) {
 			final FileSet source = model.getFileSet();
-			final RowListMaker t = new RowListMaker((JFrame) Frame.getFrames()[0],
-																							tvFrame.getRowSelection(), model
-																																							.getRowLabelInfo(),
-																							source.getDir() + source.getRoot() + "_data.cdt");
+			final RowListMaker t = new RowListMaker(
+				(JFrame) Frame.getFrames()[0],tvFrame.getRowSelection(),
+				model.getRowLabelInfo(),
+				source.getDir() + source.getRoot() + "_data.cdt");
 
-			t.setDataMatrix(model.getDataMatrix(), model.getColLabelInfo(), DataModel.NAN);
+			t.setDataMatrix(model.getDataMatrix(), model.getColLabelInfo(),
+				DataModel.NAN);
 
 			t.setConfigNode(tvFrame.getConfigNode());
 
@@ -818,9 +821,11 @@ public class TVController implements Observer {
 
 		final TreeSelectionI treeSelection = tvFrame.getRowSelection();
 
-		if((treeSelection == null) || (treeSelection.getNSelectedIndexes() <= 0)) {
+		if((treeSelection == null) ||
+			(treeSelection.getNSelectedIndexes() <= 0)) {
 
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], "Cannot generate gene list, no gene selected");
+			JOptionPane.showMessageDialog(Frame.getFrames()[0],
+				"Cannot generate gene list, no gene selected");
 			return false;
 		}
 		return true;
@@ -877,8 +882,9 @@ public class TVController implements Observer {
 	public void saveModelAs() {
 
 		if(model.getFileSet() == null) {
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], "Saving of datamodels not backed by " +
-																													"files is not yet supported.");
+			JOptionPane.showMessageDialog(Frame.getFrames()[0],
+				"Saving of datamodels not backed by files is not yet " +
+				"supported.");
 
 		}
 		else {
@@ -899,17 +905,18 @@ public class TVController implements Observer {
 				final File chosen = fileDialog.getSelectedFile();
 				String name = chosen.getName();
 
-				if(!name.toLowerCase().endsWith(".cdt") && !name.toLowerCase()
-																												.endsWith(".pcl")) {
+				if(!name.toLowerCase().endsWith(".cdt") &&
+					!name.toLowerCase().endsWith(".pcl")) {
+
 					name += ".cdt";
 				}
 
-				FileSet fileSet2 = new FileSet(name, chosen.getParent() +
-																							File.separator);
+				FileSet fileSet2 = new FileSet(name,
+					chosen.getParent() + File.separator);
 				fileSet2.copyState(model.getFileSet());
 
-				final FileSet fileSet1 = new FileSet(name, chosen.getParent() +
-																										File.separator);
+				final FileSet fileSet1 = new FileSet(name,
+					chosen.getParent() + File.separator);
 				fileSet1.setName(model.getFileSet().getName());
 
 				model.getFileSet().copyState(fileSet1);
@@ -922,8 +929,8 @@ public class TVController implements Observer {
 				tvFrame.addFileMenuListeners(new FileMenuListener());
 
 				if(model instanceof TVModel) {
-					((TVModel) model).getDocumentConfig().put("jtv", model.getFileSet()
-																																.getJtv());
+					((TVModel) model).getDocumentConfig().put("jtv",
+						model.getFileSet().getJtv());
 				}
 			}
 		}

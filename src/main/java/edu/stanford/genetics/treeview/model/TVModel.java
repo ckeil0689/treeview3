@@ -284,8 +284,8 @@ public class TVModel extends Observable implements DataModel {
 	}
 
 	protected static Hashtable<String, Integer> populateHash(
-			final LabelInfo source, final String labelType,
-			final Hashtable<String, Integer> target) {
+		final LabelInfo source, final String labelType,
+		final Hashtable<String, Integer> target) {
 
 		final int indexCol = source.getIndex(labelType);
 
@@ -298,7 +298,7 @@ public class TVModel extends Observable implements DataModel {
 
 		if (target == null) {
 			target = new Hashtable<String, Integer>(
-					(source.getNumLabels() * 4) / 3, .75f);
+				(source.getNumLabels() * 4) / 3, .75f);
 
 		} else {
 			target.clear();
@@ -1043,22 +1043,12 @@ public class TVModel extends Observable implements DataModel {
 		/*
 		TODO ... oh god this all just throws out fixed values.
 		*/
-		public int getAIDIndex() {
-
-			return 1;
-		}
-
-		public int getGIDIndex() {
-
-			return 0;
-		}
-
 		public int getYorfIndex() {
 
 			if (getIndex("GID") == -1) {
 				return 0;
 			}
-			
+
 			return 1;
 		}
 
@@ -1067,7 +1057,7 @@ public class TVModel extends Observable implements DataModel {
 			if (getIndex("GID") == -1) {
 				return 1;
 			}
-			
+
 				return 2;
 		}
 
