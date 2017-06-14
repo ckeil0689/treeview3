@@ -97,8 +97,6 @@ public class IMVMouseAdapter extends MouseAdapter {
 		xmap.setHoverIndex(colIdx);
 		ymap.setHoverIndex(rowIdx);
 
-		imView.repaint();
-
 		mvController.setDataValueAt(rowIdx, colIdx);
 	}
 	
@@ -481,7 +479,7 @@ public class IMVMouseAdapter extends MouseAdapter {
 			}
 		}
 	};
-	
+
 	/**
 	 * This method should be called after an N-click event has completed,
 	 * where 'N' is the number of clicks (e.g. single-click, double-click,
