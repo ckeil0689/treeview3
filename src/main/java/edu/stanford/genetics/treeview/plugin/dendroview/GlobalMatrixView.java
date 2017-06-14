@@ -72,7 +72,6 @@ public class GlobalMatrixView extends MatrixView {
 		if (viewPortRect != null) {
 			g2.setColor(Color.white);
 
-			LogBuffer.println("Drawing viewport rect at x: " + viewPortRect.x + " and y: " + viewPortRect.y + " with width: " + viewPortRect.width + " and height: " + viewPortRect.height);
 			g2.drawRect(viewPortRect.x, viewPortRect.y, viewPortRect.width,
 				viewPortRect.height);
 		}
@@ -431,8 +430,6 @@ public class GlobalMatrixView extends MatrixView {
 		this.imv_firstYVisible = firstYVisible;
 		this.imv_numXVisible = numXVisible;
 		this.imv_numYVisible = numYVisible;
-
-		LogBuffer.println("Setting num visible x: " + numXVisible + " and y: " + numYVisible);
 
 		recalculateOverlay();
 		offscreenValid = false;	
