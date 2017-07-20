@@ -192,14 +192,16 @@ public class ReorderedDataModel extends Observable implements DataModel {
 
 		@Override
 		public double getMean() {
-			
+
 			return parent.getDataMatrix().getMean();
 		}
-		
+
 		@Override
-		public double getZoomedMean(int startingRow, int endingRow, int startingCol, int endingCol) {
-			
-			return parent.getDataMatrix().getZoomedMean(startingRow, endingRow, startingCol, endingCol);
+		public double getZoomedMean(int startingRow, int endingRow,
+			int startingCol, int endingCol) {
+
+			return parent.getDataMatrix().getZoomedMean(startingRow, endingRow,
+				startingCol, endingCol);
 		}
 
 		@Override

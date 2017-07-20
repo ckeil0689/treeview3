@@ -75,8 +75,10 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 
 	private final boolean swap_animation_modifiers = true;
 
-	private int spacePressInitialDelay = 350;
-	private int spacePressRepeatDelay = 50;
+	private static int SCROLL_REPAINT_INTERVAL_MS = 250;
+
+	private static int SPACE_PRESS_INIT_DELAY = 350;
+	private static int SPACE_PRESS_REPEAT_DELAY = 50;
 
 	public MatrixViewController(final InteractiveMatrixView imView,
 		final GlobalMatrixView gmView,final DataModel model,
@@ -224,7 +226,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * 
 	 * @param minVal - data minimum value.
 	 * @param maxVal - data maximum value. */
-	public void setColorExtractorData(final double minVal, final double maxVal) {
+	public void setColorExtractorData(final double minVal,final double maxVal) {
 
 		colorExtractor.setMin(minVal);
 		colorExtractor.setMax(maxVal);
@@ -253,8 +255,8 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	@Override
 	public void addKeyBindings() {
 
-		final InputMap input_map = imView.getInputMap(
-			JComponent.WHEN_IN_FOCUSED_WINDOW);
+		final InputMap input_map =
+			imView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 		final ActionMap action_map = imView.getActionMap();
 
 		/* Gets the system's modifier key (CTRL for Windows, CMD for OS X) */
@@ -663,16 +665,16 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 		@Override
 		public void actionPerformed(final ActionEvent arg0) {
 			if(spacePressTimer != null && spacePressTimer.isRunning()) {
-				spacePressTimer.setDelay(spacePressRepeatDelay);
+				spacePressTimer.setDelay(SPACE_PRESS_REPEAT_DELAY);
 				spacePressTimer.restart();
 			} else {
 				toggleLabels();
 				if(spacePressTimer != null) {
-					spacePressTimer.setDelay(spacePressInitialDelay);
+					spacePressTimer.setDelay(SPACE_PRESS_INIT_DELAY);
 					spacePressTimer.start();
 					
 				} else {
-					spacePressTimer = new Timer(spacePressInitialDelay,
+					spacePressTimer = new Timer(SPACE_PRESS_INIT_DELAY,
 						spacePressTimerListener);
 					spacePressTimer.start();
 				}
@@ -839,7 +841,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 				 * determined in TreeView3.java instead of replicating that code
 				 * here. */
 				onamac = System	.getProperty("os.name").toLowerCase()
-												.startsWith("mac os x");
+					.startsWith("mac os x");
 			}
 			catch(Exception ex) {
 				LogBuffer.println("Failed to determine os: " + ex.getMessage());
@@ -873,15 +875,18 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 			return(natural);
 		}
 
-		/** Zooming when the mouse wheel is used in conjunction with the alt/
-		 * option key. Vertical scrolling if the shift key is not pressed. */
+		/**
+		 * Zooming when the mouse wheel is used in conjunction with the alt/
+		 * option key. Vertical scrolling if the shift key is not pressed.
+		 */
 		@Override
 		public void mouseWheelMoved(final MouseWheelEvent e) {
 
 			if(!imView.hasMouse()) { return; }
 
 			final int notches = e.getWheelRotation();
-			final int shift = (notches < 0) ? -3 : 3;
+			final int shift = notches;
+			final double scroll_ratio = 0.01;
 
 			//On macs' magic mouse, horizontal scroll comes in as if the shift
 			//was down
@@ -911,20 +916,22 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 				}
 			}
 			else if(e.isShiftDown()) {
-				interactiveXmap.scrollBy(shift);
+				interactiveXmap.scrollBy(shift * (int) Math.ceil(scroll_ratio *
+					interactiveXmap.getNumVisible()));
 				//Now we are hovered over a new index
 				interactiveXmap.setHoverIndex(interactiveXmap.getIndex(
 					e.getX()));
 
 			}
 			else {
-				interactiveYmap.scrollBy(shift);
+				interactiveYmap.scrollBy(shift * (int) Math.ceil(scroll_ratio *
+					interactiveYmap.getNumVisible()));
 				//Now we are hovered over a new index
 				interactiveYmap.setHoverIndex(interactiveYmap.getIndex(
 					e.getY()));
 			}
 
-			imView.repaint();
+			imView.repaint(SCROLL_REPAINT_INTERVAL_MS);
 		}
 	}
 
@@ -1079,7 +1086,7 @@ public class MatrixViewController implements Observer, ConfigNodePersistent,
 	 * 
 	 * @param xmap
 	 * @param ymap */
-	public void setGlobalMapContainers(	final MapContainer xmap,
+	public void setGlobalMapContainers(final MapContainer xmap,
 		final MapContainer ymap) {
 
 		this.globalXmap = xmap;
