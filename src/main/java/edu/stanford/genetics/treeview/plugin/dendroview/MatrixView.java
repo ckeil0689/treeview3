@@ -102,16 +102,16 @@ public abstract class MatrixView extends ModelViewProduced {
 
 		repaint();
 	}
-	
+
 	@Override
 	protected void updateMatrix() {
-		
+
 		if(xmap.hoverChanged() || ymap.hoverChanged()) {
 			xmap.unsetHoverChanged();
 			ymap.unsetHoverChanged();
 			return;
 		}
-		
+
 		if (!offscreenValid) {
 			adjustPixelsToMaps();
 			revalidateScreen();
@@ -520,7 +520,7 @@ public abstract class MatrixView extends ModelViewProduced {
 	 * recalculate its pixel color values. 
 	 */
 	public void setDataChanged() {
-		
+
 		this.dataChanged = true;
 	}
 	
