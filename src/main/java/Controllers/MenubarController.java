@@ -52,10 +52,10 @@ public class MenubarController {
 		switch (name) {
 
 		case StringRes.menu_Open:
-			controller.openFile(null, false);
+			controller.openFile(null,false,false);
 			break;
 		case StringRes.menu_Import:
-			controller.openFile(null, true);
+			controller.openFile(null,true,false);
 			break;
 		// case StringRes.menu_Save:
 		// controller.doModelSave(true);
@@ -122,10 +122,10 @@ public class MenubarController {
 			tvFrame.createNewFrame().getAppFrame().setVisible(true);
 			break;
 		case StringRes.menu_About:
-			tvFrame.showAboutWindow();
+			TreeViewFrame.showAboutWindow();
 			break;
 		case StringRes.menu_Shortcuts:
-			tvFrame.showShortcuts();
+			TreeViewFrame.showShortcuts();
 			break;
 		// There's currently no documentation page - don't need it for the first
 		// release
@@ -148,9 +148,9 @@ public class MenubarController {
 	 */
 	private void showSubData() {
 
-		controller.showSubDataModel(tvFrame.getRowSelection()
-				.getSelectedIndexes(), tvFrame.getColSelection()
-				.getSelectedIndexes(), null, null);
+		controller.showSubDataModel(
+			tvFrame.getRowSelection().getSelectedIndexes(),
+			tvFrame.getColSelection().getSelectedIndexes(), null, null);
 	}
 
 	/**

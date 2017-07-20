@@ -131,7 +131,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 					+ this.getClass().toString() + " because parent was null.");
 			return;
 		}
-		
+
 		this.configNode = parentNode.node(StringRes.pnode_TVFrame);
 	}
 	
@@ -459,7 +459,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	}
 
 	/**
-	 * @param isMac - (TODO unused but may change) indicates whether the program runs on macOS or not.  
+	 * @param isMac - (TODO unused but may change) indicates whether the program
+	 * runs on macOS or not.
 	 */
 	private void constructFileMenu(final boolean isMac) {
 
@@ -469,9 +470,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		// Open new file menu
 		final JMenuItem openMenuItem = new JMenuItem(StringRes.menu_Open,
-				KeyEvent.VK_O);
+			KeyEvent.VK_O);
 		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
-				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		fileMenu.add(openMenuItem);
 		stackMenuList.add(openMenuItem);
 
@@ -515,7 +516,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		fileMenu.add(recentSubMenu);
 
 		final JMenuItem editRecentMenuItem = new JMenuItem(
-				StringRes.menu_EditRecent);
+			StringRes.menu_EditRecent);
 		fileMenu.add(editRecentMenuItem);
 		stackMenuList.add(editRecentMenuItem);
 
@@ -523,9 +524,9 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		/* Quit Program Menu */
 		final JMenuItem quitMenuItem = new JMenuItem(StringRes.menu_QuitWindow,
-				KeyEvent.VK_W);
+			KeyEvent.VK_W);
 		quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
-				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		fileMenu.add(quitMenuItem);
 		stackMenuList.add(quitMenuItem);
 		
@@ -534,15 +535,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			// Open new file with import dialog menu
 			final JMenuItem importMenuItem = new JMenuItem(StringRes.menu_Import, KeyEvent.VK_I);
 			importMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
-					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			fileMenu.add(importMenuItem);
 			stackMenuList.add(importMenuItem);
 			
 			// Export Menu
 			final JMenuItem exportMenuItem = 
-					new JMenuItem(StringRes.menu_Export, KeyEvent.VK_E);
+				new JMenuItem(StringRes.menu_Export, KeyEvent.VK_E);
 			exportMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
-					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 			fileMenu.add(exportMenuItem);
 			stackMenuList.add(exportMenuItem);
 		}

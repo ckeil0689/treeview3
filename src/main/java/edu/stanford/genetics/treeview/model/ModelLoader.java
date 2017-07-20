@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview.model;
 
+import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import Controllers.TVController;
@@ -18,6 +21,7 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
+import java.util.concurrent.ExecutionException;
 
 /** The class responsible for loading data into the TVModel. */
 public class ModelLoader extends SwingWorker<Void, LoadStatus> {
@@ -41,7 +45,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private boolean hasEWeight = false;
 	private boolean hasGWeight = false;
 
-	public ModelLoader(	final DataModel model, final TVController controller,
+	public ModelLoader(final DataModel model, final TVController controller,
 		final DataLoadInfo dataInfo) {
 
 		this.controller = controller;
@@ -59,8 +63,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		dataInfo.setDelimiter(delimiter);
 	}
 
-	/** Define the start coordinate of the first data cell in the data table to be
-	 * loaded (first non-label cell).
+	/** Define the start coordinate of the first data cell in the data table to
+	 * be loaded (first non-label cell).
 	 * 
 	 * @param dataStartRow - The row index of the first data cell.
 	 * @param dataStartCol - The column index of the first data cell. */
@@ -134,11 +138,28 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		publish(ls);
 
 		reader.close();
-		return null;
+
+		controller.setLoadSuccess(true);
+
+		return(null);
 	}
 
 	@Override
 	protected void done() {
+
+		//Exceptions that happen in the SwingWorker are caught here.  We call
+		//get() in order to wait for the exception to be thrown properly.
+		//Otherwise, the exception happens quietly.
+		try {
+			get();
+		} catch (InterruptedException | ExecutionException e) {
+			if(e.getLocalizedMessage().contains("OutOfMemoryError")) {
+				controller.setLoadThreadError("Out of memory.");
+			} else {
+				controller.setLoadThreadError(e.getLocalizedMessage());
+			}
+			e.printStackTrace();
+		}
 
 		doubleData = null;
 
@@ -146,11 +167,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		controller.finishLoading(dataInfo);
 	}
 
-	/** Check the labels for commonly used labels that are useful for TreeView. */
+	/**
+	 * Check the labels for commonly used labels that are useful for TreeView.
+	 */
 	private void analyzeLabels(String[][] stringLabels) {
 
 		for(int i = 0; i < dataInfo.getDataStartRow(); i++) {
-
 			String[] labels = stringLabels[i];
 			for(int j = 0; j < dataInfo.getDataStartCol(); j++) {
 				if("GID".equalsIgnoreCase(labels[j])) {
@@ -176,12 +198,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	 * @param row_idx - The index of the current row.
 	 * @return An array of labels of the current row at index row_idx */
 	private String[] partitionRow(final String[] lineAsStrings,
-																final int row_idx) {
+		final int row_idx) {
 
 		// load line as String array
 		final String[] labels = new String[dataInfo.getDataStartCol()];
-		final double[] dataValues = new double[lineAsStrings.length - dataInfo
-																																					.getDataStartCol()];
+		final double[] dataValues =
+			new double[lineAsStrings.length - dataInfo.getDataStartCol()];
 
 		System.arraycopy(lineAsStrings, 0, labels, 0, dataInfo.getDataStartCol());
 
@@ -223,14 +245,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private void assignDataToModel(final String[][] stringLabels) {
 
 		// Parse the CDT File
-		/* TODO wrap in try-catch */
 		parseCDT(stringLabels);
 
 
 		// If present, parse ATR File
 		if(hasAID) {
 			parseATR();
-
 		}
 		else {
 			LogBuffer.println("No ATR file found for this CDT file.");
@@ -240,7 +260,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		// If present, parse GTR File
 		if(hasGID) {
 			parseGTR();
-
 		}
 		else {
 			LogBuffer.println("No GTR file found for this CDT file.");
@@ -257,7 +276,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			final String fileName = targetModel.getFileSet().getRoot();
 			final String fileExt = targetModel.getFileSet().getExt();
 
-			final Preferences fileNode = controller.getConfigNode().node("File");
+			final Preferences fileNode =
+				controller.getConfigNode().node("File");
 
 			Preferences documentConfig = null;
 			final String[] childrenNodes = fileNode.childrenNames();
@@ -270,13 +290,15 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			if(childrenNodes.length > 0) {
 				for(final String childrenNode : childrenNodes) {
 
-					final String childName = fileNode	.node(childrenNode)
-																						.get("name", default_name);
-					final String childExt = fileNode.node(childrenNode)
-																					.get("extension", default_ext);
+					final String childName =
+						fileNode.node(childrenNode).get("name", default_name);
+					final String childExt =
+						fileNode.node(childrenNode).get("extension",
+							default_ext);
 
-					if(childName.equalsIgnoreCase(fileName) && childExt
-																															.equalsIgnoreCase(fileExt)) {
+					if(childName.equalsIgnoreCase(fileName) &&
+						childExt.equalsIgnoreCase(fileExt)) {
+
 						documentConfig = fileNode.node(childrenNode);
 						fileFound = true;
 						break;
@@ -469,8 +491,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		targetModel.setExprData(doubleData);
 		targetModel.getDataMatrix().calculateBaseValues();
-
-		LogBuffer.println("Done parsing for CDT-format.");
 	}
 
 	private void parseGTR() {
@@ -490,8 +510,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		(firstRow.length == 4)// is the length classic?
 				&& !(firstRow[0].equalsIgnoreCase("NODEID"))) {
 			// okay, need to assign label types...
-			targetModel.setGtrLabelTypes(new String[] {	"NODEID", "LEFT", "RIGHT",
-																									"CORRELATION"});
+			targetModel.setGtrLabelTypes(new String[] {"NODEID","LEFT","RIGHT",
+				"CORRELATION"});
 
 			final String[][] gtrLabels = new String[gtrData.size()][];
 			for(int i = 0; i < gtrLabels.length; i++) {
