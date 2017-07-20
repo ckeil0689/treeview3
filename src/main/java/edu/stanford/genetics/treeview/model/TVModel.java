@@ -543,7 +543,8 @@ public class TVModel extends Observable implements DataModel {
 		private double median = Double.NaN;
 
 		/**
-		 * Sets all member variables of the DataMatrix instance to their initial default values.
+		 * Sets all member variables of the DataMatrix instance to their initial
+		 * default values.
 		 */
 		public void clear() {
 
@@ -579,8 +580,9 @@ public class TVModel extends Observable implements DataModel {
 		@Override
 		public void calculateBaseValues() {
 
-			// Double.MAX_VALUE is multiplied by -1 because data can be negative and we want to start with the 
-			// smallest value possible for finding a maximum in a data array. Double.MIN_VALUE is the smallest
+			// Double.MAX_VALUE is multiplied by -1 because data can be negative
+			// and we want to start with the smallest value possible for finding
+			// a maximum in a data array. Double.MIN_VALUE is the smallest
 			// positive value.
 			double maxVal = -1.0 * Double.MAX_VALUE;
 			double minVal = Double.MAX_VALUE;
@@ -644,14 +646,14 @@ public class TVModel extends Observable implements DataModel {
 			final int nRows = nRows();
 			final int nCols = nCols();
 			if (exprData == null) {
-				LogBuffer.println("Could not calculate Zommed mean. Data " +
+				LogBuffer.println("Could not calculate Zoomed mean. Data " +
 					"matrix was null.");
 				return 0;
 			}
 			if(startingRow < 0 || endingRow >= nRows || startingCol < 0 ||
 				endingCol >= nCols) {
 
-				LogBuffer.println("Could not calculate Zommed mean. Indexes " +
+				LogBuffer.println("Could not calculate Zoomed mean. Indexes " +
 					"are out of range.");
 				return 0;
 			}
@@ -665,8 +667,8 @@ public class TVModel extends Observable implements DataModel {
 
 					final double dataPoint = exprData[i][j];
 
-					if(!Double.isNaN(dataPoint) 
-							&& !Double.isInfinite(dataPoint)) {
+					if(!Double.isNaN(dataPoint) &&
+						!Double.isInfinite(dataPoint)) {
 						sum += dataPoint;
 
 						if (dataPoint > maxVal) {
@@ -781,10 +783,10 @@ public class TVModel extends Observable implements DataModel {
 		/**
 		 * Helper for calculateBaseValues().
 		 * Finds the mean value of a 2D double array given the sum of the data
-		 * values and the amount of skipped values.  This doesn't calculate the
-		 * mean from the data itself because during search min and max values,
-		 * the sum is already created. This way, another walk of the data arrays
-		 * can be avoided.
+		 * values and the amount of skipped values.
+		 * This doesn't calculate the mean from the data itself because during
+		 * search min and max values, the sum is already created. This way,
+		 * another walk of the data arrays can be avoided.
 		 * @param sum - Sum of all data values.
 		 * @param skipped - Amount of skipped data array entries.
 		 * @return Mean value.
@@ -858,7 +860,7 @@ public class TVModel extends Observable implements DataModel {
 
 			final int nexpr = nCols();
 			final int ngene = nRows();
-			
+
 			if ((x < nexpr) && (y < ngene) && (x >= 0) && (y >= 0)) {
 				return exprData[y][x];
 			}
@@ -923,7 +925,8 @@ public class TVModel extends Observable implements DataModel {
 		/*
 		 * returns the average of a set of Rows - fromRow to toRow(included)
 		 * (non-Javadoc)
-		 * @see edu.stanford.genetics.treeview.DataMatrix#getRowAverage(int,int)
+		 * @see edu.stanford.genetics.treeview.DataMatrix#getRowAverage(int,
+		 * int)
 		 */
 		public double getRowAverage(int fromRowId, int toRowId){
 			double sum = 0;

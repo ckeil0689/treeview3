@@ -14,11 +14,13 @@ REFERENCES:
 BITBUCKET PULL REQUEST FORM[3]
 ==============================
 
-DATE OF SUBMISSION: 
+SUBMISSION DATE: 
 
-BITBUCKET ISSUE NUMBER(S): #
+ISSUE NUMBER(S): #
 
-LINK TO JAR FILE: 
+BRANCH: https://bitbucket.org/TreeView3Dev/treeview3/branch/<BRANCH_NAME>#diff
+
+TEST JAR: https://bitbucket.org/TreeView3Dev/treeview3/downloads/<JAR_FILE_NAME>.jar
 
 LEVEL OF EFFORT: trivial/minor/medium/major/overhaul (choose one)
 
@@ -29,15 +31,14 @@ DESCRIPTION OF CHANGES:
 MANUAL COMMIT/MERGE REQUEST FORM[4]
 ===================================
 
-           AUTHOR NAME: 
-    DATE OF SUBMISSION: 
-BITBUCKET ISSUE NUMBER: #
-   CHANGED BRANCH NAME: 
-      LINK TO JAR FILE: 
-       BRANCH LOCATION: local/remote (choose one)
-       LEVEL OF EFFORT: trivial/minor/medium/major/overhaul (choose one)
+        AUTHOR NAME: 
+    SUBMISSION DATE: 
+       ISSUE NUMBER: #
+           TEST JAR: https://bitbucket.org/TreeView3Dev/treeview3/downloads/<JAR_FILE_NAME>.jar
+             BRANCH: https://bitbucket.org/TreeView3Dev/treeview3/branch/<BRANCH_NAME>#diff
+    LEVEL OF EFFORT: trivial/minor/medium/major/overhaul (choose one)
 
-LIST OF FILES CHANGED AND THEIR PSL/PDL LOCATIONS:
+LIST OF FILES CHANGED AND THEIR LOCATIONS:
 
 
 DESCRIPTION OF CHANGES:
