@@ -105,16 +105,17 @@ public class FileSet {
 	 * Make fileset based upon unrooted DummyConfigNode with the specified
 	 * values
 	 *
-	 * @param string1
-	 *            name of cdt which this fileset is based on
-	 * @param string2
-	 *            directory to find file in.
+	 * @param fullFileName
+	 *            name of file which this fileset is based on, including extension.
+	 *            For example "myfile.txt"
+	 * @param dir
+	 *            directory where file is located.
 	 */
-	public FileSet(final String cdt, final String dir) {
+	public FileSet(final String fullFileName, final String dir) {
 
 		this.node = Preferences.userRoot().node(StringRes.pnode_globalMain)
 				.node("FileSet");
-		setCdt(cdt);
+		setCdt(fullFileName);
 		setDir(dir);
 	}
 
@@ -217,16 +218,24 @@ public class FileSet {
 	 */
 	public String getRoot() {
 
-		return node.get("root", "");
+		return node.get("root", "generic-tv-file");
 	}
 
 	/**
-	 * @return The extension associated with the base of the fileset (i.e. "cdt"
-	 *         for one based on "test.cdt", "pcl" for one based on "test.pcl"
+	 * @return The extension associated with the base of the fileset (i.e. ".cdt"
+	 *         for one based on "test.cdt", ".pcl" for one based on "test.pcl"
 	 */
 	public String getExt() {
+		
+		String storedExt = node.get("cdt", ".cdt");
+		String finalExt = ".cdt";
+		
+		/* FileUtils removed dot from file extension - ensure it is present */
+		if(!storedExt.substring(0, 1).equals(".")) {
+			finalExt = "." + storedExt;
+		}
 
-		return node.get("cdt", ".cdt");
+		return finalExt;
 	}
 
 	/**
@@ -241,7 +250,8 @@ public class FileSet {
 	 * Sets the base of the FileSet object. Parses out extension, root
 	 *
 	 * @param fileSetBasename
-	 *            Name of base of the FileSet
+	 *            Name of base of the FileSet, including the extension. 
+	 *            For example "myfile.txt"
 	 */
 	public void setCdt(final String fileSetBasename) {
 
@@ -275,22 +285,21 @@ public class FileSet {
 	}
 
 	/**
-	 * Sets the extension associated with the base of the fileset.
+	 * Sets the extension associated with the base of the FileSet.
 	 *
-	 * @param string
-	 *            The new ext value
+	 * @param ext - the new extension value
 	 */
-	public void setExt(final String string) {
-
-		node.put("cdt", string);
+	public void setExt(final String ext) {
+		
+		node.put("cdt", ext);
 	}
 
 	/**
 	 * @return The logical name of the fileset
 	 */
-	public void setName(final String string) {
+	public void setName(final String name) {
 
-		node.put("name", string);
+		node.put("name", name);
 	}
 
 	/**

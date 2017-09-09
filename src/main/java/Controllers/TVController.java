@@ -27,6 +27,8 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
+import org.apache.commons.io.FilenameUtils;
+
 import ColorChooser.ColorChooserController;
 import ColorChooser.ColorChooserUI;
 import Utilities.StringRes;
@@ -547,7 +549,7 @@ public class TVController implements Observer {
 	 * post-clustering for now.
 	 */
 	public void loadClusteredModel(final TVModel newModel, 
-	                                final boolean isFromCluster) {
+	                               final boolean isFromCluster) {
 		
 		FileSet oldFileset = model.getFileSet();
 		String oldRoot = oldFileset.getRoot();
@@ -861,6 +863,26 @@ public class TVController implements Observer {
 		model.setModified(false);
 		return true;
 	}
+	
+	/** 
+	 * Fix extension if user did not add one or added an invalid extension. 
+	 * This is here and not in FileSet because knowledge about whether 
+	 * the model is clustered is required.*/
+	private String fixFileExtension(String filename, 
+	                                final AllowedFilesFilter ff) {
+		
+		String ext = FilenameUtils.getExtension(filename);
+		if(ext.equals("") || !ff.accept(null, filename)) {
+			filename = FilenameUtils.removeExtension(filename);
+			ext = ".txt";
+			if(model.isRowClustered() || model.isColClustered()) {
+				ext = ModelSaver.CDT_EXT;
+			}
+			filename += ext;
+		}
+		
+		return filename;
+	}
 
 	/** Saves the model as a user specified file. */
 	public void saveModelAs() {
@@ -883,15 +905,17 @@ public class TVController implements Observer {
 		final int retVal = fileDialog.showSaveDialog(JFrame.getFrames()[0]);
 
 		if(retVal == JFileChooser.APPROVE_OPTION) {
-			String spath = fileDialog.getSelectedFile().getAbsolutePath();
-			Path path = Paths.get(spath);
-			String name = path.getFileName().toString();
+			// File Extension is not taken care of
+			String selectedPath = fileDialog.getSelectedFile().getAbsolutePath();
+			Path path = Paths.get(selectedPath);
+			String filename = path.getFileName().toString();
+			filename = fixFileExtension(filename, ff);
 
-			FileSet fileSet2 = new FileSet(name, fileDialog.getParent() +
+			FileSet fileSet2 = new FileSet(filename, fileDialog.getParent() +
 																						File.separator);
 			fileSet2.copyState(model.getFileSet());
 
-			final FileSet fileSet1 = new FileSet(name, fileDialog.getParent() +
+			final FileSet fileSet1 = new FileSet(filename, fileDialog.getParent() +
 																										File.separator);
 			fileSet1.setName(model.getFileSet().getName());
 

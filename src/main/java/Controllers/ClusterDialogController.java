@@ -253,7 +253,8 @@ public class ClusterDialogController {
 			
 			ClusterModelTransformator cmt = 
 				new ClusterModelTransformator(rowCAD, colCAD, (TVModel) tvModel);
-			tvController.loadClusteredModel(cmt.applyClusterChanges(isHierarchical()), true);
+			TVModel clusteredModel = cmt.applyClusterChanges(isHierarchical());
+			tvController.loadClusteredModel(clusteredModel, true);
 			clusterDialog.dispose();
 		}
 		
