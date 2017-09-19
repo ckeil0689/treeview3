@@ -36,3 +36,4 @@ prefs.xml
 # Temporary junk files
 fix_control.pl
 build.gradle-setupbuilder
+build.gradle-nebula
