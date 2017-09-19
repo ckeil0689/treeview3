@@ -128,7 +128,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		if(!isMac()) {
 			URL iconPath =
 				getClass().getClassLoader().getResource("logo.png");
-			LogBuffer.println("ICON: " + iconPath.toString());
 			appFrame.setIconImage(new ImageIcon(iconPath).getImage());
 		}
 	}
