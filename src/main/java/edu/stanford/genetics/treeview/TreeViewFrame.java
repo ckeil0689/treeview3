@@ -18,6 +18,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.ActionMap;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -121,6 +122,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		/* Initial view */
 		generateView(ViewType.WELCOME_VIEW);
+
+		this.getAppFrame().setIconImage(new ImageIcon(getClass().getClassLoader().getResource("TreeView3.icns")).getImage());
 	}
 
 	@Override
