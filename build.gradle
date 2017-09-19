@@ -1,7 +1,8 @@
 plugins {
-  //For building .app/.dmg Mac packages/apps - WORKS
+  //For building .app/.dmg Mac packages/apps
   id "edu.sc.seis.macAppBundle" version "2.1.6"
 
+  //For building shell-script/.deb Debian packages/scripts
   id "nebula.ospackage" version "4.4.0"
 }
 
@@ -78,77 +79,59 @@ task fatJar(type: Jar) {
  * Thank you @ http://ryanharter.com/blog/2013/07/30/automatic-versioning-with-git-and-gradle/
  */
 def getVersionName() {
-    def stdout = new ByteArrayOutputStream()
-    exec {
-       // might be useful for later version management
-       // commandLine 'git', 'describe', '--tags'
-        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
+  def stdout = new ByteArrayOutputStream()
+  exec {
+    // might be useful for later version management
+    // commandLine 'git', 'describe', '--tags'
+    commandLine 'git', 'rev-parse', '--short', 'HEAD'
+    standardOutput = stdout
+  }
+  return stdout.toString().trim()
 }
 
-//Mac App Builder stuff - WORKS! - Use createDmg/createApp
+//Mac App Builder stuff - Use createDmg/createApp
 macAppBundle {
-    mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
-    icon = "src/main/resources/TreeView3.icns"
-    appName = "TreeView3"
-    bundleJRE = true
+  mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
+  icon = "src/main/resources/TreeView3.icns"
+  appName = "TreeView3"
+  bundleJRE = true
 }
 
-    ospackage {
-        packageName = 'treeview3'
-	//NOTE: version must start with a number & sometimes a dash will get replaced with a tilde
-        version = '01beta.build' + getVersionName()
-        release = 'rel1'
-        arch = I386
-        os = LINUX
+//Deb builder stuff (creates shell script & puts in /usr/local) - Use buildDeb
+ospackage {
+  packageName = 'treeview3'
+  //NOTE: version must start with a number & sometimes a dash will get replaced with a tilde
+  version = '01beta.build' + getVersionName()
+  release = 'rel1'
+  arch = I386
+  os = LINUX
 
-        //installUtils file('scripts/rpm/utils.sh')
-        //preInstall file('scripts/rpm/preInstall.sh')
-        //postInstall file('scripts/rpm/postInstall.sh')
-        //preUninstall 'touch /tmp/myfile'
-        //postUninstall file('scripts/rpm/postUninstall.sh')
+  into '/usr/local/treeview3'
 
-        into '/usr/local/treeview3'
+  from ( 'build/install/treeview3/lib' ) {
+    include '*.jar'
+    into "lib"
+  }
+  from ( 'build/scripts' ) {
+    include 'treeview3'
+    fileMode 0555
+    into "bin"
+  }
+}
 
-	//The following is an attempt to install the fatJar created via debianPreparetreeview3, but I could not figure out how to add it to the class path in the java call, so intsead, I used the regular jar (and dependant jars) that is auto-built via buildDeb
-        //from(fatJar.outputs.files) {
-        //    into 'lib'
-        //}
-        //from ( 'build/libs' ) {
-        //    include 'treeview3-all-*.jar'
-	//    into "lib"
-        //}
-	//from ( 'build/install/treeview3/bin' ) {
-	//    include 'treeview3'
-	//    fileMode 0555
-	//    into "bin"
-	//}
+buildRpm {
+  //link('/etc/init.d/foo', '/opt/foo/bin/foo.init')
+}
 
-        from ( 'build/install/treeview3/lib' ) {
-	    include '*.jar'
-	    into "lib"
-	}
-	from ( 'build/scripts' ) {
-	    include 'treeview3'
-	    fileMode 0555
-	    into "bin"
-	}
-    }
-
-    buildRpm {
-        //link('/etc/init.d/foo-F¢, '/opt/foo/bin/foo.init')-A
-    }
-
-    buildDeb {
-        link('/usr/local/bin/treeview3', '/usr/local/treeview3/bin/treeview3')
-        String libname = 'treeview3-' + getVersionName() + '.jar'
-        link('/usr/local/lib/' + libname, '/usr/local/treeview3/lib/' + libname)
-    }
+buildDeb {
+  link('/usr/local/bin/treeview3', '/usr/local/treeview3/bin/treeview3')
+  String libname = 'treeview3-' + getVersionName() + '.jar'
+  link('/usr/local/lib/' + libname, '/usr/local/treeview3/lib/' + libname)
+}
 
 
-//The following attempt to create a debian package installer is based on:
+//This code is required in order to have a shell script created for the .deb package installer
+//The following is based on:
 //https://blog.heckel.xyz/2014/05/29/gradle-create-windows-installers-debian-packages-manage-a-ppa-and-optional-sub-projects/#Building-Debian-Ubuntu-packages-and-uploading-to-a-PPA
 
 mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
@@ -156,7 +139,7 @@ mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
 String applicationVersionFull = getVersionName()
 
 task debianClean(type: Delete) {
-	delete 'build/debian'	
+    delete 'build/debian'
 }
 
 tasks.addRule("Pattern: debianPrepare<distribution>") { String taskName ->
@@ -203,5 +186,4 @@ tasks.addRule("Pattern: debianPrepare<distribution>") { String taskName ->
   }
 }
 
-//buildDeb.dependsOn fatJar
 buildDeb.dependsOn debianPreparetreeview3
