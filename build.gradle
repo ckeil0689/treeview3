@@ -98,8 +98,9 @@ macAppBundle {
 
     ospackage {
         packageName = 'treeview3'
-        version = getVersionName()
-        release = 'beta01'
+	//NOTE: version must start with a number & sometimes a dash will get replaced with a tilde
+        version = '01beta.build' + getVersionName()
+        release = 'rel1'
         arch = I386
         os = LINUX
 
@@ -109,7 +110,7 @@ macAppBundle {
         //preUninstall 'touch /tmp/myfile'
         //postUninstall file('scripts/rpm/postUninstall.sh')
 
-        into '/opt/local/treeview3'
+        into '/usr/local/treeview3'
 
 	//The following is an attempt to install the fatJar created via debianPreparetreeview3, but I could not figure out how to add it to the class path in the java call, so intsead, I used the regular jar (and dependant jars) that is auto-built via buildDeb
         //from(fatJar.outputs.files) {
@@ -141,7 +142,9 @@ macAppBundle {
     }
 
     buildDeb {
-        //link('/etc/init.d/foo', '/opt/foo/bin/foo.upstart')
+        link('/usr/local/bin/treeview3', '/usr/local/treeview3/bin/treeview3')
+        String libname = 'treeview3-' + getVersionName() + '.jar'
+        link('/usr/local/lib/' + libname, '/usr/local/treeview3/lib/' + libname)
     }
 
 
