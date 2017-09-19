@@ -22,6 +22,8 @@ prefs.xml
 
 # OS Stuff
 .DS_Store
+\#*
+.#*
 
 # Eclipse stuff
 .project
@@ -30,3 +32,7 @@ prefs.xml
 .classpath
 /bin/
 /build/
+
+# Temporary junk files
+fix_control.pl
+build.gradle-setupbuilder
