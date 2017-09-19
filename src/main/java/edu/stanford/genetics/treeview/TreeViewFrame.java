@@ -11,6 +11,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -123,7 +124,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		/* Initial view */
 		generateView(ViewType.WELCOME_VIEW);
 
-		this.getAppFrame().setIconImage(new ImageIcon(getClass().getClassLoader().getResource("TreeView3.icns")).getImage());
+		//Set the java executable icon for non-mac systems
+		if(!isMac()) {
+			URL iconPath =
+				getClass().getClassLoader().getResource("logo.png");
+			LogBuffer.println("ICON: " + iconPath.toString());
+			appFrame.setIconImage(new ImageIcon(iconPath).getImage());
+		}
 	}
 
 	@Override
@@ -454,11 +461,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		stackMenuList = new ArrayList<JMenuItem>();
 
-		final String os = System.getProperty("os.name").toLowerCase();
-		final boolean isMac = os.startsWith("mac os x");
-
-		constructFileMenu(isMac);
-		constructHelpMenu(isMac);
+		constructFileMenu(isMac());
+		constructHelpMenu(isMac());
 	}
 
 	/**
@@ -879,24 +883,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private void setLoadedTitle() {
 
 		String newTitle;
-		// TODO replace with static method when PR is merged
-		final String os = System.getProperty("os.name").toLowerCase();
-		final boolean isMac = os.startsWith("mac os x");
-	  if(isMac) {
-	  	// no app name in frame title
-	  	newTitle = title;
-	  } else {
-	  	newTitle = StringRes.appName + ": " + title;
-	  }
-	  
+		if(isMac()) {
+			// no app name in frame title
+			newTitle = title;
+		} else {
+			newTitle = StringRes.appName + ": " + title;
+		}
+
 		appFrame.setTitle(newTitle);
 	}
-
-	// @Override
-	// public void setDataModel(final DataModel model) {
-	//
-	// this.dataModel = model;
-	// }
 
 	public void setTitleString(final String title) {
 
@@ -915,8 +910,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public FileSet findFileSet(final JMenuItem menuItem) {
 
 		if (fileSetList.size() != fileMenuList.size()) {
-			LogBuffer.println("Sizes of FileSetList and FileMenuList in "
-					+ "TVFrame don't match.");
+			LogBuffer.println("Sizes of FileSetList and FileMenuList in " +
+				"TVFrame don't match.");
 			return null;
 		}
 
