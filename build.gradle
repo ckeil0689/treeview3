@@ -120,7 +120,9 @@ ospackage {
 }
 
 buildRpm {
-  //link('/etc/init.d/foo', '/opt/foo/bin/foo.init')
+  link('/usr/local/bin/treeview3', '/usr/local/treeview3/bin/treeview3')
+  String libname = 'treeview3-' + getVersionName() + '.jar'
+  link('/usr/local/lib/' + libname, '/usr/local/treeview3/lib/' + libname)
 }
 
 buildDeb {
@@ -187,3 +189,4 @@ tasks.addRule("Pattern: debianPrepare<distribution>") { String taskName ->
 }
 
 buildDeb.dependsOn debianPreparetreeview3
+buildRpm.dependsOn debianPreparetreeview3
