@@ -109,62 +109,38 @@ macAppBundle {
         //preUninstall 'touch /tmp/myfile'
         //postUninstall file('scripts/rpm/postUninstall.sh')
 
-        //requires('qux')
-
         into '/opt/local/treeview3'
 
-        from ( 'build/libs' ) {
-            include '*.jar'
-	    into "lib"
-        }
+	//The following is an attempt to install the fatJar created via debianPreparetreeview3, but I could not figure out how to add it to the class path in the java call, so intsead, I used the regular jar (and dependant jars) that is auto-built via buildDeb
+        //from(fatJar.outputs.files) {
+        //    into 'lib'
+        //}
+        //from ( 'build/libs' ) {
+        //    include 'treeview3-all-*.jar'
+	//    into "lib"
+        //}
+	//from ( 'build/install/treeview3/bin' ) {
+	//    include 'treeview3'
+	//    fileMode 0555
+	//    into "bin"
+	//}
 
+        from ( 'build/install/treeview3/lib' ) {
+	    include '*.jar'
+	    into "lib"
+	}
 	from ( 'build/scripts' ) {
 	    include 'treeview3'
 	    fileMode 0555
 	    into "bin"
 	}
-        //from(jar.outputs.files) {
-        //    into 'lib'
-        //}
-        //from(configurations.runtime) {
-        //    into 'lib'
-        //}
-        //from('lib') {
-        //    into 'lib'
-        //}
-        //from('scripts') {
-        //    into 'bin'
-        //    exclude 'database'
-        //    fileMode = 0550
-        //}
-        //from('src/main/resources') {
-        //    fileType CONFIG | NOREPLACE
-        //    into 'conf'
-        //}
-        //from('home') {
-            // Creating directory entries (or not) in the RPM is normally left up to redline-rpm library.
-            // Use this to explicitly create an entry -- for setting directory fileMode on system directories.
-        //    createDirectoryEntry = true
-        //    fileMode = 0500
-        //    into 'home'
-        //}
-        //from('endorsed') {
-            // Will tell redline-rpm not to auto create directories, which
-            // is sometimes necessary to avoid rpm directory conflicts
-        //    addParentDirs = false
-        //    into '/usr/share/tomcat/endorsed'
-        //}
-
     }
 
     buildRpm {
-        //requires('bar', '2.2', GREATER | EQUAL)
-        //requires('baz', '1.0.1', LESS)
         //link('/etc/init.d/foo-F¢, '/opt/foo/bin/foo.init')-A
     }
 
     buildDeb {
-        //requires('bat', '1.0.1')
         //link('/etc/init.d/foo', '/opt/foo/bin/foo.upstart')
     }
 
@@ -224,4 +200,5 @@ tasks.addRule("Pattern: debianPrepare<distribution>") { String taskName ->
   }
 }
 
+//buildDeb.dependsOn fatJar
 buildDeb.dependsOn debianPreparetreeview3
