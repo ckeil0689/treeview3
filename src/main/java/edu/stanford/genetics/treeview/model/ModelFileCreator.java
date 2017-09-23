@@ -68,15 +68,6 @@ public class ModelFileCreator {
 		File tempFile = Paths.get(filename).toFile();
 		// Do not overwrite at the moment
 		//tempFile = ModelFileCreator.getNewFile(clusterPath, fileEnd);
-		
-		try {
-			tempFile.createNewFile();
-		}
-		catch(IOException e) {
-			LogBuffer.logException(e);
-			// TODO add warning Dialog before proceeding
-		}
-
 		return tempFile;
 	}
 	

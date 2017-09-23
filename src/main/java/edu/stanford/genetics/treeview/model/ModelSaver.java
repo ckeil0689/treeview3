@@ -1,6 +1,7 @@
 package edu.stanford.genetics.treeview.model;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 import javax.swing.JFrame;
@@ -38,7 +39,12 @@ public class ModelSaver {
 	public void save(final DataModel model, final Path path) {
 		
 		this.model = model;
-		new SaveTask(path).execute();
+		SaveTask saveTask = new SaveTask(path);
+		if(saveTask.shouldAbortSave()) {
+			LogBuffer.println("Aborted saving due to user choice.");
+			return;
+		}
+		saveTask.execute();
 	}
 	
 	/**
@@ -100,6 +106,18 @@ public class ModelSaver {
 				}
 			});
 			
+			// Create the new files on disk
+			try {
+				matrixFile.createNewFile();
+				
+				if(model.isColClustered()) atrFile.createNewFile();
+				if(model.isRowClustered()) gtrFile.createNewFile();
+			}
+			catch(IOException e) {
+				LogBuffer.logException(e);
+				// TODO add warning Dialog before proceeding
+			}
+			
 			try {
 				return writeFile();
 				
@@ -117,24 +135,14 @@ public class ModelSaver {
 		protected void done() {
 
 			if (!isCancelled() && !hadProblem) {// && hasEnsuredTreeFilePresence()) {
-				// Update model fileset
-			  // Copy state of old FileSet from model into new FileSet
 				String filename = filePath.getFileName().toString();
 				String dir = filePath.getParent().toString() + File.separator;
 				
 				FileSet newFS = new FileSet(filename, dir);
 				((TVModel) model).setSource(newFS);
 				((TVModel) model).setLoaded(true);
-//				fileSet2.copyState(model.getFileSet());
-//
-//				// New FileSet with the same name as the active one
-//				final FileSet fileSet1 = new FileSet(filename, dir);
-//				fileSet1.setName(model.getFileSet().getName());
-//
-//				// New FileSet with the same name attached to model
-//				model.getFileSet().copyState(fileSet1);
-//				model.getFileSet().notifyMoved();
-				//JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Saving complete.");
+				
+				JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Saving complete.");
 				LogBuffer.println("Success. Saved file " + model.getFileName());
 				
 			} else {
@@ -260,16 +268,34 @@ public class ModelSaver {
 //			} 
 //		}
 //		
-//		/**
-//		 * Checks if a file at a given path exists or not.
-//		 * @param path - The complete file path which to check.
-//		 * @return Whether the checked file exists or not.
-//		 */
-//		private boolean doesFileExist(final String path) {
-//			
-//			File f = new File(path);
-//			return (f.exists() && !f.isDirectory());
-//		}
+		/**
+		 * Check for duplicate main file. If the user does not want to overwrite
+		 * a duplicate file, then cancel the saving procedure.
+		 * @return boolean whether the save process should be aborted.
+		 */
+		public boolean shouldAbortSave() {
+			
+			if (matrixFile.exists() && !matrixFile.isDirectory()) {
+				int response = JOptionPane.showConfirmDialog(null,
+				                              "A file with this name already exists. " +
+				                              "Do you want to replace it?",
+				                              "Confirm",
+				                              JOptionPane.YES_NO_OPTION,
+				                              JOptionPane.QUESTION_MESSAGE);
+				return (response != JOptionPane.YES_OPTION);
+			}
+			return false;
+		}
+		/**
+		 * Checks if a file at a given path exists or not.
+		 * @param path - The complete file path which to check.
+		 * @return Whether the checked file exists or not.
+		 */
+		private boolean doesFileExist(final String path) {
+			
+			File f = new File(path);
+			return (f.exists() && !f.isDirectory());
+		}
 		
 		/**
 		 * Deletes all files associated with the last clustering step. Also
