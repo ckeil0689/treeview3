@@ -7,9 +7,12 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.model.ModelFileCreator;
 import edu.stanford.genetics.treeview.model.ModelSaver;
 
-/** This class determines the file name structure (full path) for a file
+/** 
+ * @deprecated
+ * This class determines the file name structure (full path) for a file
  * that will be written during clustering. The name will be dependent on
  * the linkage type (avg, single, complete) and what kind of file will
  * be created. */
@@ -242,7 +245,7 @@ public class ClusterFileStorage {
 		 * be exclusively counted. While single axes might be clustered,
 		 * if the user hits cancel during clustering, no .cdt file will exist.
 		 */
-		String cdtFileDescr = oldClusterPath.toString() + ModelSaver.CDT_EXT;
+		String cdtFileDescr = oldClusterPath.toString() + FILE_EXT;
 		File cdtFile = Paths.get(cdtFileDescr).toFile();
 
 		int fileCount = 0;
@@ -251,7 +254,7 @@ public class ClusterFileStorage {
 		while(cdtFile.exists()) {
 			fileCount++;
 
-			cdtSuffix = "_" + fileCount + ModelSaver.CDT_EXT;
+			cdtSuffix = "_" + fileCount + FILE_EXT;
 			cdtFileDescr = oldClusterPath.toString() + cdtSuffix;
 			cdtFile = Paths.get(cdtFileDescr).toFile();
 

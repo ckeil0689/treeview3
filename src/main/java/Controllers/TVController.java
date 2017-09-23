@@ -27,8 +27,6 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
-import org.apache.commons.io.FilenameUtils;
-
 import ColorChooser.ColorChooserController;
 import ColorChooser.ColorChooserUI;
 import Utilities.StringRes;
@@ -78,6 +76,7 @@ public class TVController implements Observer {
 
 		// Add the view as observer to the model
 		((TVModel) model).addObserver(tvFrame);
+		((TVModel) model).addObserver(this);
 
 		tvFrame.addObserver(this);
 		tvFrame.getAppFrame().addComponentListener(new AppFrameListener());
@@ -171,8 +170,8 @@ public class TVController implements Observer {
 		dendroController.toggleTrees();
 	}
 
-	/** Generates the menubar controller. Causes listeners to be added for the
-	 * main menubar as well as the listed file names in 'Recent Files'. file
+	/** Generates the MenuBar controller. Causes listeners to be added for the
+	 * main MenuBar as well as the listed file names in 'Recent Files'. file
 	 * names in . */
 	private void addMenuListeners() {
 
@@ -374,7 +373,6 @@ public class TVController implements Observer {
 				this.fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
 				tvFrame.getFileMRU().setLast(fileMenuSet);
 				fileMenuSet = null;
-
 			}
 			else {
 				LogBuffer.println("FileSet is null. Could not load old " +
@@ -551,13 +549,12 @@ public class TVController implements Observer {
 	public void loadClusteredModel(final TVModel newModel, 
 	                               final boolean isFromCluster) {
 		
-		FileSet oldFileset = model.getFileSet();
-		String oldRoot = oldFileset.getRoot();
-		String oldExt = oldFileset.getExt();
+		FileSet oldFileSet = model.getFileSet();
+		String oldRoot = oldFileSet.getRoot();
+		String oldExt = oldFileSet.getExt();
 		Preferences oldNode = getOldPreferences(oldRoot, oldExt);
-		DataLoadInfo dataInfo = getStoredDataLoadInfo(oldFileset, oldNode);
+		DataLoadInfo dataInfo = getStoredDataLoadInfo(oldFileSet, oldNode);
 		
-
 		if(dataInfo == null) {
 			String message = "Updating data after clustering was interrupted.";
 			LogBuffer.println(message);
@@ -848,48 +845,28 @@ public class TVController implements Observer {
 	/** Saves the current model, GUI handled by TVFrame.
 	 *
 	 * @param The path at which the file should be saved.
-	 * @return */
-	private boolean doModelSave(final Path path) {
+	 * @return String name of the saved file */
+	private void doModelSave(final Path path) {
 
 		if(path == null) {
 			String msg = "No defined file path. Could not save the file.";
 			JOptionPane.showMessageDialog(JFrame.getFrames()[0], msg);
 			LogBuffer.println(msg);
-			return false;
+			return;
 		}
 		
 		ModelSaver ms = new ModelSaver();
 		ms.save(model, path);
 		model.setModified(false);
-		return true;
-	}
-	
-	/** 
-	 * Fix extension if user did not add one or added an invalid extension. 
-	 * This is here and not in FileSet because knowledge about whether 
-	 * the model is clustered is required.*/
-	private String fixFileExtension(String filename, 
-	                                final AllowedFilesFilter ff) {
-		
-		String ext = FilenameUtils.getExtension(filename);
-		if(ext.equals("") || !ff.accept(null, filename)) {
-			filename = FilenameUtils.removeExtension(filename);
-			ext = ".txt";
-			if(model.isRowClustered() || model.isColClustered()) {
-				ext = ModelSaver.CDT_EXT;
-			}
-			filename += ext;
-		}
-		
-		return filename;
 	}
 
 	/** Saves the model as a user specified file. */
 	public void saveModelAs() {
 
 		if(model.getFileSet() == null) {
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], "Saving of datamodels not backed by " +
-																													"files is not yet supported.");
+			JOptionPane.showMessageDialog(Frame.getFrames()[0], 
+			                              "Saving of datamodels not backed by "
+			                              	+ "files is not yet supported.");
 			return;
 		}
 	  
@@ -905,33 +882,24 @@ public class TVController implements Observer {
 		final int retVal = fileDialog.showSaveDialog(JFrame.getFrames()[0]);
 
 		if(retVal == JFileChooser.APPROVE_OPTION) {
-			// File Extension is not taken care of
+			LogBuffer.println("Saving file.");
+			// File extension is not taken care of
 			String selectedPath = fileDialog.getSelectedFile().getAbsolutePath();
 			Path path = Paths.get(selectedPath);
-			String filename = path.getFileName().toString();
-			filename = fixFileExtension(filename, ff);
-
-			FileSet fileSet2 = new FileSet(filename, fileDialog.getParent() +
-																						File.separator);
-			fileSet2.copyState(model.getFileSet());
-
-			final FileSet fileSet1 = new FileSet(filename, fileDialog.getParent() +
-																										File.separator);
-			fileSet1.setName(model.getFileSet().getName());
-
-			model.getFileSet().copyState(fileSet1);
 			doModelSave(path);
+		}
+	}
+	
+	private void updateModelFileMRU() {
 
-			model.getFileSet().notifyMoved();
-			tvFrame.getFileMRU().removeDuplicates(model.getFileSet());
-			fileSet2 = tvFrame.getFileMRU().addUnique(fileSet2);
-			tvFrame.getFileMRU().setLast(model.getFileSet());
-			tvFrame.addFileMenuListeners(new FileMenuListener());
+		tvFrame.getFileMRU().removeDuplicates(model.getFileSet());
+		tvFrame.getFileMRU().addUnique(model.getFileSet());
+		tvFrame.getFileMRU().setLast(model.getFileSet());
+		tvFrame.addFileMenuListeners(new FileMenuListener());
 
-			if(model instanceof TVModel) {
-				((TVModel) model).getDocumentConfig().put("jtv", model.getFileSet()
-																																.getJtv());
-			}
+		if(model instanceof TVModel) {
+			((TVModel) model).getDocumentConfig().put("jtv", model.getFileSet()
+																															.getJtv());
 		}
 	}
 
@@ -955,7 +923,6 @@ public class TVController implements Observer {
 	 *
 	 * @param menu - The type of opened menu distinguished by its String name. */
 	@SuppressWarnings("unused") // LabelSettingsController doesn't need to be stored in a variable
-
 	public void openLabelMenu(final String menu) {
 
 		final LabelSettings labelSettingsView = new LabelSettings(tvFrame);
@@ -974,7 +941,6 @@ public class TVController implements Observer {
 	 *
 	 * @param menu */
 	@SuppressWarnings("unused") // ExportDialogController doesn't need to be stored in a variable
-
 	public void openExportMenu() {
 
 		if(tvFrame.getDendroView() == null || !tvFrame.isLoaded()) {
@@ -1051,8 +1017,11 @@ public class TVController implements Observer {
 		/* when tvFrame rebuilds its menu */
 		if(o instanceof ViewFrame) {
 			addMenuListeners();
+		} else if(o instanceof TVModel) {
+			LogBuffer.println("TVModel updated.");
+			tvFrame.setTitleString(model.getFileName());
+			updateModelFileMRU();
 		}
-
 	}
 
 	/** Relays copy call to dendroController.

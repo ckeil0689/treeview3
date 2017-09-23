@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 
 import org.apache.commons.io.FilenameUtils;
 
+import edu.stanford.genetics.treeview.AllowedFilesFilter;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /** This class determines the file name structure (full path) for a file
@@ -15,9 +16,42 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * be created. */
 public class ModelFileCreator {
 
+	private final static String DEFAULT_EXT = ".txt";
+	private final static String CDT_EXT = ".cdt";
+	private final static String GTR_EXT = ".gtr";
+	private final static String ATR_EXT = ".atr";
+	
 	private static final String KMEANS_DESIGNATOR = "_K";
 	private static final String KMEANS_ROW_SUFFIX = "_G";
 	private static final String KMEANS_COL_SUFFIX = "_A";
+
+	public static File retrieveDefaultFile(final Path clusterPath) {
+		
+		return retrieveFile(clusterPath, ModelFileCreator.DEFAULT_EXT);
+	}
+	
+	public static File retrieveMainFile(final Path clusterPath, 
+	                                    final boolean isRowClustered, 
+	                                    final boolean isColClustered, 
+	                                    final boolean isHier, 
+	                                    final int[] spinnerInput) {
+		
+		String fileExt = ModelFileCreator.determineClusterFileExt(isRowClustered, 
+		                                                          isColClustered, 
+		                                                          isHier,
+		                                                          spinnerInput);
+		return retrieveFile(clusterPath, fileExt);
+	}
+	
+  public static File retrieveATRFile(final Path clusterPath) {
+		
+		return retrieveFile(clusterPath, ModelFileCreator.ATR_EXT);
+	}
+  
+  public static File retrieveGTRFile(final Path clusterPath) {
+		
+		return retrieveFile(clusterPath, ModelFileCreator.GTR_EXT);
+	}
 
 	/** Creates a new file from based on the passed directory, file name, link
 	 * name, and file end.
@@ -26,23 +60,47 @@ public class ModelFileCreator {
 	 *          which the new file will reside.
 	 * @param fileEnd - The file ending
 	 * @return A newly created File object. */
-	public static File retrieveFile(final Path clusterPath,
+	private static File retrieveFile(final Path clusterPath,
 																	final String fileEnd) {
 
+		final String fileBasename = FilenameUtils.removeExtension(clusterPath.toString());
+		final String filename = fileBasename + fileEnd;
+		File tempFile = Paths.get(filename).toFile();
+		// Do not overwrite at the moment
+		//tempFile = ModelFileCreator.getNewFile(clusterPath, fileEnd);
 		
-		final String fullFilePath = FilenameUtils.removeExtension(clusterPath.toString()) + fileEnd;
-		File tempFile = Paths.get(fullFilePath).toFile();
-
 		try {
-			// Do not overwrite at the moment
-			tempFile = ModelFileCreator.getNewFile(clusterPath, fileEnd);
 			tempFile.createNewFile();
 		}
-		catch(final IOException e) {
+		catch(IOException e) {
 			LogBuffer.logException(e);
+			// TODO add warning Dialog before proceeding
 		}
 
 		return tempFile;
+	}
+	
+	/** 
+	 * Fix extension if user did not add one or added an invalid extension. 
+	 * This is here and not in FileSet because knowledge about whether 
+	 * the model is clustered is required.*/
+	public static Path fixFileExtension(Path filePath, 
+	                                    final boolean isClustered) {
+		
+		String sFilePath = filePath.toString();
+		AllowedFilesFilter ff = new AllowedFilesFilter();
+		String ext = FilenameUtils.getExtension(sFilePath);
+		
+		if(ext.equals("") || !ff.accept(null, sFilePath)) {
+			sFilePath = FilenameUtils.removeExtension(sFilePath);
+			ext = ModelFileCreator.DEFAULT_EXT;
+			if(isClustered) {
+				ext = ModelFileCreator.CDT_EXT;
+			}
+			sFilePath += ext;
+		}
+		
+		return Paths.get(sFilePath);
 	}
 
 	/** Sets up a new file object based on the passed components. Makes sure
@@ -56,10 +114,10 @@ public class ModelFileCreator {
 	 * @param oldName - The original name for the file which is used as a basis.
 	 * @param fileEnd - The original file ending.
 	 * @return A new file object. */
-	private static File getNewFile(	final Path oldClusterPath,
+	private static File getNewFile(	final Path clusterPath,
 																	final String fileEnd) {
 
-		String fileDescr = oldClusterPath.toString() + fileEnd;
+		String fileDescr = clusterPath.toString() + fileEnd;
 		File file = Paths.get(fileDescr).toFile();
 
 		/*
@@ -67,7 +125,7 @@ public class ModelFileCreator {
 		 * be exclusively counted. While single axes might be clustered,
 		 * if the user hits cancel during clustering, no .cdt file will exist.
 		 */
-		String cdtFileDescr = oldClusterPath.toString() + ModelSaver.CDT_EXT;
+		String cdtFileDescr = clusterPath.toString() + ModelFileCreator.CDT_EXT;
 		File cdtFile = Paths.get(cdtFileDescr).toFile();
 
 		int fileCount = 0;
@@ -76,17 +134,24 @@ public class ModelFileCreator {
 		while(cdtFile.exists()) {
 			fileCount++;
 
-			cdtSuffix = "_" + fileCount + ModelSaver.CDT_EXT;
-			cdtFileDescr = oldClusterPath.toString() + cdtSuffix;
+			cdtSuffix = "_" + fileCount + ModelFileCreator.CDT_EXT;
+			cdtFileDescr = clusterPath.toString() + cdtSuffix;
 			cdtFile = Paths.get(cdtFileDescr).toFile();
 
 			suffix = "_" + fileCount + fileEnd;
-			fileDescr = oldClusterPath.toString() + suffix;
+			fileDescr = clusterPath.toString() + suffix;
 			file = Paths.get(fileDescr).toFile();
 		}
 
+		try {
+			file.createNewFile();
+		}
+		catch(IOException e) {
+			LogBuffer.logException(e);
+			// TODO add warning Dialog before proceeding
+		}
+		
 		cdtFile = null;
-
 		return file;
 	}
 
@@ -113,7 +178,7 @@ public class ModelFileCreator {
 		}
 
 		if(isHier) {
-			fileEnd = ModelSaver.CDT_EXT;
+			fileEnd = ModelFileCreator.CDT_EXT;
 
 			// k-means file names have a few more details
 		}
@@ -133,7 +198,7 @@ public class ModelFileCreator {
 			}
 
 			fileEnd = ModelFileCreator.KMEANS_DESIGNATOR +	rowC + colC +
-								ModelSaver.CDT_EXT;
+								ModelFileCreator.CDT_EXT;
 		}
 
 		return fileEnd;

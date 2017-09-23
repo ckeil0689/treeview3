@@ -249,9 +249,9 @@ public class ClusterProcessor {
 			if (!isCancelled()) {
 				/* keep track of overall progress */
 				pBarCount += axisSize;
-				LogBuffer.println("DistTask is done: success.");
+				LogBuffer.println("DistTask succeeded (" + axis + ")");
 			} else {
-				LogBuffer.println("DistTask is done: cancelled.");
+				LogBuffer.println("DistTask cancelled (" + axis + ")");
 			}
 		}
 
@@ -328,9 +328,9 @@ public class ClusterProcessor {
 			
 			if (!isCancelled()) {
 				pBarCount += max;
-				LogBuffer.println("ProcessorClusterTask is done: success.");
+				LogBuffer.println("ProcessorClusterTask succeeded (" + axisID + ")");
 			} else {
-				LogBuffer.println("ProcessorClusterTask is done: cancelled.");
+				LogBuffer.println("ProcessorClusterTask cancelled (" + axisID + ")");
 			}
 		}
 		

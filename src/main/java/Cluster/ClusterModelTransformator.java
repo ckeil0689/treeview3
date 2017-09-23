@@ -44,7 +44,7 @@ public class ClusterModelTransformator {
 		prepareModel(rowLabelI, colLabelI);
 		model.setHierarchical(isHierarchical);
 		reorderClusteredModel();
-		model.setModified(true);
+		//model.setModified(true);
 		model.setRowClustered(rowCAD.isAxisClustered());
 		model.setColClustered(colCAD.isAxisClustered());
 		

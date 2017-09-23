@@ -5,19 +5,19 @@ import java.nio.file.Path;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import Utilities.CustomDialog;
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.FileSet;
+import edu.stanford.genetics.treeview.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class ModelSaver {
 
 	private final int ROW_IDX = 0;
 	private final int COL_IDX = 1;
-	
-	public final static String CDT_EXT = ".cdt";
-	public final static String GTR_EXT = ".gtr";
-	public final static String ATR_EXT = ".atr";
 	
 	private DataModel model;
 	
@@ -51,6 +51,7 @@ public class ModelSaver {
 	 */
 	private class SaveTask extends SwingWorker<Boolean, Void> {
 
+		private HintDialog hintDialog;
 		private boolean hadProblem = false;
 		private Path filePath;
 		
@@ -60,28 +61,45 @@ public class ModelSaver {
 
 		public SaveTask(final Path path) {
 
-			this.filePath = path;
+			this.hintDialog = new HintDialog("Saving...");
+			boolean isClustered = model.isRowClustered() || model.isColClustered();
+			this.filePath = ModelFileCreator.fixFileExtension(path, isClustered);
 			
-			// Determine file extensions for CDT file (varies between hierarchical and k-means)
-			String fileEnd = ModelFileCreator.determineClusterFileExt(
-			                                                          model.isRowClustered(), model.isColClustered(),
-			                                                          model.isHierarchical(), 
-			                                                          model.getKMeansClusterNum());
-					
-			matrixFile = ModelFileCreator.retrieveFile(filePath, fileEnd);
-			
-			if(model.isColClustered()) {
-				atrFile = ModelFileCreator.retrieveFile(filePath, ATR_EXT);
+			// Main file
+			// Update file extension according to clustering status of model
+			if(isClustered) {
+				this.matrixFile = ModelFileCreator.retrieveMainFile(filePath, 
+				                                                    model.isRowClustered(), 
+				                                                    model.isColClustered(),
+				                                                    model.isHierarchical(), 
+				                                                    model.getKMeansClusterNum());
+			} else {
+				this.matrixFile = ModelFileCreator.retrieveDefaultFile(filePath);
 			}
 			
-			if(model.isRowClustered()) {
-				gtrFile = ModelFileCreator.retrieveFile(filePath, GTR_EXT);
+			// Column tree file
+			if(model.isHierarchical() && model.isColClustered()) {
+				this.atrFile = ModelFileCreator.retrieveATRFile(filePath);
+			}
+			
+			// Row tree file
+			if(model.isHierarchical() && model.isRowClustered()) {
+				this.gtrFile = ModelFileCreator.retrieveGTRFile(filePath);
 			}
 		}
 
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					hintDialog.setVisible(true);
+					hintDialog.setModal(true);
+				}
+			});
+			
 			try {
 				return writeFile();
 				
@@ -99,14 +117,36 @@ public class ModelSaver {
 		protected void done() {
 
 			if (!isCancelled() && !hadProblem) {// && hasEnsuredTreeFilePresence()) {
-				JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Saving complete.");
-				LogBuffer.println("SaveTask is done: success.");
+				// Update model fileset
+			  // Copy state of old FileSet from model into new FileSet
+				String filename = filePath.getFileName().toString();
+				String dir = filePath.getParent().toString() + File.separator;
+				
+				FileSet newFS = new FileSet(filename, dir);
+				((TVModel) model).setSource(newFS);
+				((TVModel) model).setLoaded(true);
+//				fileSet2.copyState(model.getFileSet());
+//
+//				// New FileSet with the same name as the active one
+//				final FileSet fileSet1 = new FileSet(filename, dir);
+//				fileSet1.setName(model.getFileSet().getName());
+//
+//				// New FileSet with the same name attached to model
+//				model.getFileSet().copyState(fileSet1);
+//				model.getFileSet().notifyMoved();
+				//JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Saving complete.");
+				LogBuffer.println("Success. Saved file " + model.getFileName());
 				
 			} else {
 				deleteAllFiles();
 			}
+			hintDialog.setVisible(false);
 		}
 		
+		/**
+		 * Write a matrix file from the TVModel using ModelFileGenerator.
+		 * @return
+		 */
 		private boolean writeFile() {
 			
 			final ModelFileGenerator modelGen = 

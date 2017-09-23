@@ -176,6 +176,11 @@ public class DataLoadInfo {
 												". Cannot import old settings.");
 			return;
 		}
+		
+		if(node == null) {
+			LogBuffer.println("Preferences node is null. Cannot import data.");
+			return;
+		}
 
 		setOldNode(node);
 
