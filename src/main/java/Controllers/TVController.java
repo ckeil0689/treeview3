@@ -354,8 +354,6 @@ public class TVController implements Observer {
 	public void finishLoading(final DataLoadInfo dataInfo) {
 
 		if(model.getDataMatrix().getNumRow() > 0) {
-			tvFrame.setTitleString(model.getFileName());
-
 			/* Will notify view of successful loading. */
 			((TVModel) model).setLoaded(true);
 			setDataModel();
