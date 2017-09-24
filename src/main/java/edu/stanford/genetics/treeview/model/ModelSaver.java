@@ -149,6 +149,7 @@ public class ModelSaver {
 				deleteAllFiles();
 			}
 			hintDialog.setVisible(false);
+			hintDialog.dispose();
 		}
 		
 		/**

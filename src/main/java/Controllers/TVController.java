@@ -66,7 +66,7 @@ public class TVController implements Observer {
 	private DataModel model;
 	private MenubarController menuController;
 	private File file;
-	private FileSet fileMenuSet;
+//	private FileSet fileMenuSet;
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
@@ -327,12 +327,14 @@ public class TVController implements Observer {
 		// Loading TVModel
 		final TVModel tvModel = (TVModel) model;
 
-		setFileMenuSet(fileSet);
+//		setFileMenuSet(fileSet);
 
 		try {
 			// first, ensure reset of the model data
 			tvModel.resetState();
-			tvModel.setSource(fileMenuSet);
+			tvModel.setSource(fileSet);
+	    LogBuffer.println("Loading FileSet: " + fileSet);
+//			tvModel.setSource(fileMenuSet);
 
 			final ModelLoader loader = new ModelLoader(tvModel, this, dataInfo);
 			loader.execute();
@@ -359,7 +361,23 @@ public class TVController implements Observer {
 			setDataModel();
 			dendroController.setNewMatrix(tvFrame.getDendroView(), model);
 
-			if(fileMenuSet != null) {
+//			if(fileMenuSet != null) {
+//				/*
+//				 * TODO Needs to happen after setNewMatrix because a new
+//				 * ColorExtractor object is created, which would void the 
+//				 * updated ColorExtractor state if copying happens before. 
+//				 * Implement a nicer solution one day...
+//				 */
+//				importOldPreferencesFrom(dataInfo.getOldNode());
+//
+//				this.fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
+//				tvFrame.getFileMRU().setLast(fileMenuSet);
+//				fileMenuSet = null;
+//			}
+			// Check if TVModel FileSet was updated
+			if(dataInfo.getOldFileSet() != null && 
+				!model.getFileSet().equals(dataInfo.getOldFileSet())) {
+				LogBuffer.println("Importing old preferences.");
 				/*
 				 * TODO Needs to happen after setNewMatrix because a new
 				 * ColorExtractor object is created, which would void the 
@@ -367,20 +385,14 @@ public class TVController implements Observer {
 				 * Implement a nicer solution one day...
 				 */
 				importOldPreferencesFrom(dataInfo.getOldNode());
-
-				this.fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
-				tvFrame.getFileMRU().setLast(fileMenuSet);
-				fileMenuSet = null;
+//				fileMenuSet = null;
 			}
 			else {
-				LogBuffer.println("FileSet is null. Could not load old " +
-													"preferences and add last file to recent file list.");
+				LogBuffer.println("FileSet is null. Could not load old preferences.");
 			}
 
 			dendroController.restoreComponentStates();
-
 			LogBuffer.println("Successfully loaded: " + model.getSource());
-
 		}
 		else {
 			final String message = "No numeric data could be found in the " +
@@ -489,20 +501,20 @@ public class TVController implements Observer {
 		return targetNode;
 	}
 
-	private void setFileMenuSet(final FileSet fs) {
-
-		FileSet newFs;
-
-		if(fs != null) {
-			newFs = fs;
-
-		}
-		else {
-			newFs = ViewFrame.getFileSet(file);
-		}
-
-		this.fileMenuSet = newFs;
-	}
+//	private void setFileMenuSet(final FileSet fs) {
+//
+//		FileSet newFs;
+//
+//		if(fs != null) {
+//			newFs = fs;
+//
+//		}
+//		else {
+//			newFs = ViewFrame.getFileSet(file);
+//		}
+//
+//		this.fileMenuSet = newFs;
+//	}
 
 	/** This method opens a file dialog to open either the visualization view or
 	 * the cluster view depending on which file type is chosen.
@@ -529,6 +541,7 @@ public class TVController implements Observer {
 			}
 
 			getDataInfoAndLoad(loadFileSet, null, null, false, shouldUseImport);
+			updateModelFileMRU();
 
 		}
 		catch(final LoadException e) {
@@ -888,17 +901,15 @@ public class TVController implements Observer {
 		}
 	}
 	
+	/**
+	 * Updates the FileMRU according to the current FileSet attached to the model.
+	 */
 	private void updateModelFileMRU() {
 
 		tvFrame.getFileMRU().removeDuplicates(model.getFileSet());
 		tvFrame.getFileMRU().addUnique(model.getFileSet());
 		tvFrame.getFileMRU().setLast(model.getFileSet());
 		tvFrame.addFileMenuListeners(new FileMenuListener());
-
-		if(model instanceof TVModel) {
-			((TVModel) model).getDocumentConfig().put("jtv", model.getFileSet()
-																															.getJtv());
-		}
 	}
 
 	/** This class is an ActionListener which overrides the run() function. */
@@ -907,12 +918,15 @@ public class TVController implements Observer {
 		@Override
 		public void actionPerformed(final ActionEvent actionEvent) {
 
-			tvFrame.getFileMRU().setLast(tvFrame.getFileMenuSet());
+			//tvFrame.getFileMRU().setLast(tvFrame.getFileMenuSet());
+			tvFrame.getFileMRU().setLast(model.getFileSet());
 			tvFrame.getFileMRU().notifyObservers();
 
-			fileMenuSet = tvFrame.findFileSet((JMenuItem) actionEvent.getSource());
-
-			openFile(fileMenuSet, false);
+			FileSet newFS = tvFrame.findFileSet((JMenuItem) actionEvent.getSource());
+//			fileMenuSet = tvFrame.findFileSet((JMenuItem) actionEvent.getSource());
+      LogBuffer.println("Attempting to open file " + newFS);
+			openFile(newFS, false);
+//			openFile(fileMenuSet, false);
 		}
 	}
 

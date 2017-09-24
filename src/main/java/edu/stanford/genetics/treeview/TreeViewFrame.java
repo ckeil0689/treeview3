@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import Utilities.GUIFactory;
@@ -112,9 +113,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		/* Most recently used files */
 		setupFileMru();
-
-		/* Initial view */
-		generateView(ViewType.WELCOME_VIEW);
+    setLoaded(false);
 	}
 
 	@Override
@@ -192,7 +191,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			break;
 		}
 
-		buildMenuBar();
+		//buildMenuBar();
 		displayView(view);
 	}
 
@@ -203,6 +202,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void displayView(final JPanel view) {
 
+		LogBuffer.println("View generated on EDT? " 
+											+ SwingUtilities.isEventDispatchThread());
 		viewPanel.removeAll();
 
 		viewPanel.add(view, "push, grow");
@@ -387,7 +388,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void update(final Observable o, final Object obj) {
 
 		if (o instanceof FileMru) {
-			buildMenuBar();
+			//buildMenuBar();
 			setChanged();
 			notifyObservers();
 
@@ -440,6 +441,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	private void buildMenuBar() {
 
+		LogBuffer.println("Building MenuBar.");
+		
 		menuBar = new JMenuBar();
 		appFrame.setJMenuBar(menuBar);
 

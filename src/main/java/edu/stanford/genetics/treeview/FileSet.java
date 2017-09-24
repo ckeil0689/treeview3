@@ -228,11 +228,14 @@ public class FileSet {
 	public String getExt() {
 		
 		String storedExt = node.get("cdt", ".cdt");
-		String finalExt = ".cdt";
+		String finalExt;
 		
 		/* FileUtils removed dot from file extension - ensure it is present */
 		if(!storedExt.substring(0, 1).equals(".")) {
 			finalExt = "." + storedExt;
+			node.put("cdt", finalExt);
+		} else {
+			finalExt = storedExt;
 		}
 
 		return finalExt;
