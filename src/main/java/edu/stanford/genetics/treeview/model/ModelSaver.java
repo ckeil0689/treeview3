@@ -141,7 +141,7 @@ public class ModelSaver {
 				FileSet newFS = new FileSet(filename, dir);
 				((TVModel) model).setSource(newFS);
 				((TVModel) model).setLoaded(true);
-				
+
 				JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Saving complete.");
 				LogBuffer.println("Success. Saved file " + model.getFileName());
 				

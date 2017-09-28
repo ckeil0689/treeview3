@@ -1,4 +1,5 @@
 /* BEGIN_HEADER                                                   TreeView 3
+/* BEGIN_HEADER                                                   TreeView 3
  *
  * Please refer to our LICENSE file if you wish to make changes to this software
  *
@@ -202,8 +203,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void displayView(final JPanel view) {
 
-		LogBuffer.println("View generated on EDT? " 
-											+ SwingUtilities.isEventDispatchThread());
 		viewPanel.removeAll();
 
 		viewPanel.add(view, "push, grow");

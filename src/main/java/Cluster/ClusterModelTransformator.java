@@ -48,6 +48,8 @@ public class ClusterModelTransformator {
 		model.setRowClustered(rowCAD.isAxisClustered());
 		model.setColClustered(colCAD.isAxisClustered());
 		
+		model.setModified(true);
+		
 		return model;
 	}
 	

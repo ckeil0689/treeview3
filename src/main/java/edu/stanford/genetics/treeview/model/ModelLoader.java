@@ -142,11 +142,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		doubleData = null;
 		
-		// store load information in Preferences
 		final Preferences fileNode = controller.getConfigNode().node("File");
-		Preferences documentConfig = getConfigData(targetModel, fileNode);
-		storeDataLoadInfo(documentConfig);
-		targetModel.setDocumentConfig(documentConfig);
+		storeDataLoadInfo(fileNode, targetModel, dataInfo);
 
 		// Update GUI, set new DendroView
 		controller.finishLoading(dataInfo);
@@ -305,21 +302,27 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	/** Store load info such as coordinates of first data cell and used delimiter
 	 * to the supplied node.
 	 * 
-	 * @param node - The node at which the values will be stored. */
-	private void storeDataLoadInfo(Preferences node) {
+	 * @param fileNode - The node at which the values will be stored. */
+	public static void storeDataLoadInfo(final Preferences fileNode,
+	                                     final DataModel model,
+	                                     final DataLoadInfo dataLoadInfo) {
 
-		if(node == null) {
+		if(fileNode == null) {
 			LogBuffer.println("Cannot store any data load information. " +
 				"The Preferences node for the model is not defined.");
 			return;
 		}
 		
-		node.putBoolean("firstLoad", false);
-		node.put("delimiter", dataInfo.getDelimiter());
-		node.putInt("rowCoord", dataInfo.getDataStartRow());
-		node.putInt("colCoord", dataInfo.getDataStartCol());
-		node.put("rowLabelTypes", dataInfo.getRowLabelTypesAsString());
-		node.put("colLabelTypes", dataInfo.getColLabelTypesAsString());
+		Preferences modelNode = getConfigData(model, fileNode);
+		
+		modelNode.putBoolean("firstLoad", false);
+		modelNode.put("delimiter", dataLoadInfo.getDelimiter());
+		modelNode.putInt("rowCoord", dataLoadInfo.getDataStartRow());
+		modelNode.putInt("colCoord", dataLoadInfo.getDataStartCol());
+		modelNode.put("rowLabelTypes", dataLoadInfo.getRowLabelTypesAsString());
+		modelNode.put("colLabelTypes", dataLoadInfo.getColLabelTypesAsString());
+		
+		((TVModel) model).setDocumentConfig(modelNode);
 	}
 
 	/** Parses the label types from the label data collected until

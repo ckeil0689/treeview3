@@ -7,6 +7,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.List;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +29,7 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
+import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
@@ -255,7 +257,7 @@ public class ClusterDialogController {
 			ClusterModelTransformator cmt = 
 				new ClusterModelTransformator(rowCAD, colCAD, (TVModel) tvModel);
 			TVModel clusteredModel = cmt.applyClusterChanges(isHierarchical());
-			tvController.loadClusteredModel(clusteredModel, true); //updates TVModel
+			tvController.loadClusteredModel(clusteredModel); //updates TVModel
 			clusterDialog.dispose();
 		}
 		

@@ -541,8 +541,7 @@ public class TVController implements Observer {
 			}
 
 			getDataInfoAndLoad(loadFileSet, null, null, false, shouldUseImport);
-			updateModelFileMRU();
-
+			//updateModelFileMRU();
 		}
 		catch(final LoadException e) {
 			message = "Loading the file was interrupted.";
@@ -557,25 +556,23 @@ public class TVController implements Observer {
 	 * preferences node without saving to file. This is exclusively used 
 	 * post-clustering for now.
 	 */
-	public void loadClusteredModel(final TVModel newModel, 
-	                               final boolean isFromCluster) {
+	public void loadClusteredModel(final TVModel newModel) {
 		
 		FileSet oldFileSet = model.getFileSet();
 		String oldRoot = oldFileSet.getRoot();
 		String oldExt = oldFileSet.getExt();
 		Preferences oldNode = getOldPreferences(oldRoot, oldExt);
-		DataLoadInfo dataInfo = getStoredDataLoadInfo(oldFileSet, oldNode);
+		DataLoadInfo dataLoadInfo = getStoredDataLoadInfo(oldFileSet, oldNode);
 		
-		if(dataInfo == null) {
+		if(dataLoadInfo == null) {
 			String message = "Updating data after clustering was interrupted.";
 			LogBuffer.println(message);
 			return;
 		}
 
-		dataInfo.setIsClusteredFile(isFromCluster);
-		newModel.setFileName(model.getName() + "-[clustered]");
+		dataLoadInfo.setIsClusteredFile(true);
 		model = newModel;
-		finishLoading(dataInfo);
+		finishLoading(dataLoadInfo);
 	}
 
 	/** Used to transfer information to ModelLoader about the data
@@ -629,6 +626,46 @@ public class TVController implements Observer {
 
 		dataInfo.setIsClusteredFile(isFromCluster);
 		loadData(newFileSet, dataInfo);
+	}
+	
+	private DataLoadInfo getDataLoadInfo(final FileSet newFileSet, 
+	                                     final String oldRoot,
+	                                     final String oldExt, 
+	                                     boolean isFromCluster,
+	                                     boolean shouldUseImport) {
+		Preferences oldNode;
+
+		// Transfer settings to clustered file
+		if(isFromCluster && oldRoot != null && oldExt != null) {
+			LogBuffer.println("Getting preferences for transfer to clustered file.");
+			oldNode = getOldPreferences(oldRoot, oldExt);
+
+			// Check if file was loaded before
+		}
+		else {
+			LogBuffer.println("Checking if preferences exist for the new file.");
+			oldNode = getOldPreferences(newFileSet.getRoot(), newFileSet.getExt());
+		}
+
+		DataLoadInfo dataInfo;
+		if(oldNode == null || shouldUseImport) {
+			LogBuffer.println("Using import dialog.");
+			dataInfo = useImportDialog(newFileSet);
+
+		}
+		else {
+			LogBuffer.println("Loading with info from existing node.");
+			dataInfo = getStoredDataLoadInfo(newFileSet, oldNode);
+		}
+
+		if(dataInfo == null) {
+			String message = "Data loading was interrupted.";
+			LogBuffer.println(message);
+			return new DataLoadInfo(oldNode);
+		}
+
+		dataInfo.setIsClusteredFile(isFromCluster);
+		return dataInfo;
 	}
 
 	/** Show a dialog for the user to specify how his data should be loaded.
@@ -885,9 +922,11 @@ public class TVController implements Observer {
 	  final AllowedFilesFilter ff = new AllowedFilesFilter();
 		fileDialog.setFileFilter(ff);
 
-		final String string = model.getFileSet().getDir();
-		if(string != null) {
-			fileDialog.setCurrentDirectory(new File(string));
+		final String dir = model.getFileSet().getDir();
+		final String oldRoot = model.getFileSet().getRoot();
+		final String oldExt = model.getFileSet().getExt();
+		if(dir != null) {
+			fileDialog.setCurrentDirectory(new File(dir));
 		}
 
 		final int retVal = fileDialog.showSaveDialog(JFrame.getFrames()[0]);
@@ -898,6 +937,20 @@ public class TVController implements Observer {
 			String selectedPath = fileDialog.getSelectedFile().getAbsolutePath();
 			Path path = Paths.get(selectedPath);
 			doModelSave(path);
+			
+			// Update Model node associated with the TVModel to permanent storage.
+			Preferences fileNode = getConfigNode().node("File");
+			boolean isFromCluster = model.isRowClustered() || model.isColClustered();
+			DataLoadInfo dataLoadInfo = getDataLoadInfo(model.getFileSet(), 
+			                                            oldRoot, oldExt, 
+			                                            isFromCluster, false);
+			ModelLoader.storeDataLoadInfo(fileNode, model, dataLoadInfo);
+			
+			// Transfer old Preferences to new Model entry
+			
+			// Model now counts as not modified
+			model.setModified(false);
+	
 		}
 	}
 	
@@ -1030,8 +1083,11 @@ public class TVController implements Observer {
 		if(o instanceof ViewFrame) {
 			addMenuListeners();
 		} else if(o instanceof TVModel) {
-			LogBuffer.println("TVModel updated.");
-			tvFrame.setTitleString(model.getFileName());
+			if(model.getModified()) {
+				tvFrame.setTitleString(model.getFileName() + "-[modified]");
+			} else {
+				tvFrame.setTitleString(model.getFileName());
+			}
 			updateModelFileMRU();
 		}
 	}
