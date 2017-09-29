@@ -101,7 +101,6 @@ public class ModelTreeAdder {
 				gtrLabels[i] = gtrData.get(i);
 			}
 			setGtrLabels(gtrLabels);
-
 		}
 		else {// first row of tempVector is actual label type names...
 			setGtrLabelTypes(firstRow);

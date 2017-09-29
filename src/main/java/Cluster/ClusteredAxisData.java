@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A class used to organize and store relevant data for clustering an axis.
+ * A class used to organize and store all relevant data for clustering an axis.
  * It can be passed and used throughout different phases of clustering and
  * makes it easier and cleaner to track important cluster information for 
  * an axis.
- *
  */
 public class ClusteredAxisData {
 

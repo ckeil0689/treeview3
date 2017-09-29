@@ -1,13 +1,11 @@
 package Controllers;
 
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.List;
-import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,10 +26,8 @@ import Utilities.StringRes;
 import Views.ClusterDialog;
 import Views.ClusterView;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
-import edu.stanford.genetics.treeview.model.ModelLoader;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
@@ -50,7 +46,7 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  */
 public class ClusterDialogController {
 
-	/* Axes identifiers */
+	// Axes identifiers
 	public final static String ROW_ID_LABELTYPE = "GID";
 	public final static String COL_ID_LABELTYPE = "AID";
 	
@@ -65,7 +61,7 @@ public class ClusterDialogController {
 	private final ClusterView clusterView;
 	private final ClusterDialog clusterDialog;
 
-	/* Delegates the clustering process */
+	// Delegates the clustering process
 	private ClusterProcessor processor;
 
 	/* Initialize with defaults for error checking parameters */
@@ -550,40 +546,7 @@ public class ClusterDialogController {
 					clusterView.getSpinnerValues(), isHierarchical(), axisID));
 		}
 	}
-
-	/**
-	 * @deprecated
-	 * Sets a new <code>DendroView</code> with the new data loaded into 
-	 * <code>TVModel</code>, displaying an updated heat map. 
-	 * It should also close the <code>ClusterDialog</code>.
-	 * @param clusteredFilePath - The path to the clustered file which should
-	 * be loaded
-	 */
-	private void loadClusteredData(final String clusteredFilePath) {
-
-		File file = null;
-		
-		if (clusteredFilePath != null) {
-			file = new File(clusteredFilePath);
-			
-			// Later used to import preferences
-			final String oldRoot = tvModel.getFileSet().getRoot();
-			final String oldExt = tvModel.getFileSet().getExt();
-			
-			final FileSet clusteredFileSet = new FileSet(file.getName(),
-					file.getParent() + File.separator);
-			
-			clusterDialog.dispose();
-			tvController.getDataInfoAndLoad(clusteredFileSet, oldRoot, oldExt, true, false);
-
-		} else {
-			final String alert = "When trying to load the clustered file, no "
-					+ "file path could be found.";
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], alert, "Alert",
-					JOptionPane.WARNING_MESSAGE);
-			LogBuffer.println("Alert: " + alert);
-		}
-	}
+	
 
 	/* -------------------- Listeners ------------------------------ */
 	/**

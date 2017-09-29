@@ -7,6 +7,7 @@
 
 package edu.stanford.genetics.treeview;
 
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
@@ -109,6 +110,16 @@ public interface DataModel {
 	 * Gets the HeaderInfo associated with array tree for this DataModel.
 	 */
 	public LabelInfo getAtrLabelInfo();
+	
+	/**
+	 * Gets the node pair data associated with column tree for this DataModel.
+	 */
+	public List<String[]> getGTRData();
+	
+	/**
+	 * Gets the node pair data associated with column tree for this DataModel.
+	 */
+	public List<String[]> getATRData();
 
 	/**
 	 * This not-so-object-oriented hack is in those rare instances where it is

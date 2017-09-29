@@ -8,7 +8,9 @@
 package edu.stanford.genetics.treeview.model;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
@@ -41,6 +43,9 @@ public class TVModel extends Observable implements DataModel {
 	protected RowLabelInfo rowLabelInfo;
 	protected IntLabelInfo atrLabelInfo;
 	protected IntLabelInfo gtrLabelInfo;
+	
+	protected List<String[]> gtrData;
+	protected List<String[]> atrData;
 
 	protected boolean aidFound = false;
 	protected boolean gidFound = false;
@@ -94,7 +99,6 @@ public class TVModel extends Observable implements DataModel {
 		hasChanged();
 	}
 
-	// accessor methods
 	@Override
 	public IntLabelInfo getRowLabelInfo() {
 
@@ -128,7 +132,31 @@ public class TVModel extends Observable implements DataModel {
 		return gtrLabelInfo;
 	}
 
-	public boolean gweightFound() {
+	public List<String[]> getATRData() {
+		
+		if(atrData == null) {
+			LogBuffer.println("No ATR data stored in TVModel. " +
+				"Returning empty list.");
+			List<String[]> emptyList = Collections.emptyList();
+			return emptyList;
+		}
+		
+		return atrData;
+	}
+	
+	public List<String[]> getGTRData() {
+		
+		if(gtrData == null) {
+			LogBuffer.println("No GTR data stored in TVModel. " +
+				"Returning empty list.");
+			List<String[]> emptyList = Collections.emptyList();
+			return emptyList;
+		}
+		
+		return gtrData;
+	}
+	
+  public boolean gweightFound() {
 
 		return gweightFound;
 	}
@@ -1048,6 +1076,14 @@ public class TVModel extends Observable implements DataModel {
 		atrLabelInfo.setLabelTypeArray(atrLabelTypes);
 	}
 
+	/**
+	 * Holds all node pair data for column trees, including the headers.
+	 * @param atrData - node pair data for column trees
+	 */
+	public void setATRData(final List<String[]> atrData) {
+		this.atrData = atrData;
+	}
+	
 	/** holds actual node information for row tree */
 	public void setGtrLabels(final String[][] gtrLabels) {
 
@@ -1059,6 +1095,14 @@ public class TVModel extends Observable implements DataModel {
 		gtrLabelInfo.setLabelTypeArray(gtrLabelTypes);
 	}
 
+	/**
+	 * Holds all node pair data for row trees, including the headers.
+	 * @param gtrData - node pair data for row trees
+	 */
+	public void setGTRData(final List<String[]> gtrData) {
+		this.gtrData = gtrData;
+	}
+	
 	public void setColumnLabels(final String[][] newLabels) {
 
 		colLabelInfo.setLabelArray(newLabels);

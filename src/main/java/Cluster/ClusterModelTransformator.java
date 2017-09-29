@@ -44,7 +44,7 @@ public class ClusterModelTransformator {
 	/**
 	 * Uses ClusteredAxisData for both axes to apply clustering changes directly
 	 * to the underlying TVModel without the need to store data in files beforehand.
-	 * @return A transformed TVModel with reordered data, labels and added 
+	 * @return The active TVModel with reordered data, labels and added 
 	 * Dendrograms, if applicable.
 	 */
 	public TVModel applyClusterChanges(boolean isHierarchical) {
@@ -128,6 +128,7 @@ public class ClusterModelTransformator {
 		if(rowCAD.isAxisClustered()) {
 			boolean wasParsed = mta.parseGTR(rowCAD.getTreeNodeData());
 			if(wasParsed) {
+				model.setGTRData(rowCAD.getTreeNodeData());
 				model.setGtrLabelTypes(mta.getGtrLabelTypes());
 				model.setGtrLabels(mta.getGtrLabels());
 				model.hashGIDs();
@@ -138,6 +139,7 @@ public class ClusterModelTransformator {
 		if(colCAD.isAxisClustered()) {
 			boolean wasParsed = mta.parseATR(colCAD.getTreeNodeData());
 			if(wasParsed) {
+				model.setATRData(colCAD.getTreeNodeData());
 				model.setAtrLabelTypes(mta.getAtrLabelTypes());
 				model.setAtrLabels(mta.getAtrLabels());
 				model.hashAIDs();

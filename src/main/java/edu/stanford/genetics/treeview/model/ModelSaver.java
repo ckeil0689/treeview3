@@ -1,15 +1,15 @@
 package edu.stanford.genetics.treeview.model;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import Utilities.CustomDialog;
+import Cluster.TreeFileWriter;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.HintDialog;
@@ -17,9 +17,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 public class ModelSaver {
 
-	private final int ROW_IDX = 0;
-	private final int COL_IDX = 1;
-	
 	private DataModel model;
 	
 	/**
@@ -39,6 +36,7 @@ public class ModelSaver {
 	public void save(final DataModel model, final Path path) {
 		
 		this.model = model;
+		
 		SaveTask saveTask = new SaveTask(path);
 		if(saveTask.shouldAbortSave()) {
 			LogBuffer.println("Aborted saving due to user choice.");
@@ -57,7 +55,11 @@ public class ModelSaver {
 	 */
 	private class SaveTask extends SwingWorker<Boolean, Void> {
 
-		private HintDialog hintDialog;
+		// This dialog just tells the user about saving being in progress
+		// This helps to avoid confusion for large files, where writing may
+		// take a while.
+		private HintDialog saveHintDialog;
+		
 		private boolean hadProblem = false;
 		private Path filePath;
 		
@@ -67,7 +69,7 @@ public class ModelSaver {
 
 		public SaveTask(final Path path) {
 
-			this.hintDialog = new HintDialog("Saving...");
+			this.saveHintDialog = new HintDialog("Saving...");
 			boolean isClustered = model.isRowClustered() || model.isColClustered();
 			this.filePath = ModelFileCreator.fixFileExtension(path, isClustered);
 			
@@ -97,31 +99,39 @@ public class ModelSaver {
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
+			// Needed to open the dialog on Event Dispatch Thread 
+			// (Swing is not a thread-safe library)
 			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override
 				public void run() {
-					hintDialog.setVisible(true);
-					hintDialog.setModal(true);
+					saveHintDialog.setVisible(true);
+					saveHintDialog.setModal(true);
 				}
 			});
 			
-			// Create the new files on disk
 			try {
+				// CDT
 				matrixFile.createNewFile();
+				boolean isCDTWriteOK = writeCDTFile();
 				
-				if(model.isColClustered()) atrFile.createNewFile();
-				if(model.isRowClustered()) gtrFile.createNewFile();
-			}
-			catch(IOException e) {
-				LogBuffer.logException(e);
-				// TODO add warning Dialog before proceeding
-			}
-			
-			try {
-				return writeFile();
+				// Row tree file
+				boolean isGTRWriteOK = true;
+				if(model.isRowClustered()) {
+					gtrFile.createNewFile();
+					isGTRWriteOK = writeTreeFile(gtrFile, model.getGTRData());
+				}
 				
-			} catch(Exception e) {
+				// Column tree file
+				boolean isATRWriteOK = true;
+				if(model.isColClustered()) {
+					atrFile.createNewFile();
+					isATRWriteOK = writeTreeFile(atrFile, model.getATRData());
+				}
+				
+				return (isCDTWriteOK && isGTRWriteOK && isATRWriteOK);
+			} 
+			catch(Exception e) {
 				hadProblem = true;
 				LogBuffer.logException(e);
 				String msg = "There was a problem. Could not save the file.";
@@ -148,15 +158,16 @@ public class ModelSaver {
 			} else {
 				deleteAllFiles();
 			}
-			hintDialog.setVisible(false);
-			hintDialog.dispose();
+			saveHintDialog.setVisible(false);
+			saveHintDialog.dispose();
 		}
 		
 		/**
-		 * Write a matrix file from the TVModel using ModelFileGenerator.
-		 * @return
+		 * Write a CDT matrix file from the TVModel using ModelFileGenerator.
+		 * @return An indicator whether the file writing concluded without 
+		 * cancellation.
 		 */
-		private boolean writeFile() {
+		private boolean writeCDTFile() {
 			
 			final ModelFileGenerator modelGen = 
 				new ModelFileGenerator((TVModel) model);
@@ -169,6 +180,22 @@ public class ModelSaver {
 
 			return Boolean.TRUE;
 		}
+		
+		/**
+		 * Writes a tree file which contains all tree node data for the given axis.
+		 * @param treeFile - The file which to write the tree data to.
+		 * @param treeNodeData - The node pair data to write to treeFile.
+		 * @return A boolean indicating whether the write process was successful.
+		 */
+    private boolean writeTreeFile(final File treeFile, 
+                                  final List<String[]> treeNodeData) {
+    	
+    	TreeFileWriter treeFileWriter = new TreeFileWriter(treeFile);
+    	boolean wasWriteSuccessful = treeFileWriter.writeData(treeNodeData);
+    	treeFileWriter.closeWriter();
+    	
+    	return wasWriteSuccessful;
+    }
 		
 //		/**
 //		 * Makes sure that a tree file exists for an axis that is supposed to

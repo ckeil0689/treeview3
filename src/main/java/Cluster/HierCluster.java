@@ -148,7 +148,6 @@ public class HierCluster {
 		 * every matrix row is its own little cluster.
 		 */
 		for (int i = 0; i < initial_matrix_size; i++) {
-
 			final List<Integer> initialCluster = new ArrayList<Integer>(1);
 			initialCluster.add(i);
 			currentClusters.add(initialCluster);
@@ -242,17 +241,15 @@ public class HierCluster {
 		/* Get the two clusters to be fused */
 		/* Get the cluster at rowMinIndex */
 		final int[] row_cluster = new int[currentClusters.get(min_row_index)
-				.size()];
+		                                  .size()];
 		for (int i = 0; i < row_cluster.length; i++) {
-
 			row_cluster[i] = currentClusters.get(min_row_index).get(i);
 		}
 
 		/* Get the cluster at colMinIndex */
 		final int[] col_cluster = new int[currentClusters.get(min_col_index)
-				.size()];
+		                                  .size()];
 		for (int i = 0; i < col_cluster.length; i++) {
-
 			col_cluster[i] = currentClusters.get(min_col_index).get(i);
 		}
 
@@ -712,7 +709,6 @@ public class HierCluster {
 		reorderedRowIDs = new String[limit];
 
 		for (int i = 0; i < limit; i++) {
-
 			element = axisLabelType + finalCluster.get((limit - 1) - i) + "X";
 			reorderedRowIDs[i] = element;
 		}

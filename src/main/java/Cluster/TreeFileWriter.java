@@ -1,6 +1,7 @@
 package Cluster;
 
 import java.io.File;
+import java.util.List;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -28,21 +29,15 @@ public class TreeFileWriter extends ClusterFileWriter {
 	/**
 	 * Writes information about the newly clustered elements to a buffer.
 	 * 
-	 * @param link
-	 *            The pair of newly linked elements.
-	 * @param loopNum
-	 *            The current iteration step of clustering.
-	 * @param min
-	 *            The minimum value from the distance matrix associated with the
-	 *            current cluster pair.
-	 * @return The ID of the newly formed tree node.
+	 * @param treeNodeData - list of all node pairs which define the Dendrogram.
+	 * @return boolean indicating success of writing the node data to file.
 	 */
-	public String writeData(final String[] link, int loopNum, double min) {
+	public boolean writeData(final List<String[]> treeNodeData) {
 
 		if (bw == null) {
 			LogBuffer.println("Cannot write cluster data because "
 					+ "BufferedWriter object is null.");
-			return "NA";
+			return false;
 		}
 
 		/*
@@ -50,20 +45,20 @@ public class TreeFileWriter extends ClusterFileWriter {
 		 * row pairs) to be added to dataTable.
 		 */
 		final int nodeInfoSize = 4;
-		final String[] nodeInfo = new String[nodeInfoSize];
+		String[] nodeInfo = new String[nodeInfoSize];
+    boolean wasWriteSuccessful = false;
+    
+		for(int i = 0; i < treeNodeData.size(); i++) {
+			nodeInfo = treeNodeData.get(i);
+			wasWriteSuccessful = writeData(nodeInfo);
+			
+			if(!wasWriteSuccessful) {
+				LogBuffer.println("Could not write node info " +
+					"to file (" + nodeInfo + ")");
+				return false;
+			}
+		}
 
-		/*
-		 * Create a list that stores the info of the current new node to be
-		 * formed. This will be written down in the corresponding tree file.
-		 */
-		nodeInfo[0] = "NODE" + (loopNum + 1) + "X";
-		nodeInfo[1] = link[0];
-		nodeInfo[2] = link[1];
-		nodeInfo[3] = String.valueOf(1 - min);
-
-		/* Write the node info to the tree output file */
-		writeData(nodeInfo);
-
-		return nodeInfo[0];
+		return true;
 	}
 }

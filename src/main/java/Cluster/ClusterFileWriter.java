@@ -54,17 +54,20 @@ public class ClusterFileWriter {
 	 * Creates a single string by calling doParse() and then writes the 
 	 * supplied data using the BufferedWriter object.
 	 * @param data - A String array of data to be written to a file.
+	 * @return boolean indicating finishing of data writing without any Exception.
 	 */
-	public void writeData(final String[] data) {
-			
+	public boolean writeData(final String[] data) {
+		
 		final String content = doParse(data);
 
 		try {
 			bw.write(content);
-
-		} catch (final IOException e) {
+		} 
+		catch (final IOException e) {
 			LogBuffer.logException(e);
+			return false;
 		}
+		return true;
 	}
 	
 	/**
