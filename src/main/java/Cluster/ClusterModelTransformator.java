@@ -7,9 +7,9 @@ import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
- * The purpose of this class is to take the currently loaded TVModel and 
- * apply changes from clustering to it, without the step of saving files.
- * For this it takes information stored in ClusteredAxisData objects 
+ * The purpose of this class is to take the currently loaded (active) TVModel 
+ * and apply changes from clustering to it, without the step of saving files.
+ * For this, the class uses information stored in ClusteredAxisData objects 
  * for each axis.
  */
 public class ClusterModelTransformator {
@@ -22,8 +22,19 @@ public class ClusterModelTransformator {
 	
 	private TVModel model;
 	
-	public ClusterModelTransformator(ClusteredAxisData rowCAD, 
-	                                 ClusteredAxisData colCAD, TVModel model) {
+	/**
+	 * Constructor for the ClusterModelTransformator which uses ClusteredAxisData
+	 * objects to manipulate an existing TVModel object.
+	 * @param rowCAD - ClusteredAxisData for rows which contains all important
+	 * information about the clustered rows.
+	 * @param colCAD - ClusteredAxisData for columns which contains all important
+	 * information about the clustered columns.
+	 * @param model - The currently active TVModel which is reordered 
+	 * by clustering.
+	 */
+	public ClusterModelTransformator(final ClusteredAxisData rowCAD, 
+	                                 final ClusteredAxisData colCAD, 
+	                                 final TVModel model) {
 		
 		this.rowCAD = rowCAD;
 		this.colCAD = colCAD;
@@ -44,11 +55,9 @@ public class ClusterModelTransformator {
 		prepareModel(rowLabelI, colLabelI);
 		model.setHierarchical(isHierarchical);
 		reorderClusteredModel();
-		//model.setModified(true);
+		model.setModified(true);
 		model.setRowClustered(rowCAD.isAxisClustered());
 		model.setColClustered(colCAD.isAxisClustered());
-		
-		model.setModified(true);
 		
 		return model;
 	}
@@ -58,8 +67,8 @@ public class ClusterModelTransformator {
 	 * @param rowLabelI - <code>IntLabelInfo</code> object for the row labels.
 	 * @param colLabelI - <code>IntLabelInfo</code> object for the column
 	 *          labels. */
-	public void prepareModel(final IntLabelInfo rowLabelI,
-											final IntLabelInfo colLabelI) {
+	private void prepareModel(final IntLabelInfo rowLabelI,
+	                          final IntLabelInfo colLabelI) {
 		
 		this.rowCAD.setLabelTypes(rowLabelI.getLabelTypes());
 		this.colCAD.setLabelTypes(colLabelI.getLabelTypes());
@@ -77,13 +86,14 @@ public class ClusterModelTransformator {
 	 */
 	private void reorderClusteredModel() {
 
-		// data matrix
+		// Reorder the data matrix
 		final TVDataMatrix origMatrix = (TVDataMatrix) model.getDataMatrix();
 		int[] reorderedRowIndices = getReorderedIndices(rowCAD);
 		int[] reorderedColIndices = getReorderedIndices(colCAD);
 		origMatrix.reorderMatrixData(reorderedRowIndices, reorderedColIndices);
 	  
-	  // update labels
+	  // Update labels associated with DataModel
+		// Rows
 		if(!model.gidFound() && rowCAD.isAxisClustered()) {
 			int idx = model.getRowLabelInfo().getNumLabelTypes();
 			model.getRowLabelInfo().addLabelType(ROW_ID_LABELTYPE, idx);
@@ -94,6 +104,7 @@ public class ClusterModelTransformator {
 			model.getRowLabelInfo().addLabels(orderedGIDs);
 		}
 		
+		// Columns
 		if(!model.aidFound() && colCAD.isAxisClustered()) {
 			int idx = model.getColLabelInfo().getNumLabelTypes();
 			model.getColLabelInfo().addLabelType(COL_ID_LABELTYPE, idx);
@@ -104,13 +115,13 @@ public class ClusterModelTransformator {
 			model.getColLabelInfo().addLabels(orderedAIDs);
 		}
 		
-		addTrees();
+		attachTreesToModel();
 	}
 	
 	/**
 	 * Adds tree data from ClusteredAxisData of both axes to the TVModel. 
 	 */
-	private void addTrees() {
+	private void attachTreesToModel() {
 		
 		ModelTreeAdder mta = new ModelTreeAdder(model);
 		
@@ -212,9 +223,9 @@ public class ClusterModelTransformator {
 	
 	/** Finds the last index of an element match in a String array.
 	 *
-	 * @param array
-	 * @param element
-	 * @return */
+	 * @param array - A String array to be searched.
+	 * @param element - A String element to be found in the array.
+	 * @return The last instance of the String element in the array. */
 	private int findIndex(final String[] array, final String element) {
 
 		int index = -1;

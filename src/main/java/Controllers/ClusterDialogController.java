@@ -17,6 +17,8 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.io.FilenameUtils;
+
 import Cluster.ClusterModelTransformator;
 import Cluster.ClusterProcessor;
 import Cluster.ClusteredAxisData;
@@ -184,27 +186,29 @@ public class ClusterDialogController {
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
-			/* Get fileName for saving calculated data */
-			final int extlen = tvModel.getFileSet().getExt().length();
-			this.oldFileName = tvModel.getSource().substring(0, tvModel.getSource().length() - extlen);
+			// Get fileName for saving calculated data
+			this.oldFileName = FilenameUtils.removeExtension(tvModel.getSource());
 
-			/* Initialize the clustering processor and pass the data */
+			// Initialize the clustering processor and pass the data
 			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel.getDataMatrix();
 			
-			/* Initialize the cluster processor */
+			// Initialize the cluster processor
 			if(isHierarchical()) {
+				// Hierarchical
 				processor = new ClusterProcessor(originalMatrix);
-				
-			} else {
+			} 
+			else {
+				// K-means
 				final IntLabelInfo rowLabelI = tvModel.getRowLabelInfo();
 				final IntLabelInfo colLabelI = tvModel.getColLabelInfo();
 				
-				processor = new ClusterProcessor(originalMatrix, oldFileName, rowLabelI, colLabelI);
+				processor = new ClusterProcessor(originalMatrix, oldFileName, 
+				                                 rowLabelI, colLabelI);
 			}
 
 			// Set zeroes invalid if they should be ignored.
 			if (clusterView.isIgnoreZeroesChecked()) {
-				originalMatrix.setZeroesToMissing();
+				originalMatrix.treatZeroesAsMissing();
 			}
 
 			final boolean isRowReady = isReady(rowSimilarity, ROW);

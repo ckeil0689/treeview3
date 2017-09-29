@@ -66,7 +66,6 @@ public class TVController implements Observer {
 	private DataModel model;
 	private MenubarController menuController;
 	private File file;
-//	private FileSet fileMenuSet;
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
@@ -392,6 +391,7 @@ public class TVController implements Observer {
 			}
 
 			dendroController.restoreComponentStates();
+			updateModelFileMRU();
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 		}
 		else {
@@ -475,7 +475,8 @@ public class TVController implements Observer {
 	 * @throws BackingStoreException */
 	private static Preferences getTargetNode(	final Preferences root,
 																						final String srcName,
-																						final String srcExtension) throws BackingStoreException {
+																						final String srcExtension) 
+																							throws BackingStoreException {
 
 		String[] fileNodes = root.childrenNames();
 
@@ -500,21 +501,6 @@ public class TVController implements Observer {
 
 		return targetNode;
 	}
-
-//	private void setFileMenuSet(final FileSet fs) {
-//
-//		FileSet newFs;
-//
-//		if(fs != null) {
-//			newFs = fs;
-//
-//		}
-//		else {
-//			newFs = ViewFrame.getFileSet(file);
-//		}
-//
-//		this.fileMenuSet = newFs;
-//	}
 
 	/** This method opens a file dialog to open either the visualization view or
 	 * the cluster view depending on which file type is chosen.
@@ -1088,7 +1074,6 @@ public class TVController implements Observer {
 			} else {
 				tvFrame.setTitleString(model.getFileName());
 			}
-			updateModelFileMRU();
 		}
 	}
 
@@ -1114,7 +1099,6 @@ public class TVController implements Observer {
 			JOptionPane.WARNING_MESSAGE,null,options,options[1]);
 
 		switch (choice) {
-
 			case JOptionPane.OK_OPTION:
 				LogBuffer.println("Saving settings before window close.");
 
@@ -1126,7 +1110,7 @@ public class TVController implements Observer {
 				// window without data loaded does not save settings because
 				// it's tied to the matrix jpanel
 				if(model != null && model.getModified()) {
-					if(checkIfSaveNecessary()) saveModelAs();
+					if(userWantsToSave()) saveModelAs();
 				}
 				
 				tvFrame.storeState();
@@ -1156,10 +1140,18 @@ public class TVController implements Observer {
 	}
 	
 	/**
-	 * checks if DataModel has been modified. Stores a configFile when closing
-	 * the window.
+	 * Opens a dialog for the user, asking if he/she wants to save the data model.
+	 * @return boolean - whether the user wants to save the modified DataModel to a new
+	 * file.
 	 */
-	public boolean checkIfSaveNecessary() {
+	public boolean userWantsToSave() {
+		
+		// No need to ask or save anything, if the DataModel was not modified.
+		if(!model.getModified()) {
+			LogBuffer.println("DataModel not recognized as modified. " +
+				"Nothing to save.");
+			return false;
+		}
 
 		// Confirm user's intent to exit the application.
 		final int choice = JOptionPane.showOptionDialog(tvFrame.getAppFrame(),

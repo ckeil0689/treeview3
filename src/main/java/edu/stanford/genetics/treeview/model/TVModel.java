@@ -583,7 +583,7 @@ public class TVModel extends Observable implements DataModel {
 		 * status. They will be ignored during clustering and colored like
 		 * missing values.
 		 */
-		public void setZeroesToMissing() {
+		public void treatZeroesAsMissing() {
 
 			for (int i = 0; i < exprData.length; i++) {
 				for (int j = 0; j < exprData[i].length; j++) {
@@ -662,7 +662,8 @@ public class TVModel extends Observable implements DataModel {
 		 * @param startingCol included in the mean calculation
 		 * @param endingRow included in the mean calculation
 		 */
-		public double getZoomedMean(int startingRow, int endingRow, int startingCol, int endingCol){
+		public double getZoomedMean(int startingRow, int endingRow, 
+		                            int startingCol, int endingCol){
 			final int nRows = nRows();
 			final int nCols = nCols();
 			if (exprData == null) {
