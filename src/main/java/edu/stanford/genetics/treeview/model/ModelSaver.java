@@ -74,6 +74,7 @@ public class ModelSaver {
 		public SaveTask(final Path path) {
 
 			this.saveHintDialog = new HintDialog("Saving...");
+			// TODO this will be false if model was not clustered in current session
 			boolean isClustered = model.isRowClustered() || model.isColClustered();
 			this.filePath = ModelFileCreator.fixFileExtension(path, isClustered);
 			

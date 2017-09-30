@@ -25,9 +25,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class TVModel extends Observable implements DataModel {
 
 	private boolean wasModified = false;
-	private boolean isHierarchical = false;
-	private boolean isRowClustered = false;
-	private boolean isColClustered = false;
 	
 	private int kmeans_rowClusterNum = 0;
 	private int kmeans_colClusterNum = 0;
@@ -1249,37 +1246,37 @@ public class TVModel extends Observable implements DataModel {
 	@Override
 	public void setHierarchical(boolean isHierarchical) {
 		
-		this.isHierarchical = isHierarchical;
+		documentConfig.putBoolean("isHierarchical", isHierarchical);
 	}
 
 	@Override
 	public boolean isHierarchical() {
 		
-		return isHierarchical;
+		return documentConfig.getBoolean("isHierarchical", false);
 	}
 
 	@Override
 	public void setRowClustered(boolean isRowClustered) {
 
-		this.isRowClustered = isRowClustered;
+		documentConfig.putBoolean("isRowClustered", isRowClustered);
 	}
 
 	@Override
 	public boolean isRowClustered() {
 
-		return isRowClustered;
+		return documentConfig.getBoolean("isRowClustered", false);
 	}
 
 	@Override
 	public void setColClustered(boolean isColClustered) {
 		
-		this.isColClustered = isColClustered;
+		documentConfig.putBoolean("isColClustered", isColClustered);
 	}
 
 	@Override
 	public boolean isColClustered() {
 
-		return isColClustered;
+		return documentConfig.getBoolean("isColClustered", false);
 	}
 
 	@Override

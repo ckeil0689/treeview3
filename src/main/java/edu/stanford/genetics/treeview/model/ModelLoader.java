@@ -229,7 +229,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		/* TODO wrap in try-catch */
 		parseCDT(stringLabels);
 
-
 		// If present, parse ATR File
 		if(hasAID) {
 			parseATR();
@@ -512,6 +511,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.hashGIDs();
 		targetModel.hashGTRs();
 		targetModel.gidFound(hasGID);
+		targetModel.setRowClustered(true);
 	}
 
 	//TODO replace with ModelTreeAdder to reduce code
@@ -555,6 +555,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.hashAIDs();
 		targetModel.hashATRs();
 		targetModel.aidFound(hasAID);
+		targetModel.setColClustered(true);
 	}
 
 	private static List<String[]> loadTreeSet(final String loadingSet) {
