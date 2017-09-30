@@ -575,7 +575,7 @@ public class TVController implements Observer {
 	 * @param oldExt The extension of the old FileSet (FileSet.getExt())
 	 * @param isFromCluster Whether the loading happens as a result of
 	 *          clustering. */
-	public void getDataInfoAndLoad(	final FileSet newFileSet, final String oldRoot,
+	private void getDataInfoAndLoad(	final FileSet newFileSet, final String oldRoot,
 																	final String oldExt, boolean isFromCluster,
 																	boolean shouldUseImport) {
 
@@ -614,7 +614,7 @@ public class TVController implements Observer {
 		loadData(newFileSet, dataInfo);
 	}
 	
-	private DataLoadInfo getDataLoadInfo(final FileSet newFileSet, 
+	public DataLoadInfo getDataLoadInfo(final FileSet newFileSet, 
 	                                     final String oldRoot,
 	                                     final String oldExt, 
 	                                     boolean isFromCluster,
@@ -889,8 +889,33 @@ public class TVController implements Observer {
 			return;
 		}
 		
-		ModelSaver ms = new ModelSaver();
+		ModelSaver ms = new ModelSaver(TVController.this);
 		ms.save(model, path);
+	}
+	
+	/**
+	 * When the worker thread in ModelSaver is done, it  
+	 * @param wasSuccessful
+	 */
+	public void finishModelSave(final boolean wasSuccessful) {
+		
+		if(wasSuccessful) {
+			// Update Model node associated with the TVModel to permanent storage.
+			Preferences fileNode = getConfigNode().node("File");
+			boolean isFromCluster = model.isRowClustered() || model.isColClustered();
+			// TODO updated clustered data coords?
+			final String oldRoot = model.getFileSet().getRoot();
+			final String oldExt = model.getFileSet().getExt();
+			DataLoadInfo dataLoadInfo = getDataLoadInfo(model.getFileSet(), 
+			                                            oldRoot, oldExt, 
+			                                            isFromCluster, false);
+			ModelLoader.storeDataLoadInfo(fileNode, model, dataLoadInfo);
+			updateFileMRU();
+		}
+		
+		// Transfer old Preferences to new Model entry
+		
+		// Model now counts as not modified
 		model.setModified(false);
 		LogBuffer.println("doModelSave() finished with FileSet " 
 		+ model.getFileSet());
@@ -911,8 +936,6 @@ public class TVController implements Observer {
 		fileDialog.setFileFilter(ff);
 
 		final String dir = model.getFileSet().getDir();
-		final String oldRoot = model.getFileSet().getRoot();
-		final String oldExt = model.getFileSet().getExt();
 		if(dir != null) {
 			fileDialog.setCurrentDirectory(new File(dir));
 		}
@@ -925,20 +948,6 @@ public class TVController implements Observer {
 			String selectedPath = fileDialog.getSelectedFile().getAbsolutePath();
 			Path path = Paths.get(selectedPath);
 			doModelSave(path);
-			
-			// Update Model node associated with the TVModel to permanent storage.
-			Preferences fileNode = getConfigNode().node("File");
-			boolean isFromCluster = model.isRowClustered() || model.isColClustered();
-			// TODO updated clustered data coords?
-			DataLoadInfo dataLoadInfo = getDataLoadInfo(model.getFileSet(), 
-			                                            oldRoot, oldExt, 
-			                                            isFromCluster, false);
-			ModelLoader.storeDataLoadInfo(fileNode, model, dataLoadInfo);
-			
-			// Transfer old Preferences to new Model entry
-			
-			// Model now counts as not modified
-			model.setModified(false);
 		}
 	}
 	

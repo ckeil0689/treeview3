@@ -3,6 +3,7 @@ package edu.stanford.genetics.treeview.model;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -10,6 +11,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import Cluster.TreeFileWriter;
+import Controllers.TVController;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.HintDialog;
@@ -18,14 +20,16 @@ import edu.stanford.genetics.treeview.LogBuffer;
 public class ModelSaver {
 
 	private DataModel model;
+	private final TVController tvController;
 	
 	/**
 	 * Handles the process of saving a DataModel object to file.
 	 * @param parent - The parent Component over which the Save-dialog will 
 	 * appear.
 	 */
-	public ModelSaver() {
+	public ModelSaver(final TVController tvController) {
 		
+		this.tvController = tvController;
 	}
 	
 	/**
@@ -155,9 +159,11 @@ public class ModelSaver {
 
 				JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Saving complete.");
 				LogBuffer.println("Success. Saved file " + model.getFileName());
+				tvController.finishModelSave(true);
 				
 			} else {
 				deleteAllFiles();
+				tvController.finishModelSave(false);
 			}
 			saveHintDialog.setVisible(false);
 			saveHintDialog.dispose();
