@@ -391,7 +391,7 @@ public class TVController implements Observer {
 			}
 
 			dendroController.restoreComponentStates();
-			updateModelFileMRU();
+			updateFileMRU();
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 		}
 		else {
@@ -892,6 +892,8 @@ public class TVController implements Observer {
 		ModelSaver ms = new ModelSaver();
 		ms.save(model, path);
 		model.setModified(false);
+		LogBuffer.println("doModelSave() finished with FileSet " 
+		+ model.getFileSet());
 	}
 
 	/** Saves the model as a user specified file. */
@@ -927,6 +929,7 @@ public class TVController implements Observer {
 			// Update Model node associated with the TVModel to permanent storage.
 			Preferences fileNode = getConfigNode().node("File");
 			boolean isFromCluster = model.isRowClustered() || model.isColClustered();
+			// TODO updated clustered data coords?
 			DataLoadInfo dataLoadInfo = getDataLoadInfo(model.getFileSet(), 
 			                                            oldRoot, oldExt, 
 			                                            isFromCluster, false);
@@ -936,16 +939,13 @@ public class TVController implements Observer {
 			
 			// Model now counts as not modified
 			model.setModified(false);
-	
 		}
 	}
 	
 	/**
 	 * Updates the FileMRU according to the current FileSet attached to the model.
 	 */
-	private void updateModelFileMRU() {
-
-		tvFrame.getFileMRU().removeDuplicates(model.getFileSet());
+	private void updateFileMRU() {
 		tvFrame.getFileMRU().addUnique(model.getFileSet());
 		tvFrame.getFileMRU().setLast(model.getFileSet());
 		tvFrame.addFileMenuListeners(new FileMenuListener());

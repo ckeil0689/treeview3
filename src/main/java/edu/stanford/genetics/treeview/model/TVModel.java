@@ -34,8 +34,6 @@ public class TVModel extends Observable implements DataModel {
 	
 	
 	protected FileSet source = null;
-	protected String dir = null;
-	protected String root;
 
 	protected TVDataMatrix dataMatrix;
 
@@ -52,6 +50,7 @@ public class TVModel extends Observable implements DataModel {
 
 	protected boolean eweightFound = false;
 	protected boolean gweightFound = false;
+	
 	protected Preferences documentConfig; // holds document config
 
 	/** has model been successfully loaded? */

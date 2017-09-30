@@ -149,6 +149,7 @@ public class ModelSaver {
 				String dir = filePath.getParent().toString() + File.separator;
 				
 				FileSet newFS = new FileSet(filename, dir);
+				LogBuffer.println("New FileSet created when saving: " + newFS);
 				((TVModel) model).setSource(newFS);
 				((TVModel) model).setLoaded(true);
 

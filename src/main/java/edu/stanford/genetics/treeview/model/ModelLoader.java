@@ -255,6 +255,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	public static Preferences getConfigData(final DataModel model, 
 	                                 final Preferences fileNode) {
 
+		LogBuffer.println("Loading Model entry from File node.");
+
 		try {
 			final String fileName = model.getFileSet().getRoot();
 			final String fileExt = model.getFileSet().getExt();
@@ -268,16 +270,14 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			// Look if there's already a node for the file
 			boolean fileFound = false;
 			if(childrenNodes.length > 0) {
-				for(final String childrenNode : childrenNodes) {
-
-					final String childName = fileNode	.node(childrenNode)
-																						.get("name", default_name);
-					final String childExt = fileNode.node(childrenNode)
-																					.get("extension", default_ext);
+				for(final String entry : childrenNodes) {
+					Preferences childNode = fileNode.node(entry);
+					final String childName = childNode.get("name", default_name);
+					final String childExt = childNode.get("extension", default_ext);
 
 					if(childName.equalsIgnoreCase(fileName) && childExt
 																															.equalsIgnoreCase(fileExt)) {
-						documentConfig = fileNode.node(childrenNode);
+						documentConfig = childNode;
 						fileFound = true;
 						break;
 					}
@@ -290,7 +290,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 				documentConfig.put("name", fileName);
 				documentConfig.put("extension", fileExt);
 			}
-
+			
+			LogBuffer.println("Found Model entry: " + documentConfig);
 			return documentConfig;
 		}
 		catch(final Exception e) {
