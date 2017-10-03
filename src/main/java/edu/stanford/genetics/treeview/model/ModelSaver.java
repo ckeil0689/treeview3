@@ -1,13 +1,15 @@
 package edu.stanford.genetics.treeview.model;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.prefs.Preferences;
+import java.util.concurrent.ExecutionException;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import Cluster.TreeFileWriter;
@@ -33,20 +35,61 @@ public class ModelSaver {
 	}
 	
 	/**
+	 * Modal dialog opened which will wait for save process to finish.
+	 * Listens to completion of SwingWorker task and then closes the modal dialog.
+	 */
+	class SaveCompletionWaiter implements PropertyChangeListener {
+		private JDialog dialog;
+
+    public SaveCompletionWaiter(JDialog dialog) {
+        this.dialog = dialog;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+    	if ("state".equals(event.getPropertyName()) && 
+    		SwingWorker.StateValue.DONE == event.getNewValue()) {
+    		dialog.setVisible(false);
+    		dialog.dispose();
+    	}
+    }
+  }
+	
+	/**
 	 * Pops up a dialog to define path and filename for the model to be saved.
 	 * It then initiates a SaveTask SwingWorker.
 	 * @param model - the DataModel to be saved.
+	 * @return An indicator whether saving finished successfully
 	 */
-	public void save(final DataModel model, final Path path) {
+	public boolean save(final DataModel model, final Path path) {
 		
 		this.model = model;
+	  // This dialog just tells the user about saving being in progress
+	  // This helps to avoid confusion for large files, where writing may
+		// take a while.
+		HintDialog saveHintDialog = new HintDialog("Saving...");
+		saveHintDialog.setModal(true);
 		
 		SaveTask saveTask = new SaveTask(path);
 		if(saveTask.shouldAbortSave()) {
 			LogBuffer.println("Aborted saving due to user choice.");
-			return;
+			return false;
 		}
+		
+		saveTask.addPropertyChangeListener(new SaveCompletionWaiter(saveHintDialog));
 		saveTask.execute();
+		saveHintDialog.setVisible(true);
+		
+		try {
+			// get() used to let everything wait for saving to finish (GUI lock!)
+			// hence the need for a modal dialog to prevent user confusion
+			return saveTask.get();
+		}
+		catch(InterruptedException | ExecutionException e) {
+			LogBuffer.logException(e);
+			LogBuffer.println("Saving the file " + path + "has failed.");
+			return false;
+		}
 	}
 	
 	/**
@@ -58,11 +101,6 @@ public class ModelSaver {
 	 * @param path - The path where the new file is to be saved
 	 */
 	private class SaveTask extends SwingWorker<Boolean, Void> {
-
-		// This dialog just tells the user about saving being in progress
-		// This helps to avoid confusion for large files, where writing may
-		// take a while.
-		private HintDialog saveHintDialog;
 		
 		private boolean hadProblem = false;
 		private Path filePath;
@@ -73,7 +111,6 @@ public class ModelSaver {
 
 		public SaveTask(final Path path) {
 
-			this.saveHintDialog = new HintDialog("Saving...");
 			// TODO this will be false if model was not clustered in current session
 			boolean isClustered = model.isRowClustered() || model.isColClustered();
 			this.filePath = ModelFileCreator.fixFileExtension(path, isClustered);
@@ -86,7 +123,8 @@ public class ModelSaver {
 				                                                    model.isColClustered(),
 				                                                    model.isHierarchical(), 
 				                                                    model.getKMeansClusterNum());
-			} else {
+			} 
+			else {
 				this.matrixFile = ModelFileCreator.retrieveDefaultFile(filePath);
 			}
 			
@@ -103,17 +141,6 @@ public class ModelSaver {
 
 		@Override
 		protected Boolean doInBackground() throws Exception {
-
-			// Needed to open the dialog on Event Dispatch Thread 
-			// (Swing is not a thread-safe library)
-			SwingUtilities.invokeLater(new Runnable() {
-
-				@Override
-				public void run() {
-					saveHintDialog.setVisible(true);
-					saveHintDialog.setModal(true);
-				}
-			});
 			
 			try {
 				// CDT
@@ -161,13 +188,11 @@ public class ModelSaver {
 				JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Saving complete.");
 				LogBuffer.println("Success. Saved file " + model.getFileName());
 				tvController.finishModelSave(true);
-				
-			} else {
+			} 
+			else {
 				deleteAllFiles();
 				tvController.finishModelSave(false);
 			}
-			saveHintDialog.setVisible(false);
-			saveHintDialog.dispose();
 		}
 		
 		/**

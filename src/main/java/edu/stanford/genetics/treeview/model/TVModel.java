@@ -420,13 +420,14 @@ public class TVModel extends Observable implements DataModel {
 
 	public void resetState() {
 
-		LogBuffer.println("Resetting model.");
+		LogBuffer.println("MODEL RESET (all data cleared).");
 
 		// reset some state stuff.
 		// if (documentConfig != null)
 		// documentConfig.store();
 		documentConfig = null;
 		setLoaded(false);
+		setModified(false);
 		aidFound = false;
 		gidFound = false;
 		source = null;

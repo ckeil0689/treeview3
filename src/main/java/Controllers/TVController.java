@@ -520,6 +520,7 @@ public class TVController implements Observer {
 			LogBuffer.println("Another Model is loaded and modified. " +
 				"Asking for save.");
 			askSaveModified();
+			// Only continue if finished
 		}
 
 		try {
@@ -886,17 +887,17 @@ public class TVController implements Observer {
 	 *
 	 * @param The path at which the file should be saved.
 	 * @return String name of the saved file */
-	private void doModelSave(final Path path) {
+	private boolean doModelSave(final Path path) {
 
 		if(path == null) {
 			String msg = "No defined file path. Could not save the file.";
 			JOptionPane.showMessageDialog(JFrame.getFrames()[0], msg);
 			LogBuffer.println(msg);
-			return;
+			return false;
 		}
 		
 		ModelSaver ms = new ModelSaver(TVController.this);
-		ms.save(model, path);
+		return ms.save(model, path);
 	}
 	
 	/**
@@ -947,7 +948,6 @@ public class TVController implements Observer {
 		}
 
 		final int retVal = fileDialog.showSaveDialog(JFrame.getFrames()[0]);
-
 		if(retVal == JFileChooser.APPROVE_OPTION) {
 			LogBuffer.println("Saving file.");
 			// File extension is not taken care of
