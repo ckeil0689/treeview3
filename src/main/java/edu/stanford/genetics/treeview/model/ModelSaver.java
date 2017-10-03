@@ -51,6 +51,9 @@ public class ModelSaver {
     		SwingWorker.StateValue.DONE == event.getNewValue()) {
     		dialog.setVisible(false);
     		dialog.dispose();
+    		
+				JOptionPane.showMessageDialog(JFrame.getFrames()[0], 
+				                              "Saving complete.");
     	}
     }
   }
@@ -185,7 +188,6 @@ public class ModelSaver {
 				((TVModel) model).setSource(newFS);
 				((TVModel) model).setLoaded(true);
 
-				JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Saving complete.");
 				LogBuffer.println("Success. Saved file " + model.getFileName());
 				tvController.finishModelSave(true);
 			} 
