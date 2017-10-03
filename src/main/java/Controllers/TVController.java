@@ -515,6 +515,12 @@ public class TVController implements Observer {
 
 		String message;
 		FileSet loadFileSet = fileSet;
+		
+		if(model.isLoaded() && model.getModified()) {
+			LogBuffer.println("Another Model is loaded and modified. " +
+				"Asking for save.");
+			askSaveModified();
+		}
 
 		try {
 			if(loadFileSet == null) {
@@ -948,6 +954,35 @@ public class TVController implements Observer {
 			String selectedPath = fileDialog.getSelectedFile().getAbsolutePath();
 			Path path = Paths.get(selectedPath);
 			doModelSave(path);
+		}
+	}
+	
+	/**
+	 * If the Model was modified, this method will pop up a dialog asking 
+	 * the user if he would like to save the modified data. If confirmed, 
+	 * the saving process is initialized.
+	 */
+	private void askSaveModified() {
+		
+		if(!model.getModified()) {
+			LogBuffer.println("Dialog for saving modified data was attempted to " +
+				"be opened although the model does not appear modified.");
+			return;
+		}
+		
+		String title = "Save Modified Data";
+		String message = "The current file seems to be modified. " +
+			"Would you like to save modifications?";
+		int retVal = JOptionPane.showConfirmDialog(Frame.getFrames()[0], 
+		                                           message, 
+		                                           title, 
+		                                           JOptionPane.YES_NO_OPTION,  
+		                                           JOptionPane.QUESTION_MESSAGE);
+		if(retVal == JOptionPane.YES_OPTION) {
+			saveModelAs();
+		}
+		else {
+			LogBuffer.println("Modified data not saved.");
 		}
 	}
 	
