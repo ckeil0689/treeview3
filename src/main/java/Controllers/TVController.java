@@ -478,16 +478,21 @@ public class TVController implements Observer {
 																						final String srcExtension) 
 																							throws BackingStoreException {
 
+		LogBuffer.println("Looking for target node (" + srcName + ", " 
+		+ srcExtension + ")");
+		
 		String[] fileNodes = root.childrenNames();
-
 		Preferences targetNode = null;
 		for(String nodeName : fileNodes) {
 			Preferences node = root.node(nodeName);
 			String name = node.get("name", "none");
 			String extension = node.get("extension", ".txt");
+			
+			LogBuffer.println("Checking node (" + name + ", " + extension + ")");
 
 			if(name.equalsIgnoreCase(srcName) && extension
 																										.equalsIgnoreCase(srcExtension)) {
+				LogBuffer.println("Success. Target node found.");
 				targetNode = node;
 				break;
 			}
@@ -533,7 +538,9 @@ public class TVController implements Observer {
 				loadFileSet = ViewFrame.getFileSet(file);
 			}
 
-			getDataInfoAndLoad(loadFileSet, null, null, false, shouldUseImport);
+			DataLoadInfo dataInfo = getDataLoadInfo(loadFileSet, null, null, 
+			                                        false, shouldUseImport);
+			loadData(loadFileSet, dataInfo);
 			//updateModelFileMRU();
 		}
 		catch(final LoadException e) {
@@ -581,76 +588,55 @@ public class TVController implements Observer {
 	 * @param oldRoot The root name of the old FileSet (FileSet.getRoot())
 	 * @param oldExt The extension of the old FileSet (FileSet.getExt())
 	 * @param isFromCluster Whether the loading happens as a result of
-	 *          clustering. */
-	private void getDataInfoAndLoad(	final FileSet newFileSet, final String oldRoot,
-																	final String oldExt, boolean isFromCluster,
-																	boolean shouldUseImport) {
-
-		Preferences oldNode;
-
-		// Transfer settings to clustered file
-		if(isFromCluster && oldRoot != null && oldExt != null) {
-			LogBuffer.println("Getting preferences for transfer to clustered file.");
-			oldNode = getOldPreferences(oldRoot, oldExt);
-
-			// Check if file was loaded before
-		}
-		else {
-			LogBuffer.println("Checking if preferences exist for the new file.");
-			oldNode = getOldPreferences(newFileSet.getRoot(), newFileSet.getExt());
-		}
-
-		DataLoadInfo dataInfo;
-		if(oldNode == null || shouldUseImport) {
-			LogBuffer.println("Using import dialog.");
-			dataInfo = useImportDialog(newFileSet);
-
-		}
-		else {
-			LogBuffer.println("Loading with info from existing node.");
-			dataInfo = getStoredDataLoadInfo(newFileSet, oldNode);
-		}
-
-		if(dataInfo == null) {
-			String message = "Data loading was interrupted.";
-			LogBuffer.println(message);
-			return;
-		}
-
-		dataInfo.setIsClusteredFile(isFromCluster);
-		loadData(newFileSet, dataInfo);
-	}
-	
-	public DataLoadInfo getDataLoadInfo(final FileSet newFileSet, 
+	 *          clustering. 
+	 * @return A DataLoadInfo object containing all the relevant information
+	 * for loading a data set.
+	 */
+	private DataLoadInfo getDataLoadInfo(final FileSet newFileSet, 
 	                                     final String oldRoot,
 	                                     final String oldExt, 
 	                                     boolean isFromCluster,
 	                                     boolean shouldUseImport) {
+		LogBuffer.println("GET DATA LOAD INFO");
+		LogBuffer.println("Old Root: " + oldRoot);
 		Preferences oldNode;
-
+		// Step 1) Retrieve possible old data load information
 		// Transfer settings to clustered file
-		if(isFromCluster && oldRoot != null && oldExt != null) {
+		// Case 1) Coming from clustering. Solution: transfer existing node info
+		// to new node.
+		//if(isFromCluster && oldRoot != null && oldExt != null) {
+		if(oldRoot != null && oldExt != null) {
 			LogBuffer.println("Getting preferences for transfer to clustered file.");
 			oldNode = getOldPreferences(oldRoot, oldExt);
-
-			// Check if file was loaded before
 		}
+		// Case 2) Not from cluster, but the same file might have been loaded 
+		// before such that a Preferences node already exists. Solution: use the
+		// old node, if it exists.
 		else {
-			LogBuffer.println("Checking if preferences exist for the new file.");
+			LogBuffer.println("Checking if preferences exist for new file.");
+			// TODO naming here is confusing: this looks for potentially existing 
+			// nodes of the new FileSet
 			oldNode = getOldPreferences(newFileSet.getRoot(), newFileSet.getExt());
 		}
+		
+		// Case 3) A new file is created (saved) from the currently open file.
+		// Solution: transfer info from the existing node (same as Case 1)
 
+		// Step 2) Get the information from a node or use import dialog to define 
+		// new information
+		
+		// Case 1) No node was found, or import dialog should explicitly be used
 		DataLoadInfo dataInfo;
 		if(oldNode == null || shouldUseImport) {
 			LogBuffer.println("Using import dialog.");
 			dataInfo = useImportDialog(newFileSet);
-
 		}
 		else {
 			LogBuffer.println("Loading with info from existing node.");
 			dataInfo = getStoredDataLoadInfo(newFileSet, oldNode);
 		}
 
+		// If we don't have valid information here, something was messed up
 		if(dataInfo == null) {
 			String message = "Data loading was interrupted.";
 			LogBuffer.println(message);
@@ -903,16 +889,21 @@ public class TVController implements Observer {
 	/**
 	 * When the worker thread in ModelSaver is done, it  
 	 * @param wasSuccessful
+	 * @param oldFileSet - The FileSet attached to the Model before the new 
+	 * one was added during the saving process. It is needed to transfer 
+	 * Preferences information.
 	 */
-	public void finishModelSave(final boolean wasSuccessful) {
+	public void finishModelSave(final boolean wasSuccessful, 
+	                            final FileSet oldFileSet) {
 		
 		if(wasSuccessful) {
 			// Update Model node associated with the TVModel to permanent storage.
 			Preferences fileNode = getConfigNode().node("File");
 			boolean isFromCluster = model.isRowClustered() || model.isColClustered();
 			// TODO updated clustered data coords?
-			final String oldRoot = model.getFileSet().getRoot();
-			final String oldExt = model.getFileSet().getExt();
+			final String oldRoot = oldFileSet.getRoot();
+			final String oldExt = oldFileSet.getExt();
+			LogBuffer.println("Successful save, old root: " + oldRoot);
 			DataLoadInfo dataLoadInfo = getDataLoadInfo(model.getFileSet(), 
 			                                            oldRoot, oldExt, 
 			                                            isFromCluster, false);

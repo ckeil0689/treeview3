@@ -179,6 +179,8 @@ public class ModelSaver {
 		@Override
 		protected void done() {
 
+			FileSet oldFS = model.getFileSet();
+			LogBuffer.println("Old FileSet in ModelSaver.done(): " + oldFS);
 			if (!isCancelled() && !hadProblem) {// && hasEnsuredTreeFilePresence()) {
 				String filename = filePath.getFileName().toString();
 				String dir = filePath.getParent().toString() + File.separator;
@@ -189,11 +191,11 @@ public class ModelSaver {
 				((TVModel) model).setLoaded(true);
 
 				LogBuffer.println("Success. Saved file " + model.getFileName());
-				tvController.finishModelSave(true);
+				tvController.finishModelSave(true, oldFS);
 			} 
 			else {
 				deleteAllFiles();
-				tvController.finishModelSave(false);
+				tvController.finishModelSave(false, oldFS);
 			}
 		}
 		
