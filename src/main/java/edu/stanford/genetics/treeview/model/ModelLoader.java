@@ -227,12 +227,14 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		// Parse the CDT File
 		/* TODO wrap in try-catch */
+		LogBuffer.println("Parsing CDT file.");
 		parseCDT(stringLabels);
 
 		// If present, parse ATR File
 		if(hasAID) {
+			LogBuffer.println("Parsing ATR file.");
 			parseATR();
-
+			LogBuffer.println("Done parsing ATR file.");
 		}
 		else {
 			LogBuffer.println("No ATR file found for this CDT file.");
@@ -241,8 +243,9 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		// If present, parse GTR File
 		if(hasGID) {
+			LogBuffer.println("Parsing GTR file.");
 			parseGTR();
-
+			LogBuffer.println("Done parsing GTR file.");
 		}
 		else {
 			LogBuffer.println("No GTR file found for this CDT file.");
@@ -309,6 +312,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		Preferences modelNode = getConfigData(model, fileNode);
 		
 		modelNode.putBoolean("firstLoad", false);
+		modelNode.putBoolean("isRowClustered", model.gidFound());
+		modelNode.putBoolean("isColClustered", model.aidFound());
 		modelNode.put("delimiter", dataLoadInfo.getDelimiter());
 		modelNode.putInt("rowCoord", dataLoadInfo.getDataStartRow());
 		modelNode.putInt("colCoord", dataLoadInfo.getDataStartCol());
@@ -316,6 +321,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		modelNode.put("colLabelTypes", dataLoadInfo.getColLabelTypesAsString());
 		
 		((TVModel) model).setDocumentConfig(modelNode);
+		
 	}
 
 	/** Parses the label types from the label data collected until
@@ -504,7 +510,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.hashGIDs();
 		targetModel.hashGTRs();
 		targetModel.gidFound(hasGID);
-		targetModel.setRowClustered(true);
 	}
 
 	//TODO replace with ModelTreeAdder to reduce code
@@ -548,7 +553,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.hashAIDs();
 		targetModel.hashATRs();
 		targetModel.aidFound(hasAID);
-		targetModel.setColClustered(true);
 	}
 
 	private static List<String[]> loadTreeSet(final String loadingSet) {

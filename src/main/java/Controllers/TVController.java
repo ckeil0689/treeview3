@@ -887,9 +887,8 @@ public class TVController implements Observer {
 			// Update Model node associated with the TVModel to permanent storage.
 			Preferences fileNode = getConfigNode().node("File");
 			boolean isFromCluster = model.isRowClustered() || model.isColClustered();
-			// TODO updated clustered data coords?
 			LogBuffer.println("Successful save, old root: " + oldFileSetName);
-			DataLoadInfo dataLoadInfo = getDataLoadInfo(model.getFileSet(), 
+			DataLoadInfo dataLoadInfo = getDataLoadInfo(model.getFileSet(),
 			                                            oldFileSetName, 
 			                                            isFromCluster, false);
 			ModelLoader.storeDataLoadInfo(fileNode, model, dataLoadInfo);
