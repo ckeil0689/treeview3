@@ -131,7 +131,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		setChanged();
 
 		final long subNodeIndex = System.currentTimeMillis();
-		LogBuffer.println("Creating subNode File" + subNodeIndex);
+		LogBuffer.println("Creating FileMRU subNode File" + subNodeIndex);
 		Preferences node = configNode.node("File" + subNodeIndex);
 		fileNodes.push(node);
 		return node;

@@ -45,6 +45,17 @@ public class FileSet {
 	public static final int KMEANS_STYLE = 2;
 	public static final int LINKED_STYLE = 3;
 	public static final String TRV = ".trv";
+	
+	// Sensible defaults for FileSet properties
+	public static final String DEFAULT_ROOT = "generic-tv-file";
+	public static final String DEFAULT_EXT = ".txt";
+	public static final String DEFAULT_DIR = System.getProperty("user.home");
+	public static final String DEFAULT_JTV = ".jtv";
+	public static final String DEFAULT_ATR = ".atr";
+	public static final String DEFAULT_GTR = ".gtr";
+	public static final String DEFAULT_KGG = ".kgg";
+	public static final String DEFAULT_KAG = ".kag";
+	
 	private static final String validStyles = "auto|classic|kmeans|linked";
 	private static final String[] validStylesArray = { "Auto", "Classic",
 			"Kmeans", "Linked" };
@@ -69,8 +80,8 @@ public class FileSet {
 		try {
 			final File f = new File(getCdt());
 			return !(f.exists());
-
-		} catch (final Exception e) {
+		} 
+		catch (final Exception e) {
 			LogBuffer.println("Exception occurred when checking "
 					+ "whether a FileSet has moved: " + e.getMessage());
 		}
@@ -102,11 +113,11 @@ public class FileSet {
 	}
 
 	/**
-	 * Make fileset based upon unrooted DummyConfigNode with the specified
+	 * Make FileSet based upon unrooted DummyConfigNode with the specified
 	 * values
 	 *
 	 * @param fullFileName
-	 *            name of file which this fileset is based on, including extension.
+	 *            name of file which this FileSet is based on, including extension.
 	 *            For example "myfile.txt"
 	 * @param dir
 	 *            directory where file is located.
@@ -147,7 +158,6 @@ public class FileSet {
 		setRoot(fileSet.getRoot());
 		setDir(fileSet.getDir());
 		setExt(fileSet.getExt());
-		setName(fileSet.getName());
 		setStyle(fileSet.getStyle());
 	}
 
@@ -177,7 +187,7 @@ public class FileSet {
 	 */
 	public String getAtr() {
 
-		return getDir() + getRoot() + node.get("atr", ".atr");
+		return getDir() + getRoot() + node.get("atr", DEFAULT_ATR);
 	}
 
 	/**
@@ -193,7 +203,7 @@ public class FileSet {
 	 */
 	public String getDir() {
 
-		return node.get("dir", "");
+		return node.get("dir", DEFAULT_DIR);
 	}
 
 	/**
@@ -201,7 +211,7 @@ public class FileSet {
 	 */
 	public String getGtr() {
 
-		return getDir() + getRoot() + node.get("gtr", ".gtr");
+		return getDir() + getRoot() + node.get("gtr", DEFAULT_GTR);
 	}
 
 	/**
@@ -209,7 +219,7 @@ public class FileSet {
 	 */
 	public String getJtv() {
 
-		return getDir() + getRoot() + node.get("jtv", ".jtv");
+		return getDir() + getRoot() + node.get("jtv", DEFAULT_JTV);
 	}
 
 	/**
@@ -218,7 +228,7 @@ public class FileSet {
 	 */
 	public String getRoot() {
 
-		return node.get("root", "generic-tv-file");
+		return node.get("root", DEFAULT_ROOT);
 	}
 
 	/**
@@ -227,13 +237,13 @@ public class FileSet {
 	 */
 	public String getExt() {
 		
-		String storedExt = node.get("cdt", ".cdt");
+		String storedExt = node.get("ext", DEFAULT_EXT);
 		String finalExt;
 		
-		/* FileUtils removed dot from file extension - ensure it is present */
+		// FileUtils removed dot from file extension - ensure it is present!
 		if(!storedExt.substring(0, 1).equals(".")) {
 			finalExt = "." + storedExt;
-			node.put("cdt", finalExt);
+			setExt(finalExt);
 		} else {
 			finalExt = storedExt;
 		}
@@ -246,7 +256,7 @@ public class FileSet {
 	 */
 	public String getName() {
 
-		return node.get("name", "No name");
+		return getRoot() + getExt();
 	}
 
 	/**
@@ -268,12 +278,14 @@ public class FileSet {
 	 * Sets the root of the FileSet object. i.e. the filename without
 	 * extension.
 	 *
-	 * @param string
+	 * @param newRoot
 	 *            The new root value
 	 */
-	public void setRoot(final String string) {
+	public void setRoot(final String newRoot) {
 
-		node.put("root", string);
+		LogBuffer.println("Setting root " + newRoot + " on FileSet " 
+		+ this.toString());
+		node.put("root", newRoot);
 	}
 
 	/**
@@ -282,9 +294,9 @@ public class FileSet {
 	 * @param string
 	 *            The new dir value
 	 */
-	public void setDir(final String string) {
+	public void setDir(final String newDir) {
 
-		node.put("dir", string);
+		node.put("dir", newDir);
 	}
 
 	/**
@@ -294,15 +306,7 @@ public class FileSet {
 	 */
 	public void setExt(final String ext) {
 		
-		node.put("cdt", ext);
-	}
-
-	/**
-	 * @return The logical name of the fileset
-	 */
-	public void setName(final String name) {
-
-		node.put("name", name);
+		node.put("ext", ext);
 	}
 
 	/**
@@ -321,7 +325,7 @@ public class FileSet {
 			filename = filename.substring(0, arrayid);
 		}
 
-		return getDir() + filename + node.get("kgg", ".kgg");
+		return getDir() + filename + node.get("kgg", DEFAULT_KGG);
 	}
 
 	/**
@@ -341,7 +345,7 @@ public class FileSet {
 					+ filename.substring(arrayid);
 		}
 
-		return getDir() + filename + node.get("kag", ".kag");
+		return getDir() + filename + node.get("kag", DEFAULT_KAG);
 	}
 
 	/**

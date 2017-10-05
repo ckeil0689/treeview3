@@ -17,14 +17,14 @@ import edu.stanford.genetics.treeview.model.PreviewLoader;
 
 public class DataImportController {
 
-	private final static String TAB_DELIM = "\\t";
-	private final static String COMMA_DELIM = ",";
-	private final static String SEMICOLON_DELIM = ";";
-	private final static String SPACE_DELIM = "\\s";
+	public final static String TAB_DELIM = "\\t";
+	public final static String COMMA_DELIM = ",";
+	public final static String SEMICOLON_DELIM = ";";
+	public final static String SPACE_DELIM = "\\s";
 
 	private final DataImportDialog previewDialog;
 	private FileSet fileSet;
-	private String selectedDelimiter;
+	private String selectedDelimiter = TAB_DELIM;
 
 	public DataImportController(final String selectedDelimiter) {
 
@@ -89,12 +89,12 @@ public class DataImportController {
 		List<JCheckBox> delimiters = previewDialog.getDelimiterList();
 
 		for (JCheckBox cb : delimiters) {
-
 			if (cb.isSelected()) {
 				final int idx = delimiters.indexOf(cb);
 				if (addCount++ > 0) {
 					selectedDelimiter += "|" + getDelimiter(idx);
-				} else {
+				} 
+				else {
 					selectedDelimiter += getDelimiter(idx);
 				}
 			}

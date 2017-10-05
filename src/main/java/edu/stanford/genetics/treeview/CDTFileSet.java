@@ -88,7 +88,6 @@ public class CDTFileSet extends FileSet {
 		setRoot(fileSet.getRoot());
 		setDir(fileSet.getDir());
 		setExt(fileSet.getExt());
-		setName(fileSet.getName());
 		setStyle(fileSet.getStyle());
 	}
 

@@ -415,26 +415,22 @@ public class TVController implements Observer {
 	/** Checks if the root File node is parent to a node with the supplied
 	 * srcName and srcExtension stored as name values.
 	 * 
-	 * @param srcName
-	 * @param srcExtension
+	 * @param srcFileSetName
 	 * @return The target Preferences node, if it exists. Otherwise null. */
-	private Preferences getOldPreferences(final String srcName,
-																				final String srcExtension) {
+	private Preferences getModelNodeFromFileSet(final String srcFileSetName) {
 
 		try {
 			/* First, get the relevant old node... */
-			Preferences root;
+			Preferences fileNode;
 			if(getConfigNode().nodeExists("File")) {
-				root = getConfigNode().node("File");
-
+				fileNode = getConfigNode().node("File");
 			}
 			else {
 				LogBuffer.println("File node not found. Could not copy data.");
 				return null;
 			}
 
-			return getTargetNode(root, srcName, srcExtension);
-
+			return getTargetModelNode(fileNode, srcFileSetName);
 		}
 		catch(BackingStoreException e) {
 			LogBuffer.logException(e);
@@ -468,30 +464,24 @@ public class TVController implements Observer {
 	/** Finds a specific sub-node in a root node by looking for keys with the
 	 * srcName and srcExtension.
 	 * 
-	 * @param root
-	 * @param srcName
-	 * @param srcExtension
+	 * @param fileNode - The File node under which all Model nodes are stored.
+	 * @param srcFileSetName
 	 * @return The target Preferences node.
 	 * @throws BackingStoreException */
-	private static Preferences getTargetNode(	final Preferences root,
-																						final String srcName,
-																						final String srcExtension) 
+	private static Preferences getTargetModelNode(	final Preferences fileNode,
+																						final String srcFileSetName) 
 																							throws BackingStoreException {
 
-		LogBuffer.println("Looking for target node (" + srcName + ", " 
-		+ srcExtension + ")");
+		LogBuffer.println("Looking for target node (" + srcFileSetName + ")");
 		
-		String[] fileNodes = root.childrenNames();
+		String[] fileNodes = fileNode.childrenNames();
 		Preferences targetNode = null;
 		for(String nodeName : fileNodes) {
-			Preferences node = root.node(nodeName);
-			String name = node.get("name", "none");
-			String extension = node.get("extension", ".txt");
+			Preferences node = fileNode.node(nodeName);
+			String connectedFS = node.get("connectedFileSet", "generic-tv-file");
 			
-			LogBuffer.println("Checking node (" + name + ", " + extension + ")");
-
-			if(name.equalsIgnoreCase(srcName) && extension
-																										.equalsIgnoreCase(srcExtension)) {
+			LogBuffer.println("Checking node (" + connectedFS + ")");
+			if(connectedFS.equalsIgnoreCase(srcFileSetName)) {
 				LogBuffer.println("Success. Target node found.");
 				targetNode = node;
 				break;
@@ -538,7 +528,7 @@ public class TVController implements Observer {
 				loadFileSet = ViewFrame.getFileSet(file);
 			}
 
-			DataLoadInfo dataInfo = getDataLoadInfo(loadFileSet, null, null, 
+			DataLoadInfo dataInfo = getDataLoadInfo(loadFileSet, null, 
 			                                        false, shouldUseImport);
 			loadData(loadFileSet, dataInfo);
 			//updateModelFileMRU();
@@ -559,10 +549,9 @@ public class TVController implements Observer {
 	public void loadClusteredModel(final TVModel newModel) {
 		
 		FileSet oldFileSet = model.getFileSet();
-		String oldRoot = oldFileSet.getRoot();
-		String oldExt = oldFileSet.getExt();
-		Preferences oldNode = getOldPreferences(oldRoot, oldExt);
-		DataLoadInfo dataLoadInfo = getStoredDataLoadInfo(oldFileSet, oldNode);
+		String oldFileSetName = oldFileSet.getName();
+		Preferences oldModelNode = getModelNodeFromFileSet(oldFileSetName);
+		DataLoadInfo dataLoadInfo = getStoredDataLoadInfo(oldFileSet, oldModelNode);
 		
 		if(dataLoadInfo == null) {
 			String message = "Updating data after clustering was interrupted.";
@@ -585,7 +574,7 @@ public class TVController implements Observer {
 	 * their old data.
 	 * 
 	 * @param newFileSet File name + directory information object.
-	 * @param oldRoot The root name of the old FileSet (FileSet.getRoot())
+	 * @param oldFileSetName The root name of the old FileSet (FileSet.getRoot())
 	 * @param oldExt The extension of the old FileSet (FileSet.getExt())
 	 * @param isFromCluster Whether the loading happens as a result of
 	 *          clustering. 
@@ -593,21 +582,20 @@ public class TVController implements Observer {
 	 * for loading a data set.
 	 */
 	private DataLoadInfo getDataLoadInfo(final FileSet newFileSet, 
-	                                     final String oldRoot,
-	                                     final String oldExt, 
+	                                     final String oldFileSetName,
 	                                     boolean isFromCluster,
 	                                     boolean shouldUseImport) {
 		LogBuffer.println("GET DATA LOAD INFO");
-		LogBuffer.println("Old Root: " + oldRoot);
-		Preferences oldNode;
+		LogBuffer.println("Old Root: " + oldFileSetName);
+		Preferences oldModelNode;
 		// Step 1) Retrieve possible old data load information
 		// Transfer settings to clustered file
 		// Case 1) Coming from clustering. Solution: transfer existing node info
 		// to new node.
 		//if(isFromCluster && oldRoot != null && oldExt != null) {
-		if(oldRoot != null && oldExt != null) {
+		if(oldFileSetName != null) {
 			LogBuffer.println("Getting preferences for transfer to clustered file.");
-			oldNode = getOldPreferences(oldRoot, oldExt);
+			oldModelNode = getModelNodeFromFileSet(oldFileSetName);
 		}
 		// Case 2) Not from cluster, but the same file might have been loaded 
 		// before such that a Preferences node already exists. Solution: use the
@@ -616,7 +604,7 @@ public class TVController implements Observer {
 			LogBuffer.println("Checking if preferences exist for new file.");
 			// TODO naming here is confusing: this looks for potentially existing 
 			// nodes of the new FileSet
-			oldNode = getOldPreferences(newFileSet.getRoot(), newFileSet.getExt());
+			oldModelNode = getModelNodeFromFileSet(newFileSet.getName());
 		}
 		
 		// Case 3) A new file is created (saved) from the currently open file.
@@ -626,25 +614,25 @@ public class TVController implements Observer {
 		// new information
 		
 		// Case 1) No node was found, or import dialog should explicitly be used
-		DataLoadInfo dataInfo;
-		if(oldNode == null || shouldUseImport) {
+		DataLoadInfo dataLoadInfo;
+		if(oldModelNode == null || shouldUseImport) {
 			LogBuffer.println("Using import dialog.");
-			dataInfo = useImportDialog(newFileSet);
+			dataLoadInfo = useImportDialog(newFileSet);
 		}
 		else {
 			LogBuffer.println("Loading with info from existing node.");
-			dataInfo = getStoredDataLoadInfo(newFileSet, oldNode);
+			dataLoadInfo = getStoredDataLoadInfo(newFileSet, oldModelNode);
 		}
 
 		// If we don't have valid information here, something was messed up
-		if(dataInfo == null) {
+		if(dataLoadInfo == null) {
 			String message = "Data loading was interrupted.";
 			LogBuffer.println(message);
-			return new DataLoadInfo(oldNode);
+			return new DataLoadInfo(oldModelNode);
 		}
 
-		dataInfo.setIsClusteredFile(isFromCluster);
-		return dataInfo;
+		dataLoadInfo.setIsClusteredFile(isFromCluster);
+		return dataLoadInfo;
 	}
 
 	/** Show a dialog for the user to specify how his data should be loaded.
@@ -654,8 +642,7 @@ public class TVController implements Observer {
 	 * @return Options/ parameters for data loading. */
 	private static DataLoadInfo useImportDialog(final FileSet fileSet) {
 
-		DataImportDialog loadPreview = new DataImportDialog(fileSet.getRoot() +
-																												fileSet.getExt());
+		DataImportDialog loadPreview = new DataImportDialog(fileSet.getName());
 
 		DataImportController importController = new DataImportController(
 																																			loadPreview);
@@ -901,11 +888,10 @@ public class TVController implements Observer {
 			Preferences fileNode = getConfigNode().node("File");
 			boolean isFromCluster = model.isRowClustered() || model.isColClustered();
 			// TODO updated clustered data coords?
-			final String oldRoot = oldFileSet.getRoot();
-			final String oldExt = oldFileSet.getExt();
-			LogBuffer.println("Successful save, old root: " + oldRoot);
+			final String oldFileSetName = oldFileSet.getName();
+			LogBuffer.println("Successful save, old root: " + oldFileSetName);
 			DataLoadInfo dataLoadInfo = getDataLoadInfo(model.getFileSet(), 
-			                                            oldRoot, oldExt, 
+			                                            oldFileSetName, 
 			                                            isFromCluster, false);
 			ModelLoader.storeDataLoadInfo(fileNode, model, dataLoadInfo);
 			updateFileMRU();

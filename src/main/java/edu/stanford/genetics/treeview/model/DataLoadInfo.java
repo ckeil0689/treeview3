@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.prefs.Preferences;
 
 import Utilities.Helper;
+import Views.DataImportController;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class DataLoadInfo {
 
-	public final static String DEFAULT_DELIM = "\\t";
 	public final static String[] DEFAULT_LABEL_TYPES = {""};
 
 	private Preferences oldNode;
@@ -184,7 +184,7 @@ public class DataLoadInfo {
 
 		setOldNode(node);
 
-		this.delimiter = node.get("delimiter", DataLoadInfo.DEFAULT_DELIM);
+		this.delimiter = node.get("delimiter", DataImportController.TAB_DELIM);
 
 		this.dataCoords[0] = node.getInt("rowCoord", 0);
 		this.dataCoords[1] = node.getInt("colCoord", 0);

@@ -179,12 +179,15 @@ public class ModelSaver {
 		@Override
 		protected void done() {
 
-			FileSet oldFS = model.getFileSet();
+			// actual copy needed, otherwise the reference causes a race condition
+			FileSet oldFS = new FileSet(model.getFileSet()); 
 			LogBuffer.println("Old FileSet in ModelSaver.done(): " + oldFS);
 			if (!isCancelled() && !hadProblem) {// && hasEnsuredTreeFilePresence()) {
 				String filename = filePath.getFileName().toString();
 				String dir = filePath.getParent().toString() + File.separator;
 				
+				LogBuffer.println("Creating new FileSet from saved file.");
+				// TODO issue is in next statement - changes the main FileSet node
 				FileSet newFS = new FileSet(filename, dir);
 				LogBuffer.println("New FileSet created when saving: " + newFS);
 				((TVModel) model).setSource(newFS);

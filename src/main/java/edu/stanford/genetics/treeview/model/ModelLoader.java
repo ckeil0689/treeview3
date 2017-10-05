@@ -257,25 +257,19 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		LogBuffer.println("Loading Model entry from File node.");
 
 		try {
-			final String fileName = model.getFileSet().getRoot();
-			final String fileExt = model.getFileSet().getExt();
+			final String fileSetName = model.getFileSet().getName();
 
 			Preferences documentConfig = null;
 			final String[] childrenNodes = fileNode.childrenNames();
-
-			final String default_name = "No file.";
-			final String default_ext = "nan";
 
 			// Look if there's already a node for the file
 			boolean fileFound = false;
 			if(childrenNodes.length > 0) {
 				for(final String entry : childrenNodes) {
 					Preferences childNode = fileNode.node(entry);
-					final String childName = childNode.get("name", default_name);
-					final String childExt = childNode.get("extension", default_ext);
+					final String connectedFS = childNode.get("connectedFileSet", "none");
 
-					if(childName.equalsIgnoreCase(fileName) && childExt
-																															.equalsIgnoreCase(fileExt)) {
+					if(connectedFS.equalsIgnoreCase(fileSetName)) {
 						documentConfig = childNode;
 						fileFound = true;
 						break;
@@ -285,9 +279,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			// If no node for the file has been found, add one.
 			if(!fileFound) {
-				documentConfig = fileNode.node("Model" + (childrenNodes.length + 1));
-				documentConfig.put("name", fileName);
-				documentConfig.put("extension", fileExt);
+				documentConfig = fileNode.node("Model-" + (childrenNodes.length + 1));
+				documentConfig.put("connectedFileSet", fileSetName);
 			}
 			
 			LogBuffer.println("Found Model entry: " + documentConfig);
