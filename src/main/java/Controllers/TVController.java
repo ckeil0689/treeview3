@@ -876,19 +876,18 @@ public class TVController implements Observer {
 	/**
 	 * When the worker thread in ModelSaver is done, it  
 	 * @param wasSuccessful
-	 * @param oldFileSet - The FileSet attached to the Model before the new 
-	 * one was added during the saving process. It is needed to transfer 
-	 * Preferences information.
+	 * @param oldFileSetName - The name of the FileSet attached to the Model 
+	 * before the new one was added during the saving process. It is needed to 
+	 * transfer Preferences information.
 	 */
 	public void finishModelSave(final boolean wasSuccessful, 
-	                            final FileSet oldFileSet) {
+	                            final String oldFileSetName) {
 		
 		if(wasSuccessful) {
 			// Update Model node associated with the TVModel to permanent storage.
 			Preferences fileNode = getConfigNode().node("File");
 			boolean isFromCluster = model.isRowClustered() || model.isColClustered();
 			// TODO updated clustered data coords?
-			final String oldFileSetName = oldFileSet.getName();
 			LogBuffer.println("Successful save, old root: " + oldFileSetName);
 			DataLoadInfo dataLoadInfo = getDataLoadInfo(model.getFileSet(), 
 			                                            oldFileSetName, 

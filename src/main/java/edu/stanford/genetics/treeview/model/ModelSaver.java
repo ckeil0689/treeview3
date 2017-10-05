@@ -180,8 +180,8 @@ public class ModelSaver {
 		protected void done() {
 
 			// actual copy needed, otherwise the reference causes a race condition
-			FileSet oldFS = new FileSet(model.getFileSet()); 
-			LogBuffer.println("Old FileSet in ModelSaver.done(): " + oldFS);
+			String oldFSName = model.getFileSet().getName(); 
+			LogBuffer.println("Old FileSetName in ModelSaver.done(): " + oldFSName);
 			if (!isCancelled() && !hadProblem) {// && hasEnsuredTreeFilePresence()) {
 				String filename = filePath.getFileName().toString();
 				String dir = filePath.getParent().toString() + File.separator;
@@ -194,11 +194,11 @@ public class ModelSaver {
 				((TVModel) model).setLoaded(true);
 
 				LogBuffer.println("Success. Saved file " + model.getFileName());
-				tvController.finishModelSave(true, oldFS);
+				tvController.finishModelSave(true, oldFSName);
 			} 
 			else {
 				deleteAllFiles();
-				tvController.finishModelSave(false, oldFS);
+				tvController.finishModelSave(false, oldFSName);
 			}
 		}
 		
