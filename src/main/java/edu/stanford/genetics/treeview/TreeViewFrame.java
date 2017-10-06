@@ -32,7 +32,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import Utilities.GUIFactory;
@@ -42,7 +41,6 @@ import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;
 import edu.stanford.genetics.treeview.core.LogSettingsPanel;
-//import edu.stanford.genetics.treeview.core.MenuHelpPluginsFrame;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
@@ -66,12 +64,12 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private final WelcomeView welcomeView;
 	private final DendroView dendroView;
 
-	private FileSet fileMenuSet;
+	private FileSet mruFileSet;
 
 	// Menu Items to be added to menu bar
 	private List<JMenuItem> stackMenuList;
-	private List<JMenuItem> fileMenuList;
-	private List<FileSet> fileSetList;
+	private List<JMenuItem> mruFilesMenuList;
+	private List<FileSet> mruFileSetList;
 
 	private JMenuBar menuBar;
 
@@ -174,14 +172,17 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		case WELCOME_VIEW:
 			FileSet mruLast = getFileMRU().getLast();
 			view = welcomeView.makeWelcome(mruLast);
+			LogBuffer.println("SHOWING WELCOME VIEW --------");
 			break;
 
 		case PROGRESS_VIEW:
 			view = welcomeView.makeLoading();
+			LogBuffer.println("SHOWING PROGRESS VIEW -------");
 			break;
 
 		case DENDRO_VIEW:
 			view = dendroView.makeDendro();
+			LogBuffer.println("SHOWING DENDRO VIEW ---------");
 			break;
 
 		default:
@@ -420,11 +421,11 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 				generateView(ViewType.WELCOME_VIEW);
 				// JOptionPane.showMessageDialog(applicationFrame,
 				// "TreeViewFrame 253: No plugins to display");
-			} else {
+			} 
+			else {
 				setLoadedTitle();
 				generateView(ViewType.DENDRO_VIEW);
 			}
-
 		} else {
 			appFrame.setTitle(StringRes.appName);
 			setTitleString(appFrame.getName());
@@ -440,7 +441,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	private void buildMenuBar() {
 
-		LogBuffer.println("Building MenuBar.");
+		LogBuffer.println("Building new MenuBar.");
 		
 		menuBar = new JMenuBar();
 		appFrame.setJMenuBar(menuBar);
@@ -452,10 +453,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		constructFileMenu(isMac);
 		constructHelpMenu(isMac);
+		
+		// This will cause TVController to attach appropriate listeners 
+		// to JMenuItems.
+		setChanged();
+		notifyObservers();
 	}
 
 	/**
-	 * @param isMac - (TODO unused but may change) indicates whether the program runs on macOS or not.  
+	 * @param isMac - (TODO unused but may change) indicates whether the program 
+	 * runs on macOS or not.  
 	 */
 	private void constructFileMenu(final boolean isMac) {
 
@@ -490,22 +497,23 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		// menubar.setMnemonic(KeyEvent.VK_U);
 
 		// -------
-		fileMenuList = new ArrayList<JMenuItem>();
-		fileSetList = new ArrayList<FileSet>();
+		// Most recently used (mru) files (Open Recent)
+		mruFilesMenuList = new ArrayList<JMenuItem>();
+		mruFileSetList = new ArrayList<FileSet>();
 
 		final JMenu recentSubMenu = new JMenu(StringRes.menu_OpenRecent);
 
-		final Preferences[] aconfigNode = fileMru.getConfigs();
-		final String astring[] = fileMru.getFileNames();
+		final Preferences[] mruFileNodes = fileMru.getConfigs();
+		final String mruFileNames[] = fileMru.getFileNames();
 
-		for (int j = aconfigNode.length; j > 0; j--) {
+		for (int j = mruFileNodes.length; j > 0; j--) {
 
-			fileMenuSet = new FileSet(aconfigNode[j - 1]);
-			fileSetList.add(fileMenuSet);
+			mruFileSet = new FileSet(mruFileNodes[j - 1]);
+			mruFileSetList.add(mruFileSet);
 
-			final JMenuItem fileSetMenuItem = new JMenuItem(astring[j - 1]);
+			final JMenuItem fileSetMenuItem = new JMenuItem(mruFileNames[j - 1]);
 			recentSubMenu.add(fileSetMenuItem);
-			fileMenuList.add(fileSetMenuItem);
+			mruFilesMenuList.add(fileSetMenuItem);
 		}
 
 		fileMenu.add(recentSubMenu);
@@ -902,23 +910,23 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public FileSet findFileSet(final JMenuItem menuItem) {
 
-		if (fileSetList.size() != fileMenuList.size()) {
+		if (mruFileSetList.size() != mruFilesMenuList.size()) {
 			LogBuffer.println("Sizes of FileSetList and FileMenuList in "
 					+ "TVFrame don't match.");
 			return null;
 		}
 
 		int index = -1;
-		for (int i = 0; i < fileMenuList.size(); i++) {
+		for (int i = 0; i < mruFilesMenuList.size(); i++) {
 
-			if (fileMenuList.get(i).getText()
+			if (mruFilesMenuList.get(i).getText()
 					.equalsIgnoreCase(menuItem.getText())) {
 				index = i;
 				break;
 			}
 		}
 
-		return fileSetList.get(index);
+		return mruFileSetList.get(index);
 	}
 
 	/* Adding MenuActionListeners */
@@ -949,7 +957,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 */
 	public void addFileMenuListeners(final ActionListener listener) {
 
-		for (final JMenuItem item : fileMenuList) {
+		for (final JMenuItem item : mruFilesMenuList) {
 
 			if (item.getActionListeners().length == 0) {
 				item.addActionListener(listener);
@@ -959,7 +967,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 	public FileSet getFileMenuSet() {
 
-		return fileMenuSet;
+		return mruFileSet;
 	}
 
 	public List<JMenuItem> getStackMenus() {

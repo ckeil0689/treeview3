@@ -71,7 +71,8 @@ public class TVController implements Observer {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
-		this.dendroController = new DendroController(tvFrame, this);
+		this.dendroController = new DendroController(tvFrame, TVController.this);
+		this.menuController = new MenubarController(tvFrame, TVController.this);
 
 		// Add the view as observer to the model
 		((TVModel) model).addObserver(tvFrame);
@@ -174,7 +175,7 @@ public class TVController implements Observer {
 	 * names in . */
 	private void addMenuListeners() {
 
-		menuController = new MenubarController(tvFrame, TVController.this);
+		LogBuffer.println("ADDING MENU LISTENERS -----");
 
 		tvFrame.addMenuActionListeners(new StackMenuListener());
 		tvFrame.addFileMenuListeners(new FileMenuListener());
@@ -320,21 +321,17 @@ public class TVController implements Observer {
 	 *          data. */
 	public void loadData(final FileSet fileSet, final DataLoadInfo dataInfo) {
 
-		// Setting loading screen
-		tvFrame.generateView(ViewType.PROGRESS_VIEW);
-
 		// Loading TVModel
 		final TVModel tvModel = (TVModel) model;
-
-//		setFileMenuSet(fileSet);
 
 		try {
 			// first, ensure reset of the model data
 			tvModel.resetState();
 			tvModel.setSource(fileSet);
 	    LogBuffer.println("Loading FileSet: " + fileSet);
-//			tvModel.setSource(fileMenuSet);
 
+	    tvFrame.generateView(ViewType.PROGRESS_VIEW);
+	    
 			final ModelLoader loader = new ModelLoader(tvModel, this, dataInfo);
 			loader.execute();
 		}
@@ -384,7 +381,6 @@ public class TVController implements Observer {
 				 * Implement a nicer solution one day...
 				 */
 				importOldPreferencesFrom(dataInfo.getOldNode());
-//				fileMenuSet = null;
 			}
 			else {
 				LogBuffer.println("FileSet is null. Could not load old preferences.");
@@ -1086,11 +1082,14 @@ public class TVController implements Observer {
 
 		/* when tvFrame rebuilds its menu */
 		if(o instanceof ViewFrame) {
+			LogBuffer.println("UPDATE FROM VIEWFRAME");
 			addMenuListeners();
-		} else if(o instanceof TVModel) {
+		} 
+		else if(o instanceof TVModel) {
 			if(model.getModified()) {
 				tvFrame.setTitleString(model.getFileName() + "-[modified]");
-			} else {
+			} 
+			else {
 				tvFrame.setTitleString(model.getFileName());
 			}
 		}
