@@ -47,9 +47,13 @@ public class DataImportController {
 		detectDataBoundaries(null);
 	}
 
+	/**
+	 * Adds all listeners to GUI components.
+	 */
 	private void addAllListeners() {
 
 		previewDialog.addProceedBtnListener(new ProceedListener());
+		previewDialog.addCancelBtnListener(new CancelListener());
 		previewDialog.addDelimCheckBoxesListener(new DelimiterListener());
 		previewDialog.addSpinnerListeners(new LabelIncludeListener());
 		previewDialog.addDataDetectListener(new DataDetectionListener());
@@ -126,7 +130,20 @@ public class DataImportController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			previewDialog.setResult(selectedDelimiter);
+			previewDialog.setDelimiterForResult(selectedDelimiter);
+			previewDialog.setVisible(false);
+			previewDialog.dispose();
+		}
+	}
+	
+	private class CancelListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			LogBuffer.println("User cancelled file import.");
+			
+			previewDialog.clearResult();
 			previewDialog.setVisible(false);
 			previewDialog.dispose();
 		}

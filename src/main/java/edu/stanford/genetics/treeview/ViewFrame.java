@@ -840,8 +840,8 @@ public abstract class ViewFrame extends Observable implements Observer,
 			fileDialog.addChoosableFileFilter(ff);
 			// will fail on pre-1.3 swings
 			fileDialog.setAcceptAllFileFilterUsed(true);
-
-		} catch (final Exception e) {
+		} 
+		catch (final Exception e) {
 			// hmm... I'll just assume that there's no accept all.
 			fileDialog.addChoosableFileFilter(
 					new javax.swing.filechooser.FileFilter() {
@@ -865,7 +865,6 @@ public abstract class ViewFrame extends Observable implements Observer,
 		final String string = fileMru.getMostRecentDir();
 
 		if (string != null) {
-
 			fileDialog.setCurrentDirectory(new File(string));
 		}
 	}

@@ -147,7 +147,7 @@ public class FileMruEditor {
 	 */
 	private void setupWidgets() {
 
-		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		fileSetDisplay = new FileSetDisplay();
 		buttonArrangement = new ButtonArrangement();
 		buttonArrangement.setThingsSelected(false);

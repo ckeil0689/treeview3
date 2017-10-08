@@ -496,16 +496,17 @@ public class TVController implements Observer {
 	/** This method opens a file dialog to open either the visualization view or
 	 * the cluster view depending on which file type is chosen.
 	 * 
-	 * @param fileSet - A FileSet object representing the files to be loaded.
+	 * @param newFileSet - A FileSet object representing the files to be loaded.
 	 * @param shouldUseImport - Explicitly tells the loader function called in
 	 *          this method to use the import dialog
 	 *          for opening a file. Only used through menubar's 'File > Open File
 	 *          With Import Dialog...' at the moment.
 	 * @throws LoadException */
-	public void openFile(FileSet fileSet, final boolean shouldUseImport) {
+	public void openFile(FileSet newFileSet, final boolean shouldUseImport) {
 
 		String message;
-		FileSet loadFileSet = fileSet;
+		FileSet loadFileSet = newFileSet;
+		DataLoadInfo dataLoadInfo;
 		
 		if(model.isLoaded() && model.getModified()) {
 			LogBuffer.println("Another Model is loaded and modified. " +
@@ -519,15 +520,26 @@ public class TVController implements Observer {
 				this.file = tvFrame.selectFile();
 
 				// Only run loader, if JFileChooser wasn't canceled.
-				if(file == null) { return; }
+				if(file == null) {
+					message = "File selection was cancelled.";
+					LogBuffer.println(message);
+					return; 
+				}
 
 				loadFileSet = ViewFrame.getFileSet(file);
 			}
 
-			DataLoadInfo dataInfo = getDataLoadInfo(loadFileSet, null, 
-			                                        false, shouldUseImport);
-			loadData(loadFileSet, dataInfo);
-			//updateModelFileMRU();
+			dataLoadInfo = getDataLoadInfo(loadFileSet, null, 
+			                               false, shouldUseImport);
+			
+			// Cannot load without this information.
+			if(dataLoadInfo == null) {
+				message = "Could not get DataLoadInfo for loading. Aborting.";
+				LogBuffer.println(message);
+				return;
+			}
+			
+			loadData(loadFileSet, dataLoadInfo);
 		}
 		catch(final LoadException e) {
 			message = "Loading the file was interrupted.";
@@ -620,11 +632,12 @@ public class TVController implements Observer {
 			dataLoadInfo = getStoredDataLoadInfo(newFileSet, oldModelNode);
 		}
 
-		// If we don't have valid information here, something was messed up
+		// If we don't have valid information here, something was 
+		// cancelled or messed up.
 		if(dataLoadInfo == null) {
-			String message = "Data loading was interrupted.";
+			String message = "DataLoadInfo could not be defined.";
 			LogBuffer.println(message);
-			return new DataLoadInfo(oldModelNode);
+			return null;
 		}
 
 		dataLoadInfo.setIsClusteredFile(isFromCluster);
@@ -639,9 +652,8 @@ public class TVController implements Observer {
 	private static DataLoadInfo useImportDialog(final FileSet fileSet) {
 
 		DataImportDialog loadPreview = new DataImportDialog(fileSet.getName());
-
-		DataImportController importController = new DataImportController(
-																																			loadPreview);
+		DataImportController importController = 
+			new DataImportController(loadPreview);
 
 		String[][] previewData;
 		importController.setFileSet(fileSet);
@@ -967,6 +979,7 @@ public class TVController implements Observer {
 	}
 
 	/** This class is an ActionListener which overrides the run() function. */
+	
 	private class FileMenuListener implements ActionListener {
 
 		@Override
@@ -977,12 +990,10 @@ public class TVController implements Observer {
 			tvFrame.getFileMRU().notifyObservers();
 
 			FileSet newFS = tvFrame.findFileSet((JMenuItem) actionEvent.getSource());
-//			fileMenuSet = tvFrame.findFileSet((JMenuItem) actionEvent.getSource());
-      LogBuffer.println("Attempting to open file " + newFS);
 			openFile(newFS, false);
-//			openFile(fileMenuSet, false);
 		}
 	}
+	
 
 	/** Opens the preferences menu and sets the displayed menu to the specified
 	 * option using a string as identification.

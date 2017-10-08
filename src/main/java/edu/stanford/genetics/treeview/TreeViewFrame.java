@@ -388,16 +388,16 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void update(final Observable o, final Object obj) {
 
 		if (o instanceof FileMru) {
-			//buildMenuBar();
+			buildMenuBar();
 			setChanged();
 			notifyObservers();
-
-		} else if (o instanceof TVModel) {
+		} 
+		else if (o instanceof TVModel) {
 			// TVModel passes a boolean object to notify if it was loaded.
 			setRunning(((Boolean) obj).booleanValue());
 			setLoaded(((Boolean) obj).booleanValue());
-
-		} else {
+		} 
+		else {
 			LogBuffer.println("Observable is: " + o.getClass());
 			LogBuffer.println("Got weird update");
 		}
@@ -718,6 +718,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 *
 	 * @param incremental
 	 * @return
+	 * @deprecated
 	 */
 	public void openSaveDialog(final boolean writerEmpty, final String msg) {
 
@@ -918,7 +919,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		int index = -1;
 		for (int i = 0; i < mruFilesMenuList.size(); i++) {
-
 			if (mruFilesMenuList.get(i).getText()
 					.equalsIgnoreCase(menuItem.getText())) {
 				index = i;
@@ -933,7 +933,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public void addMenuActionListeners(final ActionListener l) {
 
 		for (final JMenuItem item : stackMenuList) {
-
 			if (item.getActionListeners().length == 0) {
 				item.addActionListener(l);
 			}

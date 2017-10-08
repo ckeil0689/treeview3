@@ -358,7 +358,6 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		}
 
 		return childrenNodes;
-
 	}
 	
 	/*

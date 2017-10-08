@@ -309,6 +309,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			return;
 		}
 		
+		if(dataLoadInfo == null) {
+			LogBuffer.println("Cannot store any data load information. " +
+				"The DataLoadInfo object is not defined.");
+			return;
+		}
+		
 		Preferences modelNode = getConfigData(model, fileNode);
 		
 		modelNode.putBoolean("firstLoad", false);

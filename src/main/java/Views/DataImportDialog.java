@@ -219,6 +219,15 @@ public class DataImportDialog extends CustomDialog {
 
 		proceedBtn.addActionListener(l);
 	}
+	
+	/**
+	 * Adds an action to the Cancel (or Close) button. 
+	 * @param l The ActionListener to be added.
+	 */
+	public void addCancelBtnListener(ActionListener l) {
+
+		closeBtn.addActionListener(l);
+	}
 
 	public void addSpinnerListeners(ChangeListener l) {
 
@@ -256,7 +265,7 @@ public class DataImportDialog extends CustomDialog {
 		columnDataStart.setValue(Integer.valueOf(columnCount) + 1);
 	}
 
-	public void setResult(final String delimiter) {
+	public void setDelimiterForResult(final String delimiter) {
 
 		int rowNum = getRowSpinnerDataIndex();
 		int colNum = getColSpinnerDataIndex();
@@ -264,6 +273,14 @@ public class DataImportDialog extends CustomDialog {
 		this.result = new DataLoadInfo(new int[] {rowNum, colNum}, delimiter);
 	}
 
+	/** Sets the result object to null. This is useful for returning 
+	 * a null object in case the user cancelled the import dialog.
+	 */
+	public void clearResult() {
+		
+		this.result = null;
+	}
+	
 	/** Calculates and returns the data index of the first row containing data
 	 * 
 	 * @return int */
