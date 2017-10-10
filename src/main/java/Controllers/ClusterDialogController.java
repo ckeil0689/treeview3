@@ -253,7 +253,6 @@ public class ClusterDialogController {
 				return;
 			}
 			
-			LogBuffer.println("Transforming TVModel.");
 			ClusterModelTransformator cmt = 
 				new ClusterModelTransformator(rowCAD, colCAD, (TVModel) tvModel);
 			TVModel clusteredModel = cmt.applyClusterChanges(isHierarchical());
@@ -280,13 +279,15 @@ public class ClusterDialogController {
 			
 			if(shouldClusterAxis[ROW_IDX] || tvModel.gidFound()) {
 				rowsValid = (numReorderedRowIDs == numRowLabels); 
-			} else {
+			} 
+			else {
 				rowsValid = (numReorderedRowIDs == 0);
 			}
 			
 			if(shouldClusterAxis[COL_IDX] || tvModel.aidFound()) {
 				colsValid = (numReorderedColIDs == numColLabels); 
-			} else {
+			} 
+			else {
 				colsValid = (numReorderedColIDs == 0);
 			}
 			
@@ -305,32 +306,32 @@ public class ClusterDialogController {
 			Pattern p;
 			int pos = 0;
 			
-            if(axisID == ROW_IDX) {
-            	labelArray = tvModel.getRowLabelInfo().getLabelArray();
-            	
-            	if(!tvModel.gidFound()) {
-            		return new String[]{};
-            	}
-            	/* Find ID index */
-            	p = Pattern.compile("ROW\\d+X");
-            	
-            } else {
-            	labelArray = tvModel.getColLabelInfo().getLabelArray();
-            	
-            	if(!tvModel.aidFound()) {
-            		return new String[]{};
-            	}
-            	p = Pattern.compile("COL\\d+X");
-            }
-			
-            /* Find ID index */
-        	for(int i = 0; i < labelArray[0].length; i++) {
-        		Matcher m = p.matcher(labelArray[0][i]);
-        		if(m.find()) {
-        			pos = i;
-        			break;
-        		}
-        	}
+      if(axisID == ROW_IDX) {
+      	labelArray = tvModel.getRowLabelInfo().getLabelArray();
+      	
+      	if(!tvModel.gidFound()) {
+      		return new String[]{};
+      	}
+      	/* Find ID index */
+      	p = Pattern.compile("ROW\\d+X");
+      } 
+      else {
+      	labelArray = tvModel.getColLabelInfo().getLabelArray();
+      	
+      	if(!tvModel.aidFound()) {
+      		return new String[]{};
+      	}
+      	p = Pattern.compile("COL\\d+X");
+      }
+
+      /* Find ID index */
+  	  for(int i = 0; i < labelArray[0].length; i++) {
+  		  Matcher m = p.matcher(labelArray[0][i]);
+  		  if(m.find()) {
+  			  pos = i;
+  			  break;
+  		  }
+  	  }
         	
 			oldIDs = new String[labelArray.length];
 			

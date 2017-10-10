@@ -647,7 +647,7 @@ public class TVController implements Observer {
 	/** Show a dialog for the user to specify how his data should be loaded.
 	 * Retrieves the user chosen options and returns them in a DataInfo object.
 	 * 
-	 * @param filename
+	 * @param fileSet The FileSet for which to set import options.
 	 * @return Options/ parameters for data loading. */
 	private static DataLoadInfo useImportDialog(final FileSet fileSet) {
 

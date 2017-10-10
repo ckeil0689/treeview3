@@ -50,10 +50,6 @@ public class HierCluster {
 	 * reordered axis that was selected to be clustered.
 	 */
 	private String[] reorderedRowIDs;
-
-	/**
-	 * TEST
-	 */
 	private List<Node> nodeList;
 	private List<String[]> treeNodeData;
 
@@ -65,8 +61,6 @@ public class HierCluster {
 	 */
 	private List<List<Integer>> currentClusters;
 	private int[][] rowIndexTable;
-
-//	private TreeFileWriter treeWriter;
 
 	private String[] links; // needed for connectNodes??? better way?
 
@@ -101,11 +95,6 @@ public class HierCluster {
 
 		prepareCluster();
 	}
-	
-//	public TreeFileWriter getTreeFileWriter() {
-//		
-//		return this.treeWriter;
-//	}
 
 	/**
 	 * Goes through a bunch of steps to prepare the object and data for
@@ -192,9 +181,6 @@ public class HierCluster {
 		String[] nodeData = getNodeData(link, iterNum, min);
 		links[iterNum] = nodeData[0];
 		treeNodeData.add(nodeData);
-
-		/* Record new node with its data, so it can be sorted later. */
-		// addNodeToList(link);
 
 		/* STEP 4: Update the lists that keep track of clusters. */
 
@@ -379,7 +365,6 @@ public class HierCluster {
 		 */
 		final List<Integer> newVals = new ArrayList<Integer>();
 		for (final int element : newCluster) {
-
 			newVals.add(element);
 		}
 
@@ -464,67 +449,13 @@ public class HierCluster {
 	 */
 	public void finish() {
 
-		// LogBuffer.println("Min-List: " + Arrays.toString(minList));
-		// LogBuffer.println("Link-List: " + Arrays.deepToString(links));
-		// LogBuffer.println("currentClusters: " + currentClusters);
-
-		// List<Node> orderedNodes = new ArrayList<Node>();
-		//
-		// extractOrderedNodes(nodeList.get(0), orderedNodes);
-		//
-		// LogBuffer.println("Ordered nodes: " + orderedNodes);
-
-//		treeWriter.closeWriter();
 		linker.close();
 		reorderRows(currentClusters.get(0));
-
-		// writeReordered();
 
 		/* Ensure garbage collection for large objects */
 		links = null;
 		currentClusters = null;
 	}
-
-	// TODO method never used - remove?
-	private void writeReordered() {
-
-		String fileName = "reordered.txt";
-		File file = new File(fileName);
-		BufferedWriter bw = null;
-		
-		try {
-			bw = new BufferedWriter((new OutputStreamWriter(
-					new FileOutputStream(file.getAbsoluteFile()), "UTF-8")));
-
-			for (String element : reorderedRowIDs) {
-				bw.write(element + "\n");
-				bw.write("\n");
-			}
-
-		} catch (IOException e) {
-			LogBuffer.logException(e);
-			
-		} finally {
-			try {
-				bw.close();
-				
-			} catch (IOException e) {
-				LogBuffer.logException(e);
-			}
-		}
-	}
-
-//	/**
-//	 * Sets up a buffered writer to write & save the tree files (GTR & ATR).
-//	 * Also sets the filePath to the directory in which the resulting file was
-//	 * saved. Cancels the cluster worker and alerts the user if there's a
-//	 * problem with setting up the buffered writer since there wouldn't be a
-//	 * filePath where the cluster data could be saved anyways.
-//	 */
-//	public void setupTreeFileWriter(final File file) {
-//
-//		this.treeWriter = new TreeFileWriter(file);
-//	}
 
 	/**
 	 * Find minimum of an integer array that represents a cluster. O(n)

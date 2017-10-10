@@ -343,7 +343,8 @@ public class ClusterProcessor {
 		private ClusteredAxisData doHierarchicalCluster() {
 			
 			
-			final HierCluster clusterer = new HierCluster(linkMethod, distMatrix, axisID);
+			final HierCluster clusterer = new HierCluster(linkMethod, distMatrix, 
+			                                              axisID);
 
 			/*
 			 * Continue process until distMatrix has a size of 1, This array
