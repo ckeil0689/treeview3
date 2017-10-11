@@ -1,11 +1,6 @@
 package Cluster;
 
 import java.awt.Frame;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,9 +15,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * Class that performs hierarchical clustering on a supplied distance matrix. It
  * implements multiple linkage methods and consists of one main method
  * (cluster()) that is used to create one new cluster at a time.
- *
- * @author CKeil
- *
  */
 public class HierCluster {
 
@@ -49,7 +41,7 @@ public class HierCluster {
 	 * Reordered list of distance matrix rows. This directly represents the
 	 * reordered axis that was selected to be clustered.
 	 */
-	private String[] reorderedRowIDs;
+	private int[] reorderedRowIdxs;
 	private List<Node> nodeList;
 	private List<String[]> treeNodeData;
 
@@ -91,6 +83,7 @@ public class HierCluster {
 							ClusterFileGenerator.COL_AXIS_BASEID;
 		
 		treeNodeData = new ArrayList<String[]>(initial_matrix_size);
+		// Add header row right away
 		treeNodeData.add(new String[] {	"NODEID", "LEFT", "RIGHT", "CORRELATION"});
 
 		prepareCluster();
@@ -210,7 +203,6 @@ public class HierCluster {
 		this.min = distMatrix.findCurrentMin(min);
 		this.min_row_index = distMatrix.getMinRowIndex();
 		this.min_col_index = distMatrix.getMinColIndex();
-
 	}
 
 	/**
@@ -443,9 +435,9 @@ public class HierCluster {
 	}
 
 	/**
-	 * Finishes up clustering. Closes the bufferedWriter and causes the list of
-	 * reordered distance matrix rows to be generated. Also sets the variables
-	 * that store the most data to null, to ensure garbage collection.
+	 * Finishes up clustering. Orders the list of reordered distance matrix rows 
+	 * to be generated. Sets the variables that store the most data to null, 
+	 * to ensure their garbage collection.
 	 */
 	public void finish() {
 
@@ -633,15 +625,11 @@ public class HierCluster {
 	 */
 	public void reorderRows(final List<Integer> finalCluster) {
 
-		String element = "";
-
 		int limit = finalCluster.size();
-
-		reorderedRowIDs = new String[limit];
+		this.reorderedRowIdxs = new int[limit];
 
 		for (int i = 0; i < limit; i++) {
-			element = axisLabelType + finalCluster.get((limit - 1) - i) + "X";
-			reorderedRowIDs[i] = element;
+			reorderedRowIdxs[i] = finalCluster.get((limit - 1) - i);
 		}
 	}
 
@@ -652,10 +640,10 @@ public class HierCluster {
 	/**
 	 * Getter for the reordered list
 	 *
-	 * @return The reordered list of matrix elements after clustering.
+	 * @return The reordered matrix row indices after clustering.
 	 */
-	public String[] getReorderedIDs() {
+	public int[] getReorderedIDs() {
 
-		return reorderedRowIDs;
+		return reorderedRowIdxs;
 	}
 }

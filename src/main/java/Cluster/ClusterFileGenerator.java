@@ -114,8 +114,8 @@ public class ClusterFileGenerator {
 
 		final boolean foundGIDs = findIndex(rowLabelTypes, ROW_ID_LABELTYPE) != -1;
 
-		final String[] orderedGIDs = rowClusterData.getReorderedIDs();
-		final String[] orderedAIDs = colClusterData.getReorderedIDs();
+		final String[] orderedGIDs = rowClusterData.getReorderedIdxs();
+		final String[] orderedAIDs = colClusterData.getReorderedIdxs();
 
 		// Define how long a single matrix row needs to be
 		int rowLength = rowLabelTypes.length + colClusterData.getNumLabels();

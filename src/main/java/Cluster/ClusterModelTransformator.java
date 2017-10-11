@@ -99,7 +99,7 @@ public class ClusterModelTransformator {
 			model.getRowLabelInfo().addLabelType(ROW_ID_LABELTYPE, idx);
 		  ((TVModel)model).gidFound(true);
 		  
-		  final String[] orderedGIDs = rowCAD.getReorderedIDs();
+		  final String[] orderedGIDs = rowCAD.getReorderedIdxs();
 			model.getRowLabelInfo().reorderLabels(reorderedRowIndices);
 			model.getRowLabelInfo().addLabels(orderedGIDs);
 		}
@@ -110,7 +110,7 @@ public class ClusterModelTransformator {
 			model.getColLabelInfo().addLabelType(COL_ID_LABELTYPE, idx);
 		  ((TVModel)model).aidFound(true);
 		  
-		  final String[] orderedAIDs = colCAD.getReorderedIDs();
+		  final String[] orderedAIDs = colCAD.getReorderedIdxs();
 			model.getColLabelInfo().reorderLabels(reorderedColIndices);
 			model.getColLabelInfo().addLabels(orderedAIDs);
 		}
@@ -156,7 +156,7 @@ public class ClusterModelTransformator {
 	private int[] getReorderedIndices(ClusteredAxisData cd) {
 
 		int[] reorderedIndices = new int[cd.getNumLabels()];
-		int orderedIDNum = cd.getReorderedIDs().length;
+		int orderedIDNum = cd.getReorderedIdxs().length;
 
 		try {
 			if(cd.shouldReorderAxis() && cd.isAxisClustered() && orderedIDNum != 0) {
@@ -204,7 +204,7 @@ public class ClusterModelTransformator {
 		int index = -1;
 		// Make an array of indexes from the ordered column list.
 		for(int i = 0; i < reorderedIndices.length; i++) {
-			final String id = cd.getReorderedIDs()[i];
+			final String id = cd.getReorderedIdxs()[i];
 
 			if(model.isHierarchical()) {
 				// extract numerical part of element ID

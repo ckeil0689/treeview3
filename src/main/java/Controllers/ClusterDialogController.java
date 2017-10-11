@@ -167,8 +167,8 @@ public class ClusterDialogController {
 			this.rowCAD = new ClusteredAxisData(ROW_IDX);
 			this.colCAD = new ClusteredAxisData(COL_IDX);
 			
-			rowCAD.setReorderedIDs(getOldIDs(ROW_IDX));
-			colCAD.setReorderedIDs(getOldIDs(COL_IDX));
+			rowCAD.setReorderedIdxs(getOldIDs(ROW_IDX));
+			colCAD.setReorderedIdxs(getOldIDs(COL_IDX));
 		}
 
 		@Override
@@ -274,8 +274,8 @@ public class ClusterDialogController {
 			int numRowLabels = tvModel.getRowLabelInfo().getNumLabels();
 			int numColLabels = tvModel.getColLabelInfo().getNumLabels();
 			
-			int numReorderedRowIDs = rowCAD.getReorderedIDs().length;
-			int numReorderedColIDs = colCAD.getReorderedIDs().length;
+			int numReorderedRowIDs = rowCAD.getReorderedIdxs().length;
+			int numReorderedColIDs = colCAD.getReorderedIdxs().length;
 			
 			if(shouldClusterAxis[ROW_IDX] || tvModel.gidFound()) {
 				rowsValid = (numReorderedRowIDs == numRowLabels); 

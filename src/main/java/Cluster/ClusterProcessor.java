@@ -18,7 +18,6 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  * to mathematical principles of hierarchical clustering. It generates files to
  * display dendrograms (.gtr and .atr) as well as a reordered original data file
  * (.cdt).
- *
  */
 public class ClusterProcessor {
 
@@ -38,7 +37,6 @@ public class ClusterProcessor {
 	 * process can be displayed.
 	 *
 	 * @param dataMatrix The original data matrix to be clustered.
-	 * @param fileName The name of the file to which the data matrix belongs.
 	 */
 	public ClusterProcessor(final TVDataMatrix dataMatrix) {
 
@@ -343,7 +341,7 @@ public class ClusterProcessor {
 		private ClusteredAxisData doHierarchicalCluster() {
 			
 			
-			final HierCluster clusterer = new HierCluster(linkMethod, distMatrix, 
+			final HierCluster hierCluster = new HierCluster(linkMethod, distMatrix, 
 			                                              axisID);
 
 			/*
@@ -355,7 +353,7 @@ public class ClusterProcessor {
 			int distMatrixSize = distMatrix.getSize();
 
 			while (distMatrixSize > 1 && !isCancelled()) {
-				distMatrixSize = clusterer.cluster();
+				distMatrixSize = hierCluster.cluster();
 				publish(loopNum++);
 			}
 
@@ -370,10 +368,10 @@ public class ClusterProcessor {
 				return cad;
 			}
 
-			clusterer.finish();
+			hierCluster.finish();
 
-			cad.setReorderedIDs(clusterer.getReorderedIDs());
-			cad.setTreeNodeData(clusterer.getTreeNodeData());
+			cad.setReorderedIdxs(hierCluster.getReorderedIDs());
+			cad.setTreeNodeData(hierCluster.getTreeNodeData());
 			cad.shouldReorderAxis(true);
 			cad.setAxisClustered(true);
 			
@@ -429,7 +427,7 @@ public class ClusterProcessor {
 			clusterer.finish(labelArray);
 
 			cad.setKmeansClusterNum(k);
-			cad.setReorderedIDs(clusterer.getReorderedList());
+			cad.setReorderedIdxs(clusterer.getReorderedList());
 			cad.setAxisClustered(true);
 			return cad;
 		}

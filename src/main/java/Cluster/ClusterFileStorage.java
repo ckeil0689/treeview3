@@ -297,8 +297,8 @@ public class ClusterFileStorage {
 			final int row_clusterN = spinnerInput[0];
 			final int col_clusterN = spinnerInput[2];
 
-			final String[] orderedGIDs = rowClusterData.getReorderedIDs();
-			final String[] orderedAIDs = colClusterData.getReorderedIDs();
+			final String[] orderedGIDs = rowClusterData.getReorderedIdxs();
+			final String[] orderedAIDs = colClusterData.getReorderedIdxs();
 
 			if((orderedGIDs != null) && (orderedGIDs.length > 0)) {
 				rowC = ClusterFileStorage.KMEANS_ROW_SUFFIX + row_clusterN;
