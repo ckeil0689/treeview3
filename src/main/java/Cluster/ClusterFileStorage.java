@@ -7,8 +7,6 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.model.ModelFileCreator;
-import edu.stanford.genetics.treeview.model.ModelSaver;
 
 /** 
  * @deprecated
@@ -297,8 +295,8 @@ public class ClusterFileStorage {
 			final int row_clusterN = spinnerInput[0];
 			final int col_clusterN = spinnerInput[2];
 
-			final String[] orderedGIDs = rowClusterData.getReorderedIdxs();
-			final String[] orderedAIDs = colClusterData.getReorderedIdxs();
+			final String[] orderedGIDs = new String[0];//rowClusterData.getReorderedIdxs();
+			final String[] orderedAIDs = new String[0];//colClusterData.getReorderedIdxs();
 
 			if((orderedGIDs != null) && (orderedGIDs.length > 0)) {
 				rowC = ClusterFileStorage.KMEANS_ROW_SUFFIX + row_clusterN;

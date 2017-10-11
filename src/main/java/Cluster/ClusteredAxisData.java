@@ -15,6 +15,8 @@ public class ClusteredAxisData {
 	private final String AXIS_BASEID;
 	
 	private int[] reorderedIdxs = new int[0];
+	private String[] previousAxisIDs = new String[0];
+	private String[] newAxisIDs = new String[0];
 	private String[] axisLabelTypes = new String[0];
 	private String[][] axisLabels = new String[0][];
 	private List<String[]> treeNodeData = new ArrayList<String[]>();
@@ -39,6 +41,16 @@ public class ClusteredAxisData {
 	public void setReorderedIdxs(final int[] newReorderedIdxs) {
 		
 		this.reorderedIdxs = newReorderedIdxs;
+	}
+	
+	public void setPreviousIDs(final String[] previousIDs) {
+		
+		this.previousAxisIDs = previousIDs;
+	}
+	
+	public void setNewIDs(final String[] newIDs) {
+		
+		this.newAxisIDs = newIDs;
 	}
 	
   public void setTreeNodeData(final List<String[]> newTreeNodeData) {
@@ -82,9 +94,19 @@ public class ClusteredAxisData {
 		return AXIS_BASEID;
 	}
 	
-	public String[] getReorderedIDs() {
+	public int[] getReorderedIdxs() {
 		
 		return reorderedIdxs;
+	}
+	
+	public String[] getPreviousIDs() {
+		
+		return previousAxisIDs;
+	}
+	
+	public String[] getNewIDs() {
+		
+		return newAxisIDs;
 	}
 	
 	public List<String[]> getTreeNodeData() {

@@ -67,7 +67,6 @@ public class ClusterFileGenerator {
 		// Add some string elements, as well as row/ column names
 		if(isHier) {
 			createHierCDT();
-
 		}
 		else {
 			createKMeansCDT();
@@ -114,8 +113,8 @@ public class ClusterFileGenerator {
 
 		final boolean foundGIDs = findIndex(rowLabelTypes, ROW_ID_LABELTYPE) != -1;
 
-		final String[] orderedGIDs = rowClusterData.getReorderedIdxs();
-		final String[] orderedAIDs = colClusterData.getReorderedIdxs();
+		final String[] orderedGIDs = rowClusterData.getNewIDs();
+		final String[] orderedAIDs = colClusterData.getNewIDs();
 
 		// Define how long a single matrix row needs to be
 		int rowLength = rowLabelTypes.length + colClusterData.getNumLabels();

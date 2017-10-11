@@ -1,5 +1,9 @@
 package Cluster;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import Controllers.ClusterDialogController;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
 import edu.stanford.genetics.treeview.model.ModelTreeAdder;
@@ -79,6 +83,57 @@ public class ClusterModelTransformator {
 		 */
 		this.rowCAD.setLabels(rowLabelI.getLabelArray());
 		this.colCAD.setLabels(colLabelI.getLabelArray());
+		
+		rowCAD.setPreviousIDs(getOldIDs(ClusterDialogController.ROW_IDX));
+		colCAD.setPreviousIDs(getOldIDs(ClusterDialogController.COL_IDX));
+	}
+	
+	/**
+	 * Extracts the old IDs
+	 * @param axisID
+	 * @return
+	 */
+	private String[] getOldIDs(final int axisID) {
+		
+		String[][] labelArray;
+		String[] oldIDs; 
+		Pattern p;
+		int pos = 0;
+		
+    if(axisID == ClusterDialogController.ROW_IDX) {
+    	labelArray = model.getRowLabelInfo().getLabelArray();
+    	
+    	if(!model.gidFound()) {
+    		return new String[]{};
+    	}
+    	/* Find ID index */
+    	p = Pattern.compile("ROW\\d+X");
+    } 
+    else {
+    	labelArray = model.getColLabelInfo().getLabelArray();
+    	
+    	if(!model.aidFound()) {
+    		return new String[]{};
+    	}
+    	p = Pattern.compile("COL\\d+X");
+    }
+
+    /* Find ID index */
+	  for(int i = 0; i < labelArray[0].length; i++) {
+		  Matcher m = p.matcher(labelArray[0][i]);
+		  if(m.find()) {
+			  pos = i;
+			  break;
+		  }
+	  }
+      	
+		oldIDs = new String[labelArray.length];
+		
+		for(int i = 0; i < labelArray.length; i++) {
+			oldIDs[i] = labelArray[i][pos];
+		}
+		
+		return oldIDs;
 	}
 	
 	/**
@@ -88,8 +143,8 @@ public class ClusterModelTransformator {
 
 		// Reorder the data matrix
 		final TVDataMatrix origMatrix = (TVDataMatrix) model.getDataMatrix();
-		int[] reorderedRowIndices = getReorderedIndices(rowCAD);
-		int[] reorderedColIndices = getReorderedIndices(colCAD);
+		int[] reorderedRowIndices = rowCAD.getReorderedIdxs();
+		int[] reorderedColIndices = colCAD.getReorderedIdxs();
 		origMatrix.reorderMatrixData(reorderedRowIndices, reorderedColIndices);
 	  
 	  // Update labels associated with DataModel
@@ -99,7 +154,7 @@ public class ClusterModelTransformator {
 			model.getRowLabelInfo().addLabelType(ROW_ID_LABELTYPE, idx);
 		  ((TVModel)model).gidFound(true);
 		  
-		  final String[] orderedGIDs = rowCAD.getReorderedIdxs();
+		  final String[] orderedGIDs = constructAxisIDs(rowCAD);
 			model.getRowLabelInfo().reorderLabels(reorderedRowIndices);
 			model.getRowLabelInfo().addLabels(orderedGIDs);
 		}
@@ -110,7 +165,7 @@ public class ClusterModelTransformator {
 			model.getColLabelInfo().addLabelType(COL_ID_LABELTYPE, idx);
 		  ((TVModel)model).aidFound(true);
 		  
-		  final String[] orderedAIDs = colCAD.getReorderedIdxs();
+		  final String[] orderedAIDs = constructAxisIDs(colCAD);
 			model.getColLabelInfo().reorderLabels(reorderedColIndices);
 			model.getColLabelInfo().addLabels(orderedAIDs);
 		}
@@ -148,11 +203,36 @@ public class ClusterModelTransformator {
 		}
 	}
 	
+	private String[] constructAxisIDs(final ClusteredAxisData cad) {
+		
+		int[] reorderedIdxs = cad.getReorderedIdxs();
+		String[] constructedAxisIDs = new String[reorderedIdxs.length];
+		
+		// Case: Axis was not clustered before - build new IDs
+		if(cad.getPreviousIDs().length == 0) {
+			for(int i = 0; i < reorderedIdxs.length; i++) {
+				constructedAxisIDs[i] = cad.getAxisBaseID() + reorderedIdxs[i] + "X";
+			}
+		}
+		// Case: Axis was clustered before - rearrange existing IDs
+		else {
+			String[] previousIDs = cad.getPreviousIDs();
+			for(int i = 0; i < reorderedIdxs.length; i++) {
+				int pos = reorderedIdxs[i];
+				constructedAxisIDs[i] = previousIDs[pos];
+			}
+		}
+		
+		cad.setNewIDs(constructedAxisIDs);
+		return constructedAxisIDs;
+	}
+	
 	/** Creates a list of the post-clustering axis index order.
 	 * 
 	 * @param cd The <code>ClusteredAxisData</code> object for the axis for which
 	 *          indices are to be retrieved.
-	 * @return An integer array of new axis indices, useful for reordering. */
+	 * @return An integer array of new axis indices, useful for reordering. 
+	 * @deprecated*/
 	private int[] getReorderedIndices(ClusteredAxisData cd) {
 
 		int[] reorderedIndices = new int[cd.getNumLabels()];
@@ -187,7 +267,8 @@ public class ClusterModelTransformator {
 	 * @param cd The ClusteredAxisData objects containing all relevant info
 	 *          for label reordering.
 	 * @return List of new element order indices that can be used to rearrange
-	 *         the matrix data consistent with the new element ordering. */
+	 *         the matrix data consistent with the new element ordering. 
+	 *         @deprecated*/
 	private int[] orderElements(ClusteredAxisData cd) {
 
 		int[] reorderedIndices = new int[cd.getNumLabels()];
@@ -204,7 +285,7 @@ public class ClusterModelTransformator {
 		int index = -1;
 		// Make an array of indexes from the ordered column list.
 		for(int i = 0; i < reorderedIndices.length; i++) {
-			final String id = cd.getReorderedIdxs()[i];
+			final String id = "";//cd.getReorderedIdxs()[i];
 
 			if(model.isHierarchical()) {
 				// extract numerical part of element ID
@@ -227,7 +308,8 @@ public class ClusterModelTransformator {
 	 *
 	 * @param array - A String array to be searched.
 	 * @param element - A String element to be found in the array.
-	 * @return The last instance of the String element in the array. */
+	 * @return The last instance of the String element in the array. 
+	 * @deprecated*/
 	private int findIndex(final String[] array, final String element) {
 
 		int index = -1;

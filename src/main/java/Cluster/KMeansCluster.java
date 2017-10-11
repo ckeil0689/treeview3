@@ -10,6 +10,10 @@ import Controllers.ClusterDialogController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**
+ * FIXME This entire class has to be rewritten and adapted such that it 
+ * manipulates the active model rather than writing anything, which is the 
+ * job of ModelSaver.
+ * 
  * Performs the calculations of the k-means algorithm.
  */
 public class KMeansCluster {
@@ -36,7 +40,7 @@ public class KMeansCluster {
 	private double[][] clusterMeans;
 
 	/* Ordered axis element numbers to be returned for .cdt creation */
-	private String[] reorderedList;
+	private int[] reorderedIdxs;
 
 	/**
 	 * Constructor for KMeansCluster.
@@ -70,9 +74,6 @@ public class KMeansCluster {
 	 * @throws IOException
 	 */
 	public void setupFileWriter(final File file) {
-
-		final String fileEnd = (axis == ClusterDialogController.ROW) ? "_K_G" + k
-				+ ".kgg" : "_K_A" + k + ".kag";
 
 		bufferedWriter = new ClusterFileWriter(file);
 	}
@@ -130,7 +131,7 @@ public class KMeansCluster {
 		}
 
 		/* The list containing the reordered gene names. */
-		reorderedList = new String[distMatrix.getSize()];
+		reorderedIdxs = new int[distMatrix.getSize()];
 
 		String[][] kClusters_string = new String[kClusters.length][];
 
@@ -162,7 +163,8 @@ public class KMeansCluster {
 
 				addIndexInner = 0;
 
-				reorderedList[addIndex] = element;
+				reorderedIdxs[addIndex] = 1; 
+				// FIXME 1 is a placeholder to avoid error messages. NOT FUNCTIONAL
 				addIndex++;
 
 				final String[] dataPair = new String[pairSize];
@@ -493,8 +495,8 @@ public class KMeansCluster {
 	 *
 	 * @return
 	 */
-	public String[] getReorderedList() {
+	public int[] getReorderedList() {
 
-		return reorderedList;
+		return reorderedIdxs;
 	}
 }
