@@ -520,7 +520,6 @@ public class HierCluster {
 		if (newCluster.length == 2) {
 			geneRow = axisLabelType + currentClusters.get(row).get(0) + "X";
 			geneCol = axisLabelType + currentClusters.get(column).get(0) + "X";
-
 		}
 		/* If size of new cluster exceeds 2 */
 		else {
