@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import Controllers.ClusterDialogController;
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -26,7 +25,7 @@ public class HierCluster {
 	 * arrays and column access doesn't always need to jump between arrays.
 	 */
 	private Linker linker;
-	private final String axisLabelType;
+//	private final String axisLabelType;
 	private final int initial_matrix_size;
 	private int iterNum;
 
@@ -78,9 +77,9 @@ public class HierCluster {
 		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
-		this.axisLabelType = (axis == ClusterDialogController.ROW_IDX) ? 
-						ClusterFileGenerator.ROW_AXIS_BASEID : 
-							ClusterFileGenerator.COL_AXIS_BASEID;
+//		this.axisLabelType = (axis == ClusterDialogController.ROW_IDX) ? 
+//						ClusterFileGenerator.ROW_AXIS_BASEID : 
+//							ClusterFileGenerator.COL_AXIS_BASEID;
 		
 		treeNodeData = new ArrayList<String[]>(initial_matrix_size);
 		// Add header row right away
@@ -518,8 +517,10 @@ public class HierCluster {
 		 * file.
 		 */
 		if (newCluster.length == 2) {
-			geneRow = axisLabelType + currentClusters.get(row).get(0) + "X";
-			geneCol = axisLabelType + currentClusters.get(column).get(0) + "X";
+//			geneRow = axisLabelType + currentClusters.get(row).get(0) + "X";
+			geneRow = currentClusters.get(row).get(0).toString();
+//			geneCol = axisLabelType + currentClusters.get(column).get(0) + "X";
+			geneCol = currentClusters.get(column).get(0).toString();
 		}
 		/* If size of new cluster exceeds 2 */
 		else {
@@ -577,7 +578,8 @@ public class HierCluster {
 				 * If the current fusedGroup in geneIntegerTable does not have
 				 * any elements in common with geneGroups.get(column).
 				 */
-				name = axisLabelType + currentClusters.get(index).get(0) + "X";
+//				name = axisLabelType + currentClusters.get(index).get(0) + "X";
+				name = currentClusters.get(index).get(0).toString();
 			}
 		}
 

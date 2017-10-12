@@ -1,5 +1,6 @@
 package Cluster;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,6 +60,7 @@ public class ClusterModelTransformator {
 		prepareModel(rowLabelI, colLabelI);
 		model.setHierarchical(isHierarchical);
 		reorderClusteredModel();
+		attachTreesToModel();
 		model.setModified(true);
 		model.setRowClustered(rowCAD.isAxisClustered());
 		model.setColClustered(colCAD.isAxisClustered());
@@ -169,8 +171,6 @@ public class ClusterModelTransformator {
 			model.getColLabelInfo().reorderLabels(reorderedColIndices);
 			model.getColLabelInfo().addLabels(orderedAIDs);
 		}
-		
-		attachTreesToModel();
 	}
 	
 	/**
@@ -181,6 +181,7 @@ public class ClusterModelTransformator {
 		ModelTreeAdder mta = new ModelTreeAdder(model);
 		
 		if(rowCAD.isAxisClustered()) {
+			constructTreeNodeData(rowCAD);
 			boolean wasParsed = mta.parseGTR(rowCAD.getTreeNodeData());
 			if(wasParsed) {
 				model.setGTRData(rowCAD.getTreeNodeData());
@@ -192,6 +193,7 @@ public class ClusterModelTransformator {
 		}
 		
 		if(colCAD.isAxisClustered()) {
+			constructTreeNodeData(colCAD);
 			boolean wasParsed = mta.parseATR(colCAD.getTreeNodeData());
 			if(wasParsed) {
 				model.setATRData(colCAD.getTreeNodeData());
@@ -232,6 +234,41 @@ public class ClusterModelTransformator {
 		
 		cad.setNewIDs(constructedAxisIDs);
 		return constructedAxisIDs;
+	}
+	
+	/**
+	 * Tree node data depends on reordered indices of matrix elements. 
+	 * In order to reuse possible existing axis identifiers (e.g. ROW34X or 
+	 * COL67X) from previous clustering, the matrix elements which were connected 
+	 * by hierarchical clustering are only recorded by their indices in 
+	 * HierCluster.java. Here, the list of reordered indices is used to either 
+	 * reorder existing axis identifiers or construct new ones if a model was
+	 * not clustered before.
+	 * @param cad
+	 */
+	private void constructTreeNodeData(final ClusteredAxisData cad) {
+		
+		String[] oldAxisIDs = cad.getPreviousIDs();
+		List<String[]> treeNodeData = cad.getTreeNodeData();
+		
+		// Case 1: No old IDs exist. Create new ones from the indices already 
+		// recorded in HierCluster..
+		if(oldAxisIDs.length == 0) {
+			LogBuffer.println("No axis IDs exist. Creating new ones.");
+			for(String[] node : treeNodeData) {
+				// TODO make sure apache commons-lang is loaded by Gradle and 
+				// run through the nodes to create the axis IDs
+//				if(StringUtils.isNumeric(node[1])) {
+//					
+//				}
+			}
+		}
+		// Case 2: Previous axis IDs exist - reorder them according 
+		// to reordered indices.
+		else {
+			LogBuffer.println("Old axis IDs exist. Reordering.");
+			int[] reorderedIndices = cad.getReorderedIdxs();
+		}
 	}
 	
 	/** Creates a list of the post-clustering axis index order.
