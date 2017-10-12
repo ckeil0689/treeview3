@@ -15,6 +15,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * job of ModelSaver.
  * 
  * Performs the calculations of the k-means algorithm.
+ * @deprecated -- REWRITE!
  */
 public class KMeansCluster {
 
@@ -143,7 +144,7 @@ public class KMeansCluster {
 		int addIndex = 0;
 
 		/* Setting up label type line */
-		initial[addIndex] = (axis == ClusterDialogController.ROW) ? "ORF" : "ARRAY";
+		initial[addIndex] = (axis == ClusterDialogController.ROW_IDX) ? "ORF" : "ARRAY";
 		addIndex++;
 
 		initial[addIndex] = "GROUP";

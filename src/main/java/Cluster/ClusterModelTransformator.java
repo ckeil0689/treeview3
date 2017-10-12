@@ -203,6 +203,13 @@ public class ClusterModelTransformator {
 		}
 	}
 	
+	/**
+	 * Uses the reordered axis indices to construct axis IDs used to attach trees
+	 * to rows or columns (such as ROW32X).
+	 * @param cad - Contains all information accumulated during clustering which 
+	 * is needed to update the current model.
+	 * @return An array of axis IDs, one for each row or column element.
+	 */
 	private String[] constructAxisIDs(final ClusteredAxisData cad) {
 		
 		int[] reorderedIdxs = cad.getReorderedIdxs();

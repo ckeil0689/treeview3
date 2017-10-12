@@ -6,8 +6,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -49,9 +47,6 @@ public class ClusterDialogController {
 	// Axes identifiers
 	public final static String ROW_ID_LABELTYPE = "GID";
 	public final static String COL_ID_LABELTYPE = "AID";
-	
-	public final static int ROW = 1;
-	public final static int COL = 2;
 	
 	public final static int ROW_IDX = 0;
 	public final static int COL_IDX = 1;
@@ -132,7 +127,7 @@ public class ClusterDialogController {
 		public void actionPerformed(final ActionEvent e) {
 
 			/* Only starts with valid selections. */
-			if (isReady(rowSimilarity, ROW) || isReady(colSimilarity, COL)) {
+			if (isReady(rowSimilarity, ROW_IDX) || isReady(colSimilarity, COL_IDX)) {
 				/* Tell ClusterView that clustering begins */
 				clusterView.setClustering(true);
 				clusterTask = new ClusterTask();
@@ -204,8 +199,8 @@ public class ClusterDialogController {
 				originalMatrix.treatZeroesAsMissing();
 			}
 
-			final boolean isRowReady = isReady(rowSimilarity, ROW);
-			final boolean isColReady = isReady(colSimilarity, COL);
+			final boolean isRowReady = isReady(rowSimilarity, ROW_IDX);
+			final boolean isColReady = isReady(colSimilarity, COL_IDX);
 			
 			this.clusterCheck = reaffirmClusterChoice(isRowReady, isColReady);
 			
@@ -217,7 +212,7 @@ public class ClusterDialogController {
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], clusterCheck[COL_IDX]);
 			
 			if(clusterCheck[ROW_IDX]) {
-				rowCAD = calculateAxis(rowSimilarity, ROW);
+				rowCAD = calculateAxis(rowSimilarity, ROW_IDX);
 			}
 
 			// Check for cancellation in between axis clustering
@@ -226,7 +221,7 @@ public class ClusterDialogController {
 			}
 			
 			if (clusterCheck[COL_IDX]) {
-				colCAD = calculateAxis(colSimilarity, COL);
+				colCAD = calculateAxis(colSimilarity, COL_IDX);
 			}
 			
 			if(!isReorderingValid(clusterCheck)) {
@@ -245,11 +240,13 @@ public class ClusterDialogController {
 			 * first check (not via cancel).
 			 */
 			if(!isReorderingValid(clusterCheck) || isCancelled()) {
+				ClusterView.setPBarEmpty();
 				LogBuffer.println("Something occurred during reordering.");
 				// TODO make sure tvController doesnt crash the app here!
 				return;
 			}
 			
+			ClusterView.setPBarFull();
 			ClusterModelTransformator cmt = 
 				new ClusterModelTransformator(rowCAD, colCAD, (TVModel) tvModel);
 			TVModel clusteredModel = cmt.applyClusterChanges(isHierarchical());
@@ -524,7 +521,7 @@ public class ClusterDialogController {
 		                                        final int axisID) {
 			
 			final DistanceMatrix distMatrix = new DistanceMatrix(0);
-			final String axisType = (axisID == ROW) ? "row" : "column";
+			final String axisType = (axisID == ROW_IDX) ? "row" : "column";
 
 			// progressBar label
 			publish("Calculating " + axisType + " distances...");
@@ -601,8 +598,8 @@ public class ClusterDialogController {
 				rowSimilarity = clusterView.getRowSimilarity();
 
 				/* Ready indicator label */
-				clusterView.displayReadyStatus(isReady(rowSimilarity, ROW)
-						|| isReady(colSimilarity, COL));
+				clusterView.displayReadyStatus(isReady(rowSimilarity, ROW_IDX)
+						|| isReady(colSimilarity, COL_IDX));
 			}
 		}
 	}
@@ -623,8 +620,8 @@ public class ClusterDialogController {
 				colSimilarity = clusterView.getColSimilarity();
 
 				/* OR controlled ready indicator label */
-				final boolean rowReady = isReady(rowSimilarity, ROW);
-				final boolean colReady = isReady(colSimilarity, COL);
+				final boolean rowReady = isReady(rowSimilarity, ROW_IDX);
+				final boolean colReady = isReady(colSimilarity, COL_IDX);
 
 				clusterView.displayReadyStatus(rowReady || colReady);
 			}
@@ -643,8 +640,8 @@ public class ClusterDialogController {
 		public void stateChanged(final ChangeEvent arg0) {
 
 			/* OR controlled ready indicator label */
-			final boolean rowReady = isReady(rowSimilarity, ROW);
-			final boolean colReady = isReady(colSimilarity, COL);
+			final boolean rowReady = isReady(rowSimilarity, ROW_IDX);
+			final boolean colReady = isReady(colSimilarity, COL_IDX);
 
 			clusterView.displayReadyStatus(rowReady || colReady);
 		}
@@ -688,11 +685,11 @@ public class ClusterDialogController {
 
 		switch (type) {
 
-		case ROW:
+		case ROW_IDX:
 			groups = (spinnerValues[0]).intValue();
 			iterations = (spinnerValues[1]).intValue();
 			break;
-		case COL:
+		case COL_IDX:
 			groups = (spinnerValues[2]).intValue();
 			iterations = (spinnerValues[3]).intValue();
 			break;

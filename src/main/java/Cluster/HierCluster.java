@@ -78,7 +78,7 @@ public class HierCluster {
 		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
-		this.axisLabelType = (axis == ClusterDialogController.ROW) ? 
+		this.axisLabelType = (axis == ClusterDialogController.ROW_IDX) ? 
 						ClusterFileGenerator.ROW_AXIS_BASEID : 
 							ClusterFileGenerator.COL_AXIS_BASEID;
 		

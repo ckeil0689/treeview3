@@ -151,7 +151,7 @@ public class ClusterProcessor {
 			this.distMeasure = distMeasure;
 			this.axis = axis;
 
-			if (axis == ClusterDialogController.ROW) {
+			if (axis == ClusterDialogController.ROW_IDX) {
 				this.axisSize = originalMatrix.getNumRow();
 
 			} else {
@@ -172,7 +172,7 @@ public class ClusterProcessor {
 
 			/* Calculate distance matrix */
 			double[][] data = null;
-			if (axis == ClusterDialogController.ROW) {
+			if (axis == ClusterDialogController.ROW_IDX) {
 				data = originalMatrix.getExprData();
 
 			} else {
@@ -386,7 +386,7 @@ public class ClusterProcessor {
 			
 			int k;
 			int iterations;
-			if (axisID == ClusterDialogController.ROW) {
+			if (axisID == ClusterDialogController.ROW_IDX) {
 				k = spinnerInput[0];
 				iterations = spinnerInput[1];
 
@@ -408,7 +408,7 @@ public class ClusterProcessor {
 
 			/* Get axis labels */
 			String[][] labelArray;
-			if (axisID == ClusterDialogController.ROW) {
+			if (axisID == ClusterDialogController.ROW_IDX) {
 				labelArray = rowLabelI.getLabelArray();
 
 			} else {

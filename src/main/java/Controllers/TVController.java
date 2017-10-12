@@ -1139,6 +1139,7 @@ public class TVController implements Observer {
 				// window without data loaded does not save settings because
 				// it's tied to the matrix jpanel
 				if(model != null && model.getModified()) {
+					LogBuffer.println("Detected modified data. Asking user to save.");
 					if(userWantsToSave()) saveModelAs();
 				}
 				
@@ -1184,8 +1185,9 @@ public class TVController implements Observer {
 
 		// Confirm user's intent to exit the application.
 		final int choice = JOptionPane.showOptionDialog(tvFrame.getAppFrame(),
-			"It appears there is unsaved data. Do you want to save now?", 
-			"Save data", JOptionPane.YES_NO_OPTION,
+			"It appears there is unsaved data. Do you want to save before " +
+			"TreeView closes?", 
+			"Save Modified Data", JOptionPane.YES_NO_OPTION,
 			JOptionPane.WARNING_MESSAGE,null,null,null);
 
 		switch (choice) {

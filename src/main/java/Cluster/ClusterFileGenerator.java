@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import edu.stanford.genetics.treeview.model.IntLabelInfo;
-
 /** This class is used to generate the .CDT tab delimited file which Java
  * TreeView will use for visualization. It takes in the previously calculated
  * data and forms String lists to make them writable.

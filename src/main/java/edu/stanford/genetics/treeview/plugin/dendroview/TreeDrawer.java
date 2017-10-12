@@ -285,7 +285,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 
 				if (val == -1)
 					throw new DendroException("Identifier " + leftId
-							+ " from tree file not found in CDT.");
+							+ " from tree file not found in NodeInfo for current model.");
 
 				leftn = new TreeDrawerNode(leftId, 1.0, val);
 				leafList[val] = leftn;
@@ -299,7 +299,7 @@ abstract class TreeDrawer extends Observable implements Observer {
 				val = rowInfo.getLabelIndex(rightId);
 				if (val == -1)
 					throw new DendroException("Identifier " + rightId
-							+ " from tree file not found in CDT!");
+							+ " from tree file not found in NodeInfo for current model.");
 
 				rightn = new TreeDrawerNode(rightId, 1.0, val);
 				leafList[val] = rightn;
