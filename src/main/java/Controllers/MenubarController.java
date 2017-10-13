@@ -135,21 +135,6 @@ public class MenubarController {
 		}
 	}
 
-<<<<<<< HEAD
-=======
-	/* Some helpers to keep the switch statement readable. */
-	/**
-	 * Takes the currently selected row and column indexes and uses them to open
-	 * a new view that only displays the selected data.
-	 */
-	private void showSubData() {
-
-		controller.showSubDataModel(
-			tvFrame.getRowSelection().getSelectedIndexes(),
-			tvFrame.getColSelection().getSelectedIndexes(), null, null);
-	}
-
->>>>>>> master
 	/**
 	 * Just opens a stats dialog.
 	 */
