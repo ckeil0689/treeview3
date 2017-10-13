@@ -56,23 +56,14 @@ public class ClusterFileWriter {
 	 * @param data - A String array of data to be written to a file.
 	 * @return boolean indicating finishing of data writing without any Exception.
 	 */
-<<<<<<< HEAD
 	public boolean writeData(final String[] data) {
 		
-=======
-	public void writeData(final String[] data) {
-
->>>>>>> master
 		final String content = doParse(data);
 
 		try {
 			bw.write(content);
-<<<<<<< HEAD
 		} 
 		catch (final IOException e) {
-=======
-		} catch (final IOException e) {
->>>>>>> master
 			LogBuffer.logException(e);
 			return false;
 		}
