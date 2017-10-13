@@ -64,7 +64,6 @@ public class ClusterDialogController {
 	private int colSimilarity = DistMatrixCalculator.PEARSON_UN;
 
 	private SwingWorker<Boolean, String> clusterTask;
-	private SwingWorker<Boolean, Void> saveTask;
 
 	/**
 	 * Links the clustering functionality to the user interface. The object
@@ -287,54 +286,6 @@ public class ClusterDialogController {
 			
 			return rowsValid && colsValid;
 		}
-		
-//		/**
-//		 * Extracts the old IDs
-//		 * @param axisID
-//		 * @return
-//		 */
-//		private String[] getOldIDs(final int axisID) {
-//			
-//			String[][] labelArray;
-//			String[] oldIDs; 
-//			Pattern p;
-//			int pos = 0;
-//			
-//      if(axisID == ROW_IDX) {
-//      	labelArray = tvModel.getRowLabelInfo().getLabelArray();
-//      	
-//      	if(!tvModel.gidFound()) {
-//      		return new String[]{};
-//      	}
-//      	/* Find ID index */
-//      	p = Pattern.compile("ROW\\d+X");
-//      } 
-//      else {
-//      	labelArray = tvModel.getColLabelInfo().getLabelArray();
-//      	
-//      	if(!tvModel.aidFound()) {
-//      		return new String[]{};
-//      	}
-//      	p = Pattern.compile("COL\\d+X");
-//      }
-//
-//      /* Find ID index */
-//  	  for(int i = 0; i < labelArray[0].length; i++) {
-//  		  Matcher m = p.matcher(labelArray[0][i]);
-//  		  if(m.find()) {
-//  			  pos = i;
-//  			  break;
-//  		  }
-//  	  }
-//        	
-//			oldIDs = new String[labelArray.length];
-//			
-//			for(int i = 0; i < labelArray.length; i++) {
-//				oldIDs[i] = labelArray[i][pos];
-//			}
-//			
-//			return oldIDs;
-//		}
 		
 		/** 
 		 * Determines if both axes should be clustered based on available info 
@@ -720,11 +671,6 @@ public class ClusterDialogController {
 		if (clusterTask != null) {
 			LogBuffer.println("Cancelling cluster task...");
 			clusterTask.cancel(true);
-		}
-		
-		if (saveTask != null) {
-			LogBuffer.println("Cancelling save task...");
-			saveTask.cancel(true);
 		}
 	}
 

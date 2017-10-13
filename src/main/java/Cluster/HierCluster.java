@@ -2,7 +2,6 @@ package Cluster;
 
 import java.awt.Frame;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -25,7 +24,6 @@ public class HierCluster {
 	 * arrays and column access doesn't always need to jump between arrays.
 	 */
 	private Linker linker;
-//	private final String axisLabelType;
 	private final int initial_matrix_size;
 	private int iterNum;
 
@@ -41,7 +39,6 @@ public class HierCluster {
 	 * reordered axis that was selected to be clustered.
 	 */
 	private int[] reorderedRowIdxs;
-	private List<Node> nodeList;
 	private List<String[]> treeNodeData;
 
 	/*
@@ -77,11 +74,7 @@ public class HierCluster {
 		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
-//		this.axisLabelType = (axis == ClusterDialogController.ROW_IDX) ? 
-//						ClusterFileGenerator.ROW_AXIS_BASEID : 
-//							ClusterFileGenerator.COL_AXIS_BASEID;
-		
-		treeNodeData = new ArrayList<String[]>(initial_matrix_size);
+		this.treeNodeData = new ArrayList<String[]>(initial_matrix_size);
 		// Add header row right away
 		treeNodeData.add(new String[] {	"NODEID", "LEFT", "RIGHT", "CORRELATION"});
 
@@ -121,8 +114,6 @@ public class HierCluster {
 		 * steps.
 		 */
 		currentClusters = new ArrayList<List<Integer>>(initial_matrix_size);
-
-		nodeList = new ArrayList<Node>(initial_matrix_size);
 
 		/*
 		 * Fill list with integers corresponding to the row indices. Initially,
@@ -231,89 +222,6 @@ public class HierCluster {
 		}
 
 		return Helper.concatIntArrays(row_cluster, col_cluster);
-	}
-
-	// TODO method never used - remove?
-	private void addNodeToList(String[] link) {
-
-		/* Add new node object to list */
-		int id = iterNum + 1;
-		double dist_val = 1 - min;
-		Node newNode = new Node(id, dist_val);
-
-		/* Link to children */
-		int maxChildNum = 2;
-		List<Node> nodes = new ArrayList<Node>();
-
-		for (int i = 0; i < maxChildNum; i++) {
-
-			if (link[i].substring(0, "NODE".length()).equalsIgnoreCase("NODE")) {
-				String index_s = link[i].replaceAll("[\\D]", "");
-				int index_i = Integer.parseInt(index_s);
-				nodes.add(nodeList.get(index_i - 1));
-			}
-		}
-
-		nodes = orderNodes(nodes);
-
-		/* Left child is the one with larger dist value */
-		if (nodes.size() > 0 && nodes.get(0) != null) {
-			newNode.setLeftChild(nodes.get(0));
-		}
-
-		if (nodes.size() > 1 && nodes.get(1) != null) {
-			newNode.setRightChild(nodes.get(1));
-		}
-
-		nodeList.add(newNode);
-	}
-
-	/**
-	 * Order 2 nodes decreasing by their dist_value. TODO replace with actual
-	 * comparator later.
-	 * 
-	 * @param nodes
-	 * @return Ordered list of nodes.
-	 */
-	private static List<Node> orderNodes(List<Node> nodes) {
-
-		if (nodes.size() < 2)
-			return nodes;
-
-		double val_1 = -1;
-		double val_2 = -1;
-
-		if (nodes.get(0) != null) {
-			val_1 = nodes.get(0).getDistValue();
-		}
-
-		if (nodes.get(1) != null) {
-			val_2 = nodes.get(1).getDistValue();
-		}
-
-		if (val_2 > val_1) {
-			Collections.swap(nodes, 0, 1);
-		}
-
-		return nodes;
-	}
-
-	// TODO method never used - remove?
-	private Node extractOrderedNodes(Node root, List<Node> nodeList) {
-
-		if (root == null) {
-			return null; 
-		}
-
-		if (root.getLeftChild() == null && root.getRightChild() == null) {
-			nodeList.add(root);
-			return null;
-		}
-
-		extractOrderedNodes(root.getLeftChild(), nodeList);
-		extractOrderedNodes(root.getRightChild(), nodeList);
-
-		return root;
 	}
 
 	/**
@@ -517,9 +425,7 @@ public class HierCluster {
 		 * file.
 		 */
 		if (newCluster.length == 2) {
-//			geneRow = axisLabelType + currentClusters.get(row).get(0) + "X";
 			geneRow = currentClusters.get(row).get(0).toString();
-//			geneCol = axisLabelType + currentClusters.get(column).get(0) + "X";
 			geneCol = currentClusters.get(column).get(0).toString();
 		}
 		/* If size of new cluster exceeds 2 */
@@ -578,7 +484,6 @@ public class HierCluster {
 				 * If the current fusedGroup in geneIntegerTable does not have
 				 * any elements in common with geneGroups.get(column).
 				 */
-//				name = axisLabelType + currentClusters.get(index).get(0) + "X";
 				name = currentClusters.get(index).get(0).toString();
 			}
 		}

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-
 import Controllers.ClusterDialogController;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
@@ -141,7 +139,7 @@ public class ClusterModelTransformator {
 	}
 	
 	/**
-	 * Updates the TVModel ... and more? TODO
+	 * Updates the TVModel by reordering data and labels.
 	 */
 	private void reorderClusteredModel() {
 
@@ -292,101 +290,5 @@ public class ClusterModelTransformator {
 				}
 			}
 		}
-	}
-	
-	/** Creates a list of the post-clustering axis index order.
-	 * 
-	 * @param cd The <code>ClusteredAxisData</code> object for the axis for which
-	 *          indices are to be retrieved.
-	 * @return An integer array of new axis indices, useful for reordering. 
-	 * @deprecated*/
-	private int[] getReorderedIndices(ClusteredAxisData cd) {
-
-		int[] reorderedIndices = new int[cd.getNumLabels()];
-		int orderedIDNum = cd.getReorderedIdxs().length;
-
-		try {
-			if(cd.shouldReorderAxis() && cd.isAxisClustered() && orderedIDNum != 0) {
-				reorderedIndices = orderElements(cd);
-	
-				/* old order simply remains */
-			}
-			else {
-				for(int i = 0; i < reorderedIndices.length; i++) {
-					reorderedIndices[i] = i;
-				}
-			}
-
-			return reorderedIndices;
-		} catch(ArrayIndexOutOfBoundsException e) {
-			LogBuffer.logException(e);
-			LogBuffer.println("Problem when reordering model data. " +
-				"Data will remain in original order.");
-			for(int i = 0; i < reorderedIndices.length; i++) {
-				reorderedIndices[i] = i;
-			}
-			return reorderedIndices;
-		}
-	}
-	
-	/** Orders the labels for the CDT data based on the ordered ID String arrays.
-	 * 
-	 * @param cd The ClusteredAxisData objects containing all relevant info
-	 *          for label reordering.
-	 * @return List of new element order indices that can be used to rearrange
-	 *         the matrix data consistent with the new element ordering. 
-	 *         @deprecated*/
-	private int[] orderElements(ClusteredAxisData cd) {
-
-		int[] reorderedIndices = new int[cd.getNumLabels()];
-
-		// Make list of gene names to quickly access indexes
-		final String[] geneNames = new String[cd.getNumLabels()];
-
-		if(!model.isHierarchical()) {
-			for(int i = 0; i < geneNames.length; i++) {
-				geneNames[i] = cd.getAxisLabels()[i][0];
-			}
-		}
-
-		int index = -1;
-		// Make an array of indexes from the ordered column list.
-		for(int i = 0; i < reorderedIndices.length; i++) {
-			final String id = "";//cd.getReorderedIdxs()[i];
-
-			if(model.isHierarchical()) {
-				// extract numerical part of element ID
-				final String adjusted = id.replaceAll("[\\D]", "");
-				// gets index from ordered list, e.g. COL45X --> 45;
-				index = Integer.parseInt(adjusted);
-
-			}
-			else {
-				index = findIndex(geneNames, id);
-			}
-
-			reorderedIndices[i] = index;
-		}
-
-		return reorderedIndices;
-	}
-	
-	/** Finds the last index of an element match in a String array.
-	 *
-	 * @param array - A String array to be searched.
-	 * @param element - A String element to be found in the array.
-	 * @return The last instance of the String element in the array. 
-	 * @deprecated*/
-	private int findIndex(final String[] array, final String element) {
-
-		int index = -1;
-		for(int i = 0; i < array.length; i++) {
-
-			if(array[i].equalsIgnoreCase(element)) {
-				index = i;
-			}
-		}
-
-		return index;
 	}
 }

@@ -23,6 +23,7 @@ import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
 public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 	protected TVController controller;
+	private final LoadStatus ls;
 
 	// Reference to the main model which will hold the data
 	protected TVModel targetModel;
@@ -48,6 +49,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		this.targetModel = (TVModel) model;
 		this.fileSet = model.getFileSet();
 		this.dataInfo = dataInfo;
+		this.ls = new LoadStatus();
 	}
 
 	/** Set the delimiter which is used to define separate cells in
@@ -92,7 +94,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		final String[][] stringLabels = new String[nRows][];
 
-		final LoadStatus ls = new LoadStatus();
 		ls.setProgress(0);
 		ls.setMaxProgress(nRows);
 		ls.setStatus("Preparing...");
@@ -130,16 +131,22 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		// Parse tree and config files
 		assignDataToModel(stringLabels);
 
-		ls.setStatus("Done!");
-		publish(ls);
-
 		reader.close();
 		return null;
 	}
 
 	@Override
 	protected void done() {
-
+		
+		if(isCancelled()) {
+			ls.setStatus("Cancelled.");
+			ls.setProgress(0);
+			return;
+		}
+		
+		ls.setStatus("Done!");
+		ls.setProgress(ls.getMaxProgress());
+		
 		doubleData = null;
 		
 		final Preferences fileNode = controller.getConfigNode().node("File");

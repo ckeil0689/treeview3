@@ -318,6 +318,7 @@ public class ClusterProcessor {
 				return doHierarchicalCluster();
 			}
 			
+			// Not using K-means clustering at the moment. Needs refactoring!
 		  return doKMeansCluster();
 		}
 
@@ -370,6 +371,8 @@ public class ClusterProcessor {
 
 			hierCluster.finish();
 
+			// Update ClusteredAxisData object to conveniently store 
+			// clustering results
 			cad.setReorderedIdxs(hierCluster.getReorderedIDs());
 			cad.setTreeNodeData(hierCluster.getTreeNodeData());
 			cad.shouldReorderAxis(true);
@@ -381,6 +384,7 @@ public class ClusterProcessor {
 		/**
 		 * Initializes the K-Means clustering process, and keeps tracks of
 		 * the GUI aspects such as updating the progress bar for ClusterView.
+		 * @deprecated - REWRITE
 		 */
 		private ClusteredAxisData doKMeansCluster() {
 			
