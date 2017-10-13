@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import Controllers.ClusterDialogController;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
@@ -151,10 +153,12 @@ public class ClusterModelTransformator {
 	  
 	  // Update labels associated with DataModel
 		// Rows
-		if(!model.gidFound() && rowCAD.isAxisClustered()) {
-			int idx = model.getRowLabelInfo().getNumLabelTypes();
-			model.getRowLabelInfo().addLabelType(ROW_ID_LABELTYPE, idx);
-		  ((TVModel)model).gidFound(true);
+		if(rowCAD.isAxisClustered()) {
+			if(!model.gidFound()) {
+			  int idx = model.getRowLabelInfo().getNumLabelTypes();
+			  model.getRowLabelInfo().addLabelType(ROW_ID_LABELTYPE, idx);
+		    ((TVModel)model).gidFound(true);
+			}
 		  
 		  final String[] orderedGIDs = constructAxisIDs(rowCAD);
 			model.getRowLabelInfo().reorderLabels(reorderedRowIndices);
@@ -162,10 +166,12 @@ public class ClusterModelTransformator {
 		}
 		
 		// Columns
-		if(!model.aidFound() && colCAD.isAxisClustered()) {
-			int idx = model.getColLabelInfo().getNumLabelTypes();
-			model.getColLabelInfo().addLabelType(COL_ID_LABELTYPE, idx);
-		  ((TVModel)model).aidFound(true);
+		if(colCAD.isAxisClustered()) {
+			if(!model.aidFound()) {
+			  int idx = model.getColLabelInfo().getNumLabelTypes();
+			  model.getColLabelInfo().addLabelType(COL_ID_LABELTYPE, idx);
+		    ((TVModel)model).aidFound(true);
+			}
 		  
 		  final String[] orderedAIDs = constructAxisIDs(colCAD);
 			model.getColLabelInfo().reorderLabels(reorderedColIndices);
@@ -251,23 +257,40 @@ public class ClusterModelTransformator {
 		String[] oldAxisIDs = cad.getPreviousIDs();
 		List<String[]> treeNodeData = cad.getTreeNodeData();
 		
+		// Match only non-neggtive integers
+		final String intPattern = "^\\d+$";
+		
 		// Case 1: No old IDs exist. Create new ones from the indices already 
 		// recorded in HierCluster..
 		if(oldAxisIDs.length == 0) {
 			LogBuffer.println("No axis IDs exist. Creating new ones.");
 			for(String[] node : treeNodeData) {
-				// TODO make sure apache commons-lang is loaded by Gradle and 
-				// run through the nodes to create the axis IDs
-//				if(StringUtils.isNumeric(node[1])) {
-//					
-//				}
+				// E.g. 34 --> ROW34X
+				if(node[1].matches(intPattern)) {
+					node[1] = cad.getAxisBaseID() + node[1] + "X";
+				}
+				
+				if(node[2].matches(intPattern)) {
+					node[2] = cad.getAxisBaseID() + node[2] + "X";
+				}
 			}
 		}
 		// Case 2: Previous axis IDs exist - reorder them according 
 		// to reordered indices.
 		else {
 			LogBuffer.println("Old axis IDs exist. Reordering.");
-			int[] reorderedIndices = cad.getReorderedIdxs();
+			for(String[] node : treeNodeData) {
+				// E.g. 34 --> ROW34X
+				if(node[1].matches(intPattern)) {
+					int idx = Integer.parseInt(node[1]);
+					node[1] = oldAxisIDs[idx];
+				}
+				
+				if(node[2].matches(intPattern)) {
+					int idx = Integer.parseInt(node[2]);
+					node[2] = oldAxisIDs[idx];
+				}
+			}
 		}
 	}
 	

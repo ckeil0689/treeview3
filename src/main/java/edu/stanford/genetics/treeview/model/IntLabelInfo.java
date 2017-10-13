@@ -198,9 +198,7 @@ public class IntLabelInfo extends Observable implements LabelInfo {
 
 			setLabelArray(temp2);
 			return true;
-
 		}
-		
 		return false;
 	}
 
