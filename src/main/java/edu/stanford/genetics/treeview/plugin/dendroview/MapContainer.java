@@ -67,12 +67,20 @@ public class MapContainer extends Observable implements Observer,
 	private int firstVisible;
 
 	//track the first and last visible labels (controlled by LabelView) so that
-	//it can be used in other classes (e.g. for matching the trees to the
-	//labels)
+	//it can be used in other classes (e.g. for matching the blue tree
+	//backgrounds to the drawn labels)
 	private int firstVisibleLabel = -1;
 	private int lastVisibleLabel = -1;
 	private int firstVisibleLabelOffset = 0;
 	private int lastVisibleLabelOffset = 0;
+
+	//track the first and last visible label spaces (controlled by LabelView) so
+	//that it can be used in other classes (e.g. for matching the trees to the
+	//label positions)
+	private int firstVisibleLabelCapacity = -1;
+	private int lastVisibleLabelCapacity = -1;
+	private int firstVisibleLabelOffsetCapacity = 0;
+	private int lastVisibleLabelOffsetCapacity = 0;
 
 	//Track the explicitly manipulated visible labels. These can change as a
 	//result of a scroll in the label pane
@@ -95,6 +103,8 @@ public class MapContainer extends Observable implements Observer,
 	private boolean deselecting = false;
 	private int selectingStart = -1;
 	private boolean whizMode = false;
+	private boolean whizFlankMode = true;
+	private int whizFlankSize = 0; //<0 = unlimited
 
 	//These allow modifier keys in the label/tree areas to reveal the row/col
 	//highlight bar
@@ -131,7 +141,7 @@ public class MapContainer extends Observable implements Observer,
 
 		if(parentNode == null) {
 			LogBuffer.println("Could not find or create MapContainer " +
-												"node because parentNode was null.");
+				"node because parentNode was null.");
 			return;
 		}
 
@@ -149,8 +159,8 @@ public class MapContainer extends Observable implements Observer,
 	public void requestStoredState() {
 		
 		if (configNode == null) {
-			LogBuffer.println("Unable to get stored MapContainer state. ConfigNode"
-					+ " was null.");
+			LogBuffer.println("Unable to get stored MapContainer state. " +
+				"ConfigNode was null.");
 			return;
 		}
 		importStateFrom(configNode);
@@ -161,7 +171,7 @@ public class MapContainer extends Observable implements Observer,
 
 		if(configNode == null) {
 			LogBuffer.println("Unable to store MapContainer state. ConfigNode" +
-												" was null.");
+				" was null.");
 			return;
 		}
 
@@ -664,9 +674,8 @@ public class MapContainer extends Observable implements Observer,
 			//If the left/top side is closer than or equal to half the
 			//difference in area sizes
 			else if((firstIndex - initialFirstVisible) <= (diff / 2) &&
-							((initialFirstVisible + prevNumVisible - 1) - (firstIndex +
-																															numIndexes - 1)) > (diff /
-																																									2)) {
+				((initialFirstVisible + prevNumVisible - 1) - (firstIndex +
+					numIndexes - 1)) > (diff / 2)) {
 				newFirstVisible = initialFirstVisible;
 				//LogBuffer.println("zoomToward: Left/top is remaining fixed.");
 
@@ -675,12 +684,11 @@ public class MapContainer extends Observable implements Observer,
 			//If the right/bottom side is closer than or equal to half the
 			//difference in area sizes
 			else if(((initialFirstVisible + prevNumVisible - 1) - (firstIndex +
-																															numIndexes -
-																															1)) <= (diff /
-																																			2) &&
-							(firstIndex - initialFirstVisible) > (diff / 2)) {
+				numIndexes - 1)) <= (diff / 2) &&
+				(firstIndex - initialFirstVisible) > (diff / 2)) {
+
 				newFirstVisible = (initialFirstVisible + prevNumVisible - 1) -
-													numVisible + 1;
+					numVisible + 1;
 
 				updateAspectRatio = 1;
 			}
@@ -924,11 +932,11 @@ public class MapContainer extends Observable implements Observer,
 		//Catch errors - If num indexes is less than 1 or greater than the
 		//number of pixels available
 		if(firstIndex < 0 || firstIndex > getMaxIndex()) {
-			LogBuffer.println("ERROR: Either firstIndex [" +	firstIndex +
-												"] derived from pixelIndex [" + pixelPos + " out of " +
-												getAvailablePixels() +
-												" available] is less than 0 or greater than " +
-												"maxIndex [" + getMaxIndex() + "]");
+			LogBuffer.println("ERROR: Either firstIndex [" + firstIndex +
+				"] derived from pixelIndex [" + pixelPos + " out of " +
+				getAvailablePixels() +
+				" available] is less than 0 or greater than maxIndex [" +
+				getMaxIndex() + "]");
 			return(updateAspectRatio);
 		}
 
@@ -1006,8 +1014,8 @@ public class MapContainer extends Observable implements Observer,
 				//If the result of pixelPos / newScale is a whole number,
 				//newFirstVisible must be decremented (discovered via trial &
 				//error)
-				if(newFirstVisible > 0 && pixelPos / newScale == (int) (pixelPos /
-																																newScale)) {
+				if(newFirstVisible > 0 && pixelPos / newScale == (int)
+					(pixelPos / newScale)) {
 					newFirstVisible--;
 				}
 
@@ -1047,13 +1055,13 @@ public class MapContainer extends Observable implements Observer,
 			}
 			else {
 				LogBuffer.println("WARNING: The data cell hovered over has " +
-													"shifted. It was over [" + dotOver +
-													"].  Now it is over: [" + getIndex(pixelPos) +
-													"].  Previous dotOver calculation: " +
-													"[firstVisible + (int) ((double) pixelPos / newScale))] = [" +
-													firstVisible + " + (int) ((double) " + pixelPos +
-													" / " + newScale +
-													"))].  Correcting this retroactively...");
+					"shifted. It was over [" + dotOver +
+					"].  Now it is over: [" + getIndex(pixelPos) +
+					"].  Previous dotOver calculation: " +
+					"[firstVisible + (int) ((double) pixelPos / newScale))] = [" +
+					firstVisible + " + (int) ((double) " + pixelPos +
+					" / " + newScale +
+					"))].  Correcting this retroactively...");
 			}
 
 			scrollToFirstIndex(newFirstVisible/*,true*/);
@@ -1198,9 +1206,9 @@ public class MapContainer extends Observable implements Observer,
 
 		int cells = getNumVisible();
 		//If the targetZoomFrac is 1.0, return the remainder of this dimension
-		if((targetZoomFrac % 1) == 0 && ((int) Math
-																								.round(targetZoomFrac)) == 1) { return(getTotalTileNum() -
-																																												cells); }
+		if((targetZoomFrac % 1) == 0 &&
+			((int) Math.round(targetZoomFrac)) == 1) {
+			return(getTotalTileNum() - cells); }
 		int zoomVal = (int) Math.round(cells * targetZoomFrac);
 		int numPixels = getAvailablePixels();
 		//LogBuffer.println("getBestZoomOutVal: Called with pixel [" + pixel +
@@ -1286,8 +1294,8 @@ public class MapContainer extends Observable implements Observer,
 			//		"/ numPixels * z)] = [" + relCell + " = (int) (" + pixel +
 			//		" / " + numPixels + " * " + z + ")].");
 			if(z == 0) continue;
-			diff = Math.abs(((double) relCell / (double) z) - ((double) (pixel + 1) /
-																													(double) numPixels));
+			diff = Math.abs(((double) relCell / (double) z) -
+				((double) (pixel + 1) / (double) numPixels));
 			//LogBuffer.println("getBestZoomOutVal: [diff = relCell / z - " +
 			//		"pixel / numPixels] = [" +
 			//		diff + " = " + relCell + " / " + z + " - " + pixel + " / " +
@@ -1319,7 +1327,8 @@ public class MapContainer extends Observable implements Observer,
 	 * should zoom more when there are large amounts of squares to zoom
 	 * through */
 	public double getOptimalZoomIncrement(int targetNumIndexes,
-																				boolean zoomingOut) {
+		boolean zoomingOut) {
+
 		//double maxZoomFrac = 0.5;
 		double maxZoomFrac = 0.6;
 		if(ZOOM_INCREMENT > maxZoomFrac) { return(maxZoomFrac); }
@@ -1368,10 +1377,9 @@ public class MapContainer extends Observable implements Observer,
 		//remaining for the next step, just go all the way
 		//This is an approximation because I should actually be using the next
 		//step, not this one
-		if((zoomingOut && targetZoomFrac * largerXSize > Math.abs(largerXSize +	1 *
-																																						(int) Math.round(targetZoomFrac *
-																																															largerXSize) -
-																															targetNumIndexes))) {
+		if((zoomingOut && targetZoomFrac * largerXSize >
+			Math.abs(largerXSize +	1 * (int) Math.round(targetZoomFrac *
+				largerXSize) - targetNumIndexes))) {
 			//The above seems only necessary for zoom out (for speed)
 			// ||
 			//(!zoomingOut && targetZoomFrac * largerXSize <
@@ -1462,7 +1470,7 @@ public class MapContainer extends Observable implements Observer,
 	}
 
 	public void centerScrollOnSelection(final int startIndex,
-																			final int endIndex) {
+		final int endIndex) {
 
 		int scrollVal = (int) Math.round((endIndex + startIndex) / 2.0);
 
@@ -1582,8 +1590,8 @@ public class MapContainer extends Observable implements Observer,
 				break;
 
 			default:
-				LogBuffer.println("Map type (" +	type + ") not found. " +
-													"Setting fixed map.");
+				LogBuffer.println("Map type (" + type + ") not found. " +
+					"Setting fixed map.");
 				newMap = fixedMap;
 		}
 
@@ -1741,8 +1749,7 @@ public class MapContainer extends Observable implements Observer,
 	public void update(final Observable observable, final Object object) {
 
 		LogBuffer.println(new StringBuffer("MapContainer Got an " +
-																				"update from unknown ")	.append(observable)
-																																.toString());
+			"update from unknown ").append(observable).toString());
 		notifyObservers(object);
 	}
 
@@ -2038,14 +2045,14 @@ public class MapContainer extends Observable implements Observer,
 		if(numVisible > getTotalTileNum()) {
 			if(getMaxIndex() > 0) {
 				LogBuffer.println("Warning: Encountered invalid/too-large " +
-													"numVisible value: [" + numVisible +
-													"].  Resetting.");
+					"numVisible value: [" + numVisible +
+					"].  Resetting.");
 				numVisible = getMaxIndex() + 1;
 			}
 		}
 		if(numVisible < 1) {
 			LogBuffer.println("Warning: Encountered invalid/too-small " +
-												"numVisible value: [" + numVisible + "].  Resetting.");
+				"numVisible value: [" + numVisible + "].  Resetting.");
 			numVisible = 1;
 		}
 		return(numVisible);
@@ -2059,14 +2066,12 @@ public class MapContainer extends Observable implements Observer,
 		 * eventually. */
 		if(firstVisible + numVisible - 1 > getMaxIndex() && getMaxIndex() > -1) {
 			LogBuffer.println("Warning: Encountered invalid/too-large " +
-												"firstVisible value: [" + firstVisible +
-												"].  Resetting.");
+				"firstVisible value: [" + firstVisible + "].  Resetting.");
 			firstVisible = getMaxIndex() - numVisible;
 		}
 		if(firstVisible < 0) {
 			LogBuffer.println("Warning: Encountered invalid/negative " +
-												"firstVisible value: [" + firstVisible +
-												"].  Resetting.");
+				"firstVisible value: [" + firstVisible + "].  Resetting.");
 			firstVisible = 0;
 		}
 		return(firstVisible);
@@ -2081,8 +2086,7 @@ public class MapContainer extends Observable implements Observer,
 		 * eventually. */
 		if(lastVisible > getMaxIndex()) {
 			LogBuffer.println("Warning: Encountered invalid/too-large " +
-												"lastVisible value: [" + lastVisible +
-												"].  Resetting.");
+				"lastVisible value: [" + lastVisible + "].  Resetting.");
 			lastVisible = getMaxIndex();
 		}
 		return(lastVisible);
@@ -2115,8 +2119,8 @@ public class MapContainer extends Observable implements Observer,
 	public boolean nodeHasAttribute(final String nodeName, final String key) {
 
 		if(configNode == null) {
-			LogBuffer.println("Could not find " + key + ". No preferences node defined for " 
-					+ this.getClass().getName());
+			LogBuffer.println("Could not find " + key + ". No preferences " +
+				"node defined for " + this.getClass().getName());
 			return false;
 		}
 		
@@ -2132,8 +2136,8 @@ public class MapContainer extends Observable implements Observer,
 
 		}
 		catch(final BackingStoreException e) {
-			LogBuffer.println("Error in MapContainer/nodeHasAttribute: " + e
-																																			.getMessage());
+			LogBuffer.println("Error in MapContainer/nodeHasAttribute: " +
+				e.getMessage());
 			e.printStackTrace();
 		}
 
@@ -2343,24 +2347,23 @@ public class MapContainer extends Observable implements Observer,
 		hoverChanged = false;
 	}
 
-	/** @author rleach
+	/**
 	 * @return the hoverTreeMinIndex */
 	public int getHoverTreeMinIndex() {
 		return(hoverTreeMinIndex);
 	}
 
-	/** @author rleach
+	/**
 	 * @param hoverTreeMinIndex the hoverTreeMinIndex to set */
 	public void setHoverTreeMinIndex(int hoverTreeMinIndex) {
 		this.hoverTreeMinIndex = hoverTreeMinIndex;
 		debug("Setting new tree min index hover to [" +	hoverTreeMinIndex +
-					"].", 18);
+			"].", 18);
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
 	}
 
-	/** @author rleach */
 	public void unsetHoverTreeMinIndex() {
 		this.hoverTreeMinIndex = -1;
 		setChanged();
@@ -2368,24 +2371,23 @@ public class MapContainer extends Observable implements Observer,
 		notifyObservers();
 	}
 
-	/** @author rleach
+	/**
 	 * @return the hoverTreeMaxIndex */
 	public int getHoverTreeMaxIndex() {
 		return(hoverTreeMaxIndex);
 	}
 
-	/** @author rleach
+	/**
 	 * @param hoverTreeMaxIndex the hoverTreeMaxIndex to set */
 	public void setHoverTreeMaxIndex(int hoverTreeMaxIndex) {
 		this.hoverTreeMaxIndex = hoverTreeMaxIndex;
 		debug("Setting new tree max index hover to [" +	hoverTreeMaxIndex +
-					"].", 18);
+			"].", 18);
 		setChanged();
 		setHoverChanged();
 		notifyObservers();
 	}
 
-	/** @author rleach */
 	public void unsetHoverTreeMaxIndex() {
 		this.hoverTreeMaxIndex = -1;
 		setChanged();
@@ -2441,7 +2443,6 @@ public class MapContainer extends Observable implements Observer,
 	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
 	 * zooming that is aware of aspect ratio
 	 * 
-	 * @author rleach
 	 * @return double ZOOM_INCREMENT */
 	public static double getZoomIncrement() {
 
@@ -2452,118 +2453,248 @@ public class MapContainer extends Observable implements Observer,
 	 * This is needed for IMV UNTIL we have implemented a way to handle smooth
 	 * zooming that is aware of aspect ratio
 	 * 
-	 * @author rleach
 	 * @return double ZOOM_INCREMENT_FAST */
 	public static double getZoomIncrementFast() {
 
 		return(ZOOM_INCREMENT_FAST);
 	}
 
-	/** Set the first visible label data index. For use by LabelView.
+	/**
+	 * Set the first visible label data index. For use by LabelView.
 	 * -1 = unset
 	 * 
-	 * @author rleach
-	 * @param p */
+	 * @param p
+	 */
 	public void setFirstVisibleLabel(int p) {
 		if(p < getMinIndex() || p > getMaxIndex()) firstVisibleLabel = -1;
 		else firstVisibleLabel = p;
 	}
 
-	/** Retrieves the first visible label data index
+	/**
+	 * Retrieves the first visible label data index
 	 * 
-	 * @author rleach
-	 * @return firstVisiblelabel data index */
+	 * @return firstVisiblelabel data index
+	 */
 	public int getFirstVisibleLabel() {
 		return(firstVisibleLabel);
 	}
 
-	/** Set the last visible label data index. For use by LabelView.
+	/**
+	 * Set the last visible label data index. For use by LabelView.
 	 * -1 = unset
 	 * 
-	 * @author rleach
-	 * @param p */
+	 * @param p
+	 */
 	public void setLastVisibleLabel(int p) {
 		if(p < getMinIndex() || p > getMaxIndex()) lastVisibleLabel = -1;
 		else lastVisibleLabel = p;
 	}
 
-	/** Retrieves the last visible label data index
+	/**
+	 * Retrieves the last visible label data index
 	 * 
-	 * @author rleach
-	 * @return lastVisiblelabel data index */
+	 * @return lastVisiblelabel data index
+	 */
 	public int getLastVisibleLabel() {
 		return(lastVisibleLabel);
 	}
 
-	/** Retrieves the last visible label data index
+	/**
+	 * Calculates the number of visible labels
 	 * 
-	 * @author rleach
-	 * @return lastVisiblelabel data index */
+	 * @return number of visible labels
+	 */
 	public int getNumVisibleLabels() {
 		if(lastVisibleLabel < 0) { return(-1); }
 		return(lastVisibleLabel - firstVisibleLabel + 1);
 	}
 
-	/** This provides the number of pixels the first label is offset from the
+	/**
+	 * This provides the number of pixels the first label is offset from the
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @author rleach
-	 * @return the firstVisibleLabelOffset */
+	 * @return the firstVisibleLabelOffset
+	 */
 	public int getFirstVisibleLabelOffset() {
 		return(firstVisibleLabelOffset);
 	}
 
-	/** This sets the number of pixels the first label is offset from the
+	/**
+	 * This sets the number of pixels the first label is offset from the
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @author rleach
-	 * @param firstVisibleLabelOffset the firstVisibleLabelOffset to set */
+	 * @param firstVisibleLabelOffset the firstVisibleLabelOffset to set
+	 */
 	public void setFirstVisibleLabelOffset(int firstVisibleLabelOffset) {
 		this.firstVisibleLabelOffset = firstVisibleLabelOffset;
 	}
 
-	/** This provides the number of pixels the last label is offset from the
+	/**
+	 * This provides the number of pixels the last label is offset from the
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @author rleach
-	 * @return the lastVisibleLabelOffset */
+	 * @return the lastVisibleLabelOffset
+	 */
 	public int getLastVisibleLabelOffset() {
 		return(lastVisibleLabelOffset);
 	}
 
-	/** This sets the number of pixels the last label is offset from the
+	/**
+	 * This sets the number of pixels the last label is offset from the
 	 * nearest edge. This is required by the trees in order to align the leaves
 	 * with the labels
 	 * 
-	 * @author rleach
-	 * @param lastVisibleLabelOffset the lastVisibleLabelOffset to set */
+	 * @param lastVisibleLabelOffset the lastVisibleLabelOffset to set
+	 */
 	public void setLastVisibleLabelOffset(int lastVisibleLabelOffset) {
 		this.lastVisibleLabelOffset = lastVisibleLabelOffset;
 	}
 
 
-	/** @author rleach
+
+
+
+
+
+
+
+	/**
+	 * Set the first visible label capacity data index. For use by LabelView.
+	 * -1 = unset
+	 * 
+	 * @param p
+	 */
+	public void setFirstVisibleLabelCapacity(int p) {
+		if(p < getMinIndex() || p > getMaxIndex()) {
+			firstVisibleLabelCapacity = -1;
+		} else {
+			firstVisibleLabelCapacity = p;
+		}
+	}
+
+	/**
+	 * Retrieves the first visible label capacity data index
+	 * 
+	 * @return firstVisibleLabelCapacity data index
+	 */
+	public int getFirstVisibleLabelCapacity() {
+		return(firstVisibleLabelCapacity);
+	}
+
+	/**
+	 * Set the last visible label capacity data index. For use by LabelView.
+	 * -1 = unset
+	 * 
+	 * @param p
+	 */
+	public void setLastVisibleLabelCapacity(int p) {
+		if(p < getMinIndex() || p > getMaxIndex()) {
+			lastVisibleLabelCapacity = -1;
+		} else {
+			lastVisibleLabelCapacity = p;
+		}
+	}
+
+	/**
+	 * Retrieves the last visible label capacity data index
+	 * 
+	 * @return lastVisibleLabelCapacity data index
+	 */
+	public int getLastVisibleLabelCapacity() {
+		return(lastVisibleLabelCapacity);
+	}
+
+	/**
+	 * Calculates the number of labels that fit the label area
+	 * 
+	 * @return number of label spaces
+	 */
+	public int getNumVisibleLabelsCapacity() {
+		if(lastVisibleLabelCapacity < 0) {
+			return(-1);
+		}
+		return(lastVisibleLabelCapacity - firstVisibleLabelCapacity + 1);
+	}
+
+	/**
+	 * This provides the number of pixels the first label space is offset from
+	 * the nearest edge. This is required by the trees in order to align the
+	 * leaves with the labels
+	 * 
+	 * @return the firstVisibleLabelOffsetCapacity
+	 */
+	public int getFirstVisibleLabelOffsetCapacity() {
+		return(firstVisibleLabelOffsetCapacity);
+	}
+
+	/**
+	 * This sets the number of pixels the first label space is offset from the
+	 * nearest edge. This is required by the trees in order to align the leaves
+	 * with the labels
+	 * 
+	 * @param firstVisibleLabelOffsetCapacity
+	 */
+	public void setFirstVisibleLabelOffsetCapacity(
+		int firstVisibleLabelOffsetCapacity) {
+
+		this.firstVisibleLabelOffsetCapacity = firstVisibleLabelOffsetCapacity;
+	}
+
+	/**
+	 * This provides the number of pixels the last label space is offset from
+	 * the nearest edge. This is required by the trees in order to align the
+	 * leaves with the labels
+	 * 
+	 * @return the lastVisibleLabelOffsetCapacity
+	 */
+	public int getLastVisibleLabelOffsetCapacity() {
+		return(lastVisibleLabelOffsetCapacity);
+	}
+
+	/**
+	 * This sets the number of pixels the last label space is offset from the
+	 * nearest edge. This is required by the trees in order to align the leaves
+	 * with the labels
+	 * 
+	 * @param lastVisibleLabelOffsetCapacity
+	 */
+	public void setLastVisibleLabelOffsetCapacity(
+		int lastVisibleLabelOffsetCapacity) {
+
+		this.lastVisibleLabelOffsetCapacity = lastVisibleLabelOffsetCapacity;
+	}
+
+
+
+
+
+
+
+
+
+
+	/**
 	 * @return the lastTreeModeGlobal */
 	public boolean wasLastTreeModeGlobal() {
 		return(lastTreeModeGlobal);
 	}
 
-	/** @author rleach
+	/**
 	 * @param lastTreeModeGlobal the lastTreeModeGlobal to set */
 	public void setLastTreeModeGlobal(boolean lastTreeModeGlobal) {
 		this.lastTreeModeGlobal = lastTreeModeGlobal;
 	}
 
-	/** @author rleach
+	/**
 	 * @return the keepTreeGlobal */
 	public boolean shouldKeepTreeGlobal() {
 		return(keepTreeGlobal);
 	}
 
-	/** @author rleach
+	/**
 	 * @param keepTreeGlobal the keepTreeGlobal to set */
 	public void setKeepTreeGlobal(boolean keepTreeGlobal) {
 		this.keepTreeGlobal = keepTreeGlobal;
@@ -2573,13 +2704,13 @@ public class MapContainer extends Observable implements Observer,
 		return(selecting || labelsBeingScrolled || draggingDivider);
 	}
 
-	/** @author rleach
+	/**
 	 * @return the whizMode */
 	public boolean isWhizMode() {
 		return(whizMode);
 	}
 
-	/** @author rleach
+	/**
 	 * @param whizMode the whizMode to set */
 	public void setWhizMode(boolean whizMode) {
 		this.whizMode = whizMode;

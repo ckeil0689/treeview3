@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 
 import Controllers.ExportHandler;
 import Controllers.FormatType;
+import Controllers.LabelExportOption;
 import Controllers.RegionType;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
@@ -21,7 +22,7 @@ import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 public class ExportDialogController {
 
 	private final ExportDialog exportDialog;
-	private final ExportOptions exportOptions;
+	private ExportOptions exportOptions;
 	private final TreeViewFrame tvFrame;
 	private final DendroView dendroView;
 	private final MapContainer interactiveXmap;
@@ -29,28 +30,57 @@ public class ExportDialogController {
 	private final TreeSelectionI colSelection;
 	private final TreeSelectionI rowSelection;
 	private DataModel model;
+	private ExportHandler eh;
 
 	public ExportDialogController(final ExportDialog expD,
 		final TreeViewFrame tvFrame,final MapContainer interactiveXmap,
 		final MapContainer interactiveYmap,final DataModel model) {
 
-		exportDialog = expD;
+		this.exportDialog = expD;
 		this.tvFrame = tvFrame;
-		dendroView = tvFrame.getDendroView();
+		this.dendroView = tvFrame.getDendroView();
 		this.interactiveXmap = interactiveXmap;
 		this.interactiveYmap = interactiveYmap;
-		colSelection = tvFrame.getColSelection();
-		rowSelection = tvFrame.getRowSelection();
+		this.colSelection = tvFrame.getColSelection();
+		this.rowSelection = tvFrame.getRowSelection();
 		this.model = model;
+		this.eh = new ExportHandler(dendroView,
+			interactiveXmap,interactiveYmap,colSelection,rowSelection);
 
-		exportOptions = new ExportOptions();
+		try {
+			exportOptions = eh.getSetBestOptions();
+		} catch(ExportException ee) {
+			exportOptions = eh.getDefaultOptions();
+			LogBuffer.println(ee.getLocalizedMessage());
+			ee.printStackTrace();
+			showWarning(ee.getLocalizedMessage());
+			return;
+		}
 
-		addListeners();
+		//If the exported image is too large for BufferedImage to handle,
+		//getSetBestOptions has already popped up a warning to the user and
+		//returned null.  We just need to make sure the result is not null.
+		if(exportOptions != null) {
+			addListeners();
 
-		setNewPreviewComponents(exportOptions);
-		exportDialog.arrangePreviewPanel();
-		updatePreview();
-		exportDialog.setVisible(true);
+			//Make sure the radio buttons are properly enabled/disabled
+			exportDialog.updateRegionRadioBtns(
+				exportOptions.getFormatType().isDocumentFormat());
+
+			setNewPreviewComponents(exportOptions);
+			exportDialog.arrangePreviewPanel();
+			updatePreview();
+			try {
+				exportDialog.setVisible(true);
+			} catch(Exception e) {
+				LogBuffer.println("Possible memory exception during " +
+					"exportDialog.setVisible(true).");
+				e.printStackTrace();
+				throw e;
+			}
+	
+			LogBuffer.println("ExportDialogController ready");
+		}
 	}
 
 	/**
@@ -61,8 +91,11 @@ public class ExportDialogController {
 		exportDialog.addExportListener(new ExportListener());
 		exportDialog.addFormatListener(new FormatListener());
 		exportDialog.addRegionListener(new RegionListener());
+		exportDialog.addAspectListener(new AspectListener());
 		exportDialog.addItemStateListener(new RadioItemStateListener());
 		exportDialog.addCheckBoxItemStateListener(new CheckItemStateListener());
+		exportDialog.addRowLabelListener(new RowLabelListener());
+		exportDialog.addColLabelListener(new ColLabelListener());
 	}
 
 	/**
@@ -73,17 +106,69 @@ public class ExportDialogController {
 	 */
 	private void setNewPreviewComponents(final ExportOptions options) {
 
-		ExportPreviewTrees expRowTrees =
-			tvFrame.getDendroView().getRowTreeSnapshot(
-				options.isShowSelections(),options.getRegionType());
-		ExportPreviewTrees expColTrees =
-			tvFrame.getDendroView().getColTreeSnapshot(
-				options.isShowSelections(),options.getRegionType());
+		//Obtain the dimensions of the exported image components
+		eh.setOptions(options);
+		eh.setCalculatedDimensions(exportOptions.getRegionType());
+
+		//We need to get the export dimensions to update the export preview
+		int height = eh.getYDim(exportOptions.getRegionType());
+		int width = eh.getXDim(exportOptions.getRegionType());
+		int treesHeight = eh.getTreesHeight();
+		int rowLabelsLen =
+			eh.getRowLabelPanelWidth(exportOptions.getRegionType(),
+				exportOptions.getRowLabelOption());
+		int colLabelsLen =
+			eh.getColLabelPanelHeight(exportOptions.getRegionType(),
+				exportOptions.getColLabelOption());
+		int matrixHeight = height - eh.getColTreeAndGapLen() -
+			eh.getColLabelAndGapLen();
+		int matrixWidth = width - eh.getRowTreeAndGapLen() -
+			eh.getRowLabelAndGapLen();
+
+		ExportPreviewTrees expRowTrees = null;
+		if(eh.isRowTreeIncluded()) {
+			expRowTrees =
+				tvFrame.getDendroView().getRowTreeSnapshot(
+					options.isShowSelections(),options.getRegionType(),
+					treesHeight,matrixHeight,
+					(matrixWidth > matrixHeight ? matrixWidth : matrixHeight));
+		}
+		ExportPreviewTrees expColTrees = null;
+		if(eh.isColTreeIncluded()) {
+			expColTrees =
+				tvFrame.getDendroView().getColTreeSnapshot(
+					options.isShowSelections(),options.getRegionType(),
+					matrixWidth,treesHeight,
+					(matrixWidth > matrixHeight ? matrixWidth : matrixHeight));
+		}
+		ExportPreviewLabels expRowLabels = null;
+		if(options.getRowLabelOption() != LabelExportOption.NO) {
+			expRowLabels =
+				tvFrame.getDendroView().getRowLabelsSnapshot(
+					options.isShowSelections(),options.getRegionType(),
+					rowLabelsLen,matrixHeight,
+					options.getRowLabelOption() == LabelExportOption.SELECTION,
+					eh.getTileHeight(),
+					eh.getLabelAreaHeight() - ExportHandler.SQUEEZE,
+					(matrixWidth > matrixHeight ? matrixWidth : matrixHeight));
+		}
+		ExportPreviewLabels expColLabels = null;
+		if(options.getColLabelOption() != LabelExportOption.NO) {
+			expColLabels =
+				tvFrame.getDendroView().getColLabelsSnapshot(
+					options.isShowSelections(),options.getRegionType(),
+					matrixWidth,colLabelsLen,
+					options.getColLabelOption() == LabelExportOption.SELECTION,
+					eh.getTileWidth(),
+					eh.getLabelAreaHeight() - ExportHandler.SQUEEZE,
+					(matrixWidth > matrixHeight ? matrixWidth : matrixHeight));
+		}
 		ExportPreviewMatrix expMatrix =
 			tvFrame.getDendroView().getMatrixSnapshot(
 				options.isShowSelections(),options.getRegionType());
 
-		exportDialog.setPreviewComponents(expRowTrees,expColTrees,expMatrix);
+		exportDialog.setPreviewComponents(expRowTrees,expColTrees,expRowLabels,
+			expColLabels,expMatrix);
 	}
 
 	/**
@@ -94,6 +179,10 @@ public class ExportDialogController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
+			if(arg0.getSource() != exportDialog.getExportButton()) {
+				return;
+			}
+
 			//This will open a file chooser dialog
 			String exportFilename =
 				chooseSaveFile(exportOptions.getFormatType());
@@ -101,24 +190,26 @@ public class ExportDialogController {
 			//If the returned string is null or empty, they either canceled or
 			//there was an error
 			if((exportFilename == null) || exportFilename.isEmpty()) {
-				LogBuffer.println("Could not export. A file name could "
-					+ "not be created.");
+				LogBuffer.println("Could not export. A file name could " +
+					"not be created.");
 				return;
+			} else {
+				LogBuffer.println("Exporting to file: [" + exportFilename +
+					"]");
 			}
 
 			//Now export the file
 			try {
 				ExportHandler eh = new ExportHandler(dendroView,
-					interactiveXmap,
-					interactiveYmap,colSelection,rowSelection);
-				//TODO use and pass ExportOptions object instead
-				eh.setDefaultPageSize(exportOptions.getPaperType());
-				eh.setDefaultPageOrientation(exportOptions.getOrientation());
-				eh.setTileAspectRatio(exportOptions.getAspectType());
+					interactiveXmap,interactiveYmap,colSelection,rowSelection);
+				eh.setOptions(exportOptions);
+				eh.setCalculatedDimensions(exportOptions.getRegionType());
 				boolean exportSucess = eh.export(exportOptions.getFormatType(),
 					exportFilename,
 					exportOptions.getRegionType(),
-					exportOptions.isShowSelections());
+					exportOptions.isShowSelections(),
+					exportOptions.getRowLabelOption(),
+					exportOptions.getColLabelOption());
 
 				if(exportSucess) {
 					String msg = "Exported file: [" + exportFilename + "].";
@@ -129,7 +220,7 @@ public class ExportDialogController {
 					//Open the file in the default system app
 					Desktop.getDesktop().open(new File(exportFilename));
 				} else {
-					String msg = "Could not export the file : [" +
+					String msg = "Could not export the file: [" +
 						exportFilename + "].";
 					LogBuffer.println(msg);
 				}
@@ -210,10 +301,7 @@ public class ExportDialogController {
 				tvFrame.getRowSelection());
 
 			List<RegionType> tooBigs = new ArrayList<RegionType>();
-			if(!selFormat.isDocumentFormat()) {
-				final boolean useMinimums = true;
-				tooBigs = eh.getOversizedRegions(useMinimums);
-			}
+			tooBigs = eh.getOversizedRegions(true,selFormat.isDocumentFormat());
 
 			exportDialog.setBigRegs(tooBigs);
 			exportDialog.updateRegionRadioBtns(selFormat.isDocumentFormat());
@@ -230,6 +318,54 @@ public class ExportDialogController {
 
 			exportDialog.updateAspectRadioBtns(selFormat.isDocumentFormat(),
 				selRegion);
+		}
+	}
+
+	private class AspectListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			FormatType selFormat = exportOptions.getFormatType();
+			RegionType selRegion = exportOptions.getRegionType();
+			AspectType selAspect = exportOptions.getAspectType();
+
+			exportDialog.updateLabelBtns(selFormat.isDocumentFormat(),
+				selRegion,selAspect);
+		}
+	}
+
+	private class RowLabelListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			FormatType selFormat = exportOptions.getFormatType();
+			RegionType selRegion = exportOptions.getRegionType();
+			AspectType selAspect = exportOptions.getAspectType();
+			LabelExportOption selRows = exportOptions.getRowLabelOption();
+
+			//We might need to enable/disable column label buttons upon change
+			//of the row label button selection
+			exportDialog.updateColLabelBtns(selFormat.isDocumentFormat(),
+				selRegion,selAspect,selRows);
+		}
+	}
+ 
+	private class ColLabelListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			FormatType selFormat = exportOptions.getFormatType();
+			RegionType selRegion = exportOptions.getRegionType();
+			AspectType selAspect = exportOptions.getAspectType();
+			LabelExportOption selCols = exportOptions.getColLabelOption();
+
+			//We might need to enable/disable row label buttons upon change
+			//of the column label button selection
+			exportDialog.updateRowLabelBtns(selFormat.isDocumentFormat(),
+				selRegion,selAspect,selCols);
 		}
 	}
 
@@ -281,8 +417,8 @@ public class ExportDialogController {
 	private void updatePreview() {
 
 		if(exportDialog == null) {
-			LogBuffer.println("No exportDialog object defined. Could "
-				+ "not update preview components.");
+			LogBuffer.println("No exportDialog object defined. Could not " +
+				"update preview components.");
 			return;
 		}
 

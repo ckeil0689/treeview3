@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
-public class ExportPreviewTrees extends JPanel {
+public class ExportPreviewLabels extends JPanel {
 
 	/**
 	 * 
@@ -18,10 +18,8 @@ public class ExportPreviewTrees extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	/* Initial default sizes */
-	public static final int PRIMARY_SIDE_LEN_DEFAULT = 300;
-	public static final int SECONDARY_SIDE_LEN_DEFAULT = 85;
-	//Minimum dimension of an element (e.g. tree height)
-	public static final int D_MIN = 1;
+	public static final int PRIMARY_SIDE_LEN_DEFAULT = 400;
+	public static final int SECONDARY_SIDE_LEN_DEFAULT = 80;
 	
 	private final Image paintImage;
 	private final boolean isRows;
@@ -34,42 +32,43 @@ public class ExportPreviewTrees extends JPanel {
 	/**
 	 * Constructor
 	 * 
-	 * @param trees - buffered image object
-	 * @param isRows - whether this is for row trees or not
+	 * @param labels - the image of the labels
+	 * @param isRows - whether they are row or column labels
 	 */
-	public ExportPreviewTrees(final BufferedImage trees, final boolean isRows) {
+	public ExportPreviewLabels(final BufferedImage labels, final boolean isRows) {
 		
-		this.paintImage = trees;
+		this.paintImage = labels;
 		this.isRows = isRows;
 		
 		setLayout(new MigLayout());
-		setShortSide(SECONDARY_SIDE_LEN_DEFAULT);
-		setLongSide(PRIMARY_SIDE_LEN_DEFAULT);
+		setSecondarySideLen(SECONDARY_SIDE_LEN_DEFAULT);
+		setPrimarySideLen(PRIMARY_SIDE_LEN_DEFAULT);
 		setPaperBackground(false);
 	}
 
 	/**
 	 * Constructor
 	 * 
-	 * @param trees - buffered image object
-	 * @param isRows - whether this is for row trees or not
-	 * @param secondaryLen - Tree height
-	 * @param primaryLen - Tree width
+	 * @param labels - the image of the labels
+	 * @param isRows - whether they are row or column labels
+	 * @param secondaryLen - Length of the panel side perpendicular to the
+	 *                       adjacent matrix side
+	 * @param primaryLen - Length of the panel side adjacent to the matrix
 	 */
-	public ExportPreviewTrees(final BufferedImage trees,final boolean isRows,
+	public ExportPreviewLabels(final BufferedImage labels,final boolean isRows,
 		final int secondaryLen,final int primaryLen) {
-
-		this.paintImage = trees;
+		
+		this.paintImage = labels;
 		this.isRows = isRows;
-
+		
 		setLayout(new MigLayout());
-		setShortSide(secondaryLen);
-		setLongSide(primaryLen);	
+		setSecondarySideLen(secondaryLen);
+		setPrimarySideLen(primaryLen);	
 		setPaperBackground(false);
 	}
 
 	/**
-	 * Define the background color of the tree drawing. For paper type 
+	 * Define the background color of the label drawing. For paper type 
 	 * export formats this will turn the background white. For non-paper type
 	 * backgrounds the color will be the default of the application, making it
 	 * look transparent.
@@ -87,53 +86,53 @@ public class ExportPreviewTrees extends JPanel {
 	}
 	
 	/**
-	 * The tree panels can vary in thickness. This method can be used to 
-	 * adapt the length to represent the calculated tree thickness according 
-	 * to calculated matrix-tree ratios in ExportHandler.
-	 * @param shortSide - The thickness of the tree preview panel.
+	 * The label panels can vary in thickness. This method can be used to 
+	 * adapt the length to represent the calculated label thickness according 
+	 * to calculated matrix-label ratios in ExportHandler.
+	 * @param secondaryLen - The thickness of the label preview panel.
 	 */
-	public void setShortSide(final int shortSide) {
+	public void setSecondarySideLen(final int secondaryLen) {
 		
 		if(isRows) {
-			this.xSide = shortSide;
+			this.xSide = secondaryLen;
 			
 		} else {
-			this.ySide = shortSide;
+			this.ySide = secondaryLen;
 		}
 	}
 	
 	/**
-	 * The tree panels can vary in length depending on the matrix. This method
+	 * The label panels can vary in length depending on the matrix. This method
 	 * can be used to adapt the length to retain the same size as the matrix
 	 * they belong to.
-	 * @param longSide - The size of the long side of the tree preview panel.
+	 * @param primaryLen - The size of the long side of the label preview panel.
 	 */
-	public void setLongSide(final int longSide) {
+	public void setPrimarySideLen(final int primaryLen) {
 		
 		if(isRows) {
-			this.ySide = longSide;
+			this.ySide = primaryLen;
 			
 		} else {
-			this.xSide = longSide;
+			this.xSide = primaryLen;
 		}
 	}
 	
 	/**
-	 * @return the longest side length for the preview trees.
+	 * @return the longest side length for the preview labels.
 	 */
-	public int getLongSide() {
+	public int getPrimarySideLen() {
 		
 		return (isRows) ? ySide : xSide;
 	}
 	
 	/**
-	 * @return the shortest side length (thickness) for the preview trees.
+	 * @return the shortest side length (thickness) for the preview labels.
 	 */
-	public int getShortSide() {
+	public int getSecondarySideLen() {
 		
 		return (isRows) ? xSide : ySide;
 	}
-	
+
 	/*
 	 * The double buffer in Swing doesn't seem to be persistent across draws.
 	 * for instance, every time another window obscures one of our windows and
@@ -142,11 +141,15 @@ public class ExportPreviewTrees extends JPanel {
 	 * We apparently need to maintain our own persistent offscreen buffer for
 	 * speed reasons...
 	 */
+	/**
+	 * Paints the label panel
+	 * @param g - Graphics object
+	 */
 	@Override
 	public synchronized void paintComponent(final Graphics g) {
 
 		super.paintComponent(g);
-		
+
 		Graphics2D g2d = (Graphics2D) g;
 
 		g2d.setColor(backgroundColor);
@@ -154,10 +157,9 @@ public class ExportPreviewTrees extends JPanel {
 
 		if(paintImage != null) {
 			g2d.drawImage(paintImage, 0, 0, xSide, ySide, this);
-			
 		} else {
 			BufferedImage img = new BufferedImage(xSide, ySide, 
-					BufferedImage.TYPE_BYTE_GRAY);
+				BufferedImage.TYPE_BYTE_GRAY);
 			g2d.drawImage(img, 0, 0, xSide, ySide, this);
 		}
 	}

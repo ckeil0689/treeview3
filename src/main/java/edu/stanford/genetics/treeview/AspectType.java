@@ -37,6 +37,15 @@ public enum AspectType {
 		return(null);
 	}
 
+	/**
+	 * This is the default that results in the lowest resolution image
+	 * 
+	 * @return
+	 */
+	public static AspectType getMinDefault() {
+		return(AspectType.ONETOONE);
+	}
+
 	public static AspectType getAspect(String aspName) {
 		for(AspectType asp : AspectType.values()) {
 			if(asp.toString().equals(aspName)) {

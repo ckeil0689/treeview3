@@ -52,10 +52,10 @@ public class MenubarController {
 		switch (name) {
 
 		case StringRes.menu_Open:
-			controller.openFile(null, false);
+			controller.openFile(null,false,false);
 			break;
 		case StringRes.menu_Import:
-			controller.openFile(null, true);
+			controller.openFile(null,true,false);
 			break;
 		case StringRes.menu_SaveAs:
 		  controller.saveModelAs();
@@ -70,7 +70,13 @@ public class MenubarController {
 			controller.closeWindow();
 			break;
 		case StringRes.menu_Export:
-			controller.openExportMenu();
+			try {
+				controller.openExportMenu();
+			} catch(Exception oome) {
+				LogBuffer.println("Out of memory during " +
+					"controller.openExportMenu().");
+				oome.printStackTrace();
+			}
 			break;
 		case StringRes.menu_RowAndCol:
 			controller.openLabelMenu(name);
@@ -129,6 +135,21 @@ public class MenubarController {
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	/* Some helpers to keep the switch statement readable. */
+	/**
+	 * Takes the currently selected row and column indexes and uses them to open
+	 * a new view that only displays the selected data.
+	 */
+	private void showSubData() {
+
+		controller.showSubDataModel(
+			tvFrame.getRowSelection().getSelectedIndexes(),
+			tvFrame.getColSelection().getSelectedIndexes(), null, null);
+	}
+
+>>>>>>> master
 	/**
 	 * Just opens a stats dialog.
 	 */

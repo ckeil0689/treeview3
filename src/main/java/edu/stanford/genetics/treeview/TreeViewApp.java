@@ -216,7 +216,6 @@ public abstract class TreeViewApp {// implements WindowListener {
 
 		try {
 			return openNew(null);
-
 		} catch (final LoadException e) {
 			// ignore, since not loading anything shouldn't throw.
 			return null;
@@ -242,7 +241,7 @@ public abstract class TreeViewApp {// implements WindowListener {
 		final TVController tvController = new TVController(tvFrame, model);
 
 		if (fileSet != null) {
-			tvController.openFile(fileSet, false);
+			tvController.openFile(fileSet,false,false);
 		}
 		// tvFrame.addWindowListener(this);
 		return tvFrame;

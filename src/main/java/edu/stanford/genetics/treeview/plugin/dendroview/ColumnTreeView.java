@@ -73,6 +73,13 @@ public class ColumnTreeView extends TRView {
 			getSecondaryPaneSize(offscreenSize));
 	}
 
+	/**
+	 * When the whizzing labels are active, but the tree is drawn static/linked
+	 * to the data instead of the labels, this is used to draw a different color
+	 * background behind the portion of the tree the labels are shown for
+	 * @param g - graphics object
+	 * @param scaleEq - scaling factor object
+	 */
 	@Override
 	protected void drawFittedWhizBackground(final Graphics g,
 		LinearTransformation scaleEq) {
@@ -83,8 +90,9 @@ public class ColumnTreeView extends TRView {
 			return;
 		}
 
-		g.fillRect((int) scaleEq.transform((double) map.getFirstVisibleLabel()),
-			0,(int) scaleEq.transform((double) map.getFirstVisible() +
+		g.fillRect((int) scaleEq.transform(
+			(double) map.getFirstVisibleLabel()),0,
+			(int) scaleEq.transform((double) map.getFirstVisible() +
 				(double) map.getNumVisibleLabels()),
 			getSecondaryPaneSize(offscreenSize));
 	}
@@ -94,7 +102,7 @@ public class ColumnTreeView extends TRView {
 		if(destRect == null) {
 			return(-1);
 		}
-		return(destRect.x + map.getFirstVisibleLabelOffset());
+		return(destRect.x + map.getFirstVisibleLabelOffsetCapacity());
 	}
 
 	@Override
@@ -102,7 +110,8 @@ public class ColumnTreeView extends TRView {
 		if(destRect == null) {
 			return(-1);
 		}
-		return(destRect.x + map.getFirstVisibleLabelOffset() + destRect.width);
+		return(destRect.x + map.getFirstVisibleLabelOffsetCapacity() +
+			destRect.width);
 	}
 
 	@Override
@@ -156,8 +165,8 @@ public class ColumnTreeView extends TRView {
 
 	@Override
 	protected int getUsedWhizzingLength() {
-		return(map.getUsedPixels() - map.getFirstVisibleLabelOffset() -
-			map.getLastVisibleLabelOffset());
+		return(map.getUsedPixels() - map.getFirstVisibleLabelOffsetCapacity() -
+			map.getLastVisibleLabelOffsetCapacity());
 	}
 
 	@Override
@@ -236,7 +245,7 @@ public class ColumnTreeView extends TRView {
 	protected boolean isAPrimaryScroll(final MouseWheelEvent e) {
 		return(e.isShiftDown());
 	}
-	
+
 	@Override
 	protected void setExportPreviewScale(Rectangle dest) {
 		
@@ -256,7 +265,7 @@ public class ColumnTreeView extends TRView {
 				treePainter.getCorrMax(),
 				dest.y + dest.height));
 	}
-	
+
 	@Override
 	protected int getSnapShotDestRectStart(final Rectangle dest) {
 		if(dest == null) {

@@ -1,5 +1,6 @@
 package edu.stanford.genetics.treeview;
 
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
@@ -11,6 +12,9 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeListener;
 
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
@@ -18,7 +22,8 @@ import Utilities.StringRes;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 
-/** A dialog that can contain various menus, depending on which the user chooses
+/**
+ * A dialog that can contain various menus, depending on which the user chooses
  * to open. This is done by setting the contents of the dialog's contentPane
  * based on the clicked JMenuItem in the menubar.
  */
@@ -38,18 +43,20 @@ public class LabelSettings extends CustomDialog {
 	// Menus
 	private AnnotationPanel annotationSettings;
 
-	/** Main constructor for Preferences Menu
+	/**
+	 * Main constructor for Preferences Menu
 	 *
-	 * @param tvFrame */
+	 * @param tvFrame
+	 */
 	public LabelSettings(final TreeViewFrame tvFrame) {
 
 		super(StringRes.dlg_Labels);
 		this.tvFrame = tvFrame;
-		this.dendroView = tvFrame.getDendroView();
+		dendroView = tvFrame.getDendroView();
 	}
 
-	public void setLabelInfo(	final LabelInfo rowLabelInfo,
-														final LabelInfo colLabelInfo) {
+	public void setLabelInfo(final LabelInfo rowLabelInfo,
+		final LabelInfo colLabelInfo) {
 
 		this.rowLabelInfo = rowLabelInfo;
 		this.colLabelInfo = colLabelInfo;
@@ -61,9 +68,11 @@ public class LabelSettings extends CustomDialog {
 		setupLayout();
 	}
 
-	/** Returns the menu frame holding all the JPanels to display to the user.
+	/**
+	 * Returns the menu frame holding all the JPanels to display to the user.
 	 *
-	 * @return JDialog */
+	 * @return JDialog
+	 */
 	public JDialog getPreferencesFrame() {
 
 		return this;
@@ -73,41 +82,46 @@ public class LabelSettings extends CustomDialog {
 
 		if(annotationSettings != null) {
 			annotationSettings.synchronize();
-
 		}
 		else {
 			LogBuffer.println("AnnotationSettings object was null. " +
-												"Could not synchronize.");
+				"Could not synchronize.");
 		}
 	}
 
-	/** Returns the two indeces which represent the currently selected la
+	/**
+	 * Returns the two indeces which represent the currently selected la
 	 *
-	 * @return */
+	 * @return
+	 */
 	public int[] getSelectedLabelIndexes() {
 
 		if(annotationSettings == null) {
 			LogBuffer.println("AnnotationSettings object was null. " +
-												"Could not get selected indeces.");
+				"Could not get selected indeces.");
 			return null;
 		}
 
 		return new int[] {annotationSettings.getSelectedRowIndex(),
-											annotationSettings.getSelectedColIndex()};
+			annotationSettings.getSelectedColIndex()};
 	}
 
 	/* >>>>>> GUI component listeners <<<<< */
-	/** Adds an ActionListener to the ok_button.
+	/**
+	 * Adds an ActionListener to the ok_button.
 	 *
-	 * @param listener */
+	 * @param listener
+	 */
 	public void addOKButtonListener(final ActionListener listener) {
 
 		okBtn.addActionListener(listener);
 	}
 
-	/** Equips the preferences JFrame with a window listener.
+	/**
+	 * Equips the preferences JFrame with a window listener.
 	 *
-	 * @param listener */
+	 * @param listener
+	 */
 	public void addSaveAndCloseListener(final WindowAdapter listener) {
 
 		addWindowListener(listener);
@@ -120,27 +134,31 @@ public class LabelSettings extends CustomDialog {
 		}
 	}
 
-	/** Adds a component listener to the JDialog in which the content of this
+	/**
+	 * Adds a component listener to the JDialog in which the content of this
 	 * class is held. This ensures repainting of all child components when the
 	 * JDialog is being resized.
 	 *
-	 * @param l */
+	 * @param l
+	 */
 	public void addResizeDialogListener(final ComponentListener l) {
 
 		addComponentListener(l);
 	}
 
-	/** This class provides a JPanel which contains components to control font
-	 * settings for the label views. */
+	/**
+	 * This class provides a JPanel which contains components to control font
+	 * settings for the label views.
+	 */
 	class FontPanel {
 
 		private JPanel fontMainPanel;
 
 		public FontPanel() {
 
-			final FontSettings fontSettings = new FontSettings(	dendroView
-																																		.getRowLabelView(),
-																													dendroView.getColLabelView());
+			final FontSettings fontSettings = new FontSettings(dendroView
+				.getRowLabelView(),
+				dendroView.getColLabelView());
 
 			fontMainPanel = fontSettings.makeFontPanel();
 		}
@@ -151,29 +169,32 @@ public class LabelSettings extends CustomDialog {
 		}
 	}
 
-	/** This class provides a JPanel which contains components to select URL
+	/**
+	 * This class provides a JPanel which contains components to select URL
 	 * information sources, which are used to respond in the event of a user
 	 * selecting a label in the label views, e.g. by opening a browser and
-	 * displaying additional information. */
+	 * displaying additional information.
+	 */
 	class URLSettings {
 
 		private final JPanel urlMainPanel;
 
 		public URLSettings() {
 
-			this.urlMainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
+			urlMainPanel = GUIFactory.createJPanel(false,GUIFactory.NO_INSETS);
 
-			final UrlSettingsPanel genePanel = new UrlSettingsPanel(tvFrame.getUrlExtractor(),
-																															tvFrame.getGeneUrlPresets());
+			final UrlSettingsPanel genePanel = new UrlSettingsPanel(
+				tvFrame.getUrlExtractor(),
+				tvFrame.getGeneUrlPresets());
 
-			final UrlSettingsPanel arrayPanel = new UrlSettingsPanel(	tvFrame
-																																			.getArrayUrlExtractor(),
-																																tvFrame.getArrayUrlPresets());
+			final UrlSettingsPanel arrayPanel = new UrlSettingsPanel(tvFrame
+				.getArrayUrlExtractor(),
+				tvFrame.getArrayUrlPresets());
 
-			urlMainPanel.add(genePanel.generate("Row URLs"), "pushx, " +
-																												"alignx 50%, w 95%, wrap");
-			urlMainPanel.add(arrayPanel.generate("Column URLs"), "pushx, " +
-																														"alignx 50%, w 95%");
+			urlMainPanel.add(genePanel.generate("Row URLs"),"pushx, " +
+				"alignx 50%, w 95%, wrap");
+			urlMainPanel.add(arrayPanel.generate("Column URLs"),"pushx, " +
+				"alignx 50%, w 95%");
 
 			urlMainPanel.revalidate();
 			urlMainPanel.repaint();
@@ -198,31 +219,46 @@ public class LabelSettings extends CustomDialog {
 		private final JRadioButton colRightJustBtn;
 		private final JRadioButton colLeftJustBtn;
 
+		private final JRadioButton showAllPossible;
+		private final JRadioButton showSome;
+		private final JRadioButton showNone;
+		private final JSpinner neighborSpinner;
+
 		public AnnotationPanel() {
 
-			this.annotationMainPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
+			annotationMainPanel = GUIFactory.createJPanel(false,
+				GUIFactory.DEFAULT);
+			annotationMainPanel.setMinimumSize(new Dimension(400,400));
 
-			this.rowPanel = new LabelSummaryPanel(rowLabelInfo, dendroView
-																																		.getRowLabelView());
+			/* Label alignment */
+			JPanel includePanel = GUIFactory.createJPanel(false,
+				GUIFactory.TINY_GAPS_AND_INSETS);
+			includePanel.setBorder(BorderFactory.createTitledBorder(
+				"Show Label Type(s)"));
 
-			this.colPanel = new LabelSummaryPanel(colLabelInfo, dendroView
-																																		.getColLabelView());
+			rowPanel = new LabelSummaryPanel(rowLabelInfo,
+				dendroView.getRowLabelView());
+
+			colPanel = new LabelSummaryPanel(colLabelInfo,
+				dendroView.getColLabelView());
 
 			final JPanel loadLabelPanel = GUIFactory
-																							.createJPanel(false, GUIFactory.NO_INSETS);
+				.createJPanel(false,GUIFactory.NO_INSETS);
 			loadLabelPanel.setBorder(BorderFactory.createEtchedBorder());
 
 			final JLabel rows = GUIFactory.setupLabelType(StringRes.main_rows);
 			final JLabel cols = GUIFactory.setupLabelType(StringRes.main_cols);
 
 			/* Label alignment */
-			JPanel justifyPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
-			justifyPanel.setBorder(BorderFactory.createTitledBorder("Label justification"));
+			JPanel justifyPanel = GUIFactory.createJPanel(false,
+				GUIFactory.TINY_GAPS_AND_INSETS);
+			justifyPanel.setBorder(BorderFactory.createTitledBorder(
+				"Justification"));
 
 			final ButtonGroup rowJustifyBtnGroup = new ButtonGroup();
 
-			this.rowLeftJustBtn = GUIFactory.createRadioBtn("Left");
-			this.rowRightJustBtn = GUIFactory.createRadioBtn("Right");
+			rowLeftJustBtn = GUIFactory.createRadioBtn("Left");
+			rowRightJustBtn = GUIFactory.createRadioBtn("Right");
 
 			if(dendroView.getRowLabelView().getLabelAttributes().isRightJustified()) {
 				rowRightJustBtn.setSelected(true);
@@ -235,15 +271,15 @@ public class LabelSettings extends CustomDialog {
 			rowJustifyBtnGroup.add(rowRightJustBtn);
 
 			final JPanel rowRadioBtnPanel = GUIFactory
-																								.createJPanel(false, GUIFactory.DEFAULT);
+				.createJPanel(false,GUIFactory.DEFAULT);
 
-			rowRadioBtnPanel.add(rowLeftJustBtn, "span, wrap");
-			rowRadioBtnPanel.add(rowRightJustBtn, "span");
+			rowRadioBtnPanel.add(rowLeftJustBtn,"span, wrap");
+			rowRadioBtnPanel.add(rowRightJustBtn,"span");
 
 			final ButtonGroup colJustifyBtnGroup = new ButtonGroup();
 
-			this.colRightJustBtn = GUIFactory.createRadioBtn("Top");
-			this.colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
+			colRightJustBtn = GUIFactory.createRadioBtn("Top");
+			colLeftJustBtn = GUIFactory.createRadioBtn("Bottom");
 
 			if(dendroView.getColLabelView().getLabelAttributes().isRightJustified()) {
 				colRightJustBtn.setSelected(true);
@@ -256,22 +292,71 @@ public class LabelSettings extends CustomDialog {
 			colJustifyBtnGroup.add(colLeftJustBtn);
 
 			final JPanel colRadioBtnPanel = GUIFactory
-																								.createJPanel(false, GUIFactory.DEFAULT);
+				.createJPanel(false,GUIFactory.DEFAULT);
 
-			colRadioBtnPanel.add(colRightJustBtn, "span, wrap");
-			colRadioBtnPanel.add(colLeftJustBtn, "span");
+			colRadioBtnPanel.add(colRightJustBtn,"span, wrap");
+			colRadioBtnPanel.add(colLeftJustBtn,"span");
 
-			annotationMainPanel.add(rows, "pushx, alignx 50%");
-			annotationMainPanel.add(cols, "pushx, alignx 50%, wrap");
-			annotationMainPanel.add(rowPanel, "pushx, alignx 50%, w 45%");
-			annotationMainPanel.add(colPanel, "pushx, alignx 50%, w 45%, wrap");
-			justifyPanel.add(rowRadioBtnPanel, "pushx, alignx 50%, w 45%");
-			justifyPanel.add(colRadioBtnPanel, "pushx, alignx 50%, w 45%");
-			annotationMainPanel.add(justifyPanel, "push, grow, alignx 50%, span, wrap");
+			/* Label alignment */
+			JPanel showPanel = GUIFactory.createJPanel(false,
+				GUIFactory.TINY_GAPS_AND_INSETS);
+			showPanel.setBorder(BorderFactory.createTitledBorder(
+				"When labels don't fit, show...  [spacebar toggles]"));
+			showAllPossible = GUIFactory.createRadioBtn("As many as possible");
+			showSome =
+				GUIFactory.createRadioBtn("Hovered label and ");
+			neighborSpinner = new JSpinner(new SpinnerNumberModel(
+				dendroView.getRowLabelView().getMaxLabelPortFlankSize(),
+				0,getMaxNumLabels(),1));
+			showNone =
+				GUIFactory.createRadioBtn("None");
+
+			//Both row & column label views have this, but we only need to check
+			//one because we synch their behavior
+			if(dendroView.getRowLabelView().inLabelPortMode() &&
+				!dendroView.getRowLabelView().isLabelPortFlankMode()) {
+
+				showAllPossible.setSelected(true);
+				setShowBaseIsNone(false);
+			} else if(dendroView.getRowLabelView().inLabelPortMode() &&
+				dendroView.getRowLabelView().isLabelPortFlankMode()) {
+
+				showSome.setSelected(true);
+				setShowBaseIsNone(false);
+			} else {
+				showNone.setSelected(true);
+				setShowBaseIsNone(true);
+			}
+
+			final ButtonGroup showBtnGroup = new ButtonGroup();
+			showBtnGroup.add(showAllPossible);
+			showBtnGroup.add(showSome);
+			showBtnGroup.add(showNone);
+
+			showPanel.add(showAllPossible,"span, wrap");
+			showPanel.add(showSome,"");
+			showPanel.add(neighborSpinner,"alignx left");
+			showPanel.add(new JLabel(" neighboring labels"),
+				"alignx left, wrap");
+			showPanel.add(showNone);
+
+			annotationMainPanel.add(rows,"pushx, alignx 50%, aligny 0%, h 15%");
+			annotationMainPanel.add(cols,"pushx, alignx 50%, aligny 0%, h 15%, wrap");
+			includePanel.add(rowPanel,"pushx, alignx 50%, w 45%");
+			includePanel.add(colPanel,"pushx, alignx 50%, w 45%");
+			annotationMainPanel.add(includePanel,
+				"push, grow, alignx 50%, span, aligny 0%, h 25%:null:null, wrap");
+			justifyPanel.add(rowRadioBtnPanel,"pushx, alignx 50%, w 45%");
+			justifyPanel.add(colRadioBtnPanel,"pushx, alignx 50%, w 45%");
+			annotationMainPanel.add(justifyPanel,
+				"push, grow, alignx 50%, span, wrap");
 
 			JPanel fontPanel = new FontPanel().makeFontPanel();
 
-			annotationMainPanel.add(fontPanel, "push, grow, alignx 50%, span");
+			annotationMainPanel.add(fontPanel,
+				"push, grow, alignx 50%, span, wrap");
+
+			annotationMainPanel.add(showPanel,"push, grow, alignx 50%, span");
 
 			annotationMainPanel.revalidate();
 			annotationMainPanel.repaint();
@@ -286,6 +371,15 @@ public class LabelSettings extends CustomDialog {
 
 			rowPanel.synchronizeTo();
 			colPanel.synchronizeTo();
+
+			//State is stored elsewhere, so this is somewhat redundant, however
+			//if these are not called, then the state is only stored for either
+			//the column labels or row labels based on which panel was clicked
+			//to get the label settings dialog from the contextual menu (I could
+			//be wrong about this, but that's what seemed to be happening for a
+			//few settings, such as the whizzing label settings.
+			dendroView.getRowLabelView().storeState();
+			dendroView.getColLabelView().storeState();
 		}
 
 		public void addJustifyListener(final ActionListener l) {
@@ -294,6 +388,17 @@ public class LabelSettings extends CustomDialog {
 			rowRightJustBtn.addActionListener(l);
 			colLeftJustBtn.addActionListener(l);
 			colRightJustBtn.addActionListener(l);
+		}
+
+		public void addShowListener(final ActionListener l) {
+
+			showAllPossible.addActionListener(l);
+			showSome.addActionListener(l);
+			showNone.addActionListener(l);
+		}
+
+		public void addFlankSizeListener(final ChangeListener l) {
+			neighborSpinner.addChangeListener(l);
 		}
 
 		public int getSelectedRowIndex() {
@@ -305,12 +410,65 @@ public class LabelSettings extends CustomDialog {
 
 			return colPanel.getSmallestSelectedIndex();
 		}
+
+		public int getNumNeighbors() {
+			return((int) neighborSpinner.getValue());
+		}
 	}
 
-	/** Dynamically adds JScrollPane to the frame based on the MouseListener in
+	public int getNumNeighbors() {
+		return(annotationSettings.getNumNeighbors());
+	}
+
+	public void addShowListener(ActionListener l) {
+		annotationSettings.addShowListener(l);
+	}
+
+	public void addFlankSizeListener(final ChangeListener l) {
+		annotationSettings.addFlankSizeListener(l);
+	}
+
+	/**
+	 * This method determines what toggling the labels from show as many as
+	 * possible will result in (either no labels or some labels)
+	 * @return the showBaseIsNone
+	 */
+	public boolean isShowBaseIsNone() {
+		return(dendroView.getRowLabelView().isLabelPortDefaultNone());
+	}
+
+	/**
+	 * This method sets what toggling the labels from show as many as
+	 * possible will be toggled to (either no labels or some labels)
+	 * @param showBaseIsNone the showBaseIsNone to set
+	 */
+	public void setShowBaseIsNone(boolean showBaseIsNone) {
+		dendroView.getRowLabelView().setLabelPortDefaultNone(showBaseIsNone);
+		dendroView.getColLabelView().setLabelPortDefaultNone(showBaseIsNone);
+	}
+
+	public void setFlankSize(final int s) {
+		dendroView.getColLabelView().setMaxLabelPortFlankSize(s);
+		dendroView.getRowLabelView().setMaxLabelPortFlankSize(s);
+	}
+
+	protected int getMaxNumLabels() {
+		int numXLabels =
+			dendroView.getInteractiveMatrixView().getXMap().getTotalTileNum();
+		int numYLabels =
+			dendroView.getInteractiveMatrixView().getYMap().getTotalTileNum();
+		if(numXLabels > numYLabels) {
+			return(numXLabels);
+		}
+		return(numYLabels);
+	}
+
+	/**
+	 * Dynamically adds JScrollPane to the frame based on the MouseListener in
 	 * MenuPanel.
 	 *
-	 * @param title */
+	 * @param title
+	 */
 	@Override
 	protected void setupLayout() {
 
@@ -332,17 +490,17 @@ public class LabelSettings extends CustomDialog {
 		}
 		else {
 			// In case menu cannot be loaded, display excuse.
-			menuPanel = GUIFactory.createJPanel(false, GUIFactory.NO_INSETS);
+			menuPanel = GUIFactory.createJPanel(false,GUIFactory.NO_INSETS);
 
 			final JLabel hint = GUIFactory.createLabel("Menu cannot be " +
-																									"shown because it wasn't loaded.", GUIFactory.FONTS);
-			menuPanel.add(hint, "push, alignx 50%");
+				"shown because it wasn't loaded.",GUIFactory.FONTS);
+			menuPanel.add(hint,"push, alignx 50%");
 		}
 
 		okBtn = GUIFactory.createBtn(StringRes.btn_OK);
 
-		mainPanel.add(menuPanel, "push, grow, wrap");
-		mainPanel.add(okBtn, "pushx, alignx 100%, span");
+		mainPanel.add(menuPanel,"push, grow, wrap");
+		mainPanel.add(okBtn,"pushx, alignx 100%, span");
 
 		mainPanel.revalidate();
 		mainPanel.repaint();

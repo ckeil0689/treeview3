@@ -9,11 +9,11 @@ package edu.stanford.genetics.treeview;
 import java.util.Observer;
 
 /**
- * Interface to access label info about genes or arrays or treenodes This
+ * Interface to access label info about genes or arrays or treenodes.  This
  * interface is used many ways. The basic idea is that the "label" refers to
- * which row, column, or node you want information about, whereas the "label type" is
- * which header you want. Thus, getNumLabels() is the number of rows, whereas
- * getNumLabelTypes() is the number of headers for each row.
+ * which row, column, or node you want information about, whereas the "label
+ * type" is which header you want. Thus, getNumLabels() is the number of rows,
+ * whereas getNumLabelTypes() is the number of headers for each row.
  *
  * Conceptually, the objects that are annotated (rows, columns, nodes) can be
  * thought of as rows, and the various names as the headers of columns of

@@ -34,6 +34,18 @@ import javax.swing.WindowConstants;
 
 import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
+<<<<<<< HEAD
+=======
+import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+
+import javax.swing.Timer;
+>>>>>>> master
 
 /* BEGIN_HEADER                                                   TreeView 3
 *
@@ -89,11 +101,11 @@ public abstract class ViewFrame extends Observable implements Observer,
 		// TODO replace with static method when PR is merged
 		final String os = System.getProperty("os.name").toLowerCase();
 		final boolean isMac = os.startsWith("mac os x");
-	  if(isMac) {
-	  	// no app name in frame title
-	  	title = "";
-	  }
-	  
+		if(isMac) {
+			// no app name in frame title
+			title = "";
+		}
+
 		this.appFrame = new JFrame(title);
 		this.configNode = mainConfigNode;
 		
@@ -229,10 +241,26 @@ public abstract class ViewFrame extends Observable implements Observer,
 				.getDefaultConfiguration());
 		final int taskbarHeight = screenInsets.bottom;
 
-		appFrame.setSize(new Dimension(screenSize.width, screenSize.height
-				- taskbarHeight));
-		appFrame.setMinimumSize(new Dimension(screenSize.width * 1 / 2,
-				screenSize.height * 2 / 3));
+		//Account for the border between the 4 quadrants
+		int border_thickness = DendroView.getBORDER_THICKNESS();
+		//Make the min size 3 times the default min grid cell size or starting
+		//label area static size (whichever is bigger)
+		int content_height1 = DendroView.getMIN_GRID_CELL_SIZE() * 3;
+		int content_height2 = DendroView.getLABEL_AREA_HEIGHT() * 3;
+		int min_size = border_thickness + (content_height1 > content_height2 ?
+			content_height1 : content_height2);
+
+		//Don't make the min size larger than the monitor
+		int min_width = (screenSize.width / 2 > min_size ?
+			min_size : screenSize.width / 2);
+		int min_height = (screenSize.height / 2 > min_size ?
+			min_size : screenSize.height / 2);
+
+		appFrame.setSize(new Dimension(screenSize.width,
+			screenSize.height - taskbarHeight));
+		appFrame.setMinimumSize(new Dimension(
+			min_width + screenInsets.left + screenInsets.right,
+			min_height + screenInsets.bottom + screenInsets.top));
 	}
 	
 	public void addWindowListener(final WindowAdapter wa) {
@@ -279,7 +307,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 					saveResizeTimer.stop();
 					saveResizeTimer = null;
 					LogBuffer.println("Saving window dimensions & position.");
-				
+
 					storeState();
 				}
 			}
@@ -292,7 +320,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 				 * call actionPerformed of the ActionListener
 				 * "saveWindowAttrs". */
 				this.saveResizeTimer = new Timer(this.saveResizeDelay,
-												 saveWindowAttrs);
+					saveWindowAttrs);
 				this.saveResizeTimer.start();
 			} else {
 				/* Event came too soon, swallow it by resetting the timer.. */
@@ -302,8 +330,8 @@ public abstract class ViewFrame extends Observable implements Observer,
 	}
 
 	public void addAppWindowPosListener() {
-		
-		appFrame.addComponentListener( new AppWindowPosListener());
+
+		appFrame.addComponentListener(new AppWindowPosListener());
 	}
 
 	private void setupWindowPosListener() {

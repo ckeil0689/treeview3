@@ -62,9 +62,9 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	public void requestStoredState() {
 
 		if(configNode == null) {
-			LogBuffer.println("Could not synchronize state for " +	this																			.getClass()
-																																	.getSimpleName() +
-												" because configNode was null.");
+			LogBuffer.println("Could not synchronize state for " +
+				this.getClass().getSimpleName() +
+				" because configNode was null.");
 			return;
 		}
 
@@ -81,9 +81,9 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	public void storeState() {
 
 		if(configNode == null) {
-			LogBuffer.println("Could not store state for " +	this																.getClass()
-																														.getSimpleName() +
-												" because configNode was null.");
+			LogBuffer.println("Could not store state for " +
+				this.getClass().getSimpleName() +
+				" because configNode was null.");
 			return;
 		}
 
@@ -92,17 +92,17 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 		configNode.put("face", face);
 		configNode.putInt("style", style);
 		configNode.putInt("size", size);
-		configNode.putBoolean("isRightJustified", d_justified);
-		configNode.putBoolean("isFixed", d_fixed);
+		configNode.putBoolean("isRightJustified", isRightJustified);
+		configNode.putBoolean("isFixed", isFixed);
 	}
 
 	@Override
 	public void importStateFrom(Preferences oldNode) {
 
 		if(oldNode == null) {
-			LogBuffer.println("Could not import node for " +	this																.getClass()
-																														.getSimpleName() +
-												". Node not defined.");
+			LogBuffer.println("Could not import node for " +
+				this.getClass().getSimpleName() +
+				". Node not defined.");
 			return;
 		}
 
@@ -120,7 +120,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 
 		if(parentNode == null) {
 			LogBuffer.println("parentNode for " +	this.getClass().getSimpleName() +
-												" was null.");
+				" was null.");
 			return;
 		}
 
@@ -186,7 +186,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	@Override
 	public void setFace(String face) {
 		this.face = face;
-		storeState();
 		updateLabelView();
 	}
 
@@ -198,7 +197,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	@Override
 	public void setStyle(int style) {
 		this.style = style;
-		storeState();
 		updateLabelView();
 	}
 
@@ -210,7 +208,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	@Override
 	public void setPoints(int size) {
 		this.size = size;
-		storeState();
 		updateLabelView();
 	}
 
@@ -250,7 +247,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 		if(minSize < 1 || maxSize > 0 && minSize > maxSize) { return; }
 
 		this.minSize = minSize;
-		storeState();
 		updateLabelView();
 	}
 
@@ -266,7 +262,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 		if(maxSize < 1 || minSize > 0 && maxSize < minSize) { return; }
 
 		this.maxSize = maxSize;
-		storeState();
 		updateLabelView();
 	}
 
@@ -289,7 +284,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	@Override
 	public void setFixed(boolean isFixed) {
 		this.isFixed = isFixed;
-		storeState();
 		updateLabelView();
 	}
 
@@ -325,7 +319,6 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 	@Override
 	public void setRightJustified(boolean isRightJustified) {
 		this.isRightJustified = isRightJustified;
-		storeState();
 		updateLabelView();
 	}
 
@@ -338,7 +331,7 @@ public class LabelAttributes implements ConfigNodePersistent, ModelLoadReset,
 
 		this.d_justified = isRightJustified;
 	}
-
+ 
 	@Override
 	public Font getFont() {
 		return new Font(face, style, size);

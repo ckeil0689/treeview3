@@ -23,7 +23,6 @@ public class RowLabelView extends LabelView {
 		super();
 
 		labelAttr.setDefaultJustified(true);
-		zoomHint = StringRes.lbl_ZoomRowLabels;
 	}
 
 	@Override
@@ -47,7 +46,7 @@ public class RowLabelView extends LabelView {
 
 		if(parentNode == null) {
 			LogBuffer.println("Error: Could not find or create ArrayameView" +
-												"node because parentNode was null.");
+				"node because parentNode was null.");
 			return;
 		}
 
@@ -124,6 +123,13 @@ public class RowLabelView extends LabelView {
 
 	@Override
 	public void orientLabelPane(Graphics2D g2d) {}
+
+	@Override
+	public void orientLabelPreview(Graphics2D g2d,final int maxLabelLen) {}
+
+	@Override
+	public void orientLabelExport(Graphics2D g2d,final int xIndent,
+		final int yIndent,final int longestLabelLen) {}
 
 	@Override
 	public void orientHintPane(Graphics2D g2d) {

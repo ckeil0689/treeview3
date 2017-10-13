@@ -317,9 +317,14 @@ public class ClusterProcessor {
 			if (hier) {
 				return doHierarchicalCluster();
 			}
+<<<<<<< HEAD
 			
 			// Not using K-means clustering at the moment. Needs refactoring!
 		  return doKMeansCluster();
+=======
+
+			return doKMeansCluster();
+>>>>>>> master
 		}
 
 		@Override

@@ -92,6 +92,13 @@ generating a project snapshot:
 4. Upload jar file to the downloads page named with the short build number
 5. Notify project testers
 
+### Building
+To share builds between developers for testing, we use gradle.  You can build just a jar file, create a Mac application, or a Mac DMG file:
+
+- `gradle`
+- `gradle createApp`
+- `gradle createDmg`
+
 ### Who do I talk to?
 
 * Repo owner or admin
