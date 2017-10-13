@@ -120,7 +120,6 @@ public class TVModel extends Observable implements DataModel {
 		return gtrLabelInfo;
 	}
 
-<<<<<<< HEAD
 	public List<String[]> getATRData() {
 		
 		if(atrData == null) {
@@ -146,10 +145,6 @@ public class TVModel extends Observable implements DataModel {
 	}
 	
   public boolean gweightFound() {
-
-=======
-	public boolean gweightFound() {
->>>>>>> master
 		return gweightFound;
 	}
 
@@ -413,11 +408,6 @@ public class TVModel extends Observable implements DataModel {
 
 	public void resetState() {
 
-<<<<<<< HEAD
-		LogBuffer.println("MODEL RESET (all data cleared).");
-
-=======
->>>>>>> master
 		// reset some state stuff.
 		// if (documentConfig != null)
 		// documentConfig.store();
@@ -683,14 +673,8 @@ public class TVModel extends Observable implements DataModel {
 		 * @param startingCol included in the mean calculation
 		 * @param endingRow included in the mean calculation
 		 */
-<<<<<<< HEAD
 		public double getZoomedMean(int startingRow, int endingRow, 
 		                            int startingCol, int endingCol){
-=======
-		public double getZoomedMean(int startingRow, int endingRow,
-			int startingCol, int endingCol){
-
->>>>>>> master
 			final int nRows = nRows();
 			final int nCols = nCols();
 			if (exprData == null) {
@@ -808,7 +792,6 @@ public class TVModel extends Observable implements DataModel {
 
 			return Helper.roundDouble(result, 4);
 		}
-<<<<<<< HEAD
 		
 		/** Uses lists of reordered axis indices to reorder the expression 
 		 * data matrix. This algorithm is not in place!
@@ -845,19 +828,6 @@ public class TVModel extends Observable implements DataModel {
 			setChanged();
 		}
 		
-		/**
-		 * This method truncates a sorted array at the first occurrence of
-		 * NaN or Infinity as defined in the Double class.
-		 * @param data
-		 * @return A truncated data array.
-		 */
-		private double[] truncateSortedData(final double[] data) {
-			
-			LogBuffer.println("Truncating sorted data array.");
-			
-			int idx = data.length;
-			
-=======
 
 		private int getRealDataSize(final double[] data) {
 			int size = data.length;
@@ -866,7 +836,6 @@ public class TVModel extends Observable implements DataModel {
 			//during load on the Ubuntu VM Rob created
 //			double[] causeMemExcep = Arrays.copyOfRange(data,0,data.length - 1);
 
->>>>>>> master
 			// find first NaN or Infinity value
 			for(int i = 0; i < data.length; i++) {
 				double dataPoint = data[i];
