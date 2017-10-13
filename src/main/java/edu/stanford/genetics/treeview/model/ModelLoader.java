@@ -1,17 +1,15 @@
 package edu.stanford.genetics.treeview.model;
 
-import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import Controllers.TVController;
@@ -21,7 +19,6 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
-import java.util.concurrent.ExecutionException;
 
 /** The class responsible for loading data into the TVModel. */
 public class ModelLoader extends SwingWorker<Void, LoadStatus> {
@@ -144,18 +141,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 	@Override
 	protected void done() {
-<<<<<<< HEAD
-		
-		if(isCancelled()) {
-			ls.setStatus("Cancelled.");
-			ls.setProgress(0);
-			return;
-		}
-		
-		ls.setStatus("Done!");
-		ls.setProgress(ls.getMaxProgress());
-		
-=======
 
 		//Exceptions that happen in the SwingWorker are caught here.  We call
 		//get() in order to wait for the exception to be thrown properly.
@@ -171,7 +156,16 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			e.printStackTrace();
 		}
 
->>>>>>> master
+		// In case the user cancelled the load process.
+		if(isCancelled()) {
+			ls.setStatus("Cancelled.");
+			ls.setProgress(0);
+			return;
+		}
+		
+		ls.setStatus("Done!");
+		ls.setProgress(ls.getMaxProgress());
+		
 		doubleData = null;
 		
 		final Preferences fileNode = controller.getConfigNode().node("File");
@@ -259,21 +253,15 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private void assignDataToModel(final String[][] stringLabels) {
 
 		// Parse the CDT File
-<<<<<<< HEAD
 		/* TODO wrap in try-catch */
 		LogBuffer.println("Parsing CDT file.");
-=======
->>>>>>> master
 		parseCDT(stringLabels);
 
 		// If present, parse ATR File
 		if(hasAID) {
 			LogBuffer.println("Parsing ATR file.");
 			parseATR();
-<<<<<<< HEAD
 			LogBuffer.println("Done parsing ATR file.");
-=======
->>>>>>> master
 		}
 		else {
 			LogBuffer.println("No ATR file found for this CDT file.");
@@ -284,10 +272,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		if(hasGID) {
 			LogBuffer.println("Parsing GTR file.");
 			parseGTR();
-<<<<<<< HEAD
 			LogBuffer.println("Done parsing GTR file.");
-=======
->>>>>>> master
 		}
 		else {
 			LogBuffer.println("No GTR file found for this CDT file.");
@@ -301,13 +286,8 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		LogBuffer.println("Loading Model entry from File node.");
 
-<<<<<<< HEAD
 		try {
 			final String fileSetName = model.getFileSet().getName();
-=======
-			final Preferences fileNode =
-				controller.getConfigNode().node("File");
->>>>>>> master
 
 			Preferences documentConfig = null;
 			final String[] childrenNodes = fileNode.childrenNames();
@@ -315,27 +295,12 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			// Look if there's already a node for the file
 			boolean fileFound = false;
 			if(childrenNodes.length > 0) {
-<<<<<<< HEAD
 				for(final String entry : childrenNodes) {
 					Preferences childNode = fileNode.node(entry);
 					final String connectedFS = childNode.get("connectedFileSet", "none");
 
 					if(connectedFS.equalsIgnoreCase(fileSetName)) {
 						documentConfig = childNode;
-=======
-				for(final String childrenNode : childrenNodes) {
-
-					final String childName =
-						fileNode.node(childrenNode).get("name", default_name);
-					final String childExt =
-						fileNode.node(childrenNode).get("extension",
-							default_ext);
-
-					if(childName.equalsIgnoreCase(fileName) &&
-						childExt.equalsIgnoreCase(fileExt)) {
-
-						documentConfig = fileNode.node(childrenNode);
->>>>>>> master
 						fileFound = true;
 						break;
 					}
