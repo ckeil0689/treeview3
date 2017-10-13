@@ -67,29 +67,23 @@ public class TVController implements Observer {
 	private DataModel model;
 	private MenubarController menuController;
 	private File file;
-<<<<<<< HEAD
-=======
-	private FileSet fileMenuSet;
+	
 	private boolean loadSuccess;
 	private boolean isFromRecents;
 	private boolean isFromCluster;
 	private String loadThreadError;
->>>>>>> master
 
 	public TVController(final TreeViewFrame tvFrame, final DataModel model) {
 
 		this.model = model;
 		this.tvFrame = tvFrame;
-<<<<<<< HEAD
 		this.dendroController = new DendroController(tvFrame, TVController.this);
 		this.menuController = new MenubarController(tvFrame, TVController.this);
-=======
-		this.dendroController = new DendroController(tvFrame, this);
+
 		this.loadSuccess = false;
 		this.isFromRecents = false;
 		this.isFromCluster = false;
 		this.loadThreadError = "";
->>>>>>> master
 
 		// Add the view as observer to the model
 		((TVModel) model).addObserver(tvFrame);
@@ -189,16 +183,9 @@ public class TVController implements Observer {
 		dendroController.toggleTrees();
 	}
 
-<<<<<<< HEAD
 	/** Generates the MenuBar controller. Causes listeners to be added for the
 	 * main MenuBar as well as the listed file names in 'Recent Files'. file
 	 * names in . */
-=======
-	/**
-	 * Generates the menubar controller. Causes listeners to be added for the
-	 * main menubar as well as the listed file names in 'Recent Files'.
-	 */
->>>>>>> master
 	private void addMenuListeners() {
 
 		LogBuffer.println("ADDING MENU LISTENERS -----");
@@ -207,15 +194,8 @@ public class TVController implements Observer {
 		tvFrame.addFileMenuListeners(new FileMenuListener());
 	}
 
-<<<<<<< HEAD
 	/** Calls a sequence of methods related to loading a file, when its button is
 	 * clicked.*/
-=======
-	/**
-	 * Calls a sequence of methods related to loading a file, when its button is
-	 * clicked.
-	 */
->>>>>>> master
 	private class LoadButtonListener implements ActionListener {
 
 		@Override
@@ -225,13 +205,7 @@ public class TVController implements Observer {
 		}
 	}
 
-<<<<<<< HEAD
 	/** Initiates loading of last used file.*/
-=======
-	/**
-	 * Initiates loading of last used file.
-	 */
->>>>>>> master
 	private class LoadLastButtonListener implements ActionListener {
 
 		@Override
@@ -371,20 +345,17 @@ public class TVController implements Observer {
 			tvModel.setSource(fileSet);
 	    LogBuffer.println("Loading FileSet: " + fileSet);
 
-<<<<<<< HEAD
 	    tvFrame.generateView(ViewType.PROGRESS_VIEW);
 	    
 			final ModelLoader loader = new ModelLoader(tvModel, this, dataInfo);
-=======
-			final ModelLoader loader = new ModelLoader(tvModel,this,dataInfo);
 			loadSuccess = false;
 			//Commenting to see if this is overwriting the thread's setting
 			//loadThreadError = "";
 			this.isFromRecents = isFromRecents;
 			this.isFromCluster = isFromCluster;
->>>>>>> master
 			loader.execute();
-		} catch(final OutOfMemoryError e) {
+		} 
+		catch(final OutOfMemoryError e) {
 			final String oomError = "The data file is too large. " +
 				"Increase the JVM's heap size. Error: " + e.getMessage();
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], oomError,
@@ -400,13 +371,7 @@ public class TVController implements Observer {
 	 *          available. */
 	public void finishLoading(final DataLoadInfo dataInfo) {
 
-<<<<<<< HEAD
-		if(model.getDataMatrix().getNumRow() > 0) {
-=======
 		if(loadSuccess && model.getDataMatrix().getNumRow() > 0) {
-			tvFrame.setTitleString(model.getFileName());
-
->>>>>>> master
 			/* Will notify view of successful loading. */
 			((TVModel) model).setLoaded(true);
 			setDataModel();
@@ -438,23 +403,15 @@ public class TVController implements Observer {
 				importOldPreferencesFrom(dataInfo.getOldNode());
 			}
 			else {
-<<<<<<< HEAD
-				LogBuffer.println("FileSet is null. Could not load old preferences.");
-=======
 				LogBuffer.println("FileSet is null. Could not load old " +
 					"preferences and add last file to recent file list.");
->>>>>>> master
 			}
 
 			dendroController.restoreComponentStates();
 			updateFileMRU();
 			LogBuffer.println("Successfully loaded: " + model.getSource());
-<<<<<<< HEAD
-		}
-		else {
-=======
-
-		} else if(!loadSuccess) {
+		} 
+		else if(!loadSuccess) {
 			final String message = "Something went wrong with the data " +
 				"load" + (loadThreadError.equalsIgnoreCase("") ?
 					".\nIt could be an out of memory error or some other " +
@@ -471,8 +428,8 @@ public class TVController implements Observer {
 			if(!isFromRecents && !isFromCluster) {
 				openFile(null,true,false);
 			}
-		} else {
->>>>>>> master
+		} 
+		else {
 			final String message = "No numeric data could be found in the " +
 				"input file.\nThe input file must contain tab-delimited " +
 				"numeric values.";
@@ -499,12 +456,7 @@ public class TVController implements Observer {
 	 * 
 	 * @param srcFileSetName
 	 * @return The target Preferences node, if it exists. Otherwise null. */
-<<<<<<< HEAD
 	private Preferences getModelNodeFromFileSet(final String srcFileSetName) {
-=======
-	private Preferences getOldPreferences(final String srcName,
-		final String srcExtension) {
->>>>>>> master
 
 		try {
 			/* First, get the relevant old node... */
@@ -555,42 +507,22 @@ public class TVController implements Observer {
 	 * @param fileNode - The File node under which all Model nodes are stored.
 	 * @param srcFileSetName
 	 * @return The target Preferences node.
-<<<<<<< HEAD
 	 * @throws BackingStoreException */
 	private static Preferences getTargetModelNode(	final Preferences fileNode,
 																						final String srcFileSetName) 
 																							throws BackingStoreException {
-=======
-	 * @throws BackingStoreException
-	 */
-	private static Preferences getTargetNode(final Preferences root,
-		final String srcName,final String srcExtension) throws
-		BackingStoreException {
-
-		String[] fileNodes = root.childrenNames();
->>>>>>> master
 
 		LogBuffer.println("Looking for target node (" + srcFileSetName + ")");
 		
 		String[] fileNodes = fileNode.childrenNames();
 		Preferences targetNode = null;
 		for(String nodeName : fileNodes) {
-<<<<<<< HEAD
 			Preferences node = fileNode.node(nodeName);
 			String connectedFS = node.get("connectedFileSet", "generic-tv-file");
 			
 			LogBuffer.println("Checking node (" + connectedFS + ")");
 			if(connectedFS.equalsIgnoreCase(srcFileSetName)) {
 				LogBuffer.println("Success. Target node found.");
-=======
-			Preferences node = root.node(nodeName);
-			String name = node.get("name", "none");
-			String extension = node.get("extension", ".txt");
-
-			if(name.equalsIgnoreCase(srcName) &&
-				extension.equalsIgnoreCase(srcExtension)) {
-
->>>>>>> master
 				targetNode = node;
 				break;
 			}
@@ -606,38 +538,11 @@ public class TVController implements Observer {
 		return targetNode;
 	}
 
-<<<<<<< HEAD
 	/** This method opens a file dialog to open either the visualization view or
-=======
-	private void setFileMenuSet(final FileSet fs) {
-
-		FileSet newFs;
-
-		if(fs != null) {
-			newFs = fs;
-
-		}
-		else {
-			newFs = ViewFrame.getFileSet(file);
-		}
-
-		this.fileMenuSet = newFs;
-	}
-
-	/**
-	 * This method opens a file dialog to open either the visualization view or
->>>>>>> master
 	 * the cluster view depending on which file type is chosen.
 	 * 
 	 * @param newFileSet - A FileSet object representing the files to be loaded.
 	 * @param shouldUseImport - Explicitly tells the loader function called in
-<<<<<<< HEAD
-	 *          this method to use the import dialog
-	 *          for opening a file. Only used through menubar's 'File > Open File
-	 *          With Import Dialog...' at the moment.
-	 * @throws LoadException */
-	public void openFile(FileSet newFileSet, final boolean shouldUseImport) {
-=======
 	 *          this method to use the import dialog for opening a file. Only
 	 *          used through menubar's 'File > Import...' at the moment.
 	 * @param isFromRecents - Tells the loader whether the file being opened was
@@ -646,9 +551,8 @@ public class TVController implements Observer {
 	 *          whether to return the user to an open dialog or not.
 	 * @throws LoadException
 	 */
-	public void openFile(FileSet fileSet, final boolean shouldUseImport,
+	public void openFile(FileSet newFileSet, final boolean shouldUseImport,
 		final boolean isFromRecents) {
->>>>>>> master
 
 		String message;
 		FileSet loadFileSet = newFileSet;
@@ -675,7 +579,6 @@ public class TVController implements Observer {
 				loadFileSet = ViewFrame.getFileSet(file);
 			}
 
-<<<<<<< HEAD
 			dataLoadInfo = getDataLoadInfo(loadFileSet, null, 
 			                               false, shouldUseImport);
 			
@@ -686,12 +589,7 @@ public class TVController implements Observer {
 				return;
 			}
 			
-			loadData(loadFileSet, dataLoadInfo);
-=======
-			getDataInfoAndLoad(loadFileSet,null,null,false,shouldUseImport,
-				isFromRecents);
-
->>>>>>> master
+			loadData(loadFileSet, dataLoadInfo, false, isFromRecents);
 		}
 		catch(final LoadException e) {
 			message = "Loading the file was interrupted.";
@@ -737,7 +635,6 @@ public class TVController implements Observer {
 	 * @param oldFileSetName The root name of the old FileSet (FileSet.getRoot())
 	 * @param oldExt The extension of the old FileSet (FileSet.getExt())
 	 * @param isFromCluster Whether the loading happens as a result of
-<<<<<<< HEAD
 	 *          clustering. 
 	 * @return A DataLoadInfo object containing all the relevant information
 	 * for loading a data set.
@@ -757,38 +654,15 @@ public class TVController implements Observer {
 		if(oldFileSetName != null) {
 			LogBuffer.println("Getting preferences for transfer to clustered file.");
 			oldModelNode = getModelNodeFromFileSet(oldFileSetName);
-=======
-	 *          clustering. */
-	public void getDataInfoAndLoad(	final FileSet newFileSet,
-		final String oldRoot,final String oldExt, boolean isFromCluster,
-		boolean shouldUseImport,final boolean isFromRecents) {
-
-		Preferences oldNode;
-
-		// Transfer settings to clustered file
-		if(isFromCluster && oldRoot != null && oldExt != null) {
-			LogBuffer.println("Getting preferences for transfer to clustered " +
-				"file.");
-			oldNode = getOldPreferences(oldRoot, oldExt);
-
-			// Check if file was loaded before
->>>>>>> master
 		}
 		// Case 2) Not from cluster, but the same file might have been loaded 
 		// before such that a Preferences node already exists. Solution: use the
 		// old node, if it exists.
 		else {
-<<<<<<< HEAD
 			LogBuffer.println("Checking if preferences exist for new file.");
 			// TODO naming here is confusing: this looks for potentially existing 
 			// nodes of the new FileSet
 			oldModelNode = getModelNodeFromFileSet(newFileSet.getName());
-=======
-			LogBuffer.println("Checking if preferences exist for the new " +
-				"file.");
-			oldNode = getOldPreferences(newFileSet.getRoot(),
-				newFileSet.getExt());
->>>>>>> master
 		}
 		
 		// Case 3) A new file is created (saved) from the currently open file.
@@ -801,11 +675,7 @@ public class TVController implements Observer {
 		DataLoadInfo dataLoadInfo;
 		if(oldModelNode == null || shouldUseImport) {
 			LogBuffer.println("Using import dialog.");
-<<<<<<< HEAD
 			dataLoadInfo = useImportDialog(newFileSet);
-=======
-			dataInfo = useImportDialog(newFileSet);
->>>>>>> master
 		}
 		else {
 			LogBuffer.println("Loading with info from existing node.");
@@ -820,13 +690,8 @@ public class TVController implements Observer {
 			return null;
 		}
 
-<<<<<<< HEAD
 		dataLoadInfo.setIsClusteredFile(isFromCluster);
 		return dataLoadInfo;
-=======
-		dataInfo.setIsClusteredFile(isFromCluster);
-		loadData(newFileSet,dataInfo,isFromCluster,isFromRecents);
->>>>>>> master
 	}
 
 	/** Show a dialog for the user to specify how his data should be loaded.
@@ -836,17 +701,9 @@ public class TVController implements Observer {
 	 * @return Options/ parameters for data loading. */
 	private static DataLoadInfo useImportDialog(final FileSet fileSet) {
 
-<<<<<<< HEAD
 		DataImportDialog loadPreview = new DataImportDialog(fileSet.getName());
 		DataImportController importController = 
 			new DataImportController(loadPreview);
-=======
-		DataImportDialog loadPreview = new DataImportDialog(fileSet.getRoot() +
-			fileSet.getExt());
-
-		DataImportController importController = new DataImportController(
-			loadPreview);
->>>>>>> master
 
 		String[][] previewData;
 		importController.setFileSet(fileSet);
@@ -998,30 +855,6 @@ public class TVController implements Observer {
 		}
 	}
 
-<<<<<<< HEAD
-=======
-	public void showSubDataModel(final int[] geneIndexes,
-		final int[] arrayIndexes,final String source,final String name) {
-
-		final ReorderedDataModel dataModel = new ReorderedDataModel(model,
-			geneIndexes,arrayIndexes);
-		if(source != null) {
-			dataModel.setSource(source);
-		}
-
-		if(name != null) {
-			dataModel.setName(name);
-		}
-
-		// final ViewFrame window = getApp().openNew();
-		// window.setDataModel(dataModel);
-		// window.setLoaded(true);
-		// window.getAppFrame().setVisible(true);
-		// tvFrame.setDataModel(dataModel);
-		// setViewChoice(false);
-	}
-
->>>>>>> master
 	/** Opens an instance of GeneListMaker used to save a list of genes. */
 	public void saveList() {
 
@@ -1138,7 +971,6 @@ public class TVController implements Observer {
 	public void saveModelAs() {
 
 		if(model.getFileSet() == null) {
-<<<<<<< HEAD
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], 
 			                              "Saving of datamodels not backed by "
 			                              	+ "files is not yet supported.");
@@ -1153,11 +985,6 @@ public class TVController implements Observer {
 		if(dir != null) {
 			fileDialog.setCurrentDirectory(new File(dir));
 		}
-=======
-			JOptionPane.showMessageDialog(Frame.getFrames()[0],
-				"Saving of datamodels not backed by files is not yet " +
-				"supported.");
->>>>>>> master
 
 		final int retVal = fileDialog.showSaveDialog(JFrame.getFrames()[0]);
 		if(retVal == JFileChooser.APPROVE_OPTION) {
@@ -1194,55 +1021,7 @@ public class TVController implements Observer {
 			saveModelAs();
 		}
 		else {
-<<<<<<< HEAD
 			LogBuffer.println("Modified data not saved.");
-=======
-			final JFileChooser fileDialog = new JFileChooser();
-			final CdtFilter ff = new CdtFilter();
-			fileDialog.setFileFilter(ff);
-
-			final String string = model.getFileSet().getDir();
-
-			if(string != null) {
-
-				fileDialog.setCurrentDirectory(new File(string));
-			}
-
-			final int retVal = fileDialog.showSaveDialog(Frame.getFrames()[0]);
-
-			if(retVal == JFileChooser.APPROVE_OPTION) {
-				final File chosen = fileDialog.getSelectedFile();
-				String name = chosen.getName();
-
-				if(!name.toLowerCase().endsWith(".cdt") &&
-					!name.toLowerCase().endsWith(".pcl")) {
-
-					name += ".cdt";
-				}
-
-				FileSet fileSet2 = new FileSet(name,
-					chosen.getParent() + File.separator);
-				fileSet2.copyState(model.getFileSet());
-
-				final FileSet fileSet1 = new FileSet(name,
-					chosen.getParent() + File.separator);
-				fileSet1.setName(model.getFileSet().getName());
-
-				model.getFileSet().copyState(fileSet1);
-				doModelSave(false);
-
-				model.getFileSet().notifyMoved();
-				tvFrame.getFileMRU().removeDuplicates(model.getFileSet());
-				fileSet2 = tvFrame.getFileMRU().addUnique(fileSet2);
-				tvFrame.getFileMRU().setLast(model.getFileSet());
-				tvFrame.addFileMenuListeners(new FileMenuListener());
-
-				if(model instanceof TVModel) {
-					((TVModel) model).getDocumentConfig().put("jtv",
-						model.getFileSet().getJtv());
-				}
-			}
->>>>>>> master
 		}
 	}
 	
@@ -1266,15 +1045,8 @@ public class TVController implements Observer {
 			tvFrame.getFileMRU().setLast(model.getFileSet());
 			tvFrame.getFileMRU().notifyObservers();
 
-<<<<<<< HEAD
 			FileSet newFS = tvFrame.findFileSet((JMenuItem) actionEvent.getSource());
-			openFile(newFS, false);
-=======
-			fileMenuSet =
-				tvFrame.findFileSet((JMenuItem) actionEvent.getSource());
-
-			openFile(fileMenuSet,false,true);
->>>>>>> master
+			openFile(newFS, false, true);
 		}
 	}
 	
@@ -1413,7 +1185,6 @@ public class TVController implements Observer {
 
 		dendroController.copyLabels(copyType, isRows);
 	}
-<<<<<<< HEAD
 	
 	/**
 	 * checks if DataModel has been modified. Stores a configFile when closing
@@ -1502,7 +1273,7 @@ public class TVController implements Observer {
 					"as not saving to file).");
 				return false;
 		}
-=======
+	}
 
 	/**
 	 * 
@@ -1558,6 +1329,5 @@ public class TVController implements Observer {
 	 */
 	public void setFromCluster(boolean isFromCluster) {
 		this.isFromCluster = isFromCluster;
->>>>>>> master
 	}
 }
