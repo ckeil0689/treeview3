@@ -79,6 +79,7 @@ public class ColorPresets implements ConfigNodePersistent {
 			return;
 		}
 
+		LogBuffer.println("SETTING COLORPRESETS CONFIGNODE.");
 		this.configNode = parentNode.node(this.getClass().getSimpleName());
 		requestStoredState();
 	}
@@ -191,6 +192,8 @@ public class ColorPresets implements ConfigNodePersistent {
 												"Returning default Red-Green.");
 			return ColorSchemeType.REDGREEN;
 		}
+		
+		LogBuffer.println("The current active parent node of ColorPresets is " + configNode.parent());
 
 		String lastActiveScheme = configNode
 																				.get("lastActiveColorScheme", ColorSchemeType.REDGREEN.toString());

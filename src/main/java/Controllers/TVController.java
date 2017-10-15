@@ -377,22 +377,10 @@ public class TVController implements Observer {
 			setDataModel();
 			dendroController.setNewMatrix(tvFrame.getDendroView(), model);
 
-//			if(fileMenuSet != null) {
-//				/*
-//				 * TODO Needs to happen after setNewMatrix because a new
-//				 * ColorExtractor object is created, which would void the 
-//				 * updated ColorExtractor state if copying happens before. 
-//				 * Implement a nicer solution one day...
-//				 */
-//				importOldPreferencesFrom(dataInfo.getOldNode());
-//
-//				this.fileMenuSet = tvFrame.getFileMRU().addUnique(fileMenuSet);
-//				tvFrame.getFileMRU().setLast(fileMenuSet);
-//				fileMenuSet = null;
-//			}
-			// Check if TVModel FileSet was updated
-			if(dataInfo.getOldFileSet() != null && 
-				!model.getFileSet().equals(dataInfo.getOldFileSet())) {
+			// If an old node exists, a file was already loaded beforehand.
+			// If the FileSet connected to this node 
+			if(dataInfo.getOldNode() != null && 
+				!model.getFileSet().equals(dataInfo.getPreviousFileSetName())) {
 				LogBuffer.println("Importing old preferences.");
 				/*
 				 * TODO Needs to happen after setNewMatrix because a new
@@ -403,7 +391,7 @@ public class TVController implements Observer {
 				importOldPreferencesFrom(dataInfo.getOldNode());
 			}
 			else {
-				LogBuffer.println("FileSet is null. Could not load old " +
+				LogBuffer.println("Problem with old FileSet. Could not load old " +
 					"preferences and add last file to recent file list.");
 			}
 
@@ -477,22 +465,22 @@ public class TVController implements Observer {
 		}
 	}
 
-	/** Copies label and color data from the pre-clustered file to the
-	 * Preferences node of the post-clustered file.
+	/** Copies label and color data from a previous Model node to the
+	 * Model node of the currently active file.
 	 * 
-	 * @param loadedNode - A node from which to import preferences settings. */
-	private void importOldPreferencesFrom(final Preferences loadedNode) {
+	 * @param previousModelNode - A node from which to import preferences 
+	 * settings. */
+	private void importOldPreferencesFrom(final Preferences previousModelNode) {
 
-		if(loadedNode == null) {
-			LogBuffer.println("No old node was found when trying to copy old" +
+		if(previousModelNode == null) {
+			LogBuffer.println("No old Model node was found when trying to copy old" +
 				" preferences. Aborting import attempt.");
 			return;
 		}
 
 		try {
-			dendroController.importLabelPreferences(loadedNode);
-			dendroController.importColorPreferences(loadedNode);
-
+			dendroController.importLabelPreferences(previousModelNode);
+			dendroController.importColorPreferences(previousModelNode);
 		}
 		catch(BackingStoreException e) {
 			LogBuffer.logException(e);
@@ -652,7 +640,7 @@ public class TVController implements Observer {
 		// to new node.
 		//if(isFromCluster && oldRoot != null && oldExt != null) {
 		if(oldFileSetName != null) {
-			LogBuffer.println("Getting preferences for transfer to clustered file.");
+			LogBuffer.println("Getting preferences for transfer to new file.");
 			oldModelNode = getModelNodeFromFileSet(oldFileSetName);
 		}
 		// Case 2) Not from cluster, but the same file might have been loaded 
@@ -719,7 +707,8 @@ public class TVController implements Observer {
 
 	/** Load stored info for a specific file.
 	 * 
-	 * @param fileSet The <code>FileSet</code> for the file to be loaded.
+	 * @param fileSet - The <code>FileSet</code> for the file to be loaded.
+	 * @param node - The Model node for the fileSet.
 	 * @return A <code>DataLoadInfo</code> object which contains information
 	 *         relevant for setting up the <code>DataLoadDialog</code>. */
 	public static DataLoadInfo getStoredDataLoadInfo(final FileSet fileSet,
@@ -747,11 +736,10 @@ public class TVController implements Observer {
 			 * coordinates need to be updated here, as found by
 			 * dataInfo.needsDataCoordsUpdate() but otherwise the new
 			 * coordinates are unrelated to the old node! */
-			String oldFileName = node.get("name", "") +
-				node.get("extension", "");
-			String newFileName = fileSet.getRoot() + fileSet.getExt();
+			String oldFSName = node.get("connectedFileSet", "generic-tvfile.txt");
+			String newFSName = fileSet.getRoot() + fileSet.getExt();
 
-			if(oldFileName.equals(newFileName)) {
+			if(oldFSName.equals(newFSName)) {
 				node.putInt("rowCoord", newDataCoords[0]);
 				node.putInt("colCoord", newDataCoords[1]);
 			}
@@ -939,7 +927,7 @@ public class TVController implements Observer {
 	
 	/**
 	 * When the worker thread in ModelSaver is done, it  
-	 * @param wasSuccessful
+	 * @param wasSuccessful - Indicates whether the save process was successful.
 	 * @param oldFileSetName - The name of the FileSet attached to the Model 
 	 * before the new one was added during the saving process. It is needed to 
 	 * transfer Preferences information.
@@ -956,15 +944,17 @@ public class TVController implements Observer {
 			                                            oldFileSetName, 
 			                                            isFromCluster, false);
 			ModelLoader.storeDataLoadInfo(fileNode, model, dataLoadInfo);
+			
+		  // Transfer old Preferences to new Model entry
+			LogBuffer.println("AFTER SAVE active Model node: " + ((TVModel) model).getDocumentConfig());
+			dendroController.setActiveModelPreferences();
+			importOldPreferencesFrom(dataLoadInfo.getOldNode());
+			
 			updateFileMRU();
 		}
 		
-		// Transfer old Preferences to new Model entry
-		
 		// Model now counts as not modified
 		model.setModified(false);
-		LogBuffer.println("doModelSave() finished with FileSet " 
-		+ model.getFileSet());
 	}
 
 	/** Saves the model as a user specified file. */

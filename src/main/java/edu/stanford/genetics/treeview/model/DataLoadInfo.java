@@ -13,7 +13,6 @@ public class DataLoadInfo {
 	public final static String[] DEFAULT_LABEL_TYPES = {""};
 
 	private Preferences oldNode;
-	private FileSet oldFileSet;
 
 	private boolean isClusteredFile = false;
 	private int[] dataCoords;
@@ -38,12 +37,16 @@ public class DataLoadInfo {
 		this.delimiter = delimString;
 	}
 
-	public void setOldFileSet(final FileSet fs) {
-		this.oldFileSet = fs;
-	}
-
-	public FileSet getOldFileSet() {
-		return oldFileSet;
+	public String getPreviousFileSetName() {
+		
+		if(oldNode == null) {
+			LogBuffer.println("No old node defined for current FileSet, " +
+				"no previous FileSet name found.");
+			return "";
+		}
+		
+		String defaultName = FileSet.DEFAULT_ROOT + FileSet.DEFAULT_EXT;
+		return oldNode.get("connectedFileSet", defaultName);
 	}
 
 	public void setOldNode(Preferences oldNode) {
@@ -203,7 +206,7 @@ public class DataLoadInfo {
 
 	@Override
 	public String toString() {
-		return "DataLoadInfo [oldNode=" +	oldNode + ", oldFileSet=" + oldFileSet +
+		return "DataLoadInfo [oldNode=" +	oldNode + ", oldFileSet=" + getPreviousFileSetName() +
 						", isClusteredFile=" + isClusteredFile + ", dataCoords=" + Arrays
 																																							.toString(dataCoords) +
 						", rowLabelTypes=" + Arrays.toString(rowLabelTypes) +
