@@ -79,7 +79,6 @@ public class ColorPresets implements ConfigNodePersistent {
 			return;
 		}
 
-		LogBuffer.println("SETTING COLORPRESETS CONFIGNODE.");
 		this.configNode = parentNode.node(this.getClass().getSimpleName());
 		requestStoredState();
 	}

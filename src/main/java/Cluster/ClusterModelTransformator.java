@@ -152,28 +152,44 @@ public class ClusterModelTransformator {
 	  // Update labels associated with DataModel
 		// Rows
 		if(rowCAD.isAxisClustered()) {
+			
+			model.getRowLabelInfo().reorderLabels(reorderedRowIndices);
+			
 			if(!model.gidFound()) {
 			  int idx = model.getRowLabelInfo().getNumLabelTypes();
 			  model.getRowLabelInfo().addLabelType(ROW_ID_LABELTYPE, idx);
+			  
+			  final String[] orderedGIDs = constructAxisIDs(rowCAD);
+			  model.getRowLabelInfo().addLabels(orderedGIDs);
+			  
 		    ((TVModel)model).gidFound(true);
 			}
 		  
-		  final String[] orderedGIDs = constructAxisIDs(rowCAD);
-			model.getRowLabelInfo().reorderLabels(reorderedRowIndices);
-			model.getRowLabelInfo().addLabels(orderedGIDs);
+//		  final String[] orderedGIDs = constructAxisIDs(rowCAD);
+//			model.getRowLabelInfo().reorderLabels(reorderedRowIndices);
+			
+			// FIXME add when old label IDs do not exist -- otherwise replace!
+//			model.getRowLabelInfo().addLabels(orderedGIDs);
 		}
 		
 		// Columns
 		if(colCAD.isAxisClustered()) {
+			
+			model.getColLabelInfo().reorderLabels(reorderedColIndices);
+			
 			if(!model.aidFound()) {
 			  int idx = model.getColLabelInfo().getNumLabelTypes();
 			  model.getColLabelInfo().addLabelType(COL_ID_LABELTYPE, idx);
+			  
+			  final String[] orderedAIDs = constructAxisIDs(colCAD);
+			  model.getColLabelInfo().addLabels(orderedAIDs);
+			  
 		    ((TVModel)model).aidFound(true);
 			}
 		  
-		  final String[] orderedAIDs = constructAxisIDs(colCAD);
-			model.getColLabelInfo().reorderLabels(reorderedColIndices);
-			model.getColLabelInfo().addLabels(orderedAIDs);
+//		  final String[] orderedAIDs = constructAxisIDs(colCAD);
+//			model.getColLabelInfo().reorderLabels(reorderedColIndices);
+//			model.getColLabelInfo().addLabels(orderedAIDs);
 		}
 	}
 	

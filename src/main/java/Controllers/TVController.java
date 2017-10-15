@@ -377,23 +377,23 @@ public class TVController implements Observer {
 			setDataModel();
 			dendroController.setNewMatrix(tvFrame.getDendroView(), model);
 
-			// If an old node exists, a file was already loaded beforehand.
-			// If the FileSet connected to this node 
-			if(dataInfo.getOldNode() != null && 
-				!model.getFileSet().equals(dataInfo.getPreviousFileSetName())) {
-				LogBuffer.println("Importing old preferences.");
-				/*
-				 * TODO Needs to happen after setNewMatrix because a new
-				 * ColorExtractor object is created, which would void the 
-				 * updated ColorExtractor state if copying happens before. 
-				 * Implement a nicer solution one day...
-				 */
-				importOldPreferencesFrom(dataInfo.getOldNode());
-			}
-			else {
-				LogBuffer.println("Problem with old FileSet. Could not load old " +
-					"preferences and add last file to recent file list.");
-			}
+//			// If an old node exists, a file was already loaded beforehand.
+//			// If the FileSet connected to this node 
+//			if(dataInfo.getOldNode() != null && 
+//				!model.getFileSet().equals(dataInfo.getPreviousFileSetName())) {
+//				LogBuffer.println("Importing old preferences.");
+//				/*
+//				 * TODO Needs to happen after setNewMatrix because a new
+//				 * ColorExtractor object is created, which would void the 
+//				 * updated ColorExtractor state if copying happens before. 
+//				 * Implement a nicer solution one day...
+//				 */
+//				importOldPreferencesFrom(dataInfo.getOldNode());
+//			}
+//			else {
+//				LogBuffer.println("Problem with old FileSet. Could not load old " +
+//					"preferences and add last file to recent file list.");
+//			}
 
 			dendroController.restoreComponentStates();
 			updateFileMRU();

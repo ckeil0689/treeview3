@@ -134,6 +134,8 @@ public class ModelFileGenerator {
 			writeRowAndClear(fullRow);
 		}
 
+		LogBuffer.println("File Write Debug.");
+		
 		// Filling the data rows
 		for(int i = 0; i < origMatrix.length; i++) {
 			// 1) adding row IDs ("ROW130X")...
@@ -144,6 +146,8 @@ public class ModelFileGenerator {
 			// 2) adding remaining row labels
 			System.arraycopy(labels, 0, row, idxTracker, labels.length);
 			idxTracker += labels.length;
+			
+			LogBuffer.println("Iteration: " + i);
 
 			// 3) adding data values
 			String[] rowData = getStringArray(origMatrix[i]);
