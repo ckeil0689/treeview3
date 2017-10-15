@@ -212,7 +212,7 @@ public class ModelSaver {
 			final ModelFileGenerator modelGen = 
 				new ModelFileGenerator((TVModel) model);
 			modelGen.setupWriter(matrixFile);
-			modelGen.generateCDT();
+			modelGen.generateMainFile();
 			
 			if(isCancelled()) {
 				return Boolean.FALSE;

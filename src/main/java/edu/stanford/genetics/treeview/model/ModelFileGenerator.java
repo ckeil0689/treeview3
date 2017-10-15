@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.LogBuffer;
 
 /** This class is used to generate the .CDT tab delimited file which Java
  * TreeView will use for visualization. It takes in the previously calculated
@@ -61,16 +62,23 @@ public class ModelFileGenerator {
 		this.modelFileWriter = new ModelFileWriter(file);
 	}
 
-	/** Manages the generation of a clustered data table (CDT) file. */
-	public void generateCDT() {
+	/** Manages the generation of the main file which describes a data model. */
+	public void generateMainFile() {
 
-		// Add some string elements, as well as row/ column names
-		if(isHier) {
-			createHierCDT();
-
-		}
+		if(isRowClustered || isColClustered) {
+		  // Add some string elements, as well as row/ column names
+		  if(isHier) {
+		  	LogBuffer.println("Writing CDT file for hierarchical clustered data.");
+			  createHierCDT();
+		  }
+		  else {
+		  	LogBuffer.println("Writing CDT file for k-means clustered data.");
+			  createKMeansCDT();
+		  }
+		} 
 		else {
-			createKMeansCDT();
+			LogBuffer.println("Writing TXT file for unclustered data.");
+			createHierCDT();
 		}
 		
 		modelFileWriter.closeWriter();
