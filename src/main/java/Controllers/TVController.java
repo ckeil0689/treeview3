@@ -188,8 +188,6 @@ public class TVController implements Observer {
 	 * names in . */
 	private void addMenuListeners() {
 
-		LogBuffer.println("ADDING MENU LISTENERS -----");
-
 		tvFrame.addMenuActionListeners(new StackMenuListener());
 		tvFrame.addFileMenuListeners(new FileMenuListener());
 	}
@@ -499,16 +497,12 @@ public class TVController implements Observer {
 	private static Preferences getTargetModelNode(	final Preferences fileNode,
 																						final String srcFileSetName) 
 																							throws BackingStoreException {
-
-		LogBuffer.println("Looking for target node (" + srcFileSetName + ")");
 		
 		String[] fileNodes = fileNode.childrenNames();
 		Preferences targetNode = null;
 		for(String nodeName : fileNodes) {
 			Preferences node = fileNode.node(nodeName);
 			String connectedFS = node.get("connectedFileSet", "generic-tv-file");
-			
-			LogBuffer.println("Checking node (" + connectedFS + ")");
 			if(connectedFS.equalsIgnoreCase(srcFileSetName)) {
 				LogBuffer.println("Success. Target node found.");
 				targetNode = node;
@@ -631,8 +625,7 @@ public class TVController implements Observer {
 	                                     final String oldFileSetName,
 	                                     boolean isFromCluster,
 	                                     boolean shouldUseImport) {
-		LogBuffer.println("GET DATA LOAD INFO");
-		LogBuffer.println("Old Root: " + oldFileSetName);
+		
 		Preferences oldModelNode;
 		// Step 1) Retrieve possible old data load information
 		// Transfer settings to clustered file
@@ -946,7 +939,6 @@ public class TVController implements Observer {
 			ModelLoader.storeDataLoadInfo(fileNode, model, dataLoadInfo);
 			
 		  // Transfer old Preferences to new Model entry
-			LogBuffer.println("AFTER SAVE active Model node: " + ((TVModel) model).getDocumentConfig());
 			dendroController.setActiveModelPreferences();
 			importOldPreferencesFrom(dataLoadInfo.getOldNode());
 			
@@ -1154,7 +1146,6 @@ public class TVController implements Observer {
 
 		/* when tvFrame rebuilds its menu */
 		if(o instanceof ViewFrame) {
-			LogBuffer.println("UPDATE FROM VIEWFRAME");
 			addMenuListeners();
 		} 
 		else if(o instanceof TVModel) {

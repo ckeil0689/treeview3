@@ -1200,7 +1200,6 @@ public class TVModel extends Observable implements DataModel {
 	@Override
 	public void setModified(boolean wasModified) {
 		
-		LogBuffer.println("TVModel is modified? " + wasModified);
 		this.wasModified = wasModified;
 		setChanged();
 		notifyObservers(loaded);

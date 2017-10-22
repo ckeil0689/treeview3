@@ -172,17 +172,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 		case WELCOME_VIEW:
 			FileSet mruLast = getFileMRU().getLast();
 			view = welcomeView.makeWelcome(mruLast);
-			LogBuffer.println("SHOWING WELCOME VIEW --------");
 			break;
 
 		case PROGRESS_VIEW:
 			view = welcomeView.makeLoading();
-			LogBuffer.println("SHOWING PROGRESS VIEW -------");
 			break;
 
 		case DENDRO_VIEW:
 			view = dendroView.makeDendro();
-			LogBuffer.println("SHOWING DENDRO VIEW ---------");
 			break;
 
 		default:
@@ -193,7 +190,6 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 			break;
 		}
 
-		//buildMenuBar();
 		displayView(view);
 	}
 

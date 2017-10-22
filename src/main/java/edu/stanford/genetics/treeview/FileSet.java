@@ -49,7 +49,7 @@ public class FileSet {
 	// Sensible defaults for FileSet properties
 	public static final String DEFAULT_ROOT = "generic-tv-file";
 	public static final String DEFAULT_EXT = ".txt";
-	public static final String DEFAULT_DIR = System.getProperty("user.home");
+	public static final String DEFAULT_DIR = System.getProperty("user.home") + File.separator;
 	public static final String DEFAULT_JTV = ".jtv";
 	public static final String DEFAULT_ATR = ".atr";
 	public static final String DEFAULT_GTR = ".gtr";
