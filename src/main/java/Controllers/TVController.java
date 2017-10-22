@@ -544,7 +544,7 @@ public class TVController implements Observer {
 			LogBuffer.println("Another Model is loaded and modified. " +
 				"Asking for save.");
 			askSaveModified();
-			// Only continue if finished
+			// Only continues if finished
 		}
 
 		try {
