@@ -114,6 +114,15 @@ public interface LabelInfo {
 	 * @return true if successfully added, false if not.
 	 */
 	public boolean addLabelType(String labelType, int location);
+	
+	/**
+	 * Extends the 2D array of labels such that each entry has one more element.
+	 * The new elements are added at the last index. 
+	 * @param newLabels - The new labels to be added. The array must be the 
+	 * same length as the number of entries in the 2D label array.
+	 * @return Whether the operation was successful or not.
+	 */
+	public boolean addLabels(String[] newLabels);
 
 	/**
 	 * Sets indicated label to specified value Just return false if your label

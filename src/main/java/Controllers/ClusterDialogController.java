@@ -1,18 +1,11 @@
 package Controllers;
 
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -20,8 +13,9 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import Cluster.ClusterFileGenerator;
-import Cluster.ClusterFileStorage;
+import org.apache.commons.io.FilenameUtils;
+
+import Cluster.ClusterModelTransformator;
 import Cluster.ClusterProcessor;
 import Cluster.ClusteredAxisData;
 import Cluster.DistMatrixCalculator;
@@ -30,9 +24,9 @@ import Utilities.StringRes;
 import Views.ClusterDialog;
 import Views.ClusterView;
 import edu.stanford.genetics.treeview.DataModel;
-import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.IntLabelInfo;
+import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
 
 /**
@@ -47,32 +41,22 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  * and inheritance and avoid passing of the TVFrameController object here, just
  * to use its loading methods. Also inherits instance variables like tvModel..
  *
- * @author CKeil
- *
  */
 public class ClusterDialogController {
 
-	/* Axes identifiers */
-	public final static String CDT_END = ".cdt";
-	public final static String GTR_END = ".gtr";
-	public final static String ATR_END = ".atr";
+	// Axes identifiers
+	public final static String ROW_ID_LABELTYPE = "GID";
+	public final static String COL_ID_LABELTYPE = "AID";
 	
-	public final static int ROW = 1;
-	public final static int COL = 2;
-	
-	private final int ROW_IDX = 0;
-	private final int COL_IDX = 1;
+	public final static int ROW_IDX = 0;
+	public final static int COL_IDX = 1;
 
 	private final DataModel tvModel;
 	private final TVController tvController;
 	private final ClusterView clusterView;
 	private final ClusterDialog clusterDialog;
-	
-	private File cdtFile;
-	private File atrFile;
-	private File gtrFile;
 
-	/* Delegates the clustering process */
+	// Delegates the clustering process
 	private ClusterProcessor processor;
 
 	/* Initialize with defaults for error checking parameters */
@@ -80,7 +64,6 @@ public class ClusterDialogController {
 	private int colSimilarity = DistMatrixCalculator.PEARSON_UN;
 
 	private SwingWorker<Boolean, String> clusterTask;
-	private SwingWorker<Boolean, Void> saveTask;
 
 	/**
 	 * Links the clustering functionality to the user interface. The object
@@ -143,7 +126,7 @@ public class ClusterDialogController {
 		public void actionPerformed(final ActionEvent e) {
 
 			/* Only starts with valid selections. */
-			if (isReady(rowSimilarity, ROW) || isReady(colSimilarity, COL)) {
+			if (isReady(rowSimilarity, ROW_IDX) || isReady(colSimilarity, COL_IDX)) {
 				/* Tell ClusterView that clustering begins */
 				clusterView.setClustering(true);
 				clusterTask = new ClusterTask();
@@ -158,14 +141,12 @@ public class ClusterDialogController {
 	 * updating the progress bar and progress label. When the thread is done it
 	 * calls a function to save the results to a CDT file.
 	 *
-	 * @author CKeil
-	 *
 	 */
 	private class ClusterTask extends SwingWorker<Boolean, String> {
 		
 		/* The finished reordered axes */
-		private ClusteredAxisData rowClusterData;
-		private ClusteredAxisData colClusterData;
+		private ClusteredAxisData rowCAD;
+		private ClusteredAxisData colCAD;
 		
 		private boolean[] clusterCheck;
 
@@ -176,11 +157,9 @@ public class ClusterDialogController {
 		
 		public ClusterTask() {
 			
-			this.rowClusterData = new ClusteredAxisData(ROW_IDX);
-			this.colClusterData = new ClusteredAxisData(COL_IDX);
-			
-			rowClusterData.setReorderedIDs(getOldIDs(ROW_IDX));
-			colClusterData.setReorderedIDs(getOldIDs(COL_IDX));
+			// defaults
+			this.rowCAD = new ClusteredAxisData(ROW_IDX);
+			this.colCAD = new ClusteredAxisData(COL_IDX);
 		}
 
 		@Override
@@ -194,32 +173,33 @@ public class ClusterDialogController {
 		@Override
 		protected Boolean doInBackground() throws Exception {
 
-			/* Get fileName for saving calculated data */
-			final int extlen = tvModel.getFileSet().getExt().length();
-			this.oldFileName = tvModel.getSource().substring(0, tvModel.getSource().length() - extlen);
+			// Get fileName for saving calculated data
+			this.oldFileName = FilenameUtils.removeExtension(tvModel.getSource());
 
-			/* Initialize the clustering processor and pass the data */
+			// Initialize the clustering processor and pass the data
 			final TVDataMatrix originalMatrix = (TVDataMatrix) tvModel.getDataMatrix();
-
-			/* Initialize the cluster processor */
+			
+			// Initialize the cluster processor
 			if(isHierarchical()) {
+				// Hierarchical
 				processor = new ClusterProcessor(originalMatrix);
-
-			} else {
+			} 
+			else {
+				// K-means
 				final IntLabelInfo rowLabelI = tvModel.getRowLabelInfo();
 				final IntLabelInfo colLabelI = tvModel.getColLabelInfo();
-
-				processor = new ClusterProcessor(originalMatrix, oldFileName, rowLabelI, colLabelI);
+				
+				processor = new ClusterProcessor(originalMatrix, oldFileName, 
+				                                 rowLabelI, colLabelI);
 			}
 
 			// Set zeroes invalid if they should be ignored.
 			if (clusterView.isIgnoreZeroesChecked()) {
-				originalMatrix.setZeroesToMissing();
+				originalMatrix.treatZeroesAsMissing();
 			}
 
-			final boolean isRowReady = isReady(rowSimilarity, ROW);
-			final boolean isColReady = isReady(colSimilarity, COL);
-
+			final boolean isRowReady = isReady(rowSimilarity, ROW_IDX);
+			final boolean isColReady = isReady(colSimilarity, COL_IDX);
 			this.clusterCheck = reaffirmClusterChoice(isRowReady, isColReady);
 
 			if(!clusterCheck[ROW_IDX] && !clusterCheck[COL_IDX]) {
@@ -228,76 +208,48 @@ public class ClusterDialogController {
 			}
 
 			setupClusterViewProgressBar(clusterCheck[ROW_IDX], clusterCheck[COL_IDX]);
-
-			// TODO need to add drive partition part to the path when subpath is created
-			final Path clusterFilePath = ClusterFileStorage.createDirectoryStruc(oldFileName, 
-					clusterView.getLinkMethod());
-
-			// Cluster rows if user selected option
-			if (clusterCheck[ROW_IDX]) {
-				gtrFile = ClusterFileStorage.retrieveFile(clusterFilePath, GTR_END);
-				rowClusterData.setReorderedIDs(calculateAxis(rowSimilarity, ROW, gtrFile));
-				rowClusterData.shouldReorderAxis(true);
+			
+			if(clusterCheck[ROW_IDX]) {
+				rowCAD = calculateAxis(rowSimilarity, ROW_IDX);
 			}
 
 			// Check for cancellation in between axis clustering
-			if (isCancelled()) {
+			if(isCancelled()) {
 				return Boolean.FALSE;
 			}
-
-			// Cluster columns if user selected option
+			
 			if (clusterCheck[COL_IDX]) {
-				atrFile = ClusterFileStorage.retrieveFile(clusterFilePath, ATR_END);
-				colClusterData.setReorderedIDs(calculateAxis(colSimilarity, COL, atrFile));
-				colClusterData.shouldReorderAxis(true);
+				colCAD = calculateAxis(colSimilarity, COL_IDX);
 			}
 
 			if(!isReorderingValid(clusterCheck)) {
 				this.cancel(true);
 				return Boolean.FALSE;
 			}
-
-			// Determine file extensions for CDT file (varies between
-			// hierarchical and k-means)
-			String fileEnd = ClusterFileStorage.determineClusterFileExt(
-				isHierarchical(), clusterView.getSpinnerValues(), 
-				rowClusterData, colClusterData);
-
-			cdtFile = ClusterFileStorage.retrieveFile(clusterFilePath, fileEnd);
-
-			if(cdtFile == null) {
-				this.cancel(true);
-				return Boolean.FALSE;
-			}
-			// finished setting reordered axis labels
+			
 			return Boolean.TRUE;
 		}
 
 		@Override
 		public void done() {
 
-			boolean shouldSave = true;
-
 			/* 
 			 * Checked again here in case doInBackground() terminates before
 			 * first check (not via cancel).
 			 */
-			if(!isReorderingValid(clusterCheck)) {
+			if(!isReorderingValid(clusterCheck) || isCancelled()) {
+				ClusterView.setPBarEmpty();
 				LogBuffer.println("Something occurred during reordering.");
-				shouldSave = false;
+				// TODO make sure tvController doesnt crash the app here!
+				return;
 			}
 			
-			if (!isCancelled() && shouldSave) {
-				LogBuffer.println("ClusterTask is done: success.  Saving to " +
-					oldFileName);
-				saveClusterFile(oldFileName, rowClusterData, colClusterData);
-			} else {
-				rowClusterData.setReorderedIDs(new String[] {});
-				colClusterData.setReorderedIDs(new String[] {});
-				clusterView.setClustering(false);
-				LogBuffer.println("ClusterTask is done: cancelled.");
-				deleteAllFiles();
-			}
+			ClusterView.setPBarFull();
+			ClusterModelTransformator cmt = 
+				new ClusterModelTransformator(rowCAD, colCAD, (TVModel) tvModel);
+			TVModel clusteredModel = cmt.applyClusterChanges(isHierarchical());
+			tvController.loadClusteredModel(clusteredModel); //updates TVModel
+			clusterDialog.dispose();
 		}
 		
 		/**
@@ -314,74 +266,24 @@ public class ClusterDialogController {
 			int numRowLabels = tvModel.getRowLabelInfo().getNumLabels();
 			int numColLabels = tvModel.getColLabelInfo().getNumLabels();
 			
-			int numReorderedRowIDs = rowClusterData.getReorderedIDs().length;
-			int numReorderedColIDs = colClusterData.getReorderedIDs().length;
+			int numReorderedRowIDs = rowCAD.getReorderedIdxs().length;
+			int numReorderedColIDs = colCAD.getReorderedIdxs().length;
 			
 			if(shouldClusterAxis[ROW_IDX] || tvModel.gidFound()) {
 				rowsValid = (numReorderedRowIDs == numRowLabels); 
-			} else {
+			} 
+			else {
 				rowsValid = (numReorderedRowIDs == 0);
 			}
 			
 			if(shouldClusterAxis[COL_IDX] || tvModel.aidFound()) {
 				colsValid = (numReorderedColIDs == numColLabels); 
-			} else {
+			} 
+			else {
 				colsValid = (numReorderedColIDs == 0);
 			}
 			
 			return rowsValid && colsValid;
-		}
-		
-		/**
-		 * Extracts the old IDs
-		 * @param axisID
-		 * @return
-		 */
-		private String[] getOldIDs(final int axisID) {
-
-			String[][] labelArray;
-			String[] oldIDs; 
-			Pattern p;
-			int pos = 0;
-
-			if(axisID == ROW_IDX) {
-				labelArray = tvModel.getRowLabelInfo().getLabelArray();
-
-				if(!tvModel.gidFound()) {
-					return new String[]{};
-				}
-				/* Find ID index */
-				p = Pattern.compile("ROW\\d+X");
-
-			} else {
-				labelArray = tvModel.getColLabelInfo().getLabelArray();
-
-				if(!tvModel.aidFound()) {
-					return new String[]{};
-				}
-				//"ARRY" is the old ID style and is retained here for backward
-				//compatibility with both previous versions and with the Cluster
-				//3.0 app.  Note, for whatever reason, "GENE" is not needed
-				//above as an alternative to "ROW".  See issue #539.
-				p = Pattern.compile("(ARRY|COL)\\d+X");
-			}
-
-			/* Find ID index */
-			for(int i = 0; i < labelArray[0].length; i++) {
-				Matcher m = p.matcher(labelArray[0][i]);
-				if(m.find()) {
-					pos = i;
-					break;
-				}
-			}
-
-			oldIDs = new String[labelArray.length];
-
-			for(int i = 0; i < labelArray.length; i++) {
-				oldIDs[i] = labelArray[i][pos];
-			}
-
-			return oldIDs;
 		}
 		
 		/** 
@@ -445,14 +347,14 @@ public class ClusterDialogController {
 			 * later used to ensure tree file presence if an axis is 
 			 * considered to be clustered. 
 			 */
-			final boolean checkForRowTreeFile = wasRowAxisClustered ||
-				shouldClusterAxis[ROW_IDX];
-			final boolean checkForColTreeFile = wasColAxisClustered ||
-				shouldClusterAxis[COL_IDX];
-
-			rowClusterData.setAxisClustered(checkForRowTreeFile);
-			colClusterData.setAxisClustered(checkForColTreeFile);
-
+			final boolean checkForRowTreeFile = wasRowAxisClustered 
+					|| shouldClusterAxis[ROW_IDX];
+			final boolean checkForColTreeFile = wasColAxisClustered 
+					|| shouldClusterAxis[COL_IDX];
+			
+			rowCAD.setAxisClustered(checkForRowTreeFile);
+			colCAD.setAxisClustered(checkForColTreeFile);
+			
 			return shouldClusterAxis;
 		}
 		
@@ -566,415 +468,32 @@ public class ClusterDialogController {
 		 *
 		 * @param similarity
 		 *            The chosen similarity measure.
-		 * @param axis
+		 * @param axisID
 		 *            The chosen matrix axis.
 		 * @return A list of reordered axis elements.
 		 */
-		private String[] calculateAxis(final int similarity, final int axis,
-				final File treeFile) {
-
-			boolean isRow = (axis == ROW);
-
-			/* Row axis cluster */
+		private ClusteredAxisData calculateAxis(final int similarity, 
+		                                        final int axisID) {
+			
 			final DistanceMatrix distMatrix = new DistanceMatrix(0);
-			final String axisType = (isRow) ? "row" : "column";
+			final String axisType = (axisID == ROW_IDX) ? "row" : "column";
 
-			/* ProgressBar label */
+			// progressBar label
 			publish("Calculating " + axisType + " distances...");
 
-			/* Calculating the distance matrix */
-			distMatrix.setMatrix(processor.calcDistance(similarity, axis));
+			// calculating the distance matrix
+			distMatrix.setMatrix(processor.calcDistance(similarity, axisID));
 
 			if (isCancelled()) {
-				return new String[] {};
+				ClusteredAxisData cad = new ClusteredAxisData(axisID);
+				cad.shouldReorderAxis(false);
+				return cad;
 			}
 
 			publish("Clustering " + axisType + " data...");
 
-			String[] reorderedAxisLabels =  processor.clusterAxis(distMatrix,
-					clusterView.getLinkMethod(),
-					clusterView.getSpinnerValues(), isHierarchical(), axis, 
-					treeFile);
-
-			return reorderedAxisLabels;
-		}
-	}
-	
-	/**
-	 * Saves the clustering output (reordered axes) to a new CDT file, so it
-	 * can later be loaded and displayed.
-	 */
-	private void saveClusterFile(final String fileName, 
-			final ClusteredAxisData rowClusterData, 
-			final ClusteredAxisData colClusterData) {
-
-		if (rowClusterData.getReorderedIDs() != null ||
-			colClusterData.getReorderedIDs() != null) {
-
-			LogBuffer.println("Saving...");
-			ClusterView.setStatusText("Saving...");
-
-			saveTask = new SaveTask(rowClusterData, colClusterData, 
-				fileName);
-			saveTask.execute();
-
-		} else {
-			final String message = "Cannot save. No clustered data was " +
-				"created.";
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,
-				"Error", JOptionPane.ERROR_MESSAGE);
-			LogBuffer.println("Alert: " + message);
-		}
-	}
-
-	/**
-	 * Worker with the task to generate and write a new CDT file which contains
-	 * the newly clustered matrix. Makes sure that the newly created file is
-	 * visualized right after clustering, given that the process was not
-	 * cancelled.
-	 *
-	 * @param reorderedRows
-	 *            Reordered row axis.
-	 * @author CKeil
-	 */
-	private class SaveTask extends SwingWorker<Boolean, Void> {
-
-		/* The finished reordered axes */
-		private final ClusteredAxisData rowClusterData;
-		private final ClusteredAxisData colClusterData;
-
-		private final String fileName;
-		private String filePath;
-
-		public SaveTask(final ClusteredAxisData rowClusterData, 
-			final ClusteredAxisData colClusterData, 
-			final String fileName) {
-
-			this.rowClusterData = rowClusterData;
-			this.colClusterData = colClusterData;
-			
-			this.fileName = fileName;
-		}
-
-		@Override
-		protected Boolean doInBackground() throws Exception {
-
-			final TVDataMatrix originalMatrix =
-				(TVDataMatrix) tvModel.getDataMatrix();
-			final double[][] data = originalMatrix.getExprData();
-
-			final ClusterFileGenerator cdtGen = new ClusterFileGenerator(data, 
-				rowClusterData, colClusterData, isHierarchical());
-
-			cdtGen.setupWriter(cdtFile);
-
-			final IntLabelInfo rowLabelI = tvModel.getRowLabelInfo();
-			final IntLabelInfo colLabelI = tvModel.getColLabelInfo();
-
-			cdtGen.prepare(rowLabelI, colLabelI);
-			cdtGen.generateCDT();
-
-			filePath = cdtGen.finish();
-
-			if(isCancelled()) {
-				return Boolean.FALSE;
-			}
-			
-			if(filePath == null) {
-				LogBuffer.println("Generating a CDT failed. Cancelling...");
-				this.cancel(true);
-				return Boolean.FALSE;
-			}
-
-			return Boolean.TRUE;
-		}
-
-		@Override
-		protected void done() {
-
-			if (!isCancelled() && hasEnsuredTreeFilePresence()) {
-				ClusterView.setStatusText("Saving done!");
-				loadClusteredData(filePath);
-				LogBuffer.println("SaveTask is done: success.");
-				
-			} else {
-				clusterView.setClustering(false);
-				LogBuffer.println("Saving did not finish successfully.");
-				deleteAllFiles();
-			}
-		}
-		
-		/**
-		 * Makes sure that a tree file exists for an axis that is supposed to
-		 * be clustered. If not, it attempts to take one from a previous 
-		 * cluster and if that does not exist either it will consider an axis
-		 * as not clustered. In that case, a tree file will not be present. Returns
-		 * true upon successful completion.
-		 */
-		private boolean hasEnsuredTreeFilePresence() {
-	
-			if(filePath == null && fileName == null) {
-				LogBuffer.println("File path and name is null");
-				return false;
-			} else if(filePath == null) {
-				LogBuffer.println("File path is null");
-				return false;
-			} else if(fileName == null) {
-				LogBuffer.println("File name is null");
-				return false;
-			}
-			
-			final int fileRootNameSize = filePath.length() - CDT_END.length();
-			final String newFileRoot = filePath.substring(0, fileRootNameSize);
-			
-			ensureTreeFilePresence(fileName, newFileRoot, GTR_END, ROW_IDX);
-			ensureTreeFilePresence(fileName, newFileRoot, ATR_END, COL_IDX);
-			
-			return true;
-		}
-		
-		/**
-		 * For a given axis, this ensures that its tree file exists in case
-		 * it is considered to be clustered. This is useful especially if
-		 * an axis was already clustered before so that the old tree file can
-		 * be carried over to the new FileSet.
-		 * @param oldFileRoot The root name of the older cdt file.
-		 * @param newFileRoot The root name of the new cdt file.
-		 * @param treeFileSuffix The tree file suffix to be used if a new file
-		 * is created.
-		 * @param axisIdx An integer identifying the axis.
-		 */
-		private void ensureTreeFilePresence(final String oldFileRoot, 
-				final String newFileRoot, final String treeFileSuffix, 
-				final int axisIdx) { 
-			
-			String axis_id;
-			boolean axisNeedsTreeFileCheck;
-			
-			if(axisIdx == ROW_IDX) {
-				axis_id = "row";
-				axisNeedsTreeFileCheck = rowClusterData.isAxisClustered();
-			} else {
-				axis_id = "column";
-				axisNeedsTreeFileCheck = colClusterData.isAxisClustered();
-			}
-			
-			if(axisNeedsTreeFileCheck) {
-				String newTreeFilePath = newFileRoot + treeFileSuffix;
-				String oldTreeFilePath = oldFileRoot + treeFileSuffix;
-				
-				if(!doesFileExist(newTreeFilePath)) {
-					LogBuffer.println("No file found for " + axis_id 
-							+ " trees.");
-					if(doesFileExist(oldTreeFilePath)) {
-						LogBuffer.println("But old " + axis_id 
-								+ " tree file was found!");
-						copyFile(oldTreeFilePath, newTreeFilePath);
-					} else {
-						String message = "The tree file for the " + axis_id 
-								+ " axis could not be recovered. No trees "
-								+ "can be shown.";
-						JOptionPane.showMessageDialog(clusterDialog, message);
-					}
-				} else {
-					LogBuffer.println("Success! The " + axis_id 
-							+ " tree file was found.");
-				}
-			} else {
-				LogBuffer.println("The " + axis_id 
-						+ "s have not been clustered.");
-			}
-		}
-		
-		/**
-		 * Copies an old file to a new one with the correct file name. This 
-		 * is used for transferring old tree files to new clustered matrices.
-		 * @param oldTreeFilePath The path of the file to be copied.
-		 * @param newTreeFilePath The path to which the old file will be copied.
-		 */
-		private boolean copyFile(final String oldTreeFilePath, 
-				final String newTreeFilePath) {
-			
-			try(FileInputStream srcStream = 
-					new FileInputStream(oldTreeFilePath); 
-				FileOutputStream dstStream = 
-						new FileOutputStream(newTreeFilePath)) {
-				
-				dstStream.getChannel().transferFrom(srcStream.getChannel(), 
-						0, srcStream.getChannel().size());
-				return true;
-				
-			} catch (IOException e) {
-				LogBuffer.logException(e);
-				return false;
-			} 
-		}
-		
-		/**
-		 * Checks if a file at a given path exists or not.
-		 * @param path - The complete file path which to check.
-		 * @return Whether the checked file exists or not.
-		 */
-		private boolean doesFileExist(final String path) {
-			
-			File f = new File(path);
-			return (f.exists() && !f.isDirectory());
-		}
-	}
-	
-	/**
-	 * Deletes all files associated with the last clustering step. Also
-	 * deletes the directory of the files if it is empty.
-	 */
-	public void deleteAllFiles() {
-		
-		File dir = getClusterDir(cdtFile, gtrFile, atrFile);
-		
-		deleteFile(cdtFile);
-		deleteFile(atrFile);
-		deleteFile(gtrFile);
-		
-		deleteEmptyDir(dir);
-	}
-	
-	/**
-	 * TODO move to ClusterFileStorage
-	 * Attempt to extract the directory from any of the cluster files, if 
-	 * they exist.
-	 * @param cdtF The CDT file of the current cluster operation.
-	 * @param gtrF The GTR file of the current cluster operation.
-	 * @param atrF The ATR file of the current cluster operation.
-	 * @return File The directory where the files are stored or null if neither
-	 * of the files exists. 
-	 */
-	private static File getClusterDir(File cdtF, File gtrF, File atrF) {
-		
-		File dir;
-		if(cdtF != null && cdtF.exists()) {
-			dir = cdtF.getParentFile();
-			
-		} else if(gtrF != null && gtrF.exists()) {
-			dir = gtrF.getParentFile();
-			
-		} else if(atrF != null && atrF.exists()) {
-			dir = atrF.getParentFile();
-			
-		} else {
-			dir = null;
-		}
-		
-		if(dir != null) {
-			LogBuffer.println("Determined dir: " + dir.getAbsolutePath());
-		}
-		
-		return dir;
-	}
-	
-	/**
-	 * TODO move to ClusterFileStorage
-	 * If the passed File object exists and is indeed a normal file, it deletion
-	 * will be attempted. The passed object will also be set to null to avoid
-	 * lingering of object data.
-	 * @param file - The File to be deleted.
-	 */
-	private static void deleteFile(File file) {
-		
-		if(file == null) {
-			return;
-		}
-		
-		boolean success = false;
-		String name = file.getName();
-		
-		if(file.isFile() && file.exists()) {
-			success = file.delete();
-			LogBuffer.println("Attempted delete of " + name);
-			
-		} else {
-			LogBuffer.println(name + " is not a file or file does not exist.");
-		}
-		
-		if(success) {
-			LogBuffer.println(name + " was successfully deleted.");
-			//file = null;
-			// got a warning for this assignment, not sure what effects of deletion would be. can be deleted if
-			// process is not affected
-			
-		} else {
-			LogBuffer.println(name + " could not be deleted.");
-		}
-	}
-	
-	/**
-	 * TODO Move to ClusterFileStorage
-	 * Checks if the passed File object is a directory, if it is empty, and if
-	 * that is true it attempts to delete the directory.
-	 * @param dir - The File object to be deleted. It should represent 
-	 * an empty directory.
-	 */
-	private static void deleteEmptyDir(File dir) {
-		
-		if(dir == null) {
-			return;
-		}
-		
-		boolean success = false;
-		String name = dir.getName();
-		
-		if(dir.isDirectory()) {
-			File[] files = dir.listFiles();
-			if(files.length == 0) {
-				success = dir.delete();
-				
-			} else {
-				LogBuffer.println("Directory " + name + " still has " 
-						+ files.length + " files.");
-			}
-		} else {
-			LogBuffer.println(name + " is not a directory.");
-		}
-		
-		if(success) {
-			LogBuffer.println(name + " was successfully deleted.");
-			//dir = null;
-			// got a warning for this assignment, not sure what effects of deletion would be. can be deleted if
-			// process is not affected
-		} else {
-			LogBuffer.println(name + " could not be deleted.");
-		}
-	}
-
-	/**
-	 * Sets a new <code>DendroView</code> with the new data loaded into 
-	 * <code>TVModel</code>, displaying an updated heat map. 
-	 * It should also close the <code>ClusterDialog</code>.
-	 * @param clusteredFilePath - The path to the clustered file which should
-	 * be loaded
-	 */
-	private void loadClusteredData(final String clusteredFilePath) {
-
-		File file = null;
-		
-		if (clusteredFilePath != null) {
-			file = new File(clusteredFilePath);
-			
-			// Later used to import preferences
-			final String oldRoot = tvModel.getFileSet().getRoot();
-			final String oldExt = tvModel.getFileSet().getExt();
-			
-			final FileSet clusteredFileSet = new FileSet(file.getName(),
-					file.getParent() + File.separator);
-			
-			clusterDialog.dispose();
-			tvController.getDataInfoAndLoad(clusteredFileSet,oldRoot,oldExt,
-				true,false,false);
-
-		} else {
-			final String alert = "When trying to load the clustered file, no "
-					+ "file path could be found.";
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], alert, "Alert",
-					JOptionPane.WARNING_MESSAGE);
-			LogBuffer.println("Alert: " + alert);
+			return (processor.clusterAxis(distMatrix, clusterView.getLinkMethod(),
+					clusterView.getSpinnerValues(), isHierarchical(), axisID));
 		}
 	}
 
@@ -982,9 +501,6 @@ public class ClusterDialogController {
 	/**
 	 * Listens to a change in selection for the clusterChoice JComboBox in
 	 * clusterView. Calls a new layout setup as a response.
-	 *
-	 * @author CKeil
-	 *
 	 */
 	private class ClusterTypeListener implements ActionListener {
 
@@ -1007,8 +523,6 @@ public class ClusterDialogController {
 	 * Listens to a change in selection for the JComboBox linkChooser in
 	 * the ClusterDialog. Calls a new layout setup as a response.
 	 *
-	 * @author CKeil
-	 *
 	 */
 	private class LinkChoiceListener implements ActionListener {
 
@@ -1025,8 +539,6 @@ public class ClusterDialogController {
 	/**
 	 * Listens to a change in selection in the JComboBox for row distance
 	 * measure selection.
-	 *
-	 * @author CKeil
 	 */
 	private class RowDistListener implements ItemListener {
 
@@ -1040,8 +552,8 @@ public class ClusterDialogController {
 				rowSimilarity = clusterView.getRowSimilarity();
 
 				/* Ready indicator label */
-				clusterView.displayReadyStatus(isReady(rowSimilarity, ROW)
-						|| isReady(colSimilarity, COL));
+				clusterView.displayReadyStatus(isReady(rowSimilarity, ROW_IDX)
+						|| isReady(colSimilarity, COL_IDX));
 			}
 		}
 	}
@@ -1049,8 +561,6 @@ public class ClusterDialogController {
 	/**
 	 * Listens to a change in selection in the JComboBox for col distance
 	 * measure selection.
-	 *
-	 * @author CKeil
 	 */
 	private class ColDistListener implements ItemListener {
 
@@ -1064,8 +574,8 @@ public class ClusterDialogController {
 				colSimilarity = clusterView.getColSimilarity();
 
 				/* OR controlled ready indicator label */
-				final boolean rowReady = isReady(rowSimilarity, ROW);
-				final boolean colReady = isReady(colSimilarity, COL);
+				final boolean rowReady = isReady(rowSimilarity, ROW_IDX);
+				final boolean colReady = isReady(colSimilarity, COL_IDX);
 
 				clusterView.displayReadyStatus(rowReady || colReady);
 			}
@@ -1074,8 +584,6 @@ public class ClusterDialogController {
 
 	/**
 	 * Listens to a change in selection in the JSpinners for k-means.
-	 *
-	 * @author CKeil
 	 */
 	private class SpinnerListener implements ChangeListener {
 
@@ -1086,8 +594,8 @@ public class ClusterDialogController {
 		public void stateChanged(final ChangeEvent arg0) {
 
 			/* OR controlled ready indicator label */
-			final boolean rowReady = isReady(rowSimilarity, ROW);
-			final boolean colReady = isReady(colSimilarity, COL);
+			final boolean rowReady = isReady(rowSimilarity, ROW_IDX);
+			final boolean colReady = isReady(colSimilarity, COL_IDX);
 
 			clusterView.displayReadyStatus(rowReady || colReady);
 		}
@@ -1097,9 +605,6 @@ public class ClusterDialogController {
 	 * Defines what happens if the user clicks the 'Cancel' button in
 	 * DendroView. Calls the cancel() method in the view. TODO add cancel
 	 * functionality to distance worker and cluster worker.
-	 *
-	 * @author CKeil
-	 *
 	 */
 	private class CancelListener implements ActionListener {
 
@@ -1134,11 +639,11 @@ public class ClusterDialogController {
 
 		switch (type) {
 
-		case ROW:
+		case ROW_IDX:
 			groups = (spinnerValues[0]).intValue();
 			iterations = (spinnerValues[1]).intValue();
 			break;
-		case COL:
+		case COL_IDX:
 			groups = (spinnerValues[2]).intValue();
 			iterations = (spinnerValues[3]).intValue();
 			break;
@@ -1170,11 +675,6 @@ public class ClusterDialogController {
 			LogBuffer.println("Cancelling cluster task...");
 			clusterTask.cancel(true);
 		}
-		
-		if (saveTask != null) {
-			LogBuffer.println("Cancelling save task...");
-			saveTask.cancel(true);
-		}
 	}
 
 	/**
@@ -1185,7 +685,6 @@ public class ClusterDialogController {
 	 */
 	private boolean isHierarchical() {
 
-		return clusterView.getClusterMethod().equalsIgnoreCase(
-				StringRes.menu_Hier);
+		return clusterView.getClusterMethod().equalsIgnoreCase(StringRes.menu_Hier);
 	}
 }

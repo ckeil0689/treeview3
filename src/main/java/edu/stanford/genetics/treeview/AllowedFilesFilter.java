@@ -11,12 +11,12 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * Class to filter through files for .cdt and .pcl files.
+ * Class to filter through files for .cdt, .txt, .csv and .pcl files.
  *
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version $Revision: 1.5 $ $Date: 2004-12-21 03:28:14 $
  */
-public class CdtFilter extends javax.swing.filechooser.FileFilter implements
+public class AllowedFilesFilter extends javax.swing.filechooser.FileFilter implements
 		FilenameFilter {
 	/**
 	 * from the <code>FilenameFilter</code> interface.
@@ -34,6 +34,10 @@ public class CdtFilter extends javax.swing.filechooser.FileFilter implements
 		if (file.toLowerCase().endsWith(".cdt"))
 			return true;
 		if (file.toLowerCase().endsWith(".pcl"))
+			return true;
+		if (file.toLowerCase().endsWith(".txt"))
+			return true;
+		if (file.toLowerCase().endsWith(".csv"))
 			return true;
 		return false;
 	}
@@ -55,7 +59,7 @@ public class CdtFilter extends javax.swing.filechooser.FileFilter implements
 	/* inherit */
 	@Override
 	public String getDescription() {
-		return "CDT or PCL Files";
+		return "CSV, TXT, CDT or PCL Files";
 	}
 
 }

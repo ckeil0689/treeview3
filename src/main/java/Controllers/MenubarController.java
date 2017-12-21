@@ -57,23 +57,17 @@ public class MenubarController {
 		case StringRes.menu_Import:
 			controller.openFile(null,true,false);
 			break;
-		// case StringRes.menu_Save:
-		// controller.doModelSave(true);
-		// break;
-		// case StringRes.menu_SaveAs:
-		// controller.saveModelAs();
-		// break;
+		case StringRes.menu_SaveAs:
+		  controller.saveModelAs();
+		  break;
 		case StringRes.menu_EditRecent:
 			tvFrame.showRecentFileEditor();
 			break;
 		case StringRes.menu_ResetPrefs:
 			controller.resetPreferences();
 			break;
-		case "Isolate Selected":
-			showSubData();
-			break;
 		case StringRes.menu_QuitWindow:
-			tvFrame.closeWindow();
+			controller.closeWindow();
 			break;
 		case StringRes.menu_Export:
 			try {
@@ -141,18 +135,6 @@ public class MenubarController {
 		}
 	}
 
-	/* Some helpers to keep the switch statement readable. */
-	/**
-	 * Takes the currently selected row and column indexes and uses them to open
-	 * a new view that only displays the selected data.
-	 */
-	private void showSubData() {
-
-		controller.showSubDataModel(
-			tvFrame.getRowSelection().getSelectedIndexes(),
-			tvFrame.getColSelection().getSelectedIndexes(), null, null);
-	}
-
 	/**
 	 * Just opens a stats dialog.
 	 */
@@ -164,7 +146,7 @@ public class MenubarController {
 		final int colNum = controller.getDataModel().getColLabelInfo()
 				.getNumLabels();
 
-		tvFrame.openStatsView(source, rowNum, colNum);
+		TreeViewFrame.openStatsView(source, rowNum, colNum);
 	}
 
 	/**

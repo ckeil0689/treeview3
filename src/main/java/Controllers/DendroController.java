@@ -34,7 +34,7 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import Utilities.Helper;
-import edu.stanford.genetics.treeview.CdtFilter;
+import edu.stanford.genetics.treeview.AllowedFilesFilter;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.CopyType;
 import edu.stanford.genetics.treeview.DataModel;
@@ -49,7 +49,6 @@ import edu.stanford.genetics.treeview.TreeDrawerNode;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.model.AtrTVModel;
-import edu.stanford.genetics.treeview.model.ReorderedDataModel;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.AtrAligner;
@@ -84,7 +83,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	private MatrixViewController mvController;
 	private DataModel tvModel;
 
-	protected Preferences configNode;
+	protected Preferences activeModelNode;
 
 	private int[] colIndex = null;
 	private int[] rowIndex = null;
@@ -134,19 +133,13 @@ public class DendroController implements ConfigNodePersistent, Observer,
 			return;
 		}
 
-		if(tvModel.getDocumentConfigRoot() != null) {
-			this.configNode = ((TVModel) tvModel).getDocumentConfig();
-
-		}
-		else {
-			this.configNode = Preferences.userRoot().node("DendroView");
-		}
+		this.activeModelNode = parentNode;
 	}
 
 	@Override
 	public void requestStoredState() {
 
-		importStateFrom(configNode);
+		importStateFrom(activeModelNode);
 	}
 
 	@Override
@@ -180,7 +173,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 
 		mvController.setup();
 
-		setComponentPreferences();
+		setActiveModelPreferences();
 		updateLabelInfo();
 		bindComponentFunctions();
 
@@ -465,8 +458,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		if(atr_loc > 0.0 && gtr_loc > 0.0) {
 
 			/* First save current setup */
-			configNode.putDouble("atr_Loc", atr_loc);
-			configNode.putDouble("gtr_Loc", gtr_loc);
+			activeModelNode.putDouble("atr_Loc", atr_loc);
+			activeModelNode.putDouble("gtr_Loc", gtr_loc);
 
 			/* Shrink tree panel to 0 to make it invisible */
 			atr_loc = 0.0;
@@ -476,11 +469,11 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		else {
 			/* Only update trees which are currently at 0.0 */
 			if(Helper.nearlyEqual(0.0, atr_loc)) {
-				atr_loc = configNode.getDouble("atr_Loc", 0.5);
+				atr_loc = activeModelNode.getDouble("atr_Loc", 0.5);
 			}
 
 			if(Helper.nearlyEqual(0.0, gtr_loc)) {
-				gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
+				gtr_loc = activeModelNode.getDouble("gtr_Loc", 0.5);
 			}
 		}
 
@@ -630,8 +623,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		@Override
 		public void componentShown(final ComponentEvent e) {
 
-			final double atr_loc = configNode.getDouble("atr_Loc", 0.5);
-			final double gtr_loc = configNode.getDouble("gtr_Loc", 0.5);
+			final double atr_loc = activeModelNode.getDouble("atr_Loc", 0.5);
+			final double gtr_loc = activeModelNode.getDouble("gtr_Loc", 0.5);
 
 			dendroView.setTreeVisibility(atr_loc, gtr_loc);
 		}
@@ -654,20 +647,20 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * nodes. */
 	public void saveSettings() {
 
-		if(configNode == null) { return; }
+		if(activeModelNode == null) { return; }
 
 		try {
-			if(configNode.nodeExists("GlobalXMap") && interactiveXmap != null) {
-				configNode.node("GlobalXMap").putInt("scale",
+			if(activeModelNode.nodeExists("GlobalXMap") && interactiveXmap != null) {
+				activeModelNode.node("GlobalXMap").putInt("scale",
 					interactiveXmap.getNumVisible());
-				configNode.node("GlobalXMap").putInt("XScrollValue",
+				activeModelNode.node("GlobalXMap").putInt("XScrollValue",
 					dendroView.getMatrixXScroll().getValue());
 			}
 
-			if(configNode.nodeExists("GlobalYMap") && interactiveYmap != null) {
-				configNode.node("GlobalYMap").putInt("scale",
+			if(activeModelNode.nodeExists("GlobalYMap") && interactiveYmap != null) {
+				activeModelNode.node("GlobalYMap").putInt("scale",
 					interactiveYmap.getNumVisible());
-				configNode.node("GlobalYMap").putInt("YScrollValue",
+				activeModelNode.node("GlobalYMap").putInt("YScrollValue",
 					dendroView.getMatrixYScroll().getValue());
 			}
 		}
@@ -701,7 +694,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	/** Getter for root */
 	public Preferences getConfigNode() {
 
-		return configNode;
+		return activeModelNode;
 	}
 
 	/** Sets arrayIndex and geneIndex if a K-Means clustered file has been
@@ -734,7 +727,8 @@ public class DendroController implements ConfigNodePersistent, Observer,
 		// ISSUE: Needs DataModel, not TVModel. Should dataModel be used
 		// in this class rather than TVModel?
 		if((colIndex != null) || (rowIndex != null)) {
-			tvModel = new ReorderedDataModel(tvModel, rowIndex, colIndex);
+			// commented to further check when KMeans gets reinstated
+//			tvModel = new ReorderedDataModel(tvModel, rowIndex, colIndex);
 			LogBuffer.println("DataModel issue in DendroController.");
 		}
 	}
@@ -858,21 +852,22 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 * Connects all sub components with DendroView's configuration node, so that
 	 * the hierarchical structure of Java's Preferences API can be followed.
 	 */
-	private void setComponentPreferences() {
+	public void setActiveModelPreferences() {
 
-		setConfigNode(tvFrame.getConfigNode());
+		// All DendroView preferences are based on the loaded file.
+		setConfigNode(((TVModel) tvModel).getDocumentConfig());
 
-		interactiveXmap.setConfigNode(configNode);
-		interactiveYmap.setConfigNode(configNode);
+		interactiveXmap.setConfigNode(activeModelNode);
+		interactiveYmap.setConfigNode(activeModelNode);
 
-		globalXmap.setConfigNode(configNode);
-		globalYmap.setConfigNode(configNode);
+		globalXmap.setConfigNode(activeModelNode);
+		globalYmap.setConfigNode(activeModelNode);
 
-		DendrogramFactory.getColorPresets().setConfigNode(configNode);
-		mvController.setConfigNode(configNode);
+		DendrogramFactory.getColorPresets().setConfigNode(activeModelNode);
+		mvController.setConfigNode(activeModelNode);
 
-		dendroView.getRowLabelView().setConfigNode(configNode);
-		dendroView.getColLabelView().setConfigNode(configNode);
+		dendroView.getRowLabelView().setConfigNode(activeModelNode);
+		dendroView.getColLabelView().setConfigNode(activeModelNode);
 	}
 
 	/** Requests all main components of the GUI to restore their states to
@@ -1030,7 +1025,7 @@ public class DendroController implements ConfigNodePersistent, Observer,
 	 *          the dialog to setup */
 	protected static void setupATRFileDialog(final JFileChooser fileDialog) {
 
-		final CdtFilter ff = new CdtFilter();
+		final AllowedFilesFilter ff = new AllowedFilesFilter();
 		try {
 			fileDialog.addChoosableFileFilter(ff);
 			// will fail on pre-1.3 swings

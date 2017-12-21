@@ -131,7 +131,7 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		setChanged();
 
 		final long subNodeIndex = System.currentTimeMillis();
-		LogBuffer.println("Creating subNode File" + subNodeIndex);
+		LogBuffer.println("Creating FileMRU subNode File" + subNodeIndex);
 		Preferences node = configNode.node("File" + subNodeIndex);
 		fileNodes.push(node);
 		return node;
@@ -182,15 +182,16 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 	public String[] getFileNames() {
 		
 		int numOfFiles = fileNodes.size();
-		final String astring[] = new String[numOfFiles];
+		final String fileNames[] = new String[numOfFiles];
 
+		// Walking the list of stored Models under the File node
 		for (int i = 0; i < numOfFiles; i++) {
 			if(i == skipIndex)
 				continue;
-			astring[i] = fileNodes.get(i).get("root", "")
-					+ fileNodes.get(i).get("cdt", "");
+			fileNames[i] = fileNodes.get(i).get("root", "[none]")
+					+ fileNodes.get(i).get("ext", "");
 		}
-		return astring;
+		return fileNames;
 	}
 
 	/**
@@ -357,7 +358,6 @@ public class FileMru extends Observable implements ConfigNodePersistent {
 		}
 
 		return childrenNodes;
-
 	}
 	
 	/*

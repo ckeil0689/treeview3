@@ -1,17 +1,15 @@
 package edu.stanford.genetics.treeview.model;
 
-import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import Controllers.TVController;
@@ -21,12 +19,12 @@ import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.ModelLoader.LoadStatus;
-import java.util.concurrent.ExecutionException;
 
 /** The class responsible for loading data into the TVModel. */
 public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 	protected TVController controller;
+	private final LoadStatus ls;
 
 	// Reference to the main model which will hold the data
 	protected TVModel targetModel;
@@ -52,6 +50,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		this.targetModel = (TVModel) model;
 		this.fileSet = model.getFileSet();
 		this.dataInfo = dataInfo;
+		this.ls = new LoadStatus();
 	}
 
 	/** Set the delimiter which is used to define separate cells in
@@ -96,7 +95,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		final String[][] stringLabels = new String[nRows][];
 
-		final LoadStatus ls = new LoadStatus();
 		ls.setProgress(0);
 		ls.setMaxProgress(nRows);
 		ls.setStatus("Preparing...");
@@ -134,9 +132,6 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		// Parse tree and config files
 		assignDataToModel(stringLabels);
 
-		ls.setStatus("Done!");
-		publish(ls);
-
 		reader.close();
 
 		controller.setLoadSuccess(true);
@@ -161,7 +156,20 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 			e.printStackTrace();
 		}
 
+		// In case the user cancelled the load process.
+		if(isCancelled()) {
+			ls.setStatus("Cancelled.");
+			ls.setProgress(0);
+			return;
+		}
+		
+		ls.setStatus("Done!");
+		ls.setProgress(ls.getMaxProgress());
+		
 		doubleData = null;
+		
+		final Preferences fileNode = controller.getConfigNode().node("File");
+		storeDataLoadInfo(fileNode, targetModel, dataInfo);
 
 		// Update GUI, set new DendroView
 		controller.finishLoading(dataInfo);
@@ -245,12 +253,15 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 	private void assignDataToModel(final String[][] stringLabels) {
 
 		// Parse the CDT File
+		/* TODO wrap in try-catch */
+		LogBuffer.println("Parsing CDT file.");
 		parseCDT(stringLabels);
-
 
 		// If present, parse ATR File
 		if(hasAID) {
+			LogBuffer.println("Parsing ATR file.");
 			parseATR();
+			LogBuffer.println("Done parsing ATR file.");
 		}
 		else {
 			LogBuffer.println("No ATR file found for this CDT file.");
@@ -259,47 +270,37 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 		// If present, parse GTR File
 		if(hasGID) {
+			LogBuffer.println("Parsing GTR file.");
 			parseGTR();
+			LogBuffer.println("Done parsing GTR file.");
 		}
 		else {
 			LogBuffer.println("No GTR file found for this CDT file.");
 			targetModel.gidFound(false);
 		}
-
-		setConfigData();
 	}
 
 	/** Loads or sets up configuration data for the file. */
-	private void setConfigData() {
+	public static Preferences getConfigData(final DataModel model, 
+	                                 final Preferences fileNode) {
+
+		LogBuffer.println("Loading Model entry from File node.");
 
 		try {
-			final String fileName = targetModel.getFileSet().getRoot();
-			final String fileExt = targetModel.getFileSet().getExt();
-
-			final Preferences fileNode =
-				controller.getConfigNode().node("File");
+			final String fileSetName = model.getFileSet().getName();
 
 			Preferences documentConfig = null;
 			final String[] childrenNodes = fileNode.childrenNames();
 
-			final String default_name = "No file.";
-			final String default_ext = "nan";
-
 			// Look if there's already a node for the file
 			boolean fileFound = false;
 			if(childrenNodes.length > 0) {
-				for(final String childrenNode : childrenNodes) {
+				for(final String entry : childrenNodes) {
+					Preferences childNode = fileNode.node(entry);
+					final String connectedFS = childNode.get("connectedFileSet", "none");
 
-					final String childName =
-						fileNode.node(childrenNode).get("name", default_name);
-					final String childExt =
-						fileNode.node(childrenNode).get("extension",
-							default_ext);
-
-					if(childName.equalsIgnoreCase(fileName) &&
-						childExt.equalsIgnoreCase(fileExt)) {
-
-						documentConfig = fileNode.node(childrenNode);
+					if(connectedFS.equalsIgnoreCase(fileSetName)) {
+						documentConfig = childNode;
 						fileFound = true;
 						break;
 					}
@@ -308,32 +309,52 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 
 			// If no node for the file has been found, add one.
 			if(!fileFound) {
-				documentConfig = fileNode.node("Model" + (childrenNodes.length + 1));
-				documentConfig.put("name", fileName);
-				documentConfig.put("extension", fileExt);
+				documentConfig = fileNode.node("Model-" + (childrenNodes.length + 1));
+				documentConfig.put("connectedFileSet", fileSetName);
 			}
-
-			storeDataLoadInfo(documentConfig);
-			targetModel.setDocumentConfig(documentConfig);
+			
+			LogBuffer.println("Found Model entry: " + documentConfig);
+			return documentConfig;
 		}
 		catch(final Exception e) {
 			LogBuffer.logException(e);
-			targetModel.setDocumentConfig(null);
+			return null;
 		}
 	}
 
 	/** Store load info such as coordinates of first data cell and used delimiter
 	 * to the supplied node.
 	 * 
-	 * @param node - The node at which the values will be stored. */
-	private void storeDataLoadInfo(Preferences node) {
+	 * @param fileNode - The node at which the values will be stored. */
+	public static void storeDataLoadInfo(final Preferences fileNode,
+	                                     final DataModel model,
+	                                     final DataLoadInfo dataLoadInfo) {
 
-		node.putBoolean("firstLoad", false);
-		node.put("delimiter", dataInfo.getDelimiter());
-		node.putInt("rowCoord", dataInfo.getDataStartRow());
-		node.putInt("colCoord", dataInfo.getDataStartCol());
-		node.put("rowLabelTypes", dataInfo.getRowLabelTypesAsString());
-		node.put("colLabelTypes", dataInfo.getColLabelTypesAsString());
+		if(fileNode == null) {
+			LogBuffer.println("Cannot store any data load information. " +
+				"The Preferences node for the model is not defined.");
+			return;
+		}
+		
+		if(dataLoadInfo == null) {
+			LogBuffer.println("Cannot store any data load information. " +
+				"The DataLoadInfo object is not defined.");
+			return;
+		}
+		
+		Preferences modelNode = getConfigData(model, fileNode);
+		
+		modelNode.putBoolean("firstLoad", false);
+		modelNode.putBoolean("isRowClustered", model.gidFound());
+		modelNode.putBoolean("isColClustered", model.aidFound());
+		modelNode.put("delimiter", dataLoadInfo.getDelimiter());
+		modelNode.putInt("rowCoord", dataLoadInfo.getDataStartRow());
+		modelNode.putInt("colCoord", dataLoadInfo.getDataStartCol());
+		modelNode.put("rowLabelTypes", dataLoadInfo.getRowLabelTypesAsString());
+		modelNode.put("colLabelTypes", dataLoadInfo.getColLabelTypesAsString());
+		
+		((TVModel) model).setDocumentConfig(modelNode);
+		
 	}
 
 	/** Parses the label types from the label data collected until
@@ -493,6 +514,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.getDataMatrix().calculateBaseValues();
 	}
 
+	//TODO replace with ModelTreeAdder to reduce code
 	private void parseGTR() {
 
 		// First, load the GTR File
@@ -535,6 +557,7 @@ public class ModelLoader extends SwingWorker<Void, LoadStatus> {
 		targetModel.gidFound(hasGID);
 	}
 
+	//TODO replace with ModelTreeAdder to reduce code
 	private void parseATR() {
 
 		// First, load the ATR File

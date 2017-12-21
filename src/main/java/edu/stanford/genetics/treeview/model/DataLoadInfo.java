@@ -4,16 +4,15 @@ import java.util.Arrays;
 import java.util.prefs.Preferences;
 
 import Utilities.Helper;
+import Views.DataImportController;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class DataLoadInfo {
 
-	public final static String DEFAULT_DELIM = "\\t";
 	public final static String[] DEFAULT_LABEL_TYPES = {""};
 
 	private Preferences oldNode;
-	private FileSet oldFileSet;
 
 	private boolean isClusteredFile = false;
 	private int[] dataCoords;
@@ -38,12 +37,16 @@ public class DataLoadInfo {
 		this.delimiter = delimString;
 	}
 
-	public void setOldFileSet(final FileSet fs) {
-		this.oldFileSet = fs;
-	}
-
-	public FileSet getOldFileSet() {
-		return oldFileSet;
+	public String getPreviousFileSetName() {
+		
+		if(oldNode == null) {
+			LogBuffer.println("No old node defined for current FileSet, " +
+				"no previous FileSet name found.");
+			return "";
+		}
+		
+		String defaultName = FileSet.DEFAULT_ROOT + FileSet.DEFAULT_EXT;
+		return oldNode.get("connectedFileSet", defaultName);
 	}
 
 	public void setOldNode(Preferences oldNode) {
@@ -176,10 +179,15 @@ public class DataLoadInfo {
 												". Cannot import old settings.");
 			return;
 		}
+		
+		if(node == null) {
+			LogBuffer.println("Preferences node is null. Cannot import data.");
+			return;
+		}
 
 		setOldNode(node);
 
-		this.delimiter = node.get("delimiter", DataLoadInfo.DEFAULT_DELIM);
+		this.delimiter = node.get("delimiter", DataImportController.TAB_DELIM);
 
 		this.dataCoords[0] = node.getInt("rowCoord", 0);
 		this.dataCoords[1] = node.getInt("colCoord", 0);
@@ -198,7 +206,7 @@ public class DataLoadInfo {
 
 	@Override
 	public String toString() {
-		return "DataLoadInfo [oldNode=" +	oldNode + ", oldFileSet=" + oldFileSet +
+		return "DataLoadInfo [oldNode=" +	oldNode + ", oldFileSet=" + getPreviousFileSetName() +
 						", isClusteredFile=" + isClusteredFile + ", dataCoords=" + Arrays
 																																							.toString(dataCoords) +
 						", rowLabelTypes=" + Arrays.toString(rowLabelTypes) +

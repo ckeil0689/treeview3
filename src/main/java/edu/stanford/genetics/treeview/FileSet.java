@@ -14,6 +14,8 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.io.FilenameUtils;
+
 import Utilities.StringRes;
 
 /**
@@ -43,6 +45,17 @@ public class FileSet {
 	public static final int KMEANS_STYLE = 2;
 	public static final int LINKED_STYLE = 3;
 	public static final String TRV = ".trv";
+	
+	// Sensible defaults for FileSet properties
+	public static final String DEFAULT_ROOT = "generic-tv-file";
+	public static final String DEFAULT_EXT = ".txt";
+	public static final String DEFAULT_DIR = System.getProperty("user.home") + File.separator;
+	public static final String DEFAULT_JTV = ".jtv";
+	public static final String DEFAULT_ATR = ".atr";
+	public static final String DEFAULT_GTR = ".gtr";
+	public static final String DEFAULT_KGG = ".kgg";
+	public static final String DEFAULT_KAG = ".kag";
+	
 	private static final String validStyles = "auto|classic|kmeans|linked";
 	private static final String[] validStylesArray = { "Auto", "Classic",
 			"Kmeans", "Linked" };
@@ -67,8 +80,8 @@ public class FileSet {
 		try {
 			final File f = new File(getCdt());
 			return !(f.exists());
-
-		} catch (final Exception e) {
+		} 
+		catch (final Exception e) {
 			LogBuffer.println("Exception occurred when checking "
 					+ "whether a FileSet has moved: " + e.getMessage());
 		}
@@ -76,6 +89,18 @@ public class FileSet {
 		return true;
 	}
 
+	/**
+	 * Constructor for the FileSet object
+	 *
+	 * @param fs - another FileSet to be copied.
+	 */
+	public FileSet(FileSet fs) {
+		
+		this.node = Preferences.userRoot().node(StringRes.pnode_globalMain)
+			.node("FileSet");
+		copyState(fs);
+	}
+	
 	/**
 	 * Constructor for the FileSet object
 	 *
@@ -88,19 +113,20 @@ public class FileSet {
 	}
 
 	/**
-	 * Make fileset based upon unrooted DummyConfigNode with the specified
+	 * Make FileSet based upon unrooted DummyConfigNode with the specified
 	 * values
 	 *
-	 * @param string1
-	 *            name of cdt which this fileset is based on
-	 * @param string2
-	 *            directory to find file in.
+	 * @param fullFileName
+	 *            name of file which this FileSet is based on, including extension.
+	 *            For example "myfile.txt"
+	 * @param dir
+	 *            directory where file is located.
 	 */
-	public FileSet(final String cdt, final String dir) {
+	public FileSet(final String fullFileName, final String dir) {
 
 		this.node = Preferences.userRoot().node(StringRes.pnode_globalMain)
 				.node("FileSet");
-		setCdt(cdt);
+		setCdt(fullFileName);
 		setDir(dir);
 	}
 
@@ -132,7 +158,6 @@ public class FileSet {
 		setRoot(fileSet.getRoot());
 		setDir(fileSet.getDir());
 		setExt(fileSet.getExt());
-		setName(fileSet.getName());
 		setStyle(fileSet.getStyle());
 	}
 
@@ -162,7 +187,7 @@ public class FileSet {
 	 */
 	public String getAtr() {
 
-		return getDir() + getRoot() + node.get("atr", ".atr");
+		return getDir() + getRoot() + node.get("atr", DEFAULT_ATR);
 	}
 
 	/**
@@ -178,7 +203,7 @@ public class FileSet {
 	 */
 	public String getDir() {
 
-		return node.get("dir", "");
+		return node.get("dir", DEFAULT_DIR);
 	}
 
 	/**
@@ -186,7 +211,7 @@ public class FileSet {
 	 */
 	public String getGtr() {
 
-		return getDir() + getRoot() + node.get("gtr", ".gtr");
+		return getDir() + getRoot() + node.get("gtr", DEFAULT_GTR);
 	}
 
 	/**
@@ -194,7 +219,7 @@ public class FileSet {
 	 */
 	public String getJtv() {
 
-		return getDir() + getRoot() + node.get("jtv", ".jtv");
+		return getDir() + getRoot() + node.get("jtv", DEFAULT_JTV);
 	}
 
 	/**
@@ -203,16 +228,27 @@ public class FileSet {
 	 */
 	public String getRoot() {
 
-		return node.get("root", "");
+		return node.get("root", DEFAULT_ROOT);
 	}
 
 	/**
-	 * @return The extension associated with the base of the fileset (i.e. "cdt"
-	 *         for one based on "test.cdt", "pcl" for one based on "test.pcl"
+	 * @return The extension associated with the base of the fileset (i.e. ".cdt"
+	 *         for one based on "test.cdt", ".pcl" for one based on "test.pcl"
 	 */
 	public String getExt() {
+		
+		String storedExt = node.get("ext", DEFAULT_EXT);
+		String finalExt;
+		
+		// FileUtils removed dot from file extension - ensure it is present!
+		if(!storedExt.substring(0, 1).equals(".")) {
+			finalExt = "." + storedExt;
+			setExt(finalExt);
+		} else {
+			finalExt = storedExt;
+		}
 
-		return node.get("cdt", ".cdt");
+		return finalExt;
 	}
 
 	/**
@@ -220,35 +256,36 @@ public class FileSet {
 	 */
 	public String getName() {
 
-		return node.get("name", "No name");
+		return getRoot() + getExt();
 	}
 
 	/**
 	 * Sets the base of the FileSet object. Parses out extension, root
 	 *
-	 * @param string1
-	 *            Name of base of the FileSet
+	 * @param fileSetBasename
+	 *            Name of base of the FileSet, including the extension. 
+	 *            For example "myfile.txt"
 	 */
-	public void setCdt(final String string1) {
+	public void setCdt(final String fileSetBasename) {
 
-		if (string1 != null) {
-			int i = string1.lastIndexOf('.');
-			
-			setRoot(string1.substring(0, i));
-			setExt(string1.substring(i, string1.length()));
+		if (fileSetBasename != null) {
+			setRoot(FilenameUtils.removeExtension(fileSetBasename));
+			setExt(FilenameUtils.getExtension(fileSetBasename));
 		}
 	}
 
 	/**
 	 * Sets the root of the FileSet object. i.e. the filename without
-	 * extendsion.
+	 * extension.
 	 *
-	 * @param string
+	 * @param newRoot
 	 *            The new root value
 	 */
-	public void setRoot(final String string) {
+	public void setRoot(final String newRoot) {
 
-		node.put("root", string);
+		LogBuffer.println("Setting root " + newRoot + " on FileSet " 
+		+ this.toString());
+		node.put("root", newRoot);
 	}
 
 	/**
@@ -257,28 +294,19 @@ public class FileSet {
 	 * @param string
 	 *            The new dir value
 	 */
-	public void setDir(final String string) {
+	public void setDir(final String newDir) {
 
-		node.put("dir", string);
+		node.put("dir", newDir);
 	}
 
 	/**
-	 * Sets the extension associated with the base of the fileset.
+	 * Sets the extension associated with the base of the FileSet.
 	 *
-	 * @param string
-	 *            The new ext value
+	 * @param ext - the new extension value
 	 */
-	public void setExt(final String string) {
-
-		node.put("cdt", string);
-	}
-
-	/**
-	 * @return The logical name of the fileset
-	 */
-	public void setName(final String string) {
-
-		node.put("name", string);
+	public void setExt(final String ext) {
+		
+		node.put("ext", ext);
 	}
 
 	/**
@@ -297,7 +325,7 @@ public class FileSet {
 			filename = filename.substring(0, arrayid);
 		}
 
-		return getDir() + filename + node.get("kgg", ".kgg");
+		return getDir() + filename + node.get("kgg", DEFAULT_KGG);
 	}
 
 	/**
@@ -317,7 +345,7 @@ public class FileSet {
 					+ filename.substring(arrayid);
 		}
 
-		return getDir() + filename + node.get("kag", ".kag");
+		return getDir() + filename + node.get("kag", DEFAULT_KAG);
 	}
 
 	/**

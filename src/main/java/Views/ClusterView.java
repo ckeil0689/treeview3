@@ -538,4 +538,20 @@ public class ClusterView {
 
 		pBar.setValue(i);
 	}
+	
+	/**
+	 * Sets the progress bar to 100% (maximum).
+	 */
+	public static void setPBarFull() {
+
+		pBar.setValue(pBar.getMaximum());
+	}
+	
+	/**
+	 * Sets the progress bar to 0%.
+	 */
+	public static void setPBarEmpty() {
+
+		pBar.setValue(0);
+	}
 }

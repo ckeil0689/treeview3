@@ -28,7 +28,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import Utilities.GUIFactory;
-import edu.stanford.genetics.treeview.CdtFilter;
+import edu.stanford.genetics.treeview.AllowedFilesFilter;
 import edu.stanford.genetics.treeview.FileSet;
 
 /**
@@ -147,7 +147,7 @@ public class FileMruEditor {
 	 */
 	private void setupWidgets() {
 
-		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT, null);
+		mainPanel = GUIFactory.createJPanel(false, GUIFactory.DEFAULT);
 		fileSetDisplay = new FileSetDisplay();
 		buttonArrangement = new ButtonArrangement();
 		buttonArrangement.setThingsSelected(false);
@@ -280,7 +280,7 @@ public class FileMruEditor {
 	public static boolean searchFile(final FileSet fileSet, final Window w) {
 
 		final JFileChooser fileDialog = new JFileChooser();
-		fileDialog.setFileFilter(new CdtFilter());
+		fileDialog.setFileFilter(new AllowedFilesFilter());
 
 		final String string = fileSet.getDir();
 		if (string != null) {

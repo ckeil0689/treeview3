@@ -1,18 +1,11 @@
 package Cluster;
 
 import java.awt.Frame;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import Controllers.ClusterDialogController;
 import Utilities.Helper;
 import edu.stanford.genetics.treeview.LogBuffer;
 
@@ -20,9 +13,6 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * Class that performs hierarchical clustering on a supplied distance matrix. It
  * implements multiple linkage methods and consists of one main method
  * (cluster()) that is used to create one new cluster at a time.
- *
- * @author CKeil
- *
  */
 public class HierCluster {
 
@@ -34,7 +24,6 @@ public class HierCluster {
 	 * arrays and column access doesn't always need to jump between arrays.
 	 */
 	private Linker linker;
-	private final String axisLabelType;
 	private final int initial_matrix_size;
 	private int iterNum;
 
@@ -49,12 +38,8 @@ public class HierCluster {
 	 * Reordered list of distance matrix rows. This directly represents the
 	 * reordered axis that was selected to be clustered.
 	 */
-	private String[] reorderedRows;
-
-	/**
-	 * TEST
-	 */
-	private List<Node> nodeList;
+	private int[] reorderedRowIdxs;
+	private List<String[]> treeNodeData;
 
 	/*
 	 * List to keep track of all clusters during each iteration of the
@@ -64,8 +49,6 @@ public class HierCluster {
 	 */
 	private List<List<Integer>> currentClusters;
 	private int[][] rowIndexTable;
-
-	private TreeFileWriter treeWriter;
 
 	private String[] links; // needed for connectNodes??? better way?
 
@@ -91,16 +74,11 @@ public class HierCluster {
 		this.linker = new Linker(linkMethod);
 		this.distMatrix = distMatrix;
 		this.initial_matrix_size = distMatrix.getSize();
-		this.axisLabelType = (axis == ClusterDialogController.ROW) ? 
-						ClusterFileGenerator.ROW_AXIS_BASEID : 
-							ClusterFileGenerator.COL_AXIS_BASEID;
+		this.treeNodeData = new ArrayList<String[]>(initial_matrix_size);
+		// Add header row right away
+		treeNodeData.add(new String[] {	"NODEID", "LEFT", "RIGHT", "CORRELATION"});
 
 		prepareCluster();
-	}
-	
-	public TreeFileWriter getTreeFileWriter() {
-		
-		return this.treeWriter;
 	}
 
 	/**
@@ -137,14 +115,11 @@ public class HierCluster {
 		 */
 		currentClusters = new ArrayList<List<Integer>>(initial_matrix_size);
 
-		nodeList = new ArrayList<Node>(initial_matrix_size);
-
 		/*
 		 * Fill list with integers corresponding to the row indices. Initially,
 		 * every matrix row is its own little cluster.
 		 */
 		for (int i = 0; i < initial_matrix_size; i++) {
-
 			final List<Integer> initialCluster = new ArrayList<Integer>(1);
 			initialCluster.add(i);
 			currentClusters.add(initialCluster);
@@ -186,10 +161,9 @@ public class HierCluster {
 		 * Then write data to buffer and add the new node to links, so the next
 		 * clusters can be checked in connectNodes() during future iterations.
 		 */
-		links[iterNum] = treeWriter.writeData(link, iterNum, min);
-
-		/* Record new node with its data, so it can be sorted later. */
-		// addNodeToList(link);
+		String[] nodeData = getNodeData(link, iterNum, min);
+		links[iterNum] = nodeData[0];
+		treeNodeData.add(nodeData);
 
 		/* STEP 4: Update the lists that keep track of clusters. */
 
@@ -219,7 +193,6 @@ public class HierCluster {
 		this.min = distMatrix.findCurrentMin(min);
 		this.min_row_index = distMatrix.getMinRowIndex();
 		this.min_col_index = distMatrix.getMinColIndex();
-
 	}
 
 	/**
@@ -236,104 +209,19 @@ public class HierCluster {
 		/* Get the two clusters to be fused */
 		/* Get the cluster at rowMinIndex */
 		final int[] row_cluster = new int[currentClusters.get(min_row_index)
-				.size()];
+		                                  .size()];
 		for (int i = 0; i < row_cluster.length; i++) {
-
 			row_cluster[i] = currentClusters.get(min_row_index).get(i);
 		}
 
 		/* Get the cluster at colMinIndex */
 		final int[] col_cluster = new int[currentClusters.get(min_col_index)
-				.size()];
+		                                  .size()];
 		for (int i = 0; i < col_cluster.length; i++) {
-
 			col_cluster[i] = currentClusters.get(min_col_index).get(i);
 		}
 
 		return Helper.concatIntArrays(row_cluster, col_cluster);
-	}
-
-	// TODO method never used - remove?
-	private void addNodeToList(String[] link) {
-
-		/* Add new node object to list */
-		int id = iterNum + 1;
-		double dist_val = 1 - min;
-		Node newNode = new Node(id, dist_val);
-
-		/* Link to children */
-		int maxChildNum = 2;
-		List<Node> nodes = new ArrayList<Node>();
-
-		for (int i = 0; i < maxChildNum; i++) {
-
-			if (link[i].substring(0, "NODE".length()).equalsIgnoreCase("NODE")) {
-				String index_s = link[i].replaceAll("[\\D]", "");
-				int index_i = Integer.parseInt(index_s);
-				nodes.add(nodeList.get(index_i - 1));
-			}
-		}
-
-		nodes = orderNodes(nodes);
-
-		/* Left child is the one with larger dist value */
-		if (nodes.size() > 0 && nodes.get(0) != null) {
-			newNode.setLeftChild(nodes.get(0));
-		}
-
-		if (nodes.size() > 1 && nodes.get(1) != null) {
-			newNode.setRightChild(nodes.get(1));
-		}
-
-		nodeList.add(newNode);
-	}
-
-	/**
-	 * Order 2 nodes decreasing by their dist_value. TODO replace with actual
-	 * comparator later.
-	 * 
-	 * @param nodes
-	 * @return Ordered list of nodes.
-	 */
-	private static List<Node> orderNodes(List<Node> nodes) {
-
-		if (nodes.size() < 2)
-			return nodes;
-
-		double val_1 = -1;
-		double val_2 = -1;
-
-		if (nodes.get(0) != null) {
-			val_1 = nodes.get(0).getDistValue();
-		}
-
-		if (nodes.get(1) != null) {
-			val_2 = nodes.get(1).getDistValue();
-		}
-
-		if (val_2 > val_1) {
-			Collections.swap(nodes, 0, 1);
-		}
-
-		return nodes;
-	}
-
-	// TODO method never used - remove?
-	private Node extractOrderedNodes(Node root, List<Node> nodeList) {
-
-		if (root == null) {
-			return null; 
-		}
-
-		if (root.getLeftChild() == null && root.getRightChild() == null) {
-			nodeList.add(root);
-			return null;
-		}
-
-		extractOrderedNodes(root.getLeftChild(), nodeList);
-		extractOrderedNodes(root.getRightChild(), nodeList);
-
-		return root;
 	}
 
 	/**
@@ -376,7 +264,6 @@ public class HierCluster {
 		 */
 		final List<Integer> newVals = new ArrayList<Integer>();
 		for (final int element : newCluster) {
-
 			newVals.add(element);
 		}
 
@@ -455,72 +342,18 @@ public class HierCluster {
 	}
 
 	/**
-	 * Finishes up clustering. Closes the bufferedWriter and causes the list of
-	 * reordered distance matrix rows to be generated. Also sets the variables
-	 * that store the most data to null, to ensure garbage collection.
+	 * Finishes up clustering. Orders the list of reordered distance matrix rows 
+	 * to be generated. Sets the variables that store the most data to null, 
+	 * to ensure their garbage collection.
 	 */
 	public void finish() {
 
-		// LogBuffer.println("Min-List: " + Arrays.toString(minList));
-		// LogBuffer.println("Link-List: " + Arrays.deepToString(links));
-		// LogBuffer.println("currentClusters: " + currentClusters);
-
-		// List<Node> orderedNodes = new ArrayList<Node>();
-		//
-		// extractOrderedNodes(nodeList.get(0), orderedNodes);
-		//
-		// LogBuffer.println("Ordered nodes: " + orderedNodes);
-
-		treeWriter.closeWriter();
 		linker.close();
 		reorderRows(currentClusters.get(0));
-
-		// writeReordered();
 
 		/* Ensure garbage collection for large objects */
 		links = null;
 		currentClusters = null;
-	}
-
-	// TODO method never used - remove?
-	private void writeReordered() {
-
-		String fileName = "reordered.txt";
-		File file = new File(fileName);
-		BufferedWriter bw = null;
-		
-		try {
-			bw = new BufferedWriter((new OutputStreamWriter(
-					new FileOutputStream(file.getAbsoluteFile()), "UTF-8")));
-
-			for (String element : reorderedRows) {
-				bw.write(element + "\n");
-				bw.write("\n");
-			}
-
-		} catch (IOException e) {
-			LogBuffer.logException(e);
-			
-		} finally {
-			try {
-				bw.close();
-				
-			} catch (IOException e) {
-				LogBuffer.logException(e);
-			}
-		}
-	}
-
-	/**
-	 * Sets up a buffered writer to write & save the tree files (GTR & ATR).
-	 * Also sets the filePath to the directory in which the resulting file was
-	 * saved. Cancels the cluster worker and alerts the user if there's a
-	 * problem with setting up the buffered writer since there wouldn't be a
-	 * filePath where the cluster data could be saved anyways.
-	 */
-	public void setupTreeFileWriter(final File file) {
-
-		this.treeWriter = new TreeFileWriter(file);
 	}
 
 	/**
@@ -592,9 +425,8 @@ public class HierCluster {
 		 * file.
 		 */
 		if (newCluster.length == 2) {
-			geneRow = axisLabelType + currentClusters.get(row).get(0) + "X";
-			geneCol = axisLabelType + currentClusters.get(column).get(0) + "X";
-
+			geneRow = currentClusters.get(row).get(0).toString();
+			geneCol = currentClusters.get(column).get(0).toString();
 		}
 		/* If size of new cluster exceeds 2 */
 		else {
@@ -652,11 +484,44 @@ public class HierCluster {
 				 * If the current fusedGroup in geneIntegerTable does not have
 				 * any elements in common with geneGroups.get(column).
 				 */
-				name = axisLabelType + currentClusters.get(index).get(0) + "X";
+				name = currentClusters.get(index).get(0).toString();
 			}
 		}
 
 		return name;
+	}
+	
+	/**
+	 * Writes information about the newly clustered elements to a buffer.
+	 * 
+	 * @param link
+	 *            The pair of newly linked elements.
+	 * @param loopNum
+	 *            The current iteration step of clustering.
+	 * @param min
+	 *            The minimum value from the distance matrix associated with the
+	 *            current cluster pair.
+	 * @return The ID of the newly formed tree node.
+	 */
+	public String[] getNodeData(final String[] link, int loopNum, double min) {
+
+		/*
+		 * List to store the Strings which represent calculated data (such as
+		 * row pairs) to be added to dataTable.
+		 */
+		final int nodeInfoSize = 4;
+		final String[] nodeInfo = new String[nodeInfoSize];
+
+		/*
+		 * Create a list that stores the info of the current new node to be
+		 * formed. This will be written down in the corresponding tree file.
+		 */
+		nodeInfo[0] = "NODE" + (loopNum + 1) + "X";
+		nodeInfo[1] = link[0];
+		nodeInfo[2] = link[1];
+		nodeInfo[3] = String.valueOf(1 - min);
+
+		return nodeInfo;
 	}
 
 	/**
@@ -666,26 +531,25 @@ public class HierCluster {
 	 */
 	public void reorderRows(final List<Integer> finalCluster) {
 
-		String element = "";
-
 		int limit = finalCluster.size();
-
-		reorderedRows = new String[limit];
+		this.reorderedRowIdxs = new int[limit];
 
 		for (int i = 0; i < limit; i++) {
-
-			element = axisLabelType + finalCluster.get((limit - 1) - i) + "X";
-			reorderedRows[i] = element;
+			reorderedRowIdxs[i] = finalCluster.get((limit - 1) - i);
 		}
 	}
 
+	public List<String[]> getTreeNodeData() {
+		
+		return treeNodeData;
+	}
 	/**
 	 * Getter for the reordered list
 	 *
-	 * @return The reordered list of matrix elements after clustering.
+	 * @return The reordered matrix row indices after clustering.
 	 */
-	public String[] getReorderedList() {
+	public int[] getReorderedIDs() {
 
-		return reorderedRows;
+		return reorderedRowIdxs;
 	}
 }

@@ -1,4 +1,4 @@
-package Cluster;
+package edu.stanford.genetics.treeview.model;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException;
 
 import edu.stanford.genetics.treeview.LogBuffer;
 
-public class ClusterFileWriter {
+public class ModelFileWriter {
 	
 	private final String SEPARATOR = "\t";
 	private final String END_OF_ROW = "\n";
@@ -18,7 +18,7 @@ public class ClusterFileWriter {
 	private File file;
 	protected BufferedWriter bw;
 	
-	public ClusterFileWriter(final File file) {
+	public ModelFileWriter(final File file) {
 
 		this.file = file;
 		setupWriter();
@@ -54,20 +54,17 @@ public class ClusterFileWriter {
 	 * Creates a single string by calling doParse() and then writes the 
 	 * supplied data using the BufferedWriter object.
 	 * @param data - A String array of data to be written to a file.
-	 * @return boolean indicating finishing of data writing without any Exception.
 	 */
-	public boolean writeData(final String[] data) {
-		
+	public void writeData(final String[] data) {
+			
 		final String content = doParse(data);
 
 		try {
 			bw.write(content);
-		} 
-		catch (final IOException e) {
+
+		} catch (final IOException e) {
 			LogBuffer.logException(e);
-			return false;
 		}
-		return true;
 	}
 	
 	/**
@@ -98,7 +95,7 @@ public class ClusterFileWriter {
 			
 		} catch (final IOException e) {
 			LogBuffer.logException(e);
-			bw = null;
+      bw = null;
 		}
 	}
 	

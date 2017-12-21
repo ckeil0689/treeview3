@@ -24,6 +24,7 @@ dependencies {
   compile 'org.freehep:freehep-graphicsio-svg:2.4'
   compile 'org.freehep:freehep-graphics2d:2.4'
   compile 'org.swinglabs.swingx:swingx-autocomplete:1.6.5-1'
+  compile 'commons-io:commons-io:2.5'
 }
 
 sourceSets {

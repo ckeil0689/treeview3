@@ -17,14 +17,14 @@ import edu.stanford.genetics.treeview.model.PreviewLoader;
 
 public class DataImportController {
 
-	private final static String TAB_DELIM = "\\t";
-	private final static String COMMA_DELIM = ",";
-	private final static String SEMICOLON_DELIM = ";";
-	private final static String SPACE_DELIM = "\\s";
+	public final static String TAB_DELIM = "\\t";
+	public final static String COMMA_DELIM = ",";
+	public final static String SEMICOLON_DELIM = ";";
+	public final static String SPACE_DELIM = "\\s";
 
 	private final DataImportDialog previewDialog;
 	private FileSet fileSet;
-	private String selectedDelimiter;
+	private String selectedDelimiter = TAB_DELIM;
 
 	public DataImportController(final String selectedDelimiter) {
 
@@ -47,9 +47,13 @@ public class DataImportController {
 		detectDataBoundaries(null);
 	}
 
+	/**
+	 * Adds all listeners to GUI components.
+	 */
 	private void addAllListeners() {
 
 		previewDialog.addProceedBtnListener(new ProceedListener());
+		previewDialog.addCancelBtnListener(new CancelListener());
 		previewDialog.addDelimCheckBoxesListener(new DelimiterListener());
 		previewDialog.addSpinnerListeners(new LabelIncludeListener());
 		previewDialog.addDataDetectListener(new DataDetectionListener());
@@ -89,12 +93,12 @@ public class DataImportController {
 		List<JCheckBox> delimiters = previewDialog.getDelimiterList();
 
 		for (JCheckBox cb : delimiters) {
-
 			if (cb.isSelected()) {
 				final int idx = delimiters.indexOf(cb);
 				if (addCount++ > 0) {
 					selectedDelimiter += "|" + getDelimiter(idx);
-				} else {
+				} 
+				else {
 					selectedDelimiter += getDelimiter(idx);
 				}
 			}
@@ -126,7 +130,20 @@ public class DataImportController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			previewDialog.setResult(selectedDelimiter);
+			previewDialog.setDelimiterForResult(selectedDelimiter);
+			previewDialog.setVisible(false);
+			previewDialog.dispose();
+		}
+	}
+	
+	private class CancelListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			LogBuffer.println("User cancelled file import.");
+			
+			previewDialog.clearResult();
 			previewDialog.setVisible(false);
 			previewDialog.dispose();
 		}

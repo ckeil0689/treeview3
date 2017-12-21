@@ -8,7 +8,9 @@
 package edu.stanford.genetics.treeview.model;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
@@ -22,10 +24,13 @@ import edu.stanford.genetics.treeview.LogBuffer;
 
 public class TVModel extends Observable implements DataModel {
 
-	// protected TreeViewFrame tvFrame;
+	private boolean wasModified = false;
+	
+	private int kmeans_rowClusterNum = 0;
+	private int kmeans_colClusterNum = 0;
+	
+	
 	protected FileSet source = null;
-	protected String dir = null;
-	protected String root;
 
 	protected TVDataMatrix dataMatrix;
 
@@ -33,12 +38,16 @@ public class TVModel extends Observable implements DataModel {
 	protected RowLabelInfo rowLabelInfo;
 	protected IntLabelInfo atrLabelInfo;
 	protected IntLabelInfo gtrLabelInfo;
+	
+	protected List<String[]> gtrData;
+	protected List<String[]> atrData;
 
 	protected boolean aidFound = false;
 	protected boolean gidFound = false;
 
 	protected boolean eweightFound = false;
 	protected boolean gweightFound = false;
+	
 	protected Preferences documentConfig; // holds document config
 
 	/** has model been successfully loaded? */
@@ -86,7 +95,6 @@ public class TVModel extends Observable implements DataModel {
 		hasChanged();
 	}
 
-	// accessor methods
 	@Override
 	public IntLabelInfo getRowLabelInfo() {
 		return rowLabelInfo;
@@ -112,7 +120,31 @@ public class TVModel extends Observable implements DataModel {
 		return gtrLabelInfo;
 	}
 
-	public boolean gweightFound() {
+	public List<String[]> getATRData() {
+		
+		if(atrData == null) {
+			LogBuffer.println("No ATR data stored in TVModel. " +
+				"Returning empty list.");
+			List<String[]> emptyList = Collections.emptyList();
+			return emptyList;
+		}
+		
+		return atrData;
+	}
+	
+	public List<String[]> getGTRData() {
+		
+		if(gtrData == null) {
+			LogBuffer.println("No GTR data stored in TVModel. " +
+				"Returning empty list.");
+			List<String[]> emptyList = Collections.emptyList();
+			return emptyList;
+		}
+		
+		return gtrData;
+	}
+	
+  public boolean gweightFound() {
 		return gweightFound;
 	}
 
@@ -251,22 +283,22 @@ public class TVModel extends Observable implements DataModel {
 		documentConfig = newVal;
 	}
 
-	protected void hashAIDs() {
+	public void hashAIDs() {
 
 		colLabelInfo.hashIDs("AID");
 	}
 
-	protected void hashGIDs() {
+	public void hashGIDs() {
 
 		rowLabelInfo.hashIDs("GID");
 	}
 
-	protected void hashATRs() {
+	public void hashATRs() {
 
 		atrLabelInfo.hashIDs("NODEID");
 	}
 
-	protected void hashGTRs() {
+	public void hashGTRs() {
 
 		gtrLabelInfo.hashIDs("NODEID");
 	}
@@ -381,6 +413,7 @@ public class TVModel extends Observable implements DataModel {
 		// documentConfig.store();
 		documentConfig = null;
 		setLoaded(false);
+		setModified(false);
 		aidFound = false;
 		gidFound = false;
 		source = null;
@@ -562,7 +595,7 @@ public class TVModel extends Observable implements DataModel {
 		 * status. They will be ignored during clustering and colored like
 		 * missing values.
 		 */
-		public void setZeroesToMissing() {
+		public void treatZeroesAsMissing() {
 
 			for (int i = 0; i < exprData.length; i++) {
 				for (int j = 0; j < exprData[i].length; j++) {
@@ -640,9 +673,8 @@ public class TVModel extends Observable implements DataModel {
 		 * @param startingCol included in the mean calculation
 		 * @param endingRow included in the mean calculation
 		 */
-		public double getZoomedMean(int startingRow, int endingRow,
-			int startingCol, int endingCol){
-
+		public double getZoomedMean(int startingRow, int endingRow, 
+		                            int startingCol, int endingCol){
 			final int nRows = nRows();
 			final int nCols = nCols();
 			if (exprData == null) {
@@ -760,6 +792,42 @@ public class TVModel extends Observable implements DataModel {
 
 			return Helper.roundDouble(result, 4);
 		}
+		
+		/** Uses lists of reordered axis indices to reorder the expression 
+		 * data matrix. This algorithm is not in place!
+		 * 
+		 * @param reorderedRowIndices List of reordered row indices.
+		 * @param reorderedColIndices List of reordered column indices */
+		public void reorderMatrixData(final int[] reorderedRowIndices,
+																	final int[] reorderedColIndices) {
+
+			int rows = reorderedRowIndices.length;
+			int cols = reorderedColIndices.length;
+			
+			if(rows != getNumRow() || cols != getNumCol()) {
+				LogBuffer.println("Size of reordered axes does not match the original matrix.");
+				return;
+			}
+
+			double[][] reorderedMatrixData = new double[rows][cols];
+
+			// order the numerical data.
+			int row = -1;
+			int col = -1;
+
+			for(int i = 0; i < rows; i++) {
+				row = reorderedRowIndices[i];
+
+				for(int j = 0; j < cols; j++) {
+					col = reorderedColIndices[j];
+					reorderedMatrixData[i][j] = exprData[row][col];
+				}
+			}
+
+			setExprData(reorderedMatrixData);
+			setChanged();
+		}
+		
 
 		private int getRealDataSize(final double[] data) {
 			int size = data.length;
@@ -989,6 +1057,14 @@ public class TVModel extends Observable implements DataModel {
 		atrLabelInfo.setLabelTypeArray(atrLabelTypes);
 	}
 
+	/**
+	 * Holds all node pair data for column trees, including the headers.
+	 * @param atrData - node pair data for column trees
+	 */
+	public void setATRData(final List<String[]> atrData) {
+		this.atrData = atrData;
+	}
+	
 	/** holds actual node information for row tree */
 	public void setGtrLabels(final String[][] gtrLabels) {
 
@@ -1000,6 +1076,14 @@ public class TVModel extends Observable implements DataModel {
 		gtrLabelInfo.setLabelTypeArray(gtrLabelTypes);
 	}
 
+	/**
+	 * Holds all node pair data for row trees, including the headers.
+	 * @param gtrData - node pair data for row trees
+	 */
+	public void setGTRData(final List<String[]> gtrData) {
+		this.gtrData = gtrData;
+	}
+	
 	public void setColumnLabels(final String[][] newLabels) {
 
 		colLabelInfo.setLabelArray(newLabels);
@@ -1087,7 +1171,8 @@ public class TVModel extends Observable implements DataModel {
 	public boolean getModified() {
 
 		return getGtrLabelInfo().getModified() 
-				|| getAtrLabelInfo().getModified();
+				|| getAtrLabelInfo().getModified()
+				|| wasModified;
 	}
 
 	@Override
@@ -1110,5 +1195,74 @@ public class TVModel extends Observable implements DataModel {
 		}
 
 		return source.getRoot() + source.getExt();
+	}
+	
+	@Override
+	public void setModified(boolean wasModified) {
+		
+		this.wasModified = wasModified;
+		setChanged();
+		notifyObservers(loaded);
+	}
+	
+	/**
+	 * Update the file name of the underlying FileSet.
+	 */
+	public void setFileName(final String filename) {
+		
+		FileSet tmpFS = new FileSet(source);
+		tmpFS.setRoot(filename);
+		source = tmpFS;
+		
+		setModified(true);
+	}
+
+	@Override
+	public void setHierarchical(boolean isHierarchical) {
+		
+		documentConfig.putBoolean("isHierarchical", isHierarchical);
+	}
+
+	@Override
+	public boolean isHierarchical() {
+		
+		return documentConfig.getBoolean("isHierarchical", false);
+	}
+
+	@Override
+	public void setRowClustered(boolean isRowClustered) {
+
+		documentConfig.putBoolean("isRowClustered", isRowClustered);
+	}
+
+	@Override
+	public boolean isRowClustered() {
+
+		return documentConfig.getBoolean("isRowClustered", false);
+	}
+
+	@Override
+	public void setColClustered(boolean isColClustered) {
+		
+		documentConfig.putBoolean("isColClustered", isColClustered);
+	}
+
+	@Override
+	public boolean isColClustered() {
+
+		return documentConfig.getBoolean("isColClustered", false);
+	}
+
+	@Override
+	public void setKMeansClusterNum(int rowN, int colN) {
+		
+		this.kmeans_rowClusterNum = rowN;
+		this.kmeans_colClusterNum = colN;
+	}
+
+	@Override
+	public int[] getKMeansClusterNum() {
+
+		return new int[] {kmeans_rowClusterNum, kmeans_colClusterNum};
 	}
 }

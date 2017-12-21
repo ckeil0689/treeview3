@@ -1,7 +1,6 @@
 package Cluster;
 
 import java.awt.Frame;
-import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -19,9 +18,6 @@ import edu.stanford.genetics.treeview.model.TVModel.TVDataMatrix;
  * to mathematical principles of hierarchical clustering. It generates files to
  * display dendrograms (.gtr and .atr) as well as a reordered original data file
  * (.cdt).
- *
- * @author CKeil
- *
  */
 public class ClusterProcessor {
 
@@ -29,7 +25,6 @@ public class ClusterProcessor {
 	private final IntLabelInfo rowLabelI;
 	private final IntLabelInfo colLabelI;
 
-//	private final String fileName;
 	private int pBarCount;
 	private DistanceWorker distTask;
 	private Clusterer clusterer;
@@ -42,7 +37,6 @@ public class ClusterProcessor {
 	 * process can be displayed.
 	 *
 	 * @param dataMatrix The original data matrix to be clustered.
-	 * @param fileName The name of the file to which the data matrix belongs.
 	 */
 	public ClusterProcessor(final TVDataMatrix dataMatrix) {
 
@@ -106,21 +100,20 @@ public class ClusterProcessor {
 	 * Starts a SwingWorker thread to do the clustering and waits for it to
 	 * return a String array containing the reordered axis elements.
 	 *
-	 * @param distMatrix
-	 * @param linkMethod
-	 * @param spinnerInput
-	 * @param hierarchical
-	 * @param axis
-	 * 
-	 * @return Reordered matrix labels.
+	 * @param distMatrix - The distance matrix calculated for clustering
+	 * @param linkMethod - The cluster linkage method to be employed
+	 * @param spinnerInput - The input values from the GUI spinners (Kmeans)
+	 * @param hierarchical - Whether we perform hierarchical clustering or Kmeans
+	 * @param axisID - The matrix axis to be clustered
+	 * @return ClusteredAxisData object which will store clustering results
 	 */
-	public String[] clusterAxis(final DistanceMatrix distMatrix,
+	public ClusteredAxisData clusterAxis(final DistanceMatrix distMatrix,
 			final int linkMethod, final Integer[] spinnerInput,
-			final boolean hierarchical, final int axis, final File treeFile) {
+			final boolean hierarchical, final int axisID) {
 
 		try {
 			this.clusterer = new Clusterer(distMatrix, linkMethod,
-					spinnerInput, hierarchical, axis, treeFile);
+					spinnerInput, hierarchical, axisID);
 			clusterer.execute();
 
 			/*
@@ -131,7 +124,11 @@ public class ClusterProcessor {
 
 		} catch (InterruptedException | ExecutionException e) {
 			LogBuffer.logException(e);
-			return new String[] {};
+			LogBuffer.println("Interrupted when clustering.");
+			ClusteredAxisData cad = new ClusteredAxisData(axisID);
+			cad.shouldReorderAxis(false);
+			cad.setAxisClustered(false);
+			return cad;
 		}
 	}
 
@@ -154,7 +151,7 @@ public class ClusterProcessor {
 			this.distMeasure = distMeasure;
 			this.axis = axis;
 
-			if (axis == ClusterDialogController.ROW) {
+			if (axis == ClusterDialogController.ROW_IDX) {
 				this.axisSize = originalMatrix.getNumRow();
 
 			} else {
@@ -175,7 +172,7 @@ public class ClusterProcessor {
 
 			/* Calculate distance matrix */
 			double[][] data = null;
-			if (axis == ClusterDialogController.ROW) {
+			if (axis == ClusterDialogController.ROW_IDX) {
 				data = originalMatrix.getExprData();
 
 			} else {
@@ -250,9 +247,9 @@ public class ClusterProcessor {
 			if (!isCancelled()) {
 				/* keep track of overall progress */
 				pBarCount += axisSize;
-				LogBuffer.println("DistTask is done: success.");
+				LogBuffer.println("DistTask succeeded (" + axis + ")");
 			} else {
-				LogBuffer.println("DistTask is done: cancelled.");
+				LogBuffer.println("DistTask cancelled (" + axis + ")");
 			}
 		}
 
@@ -279,31 +276,30 @@ public class ClusterProcessor {
 	 * so it can respond appropriately. Input data is translated into output
 	 * data here.
 	 */
-	private class Clusterer extends SwingWorker<String[], Integer> {
+	private class Clusterer extends SwingWorker<ClusteredAxisData, Integer> {
 
 		private final DistanceMatrix distMatrix;
 		private final int linkMethod;
 		private final Integer[] spinnerInput;
-		private final int axis;
+		private final int axisID;
 		private final int max;
 		private final boolean hier;
+		private ClusteredAxisData cad;
 		
-		private ClusterFileWriter fileWriter;
-		private final File treeFile;
-
 		public Clusterer(final DistanceMatrix distMatrix,
 				final int linkMethod, final Integer[] spinnerInput,
-				final boolean hier, final int axis, final File treeFile) {
+				final boolean hier, final int axisID) {
 
+			// defaults
+			this.cad = new ClusteredAxisData(axisID);
 			this.distMatrix = distMatrix;
 			this.linkMethod = linkMethod;
 			this.spinnerInput = spinnerInput;
 			this.hier = hier;
-			this.axis = axis;
-			this.treeFile = treeFile;
+			this.axisID = axisID;
 
-			/* Progress bar max dependent on selected clustering type */
-			this.max = (hier) ? distMatrix.getSize() - 1 : spinnerInput[0];
+			// progress bar max dependent on selected clustering type
+			this.max = (hier) ? (distMatrix.getSize() - 1) : spinnerInput[0];
 		}
 
 		@Override
@@ -316,33 +312,24 @@ public class ClusterProcessor {
 		}
 
 		@Override
-		public String[] doInBackground() {
+		public ClusteredAxisData doInBackground() {
 
 			if (hier) {
 				return doHierarchicalCluster();
 			}
-
-			return doKMeansCluster();
+			
+			// Not using K-means clustering at the moment. Needs refactoring!
+		  return doKMeansCluster();
 		}
 
 		@Override
 		public void done() {
-
-			/* 
-			 * One MUST ensure that the file writer for ATR/ GTR is closed
-			 * if cancellation (mayInterrupt = true) has occurred because
-			 * the cluster code was likely halted before the streamw as closed.
-			 * This will make file deletion in ClusterDialogController fail!
-			 */
-			if(fileWriter != null) {
-				fileWriter.closeWriter();
-			}
 			
 			if (!isCancelled()) {
 				pBarCount += max;
-				LogBuffer.println("ProcessorClusterTask is done: success.");
+				LogBuffer.println("ProcessorClusterTask succeeded (" + axisID + ")");
 			} else {
-				LogBuffer.println("ProcessorClusterTask is done: cancelled.");
+				LogBuffer.println("ProcessorClusterTask cancelled (" + axisID + ")");
 			}
 		}
 		
@@ -350,19 +337,13 @@ public class ClusterProcessor {
 		 * Initializes the hierarchical clustering process, 
 		 * starts and finishes the tree file writer, and keeps tracks of
 		 * the GUI aspects such as updating the progress bar for ClusterView.
-		 * @return A reordered list of labels.
+		 * @return a ClusteredAxisData object containing all results from clustering.
 		 */
-		private String[] doHierarchicalCluster() {
+		private ClusteredAxisData doHierarchicalCluster() {
 			
-			if(treeFile == null) {
-				LogBuffer.println("TreeFile not set, aborting cluster.");
-				return new String[] {};
-			}
 			
-			final HierCluster clusterer = new HierCluster(linkMethod,
-					distMatrix, axis);
-			clusterer.setupTreeFileWriter(treeFile);
-			fileWriter = clusterer.getTreeFileWriter();
+			final HierCluster hierCluster = new HierCluster(linkMethod, distMatrix, 
+			                                              axisID);
 
 			/*
 			 * Continue process until distMatrix has a size of 1, This array
@@ -373,7 +354,7 @@ public class ClusterProcessor {
 			int distMatrixSize = distMatrix.getSize();
 
 			while (distMatrixSize > 1 && !isCancelled()) {
-				distMatrixSize = clusterer.cluster();
+				distMatrixSize = hierCluster.cluster();
 				publish(loopNum++);
 			}
 
@@ -384,25 +365,32 @@ public class ClusterProcessor {
 
 			/* Return empty String[] if user cancels operation */
 			if (isCancelled()) {
-				return new String[] {};
+				cad.shouldReorderAxis(true);
+				return cad;
 			}
 
-			/* Write the tree file */
-			clusterer.finish();
+			hierCluster.finish();
 
-			return clusterer.getReorderedList();
+			// Update ClusteredAxisData object to conveniently store 
+			// clustering results
+			cad.setReorderedIdxs(hierCluster.getReorderedIDs());
+			cad.setTreeNodeData(hierCluster.getTreeNodeData());
+			cad.shouldReorderAxis(true);
+			cad.setAxisClustered(true);
+			
+			return cad;
 		}
 		
 		/**
 		 * Initializes the K-Means clustering process, and keeps tracks of
 		 * the GUI aspects such as updating the progress bar for ClusterView.
-		 * @return A reordered list of labels.
+		 * @deprecated - REWRITE
 		 */
-		private String[] doKMeansCluster() {
+		private ClusteredAxisData doKMeansCluster() {
 			
 			int k;
 			int iterations;
-			if (axis == ClusterDialogController.ROW) {
+			if (axisID == ClusterDialogController.ROW_IDX) {
 				k = spinnerInput[0];
 				iterations = spinnerInput[1];
 
@@ -410,13 +398,9 @@ public class ClusterProcessor {
 				k = spinnerInput[2];
 				iterations = spinnerInput[3];
 			}
-
-			final KMeansCluster clusterer = new KMeansCluster(distMatrix,
-					axis, k);
-
-			clusterer.setupFileWriter(treeFile);
-			fileWriter = clusterer.getClusterFileWriter();
 			
+			final KMeansCluster clusterer = new KMeansCluster(distMatrix, axisID, k);
+
 			/*
 			 * Begin iteration of recalculating means and reassigning row
 			 * distance means to clusters.
@@ -428,7 +412,7 @@ public class ClusterProcessor {
 
 			/* Get axis labels */
 			String[][] labelArray;
-			if (axis == ClusterDialogController.ROW) {
+			if (axisID == ClusterDialogController.ROW_IDX) {
 				labelArray = rowLabelI.getLabelArray();
 
 			} else {
@@ -439,15 +423,17 @@ public class ClusterProcessor {
 				LogBuffer.println("Label array length does not match "
 						+ "size of distance matrix.");
 				LogBuffer.println("Length: " + labelArray.length);
-				LogBuffer.println("Distance Matrix: "
-						+ distMatrix.getSize());
-				return new String[] {};
+				LogBuffer.println("Distance Matrix: " + distMatrix.getSize());
+				cad.shouldReorderAxis(true);
+				return cad;
 			}
 
-			/* Write data and close writer */
 			clusterer.finish(labelArray);
 
-			return clusterer.getReorderedList();
+			cad.setKmeansClusterNum(k);
+			cad.setReorderedIdxs(clusterer.getReorderedList());
+			cad.setAxisClustered(true);
+			return cad;
 		}
 	}
 	

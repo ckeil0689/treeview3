@@ -1,22 +1,27 @@
 package Cluster;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * A class used to organize and store relevant data for clustering an axis.
+ * A class used to organize and store all relevant data for clustering an axis.
  * It can be passed and used throughout different phases of clustering and
  * makes it easier and cleaner to track important cluster information for 
  * an axis.
- * @author chris0689
- *
  */
 public class ClusteredAxisData {
 
 	private final int AXIS_ID;
 	private final String AXIS_BASEID;
 	
-	private String[] reorderedIDs;
-	private String[] axisLabelTypes;
-	private String[][] axisLabels;
-	private String[][] orderedAxisLabels;
+	private int[] reorderedIdxs = new int[0];
+	private String[] previousAxisIDs = new String[0];
+	private String[] newAxisIDs = new String[0];
+	private String[] axisLabelTypes = new String[0];
+	private String[][] axisLabels = new String[0][];
+	private List<String[]> treeNodeData = new ArrayList<String[]>();
+	
+	private int kmeans_clusterN = 0;
 	
 	private boolean isAxisClustered;
 	private boolean shouldReorderAxis;
@@ -25,15 +30,32 @@ public class ClusteredAxisData {
 		
 		this.AXIS_ID = axisID;
 		this.AXIS_BASEID = (axisID == 0) ? "ROW" : "COL";
-		this.shouldReorderAxis = false;
-		this.isAxisClustered = false;
-		this.reorderedIDs = new String[] {};
+	}
+	
+	public void setKmeansClusterNum(final int clusterNum) {
+		
+		this.kmeans_clusterN = clusterNum;
 	}
 	
 	/* Setters */
-	public void setReorderedIDs(final String[] newReorderedIDs) {
+	public void setReorderedIdxs(final int[] newReorderedIdxs) {
 		
-		this.reorderedIDs = newReorderedIDs;
+		this.reorderedIdxs = newReorderedIdxs;
+	}
+	
+	public void setPreviousIDs(final String[] previousIDs) {
+		
+		this.previousAxisIDs = previousIDs;
+	}
+	
+	public void setNewIDs(final String[] newIDs) {
+		
+		this.newAxisIDs = newIDs;
+	}
+	
+  public void setTreeNodeData(final List<String[]> newTreeNodeData) {
+		
+		this.treeNodeData = newTreeNodeData;
 	}
 	
 	public void setLabelTypes(final String[] newAxisLabelTypes) {
@@ -44,11 +66,6 @@ public class ClusteredAxisData {
 	public void setLabels(final String[][] newAxisLabels) {
 		
 		this.axisLabels = newAxisLabels;
-	}
-	
-	public void setOrderedAxisLabels(final String[][] newOrderedAxisLabels) {
-		
-		this.orderedAxisLabels = newOrderedAxisLabels;
 	}
 	
 	public void setAxisClustered(final boolean isAxisClustered) {
@@ -62,6 +79,11 @@ public class ClusteredAxisData {
 	}
 	
 	/* Getters */
+	public int getKmeansClusterNum() {
+		
+		return kmeans_clusterN;
+	}
+	
 	public int getAxisID() {
 		
 		return AXIS_ID;
@@ -72,9 +94,24 @@ public class ClusteredAxisData {
 		return AXIS_BASEID;
 	}
 	
-	public String[] getReorderedIDs() {
+	public int[] getReorderedIdxs() {
 		
-		return reorderedIDs;
+		return reorderedIdxs;
+	}
+	
+	public String[] getPreviousIDs() {
+		
+		return previousAxisIDs;
+	}
+	
+	public String[] getNewIDs() {
+		
+		return newAxisIDs;
+	}
+	
+	public List<String[]> getTreeNodeData() {
+		
+		return treeNodeData;
 	}
 	
 	public String[] getAxisLabelTypes() {
@@ -90,11 +127,6 @@ public class ClusteredAxisData {
 	public int getNumLabels() {
 		
 		return axisLabels.length;
-	}
-	
-	public String[][] getOrderedLabels() {
-		
-		return orderedAxisLabels;
 	}
 	
 	public boolean isAxisClustered() {
