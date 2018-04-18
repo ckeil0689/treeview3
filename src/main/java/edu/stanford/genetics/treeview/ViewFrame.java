@@ -115,7 +115,7 @@ public abstract class ViewFrame extends Observable implements Observer,
 		final int height = mainConfigNode.getInt("frame_height", init_height);
 
 		appFrame.setBounds(left, top, width, height);
-		
+
 		//Handle app quit via a confirmation box, so set the default close
 		//operation to do nothing. Closing will be handled by an explicit call
 		//to dispose.
@@ -123,7 +123,9 @@ public abstract class ViewFrame extends Observable implements Observer,
 
 		//The following sets the java executable icon in the windows taskbar
 		appFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(ClassLoader.
-			getSystemResource("TreeView3.icns")));
+			getSystemResource("logo_small.png")));
+		LogBuffer.println("Icon file: " +
+			ClassLoader.getSystemResource("TreeView3.icns").toString());
 
 		setupWindowListener();
 
