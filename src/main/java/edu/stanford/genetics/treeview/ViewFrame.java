@@ -46,7 +46,7 @@ import javax.swing.Timer;
 //quitting, etc.  See the following link on how to release eclipse access
 //restrictions for this import:
 //https://stackoverflow.com/questions/25222811/
-import com.apple.eawt.Application;
+import com.apple.eawt.*;
 //See the following for how to hook into the application menu items and other
 //things:
 //https://developer.apple.com/library/content/documentation/Java/Conceptual/
