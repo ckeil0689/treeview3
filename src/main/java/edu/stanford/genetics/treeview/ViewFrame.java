@@ -46,11 +46,13 @@ import javax.swing.Timer;
 //quitting, etc.  See the following link on how to release eclipse access
 //restrictions for this import:
 //https://stackoverflow.com/questions/25222811/
-import com.apple.eawt.*;
+//import com.apple.eawt.*;
 //See the following for how to hook into the application menu items and other
 //things:
 //https://developer.apple.com/library/content/documentation/Java/Conceptual/
 //Java14Development/07-NativePlatformIntegration/NativePlatformIntegration.html
+//Currently commented out because it won't compile on other OS's without some
+//effort.
 
 /* BEGIN_HEADER                                                   TreeView 3
 *
@@ -139,11 +141,11 @@ public abstract class ViewFrame extends Observable implements Observer,
 			//items and code hooks for quitting, etc.  See the following link on
 			//how to release eclipse access restrictions for this import:
 			//https://stackoverflow.com/questions/25222811/
-			Image image = Toolkit.getDefaultToolkit().getImage(ClassLoader.
-				getSystemResource("logo.png"));
-			Application.getApplication().setDockIconImage(image);
-			LogBuffer.println("Icon file: " +
-				ClassLoader.getSystemResource("logo.png").toString());
+//			Image image = Toolkit.getDefaultToolkit().getImage(ClassLoader.
+//				getSystemResource("logo.png"));
+//			Application.getApplication().setDockIconImage(image);
+//			LogBuffer.println("Icon file: " +
+//				ClassLoader.getSystemResource("logo.png").toString());
 		} else {
 			//The following sets the java executable icon in the windows taskbar
 			appFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(ClassLoader.
