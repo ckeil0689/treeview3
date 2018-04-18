@@ -1,16 +1,19 @@
 plugins {
-  //For building .app/.dmg Mac packages/apps
+  //For building .app/.dmg Mac packages/apps - WORKS
   id "edu.sc.seis.macAppBundle" version "2.1.6"
 
   //For building shell-script/.deb Debian packages/scripts
   id "nebula.ospackage" version "4.4.0"
+
+  //For building windows exes/msis
+  id 'de.inetsoftware.setupbuilder' version "4.5.3c"
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 apply plugin: "nebula.ospackage"
-//apply plugin: "distribution"
+apply plugin: 'de.inetsoftware.setupbuilder'
 
 defaultTasks "clean", "fatJar", "eclipse"
 
@@ -190,3 +193,28 @@ tasks.addRule("Pattern: debianPrepare<distribution>") { String taskName ->
 
 buildDeb.dependsOn debianPreparetreeview3
 buildRpm.dependsOn debianPreparetreeview3
+
+
+//SetupBuilder attempt...
+setupBuilder {
+    vendor = 'Princeton University Bioinformatics Group'
+    application = "TreeView3"
+    appIdentifier = "TreeView3"
+    description = "Clustering heatmap browser"
+    version = '1.0'
+    icons = 'src/main/resources/TreeView3.icns'
+    licenseFile = 'LICENSES/LICENSE'
+    from fatJar.outputs
+    bundleJre = 1.7
+    mainClass = 'edu.stanford.genetics.treeview.app.TreeView3'
+    mainJar = 'TreeView3.jar'
+}
+
+msi {
+    setupBuilder.desktopStarter {
+      displayName = 'TreeView3'
+      executable = 'treeview3' + '-all-' + getVersionName() + '.jar'
+    }
+}
+
+msi.dependsOn fatJar

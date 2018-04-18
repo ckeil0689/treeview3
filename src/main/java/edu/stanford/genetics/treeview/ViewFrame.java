@@ -10,6 +10,7 @@ package edu.stanford.genetics.treeview;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -39,6 +40,19 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 import javax.swing.Timer;
+
+//com.apple.eawt.Application is used to set the app icon and can allow setup of
+//apple-specific functionality, such as App menu items and code hooks for
+//quitting, etc.  See the following link on how to release eclipse access
+//restrictions for this import:
+//https://stackoverflow.com/questions/25222811/
+//import com.apple.eawt.*;
+//See the following for how to hook into the application menu items and other
+//things:
+//https://developer.apple.com/library/content/documentation/Java/Conceptual/
+//Java14Development/07-NativePlatformIntegration/NativePlatformIntegration.html
+//Currently commented out because it won't compile on other OS's without some
+//effort.
 
 /* BEGIN_HEADER                                                   TreeView 3
 *
@@ -112,11 +126,30 @@ public abstract class ViewFrame extends Observable implements Observer,
 		final int height = mainConfigNode.getInt("frame_height", init_height);
 
 		appFrame.setBounds(left, top, width, height);
-		
+
 		//Handle app quit via a confirmation box, so set the default close
 		//operation to do nothing. Closing will be handled by an explicit call
 		//to dispose.
 		appFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+		if(isMac()) {
+			//com.apple.eawt.Application is used to set the app icon and can
+			//allow setup of apple-specific functionality, such as App menu
+			//items and code hooks for quitting, etc.  See the following link on
+			//how to release eclipse access restrictions for this import:
+			//https://stackoverflow.com/questions/25222811/
+//			Image image = Toolkit.getDefaultToolkit().getImage(ClassLoader.
+//				getSystemResource("logo.png"));
+//			Application.getApplication().setDockIconImage(image);
+//			LogBuffer.println("Icon file: " +
+//				ClassLoader.getSystemResource("logo.png").toString());
+		} else {
+			//The following sets the java executable icon in the windows taskbar
+			appFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(ClassLoader.
+				getSystemResource("logo.png")));
+			LogBuffer.println("Icon file: " +
+				ClassLoader.getSystemResource("logo.png").toString());
+		}
 
 		setupWindowListener();
 
