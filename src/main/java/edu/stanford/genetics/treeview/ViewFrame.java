@@ -121,6 +121,10 @@ public abstract class ViewFrame extends Observable implements Observer,
 		//to dispose.
 		appFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
+		//The following sets the java executable icon in the windows taskbar
+		appFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(ClassLoader.
+			getSystemResource("TreeView3.icns")));
+
 		setupWindowListener();
 
 		setupWindowPosListener();
