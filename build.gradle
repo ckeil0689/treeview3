@@ -1,9 +1,15 @@
 plugins {
+  //For building .app/.dmg Mac packages/apps - WORKS
   id "edu.sc.seis.macAppBundle" version "2.1.6"
+
+  //For building windows exes/msis
+  id 'de.inetsoftware.setupbuilder' version "4.5.3c"
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'de.inetsoftware.setupbuilder'
+apply plugin: 'application'
 
 defaultTasks "clean", "fatJar", "eclipse"
 
@@ -24,6 +30,7 @@ dependencies {
   compile 'org.freehep:freehep-graphicsio-svg:2.4'
   compile 'org.freehep:freehep-graphics2d:2.4'
   compile 'org.swinglabs.swingx:swingx-autocomplete:1.6.5-1'
+//  compile 'commons-io:commons-io:2.5'
 }
 
 sourceSets {
@@ -88,3 +95,27 @@ macAppBundle {
     appName = "TreeView3"
     bundleJRE = true
 }
+
+//SetupBuilder attempt...
+setupBuilder {
+    vendor = 'Princeton University Bioinformatics Group'
+    application = "TreeView3"
+    appIdentifier = "TreeView3"
+    description = "Clustering heatmap browser"
+    version = '1.0'
+    icons = 'src/main/resources/TreeView3.icns'
+    licenseFile = 'LICENSES/LICENSE'
+    from fatJar.outputs
+    bundleJre = 1.7
+    mainClass = 'edu.stanford.genetics.treeview.app.TreeView3'
+    mainJar = 'TreeView3.jar'
+}
+
+msi {
+    setupBuilder.desktopStarter {
+      displayName = 'TreeView3'
+      executable = 'treeview3' + '-all-' + getVersionName() + '.jar'
+    }
+}
+
+msi.dependsOn fatJar
