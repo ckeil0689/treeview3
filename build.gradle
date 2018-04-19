@@ -143,7 +143,7 @@ mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
 String applicationVersionFull = getVersionName()
 
 task debianClean(type: Delete) {
-    delete 'build/debian'
+  delete 'build/debian'
 }
 
 tasks.addRule("Pattern: debianPrepare<distribution>") { String taskName ->
@@ -196,24 +196,24 @@ buildRpm.dependsOn debianPreparetreeview3
 
 //SetupBuilder attempt...
 setupBuilder {
-    vendor = 'Princeton University Bioinformatics Group'
-    application = "TreeView3"
-    appIdentifier = "TreeView3"
-    description = "Clustering heatmap browser"
-    version = getVersionName()
-    icons = 'src/main/resources/TreeView3.icns'
-    licenseFile = 'LICENSES/LICENSE'
-    from fatJar.outputs
-    bundleJre = 1.7
-    mainClass = 'edu.stanford.genetics.treeview.app.TreeView3'
-    mainJar = 'TreeView3.jar'
+  vendor = 'Princeton University Bioinformatics Group'
+  application = "TreeView3"
+  appIdentifier = "TreeView3"
+  description = "Clustering heatmap browser"
+  version = getVersionName()
+  icons = 'src/main/resources/TreeView3.icns'
+  licenseFile = 'LICENSES/LICENSE'
+  from fatJar.outputs
+  bundleJre = 1.7
+  mainClass = 'edu.stanford.genetics.treeview.app.TreeView3'
+  mainJar = 'TreeView3.jar'
 }
 
 msi {
-    setupBuilder.desktopStarter {
-      displayName = 'TreeView3'
-      executable = 'treeview3' + '_' + getVersionName() + '_all.jar'
-    }
+  setupBuilder.desktopStarter {
+    displayName = 'TreeView3'
+    executable = 'treeview3' + '_' + getVersionName() + '_all.jar'
+  }
 }
 
 msi.dependsOn fatJar
