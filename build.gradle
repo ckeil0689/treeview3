@@ -103,8 +103,8 @@ macAppBundle {
 //Deb builder stuff (creates shell script & puts in /usr/local) - Use buildDeb
 ospackage {
   packageName = 'treeview3'
-  version = getVersionName()
-  release = ''
+  version = '1beta'
+  release = getVersionName()
   arch = ''
   os = LINUX
 
