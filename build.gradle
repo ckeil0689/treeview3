@@ -200,7 +200,7 @@ setupBuilder {
   application = "TreeView3"
   appIdentifier = "TreeView3"
   description = "Clustering heatmap browser"
-  version = getVersionName()
+  version = '1beta-' + getVersionName()
   icons = 'src/main/resources/TreeView3.icns'
   licenseFile = 'LICENSES/LICENSE'
   from fatJar.outputs
