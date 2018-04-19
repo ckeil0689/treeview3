@@ -198,9 +198,9 @@ buildRpm.dependsOn debianPreparetreeview3
 setupBuilder {
   vendor = 'Princeton University Bioinformatics Group'
   application = "TreeView3"
-  appIdentifier = "TreeView3"
+  appIdentifier = "treeview3"
   description = "Clustering heatmap browser"
-  version = '1beta-' + getVersionName()
+  version = '1beta'
   icons = 'src/main/resources/TreeView3.icns'
   licenseFile = 'LICENSES/LICENSE'
   from fatJar.outputs
