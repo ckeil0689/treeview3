@@ -108,7 +108,7 @@ ospackage {
   //release = 'rel1'
   version = getVersionName()
   release = ''
-  arch = I386
+  arch = ''
   os = LINUX
 
   into '/usr/local/treeview3'
