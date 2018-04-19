@@ -97,15 +97,12 @@ macAppBundle {
   mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
   icon = "src/main/resources/TreeView3.icns"
   appName = "TreeView3"
-  bundleJRE = true
+  bundleJRE = false
 }
 
 //Deb builder stuff (creates shell script & puts in /usr/local) - Use buildDeb
 ospackage {
   packageName = 'treeview3'
-  //NOTE: version must start with a number & sometimes a dash will get replaced with a tilde
-  //version = '01beta.build' + getVersionName()
-  //release = 'rel1'
   version = getVersionName()
   release = ''
   arch = ''
@@ -215,7 +212,7 @@ setupBuilder {
 msi {
     setupBuilder.desktopStarter {
       displayName = 'TreeView3'
-      executable = 'treeview3' + '-all-' + getVersionName() + '.jar'
+      executable = 'treeview3' + '_' + getVersionName() + '_all.jar'
     }
 }
 
