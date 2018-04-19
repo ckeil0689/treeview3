@@ -204,7 +204,7 @@ setupBuilder {
   icons = 'src/main/resources/TreeView3.icns'
   licenseFile = 'LICENSES/LICENSE'
   from fatJar.outputs
-  bundleJre = 1.7
+//  bundleJre = 1.7
   mainClass = 'edu.stanford.genetics.treeview.app.TreeView3'
   mainJar = 'TreeView3.jar'
 }
