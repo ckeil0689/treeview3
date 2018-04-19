@@ -86,7 +86,7 @@ def getVersionName() {
   exec {
     // might be useful for later version management
     // commandLine 'git', 'describe', '--tags'
-    commandLine 'git', 'rev-parse', '--short', 'HEAD'
+    commandLine 'git', 'rev-parse', '--short=8', 'HEAD'
     standardOutput = stdout
   }
   return stdout.toString().trim()
@@ -104,8 +104,10 @@ macAppBundle {
 ospackage {
   packageName = 'treeview3'
   //NOTE: version must start with a number & sometimes a dash will get replaced with a tilde
-  version = '01beta.build' + getVersionName()
-  release = 'rel1'
+  //version = '01beta.build' + getVersionName()
+  //release = 'rel1'
+  version = getVersionName()
+  release = ''
   arch = I386
   os = LINUX
 
@@ -201,7 +203,7 @@ setupBuilder {
     application = "TreeView3"
     appIdentifier = "TreeView3"
     description = "Clustering heatmap browser"
-    version = '1.0'
+    version = getVersionName()
     icons = 'src/main/resources/TreeView3.icns'
     licenseFile = 'LICENSES/LICENSE'
     from fatJar.outputs
