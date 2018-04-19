@@ -211,7 +211,7 @@ setupBuilder {
 msi {
   setupBuilder.desktopStarter {
     displayName = 'TreeView3'
-    executable = 'treeview3' + '-all-' + getVersionName() + '.jar'
+    executable = 'java -Xmx4g treeview3' + '-all-' + getVersionName() + '.jar'
   }
 }
 
