@@ -1,6 +1,6 @@
 plugins {
   //For building .app/.dmg Mac packages/apps - WORKS
-  id "edu.sc.seis.macAppBundle" version "2.1.6"
+  id "edu.sc.seis.macAppBundle" version "2.2.1"
 
   //For building shell-script/.deb Debian packages/scripts
   id "nebula.ospackage" version "4.4.0"
@@ -98,6 +98,7 @@ macAppBundle {
   icon = "src/main/resources/TreeView3.icns"
   appName = "TreeView3"
   bundleJRE = false
+  javaExtras.put("-Xmx4g",null)   //If value of key/value pair is null, it just adds the flag as-is without adding an '=' sign
 }
 
 //Deb builder stuff (creates shell script & puts in /usr/local) - Use buildDeb
