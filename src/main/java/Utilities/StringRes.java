@@ -22,10 +22,6 @@ public class StringRes {
 	public final static String updateUrl = "https://bitbucket.org/" +
 		"TreeView3Dev/treeview3/";
 
-	/** url of announcements mailing list */
-	public final static String announcementUrl = "https://www.princeton.edu/"
-		+ "~abarysh/treeview/";
-
 	public static final String appName = "TreeView 3";
 
 	// General

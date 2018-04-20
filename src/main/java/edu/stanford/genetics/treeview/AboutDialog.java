@@ -66,13 +66,6 @@ public class AboutDialog extends CustomDialog {
 		detailPanel.add(hp);
 		detailPanel.add(GUIFactory.getHyperlinkButton(StringRes.updateUrl), "wrap");
 
-		final JLabel announce = GUIFactory.createLabel("Announcements:",
-				GUIFactory.FONTS);
-
-		detailPanel.add(announce);
-		detailPanel.add(GUIFactory.getHyperlinkButton(StringRes.announcementUrl), 
-		                "wrap");
-
 		mainPanel.add(detailPanel, "push, grow");
 	}
 }
