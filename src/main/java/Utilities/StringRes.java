@@ -24,7 +24,7 @@ public class StringRes {
 
 	/** Homepage for memory increase instructions */
 	public final static String memoryUrl = "https://bitbucket.org/" +
-		"TreeView3Dev/treeview3/";
+		"TreeView3Dev/treeview3/wiki/OutOfMemory";
 
 	public static final String appName = "TreeView 3";
 
