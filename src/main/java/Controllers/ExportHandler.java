@@ -42,9 +42,13 @@ import org.freehep.graphicsio.svg.SVGGraphics2D;
 import edu.stanford.genetics.treeview.AspectType;
 import edu.stanford.genetics.treeview.ExportDialog;
 import edu.stanford.genetics.treeview.ExportDialog.ExportBarDialog;
+import edu.stanford.genetics.treeview.AboutDialog;
+import edu.stanford.genetics.treeview.ExportDialogController;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.ExportOptions;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.OomDialog;
+import edu.stanford.genetics.treeview.OomDialogController;
 import edu.stanford.genetics.treeview.PaperType;
 import edu.stanford.genetics.treeview.PpmWriter;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -838,11 +842,29 @@ public class ExportHandler {
 					LogBuffer.println("Export NOT too big.  [x" + x + " * y" +
 						y + "] <= [" + MAX_IMAGE_SIZE + "].");
 					oome.printStackTrace();
-					showWarning("Out of memory.\n\nNote, you may be able to " +
-						"export a smaller portion of the matrix or select " +
-						"fewer\noptions which increase image size or " +
-						"resolution (such as the inclusion of labels\nor " +
-						"selecting the as-seen-on-screen aspect ratio).");
+					String sugg = "You may be able to export a smaller " +
+						"portion of the matrix or select fewer<BR>\n" +
+						"options which increase image size or resolution " +
+						"(such as the inclusion of<BR>\nlabels or selecting " +
+						"the as-seen-on-screen aspect ratio).";
+
+					OomDialog oomDialog = null;
+					try {
+						oomDialog = new OomDialog(sugg);
+					} catch(ExportException ee) {
+						LogBuffer.println(ee.getLocalizedMessage());
+						ee.printStackTrace();
+						showWarning(ee.getLocalizedMessage());
+					}
+
+					try {
+						new OomDialogController(oomDialog);
+					} catch(Exception oom) {
+						LogBuffer.println("Out of memory when trying to " +
+							"create the OomDialogController.");
+						oom.printStackTrace();
+						showWarning(oom.getLocalizedMessage());
+					}
 				}
 				setExportSuccessful(false);
 			}

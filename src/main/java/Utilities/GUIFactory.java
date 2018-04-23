@@ -118,6 +118,25 @@ public class GUIFactory {
 	}
 
 	/**
+	 * Overloaded method to return a JPanel without background color
+	 * specification and a custom miglayout string.
+	 * 
+	 * @param opaque
+	 *            Whether the JPanel should be opaque or not.
+	 * @param panel_mode
+	 *            Sets the main MigLayout constrains for panel insets.
+	 * @return A JPanel.
+	 */
+	public static JPanel createJPanel(final boolean opaque, 
+		final String custom_str) {
+
+		final JPanel panel = new JPanel();
+		panel.setOpaque(opaque);
+		panel.setLayout(new MigLayout(custom_str));
+		return panel;
+	}
+
+	/**
 	 * Used to set the layout manager for a JComponent.
 	 * 
 	 * @param comp

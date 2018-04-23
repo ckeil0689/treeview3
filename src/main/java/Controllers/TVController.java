@@ -43,6 +43,8 @@ import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.OomDialog;
+import edu.stanford.genetics.treeview.OomDialogController;
 import edu.stanford.genetics.treeview.RowListMaker;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -307,9 +309,9 @@ public class TVController implements Observer {
 	 * @param fileSet - The fileSet to be loaded.
 	 * @param dataInfo - Contains information on how the data should be loaded.
 	 *          This information is determined by the
-	 *          user in the import dialog. If the file has been loaded before, the
-	 *          information can come from stored preferences
-	 *          data. */
+	 *          user in the import dialog. If the file has been loaded before,
+	 *          the information can come from stored preferences data.
+	 */
 	public void loadData(final FileSet fileSet,final DataLoadInfo dataInfo,
 		final boolean isFromCluster,final boolean isFromRecents) {
 
@@ -334,6 +336,26 @@ public class TVController implements Observer {
 			this.isFromCluster = isFromCluster;
 			loader.execute();
 		} catch(final OutOfMemoryError e) {
+			//Give the user the opportunity to restart with more memory
+			OomDialog oomDialog = null;
+			try {
+				//Nothing to suggest, so send empty string
+				oomDialog = new OomDialog("");
+			} catch(ExportException ee) {
+				LogBuffer.println(ee.getLocalizedMessage());
+				ee.printStackTrace();
+				showWarning(ee.getLocalizedMessage());
+			}
+
+			try {
+				new OomDialogController(oomDialog);
+			} catch(Exception oom) {
+				LogBuffer.println("Out of memory when trying to " +
+					"create the OomDialogController.");
+				oom.printStackTrace();
+				showWarning(oom.getLocalizedMessage());
+			}
+
 			final String oomError = "The data file is too large. " +
 				"Increase the JVM's heap size. Error: " + e.getMessage();
 			JOptionPane.showMessageDialog(Frame.getFrames()[0], oomError,
@@ -381,12 +403,45 @@ public class TVController implements Observer {
 			LogBuffer.println("Successfully loaded: " + model.getSource());
 
 		} else if(!loadSuccess) {
+			LogBuffer.println("Attempting to offer a restart option due to " +
+				"memory issue...");
+
+			String sugg =
+				"<I>Note, this error <B>might</B> not be related to memory, " +
+				"but it's a good bet<BR>\nit is.</I>  You can try clicking " +
+				"continue and opening a smaller version of<BR>\nyour file.  " +
+				"If that doesn't work, there may be an unexpected formatting " +
+				"or<BR>\nfile format issue.<BR>\n";
+
+			OomDialog oomDialog = null;
+			try {
+				oomDialog = new OomDialog(sugg);
+			} catch(ExportException ee) {
+				LogBuffer.println("Exception while trying to create an " +
+					"OomDialog.");
+				LogBuffer.println(ee.getLocalizedMessage());
+				ee.printStackTrace();
+				showWarning(ee.getLocalizedMessage());
+			}
+
+			LogBuffer.println("Now creating OomDialogController...");
+
+			try {
+				new OomDialogController(oomDialog);
+			} catch(Exception oom) {
+				LogBuffer.println("Exception while trying to create an " +
+					"OomDialogController.");
+				LogBuffer.println("Out of memory when trying to " +
+					"create the OomDialogController.");
+				oom.printStackTrace();
+				showWarning(oom.getLocalizedMessage());
+			}
+			LogBuffer.println("Done trying to offer restart option.");
+
 			final String message = "Something went wrong with the data " +
 				"load" + (loadThreadError.equalsIgnoreCase("") ?
 					".\nIt could be an out of memory error or some other " +
 					"system resource issue." : ":\n" + loadThreadError);
-			JOptionPane.showMessageDialog(Frame.getFrames()[0], message,"Alert",
-				JOptionPane.ERROR_MESSAGE);
 			LogBuffer.println("ERROR: " + message);
 
 			// Set model status, which will update the view.

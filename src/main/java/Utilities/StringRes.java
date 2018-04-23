@@ -22,6 +22,10 @@ public class StringRes {
 	public final static String updateUrl = "https://bitbucket.org/" +
 		"TreeView3Dev/treeview3/";
 
+	/** Homepage for memory increase instructions */
+	public final static String memoryUrl = "https://bitbucket.org/" +
+		"TreeView3Dev/treeview3/";
+
 	public static final String appName = "TreeView 3";
 
 	// General
