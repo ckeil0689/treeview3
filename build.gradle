@@ -220,7 +220,7 @@ msi {
     doLast {
         new File("TreeView3.bat").text = """
 @echo off
-%JAVA_HOME%\bin\java.exe -Xmx4g -jar ${jarfile}
+%JAVA_HOME%\\bin\\java.exe -Xmx4g -jar ${jarfile}
 """
     }
   }
