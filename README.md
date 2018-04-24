@@ -1,7 +1,7 @@
 TREEVIEW 3.0
 ============
 
-TreeView is an open-source Java app for visualizing large data matrices. It can load a dataset, cluster it, browse it, customize its appearance and export it (or parts of it) into a figure.
+TreeView is an open-source Java app for visualizing large data matrices. It can load a dataset, cluster it, browse it, customize its appearance and export it into a figure.
 
 ![treeview_screenshot.png](https://bitbucket.org/repo/AXqk7r/images/101136785-treeview_screenshot.png)
 
@@ -9,9 +9,7 @@ TreeView is an open-source Java app for visualizing large data matrices. It can 
 DOWNLOAD
 ========
 
-** [Alpha 3 (current release)](https://bitbucket.org/TreeView3Dev/treeview3/downloads/tv3_alpha03_release.jar) ** - released on July 5, 2016
-
-More recent "bleeding edge" releases, as well as older stable versions, are available at the [Treeview Wiki page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home).
+** [Downloads page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home) **
 
 
 INSTALL & RUN
