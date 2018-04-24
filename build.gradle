@@ -210,7 +210,7 @@ setupBuilder {
 }
 
 msi {
-  jarfile = 'treeview3' + '-all-' + getVersionName() + '.jar'
+  def jarfile = 'treeview3' + '-all-' + getVersionName() + '.jar'
   setupBuilder.desktopStarter {
     displayName = 'TreeView3'
 //    executable = 'treeview3' + '-all-' + getVersionName() + '.jar'
