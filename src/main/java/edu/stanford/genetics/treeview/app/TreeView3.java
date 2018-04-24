@@ -33,6 +33,9 @@ public class TreeView3 {
 	 */
 	private static void osSetup() {
 
+		//This enhances graphics performance
+		System.setProperty("sun.java2d.opengl", "true");
+
 		if(isMac()) {
 
 			LogBuffer.println("Running on a Mac.");
