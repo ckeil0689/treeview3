@@ -214,16 +214,33 @@ msi {
   setupBuilder.desktopStarter {
     displayName = 'TreeView3'
 //    executable = 'treeview3' + '-all-' + getVersionName() + '.jar'
-    executable = 'TreeView3.bat'
+    executable = 'TreeView3.vbs'
   }
-  task versionTxt()  {
-    doLast {
-        new File("TreeView3.bat").text = """
-@echo off
-%JAVA_HOME%\\bin\\java.exe -Xmx4g -jar ${jarfile}
+  doLast {
+//    copy {
+      //From https://stackoverflowcom/questions/38275583/
+      from files(new File("$projectDir/build/tmp/msi/TreeView3.bat").text = """
+@echo off\r
+"%JAVA_HOME%\\bin\\java.exe" -Xmx4g -jar "${jarfile}"
 """
-    }
+        ,
+        //From https://superuser.com/questions/233348/
+        new File("$projectDir/build/tmp/msi/TreeView3.vbs").text = """
+Set WshShell = CreateObject("WScript.Shell")\r
+WshShell.Run chr(34) & "TreeView3.bat" & chr(34), 0\r
+Set WshShell = Nothing
+"""
+      )
+      into "${projectDir}"
+//    }
   }
+}
+
+task testme {
+  println "Root project: ${project.rootProject}";
+  println "Root dir:     ${project.rootDir}";
+  println "Project dir:  ${project.projectDir}";
+  println "Build dir:    ${buildDir}";
 }
 
 msi.dependsOn fatJar
