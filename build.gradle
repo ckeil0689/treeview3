@@ -214,7 +214,7 @@ msi {
   setupBuilder.desktopStarter {
     displayName = 'TreeView3'
 //    executable = 'treeview3' + '-all-' + getVersionName() + '.jar'
-    executable = TreeView3.bat
+    executable = 'TreeView3.bat'
   }
   task versionTxt()  {
     doLast {
