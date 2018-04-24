@@ -210,9 +210,19 @@ setupBuilder {
 }
 
 msi {
+  jarfile = 'treeview3' + '-all-' + getVersionName() + '.jar'
   setupBuilder.desktopStarter {
     displayName = 'TreeView3'
-    executable = 'treeview3' + '-all-' + getVersionName() + '.jar'
+//    executable = 'treeview3' + '-all-' + getVersionName() + '.jar'
+    executable = TreeView3.bat
+  }
+  task versionTxt()  {
+    doLast {
+        new File("TreeView3.bat").text = """
+@echo off
+%JAVA_HOME%\bin\java.exe -Xmx4g -jar ${jarfile}
+"""
+    }
   }
 }
 
