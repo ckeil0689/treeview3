@@ -217,21 +217,28 @@ msi {
     executable = 'TreeView3.vbs'
   }
   doLast {
-//    copy {
-      //From https://stackoverflowcom/questions/38275583/
-      from files(new File("$projectDir/build/tmp/msi/TreeView3.bat").text = """
+    //From https://stackoverflowcom/questions/38275583/
+    from files(new File("$projectDir/build/tmp/msi/TreeView3.bat").text = """
 @echo off\r
 "%JAVA_HOME%\\bin\\java.exe" -Xmx4g -jar "${jarfile}"
 """
-        ,
-        //From https://superuser.com/questions/233348/
-        new File("$projectDir/build/tmp/msi/TreeView3.vbs").text = """
+      ,
+      //From https://superuser.com/questions/233348/
+      new File("$projectDir/build/tmp/msi/TreeView3.vbs").text = """
 Set WshShell = CreateObject("WScript.Shell")\r
 WshShell.Run chr(34) & "TreeView3.bat" & chr(34), 0\r
 Set WshShell = Nothing
 """
-      )
-      into "${projectDir}"
+    ) {
+      include 'TreeView3.bat,TreeView3.vbs'
+      fileMode 0755
+      into "bin"
+    }
+//    into "${projectDir}"
+//    from ( 'build/tmp/msi' ) {
+//      include 'TreeView3.vbs'
+//      fileMode 0755
+//      into "bin"
 //    }
   }
 }
