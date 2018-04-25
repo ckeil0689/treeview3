@@ -217,46 +217,8 @@ msi {
   def jarfile = 'treeview3' + '-all-' + getVersionName() + '.jar'
   setupBuilder.desktopStarter {
     displayName = 'TreeView3'
-//    executable = 'treeview3' + '-all-' + getVersionName() + '.jar'
     executable = 'TreeView3.vbs'
   }
-  doLast {
-    //From https://stackoverflowcom/questions/38275583/
-    from files(new File("$projectDir/build/tmp/msi/TreeView3.bat").text = """
-@echo off\r
-"%JAVA_HOME%\\bin\\java.exe" -Xmx4g -jar "${jarfile}"
-"""
-      ,
-      //From https://superuser.com/questions/233348/
-      new File("$projectDir/build/tmp/msi/TreeView3.vbs").text = """
-Set WshShell = CreateObject("WScript.Shell")\r
-WshShell.Run chr(34) & "TreeView3.bat" & chr(34), 0\r
-Set WshShell = Nothing
-"""
-    ) {
-      include "$projectDir/build/tmp/msi/TreeView3.bat"
-      include "$projectDir/build/tmp/msi/TreeView3.vbs"
-      fileMode 0755
-    }
-//    into "${projectDir}"
-//    from ( 'build/tmp/msi' ) {
-//      include 'TreeView3.vbs'
-//      fileMode 0755
-//      into "bin"
-//    }
-  }
-}
-
-task testme {
-  println "Root project:  ${project.rootProject}";
-  println "Root dir:      ${project.rootDir}";
-  println "Project dir:   ${project.projectDir}";
-  println "Build dir:     ${buildDir}";
-  println "Install dir:   ${configurationTargetIdentifier}";
-  println "Install dist:  ${installDist}";
-  println "Distributions: ${distributions}";
-  println "Components:    ${components}";
-  println "Exe dir:       ${executableDir}";
 }
 
 msi.dependsOn fatJar
