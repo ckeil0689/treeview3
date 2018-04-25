@@ -120,18 +120,28 @@ ospackage {
     fileMode 0555
     into "bin"
   }
+  from ( 'scripts/lnx' ) {
+    include 'treeview3.desktop'
+    into "desktop"
+  }
+  from ( 'src/main/resources' ) {
+    include 'logo.png'
+    into "desktop"
+  }
 }
 
 buildRpm {
   link('/usr/local/bin/treeview3', '/usr/local/treeview3/bin/treeview3')
   String libname = 'treeview3-' + getVersionName() + '.jar'
   link('/usr/local/lib/' + libname, '/usr/local/treeview3/lib/' + libname)
+  link('/usr/share/applications/treeview3.desktop', '/usr/local/treeview3/desktop/treeview3.desktop')
 }
 
 buildDeb {
   link('/usr/local/bin/treeview3', '/usr/local/treeview3/bin/treeview3')
   String libname = 'treeview3-' + getVersionName() + '.jar'
   link('/usr/local/lib/' + libname, '/usr/local/treeview3/lib/' + libname)
+  link('/usr/share/applications/treeview3.desktop', '/usr/local/treeview3/desktop/treeview3.desktop')
 }
 
 

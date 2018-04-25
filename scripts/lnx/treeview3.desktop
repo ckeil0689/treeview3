@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=TreeView3
+Exec=treeview3
+Icon=/usr/local/treeview3/desktop/logo.png
+Type=Application
+Comment=Clustering heatmap viewer
+Terminal=false
+Categories=GNOME;GTK;
