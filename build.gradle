@@ -210,6 +210,10 @@ setupBuilder {
 }
 
 msi {
+  from( 'scripts/win' ) {
+    include '*'
+    fileMode 0755
+  }
   def jarfile = 'treeview3' + '-all-' + getVersionName() + '.jar'
   setupBuilder.desktopStarter {
     displayName = 'TreeView3'
@@ -230,9 +234,9 @@ WshShell.Run chr(34) & "TreeView3.bat" & chr(34), 0\r
 Set WshShell = Nothing
 """
     ) {
-      include 'TreeView3.bat,TreeView3.vbs'
+      include "$projectDir/build/tmp/msi/TreeView3.bat"
+      include "$projectDir/build/tmp/msi/TreeView3.vbs"
       fileMode 0755
-      into "bin"
     }
 //    into "${projectDir}"
 //    from ( 'build/tmp/msi' ) {
@@ -244,10 +248,15 @@ Set WshShell = Nothing
 }
 
 task testme {
-  println "Root project: ${project.rootProject}";
-  println "Root dir:     ${project.rootDir}";
-  println "Project dir:  ${project.projectDir}";
-  println "Build dir:    ${buildDir}";
+  println "Root project:  ${project.rootProject}";
+  println "Root dir:      ${project.rootDir}";
+  println "Project dir:   ${project.projectDir}";
+  println "Build dir:     ${buildDir}";
+  println "Install dir:   ${configurationTargetIdentifier}";
+  println "Install dist:  ${installDist}";
+  println "Distributions: ${distributions}";
+  println "Components:    ${components}";
+  println "Exe dir:       ${executableDir}";
 }
 
 msi.dependsOn fatJar
