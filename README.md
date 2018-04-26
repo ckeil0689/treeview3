@@ -18,7 +18,6 @@ INSTALL & RUN
 ## Requirements ##
 
 * Java 7 or higher - visit <http://java.com/en/download/installed.jsp> to verify your current Java version.
-* If you tested an older version of Treeview 3.0, we recommend that you reset your preferences before you upgrade to the latest version (File > Preferences > Reset Preferences). 
 
 ## Windows ##
 
