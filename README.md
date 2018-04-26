@@ -63,7 +63,7 @@ WHAT'S NEW
 DOCUMENTATION
 =============
 
-We have gone to some effort to make TreeView3 intuitive and easy to use.  If anything is unclear, contact us at <treeview@princeton.edu>.
+[See our wiki.](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
 
 
 HOW TO CITE
