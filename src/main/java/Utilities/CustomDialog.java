@@ -3,6 +3,7 @@ package Utilities;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
@@ -47,7 +48,7 @@ public abstract class CustomDialog extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		
-		setupCloseOnEsc();
+		setupClose();
 
 		this.closeBtn = GUIFactory.createBtn("Close");
 		closeBtn.addActionListener(new CloseListener());
@@ -57,26 +58,35 @@ public abstract class CustomDialog extends JDialog {
 		getContentPane().add(mainPanel);
 	}
 	
-	private void setupCloseOnEsc() {
-		
+	private void setupClose() {
+
+		//Escape = close
 		KeyStroke escapeKeyStroke = 
-				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+			KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 		String closeByEsc = "closeByEsc";
-		
+
+		//Meta-w = close
+		KeyStroke metawKeyStroke = 
+			KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_MASK);
+		String closeByMetaW = "closeByMetaW";
+
 		Action closeDialog = new AbstractAction() {
-			
+
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-
 				dispose();
 			}
 		};
-		
+
 		JRootPane root = getRootPane();
+
 		root.getInputMap().put(escapeKeyStroke, closeByEsc);
 		root.getActionMap().put(closeByEsc, closeDialog);
+
+		root.getInputMap().put(metawKeyStroke, closeByMetaW);
+		root.getActionMap().put(closeByMetaW, closeDialog);
 	}
 
 	private class CloseListener implements ActionListener {
