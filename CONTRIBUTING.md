@@ -92,12 +92,34 @@ generating a project snapshot:
 4. Upload jar file to the downloads page named with the short build number
 5. Notify project testers
 
-### Building
-To share builds between developers for testing, we use gradle.  You can build just a jar file, create a Mac application, or a Mac DMG file:
+### Building / Releasing
+To share builds between developers for testing, we use gradle.  A simple jar file build is sufficient for testing.  To create a jar, simply run:
 
 - `gradle`
-- `gradle createApp`
+
+To release a build, a package must be created for 4 systems and the package must successfully install on the target system:
+
+#### Mac
 - `gradle createDmg`
+- Double-click to mount & drag the app to /Applications
+- Run by double-clicking the app (confirm icon)
+
+#### Windows
+- `gradle msi`
+- Double-click to mount & follow instructions
+- Run via start menu entry (confirm icon)
+
+#### Debian
+- `gradle buildDeb`
+- `sudo dpkg -i *.deb`
+- `treeview3`
+- Also run via start menu entry (confirm icon)
+
+#### RedHat
+- `gradle buildRpm`
+- `sudo dpkg -i *.rpm`
+- `treeview3`
+- Also run via start menu entry (confirm icon)
 
 ### Who do I talk to?
 
