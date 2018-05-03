@@ -157,6 +157,14 @@ ospackage {
     include 'logo.png'
     into "desktop"
   }
+  from ( "." ) {
+    include 'README.md'
+    into "docs"
+  }
+  from ( 'src/main/resources' ) {
+    include 'spellman.cdt'
+    into "docs/Sample"
+  }
 }
 
 buildRpm {
