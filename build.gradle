@@ -261,6 +261,13 @@ msi {
     include '*'
     fileMode 0755
   }
+  from ( "." ) {
+    include 'README.md'
+  }
+  from ( 'src/main/resources' ) {
+    include 'spellman.cdt'
+    into "Sample"
+  }
   def jarfile = 'treeview3' + '-all-' + getVersionName() + '.jar'
   setupBuilder.desktopStarter {
     displayName = 'TreeView3'
