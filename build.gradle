@@ -68,6 +68,21 @@ sourceSets {
   }
 }
 
+def copyMacPkgFiles() {
+  copy {
+    from file("${projectDir}/")
+    into file("${buildDir}/macApp")
+    include 'README.md'
+    rename('README.md','README.txt')
+  }
+  mkdir file("${buildDir}/macApp/Sample")
+  copy {
+    from file("${projectDir}/src/main/resources")
+    into file("${buildDir}/macApp/Sample")
+    include 'spellman.cdt'
+  }
+}
+
 task fatJar(type: Jar) {
   manifest {
     attributes 'Main-Class':'edu.stanford.genetics.treeview.app.TreeView3'
@@ -98,7 +113,21 @@ macAppBundle {
   icon = "src/main/resources/TreeView3.icns"
   appName = "TreeView3"
   bundleJRE = false
-  javaExtras.put("-Xmx4g",null)   //If value of key/value pair is null, it just adds the flag as-is without adding an '=' sign
+  javaExtras.put("-Xmx4g",null)   //If value of key/value pair is null, it just 
+                                  //adds the flag as-is without adding '='
+
+  //Put the readme & sample file(s) in the dmg
+  copyMacPkgFiles()
+
+  //The following does not work because macAppBundle follows symlinks when it creates the dmg
+  //exec {
+  //  commandLine 'ln', '-s', '/Applications', "${buildDir}/macApp/Applications"
+  //  standardOutput = new ByteArrayOutputStream()
+  //}
+  //We do not want a background image, but defining one causes a /Applications
+  //alias to get automatically created, so I created a single transparent pixel
+  //background png image
+  backgroundImage = "src/main/resources/dmg_bkgd.png"
 }
 
 //Deb builder stuff (creates shell script & puts in /usr/local) - Use buildDeb
