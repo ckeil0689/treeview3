@@ -132,23 +132,10 @@ public abstract class ViewFrame extends Observable implements Observer,
 		//to dispose.
 		appFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
-		if(isMac()) {
-			//com.apple.eawt.Application is used to set the app icon and can
-			//allow setup of apple-specific functionality, such as App menu
-			//items and code hooks for quitting, etc.  See the following link on
-			//how to release eclipse access restrictions for this import:
-			//https://stackoverflow.com/questions/25222811/
-//			Image image = Toolkit.getDefaultToolkit().getImage(ClassLoader.
-//				getSystemResource("logo.png"));
-//			Application.getApplication().setDockIconImage(image);
-//			LogBuffer.println("Icon file: " +
-//				ClassLoader.getSystemResource("logo.png").toString());
-		} else {
+		if(!isMac()) {
 			//The following sets the java executable icon in the windows taskbar
 			appFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(ClassLoader.
 				getSystemResource("logo.png")));
-//			LogBuffer.println("Icon file: " +
-//				ClassLoader.getSystemResource("logo.png").toString());
 		}
 
 		setupWindowListener();
