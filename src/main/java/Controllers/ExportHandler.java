@@ -39,16 +39,14 @@ import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.freehep.graphicsio.svg.SVGGraphics2D;
 
+import Views.AboutDialog;
+import Views.ExportDialog;
+import Views.OutOfMemoryDialog;
+import Views.ExportDialog.ExportBarDialog;
 import edu.stanford.genetics.treeview.AspectType;
-import edu.stanford.genetics.treeview.ExportDialog;
-import edu.stanford.genetics.treeview.ExportDialog.ExportBarDialog;
-import edu.stanford.genetics.treeview.AboutDialog;
-import edu.stanford.genetics.treeview.ExportDialogController;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.ExportOptions;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.OomDialog;
-import edu.stanford.genetics.treeview.OomDialogController;
 import edu.stanford.genetics.treeview.PaperType;
 import edu.stanford.genetics.treeview.PpmWriter;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -848,9 +846,9 @@ public class ExportHandler {
 						"(such as the inclusion of<BR>\nlabels or selecting " +
 						"the as-seen-on-screen aspect ratio).";
 
-					OomDialog oomDialog = null;
+					OutOfMemoryDialog outOfMemoryDialog = null;
 					try {
-						oomDialog = new OomDialog(sugg);
+						outOfMemoryDialog = new OutOfMemoryDialog(sugg);
 					} catch(ExportException ee) {
 						LogBuffer.println(ee.getLocalizedMessage());
 						ee.printStackTrace();
@@ -858,7 +856,7 @@ public class ExportHandler {
 					}
 
 					try {
-						new OomDialogController(oomDialog);
+						new OutOfMemoryDialogController(outOfMemoryDialog);
 					} catch(Exception oom) {
 						LogBuffer.println("Out of memory when trying to " +
 							"create the OomDialogController.");

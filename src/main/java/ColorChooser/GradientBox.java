@@ -102,7 +102,7 @@ public class GradientBox {
 	 *
 	 * @param point
 	 * @return */
-	protected boolean isGradientArea(final Point point) {
+	public boolean isGradientArea(final Point point) {
 
 		return gradientRect.contains(point);
 	}
@@ -115,7 +115,7 @@ public class GradientBox {
 	/** Adds a color to the gradient.
 	 *
 	 * @param newCol */
-	protected void addColor(final Color newCol) {
+	public void addColor(final Color newCol) {
 
 		float[] fractions = colorPicker.getFractions();
 
@@ -156,7 +156,7 @@ public class GradientBox {
 	}
 
 	/** Removes a color and its matching thumb from the gradient. */
-	protected void removeColor() {
+	public void removeColor() {
 
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		List<Color> colorList = colorPicker.getColorList();
@@ -182,7 +182,7 @@ public class GradientBox {
 	 * @param newCol
 	 * @param point
 	 * @return */
-	protected boolean changeColor(final Point point) {
+	public boolean changeColor(final Point point) {
 
 		List<Thumb> thumbs = colorPicker.getThumbList();
 		List<Color> colorList = colorPicker.getColorList();

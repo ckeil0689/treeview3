@@ -1,4 +1,4 @@
-package edu.stanford.genetics.treeview;
+package Controllers;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,19 +7,23 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class OomDialogController {
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.MemoryOpts;
+import Views.OutOfMemoryDialog;
 
-	private final OomDialog oomDialog;
+public class OutOfMemoryDialogController {
+
+	private final OutOfMemoryDialog outOfMemoryDialog;
 	private String xmxval;
 
-	public OomDialogController(final OomDialog oomD) {
+	public OutOfMemoryDialogController(final OutOfMemoryDialog oomD) {
 
-		this.oomDialog = oomD;
+		this.outOfMemoryDialog = oomD;
 
 		addListeners();
 
 		try {
-			oomDialog.setVisible(true);
+			outOfMemoryDialog.setVisible(true);
 		} catch(Exception e) {
 			LogBuffer.println("Possible memory exception during " +
 				"oomDialog.setVisible(true).");
@@ -34,8 +38,8 @@ public class OomDialogController {
 	 * Adds listeners to the GUI components in OomDialog.
 	 */
 	private void addListeners() {
-		oomDialog.addRestartListener(new RestartListener());
-		oomDialog.addMemoryListener(new MemoryListener());
+		outOfMemoryDialog.addRestartListener(new RestartListener());
+		outOfMemoryDialog.addMemoryListener(new MemoryListener());
 	}
 
 	/**
@@ -46,11 +50,11 @@ public class OomDialogController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			if(arg0.getSource() != oomDialog.getRestartButton()) {
+			if(arg0.getSource() != outOfMemoryDialog.getRestartButton()) {
 				return;
 			}
 
-			MemoryOpts selMem = oomDialog.getSelectedMemoryOpt();
+			MemoryOpts selMem = outOfMemoryDialog.getSelectedMemoryOpt();
 			if(selMem != null) {
 				xmxval = selMem.toJVMFlag();
 			} else {
@@ -104,7 +108,7 @@ public class OomDialogController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			MemoryOpts selMem = oomDialog.getSelectedMemoryOpt();
+			MemoryOpts selMem = outOfMemoryDialog.getSelectedMemoryOpt();
 			if(selMem != null) {
 				xmxval = selMem.toJVMFlag();
 			} else {

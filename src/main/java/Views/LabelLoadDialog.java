@@ -1,4 +1,4 @@
-package edu.stanford.genetics.treeview;
+package Views;
 
 import java.awt.Dialog;
 import java.awt.Frame;

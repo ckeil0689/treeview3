@@ -1,4 +1,4 @@
-package edu.stanford.genetics.treeview;
+package Views;
 
 import java.awt.Dimension;
 import java.awt.event.MouseWheelEvent;

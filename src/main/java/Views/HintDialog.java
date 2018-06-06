@@ -1,4 +1,4 @@
-package edu.stanford.genetics.treeview;
+package Views;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;

@@ -37,6 +37,9 @@ import javax.swing.WindowConstants;
 
 import Utilities.GUIFactory;
 import Utilities.StringRes;
+import Views.AboutDialog;
+import Views.ShortcutDialog;
+import Views.StatsDialog;
 import Views.WelcomeView;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;

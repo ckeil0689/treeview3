@@ -1,4 +1,4 @@
-package edu.stanford.genetics.treeview;
+package Controllers;
 
 import java.awt.Desktop;
 import java.awt.FileDialog;
@@ -12,10 +12,17 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import Controllers.ExportHandler;
-import Controllers.FormatType;
-import Controllers.LabelExportOption;
-import Controllers.RegionType;
+import Views.ExportDialog;
+import edu.stanford.genetics.treeview.AspectType;
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.ExportException;
+import edu.stanford.genetics.treeview.ExportOptions;
+import edu.stanford.genetics.treeview.ExportPreviewLabels;
+import edu.stanford.genetics.treeview.ExportPreviewMatrix;
+import edu.stanford.genetics.treeview.ExportPreviewTrees;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.TreeSelectionI;
+import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 

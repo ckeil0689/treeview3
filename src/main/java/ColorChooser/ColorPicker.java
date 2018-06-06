@@ -145,7 +145,7 @@ public class ColorPicker {
 	}
 
 	/** Loads the values from a given ColorSet into colorList and fractionList. */
-	protected void loadActiveColorSetValues() {
+	public void loadActiveColorSetValues() {
 
 		if(colorList == null || thumbList == null || colorExtractor == null) {
 			LogBuffer.println("Cannot load active ColorSet. Important members of ColorPicker " +
@@ -196,7 +196,7 @@ public class ColorPicker {
 	 * 
 	 * @return The new ColorSet object created from the current custom colors
 	 *         and the relative positions of the associated thumbs. */
-	protected ColorSet generateCustomColorSet() {
+	public ColorSet generateCustomColorSet() {
 
 		if(fractions.length != colorList.size()) {
 			LogBuffer.println("Did not generate custom ColorSet, because the" +
@@ -220,7 +220,7 @@ public class ColorPicker {
 	}
 
 	/** Sends the status of fractions and colors to <code>ColorExtractor</code> */
-	protected void updateColorExtractorData() {
+	public void updateColorExtractorData() {
 
 		colorExtractor.setNewParams(fractions, colorList);
 		colorExtractor.notifyObservers();
@@ -230,7 +230,7 @@ public class ColorPicker {
 	 * <code>ColorExtractor</code>.
 	 * 
 	 * @param color - The new missing <code>Color</code> */
-	protected void setMissing(final Color color) {
+	public void setMissing(final Color color) {
 
 		colorExtractor.setMissingColor(color);
 		colorExtractor.notifyObservers();
@@ -441,7 +441,7 @@ public class ColorPicker {
 	/** Returns the Color set for missing data.
 	 *
 	 * @return Color */
-	protected Color getMissing() {
+	public Color getMissing() {
 
 		return colorExtractor.getMissing();
 	}
@@ -456,12 +456,12 @@ public class ColorPicker {
 		this.thumbList = thumbs;
 	}
 
-	protected ThumbBox getThumbBox() {
+	public ThumbBox getThumbBox() {
 
 		return thumbBox;
 	}
 
-	protected GradientBox getGradientBox() {
+	public GradientBox getGradientBox() {
 
 		return gradientBox;
 	}
@@ -472,7 +472,7 @@ public class ColorPicker {
 		return thumbList.size();
 	}
 
-	protected Thumb getThumb(final int index) {
+	public Thumb getThumb(final int index) {
 
 		return thumbList.get(index);
 	}
@@ -510,7 +510,7 @@ public class ColorPicker {
 	 * and be larger in size than 2 (the boundary thumbs).
 	 * 
 	 * @return */
-	protected boolean isRemovalAllowed() {
+	public boolean isRemovalAllowed() {
 
 		if(!areFracsAndThumbsSynced()) {
 			LogBuffer.println("Fractions and the list of thumbs are not synced. Removal of thumb not allowed.");

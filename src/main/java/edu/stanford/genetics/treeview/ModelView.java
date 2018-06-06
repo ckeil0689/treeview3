@@ -32,7 +32,7 @@ public abstract class ModelView extends JPanel implements Observer,
 
 	protected ViewFrame viewFrame = null;
 
-	protected boolean hasMouse;
+	public boolean hasMouse;
 
 	/* here so that subclass will work with BufferedModelView too */
 	protected boolean offscreenValid;

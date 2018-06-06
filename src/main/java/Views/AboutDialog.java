@@ -1,4 +1,4 @@
-package edu.stanford.genetics.treeview;
+package Views;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;

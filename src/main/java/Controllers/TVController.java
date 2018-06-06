@@ -24,27 +24,24 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
-import ColorChooser.ColorChooserController;
 import ColorChooser.ColorChooserUI;
+import Utilities.CustomDetailsConfirmDialog;
 import Utilities.StringRes;
 import Views.ClusterDialog;
 import Views.ClusterView;
-import Views.DataImportController;
 import Views.DataImportDialog;
+import Views.ExportDialog;
+import Views.OutOfMemoryDialog;
 import edu.stanford.genetics.treeview.CdtFilter;
 import edu.stanford.genetics.treeview.CopyType;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.DataModelFileType;
-import edu.stanford.genetics.treeview.ExportDialog;
-import edu.stanford.genetics.treeview.ExportDialogController;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LabelSettings;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
-import edu.stanford.genetics.treeview.OomDialog;
-import edu.stanford.genetics.treeview.OomDialogController;
 import edu.stanford.genetics.treeview.RowListMaker;
 import edu.stanford.genetics.treeview.TreeSelection;
 import edu.stanford.genetics.treeview.TreeSelectionI;
@@ -337,10 +334,10 @@ public class TVController implements Observer {
 			loader.execute();
 		} catch(final OutOfMemoryError e) {
 			//Give the user the opportunity to restart with more memory
-			OomDialog oomDialog = null;
+			OutOfMemoryDialog outOfMemoryDialog = null;
 			try {
 				//Nothing to suggest, so send empty string
-				oomDialog = new OomDialog("");
+				outOfMemoryDialog = new OutOfMemoryDialog("");
 			} catch(ExportException ee) {
 				LogBuffer.println(ee.getLocalizedMessage());
 				ee.printStackTrace();
@@ -348,7 +345,7 @@ public class TVController implements Observer {
 			}
 
 			try {
-				new OomDialogController(oomDialog);
+				new OutOfMemoryDialogController(outOfMemoryDialog);
 			} catch(Exception oom) {
 				LogBuffer.println("Out of memory when trying to " +
 					"create the OomDialogController.");
@@ -413,9 +410,9 @@ public class TVController implements Observer {
 				"If that doesn't work, there may be an unexpected formatting " +
 				"or<BR>\nfile format issue.<BR>\n";
 
-			OomDialog oomDialog = null;
+			OutOfMemoryDialog outOfMemoryDialog = null;
 			try {
-				oomDialog = new OomDialog(sugg);
+				outOfMemoryDialog = new OutOfMemoryDialog(sugg);
 			} catch(ExportException ee) {
 				LogBuffer.println("Exception while trying to create an " +
 					"OomDialog.");
@@ -427,7 +424,7 @@ public class TVController implements Observer {
 			LogBuffer.println("Now creating OomDialogController...");
 
 			try {
-				new OomDialogController(oomDialog);
+				new OutOfMemoryDialogController(outOfMemoryDialog);
 			} catch(Exception oom) {
 				LogBuffer.println("Exception while trying to create an " +
 					"OomDialogController.");

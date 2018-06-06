@@ -67,7 +67,7 @@ public class BoundaryThumb extends Thumb {
 		g2d.fill(innerthumbPath);
 	}
 
-	protected boolean isMin() {
+	public boolean isMin() {
 
 		return isMin;
 	}

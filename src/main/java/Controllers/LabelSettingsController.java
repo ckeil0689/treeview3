@@ -19,9 +19,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import Utilities.StringRes;
+import Views.LabelLoadDialog;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LabelInfo;
-import edu.stanford.genetics.treeview.LabelLoadDialog;
 import edu.stanford.genetics.treeview.LoadException;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.LabelSettings;

@@ -1,4 +1,4 @@
-package edu.stanford.genetics.treeview;
+package Controllers;
 
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -30,7 +30,12 @@ import com.dd.plist.NSDictionary;
 import com.dd.plist.NSNumber;
 import com.dd.plist.PropertyListParser;
 
-import Controllers.Controller;
+import edu.stanford.genetics.treeview.ConfigNodePersistent;
+import edu.stanford.genetics.treeview.DataModel;
+import edu.stanford.genetics.treeview.DataTicker;
+import edu.stanford.genetics.treeview.IMVMouseAdapter;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.TreeSelectionI;
 import edu.stanford.genetics.treeview.model.TVModel;
 import edu.stanford.genetics.treeview.plugin.dendroview.ArrayDrawer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorExtractor;

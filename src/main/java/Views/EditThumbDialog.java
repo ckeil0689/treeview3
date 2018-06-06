@@ -1,4 +1,4 @@
-package ColorChooser;
+package Views;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -12,6 +12,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import ColorChooser.BoundaryThumb;
+import ColorChooser.ColorIcon;
+import ColorChooser.Thumb;
+import ColorChooser.ThumbBox;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.Helper;
@@ -81,7 +85,7 @@ public class EditThumbDialog extends CustomDialog {
 		setupLayout();
 	}
 
-	protected double showDialog(JPanel parent) {
+	public double showDialog(JPanel parent) {
 
 		setVisible(true);
 		return finalX; // returns when dialog closes!

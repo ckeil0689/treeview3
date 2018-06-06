@@ -1,4 +1,4 @@
-package edu.stanford.genetics.treeview;
+package Views;
 
 import java.awt.event.ActionListener;
 import java.lang.management.ManagementFactory;
@@ -11,11 +11,14 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import edu.stanford.genetics.treeview.ExportException;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.MemoryOpts;
 import Utilities.CustomDialog;
 import Utilities.GUIFactory;
 import Utilities.StringRes;
 
-public class OomDialog extends CustomDialog {
+public class OutOfMemoryDialog extends CustomDialog {
 
 	private static final long serialVersionUID = 1L;
 
@@ -26,7 +29,7 @@ public class OomDialog extends CustomDialog {
 	private MemoryOpts selmem;
 	private String trymore;
 
-	public OomDialog(final String suggestions)
+	public OutOfMemoryDialog(final String suggestions)
 		throws ExportException {
 
 		super("Out of Memory");

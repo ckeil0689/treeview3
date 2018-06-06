@@ -1,4 +1,4 @@
-package edu.stanford.genetics.treeview;
+package Views;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -30,6 +30,14 @@ import net.miginfocom.swing.MigLayout;
 
 import org.freehep.graphicsio.PageConstants;
 
+import edu.stanford.genetics.treeview.AspectType;
+import edu.stanford.genetics.treeview.ExportException;
+import edu.stanford.genetics.treeview.ExportOptions;
+import edu.stanford.genetics.treeview.ExportPreviewLabels;
+import edu.stanford.genetics.treeview.ExportPreviewMatrix;
+import edu.stanford.genetics.treeview.ExportPreviewTrees;
+import edu.stanford.genetics.treeview.LogBuffer;
+import edu.stanford.genetics.treeview.PaperType;
 import Controllers.ExportHandler;
 import Controllers.FormatType;
 import Controllers.RegionType;
