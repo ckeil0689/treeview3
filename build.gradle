@@ -128,7 +128,12 @@ macAppBundle {
   //alias to get automatically created, so I created a single transparent pixel
   //background png image
   backgroundImage = "src/main/resources/dmg_bkgd.png"
+  //codeSign certificate information:
+  //Princeton "Developer ID Application" Certificate ID string:
+  certIdentity = "Y3TW367T4G"
 }
+
+createDmg.dependsOn(codeSign)
 
 //Deb builder stuff (creates shell script & puts in /usr/local) - Use buildDeb
 ospackage {
