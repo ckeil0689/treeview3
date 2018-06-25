@@ -45,8 +45,8 @@ OPTIONAL: If you would like to edit the default amount of memory to assign to Tr
 3. Drag TreeView3.app to your Applications folder.
 4. Double-click TreeView3
 5. Security steps (if necessary)
-    * If your security preferences prevent you from opening TreeView3, right-(or control-)click the TreeView3 app and click "Open"
-    * If you are prompted to confirm open of an app downloaded from the internet from an unknown developer (Princeton University), click "Open".
+    * If you are prompted to confirm open of an app downloaded from the internet, click "Open".
+    * If your security preferences prevent you from opening TreeView3, dismiss the warning, then right-(or control-)click the TreeView3 app and click "Open".
 6. If you have used a previous version of TreeView3: Select File->Preferences->Reset Preferences & click reset.  You will have to restart TreeView3 afterwards.
 
 OPTIONAL: If you would like to edit the default amount of memory to assign to TreeView3, refer to the [instructions here](https://bitbucket.org/TreeView3Dev/treeview3/wiki/OutOfMemory).
