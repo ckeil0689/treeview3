@@ -262,7 +262,10 @@ setupBuilder {
 }
 
 msi {
-  from( 'scripts/win' ) {
+  String contents = new File( 'scripts/win/TreeView3.template' ).getText( 'UTF-8' )
+  contents = contents.replaceAll( 'HASHSTR', getVersionName() )
+  new File( 'scripts/win/final/TreeView3.bat' ).write( contents, 'UTF-8' )
+  from( 'scripts/win/final' ) {
     include '*'
     fileMode 0755
   }
