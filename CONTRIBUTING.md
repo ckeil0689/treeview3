@@ -109,13 +109,13 @@ To release a build, a package must be created for 4 systems and the package must
 - Double-click to mount & follow instructions
 - Run via start menu entry (confirm icon)
 
-#### Debian
+#### Debian (can also be built in RedHat)
 - `gradle buildDeb`
 - `sudo dpkg -i *.deb`
 - `treeview3`
 - Also run via start menu entry (confirm icon)
 
-#### RedHat
+#### RedHat (can also be built in Debian)
 - `gradle buildRpm`
 - `sudo dpkg -i *.rpm`
 - `treeview3`
