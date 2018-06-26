@@ -5,15 +5,12 @@ package Utilities;
  * so that other classes throughout the program can centrally access them. This
  * helps to prevent spelling errors, ensures consistency etc. when certain
  * Strings are used more than once.
- *
- * @author CKeil
- *
  */
 public class StringRes {
 
 	/* Global Application Fields */
 	/* Version of application */
-	public final static String versionTag = "3.0alpha03";
+	public final static String versionTag = "3.0beta01";
 	
 	/* Versioning following MAJOR.MINOR.PATCH - See http://semver.org/ */
 	public final static String preferencesVersionTag = "0.1.0-alpha";
@@ -76,8 +73,7 @@ public class StringRes {
 	public static final String menu_About = "About...";
 	public static final String menu_ShowLog = "Show Log...";
 	// There's currently no documentation page - don't need it for the first
-	// release
-	// public static final String menu_Docs = "Documentation...";
+	// release public static final String menu_Docs = "Documentation...";
 	public static final String menu_Feedback = "Send Feedback...";
 	public static final String menu_NewWindow = "New Window";
 	public static final String menu_QuitWindow = "Close Window";
