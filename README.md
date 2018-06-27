@@ -21,7 +21,7 @@ INSTALL & RUN
 
 ## Windows ##
 
-1. Download the [msi package](https://bitbucket.org/TreeView3Dev/treeview3/downloads/treeview3-beta1-win-f4a69b16.msi) from the [download page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
+1. Download the [msi package](https://bitbucket.org/TreeView3Dev/treeview3/downloads/treeview3-beta1-win-bdc455da.msi) from the [download page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
 2. Double-click the downloaded msi package.
 3. Follow the on-screen instructions in the TreeView3 Setup Wizard.
     * Click Next.
