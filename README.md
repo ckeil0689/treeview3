@@ -21,7 +21,7 @@ INSTALL & RUN
 
 ## Windows ##
 
-1. Download the [msi package](https://bitbucket.org/TreeView3Dev/treeview3/downloads/treeview3-beta1-win-e6fae8fa.msi) from the [download page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
+1. Download the [msi package](https://bitbucket.org/TreeView3Dev/treeview3/downloads/treeview3-beta1-win-f4a69b16.msi) from the [download page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
 2. Double-click the downloaded msi package.
 3. Follow the on-screen instructions in the TreeView3 Setup Wizard.
     * Click Next.
@@ -40,7 +40,7 @@ OPTIONAL: If you would like to edit the default amount of memory to assign to Tr
 
 ## Mac ##
 
-1. Download the [dmg package](https://bitbucket.org/TreeView3Dev/treeview3/downloads/treeview3-beta1-osx-e6fae8fa.dmg) from the [download page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
+1. Download the [dmg package](https://bitbucket.org/TreeView3Dev/treeview3/downloads/treeview3-beta1-osx-f4a69b16.dmg) from the [download page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
 2. Double-click the downloaded dmg package.
 3. Drag TreeView3.app to your Applications folder.
 4. Double-click TreeView3
@@ -53,7 +53,7 @@ OPTIONAL: If you would like to edit the default amount of memory to assign to Tr
 
 ## Linux (Debian) ##
 
-1. Download the [deb package](https://bitbucket.org/TreeView3Dev/treeview3/downloads/treeview3-beta1-debian-e6fae8fa.deb) from the [download page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
+1. Download the [deb package](https://bitbucket.org/TreeView3Dev/treeview3/downloads/treeview3-beta1-debian-f4a69b16.deb) from the [download page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
 2. Open a terminal.
 3. cd to the location of the deb package.
 4. Run the following commands.
@@ -67,7 +67,7 @@ Note, the `./` in front of the deb package (or rather, the path to the package) 
 
 ## Linux (Redhat) ##
 
-1. Download the [rpm package](https://bitbucket.org/TreeView3Dev/treeview3/downloads/treeview3-beta1-redhat-e6fae8fa.rpm) from the [download page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
+1. Download the [rpm package](https://bitbucket.org/TreeView3Dev/treeview3/downloads/treeview3-beta1-redhat-f4a69b16.rpm) from the [download page](https://bitbucket.org/TreeView3Dev/treeview3/wiki/Home)
 2. Open a terminal.
 3. cd to the location of the rpm package.
 4. Run the following commands.
