@@ -47,6 +47,9 @@ public class TreeView3 {
 			//The latest Mac OS X doesn't have growboxes, so this is here primarily
 			//for older versions of OS X
 			System.setProperty("apple.awt.showGrowBox", "true");
+			//Capture quit events to trigger close window so we can save the
+			//clustering, etc..  Lots to do when quitting...
+			System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
 		}
 	}
 
