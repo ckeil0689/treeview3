@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.prefs.Preferences;
 
 import Utilities.Helper;
-import Views.DataImportController;
+import Controllers.DataImportController;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 

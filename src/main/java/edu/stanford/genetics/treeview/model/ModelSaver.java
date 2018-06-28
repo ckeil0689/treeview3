@@ -16,7 +16,7 @@ import Cluster.TreeFileWriter;
 import Controllers.TVController;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
-import edu.stanford.genetics.treeview.HintDialog;
+import Views.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class ModelSaver {

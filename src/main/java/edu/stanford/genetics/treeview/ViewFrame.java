@@ -36,6 +36,19 @@ import Cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 
+//com.apple.eawt.Application is used to set the app icon and can allow setup of
+//apple-specific functionality, such as App menu items and code hooks for
+//quitting, etc.  See the following link on how to release eclipse access
+//restrictions for this import:
+//https://stackoverflow.com/questions/25222811/
+//import com.apple.eawt.*;
+//See the following for how to hook into the application menu items and other
+//things:
+//https://developer.apple.com/library/content/documentation/Java/Conceptual/
+//Java14Development/07-NativePlatformIntegration/NativePlatformIntegration.html
+//Currently commented out because it won't compile on other OS's without some
+//effort.
+
 /* BEGIN_HEADER                                                   TreeView 3
 *
 * Please refer to our LICENSE file if you wish to make changes to this software
@@ -87,11 +100,8 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public ViewFrame(String title, final Preferences mainConfigNode) {
 
-		// TODO replace with static method when PR is merged
-		final String os = System.getProperty("os.name").toLowerCase();
-		final boolean isMac = os.startsWith("mac os x");
-		if(isMac) {
-			// no app name in frame title
+		if(isMac()) {
+			// no app name in frame title on macs
 			title = "";
 		}
 
@@ -110,11 +120,18 @@ public abstract class ViewFrame extends Observable implements Observer,
 		final int height = mainConfigNode.getInt("frame_height", init_height);
 
 		appFrame.setBounds(left, top, width, height);
-		
+
 		//Handle app quit via a confirmation box, so set the default close
 		//operation to do nothing. Closing will be handled by an explicit call
 		//to dispose.
 		appFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+		if(!isMac()) {
+			//The following sets the java executable icon in the windows taskbar
+			appFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(ClassLoader.
+				getSystemResource("logo.png")));
+		}
+
 		setupWindowPosListener();
 	}
 
@@ -592,6 +609,16 @@ public abstract class ViewFrame extends Observable implements Observer,
 	abstract public void generateView(final ViewType view);
 
 	/**
+	 * Tests if the current system is running on a version of OSX
+	 * @return true if the operating system on which the JVM runs is OSX
+	 */
+	public static boolean isMac() {
+		final String os = System.getProperty("os.name").toLowerCase();
+		final boolean isMac = os.startsWith("mac os x");
+		return isMac;
+	}
+
+	/**
 	 * Decides which dialog option to use for opening files, depending on the
 	 * operating system of the user. This is meant to ensure a more native feel
 	 * of the application on the user's system although using FileDialog isn't
@@ -602,11 +629,10 @@ public abstract class ViewFrame extends Observable implements Observer,
 	 */
 	public File selectFile() throws LoadException {
 
-		final boolean isMacOrUnix = System.getProperty("os.name").contains(
-				"Mac")
-				|| System.getProperty("os.name").contains("nix")
-				|| System.getProperty("os.name").contains("nux")
-				|| System.getProperty("os.name").contains("aix");
+		final boolean isMacOrUnix = isMac() ||
+			System.getProperty("os.name").contains("nix") ||
+			System.getProperty("os.name").contains("nux") ||
+			System.getProperty("os.name").contains("aix");
 
 		return isMacOrUnix ? selectFileNix() : selectFileWin();
 	}

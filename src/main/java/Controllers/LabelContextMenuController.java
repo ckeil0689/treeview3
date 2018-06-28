@@ -1,11 +1,11 @@
-package edu.stanford.genetics.treeview.plugin.dendroview;
+package Controllers;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import Controllers.TVController;
 import Utilities.StringRes;
 import edu.stanford.genetics.treeview.CopyType;
+import edu.stanford.genetics.treeview.plugin.dendroview.LabelContextMenu;
 
 public class LabelContextMenuController {
 

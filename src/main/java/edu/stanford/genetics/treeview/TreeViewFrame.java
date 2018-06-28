@@ -12,6 +12,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -19,6 +20,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.ActionMap;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -36,6 +38,9 @@ import javax.swing.WindowConstants;
 
 import Utilities.GUIFactory;
 import Utilities.StringRes;
+import Views.AboutDialog;
+import Views.ShortcutDialog;
+import Views.StatsDialog;
 import Views.WelcomeView;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
@@ -112,7 +117,14 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 
 		/* Most recently used files */
 		setupFileMru();
-    setLoaded(false);
+		setLoaded(false);
+
+		//Set the java executable icon for non-mac systems
+		if(!isMac()) {
+			URL iconPath =
+				getClass().getClassLoader().getResource("logo.png");
+			appFrame.setIconImage(new ImageIcon(iconPath).getImage());
+		}
 	}
 
 	@Override
@@ -438,18 +450,15 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private void buildMenuBar() {
 
 		LogBuffer.println("Building new MenuBar.");
-		
+
 		menuBar = new JMenuBar();
 		appFrame.setJMenuBar(menuBar);
 
 		stackMenuList = new ArrayList<JMenuItem>();
 
-		final String os = System.getProperty("os.name").toLowerCase();
-		final boolean isMac = os.startsWith("mac os x");
+		constructFileMenu(isMac());
+		constructHelpMenu(isMac());
 
-		constructFileMenu(isMac);
-		constructHelpMenu(isMac);
-		
 		// This will cause TVController to attach appropriate listeners 
 		// to JMenuItems.
 		setChanged();
@@ -457,13 +466,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	}
 
 	/**
-<<<<<<< HEAD
-	 * @param isMac - (TODO unused but may change) indicates whether the program 
-	 * runs on macOS or not.  
-=======
 	 * @param isMac - (TODO unused but may change) indicates whether the program
 	 * runs on macOS or not.
->>>>>>> master
 	 */
 	private void constructFileMenu(final boolean isMac) {
 
@@ -883,16 +887,13 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	private void setLoadedTitle() {
 
 		String newTitle;
-		// TODO replace with static method when PR is merged
-		final String os = System.getProperty("os.name").toLowerCase();
-		final boolean isMac = os.startsWith("mac os x");
-	  if(isMac) {
-	  	// no app name in frame title
-	  	newTitle = title;
-	  } else {
-	  	newTitle = StringRes.appName + ": " + title;
-	  }
-	  
+		if(isMac()) {
+			// no app name in frame title
+			newTitle = title;
+		} else {
+			newTitle = StringRes.appName + ": " + title;
+		}
+
 		appFrame.setTitle(newTitle);
 	}
 
@@ -913,8 +914,8 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	public FileSet findFileSet(final JMenuItem menuItem) {
 
 		if (mruFileSetList.size() != mruFilesMenuList.size()) {
-			LogBuffer.println("Sizes of FileSetList and FileMenuList in "
-					+ "TVFrame don't match.");
+			LogBuffer.println("Sizes of FileSetList and FileMenuList in " +
+				"TVFrame don't match.");
 			return null;
 		}
 

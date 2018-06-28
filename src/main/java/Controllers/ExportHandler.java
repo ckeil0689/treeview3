@@ -39,9 +39,11 @@ import org.freehep.graphicsio.pdf.PDFGraphics2D;
 import org.freehep.graphicsio.ps.PSGraphics2D;
 import org.freehep.graphicsio.svg.SVGGraphics2D;
 
+import Views.AboutDialog;
+import Views.ExportDialog;
+import Views.OutOfMemoryDialog;
+import Views.ExportDialog.ExportBarDialog;
 import edu.stanford.genetics.treeview.AspectType;
-import edu.stanford.genetics.treeview.ExportDialog;
-import edu.stanford.genetics.treeview.ExportDialog.ExportBarDialog;
 import edu.stanford.genetics.treeview.ExportException;
 import edu.stanford.genetics.treeview.ExportOptions;
 import edu.stanford.genetics.treeview.LogBuffer;
@@ -838,11 +840,29 @@ public class ExportHandler {
 					LogBuffer.println("Export NOT too big.  [x" + x + " * y" +
 						y + "] <= [" + MAX_IMAGE_SIZE + "].");
 					oome.printStackTrace();
-					showWarning("Out of memory.\n\nNote, you may be able to " +
-						"export a smaller portion of the matrix or select " +
-						"fewer\noptions which increase image size or " +
-						"resolution (such as the inclusion of labels\nor " +
-						"selecting the as-seen-on-screen aspect ratio).");
+					String sugg = "You may be able to export a smaller " +
+						"portion of the matrix or select fewer<BR>\n" +
+						"options which increase image size or resolution " +
+						"(such as the inclusion of<BR>\nlabels or selecting " +
+						"the as-seen-on-screen aspect ratio).";
+
+					OutOfMemoryDialog outOfMemoryDialog = null;
+					try {
+						outOfMemoryDialog = new OutOfMemoryDialog(sugg);
+					} catch(ExportException ee) {
+						LogBuffer.println(ee.getLocalizedMessage());
+						ee.printStackTrace();
+						showWarning(ee.getLocalizedMessage());
+					}
+
+					try {
+						new OutOfMemoryDialogController(outOfMemoryDialog);
+					} catch(Exception oom) {
+						LogBuffer.println("Out of memory when trying to " +
+							"create the OomDialogController.");
+						oom.printStackTrace();
+						showWarning(oom.getLocalizedMessage());
+					}
 				}
 				setExportSuccessful(false);
 			}

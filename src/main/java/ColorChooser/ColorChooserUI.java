@@ -127,7 +127,7 @@ public class ColorChooserUI extends CustomDialog {
 	 * 
 	 * @param newColor
 	 *          The new color to be displayed. */
-	protected void updateMissingColorIcon(Color newColor) {
+	public void updateMissingColorIcon(Color newColor) {
 
 		if(missingColorIcon == null || missingBtn == null) {
 			LogBuffer.println("Could not update the color icon of the 'Missing Color' button.");
@@ -142,7 +142,7 @@ public class ColorChooserUI extends CustomDialog {
 	 * thumb selected or not.
 	 * 
 	 * @param enabled */
-	protected void setSelectionDependentBtnStatus(boolean editEnabled,
+	public void setSelectionDependentBtnStatus(boolean editEnabled,
 																								boolean removeEnabled) {
 
 		editBtn.setEnabled(editEnabled);
@@ -153,71 +153,71 @@ public class ColorChooserUI extends CustomDialog {
 	 * actual color gradient and thumbs.
 	 *
 	 * @return */
-	protected ColorPicker getColorPicker() {
+	public ColorPicker getColorPicker() {
 
 		return colorPicker;
 	}
 
 	/* ------------ Accessors ------------- */
-	protected JPanel getMainPanel() {
+	public JPanel getMainPanel() {
 
 		return contentPanel;
 	}
 
-	protected JComboBox<ColorSchemeType> getPresetChoices() {
+	public JComboBox<ColorSchemeType> getPresetChoices() {
 
 		return presetChoice;
 	}
 
-	protected boolean isCustomSelected() {
+	public boolean isCustomSelected() {
 
 		return(getPresetChoices().getSelectedItem() == ColorSchemeType.CUSTOM);
 	}
 
 	/* ------- GUI component listeners ------------ */
 
-	protected void addThumbSelectListener(final MouseListener l) {
+	public void addThumbSelectListener(final MouseListener l) {
 
 		colorPicker.getContainerPanel().addMouseListener(l);
 	}
 
-	protected void addThumbMotionListener(final MouseAdapter l) {
+	public void addThumbMotionListener(final MouseAdapter l) {
 
 		colorPicker.getContainerPanel().addMouseListener(l);
 		colorPicker.getContainerPanel().addMouseMotionListener(l);
 	}
 
-	protected void addAddListener(final ActionListener l) {
+	public void addAddListener(final ActionListener l) {
 
 		addBtn.addActionListener(l);
 	}
 
-	protected void addRemoveListener(final ActionListener l) {
+	public void addRemoveListener(final ActionListener l) {
 
 		removeBtn.addActionListener(l);
 	}
 
-	protected void addPresetChoiceListener(final ItemListener l) {
+	public void addPresetChoiceListener(final ItemListener l) {
 
 		presetChoice.addItemListener(l);
 	}
 
-	protected void addMissingListener(final ActionListener l) {
+	public void addMissingListener(final ActionListener l) {
 
 		missingBtn.addActionListener(l);
 	}
 
-	protected void addEditListener(final ActionListener l) {
+	public void addEditListener(final ActionListener l) {
 
 		editBtn.addActionListener(l);
 	}
 
-	protected void addSaveChangesListener(final ActionListener l) {
+	public void addSaveChangesListener(final ActionListener l) {
 
 		saveBtn.addActionListener(l);
 	}
 
-	protected void addDialogCloseListener(final WindowListener l) {
+	public void addDialogCloseListener(final WindowListener l) {
 
 		this.addWindowListener(l);
 	}

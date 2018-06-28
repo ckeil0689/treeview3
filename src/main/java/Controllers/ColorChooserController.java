@@ -1,4 +1,4 @@
-package ColorChooser;
+package Controllers;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -16,6 +16,12 @@ import java.util.Observable;
 import javax.swing.JColorChooser;
 import javax.swing.Timer;
 
+import ColorChooser.ColorChooserUI;
+import ColorChooser.ColorPicker;
+import ColorChooser.ColorSchemeType;
+import ColorChooser.GradientBox;
+import ColorChooser.Thumb;
+import ColorChooser.ThumbBox;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorPresets;
 import edu.stanford.genetics.treeview.plugin.dendroview.ColorSet;

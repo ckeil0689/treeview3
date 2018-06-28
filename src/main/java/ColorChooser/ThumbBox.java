@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 
 import Utilities.GUIFactory;
 import Utilities.Helper;
+import Views.EditThumbDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class ThumbBox {
@@ -102,7 +103,7 @@ public class ThumbBox {
 	 * selects a thumb if it is not yet selected, deselects it otherwise.
 	 *
 	 * @param point - A Point which one of the thumbs may contain. */
-	protected void selectThumbAtPoint(final Point point) {
+	public void selectThumbAtPoint(final Point point) {
 
 		for(final Thumb t : colorPicker.getThumbList()) {
 			if(t.contains((int) point.getX(), (int) point.getY())) {
@@ -159,7 +160,7 @@ public class ThumbBox {
 	}
 
 	/** Sets all thumbs' selection status to 'false'. */
-	protected void deselectAllThumbs() {
+	public void deselectAllThumbs() {
 
 		List<Thumb> thumbs = colorPicker.getThumbList();
 
@@ -173,7 +174,7 @@ public class ThumbBox {
 	 * useful to implement the drag-to-position feature to allow sliding thumbs.
 	 * 
 	 * @param inputX - New x-coordinate of the selected thumb. */
-	protected void dragInnerThumbTo(int inputX) {
+	public void dragInnerThumbTo(int inputX) {
 
 		if(selectedThumb == null) {
 			LogBuffer.println("Selected thumb was null.");
@@ -354,7 +355,7 @@ public class ThumbBox {
 	 * 
 	 * @param point
 	 *          Coordinate point of the clicked area. */
-	protected void editClickedThumb(final Point point) {
+	public void editClickedThumb(final Point point) {
 
 		int index = 0;
 		for(final Thumb t : colorPicker.getThumbList()) {
@@ -367,7 +368,7 @@ public class ThumbBox {
 	}
 
 	/** Opens the edit dialog for the currently selected thumb. */
-	protected void editSelectedThumb() {
+	public void editSelectedThumb() {
 
 		int selected = getSelectedThumbIndex();
 
@@ -663,7 +664,7 @@ public class ThumbBox {
 	 *          in the data range.
 	 * @return A double value between minimum and maximum of the currently
 	 *         relevant data range for coloring. */
-	protected double calcThumbVal(final int thumbIndex) {
+	public double calcThumbVal(final int thumbIndex) {
 
 		double range = colorPicker.getRange();
 		double minVal = colorPicker.getMinVal();
@@ -689,7 +690,7 @@ public class ThumbBox {
 	 * 
 	 * @return The index of the selected thumb in thumbList. If no thumb is
 	 *         selected, the function returns -1. */
-	protected int getSelectedThumbIndex() {
+	public int getSelectedThumbIndex() {
 
 		if(selectedThumb == null) { return -1; }
 
@@ -742,7 +743,7 @@ public class ThumbBox {
 	 * @param point
 	 *          The point to be checked.
 	 * @return boolean - Whether a thumb is located at the point or not. */
-	protected boolean isPointInThumb(final Point point) {
+	public boolean isPointInThumb(final Point point) {
 
 		boolean containsThumb = false;
 
@@ -947,7 +948,7 @@ public class ThumbBox {
 	 * 
 	 * @param t
 	 *          The new thumb to be set as the selected one. */
-	protected void setSelectedThumb(Thumb t) {
+	public void setSelectedThumb(Thumb t) {
 
 		this.selectedThumb = t;
 
@@ -975,7 +976,7 @@ public class ThumbBox {
 	 * there generally is a thumb in selected status.
 	 * 
 	 * @return boolean */
-	protected boolean hasSelectedThumb() {
+	public boolean hasSelectedThumb() {
 
 		return(selectedThumb != null);
 	}

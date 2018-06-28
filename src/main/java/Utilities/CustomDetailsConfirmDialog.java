@@ -6,10 +6,7 @@
  * END_HEADER
  */
 
-package Controllers;
-
-import Utilities.CustomDialog;
-import Utilities.GUIFactory;
+package Utilities;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -39,7 +36,7 @@ public class CustomDetailsConfirmDialog extends CustomDialog {
 	 * @param details - The text of the initially hidden details scrollpane
 	 * @param doString - the text on the 'OK' button */
 	public CustomDetailsConfirmDialog(String title,String summary,
-										String details,String doString) {
+		String details,String doString) {
 
 		super(title);
 

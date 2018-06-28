@@ -1,4 +1,4 @@
-package Views;
+package Controllers;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,6 +10,7 @@ import javax.swing.JCheckBox;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import Views.DataImportDialog;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.model.DataLoadInfo;
@@ -18,20 +19,20 @@ import edu.stanford.genetics.treeview.model.PreviewLoader;
 public class DataImportController {
 
 	public final static String TAB_DELIM = "\\t";
-	public final static String COMMA_DELIM = ",";
-	public final static String SEMICOLON_DELIM = ";";
-	public final static String SPACE_DELIM = "\\s";
+	private final static String COMMA_DELIM = ",";
+	private final static String SEMICOLON_DELIM = ";";
+	private final static String SPACE_DELIM = "\\s";
 
 	private final DataImportDialog previewDialog;
 	private FileSet fileSet;
-	private String selectedDelimiter = TAB_DELIM;
+	private String selectedDelimiter;
 
 	public DataImportController(final String selectedDelimiter) {
 
 		this.previewDialog = null;
 		this.selectedDelimiter = selectedDelimiter;
 	}
-	
+
 	public DataImportController(DataImportDialog dialog) {
 
 		this.previewDialog = dialog;
@@ -47,13 +48,9 @@ public class DataImportController {
 		detectDataBoundaries(null);
 	}
 
-	/**
-	 * Adds all listeners to GUI components.
-	 */
 	private void addAllListeners() {
 
 		previewDialog.addProceedBtnListener(new ProceedListener());
-		previewDialog.addCancelBtnListener(new CancelListener());
 		previewDialog.addDelimCheckBoxesListener(new DelimiterListener());
 		previewDialog.addSpinnerListeners(new LabelIncludeListener());
 		previewDialog.addDataDetectListener(new DataDetectionListener());
@@ -93,12 +90,12 @@ public class DataImportController {
 		List<JCheckBox> delimiters = previewDialog.getDelimiterList();
 
 		for (JCheckBox cb : delimiters) {
+
 			if (cb.isSelected()) {
 				final int idx = delimiters.indexOf(cb);
 				if (addCount++ > 0) {
 					selectedDelimiter += "|" + getDelimiter(idx);
-				} 
-				else {
+				} else {
 					selectedDelimiter += getDelimiter(idx);
 				}
 			}
@@ -131,19 +128,6 @@ public class DataImportController {
 		public void actionPerformed(ActionEvent e) {
 
 			previewDialog.setDelimiterForResult(selectedDelimiter);
-			previewDialog.setVisible(false);
-			previewDialog.dispose();
-		}
-	}
-	
-	private class CancelListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			LogBuffer.println("User cancelled file import.");
-			
-			previewDialog.clearResult();
 			previewDialog.setVisible(false);
 			previewDialog.dispose();
 		}

@@ -37,22 +37,22 @@ public class LabelContextMenu extends JPopupMenu {
 		this.add(clipboardMenu);
 	}
 
-	protected void addStyleListener(ActionListener l) {
+	public void addStyleListener(ActionListener l) {
 
 		labelStyles.addActionListener(l);
 	}
 	
-	protected void addCopyAllListener(ActionListener l) {
+	public void addCopyAllListener(ActionListener l) {
 
 		copyAll.addActionListener(l);
 	}
 	
-	protected void addCopySelectedListener(ActionListener l) {
+	public void addCopySelectedListener(ActionListener l) {
 
 		copySelected.addActionListener(l);
 	}
 	
-	protected void addCopyVisibleListener(ActionListener l) {
+	public void addCopyVisibleListener(ActionListener l) {
 
 		copyVisibleMatrix.addActionListener(l);
 	}
