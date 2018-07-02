@@ -125,9 +125,9 @@ TreeView3 is designed to be intuitive and easy to use. If anything is unclear, c
 HOW TO CITE
 ===========
 
-The manuscript describing Treeview 3.0 is currently in preparation. In the meantime, if you have used the latest pre-release version of the software (alpha 3) and wish to cite the source, please use the following reference:
+The manuscript describing Treeview 3.0 is currently in preparation. In the meantime, if you have used the latest pre-release version of the software (beta 1) and wish to cite the source, please use the following reference:
 
-> Keil C, Leach RW, Faizaan SM, Bezawada S, Parsons L, Baryshnikova A. (2016). Treeview 3.0 (alpha 3) - Visualization and analysis of large data matrices [Data set]. Zenodo. http://doi.org/10.5281/zenodo.160573
+> Keil C, Leach RW, Faizaan SM, Bezawada S, Parsons L, Baryshnikova A. (2016). Treeview 3.0 (beta 1) - Visualization and analysis of large data matrices [Data set]. Zenodo. http://doi.org/10.5281/zenodo.1303402
 
 
 DEVELOPERS
