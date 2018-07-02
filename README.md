@@ -155,12 +155,3 @@ LICENSE
 =======
 
 Treeview 3.0 is released under the MIT license, which can be found [here](https://bitbucket.org/TreeView3Dev/treeview3/src/85ca08ccd77f32f80d1f219aaf8ec23898a29828/LICENSE?at=master&fileviewer=file-view-default).
-
-DEPENDENCIES
-============
-
-* Java TreeView (https://sourceforge.net/projects/jtreeview/)
-* FreeHep (http://java.freehep.org/license.html)
-* MigLayout (http://www.miglayout.com/)
-* SwingX - Autocompletion (http://www.java2s.com/Code/Jar/s/Downloadswingxcore162AutoCompletitionjar.htm)
-* xml-apis/ Xerces (https://xerces.apache.org/xml-commons/)
