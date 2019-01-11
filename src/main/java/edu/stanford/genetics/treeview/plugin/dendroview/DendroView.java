@@ -1401,8 +1401,14 @@ public class DendroView implements Observer, DendroPanel {
 
 		int primaryLen =
 			(int) Math.floor((double) (isRows ? height : width) * shrinkby);
+		if(primaryLen == 0) {
+			primaryLen = 1;
+		}
 		int secondaryLen = calculatePrevSecondaryLen(shrinkby,width,height,
 			isRows);
+		if(secondaryLen == 0) {
+			secondaryLen = 1;
+		}
 
 		//Scale down the dimensions for the preview, but do not scale down the
 		//other components such as font size, as that is needed to measure
