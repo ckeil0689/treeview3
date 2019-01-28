@@ -1408,7 +1408,13 @@ public class DendroView implements Observer, DendroPanel {
 		//other components such as font size, as that is needed to measure
 		//string length which can be subsequently scaled
 		height = (isRows ? primaryLen : secondaryLen);
+		if(height == 0) {
+			height = 1;
+		}
 		width = (isRows ? secondaryLen : primaryLen);
+		if(width == 0) {
+			width = 1;
+		}
 
 		/* Set up column label image */
 		BufferedImage labelsSnapshot = null;
