@@ -33,6 +33,10 @@ prefs.xml
 /bin/
 /build/
 
+# IDEA
+*.ipr
+*.iml
+
 # Temporary junk files
 fix_control.pl
 build.gradle-setupbuilder

@@ -11,6 +11,8 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'maven'
+apply plugin: 'idea'
 apply plugin: 'application'
 apply plugin: "nebula.ospackage"
 apply plugin: 'de.inetsoftware.setupbuilder'
@@ -18,8 +20,8 @@ apply plugin: 'de.inetsoftware.setupbuilder'
 defaultTasks "clean", "fatJar", "eclipse"
 
 version = getVersionName()
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
   mavenCentral()
@@ -43,25 +45,17 @@ sourceSets {
       srcDir 'src/main/java/'
 
       // Deprecated files excluded from build path - check if removal makes sense!
-      exclude '**/edu/stanford/genetics/treeview/model/FlatFileParser2.java'
       exclude '**/edu/stanford/genetics/treeview/reg/**'
-      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/DendroView_Deprec.java'
-      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/DendroView2.java'
-      exclude '**/edu/stanford/genetics/treeview/model/TVModelLoader2.java'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/GTRZoomView.java'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/ZoomView.java'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/ColorBarExportPanel.java'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/PostscriptColorBarExportPanel.java'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/GifColorBarExportPanel.java'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/BitmapColorBarExportPanel.java'
-      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/TextView_deprec.java'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/FontSettingsPanel.java'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/InvertedTreeDrawer.java'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/KnnDendrogramFactory.java'
-      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/KnnDendroView2.java'
       exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/TextViewManager.java'
-      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/GlobalView_deprec.java'
-      exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/ArrayNameView_deprec.java'
       exclude '**/edu/stanford/genetics/treeview/LoadProgress2.java'
       exclude '**/edu/stanford/genetics/treeview/CustomConfigs.java'
       exclude '**/edu/stanford/genetics/treeview/MenuPanel.java'
@@ -85,12 +79,14 @@ def copyMacPkgFiles() {
 }
 
 task fatJar(type: Jar) {
-  manifest {
-    attributes 'Main-Class':'edu.stanford.genetics.treeview.app.TreeView3'
+  doLast {
+    manifest {
+      attributes 'Main-Class': 'edu.stanford.genetics.treeview.app.TreeView3'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
   }
-  baseName = project.name + '-all'
-  from {configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}}
-  with jar
 }
 
 /*
@@ -108,14 +104,14 @@ def getVersionName() {
   return stdout.toString().trim()
 }
 
-//Mac App Builder stuff - Use createDmg/createApp
+// Mac App Builder stuff - Use createDmg/createApp
 macAppBundle {
   mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
   icon = "src/main/resources/TreeView3.icns"
   appName = "TreeView3"
   bundleJRE = false
-  javaExtras.put("-Xmx4g",null)   //If value of key/value pair is null, it just 
-                                  //adds the flag as-is without adding '='
+  javaExtras.put("-Xmx4g", null)   //If value of key/value pair is null, it just
+  //adds the flag as-is without adding '='
 
   //Put the readme & sample file(s) in the dmg
   copyMacPkgFiles()
@@ -211,25 +207,17 @@ tasks.addRule("Pattern: debianPrepare<distribution>") { String taskName ->
         copy {
           from rootProject.files("build/install/treeview3") 
           into rootProject.file("build/debian/treeview3")
-          exclude '**/edu/stanford/genetics/treeview/model/FlatFileParser2.java'
           exclude '**/edu/stanford/genetics/treeview/reg/**'
-          exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/DendroView_Deprec.java'
-          exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/DendroView2.java'
-          exclude '**/edu/stanford/genetics/treeview/model/TVModelLoader2.java'
           exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/GTRZoomView.java'
           exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/ZoomView.java'
           exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/ColorBarExportPanel.java'
           exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/PostscriptColorBarExportPanel.java'
           exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/GifColorBarExportPanel.java'
           exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/BitmapColorBarExportPanel.java'
-          exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/TextView_deprec.java'
           exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/FontSettingsPanel.java'
           exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/InvertedTreeDrawer.java'
           exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/KnnDendrogramFactory.java'
-          exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/KnnDendroView2.java'
           exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/TextViewManager.java'
-          exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/GlobalView_deprec.java'
-          exclude '**/edu/stanford/genetics/treeview/plugin/dendroview/ArrayNameView_deprec.java'
           exclude '**/edu/stanford/genetics/treeview/LoadProgress2.java'
           exclude '**/edu/stanford/genetics/treeview/CustomConfigs.java'
           exclude '**/edu/stanford/genetics/treeview/MenuPanel.java'
