@@ -386,6 +386,7 @@ public class ClusterProcessor {
 		 * the GUI aspects such as updating the progress bar for ClusterView.
 		 * @deprecated - REWRITE
 		 */
+		@Deprecated
 		private ClusteredAxisData doKMeansCluster() {
 			
 			int k;

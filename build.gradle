@@ -1,3 +1,9 @@
+buildscript {
+    ext {
+        springBootVersion = "2.2.6.RELEASE"
+    }
+}
+
 plugins {
     id "application"
     id "eclipse"
@@ -12,9 +18,12 @@ plugins {
 
     //For building windows .exe/.msi
     id "de.inetsoftware.setupbuilder" version "4.8.7"
+
+    //Gradle lint - keep dependencies clean
+    id "nebula.lint" version "16.8.0"
 }
 
-defaultTasks "clean", "fatJar", "eclipse"
+defaultTasks "clean", "fatJar", "eclipse", "idea"
 
 version = getVersionName()
 
@@ -82,7 +91,7 @@ task fatJar(type: Jar) {
             attributes 'Main-Class': 'edu.stanford.genetics.treeview.app.TreeView3'
         }
         baseName = project.name + '-all'
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+        from { configurations.implementation.collect { it.isDirectory() ? it : zipTree(it) } }
         with jar
     }
 }
@@ -186,8 +195,9 @@ buildDeb {
 //This code is required in order to have a shell script created for the .deb package installer
 //The following is based on:
 //https://blog.heckel.xyz/2014/05/29/gradle-create-windows-installers-debian-packages-manage-a-ppa-and-optional-sub-projects/#Building-Debian-Ubuntu-packages-and-uploading-to-a-PPA
-
-mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
+application {
+    mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
+}
 
 String applicationVersionFull = getVersionName()
 

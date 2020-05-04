@@ -331,6 +331,7 @@ public class MapContainer extends Observable implements Observer,
 	 * that the meaning is conveyed and parameters don't have to be understood
 	 * and set first. 
 	 * @deprecated*/
+	@Deprecated
 	public void zoomOutEnd() {
 
 		incrementalZoom(false, false, true);
@@ -339,7 +340,9 @@ public class MapContainer extends Observable implements Observer,
 	/** This method allows for a more intuitive call from other classes so
 	 * that the meaning is conveyed and parameters don't have to be understood
 	 * and set first. 
-	 * @deprecated*/
+	 * @deprecated
+	 * */
+	@Deprecated
 	public void zoomInEnd() {
 
 		incrementalZoom(true, false, true);

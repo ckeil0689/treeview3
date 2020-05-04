@@ -17,6 +17,7 @@ import edu.stanford.genetics.treeview.LogBuffer;
  * Performs the calculations of the k-means algorithm.
  * @deprecated -- REWRITE!
  */
+@Deprecated
 public class KMeansCluster {
 
 	public final static int KMEANS = 3;
