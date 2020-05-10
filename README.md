@@ -17,7 +17,9 @@ INSTALL & RUN
 
 ## Requirements ##
 
-* Java 7 or higher - visit <http://java.com/en/download/installed.jsp> to verify your current Java version.
+* **Java 13** or higher - visit <https://www.java.com/en/download/help/version_manual.xml> to find out your current Java version.
+* Download the Java Runtime (JRE), for example at [AdoptOpenJDK](https://adoptopenjdk.net/archive.html?variant=openjdk13&jvmVariant=hotspot).
+* Alternatively, you can install Java via a package manager such as macOS homebrew: `brew cask install adoptopenjdk13`
 
 ## Windows ##
 
@@ -135,7 +137,7 @@ DEVELOPERS
 
 TreeView was first developed by Michael Eisen in 1998 (Treeview 1.0) and updated a few years later by Alok Saldanha (Treeview 2.0). The development team for Treeview 3.0 includes:
 
-* Chris Keil - University of Hamburg
+* Christopher Keil
 * Robert Leach - Princeton University
 * Srikanth Bezawada
 * Faizaan Shaik
