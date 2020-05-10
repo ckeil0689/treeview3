@@ -17,6 +17,7 @@ import java.util.prefs.Preferences;
  * @author Alok Saldanha <alok@genome.stanford.edu>
  * @version @version $Revision: 1.5 $ $Date: 2004-12-21 03:28:14 $
  */
+@Deprecated
 public class ConfigColorSet implements ColorSetI, ConfigNodePersistent {
 
 	private Preferences configNode;

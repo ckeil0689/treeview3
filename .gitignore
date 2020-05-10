@@ -15,6 +15,7 @@ LinkedView/docbook
 # Gradle
 .gradle
 build
+out/
 
 # Preferences
 prefs.xml
@@ -32,6 +33,12 @@ prefs.xml
 .classpath
 /bin/
 /build/
+
+# IDEA
+.idea
+*.iml
+*.ipr
+*.iws
 
 # Temporary junk files
 fix_control.pl

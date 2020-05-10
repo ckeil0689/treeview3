@@ -83,6 +83,7 @@ public class LinkedViewApp extends TreeViewApp {
 	 * @deprecated No features are used as plugins anymore. DendroView is now a
 	 *             native package rather than a plugin.
 	 */
+	@Deprecated
 	private void scanForPlugins() {
 
 		// final URL fileURL = getCodeBase();
@@ -208,6 +209,7 @@ public class LinkedViewApp extends TreeViewApp {
 	 * @return
 	 * @throws ExportException
 	 */
+	@Deprecated
 	private boolean attemptExport(final String exportType,
 			final TreeViewFrame tvFrame) throws ExportException {
 

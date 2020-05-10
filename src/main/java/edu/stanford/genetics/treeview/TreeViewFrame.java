@@ -725,6 +725,7 @@ public class TreeViewFrame extends ViewFrame implements FileSetListener,
 	 * @return
 	 * @deprecated
 	 */
+	@Deprecated
 	public void openSaveDialog(final boolean writerEmpty, final String msg) {
 
 		final JDialog dialog = new JDialog(appFrame);
