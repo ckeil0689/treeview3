@@ -1,0 +1,24 @@
+These perl scripts may be of use to people massaging data for use with java treeview. The use of many of them is described in the examples section,
+
+http://jtreeview.sourceforge.net/examples/index.html
+
+SCRIPTS:
+
+	aln2cdt.pl - converts clustal alignment to cdt format
+	appendPcl.pl - appends data/annotations from a pcl to a cdt
+	splitFasta.pl - extracts a set of genes from a large fasta file
+	colorByThreshold.pl - colors in dendrogram using a threshold (i.e. correlation cutoff)
+
+
+NOTES:
+
+Some depend upon the Bio::TreeIO package found in bioperl,
+
+http://bioperl.org/
+
+and/or the PCL_Analysis package available from
+
+http://pcl-analysis.sourceforge.net/
+
+Either download and install everything, or just try and run them, and the dependencies should become obvious. See INSTALL for some advice.
+

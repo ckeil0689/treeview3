@@ -1,0 +1,54 @@
+DOCUMENT REVIEW FORM
+Version 1.3
+Prepared by: Robert Leach
+
+PURPOSE: This template is for use when conducting a document review.
+
+REFERENCES:
+1. inspection_template.txt from the LANL finishing system project, 07/05/06
+2. merge_request_form.txt version 1.2
+3. SCMP_TreeView2.doc
+
+USAGE:
+Please refer to sections 3.2.6.2.2 (PROCESSING A MERGE REQUEST) of the SCMP[3]
+for details on conducting document reviews using this form, but simply, use the
+following forms for reporting each issue found during the document review.
+
+
+BITBUCKET REVIEW TEMPLATE
+=========================
+Copy & paste this item template for each issue found:
+-----------------------------------------------------
+ISSUE NUMBER: 
+
+LINE(S): 
+
+SEVERITY: Critical/Major/Minor/Question/Typo (choose one)
+
+DESCRIPTION: 
+
+SUGGESTED FIX: 
+
+
+MANUAL REVIEW TEMPLATE
+======================
+Copy & paste this header template at the top of each review file:
+-----------------------------------------------------------------
+
+          DOCUMENT NAME: 
+              COMMIT ID: 
+ BITBUCKET ISSUE NUMBER: 
+NUMBER OF CHANGED LINES: 
+            AUTHOR NAME: 
+      NAME OF INSPECTOR: 
+          DATE RECEIVED: 
+         RECOMMENDATION: Approve/Approve As-Is/Approve after issues addressed
+
+Copy & paste this item template for each issue found:
+-----------------------------------------------------
+ ISSUE NUMBER: 1
+         LINE: 
+     SEVERITY: Critical/Major/Minor/Question/Typo (choose one)
+  DESCRIPTION: 
+SUGGESTED FIX: 
+

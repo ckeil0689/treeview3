@@ -1,0 +1,288 @@
+<---------------------------------------------------------Text should be fixed width and window should be this width------------------------------------------------------------->
+
+Holistic Modifier Cheat sheet:
+++++++++++++++++++++++++++++++
+
+NOTE: The modifier names and shortcuts in this document use mac-standard naming & shortcuts, where:
+
+	control = ^
+	option  = ⌥
+	command = ⌘
+	copy uses the command key
+
+The windows analogs of these keys are:
+
+	Mac		Windows
+	---		-------
+	control(^)	control(ctrl)
+	option(⌥)	alt(alt)
+	command(⌘)	windows(win)
+	copy=⌘-c	copy=ctrl-c
+
+When hovering over the matrix:
+==============================
+needed?
+	scroll						medium vertical scroll
+	shift-scroll					medium horizontal scroll
++	control-scroll*					small(/slow) vertical scroll (*unavailable on mac when control-scroll screen zoom is enabled in sysprefs.)
++	control-shift-scroll				small(/slow) horizontal scroll
++	command-scroll					large(/fast) vertical scroll
++	command-shift-scroll				large(/fast) horizontal scroll
++	command-control-scroll				step-wise vertical scroll (i.e. "page up/down")
++	command-control-shift-scroll			step-wise horizontal scroll (i.e. "page over")
+
+	option-scroll					medium zoom
++	option-control-scroll				small(/slow) zoom
++	option-shift-scroll				large(/fast) zoom
++	option-command-scroll				full/step-wise zoom
+
+	single-click					select a single row & column (1 tile) anew
++	shift-single-click				select/deselect (based on selection state of clicked tile) extend/shrink existing from closest edge/corner to clicked tile
++	command-single-click				toggle single tile selection
+
++	option-single-click				select a single column anew
++	option-shift-single-click			select/deselect (based on selection state of clicked tile) extend/shrink existing from closest edge to clicked column
++	option-command-single-click			toggle single column selection
+
++	control-single-click				select a single row anew
++	control-shift-single-click			select/deselect (based on selection state of clicked tile) extend/shrink existing from closest edge to clicked row
++	control-command-single-click			toggle single row selection
+
+	click-drag					select a group of rows & columns (tiles) anew
++	shift-click-drag				select/deselect (based on selection state of 1st clicked tile) dragged rows & columns
++	command-click-drag				same as shift-click-drag
+
++	option-click-drag				select a group of columns anew
++	option-shift-click-drag				select/deselect (based on selection state of 1st clicked column) dragged columns
++	option-command-click-drag			same as option-shift-click-drag
+
++	control-click-drag				select a group of rows anew
++	control-shift-click-drag			select/deselect (based on selection state of 1st clicked row) dragged rows
++	control-command-click-drag			same as control-shift-click-drag
+
+	double-click					medium zoom in
+	control-double-click				small zoom in
+	shift-double-click				large zoom in
+	command-double-click				step-wise zoom in (with animation)
+	shift-command-double-click			step-wise zoom in (without animation)
+
+	option-double-click				medium column zoom out
+	option-control-double-click			small column zoom out
+	option-shift-double-click			large column zoom out
+	option-command-double-click			step-wise column zoom out (with animation)
+	option-shift-command-double-click		step-wise column zoom out (without animation)
+
+	hover						no highlight
++	shift-hover					highlights what the resulting extend/shrink selection would be if clicked
++	command-hover					highlights what the resulting single tile selection would be if clicked
+
++	control-hover					highlights a row (the resulting new selection if clicked)
++	control-shift-hover				highlights what the resulting extend/shrink row selection would be if clicked
++	control-command-hover				highlights what the resulting single toggled row selection would be if clicked
+
++	option-hover					highlights a column (the resulting new selection if clicked)
++	option-shift-hover				highlights what the resulting extend/shrink column selection would be if clicked
++	option-command-hover				highlights what the resulting single toggled column selection would be if clicked
+
+When hovering over labels:
+==========================
+	scroll						medium label or matrix scroll (depending on column or row label areas respectively)
+	shift-scroll					medium label or matrix scroll (depending on row or column label areas respectively)
++	control-scroll*					small(/slow) label or matrix scroll (*unavailable on mac when control-scroll screen zoom is enabled in sysprefs.)
++	control-shift-scroll				small(/slow) label or matrix scroll (depending on row or column label areas respectively)
++	command-scroll					large(/fast) label or matrix scroll (depending on column or row label areas respectively)
++	command-shift-scroll				large(/fast) label or matrix scroll (depending on row or column label areas respectively)
++	command-control-scroll				step-wise label or matrix scroll (i.e. "page up/down") (depending on column or row label areas respectively)
++	command-control-shift-scroll			step-wise label or matrix scroll (i.e. "page over") (depending on row or column label areas respectively)
+
++	NOTE on above: label scroll will happen if hovered over trees
+
+	option-scroll					medium column or row zoom
++	option-control-scroll				small(/slow) column or row zoom
++	option-shift-scroll				large(/fast) column or row zoom
++	option-command-scroll				full/step-wise column or row zoom
+
+	single-click					select 1 column or row anew
++	shift-single-click				select/deselect (based on selection state of 1st clicked label) extend/shrink existing from closest selection edge*
++	command-single-click				toggle selection of 1 column or row
++	option-single-click				deselect 1 column or row (no effect if not selected)
++	option-shift-single-click			shrink existing selection (from closest edge) (no effect if not selected)
++	option-command-single-click			same as option-single-click
++	control-single-click				select 1 column or row (no effect if selected)
++	control-shift-single-click			extend existing selection (from closest edge) (no effect if selected)
++	control-command-single-click			select 1 column or row (no effect if selected)
+
+	click-drag					selects dragged columns or rows anew
++	shift-click-drag				select/deselect (based on selection state of 1st clicked label) dragged columns or rows
++	command-click-drag				select/deselect (based on selection state of 1st clicked label) dragged columns or rows
++	control-click-drag				selects dragged columns or rows
+	option-click-drag				deselects dragged columns or rows
+
++	double-click					medium zoom in toward column or row
++	control-double-click				small zoom in toward column or row
++	shift-double-click				large zoom in toward column or row
++	command-double-click				step-wise zoom in toward column or row (with animation)
++	shift-command-double-click			step-wise zoom in toward column or row (without animation)
+
++	option-double-click				medium zoom out from column or row
++	option-control-double-click			small zoom out from column or row
++	option-shift-double-click			large zoom out from column or row
++	option-command-double-click			step-wise zoom out from column or row (with animation)
++	option-shift-command-double-click		step-wise zoom out from column or row (without animation)
+
+	hover						no highlight
++	shift-hover					highlights what the resulting extend/shrink selection would be if clicked
++	command-hover					highlights what the resulting single row/col selection/deselection would be if clicked
++	control-hover					highlights a row (the resulting added selection if clicked)
++	option-hover					highlights a column (the resulting removed selection if clicked)
+
+When hovering over trees:
+=========================
+	scroll						medium label or matrix scroll (depending on column or row tree areas respectively)
+	shift-scroll					medium label or matrix scroll (depending on row or column tree areas respectively)
++	control-scroll*					small(/slow) label or matrix scroll (*unavailable on mac when control-scroll screen zoom is enabled in sysprefs.)
++	control-shift-scroll				small(/slow) label or matrix scroll (depending on row or column tree areas respectively)
++	command-scroll					large(/fast) label or matrix scroll (depending on column or row tree areas respectively)
++	command-shift-scroll				large(/fast) label or matrix scroll (depending on row or column tree areas respectively)
++	command-control-scroll				step-wise label or matrix scroll (i.e. "page up/down") (depending on column or row tree areas respectively)
++	command-control-shift-scroll			step-wise label or matrix scroll (i.e. "page over") (depending on row or column tree areas respectively)
+
+	option-scroll					medium column or row zoom
++	option-control-scroll				small(/slow) column or row zoom
++	option-shift-scroll				large(/fast) column or row zoom
++	option-command-scroll				full/step-wise column or row zoom
+
+	single-click					select 1 subtree anew
++	shift-single-click				select/deselect (based on selection state of 1st clicked label) extend/shrink existing from closest selection edge
++	command-single-click				toggle selection of 1 subtree
++	option-single-click				deselect 1 subtree (no effect if not selected)
++	option-shift-single-click			shrink existing selection (from closest edge) (no effect if not selected)
++	option-command-single-click			same as option-single-click
++	control-single-click				select 1 subtree (no effect if selected)
++	control-shift-single-click			extend existing selection (from closest edge) (no effect if selected)
++	control-command-single-click			select 1 subtree (no effect if selected)
+
+	click-drag					selects dragged subtrees anew
++	shift-click-drag				select/deselect (based on selection state of 1st clicked label) dragged subtrees
++	command-click-drag				select/deselect (based on selection state of 1st clicked label) dragged subtrees
++	control-click-drag				selects dragged subtrees
++	option-click-drag				deselects dragged subtrees
+
++	double-click					medium zoom in toward column or row
++	control-double-click				small zoom in toward column or row
++	shift-double-click				large zoom in toward column or row
++	command-double-click				step-wise zoom in toward column or row (with animation)
++	shift-command-double-click			step-wise zoom in toward column or row (without animation)
+
++	option-double-click				medium zoom out from column or row
++	option-control-double-click			small zoom out from column or row
++	option-shift-double-click			large zoom out from column or row
++	option-command-double-click			step-wise zoom out from column or row (with animation)
++	option-shift-command-double-click		step-wise zoom out from column or row (without animation)
+
+	hover						no highlight
++	shift-hover					highlights what the resulting extend/shrink selection would be if clicked
++	command-hover					highlights what the resulting single row/col selection/deselection would be if clicked
++	control-hover					highlights a row (the resulting added selection if clicked)
++	option-hover					highlights a column (the resulting removed selection if clicked)
+
+When clicking a main +/- nav button:
+====================================
+	single-click					medium zoom
++	control-single-click				small zoom
++	shift-single-click				large zoom
++	command-single-click				full zoom (with animation)
++	command-shift-single-click			full zoom (without animation)
+
++	option-single-click				medium center column zoom
++	option-control-single-click			small center column zoom
++	option-command-single-click			large center column zoom
++	option-command-control-single-click		full center column zoom (with animation)
+
++	option-shift-single-click			medium center row zoom
++	option-shift-control-single-click		small center row zoom
++	option-shift-command-single-click		large center row zoom
++	option-shift-command-control-single-click	full center row zoom (with animation)
+
+When clicking the zoom selection or home nav button:
+====================================================
+	single-click					full zoom to target* (with animation)
+	command-single-click				full zoom to target* (without animation)
++	control-single-click				zoom to target* leaving a small border of unselected tiles (with animation)
++	shift-single-click				zoom to target* leaving a medium border of unselected tiles (with animation)
++	command-shift-single-click			zoom to target* leaving a large border of unselected tiles (with animation)
++	option-single-click				medium zoom toward target*
++	option-shift-single-click			large zoom toward target*
++	option-control-single-click			small zoom toward target*
++	option-command-single-click			same as single-click
++	option-shift-command-single-click		same as command-single-click
+
+	*target = selection (zoom selection button) or full zoom out (home button)
+
+When clicking a scrollbar nav button:
+=====================================
+	single-click					medium zoom toward (fixed) edge column/row
+	control-single-click				small zoom toward (fixed) edge column/row
+	shift-single-click				large zoom toward (fixed) edge column/row
+	command-single-click				full zoom to edge column/row (with animation)
+	command-shift-single-click			full zoom to edge column/row (without animation)
++	option-single-click				medium opposite end column/row zoom
++	option-shift-single-click			large opposite end column/row zoom
++	option-control-single-click			small opposite end column/row zoom
++	option-command-single-click			full opposite end column/row zoom (with animation)
++	option-command-shift-single-click		full opposite end column/row zoom (without animation)
+
+Keyboard Shortcuts
+==================
++	command-a					Select all
+	command-d					Deselect all
++	escape						Deselect all or hide popup menu depending on context
+	command-t					Toggle trees
+	command-f					Search
+	command-o					Open
++	command-c (windows: control-c)			Copy
++	command-option-c				Cluster
+	command-e					Export
+	command-w					Close window
++	command-l					Label settings
++	command-shift-c					Color settings
+
+	arrow						small scroll
+	shift-arrow					large scroll
+	command-arrow					scroll to end (with animation)
+	command-shift-arrow				scroll to end (without animation)
+	home						scroll to top
+	end						scroll to bottom
+	shift-home					scroll to left end
+	shift-end					scroll to right end
+	page-up/down					stepwise vertical scroll
+	shift-page-up/down				stepwise horizontal scroll
+
+	option-up-arrow					small zoom in
+	option-shift-up-arrow				large zoom in
+	option-command-up-arrow				stepwise zoom in (selection-aware with animation)
+	option-command-shift-up-arrow			stepwise zoom in (selection-aware without animation)
+	option-page-up					stepwise zoom in (selection aware with animation)
+	option-shift-page-up				stepwise zoom in (selection aware without animation)
+	option-end					full zoom in (with animation)
+	option-shift-end				full zoom in (without animation)
+
+	option-down-arrow				small zoom out
+	option-shift-down-arrow				large zoom out
+	option-command-down-arrow			stepwise zoom out (selection-aware with animation) 
+	option-command-shift-down-arrow			stepwise zoom out (selection-aware without animation)
+	option-page-down				stepwise zoom out (selection aware with animation)
+	option-shift-page-down				stepwise zoom out (selection aware without animation)
+	option-home					full zoom out (with animation)
+	option-shift-home				full zoom out (without animation)
+
+	=						medium zoom in
+	-						medium zoom out
+	control-=					small zoom in
+	control--					small zoom out
+	shift-=(or "+")					large zoom in
+	shift--(or "_")					large zoom out
+	command-=					stepwise zoom in (selection-aware with animation)
+	command--					stepwise zoom out (selection-aware with animation)
+	command-shift-=(or "command-+")			stepwise zoom in (selection-aware without animation)
+	command-shift--(or "command-_")			stepwise zoom out (selection-aware without animation)

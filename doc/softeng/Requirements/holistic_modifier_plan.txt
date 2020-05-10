@@ -1,0 +1,57 @@
+<---------------------------------------------Text should be fixed width and window should be this width---------------------------------------------------->
+
+Overall/simplified summary
+++++++++++++++++++++++++++
+
+	Mouse Action Types
+	==================
+
+	right		context menu or deselect all
+	click-nothing	Selection(Deselect all)
+
+	Action*			Default Function		Alternate Function (option)
+	------			----------------		---------------------------
+	single			Selection			Selection(see default function modifiers)
+	drag			Selection			Selection(see default function modifiers)
+	double			Navigation(Zoom In)		Navigation(Zoom Out)
+	scroll			Alternate Navigation(Move)**	Navigation(Zoom)
+	hover			Inspection*****			None
+	nav-button(main +/-)	Navigation(Zoom)		Alternate Navigation(Zoom 1 Dimension)**
+	nav-button(main s/h)	Navigation(Zoom To Target)	Navigation(Zoom Toward Target)
+	nav-button(scroll)	Navigation(Zoom)		Navigation(Zoom opposite end)
+
+	Default Function Modifiers
+	==========================
+
+	Modifier	Navigation***	Inspection*****			Selection(matrix)		Selection(labels & trees)
+	--------	----------	----------			-----------------		-------------------------
+	control		small		row highlight			apply to rows only		add selection
+	none		medium		no highlight			new selection			new selection
+	shift		large		pre-extend/shrink highlight	toggle/extend/shrink****	toggle/extend/shrink****
+	command		full/step-wise	pre-single highlight		toggle single			toggle single
+	option		zoom		column highlight		apply to cols only		remove selection
+
+	Alternate Navigation Modifiers**
+	==============================
+
+	Modifier		Effect on scroll-move (without option) or main nav +/- zoom buttons (with option)
+	--------		---------------------------------------------------------------------------------
+	control			small
+	none			vertical(medium)
+	shift			horizontal(medium)
+	command			large
+	command-control		step-wise
+
+	Compatible modifiers can be held in combination during an action.  The result effect may be either additive or not depending on context.
+
+	*     Mutually exclusive.
+	      All actions except nav-button clicks are assumed to be over content (matrix, labels, or trees)
+	**    Alternate Navigation Modifiers.  Applies only to: scroll-move (without option) & main nav +/- buttons (with option).
+	      Every other context when option is held utilizes the Default Function Modifiers.
+	***   Small, medium, & large are analogous to slow, medium, & fast.
+	      "Full" or "step-wise" means for example "zoom all the way" or "scroll by page".
+	****  "Toggle" is relative to the first tile clicked only.  "Extend" and "shrink" apply to existing selections from the closest edge/corner.
+	      E.g. if a tile clicked is unselected and the drag overlaps a selection, the previous selection remains selected.  Selections are added only.
+	***** "Inspection" functions are for aiding in the visual association of data that is far apart by highlighting data.
+	      It is only used for hover functions.  It can also be used to preview what will be selected after clicking.
+	      The scroll wheel turns off the highlight.

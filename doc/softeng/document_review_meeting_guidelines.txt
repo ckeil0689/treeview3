@@ -1,0 +1,65 @@
+Document Review Meeting Guidelines
+Version 1.2
+Prepared by: Robert Leach
+
+PURPOSE: The purpose of the document review meeting is only to present perceived
+         issues with the document(s) being reviewed and to ensure that the
+         issues are understood by the developer.
+
+REFERENCES:
+[1] document_review_form.txt version 1.3
+[2] SCMP_TreeView3.doc
+
+MEETING RULES
+
+The following rules will be followed in the document review meeting:
+
+1. It is not the purpose of the meeting to determine validity of issues
+   presented by reviewers, thus issues are presented as-is without debate/
+   discussion.
+2. The developer may address feedback as they see fit after the meeting via
+   document changes and a subsequent commit/merge request.
+3. A reviewer may only ask a question to the developer for clarification of
+   document content that they do not understand.  Issues arising from that
+   understanding are addressed in the next document review meeting if
+   necessary.
+4. It's the CM Leader's responsibility to maintain the scope and pace of the
+   meeting given the guidelines of this document using the following mechanisms:
+	A. Beyond Meeting Scope - If interactions between meeting members strays
+	   beyond the inspector conveying issues found during their review, or a
+	   clarification of document content, the CM Leader may declare the
+	   topic "beyond meeting scope" and either direct the reviewer to
+	   advance to the next issue or re-orient the discussion back toward the
+	   identification of the reviewer's interpretation of defects and ensure
+	   that the defect pointed out is understood by the developer.
+	B. Beyond Document Scope - If the CM Leader determines that the
+	   discussion of an issue has gone beyond the scope or intent of the
+	   document (e.g. relates to over-arching project design, principles, or
+	   coding conventions), the CM Leader may declare the topic "beyond
+	   meeting scope" and either direct the reviewer to advance to the next
+	   issue or re-orient the discussion back toward the identification of
+	   the reviewer's interpretation of defects and ensure that the defect
+	   pointed out is understood by the developer.
+	C. Time - If the CM Leader determines that a discussion, while
+	   productive, may be more effectively/efficiently addressed outside of
+	   the meeting, he/she may suggest that the topic be discussed after the
+	   meeting and direct the reviewer to advance to the next issue.
+
+BEFORE THE MEETING
+
+Refer to section 3.2.4.2.2.1 INDEPENDENT DOCUMENT REVIEWS of the SCMP[2].
+
+MEETING STRUCTURE
+
+In turn, each issue marked as major or higher severity is stated aloud.  Lower
+severity issues may be included at the discretion of the attendees.  The
+developer is given the opportunity to ask for clarifications of the nature of
+any issue or its suggested change.  The developer may respond to reviewers'
+issues that are marked as questions to clarify document elements.  Note, the
+purpose of all review meeting discussions is not to determine *how* to resolve
+an issue, but rather to define what an issue is.  The meeting ends once all
+major and higher severity issues have been discussed.
+
+ISSUE RESOLUTION
+
+Refer to section 3.2.4.2.2.2.5 ISSUE RESOLUTION of the SCMP[2].

@@ -1,0 +1,15 @@
+helper-scripts Installation Guide
+
+helper-scripts has really minimal installation. you just need to put ListManipulation.pm in a place where the perl interpreter can find it. Incidentally, you will probably want to put PCL_Analysis.pm in a place where PERL can find it too.
+
+Unix and OS X:
+
+It is recommended that you make a folder named "perl" in your home directory, and copy ListManipulation.pm into it. All of the scripts in the package will look in the perl subfolder of the home directory for modules. To determine your home directory, enter the following on a command line:
+
+perl -e 'print $ENV{'HOME'}, "\n"'
+
+Windows:
+
+I'm not sure what ActiveState considers your home directory, but a perl subdirectory of that would work. The above command may help, if you can figure out how to run it with ActiveState perl.
+
+
