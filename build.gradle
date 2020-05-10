@@ -5,7 +5,7 @@ plugins {
     id "maven"
 
     //For building .app/.dmg Mac packages/apps - WORKS
-    id "edu.sc.seis.macAppBundle" version "2.3.0"
+//    id "edu.sc.seis.macAppBundle" version "2.3.0"
 
     //For building shell-script/.deb Debian packages/scripts
     id "nebula.ospackage" version "8.1.0"
@@ -107,32 +107,32 @@ def getVersionName() {
 }
 
 // Mac App Builder stuff - Use createDmg/createApp
-macAppBundle {
-    mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
-    icon = "src/main/resources/TreeView3.icns"
-    appName = "TreeView3"
-    bundleJRE = false
-    javaExtras.put("-Xmx4g", null)   //If value of key/value pair is null, it just
-    //adds the flag as-is without adding '='
+//macAppBundle {
+//    mainClassName = "edu.stanford.genetics.treeview.app.TreeView3"
+//    icon = "src/main/resources/TreeView3.icns"
+//    appName = "TreeView3"
+//    bundleJRE = false
+//    javaExtras.put("-Xmx4g", null)   //If value of key/value pair is null, it just
+//    //adds the flag as-is without adding '='
+//
+//    //Put the readme & sample file(s) in the dmg
+//    copyMacPkgFiles()
+//
+//    //The following does not work because macAppBundle follows symlinks when it creates the dmg
+//    //exec {
+//    //  commandLine 'ln', '-s', '/Applications', "${buildDir}/macApp/Applications"
+//    //  standardOutput = new ByteArrayOutputStream()
+//    //}
+//    //We do not want a background image, but defining one causes a /Applications
+//    //alias to get automatically created, so I created a single transparent pixel
+//    //background png image
+//    backgroundImage = "src/main/resources/dmg_bkgd.png"
+//    //codeSign certificate information:
+//    //Princeton "Developer ID Application" Certificate ID string:
+//    certIdentity = "Y3TW367T4G"
+//}
 
-    //Put the readme & sample file(s) in the dmg
-    copyMacPkgFiles()
-
-    //The following does not work because macAppBundle follows symlinks when it creates the dmg
-    //exec {
-    //  commandLine 'ln', '-s', '/Applications', "${buildDir}/macApp/Applications"
-    //  standardOutput = new ByteArrayOutputStream()
-    //}
-    //We do not want a background image, but defining one causes a /Applications
-    //alias to get automatically created, so I created a single transparent pixel
-    //background png image
-    backgroundImage = "src/main/resources/dmg_bkgd.png"
-    //codeSign certificate information:
-    //Princeton "Developer ID Application" Certificate ID string:
-    certIdentity = "Y3TW367T4G"
-}
-
-createDmg.dependsOn(codeSign)
+//createDmg.dependsOn(codeSign)
 
 //Deb builder stuff (creates shell script & puts in /usr/local) - Use buildDeb
 ospackage {
