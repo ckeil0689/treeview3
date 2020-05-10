@@ -241,7 +241,7 @@ Keyboard Shortcuts
 	command-f					Search
 	command-o					Open
 +	command-c (windows: control-c)			Copy
-+	command-option-c				cluster
++	command-option-c				gui.cluster
 	command-e					Export
 	command-w					Close window
 +	command-l					Label settings

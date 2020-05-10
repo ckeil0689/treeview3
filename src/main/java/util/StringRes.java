@@ -81,12 +81,12 @@ public class StringRes {
 	// MenuBar
 	public static final String mbar_File = "File";
 	public static final String mbar_View = "View";
-	public static final String mbar_Cluster = "cluster";
+	public static final String mbar_Cluster = "gui/cluster";
 	public static final String mbar_Help = "Help";
 
 	// Preferences API
 	// Nodes
-	public static final String pnode_globalMain = "TreeViewApp";
+	public static final String pnode_globalMain = "app.TreeViewApp";
 	public static final String pnode_Preferences = "Preferences";
 	public static final String pnode_Labels = "Labels";
 	public static final String pnode_DendroView = "DendroView";
@@ -97,7 +97,7 @@ public class StringRes {
 	// Button Texts
 	public static final String btn_OK = "OK";
 	public static final String btn_Cancel = "Cancel";
-	public static final String btn_Cluster = "cluster";
+	public static final String btn_Cluster = "gui/cluster";
 	public static final String btn_CustomLabels = "Load more labels...";
 	public static final String btn_SearchLabels = "Search...";
 	public static final String btn_ShowTrees = "Show trees";
@@ -165,13 +165,13 @@ public class StringRes {
 
 	public static final String clusterInfo_Single_Adv = "Theoretical "
 		+ "properties, efficient implementations, widely used. "
-		+ "No cluster centroid or representative required: "
+		+ "No components.cluster centroid or representative required: "
 		+ "no need to recalculate similarity matrix.";
 
 	public static final String clusterInfo_Single_DisAdv = "Unsuitable for "
 		+ "isolating spherical or poorly separated clusters.";
 
-	public static final String clusterInfo_Ready = "Ready to cluster!";
+	public static final String clusterInfo_Ready = "Ready to components.cluster!";
 
 	/* Complete Linkage */
 	public static final String clusterInfo_Compl_Similarity = "Joins the "
@@ -179,7 +179,7 @@ public class StringRes {
 		+ "of points.";
 
 	public static final String clusterInfo_Compl_Type = "All entries in a "
-		+ "cluster are linked to one another within some minimum "
+		+ "components.cluster are linked to one another within some minimum "
 		+ "similarity. Small, tightly bound clusters.";
 
 	public static final String clusterInfo_Compl_Time = "O(N**3).";
@@ -192,8 +192,8 @@ public class StringRes {
 
 	/* Average Linkage */
 	public static final String clusterInfo_Avg_Similarity = "Use the average "
-		+ "value of the pairwise links within a cluster, based upon all "
-		+ "objects in the cluster.";
+		+ "value of the pairwise links within a components.cluster, based upon all "
+		+ "objects in the components.cluster.";
 
 	public static final String clusterInfo_Avg_Type = "Intermediate in "
 		+ "tightness between single link and complete link.";

@@ -1,0 +1,3 @@
+gui.DendrogramFactory
+gui.alignment.AlignmentFactory
+gui.dendroview.KnnDendrogramFactory

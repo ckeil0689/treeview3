@@ -1,15 +1,15 @@
-LinkedView/bin/
-LinkedView/bundle/
-LinkedView/applet/
-LinkedView/target/
-LinkedView/dist/
-LinkedView/doc/html/
+app.LinkedView/bin/
+app.LinkedView/bundle/
+app.LinkedView/applet/
+app.LinkedView/target/
+app.LinkedView/dist/
+app.LinkedView/doc/html/
 *~
 jtv-website/examples/spellman.jtv
 jtv-website/examples/threshold.jtv
-LinkedView/doc/JTVProgrammerGuide/JTVProgrammerGuide.fo
-LinkedView/doc/JTVUserManual/JTVUserManual.fo
-LinkedView/docbook
+app.LinkedView/doc/JTVProgrammerGuide/JTVProgrammerGuide.fo
+app.LinkedView/doc/JTVUserManual/JTVUserManual.fo
+app.LinkedView/docbook
 *.pdf
 
 # Gradle

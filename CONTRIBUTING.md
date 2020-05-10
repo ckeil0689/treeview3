@@ -23,7 +23,7 @@ Reference: http://chris.beams.io/posts/git-commit/
 
 Eclipse configuration XML files can be found here:
 
-LinkedView/doc/softeng/eclipse_java_codestyle_preferences
+app.LinkedView/doc/softeng/eclipse_java_codestyle_preferences
 
 To install the configuration files:
 
