@@ -12,7 +12,7 @@ import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import Utilities.Helper;
+import util.Helper;
 
 /** this class generates a single string summary of a LabelInfo. */
 public class LabelSummary extends Observable implements ConfigNodePersistent,

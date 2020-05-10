@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import Utilities.GUIFactory;
+import util.GUIFactory;
 
 public class DragBarUI extends BasicSplitPaneUI {
 

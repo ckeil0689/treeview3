@@ -9,7 +9,7 @@ package edu.stanford.genetics.treeview.plugin.dendroview;
 
 import java.awt.Rectangle;
 
-import Utilities.Helper;
+import util.Helper;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LogBuffer;
 

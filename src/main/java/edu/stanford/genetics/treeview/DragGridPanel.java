@@ -30,7 +30,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import Utilities.GUIFactory;
+import util.GUIFactory;
 import edu.stanford.genetics.treeview.core.Debug;
 
 /**

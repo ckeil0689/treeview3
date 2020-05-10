@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FilenameUtils;
 
-import Utilities.StringRes;
+import util.StringRes;
 
 /**
  * Encapsulates a set of files corresponding to a typical hierarchical cluster

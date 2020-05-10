@@ -10,7 +10,7 @@ package edu.stanford.genetics.treeview;
 import java.io.File;
 import java.util.prefs.Preferences;
 
-import Utilities.StringRes;
+import util.StringRes;
 
 /**
  * Encapsulates a set of files corresponding to a typical hierarchical cluster

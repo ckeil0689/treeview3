@@ -16,9 +16,9 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
 
-import Utilities.CustomDialog;
-import Utilities.GUIFactory;
-import Utilities.StringRes;
+import util.CustomDialog;
+import util.GUIFactory;
+import util.StringRes;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 import edu.stanford.genetics.treeview.plugin.dendroview.FontSettings;
 

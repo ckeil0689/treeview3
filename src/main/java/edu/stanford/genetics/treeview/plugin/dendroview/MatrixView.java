@@ -13,11 +13,11 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import Controllers.ExportHandler.ExportWorker;
-import Controllers.ColorChooserController;
-import Controllers.RegionType;
-import Utilities.GUIFactory;
-import Views.HintDialog;
+import controller.ExportHandler.ExportWorker;
+import controller.ColorChooserController;
+import controller.RegionType;
+import util.GUIFactory;
+import views.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.ModelViewProduced;
 import edu.stanford.genetics.treeview.TreeSelectionI;

@@ -12,13 +12,13 @@ public abstract class TreeviewMenuBarI {
 
 	public static final String programMenu = "File";
 	public static final String documentMenu = "Edit";
-	public static final String viewsMenu = "Views";
+	public static final String viewsMenu = "views";
 	public static final String analysisMenu = "Analysis";
 	public static final String exportMenu = "Export";
 	public static final String windowMenu = "Window";
 	public static final String helpMenu = "Help";
 	public static final String mruSubMenu = "Recent Files";
-	public static final String clusterSubMenu = "Cluster";
+	public static final String clusterSubMenu = "cluster";
 	public static final String vizSubMenu = "Visualize";
 	public static final String prefSubMenu = "Preferences";
 

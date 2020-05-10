@@ -2,11 +2,11 @@ package edu.stanford.genetics.treeview;
 
 import org.freehep.graphicsio.PageConstants;
 
-import Controllers.ExportHandler;
-import Controllers.FormatType;
-import Controllers.LabelExportOption;
-import Controllers.RegionType;
-import Controllers.TreeExportOption;
+import controller.ExportHandler;
+import controller.FormatType;
+import controller.LabelExportOption;
+import controller.RegionType;
+import controller.TreeExportOption;
 
 /**
  * This class holds and manages selected export options.

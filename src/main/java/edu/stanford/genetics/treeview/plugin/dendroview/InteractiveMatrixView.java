@@ -23,7 +23,7 @@ import java.util.Observable;
 
 import javax.swing.JScrollBar;
 
-import Utilities.GUIFactory;
+import util.GUIFactory;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 

@@ -14,8 +14,8 @@ import java.util.prefs.Preferences;
 
 import javax.swing.ToolTipManager;
 
-import Controllers.TVController;
-import Utilities.StringRes;
+import controller.TVController;
+import util.StringRes;
 import edu.stanford.genetics.treeview.model.TVModel;
 
 /**

@@ -87,7 +87,7 @@ WHAT'S NEW
 ## In Treeview 3.0 ##
 
 * We have completely re-designed the interface to include one main data panel, with zooming, scrolling and searching options.
-* We have made clustering an integral part of TreeView (no need for Cluster 3.0).
+* We have made clustering an integral part of TreeView (no need for cluster 3.0).
 * We have added more flexible color settings (multiple colors, varying ranges) and label settings.
 * We have eliminated some of the features that we considered obsolete or in need of a major re-work.
 * We have improved image export.

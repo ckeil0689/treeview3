@@ -33,10 +33,10 @@ import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
-import Controllers.RegionType;
-import Utilities.GUIFactory;
-import Utilities.Helper;
-import Utilities.StringRes;
+import controller.RegionType;
+import util.GUIFactory;
+import util.Helper;
+import util.StringRes;
 import edu.stanford.genetics.treeview.DataTicker;
 import edu.stanford.genetics.treeview.DendroPanel;
 import edu.stanford.genetics.treeview.DragGridPanel;
@@ -49,7 +49,6 @@ import edu.stanford.genetics.treeview.TreeViewFrame;
 import edu.stanford.genetics.treeview.core.ColumnFinderBox;
 import edu.stanford.genetics.treeview.core.LabelFinderBox;
 import edu.stanford.genetics.treeview.core.RowFinderBox;
-import edu.stanford.genetics.treeview.DragGridPanel;
 import edu.stanford.genetics.treeview.ExportPreviewLabels;
 
 /** TODO Refactor this JavaDoc. It's not applicable to the current program

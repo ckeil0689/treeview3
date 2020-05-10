@@ -3,8 +3,8 @@ package edu.stanford.genetics.treeview;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-import Controllers.ExportHandler;
-import Controllers.RegionType;
+import controller.ExportHandler;
+import controller.RegionType;
 
 public class ExportException extends Exception {
 

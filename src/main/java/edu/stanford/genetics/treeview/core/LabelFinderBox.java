@@ -40,7 +40,7 @@ import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
-import Utilities.GUIFactory;
+import util.GUIFactory;
 import edu.stanford.genetics.treeview.LabelInfo;
 import edu.stanford.genetics.treeview.LabelSummary;
 import edu.stanford.genetics.treeview.LogBuffer;

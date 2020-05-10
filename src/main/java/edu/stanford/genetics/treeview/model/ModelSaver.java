@@ -12,11 +12,11 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import Cluster.TreeFileWriter;
-import Controllers.TVController;
+import cluster.TreeFileWriter;
+import controller.TVController;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
-import Views.HintDialog;
+import views.HintDialog;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 public class ModelSaver {

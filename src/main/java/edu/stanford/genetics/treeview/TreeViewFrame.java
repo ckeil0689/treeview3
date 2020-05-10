@@ -36,12 +36,12 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
-import Utilities.GUIFactory;
-import Utilities.StringRes;
-import Views.AboutDialog;
-import Views.ShortcutDialog;
-import Views.StatsDialog;
-import Views.WelcomeView;
+import util.GUIFactory;
+import util.StringRes;
+import views.AboutDialog;
+import views.ShortcutDialog;
+import views.StatsDialog;
+import views.WelcomeView;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.core.FileMruEditor;
 import edu.stanford.genetics.treeview.core.LogMessagesPanel;

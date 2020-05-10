@@ -15,7 +15,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.UIManager;
 
-import ColorChooser.ColorSchemeType;
+import colorChooser.ColorSchemeType;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 

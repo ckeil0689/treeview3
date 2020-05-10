@@ -18,7 +18,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 
-import Utilities.GUIFactory;
+import util.GUIFactory;
 import edu.stanford.genetics.treeview.plugin.dendroview.MapContainer;
 import net.miginfocom.swing.MigLayout;
 

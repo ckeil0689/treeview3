@@ -3,8 +3,8 @@ package edu.stanford.genetics.treeview.model;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
 
-import Utilities.Helper;
-import Controllers.DataImportController;
+import util.Helper;
+import controller.DataImportController;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;
 

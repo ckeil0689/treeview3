@@ -39,9 +39,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.miginfocom.swing.MigLayout;
-import Controllers.RegionType;
-import Utilities.GUIFactory;
-import Utilities.StringRes;
+import controller.RegionType;
+import util.GUIFactory;
+import util.StringRes;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LabelInfo;

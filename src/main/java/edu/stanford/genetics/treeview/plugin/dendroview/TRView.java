@@ -23,7 +23,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import Controllers.RegionType;
+import controller.RegionType;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.LinearTransformation;
 import edu.stanford.genetics.treeview.LogBuffer;

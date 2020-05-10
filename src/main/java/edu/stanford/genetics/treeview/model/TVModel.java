@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.prefs.Preferences;
 
-import Utilities.Helper;
+import util.Helper;
 import edu.stanford.genetics.treeview.DataMatrix;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;

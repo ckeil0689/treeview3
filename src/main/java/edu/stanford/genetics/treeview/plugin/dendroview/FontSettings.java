@@ -34,7 +34,7 @@ import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
-import Utilities.GUIFactory;
+import util.GUIFactory;
 import edu.stanford.genetics.treeview.SettingsPanel;
 
 /** This class allows selection of Fonts for a FontSelectable. */

@@ -16,7 +16,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.prefs.Preferences;
 
-import Controllers.ExportHandler.ExportWorker;
+import controller.ExportHandler.ExportWorker;
 import edu.stanford.genetics.treeview.TreeSelectionI;
 
 /**

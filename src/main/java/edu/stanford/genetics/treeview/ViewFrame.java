@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
-import Cluster.ClusterFileFilter;
+import cluster.ClusterFileFilter;
 import edu.stanford.genetics.treeview.core.FileMru;
 import edu.stanford.genetics.treeview.plugin.dendroview.DendroView;
 

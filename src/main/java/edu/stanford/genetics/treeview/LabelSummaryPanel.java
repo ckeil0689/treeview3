@@ -9,7 +9,6 @@ package edu.stanford.genetics.treeview;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,7 +18,7 @@ import javax.swing.event.ListSelectionListener;
 
 import edu.stanford.genetics.treeview.plugin.dendroview.LabelView;
 import net.miginfocom.swing.MigLayout;
-import Utilities.GUIFactory;
+import util.GUIFactory;
 
 /**
  * enables editing of a headerSummary object.

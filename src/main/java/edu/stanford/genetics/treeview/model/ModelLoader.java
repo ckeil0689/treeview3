@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
-import Controllers.TVController;
-import Utilities.Helper;
-import Views.WelcomeView;
+import controller.TVController;
+import util.Helper;
+import views.WelcomeView;
 import edu.stanford.genetics.treeview.DataModel;
 import edu.stanford.genetics.treeview.FileSet;
 import edu.stanford.genetics.treeview.LogBuffer;

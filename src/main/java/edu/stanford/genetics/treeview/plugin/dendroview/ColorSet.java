@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import ColorChooser.ColorSchemeType;
+import colorChooser.ColorSchemeType;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /** This class represents a set of colors which can be used by a color extractor

@@ -15,8 +15,8 @@ import java.util.Observable;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import ColorChooser.ColorSchemeType;
-import Utilities.Helper;
+import colorChooser.ColorSchemeType;
+import util.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.ContrastSelectable;
 import edu.stanford.genetics.treeview.LogBuffer;

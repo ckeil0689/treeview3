@@ -8,7 +8,7 @@
 
 package edu.stanford.genetics.treeview.model;
 
-import Controllers.TVController;
+import controller.TVController;
 import edu.stanford.genetics.treeview.LogBuffer;
 
 /**

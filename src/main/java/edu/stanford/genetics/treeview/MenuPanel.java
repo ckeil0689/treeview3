@@ -5,8 +5,7 @@ import java.awt.Cursor;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import Utilities.GUIFactory;
-import net.miginfocom.swing.MigLayout;
+import util.GUIFactory;
 
 public class MenuPanel {
 

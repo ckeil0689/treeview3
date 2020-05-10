@@ -17,7 +17,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JScrollBar;
 
-import Utilities.Helper;
+import util.Helper;
 import edu.stanford.genetics.treeview.ConfigNodePersistent;
 import edu.stanford.genetics.treeview.LogBuffer;
 import edu.stanford.genetics.treeview.TreeDrawerNode;
